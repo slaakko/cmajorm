@@ -33,47 +33,47 @@ namespace cmsx.intermediate
         {
             return typeRepository.GetVoidType();
         }
-        public nothrow inline Type* GetBoolType() const
+        public nothrow inline BoolType* GetBoolType() const
         {
             return typeRepository.GetBoolType();
         }
-        public nothrow inline Type* GetSByteType() const
+        public nothrow inline SByteType* GetSByteType() const
         {
             return typeRepository.GetSByteType();
         }
-        public nothrow inline Type* GetByteType() const
+        public nothrow inline ByteType* GetByteType() const
         {
             return typeRepository.GetByteType();
         }
-        public nothrow inline Type* GetShortType() const
+        public nothrow inline ShortType* GetShortType() const
         {
             return typeRepository.GetShortType();
         }
-        public nothrow inline Type* GetUShortType() const
+        public nothrow inline UShortType* GetUShortType() const
         {
             return typeRepository.GetUShortType();
         }
-        public nothrow inline Type* GetIntType() const
+        public nothrow inline IntType* GetIntType() const
         {
             return typeRepository.GetIntType();
         }
-        public nothrow inline Type* GetUIntType() const
+        public nothrow inline UIntType* GetUIntType() const
         {
             return typeRepository.GetUIntType();
         }
-        public nothrow inline Type* GetLongType() const
+        public nothrow inline LongType* GetLongType() const
         {
             return typeRepository.GetLongType();
         }
-        public nothrow inline Type* GetULongType() const
+        public nothrow inline ULongType* GetULongType() const
         {
             return typeRepository.GetULongType();
         }
-        public nothrow inline Type* GetFloatType() const
+        public nothrow inline FloatType* GetFloatType() const
         {
             return typeRepository.GetFloatType();
         }
-        public nothrow inline Type* GetDoubleType() const
+        public nothrow inline DoubleType* GetDoubleType() const
         {
             return typeRepository.GetDoubleType();
         }
@@ -317,7 +317,8 @@ namespace cmsx.intermediate
         }
         public StringValue* MakeStringValue(const string& value)
         {
-            StringValue* val = new StringValue(value);
+            #assert(value.StartsWith("\"") && value.EndsWith("\""));
+            StringValue* val = new StringValue(value.Substring(1, value.Length() - 2));
             val->type = GetByteType();
             AddValue(val);
             return val;
@@ -420,8 +421,10 @@ namespace cmsx.intermediate
         {
             compileUnit.ValidateGlobalVariables();
         }
-        public ClsIdValue* MakeClsIdValue(Type* type, const string& typeId, int line)
+        public ClsIdValue* MakeClsIdValue(Type* type, const string& clsIdStr, int line)
         {
+            #assert(clsIdStr.StartsWith("clsid(") && clsIdStr.EndsWith(")"));
+            string typeId = clsIdStr.Substring(6, clsIdStr.Length() - 6 - 1);
             ClsIdValue* val = new ClsIdValue(typeId);
             val->type = type;
             val->line = line;
@@ -442,7 +445,8 @@ namespace cmsx.intermediate
         }
         public MDString* CreateMDString(const string& value)
         {
-            return compileUnit.metadata.CreateMDString(value);
+            #assert(value.StartsWith("\"") && value.EndsWith("\""));
+            return compileUnit.metadata.CreateMDString(value.Substring(1, value.Length() - 2));
         }
         public MDStructRef* CreateMDStructRef(int id)
         {

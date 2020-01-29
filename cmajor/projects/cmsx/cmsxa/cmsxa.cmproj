@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>afd1df4f-c81a-4b87-aae1-dfaaa56325fd</ProjectGuid>
+  <ProjectGuid>ba399098-a7e2-4553-9eb9-2018297da4e6</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -10,15 +10,17 @@
  <ItemGroup>
   <CmCompile Include="Assembler.cm"/>
   <CmCompile Include="Assembly.cm"/>
+  <CmCompile Include="AssemblyClassMap.cm"/>
   <CmCompile Include="AssemblyInstruction.cm"/>
+  <CmCompile Include="AssemblyLexer.cm"/>
   <CmCompile Include="AssemblyParser.cm"/>
-  <CmCompile Include="Class.cm"/>
+  <CmCompile Include="AssemblyTokens.cm"/>
   <CmCompile Include="Visitor.cm"/>
  </ItemGroup>
  <ItemGroup>
+  <None Include="AssemblyLexer.lexer"/>
   <None Include="AssemblyParser.parser"/>
-  <None Include="AssemblyParser.pl"/>
-  <None Include="AssemblyParser.pp"/>
+  <None Include="AssemblyParser.spg"/>
  </ItemGroup>
  <ItemGroup>
   <ProjectReference Include="../cmsxm/cmsxm.cmproj"/>

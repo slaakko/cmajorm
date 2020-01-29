@@ -1,0 +1,184 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.RegularExpressions
+{
+    public nothrow List<NfaState*> EpsilonClosure(const List<NfaState*>& states)
+    {
+        Stack<NfaState*> stack;
+        for (NfaState* state : states)
+        {
+            stack.Push(state);
+        }
+        List<NfaState*> epsilonClosure = states;
+        while (!stack.IsEmpty())
+        {
+            NfaState* s = stack.Pop();
+            List<NfaState*> u = s->Next(eps);
+            for (NfaState* v : u)
+            {
+                if (Find(epsilonClosure.CBegin(), epsilonClosure.CEnd(), v) == epsilonClosure.CEnd())
+                {
+                    epsilonClosure.Add(v);
+                    stack.Push(v);
+                }
+            }
+        }
+        return epsilonClosure;
+    }
+
+    public nothrow List<NfaState*> EpsilonClosure(NfaState* state)
+    {
+        List<NfaState*> states(1, state);
+        return EpsilonClosure(states);
+    }
+
+    public nothrow List<NfaState*> Move(const List<NfaState*>& states, uchar c)
+    {
+        List<NfaState*> next;
+        for (NfaState* state : states)
+        {
+            List<NfaState*> n = state->Next(c);
+            for (NfaState* s : n)
+            {
+                if (Find(next.CBegin(), next.CEnd(), s) == next.CEnd())
+                {
+                    next.Add(s);
+                }
+            }
+        }
+        return next;
+    }
+    
+    public nothrow Dfa Compile(Context& context, const Nfa& nfa)
+    {
+        Dfa dfa;
+        List<NfaState*> start = EpsilonClosure(nfa.Start());
+        DfaState* s = context.MakeDfaState(start);
+        s->Mark();
+        Stack<DfaState*> stack;
+        stack.Push(s);
+        while (!stack.IsEmpty())
+        {
+            DfaState* state = stack.Pop();
+            dfa.AddState(state);
+            for (const Range& range : context.Ranges())
+            {
+                List<NfaState*> next = EpsilonClosure(Move(state->NfaStates(), range.Start()));
+                if (next.IsEmpty())
+                {
+                    state->AddNext(null);
+                }
+                else
+                {
+                    DfaState* n = context.MakeDfaState(next);
+                    state->AddNext(n);
+                    if (!n->IsMarked())
+                    {
+                        n->Mark();
+                        stack.Push(n);
+                    }
+                }
+            }
+        }
+        return dfa;
+    }
+
+    public nothrow bool Match(const ustring& s, const Nfa& nfa)
+    {
+        List<NfaState*> states = EpsilonClosure(nfa.Start());
+        for (NfaState* state : states)
+        {
+            if (state->Accept())
+            {
+                return true;
+            }
+        }
+        for (uchar c : s)
+        {
+            states = EpsilonClosure(Move(states, c));
+        }
+        for (NfaState* state : states)
+        {
+            if (state->Accept())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public nothrow bool Match(Context& context, const ustring& s, const Dfa& dfa)
+    {
+        if (dfa.States().IsEmpty())
+        {
+            return false;
+        }
+        DfaState* state = dfa.States()[0];
+        for (uchar c : s)
+        {
+            int i = context.GetSymbolIndex(c);
+            if (i != -1)
+            {
+                state = state->Next(i);
+                if (state == null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        if (state != null)
+        {
+            if (state->Accept())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool MatchFileNamePattern(const ustring& s, const ustring& fileNamePattern)
+    {
+        return MatchFileNamePattern(s, fileNamePattern, false);
+    }
+
+    public bool MatchFileNamePattern(const ustring& s, const ustring& fileNamePattern, bool debug)
+    {
+        Context context;
+        FileNamePatternParser parser(context, fileNamePattern);
+        Nfa nfa = parser.Parse();
+        if (debug)
+        {
+            for (NfaState* state : context.NfaStates())
+            {
+                Console.Out() << state->ToString() << endl();
+            }
+        }
+        return Match(s, nfa);
+    }
+
+    public List<ustring> GetMatchingFileNames(const List<ustring>& fileNames, const ustring& fileNamePattern)
+    {
+        List<ustring> matchingFileNames;
+        Context context;
+        FileNamePatternParser parser(context, fileNamePattern);
+        Nfa nfa = parser.Parse();
+        for (const ustring& fileName : fileNames)
+        {
+            if (Match(fileName, nfa))
+            {
+                matchingFileNames.Add(fileName);
+            }
+        }
+        return matchingFileNames;
+    }
+}

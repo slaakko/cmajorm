@@ -942,6 +942,19 @@ namespace soulcm.scmpg
             parenthesizedExpressionNode.Subject()->Accept(*this);
             node.Reset(new Cm.Ast.ParenthesizedExpressionNode(System.Lex.Span(), node.Release()));
         }
+        public override void Visit(Cm.Ast.TemplateIdNode& templateIdNode)
+        {
+            templateIdNode.Primary()->Accept(*this);
+            Cm.Ast.Node* primary = node.Release();
+            Cm.Ast.TemplateIdNode* clone = new Cm.Ast.TemplateIdNode(System.Lex.Span(), primary);
+            int n = templateIdNode.TemplateArguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                templateIdNode.TemplateArguments()[i]->Accept(*this);
+                clone->AddTemplateArgument(node.Release());
+            }
+            node.Reset(clone);
+        }
         private UniquePtr<Cm.Ast.Node> node;
         private bool valueOfPtrType;
         private ustring nonterminalName;

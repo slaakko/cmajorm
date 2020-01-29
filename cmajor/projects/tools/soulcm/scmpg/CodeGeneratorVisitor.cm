@@ -12,8 +12,9 @@ namespace soulcm.scmpg
 {
     public class CodeGeneratorVisitor : Visitor
     {
-        public CodeGeneratorVisitor(bool verbose_, bool noParserDebugSupport_) :
-            verbose(verbose_), noParserDebugSupport(noParserDebugSupport_), domain(null), currentParser(null), currentRule(null), lexerTypeName(u"System.Lex.Lexer"), parentMatchNumber(0), setParentMatchNumber(-1), sn(0), currentBlock(null), currentClass(null), currentCompileUnit(null), tokenSwitch(null), stage(Stage.generateSource)
+        public CodeGeneratorVisitor(bool verbose_, bool debug_, bool noParserDebugSupport_) :
+            verbose(verbose_), debug(debug_), noParserDebugSupport(noParserDebugSupport_), domain(null), currentParser(null), currentRule(null), lexerTypeName(u"System.Lex.Lexer"),
+            parentMatchNumber(0), setParentMatchNumber(-1), sn(0), currentBlock(null), currentClass(null), currentCompileUnit(null), tokenSwitch(null), stage(Stage.generateSource)
         {
         }
         public enum Stage
@@ -25,6 +26,19 @@ namespace soulcm.scmpg
             Cm.Ast.ConstructionStatementNode* matchTrueStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
             matchTrueStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true));
             currentBlock->AddStatement(matchTrueStmt);
+        }
+        public override void Visit(AnyParser& parser)
+        {
+            Cm.Ast.ConstructionStatementNode* matchFalseStmt = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"));
+            matchFalseStmt->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), false));
+            currentBlock->AddStatement(matchFalseStmt);
+            Cm.Ast.CompoundStatementNode* thenS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            thenS->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"))));
+            thenS->AddStatement(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"match"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"hit")), new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true)));
+            Cm.Ast.Node* endToken = new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")),
+                new Cm.Ast.IdentifierNode(System.Lex.Span(), u"END_TOKEN"));
+            Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.NotEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), endToken), thenS, null);
+            currentBlock->AddStatement(ifStmt);
         }
         public override void Visit(TokenParser& parser)
         {
@@ -706,6 +720,14 @@ namespace soulcm.scmpg
         }
         public override void Visit(RuleParser& parser)
         {
+            if (parser.Name() == u"ModeLine")
+            {
+                int x = 0;
+            }
+            if (debug)
+            {
+                Console.Error() << ">> " << parser.Name() << endl();
+            }
             parentMatchNumber = 0;
             setParentMatchNumber = -1;
             currentRule = &parser;
@@ -1096,6 +1118,7 @@ namespace soulcm.scmpg
             }
         }
         private bool verbose;
+        private bool debug;
         private bool noParserDebugSupport;
         private Domain* domain;
         private GrammarParser* currentParser;

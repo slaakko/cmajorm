@@ -1,0 +1,44 @@
+using System;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cmsx/cmsxmdb/MdbLexer.lexer' using soulcm lexer generator scmlg version 3.0.0
+
+namespace MdbKeywords
+{
+    internal class Keywords
+    {
+        static Keywords() :
+            instance(new Keywords())
+        {
+        }
+        public static Keywords& Instance()
+        {
+            return *instance;
+        }
+        public System.Lex.KeywordMap* GetKeywordMap()
+        {
+            return keywordMap.Get();
+        }
+        private Keywords()
+        {
+            System.Lex.Keyword keyword0(u"print", MdbTokens.PRINT);
+            keywordList.Add(keyword0);
+            System.Lex.Keyword keyword1(u"trace", MdbTokens.TRACE);
+            keywordList.Add(keyword1);
+            System.Lex.Keyword keyword2(u"p", MdbTokens.PRINT);
+            keywordList.Add(keyword2);
+            System.Lex.Keyword keyword3(u"t", MdbTokens.TRACE);
+            keywordList.Add(keyword3);
+            System.Lex.Keyword nullKeyword(null, -1);
+            keywordList.Add(nullKeyword);
+            keywordMap.Reset(new System.Lex.KeywordMap(keywordList.CBegin().Ptr()));
+        }
+        private static System.UniquePtr<Keywords> instance;
+        private System.Collections.List<System.Lex.Keyword> keywordList;
+        private System.UniquePtr<System.Lex.KeywordMap> keywordMap;
+    }
+
+    public System.Lex.KeywordMap* GetKeywordMap()
+    {
+        return Keywords.Instance().GetKeywordMap();
+    }
+} // namespace MdbKeywords

@@ -1,0 +1,194 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.RegularExpressions
+{
+    public class FileNamePatternParser
+    {
+        private const int END = 0;
+        private const int CHR = 1;
+
+        public nothrow FileNamePatternParser(Context& context_, const ustring& pattern_) :
+            context(context_), pattern(pattern_), start(pattern.Chars()), end(pattern.Chars() + pattern.Length()), pos(start)
+        {
+        }
+        public Nfa Parse()
+        {
+            int token = GetToken();
+            Nfa left;
+            while (token == CHR)
+            {
+                if (left.IsEmpty())
+                {
+                    left = nfa;
+                }
+                else
+                {
+                    left = Cat(left, nfa);
+                }
+                token = GetToken();
+            }
+            return left;
+        }
+        private int GetToken()
+        {
+            uchar rangeStart;
+            Class* cls = null;
+            int state = 0;
+            while (pos != end)
+            {
+                uchar c = *pos;
+                switch (state)
+                {
+                    case 0:
+                    {
+                        switch (c)
+                        {
+                            case '*':
+                            {
+                                nfa = Kleene(context, MakeNfa(context, context.MakeAny()));
+                                ++pos;
+                                return CHR;
+                            }
+                            case '?':
+                            {
+                                nfa = MakeNfa(context, context.MakeAny());
+                                ++pos;
+                                return CHR;
+                            }
+                            case '[':
+                            {
+                                state = 1;
+                                cls = context.MakeClass();
+                                break;
+                            }
+                            default: 
+                            {
+                                nfa = MakeNfa(context, c);
+                                ++pos;
+                                return CHR;
+                            }
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        switch (c)
+                        {
+                            case '^':
+                            {
+                                cls->SetInverse();
+                                state = 2;
+                                break;
+                            }
+                            case '\\':
+                            {
+                                state = 5;
+                                break;
+                            }
+                            default:
+                            {
+                                rangeStart = c;
+                                state = 3;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        switch (c)
+                        {
+                            case '\\':
+                            {
+                                state = 5;
+                                break;
+                            }
+                            case ']':
+                            {
+                                nfa = MakeNfa(context, cls);
+                                ++pos;
+                                return CHR;
+                            }
+                            default:
+                            {
+                                rangeStart = c;
+                                state = 3;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        switch (c)
+                        {
+                            case '-':
+                            {
+                                state = 4;
+                                break;
+                            }
+                            case '\\':
+                            {
+                                state = 5;
+                                break;
+                            }
+                            case ']':
+                            {
+                                cls->AddSymbol(context.MakeChar(rangeStart));
+                                nfa = MakeNfa(context, cls);
+                                ++pos;
+                                return CHR;
+                            }
+                            default:
+                            {
+                                cls->AddSymbol(context.MakeChar(rangeStart));
+                                rangeStart = c;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 4:
+                    {
+                        if (c == ']')
+                        {
+                            cls->AddSymbol(context.MakeChar('-'));
+                            nfa = MakeNfa(context, cls);
+                            ++pos;
+                            return CHR;
+                        }
+                        else
+                        {
+                            cls->AddSymbol(context.MakeRange(rangeStart, c));
+                            state = 2;
+                        }
+                        break;
+                    }
+                    case 5:
+                    {
+                        rangeStart = c;
+                        state = 3;
+                        break;
+                    }
+                }
+                ++pos;
+            }
+            if (state != 0)
+            {
+                throw Exception("invalid pattern '" + ToUtf8(pattern) + "'");
+            }
+            return END;
+        }
+        private Context& context;
+        private ustring pattern;
+        private uchar* start;
+        private uchar* end;
+        private uchar* pos;
+        private Nfa nfa;
+    }
+}

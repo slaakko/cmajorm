@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using Span = System.Text.Parsing.Span;
+using Span = System.Lex.Span;
 using cmsx.object;
 
 namespace cmsx.assembly
@@ -11,9 +11,30 @@ namespace cmsx.assembly
         exceptionInfo = 14u
     }
 
+    private AssemblyLexer* currentAssemblyLexer = null;
+
+    public class ScopedAssemblyLexerPtr
+    {
+        public nothrow ScopedAssemblyLexerPtr(AssemblyLexer* lexer)
+        {
+            currentAssemblyLexer = lexer;
+        }
+        public ~ScopedAssemblyLexerPtr()
+        {
+            currentAssemblyLexer = null;
+        }
+    }
+
     public void Error(const string& message, const Span& span)
     {
-        System.Text.Parsing.ThrowException(message, span);
+        if (currentAssemblyLexer != null)
+        {
+            throw Exception(message + ":\n" + ToUtf8(currentAssemblyLexer->ErrorLines(span)));
+        }
+        else
+        {
+            throw Exception(message);
+        }
     }
 
     public class Assembler : Visitor

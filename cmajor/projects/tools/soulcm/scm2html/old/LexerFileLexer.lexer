@@ -1,0 +1,139 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+classmap LexerFileClassMap;
+
+tokens LexerFileTokens
+{
+    (CLASSMAP, "'classmap'"), (TOKENS, "'tokens'"), (KEYWORDS, "'keywords'"), (EXPRESSIONS, "'expressions'"), (LEXER, "'lexer'"),
+    (VARIABLES, "''variables'"), (ACTIONS, "'actions'"), (DOLLAR, "'$'"), 
+    (ASSERT, "'assert'"), (ELIF, "'elif'"), (ENDIF, "'endif'"), (BOOL, "'bool'"), (TRUE, "'true'"), (FALSE, "'false'"),
+    (SBYTE, "'sbyte'"), (BYTE, "'byte'"), (SHORT, "'short'"), (USHORT, "'ushort'"), (INT, "'int'"),
+    (UINT, "'uint'"), (LONG, "'long'"), (ULONG, "'ulong'"), (FLOAT, "'float'"), (DOUBLE, "'double'"), (CHAR, "'char'"), (WCHAR, "'wchar'"), (UCHAR, "'uchar'"), (VOID, "'void'"),
+    (ENUM, "'enum'"), (CAST, "'cast'"), (INTERFACE, "'interface'"), (NAMESPACE, "'namespace'"), (USING, "'using'"),
+    (STATIC, "'static'"), (EXTERN, "'extern'"), (AS, "'as'"), (IS, "'is'"), (EXPLICIT, "'explicit'"), (DELEGATE, "'delegate'"), (INLINE, "'inline'"), (CDECL, "'cdecl'"), (NOTHROW, "'nothrow'"),
+    (PUBLIC, "'public'"), (PROTECTED, "'protected'"), (PRIVATE, "'private'"), (INTERNAL, "'internal'"), (VIRTUAL, "'virtual'"), (ABSTRACT, "'abstract'"), (OVERRIDE, "'override'"),
+    (SUPPRESS, "'suppress'"), (OPERATOR, "'operator'"), (CLASS, "'class'"), (RETURN, "'return'"),
+    (IF, "'if'"), (ELSE, "'else'"), (SWITCH, "'switch'"), (CASE, "'case'"), (DEFAULT, "'default'"),
+    (WHILE, "'while'"), (DO, "'do'"), (FOR, "'for'"), (BREAK, "'break'"), (CONTINUE, "'continue'"), (GOTO, "'goto'"), (TYPEDEF, "'typedef'"), (TYPENAME, "'typename'"), (TYPEID, "'typeid'"),
+    (CONST, "'const'"), (CONSTEXPR, "'constexpr'"), (NULLLIT, "'null'"), (THIS, "'this'"), (BASE, "'base'"), (CONSTRUCT, "'construct'"), (DESTROY, "'destroy'"),
+    (NEW, "'new'"), (DELETE, "'delete'"), (SIZEOF, "'sizeof'"), (TRY, "'try'"), (CATCH, "'catch'"), (THROW, "'throw'"),
+    (CONCEPT, "'concept'"), (WHERE, "'where'"), (AXIOM, "'axiom'"), (AND, "'and'"), (OR, "'or'"), (EXCLAMATION, "'!'"), (UNIT_TEST, "'unit_test'"),
+    (ID, "identifier"), (FLOATINGLIT, "floating literal"), (INTLIT, "integer literal"), (CHARLIT, "character literal"), (STRINGLIT, "string literal"),
+    (EQUIVALENCE, "'<=>'"), (IMPLICATION, "'=>'"), (DISJUNCTION, "'||'"), (AMPAMP, "'&&'"),
+    (BITOR, "'|'"), (BITXOR, "'^'"), (AMP, "'&'"), (EQ, "'=='"), (NEQ, "'!='"), (LEQ, "'<='"), (GEQ, "'>='"), (SHIFTLEFT, "'<<'"), (SHIFTRIGHT, "'>>'"),
+    (PLUS, "'+'"), (MINUS, "'-'"), (STAR, "'*'"), (DIV, "'/'"), (REM, "'%'"), (PLUSPLUS, "'++'"), (MINUSMINUS, "'--'"), (CPL, "'~'"), (DOT, "'.'"), (ARROW, "'->'"),
+    (LBRACKET, "'['"), (RBRACKET, "']'"), (LPAREN, "'('"), (RPAREN, "')'"), (LANGLE, "'<'"), (RANGLE, "'>'"), (LBRACE, "'{'"), (RBRACE, "'}'"), (COMMA, "','"), (ASSIGN, "'='"),
+    (COLON, "':'"), (SEMICOLON, "';'"), (HASH, "'#'")
+}
+
+keywords LexerFileKeywords
+{
+    ("classmap", CLASSMAP), ("tokens", TOKENS), ("keywords", KEYWORDS), ("expressions", EXPRESSIONS), ("lexer", LEXER),
+    ("variables", VARIABLES), ("actions", ACTIONS),
+    ("assert", ASSERT), ("elif", ELIF), ("endif", ENDIF), ("bool", BOOL), ("true", TRUE), ("false", FALSE),
+    ("sbyte", SBYTE), ("byte", BYTE), ("short", SHORT), ("ushort", USHORT), ("int", INT), ("uint", UINT), ("long", LONG), ("ulong", ULONG),
+    ("float", FLOAT), ("double", DOUBLE), ("char", CHAR), ("wchar", WCHAR), ("uchar", UCHAR), ("void", VOID), ("enum", ENUM), ("cast", CAST), ("interface", INTERFACE),
+    ("namespace", NAMESPACE), ("using", USING), ("static", STATIC), ("extern", EXTERN), ("as", AS), ("is", IS), ("explicit", EXPLICIT), ("delegate", DELEGATE), ("inline", INLINE), ("cdecl", CDECL), ("nothrow", NOTHROW),
+    ("public", PUBLIC), ("protected", PROTECTED), ("private", PRIVATE), ("internal", INTERNAL), ("virtual", VIRTUAL), ("abstract", ABSTRACT), ("override", OVERRIDE), ("suppress", SUPPRESS),
+    ("operator", OPERATOR), ("class", CLASS), ("return", RETURN), ("if", IF), ("else", ELSE), 
+    ("switch", SWITCH), ("case", CASE), ("default", DEFAULT), ("while", WHILE), ("do", DO), ("for", FOR), 
+    ("break", BREAK), ("continue", CONTINUE), ("goto", GOTO), ("typedef", TYPEDEF), ("typename", TYPENAME), ("typeid", TYPEID), ("const", CONST), ("constexpr", CONSTEXPR), ("null", NULLLIT), ("this", THIS), ("base", BASE),
+    ("construct", CONSTRUCT), ("destroy", DESTROY), ("new", NEW), ("delete", DELETE), ("sizeof", SIZEOF), ("try", TRY), ("catch", CATCH), ("throw", THROW), 
+    ("concept", CONCEPT), ("where", WHERE), ("axiom", AXIOM), ("and", AND), ("or", OR), ("unit_test", UNIT_TEST)
+}
+
+expressions
+{
+    ws = "[\n\r\t ]";
+    newline = "\r\n|\n|\r";
+    linecomment = "//[^\n\r]*{newline}";
+    blockcomment = "/\*([^*]|\*[^/])*\*/";
+    comment = "{linecomment}|{blockcomment}";
+    separators = "({ws}|{comment})+";
+    id = "{idstart}{idcont}*";
+    decdigits = "[0-9]+";
+    hexdigit = "[0-9a-fA-F]";
+    hexdigits = "{hexdigit}+";
+    hex4 = "{hexdigit}{hexdigit}{hexdigit}{hexdigit}";
+    hex8 = "{hex4}{hex4}";
+    octaldigits = "[0-7]+";
+    fraction = "{decdigits}?\.{decdigits}|{decdigits}\.";
+    sign = "\+|-";
+    exponent = "(e|E){sign}?{decdigits}";
+    integer = "(0{octaldigits}?|[1-9]{decdigits}?|0(x|X){hexdigits})(u|U)?";
+    floating = "({fraction}{exponent}?|{decdigits}{exponent})(f|F)?";
+    escape = "\\((x|X){hexdigits}|(d|D){decdigits}|{octaldigits}|u{hex4}|U{hex8}|(a|b|f|n|r|t|v|.))";
+    character = "(w|u)?'([^\\\r\n']+|{escape})'";
+    string = "((w|u)?@\"[^\"]*\")|(w|u)?\"([^\\\r\n\"]|{escape})*\"";
+}
+
+lexer LexerFileLexer
+{
+    "{separators}" {}
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "{integer}" { return INTLIT; }
+    "{floating}" { return FLOATINGLIT; }
+    "{character}" { return CHARLIT; }
+    "{string}" { return STRINGLIT; }
+    "$" { return DOLLAR; }
+    "<=>" { return EQUIVALENCE; }
+    "=>" { return IMPLICATION; }
+    "\|\|" { return DISJUNCTION; }
+    "&&" { return AMPAMP; }
+    "\|" { return BITOR; }
+    "^" { return BITXOR; }
+    "&" { return AMP; }
+    "==" { return EQ; }
+    "!=" { return NEQ; }
+    "<=" { return LEQ; }
+    ">=" { return GEQ; }
+    "<" { return LANGLE; }
+    ">" { return RANGLE; }
+    "<<" $(1) { return SHIFTLEFT; }
+    ">>" $(2) { return SHIFTRIGHT; }
+    "\+" { return PLUS; }
+    "-" { return MINUS; }
+    "\*" { return STAR; }
+    "/" { return DIV; }
+    "%" { return REM; }
+    "\+\+" { return PLUSPLUS; }
+    "--" { return MINUSMINUS; }
+    "!" { return EXCLAMATION; }
+    "~" { return CPL; }
+    "\." { return DOT; }
+    "->" { return ARROW; }
+    "\[" { return LBRACKET; }
+    "\]" { return RBRACKET; }
+    "\(" { return LPAREN; }
+    "\)" { return RPAREN; }
+    "\{" { return LBRACE; }
+    "\}" { return RBRACE; }
+    "," { return COMMA; }
+    "=" { return ASSIGN; }
+    ":" { return COLON; }
+    ";" { return SEMICOLON; }
+    "#" { return HASH; }
+
+    variables
+    {
+        double floatingLit;
+        bool floatingLitFloat;
+        ulong intLit;
+        bool intLitUnsigned;
+        uchar chrLit;
+        int chrLitPrefix;
+        ustring strLit;
+        int strLitPrefix;
+        int leftAngleCount;
+        bool parsingOperatorFunctionGroupId;
+    }
+
+    actions
+    {
+        $(1)={ if (parsingOperatorFunctionGroupId) return INVALID_TOKEN; }
+        $(2)={ if (leftAngleCount > 0) return INVALID_TOKEN; }
+    }
+}

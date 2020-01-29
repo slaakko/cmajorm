@@ -1,155 +1,164 @@
-using System;
+using AssemblyTokens;
 
-namespace cmsx.assembly
+parser AssemblyParser
 {
-    grammar AssemblyGrammar
-    {
-        start AssemblyFile;
+    uselexer AssemblyLexer;
+    main;
 
-        DecimalConstant : DecimalConstant*
-            ::= token(digit+){ value = new DecimalConstant(span, ParseULong(ToUtf8(ustring(matchBegin, matchEnd)))); }
-            ;
+    AssemblyFile(List<UniquePtr<cmsx.assembly.Instruction>>* instructionList) 
+        ::= AssemblyLine(instructionList):assemblyLine*
+        ;
 
-        HexConstant : HexConstant*
-            ::= token('#' (hexdigit+){ value = new HexConstant(span, ParseHexULong(ToUtf8(ustring(matchBegin, matchEnd)))); })
-            ;
+    AssemblyLine(List<UniquePtr<cmsx.assembly.Instruction>>* instructionList)
+        ::= CommentLine:commentLine
+        |   EmptyLine:emptyLine
+        |   ModeLine(instructionList):modeLine
+        |   InstructionLine(instructionList):instructionLine
+        ;
 
-        CharacterConstant : CharacterConstant*
-            ::= '\'' [^\n']{ value = new CharacterConstant(span, *matchBegin); } '\''
-            ;
+    CommentLine
+        ::= Comment:cmt NEWLINE
+        ;
 
-        StringConstant : StringConstant*
-            ::= '"' ([^"\n]*){ value = new StringConstant(span, ustring(matchBegin, matchEnd)); } '"'
-            ;
+    Comment
+        ::= SPACE? (any - (NEWLINE | SYMBOL | LOCAL_SYMBOL | DOT | SEMICOLON | AT)) (any - NEWLINE)*
+        ;
 
-        ClsIdConstant : ClsIdConstant*
-            ::= "$CLSID" '(' (hexdigit+){ value = new ClsIdConstant(span, ToUtf8(ustring(matchBegin, matchEnd))); } ')'
-            ;
+    EmptyLine
+        ::= SPACE? NEWLINE
+        ;
 
-        Constant : Constant*
-            ::= DecimalConstant{ value = DecimalConstant; }
-            |   HexConstant{ value = HexConstant; }
-            |   CharacterConstant{ value = CharacterConstant; }
-            |   StringConstant{ value = StringConstant; }
-            |   ClsIdConstant{ value = ClsIdConstant; }
-            ;
+    ModeLine(List<UniquePtr<cmsx.assembly.Instruction>>* instructionList)
+        ::= SPACE?
+            DOT
+            SYMBOL
+            {
+                cmsx.assembly.Instruction* modeInst = cmsx.assembly.MakeModeInst(span, lexer.GetToken(pos));
+                pass = modeInst != null;
+                if (pass)
+                {
+                    instructionList->Add(UniquePtr<cmsx.assembly.Instruction>(modeInst));
+                }
+            }
+            SPACE?
+            NEWLINE
+        ;
 
-        LocalSymbol : SymbolNode*
-            ::= token('@' digit+){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), true); }
-            ;
+    InstructionLine(List<UniquePtr<cmsx.assembly.Instruction>>* instructionList)
+        ::= Instruction:left{ instructionList->Add(UniquePtr<cmsx.assembly.Instruction>(left)); }
+            (SPACE? SEMICOLON Instruction:right{ instructionList->Add(UniquePtr<cmsx.assembly.Instruction>(right)); })* Comment:cmt? NEWLINE
+        ;
 
-        Symbol : SymbolNode*
-            ::= token((idstart | ':' | '_' ) (idcont | ':' | '_' | '@')*){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), false); }
-            ;
+    Instruction(var Span s, var UniquePtr<cmsx.assembly.Node> label) : cmsx.assembly.Instruction*
+        ::=
+        (
+            empty{ lexer.PushSpan(); }
+            Label:lbl{ lexer.SetSpan(pos); label.Reset(lbl); }
+            SplitLine(!label.IsNull()):splitLine{ lexer.SetSpan(pos); }
+            OpCode:opcode{ lexer.SetSpan(pos); }
+            Operands:operands{ lexer.SetSpan(pos); }
+        )
+        {
+            return new cmsx.assembly.Instruction(lexer.PopSpan(), label.Release(), opcode, operands);
+        }
+        ;
 
-        At : At*
-            ::= '@'{ value = new At(span); }
-            ;
+    Label : cmsx.assembly.Node*
+        ::= LOCAL_SYMBOL{ return cmsx.assembly.MakeLocalSymbolNode(span, lexer.GetToken(pos)); }
+        |   SYMBOL{ return cmsx.assembly.MakeSymbolNode(span, lexer.GetToken(pos)); }
+        |   empty{ return null; }
+        ;
 
-        PrimaryExpression : Node*
-            ::= token(
-                LocalSymbol{ value = LocalSymbol; }
-            |   Constant{ value = Constant; }
-            |   Symbol{ value = Symbol; }
-            |   At{ value = At; }
-            |   ('(' Expression ')'){ value = new ParenthesizedExpression(span, Expression); }
-            |   (UnaryOperator PrimaryExpression){ value = new UnaryExpression(span, UnaryOperator, PrimaryExpression); }
-            )
-            ;
+    SplitLine(bool hasLabel)
+        ::= SPACE (NEWLINE SPACE)?
+        |   empty{ pass = hasLabel; } NEWLINE SPACE
+        ;
 
-        UnaryOperator : Operator
-            ::= '+'{ value = Operator.unaryPlus; }
-            |   '-'{ value = Operator.unaryMinus; }
-            |   '~'{ value = Operator.complement; }
-            |   '$'{ value = Operator.register; }
-            |   '&'{ value = Operator.serial; }
-            ;
+    OpCode : cmsx.assembly.OpCode*
+        ::= empty{ lexer.PushSpan(); } (DECIMAL_CONSTANT{ lexer.SetSpan(pos); })? SYMBOL{ lexer.SetSpan(pos); Span s = lexer.PopSpan(); return cmsx.assembly.MakeOpCode(s, lexer.GetMatch(s)); }
+        ;
 
-        Term : Node*
-            ::= token(PrimaryExpression:left{ value = left; } (StrongOperator PrimaryExpression:right{ value = new BinaryExpression(span, value, StrongOperator, right); })*)
-            ;
+    Operands(var UniquePtr<cmsx.assembly.OperandList> operandList) : cmsx.assembly.OperandList*
+        ::=
+        (   SPACE? Expression:left{ operandList.Reset(new cmsx.assembly.OperandList(span, left)); } (COMMA Expression:right{ operandList->AddOperand(right); })*
+        |   SPACE? empty{ operandList.Reset(new cmsx.assembly.OperandList(span, new cmsx.assembly.DecimalConstant(span, 0u))); }
+        )
+        {
+            return operandList.Release();
+        }
+        ;
 
-        StrongOperator : Operator
-            ::= '*'{ value = Operator.multiply; }
-            |   '/'{ value = Operator.divide; }
-            |   "//"{ value = Operator.fractionalDivide; }
-            |   '%'{ value = Operator.modulus; }
-            |   "<<"{ value = Operator.shiftLeft; }
-            |   ">>"{ value = Operator.shiftRight; }
-            |   '&'{ value = Operator.bitwiseAnd; }
-            ;
+    Expression(var UniquePtr<cmsx.assembly.Node> expr) : cmsx.assembly.Node*
+        ::=
+        (
+            Term:left{ expr.Reset(left); } (WeakOperator:op Term:right{ expr.Reset(new cmsx.assembly.BinaryExpression(span, expr.Release(), op, right)); })*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+    
+    WeakOperator : cmsx.assembly.Operator
+        ::= PLUS{ return cmsx.assembly.Operator.add; }
+        |   MINUS{ return cmsx.assembly.Operator.subtract; }
+        |   BAR{ return cmsx.assembly.Operator.bitwiseOr; }
+        |   CARET{ return cmsx.assembly.Operator.bitwiseXor; }
+        ;
 
-        Expression : Node*
-            ::= token(Term:left{ value = left; } (WeakOperator Term:right{ value = new BinaryExpression(span, value, WeakOperator, right); })*)
-            ;
+    Term(var UniquePtr<cmsx.assembly.Node> expr) : cmsx.assembly.Node*
+        ::=
+        (
+            PrimaryExpression:left{ expr.Reset(left); } (StrongOperator:op PrimaryExpression:right{ expr.Reset(new cmsx.assembly.BinaryExpression(span, expr.Release(), op, right)); })*
+        )
+        {
+            return expr.Release();
+        }
+        ;
 
-        WeakOperator : Operator
-            ::= '+'{ value = Operator.add; }
-            |   '-'{ value = Operator.subtract; }
-            |   '|'{ value = Operator.bitwiseOr; }
-            |   '^'{ value = Operator.bitwiseXor; }
-            ;
+    StrongOperator : cmsx.assembly.Operator
+        ::= AST{ return cmsx.assembly.Operator.multiply; }
+        |   SLASH{ return cmsx.assembly.Operator.divide; }
+        |   SLASHSLASH{ return cmsx.assembly.Operator.fractionalDivide; }
+        |   PERCENT{ return cmsx.assembly.Operator.modulus; }
+        |   SHIFT_LEFT{ return cmsx.assembly.Operator.shiftLeft; }
+        |   SHIFT_RIGHT{ return cmsx.assembly.Operator.shiftRight; }
+        |   AMP{ return cmsx.assembly.Operator.bitwiseAnd; }
+        ;
 
-        Instruction : Instruction*
-            ::= (Label SNL(Label) OpCode Operands){ value = new Instruction(span, Label, OpCode, Operands); }
-            ;
+    PrimaryExpression(var Span s) : cmsx.assembly.Node*
+        ::= LocalSymbol:localSymbol{ return localSymbol; }
+        |   Constant:constant{ return constant; }
+        |   Symbol:symbol{ return symbol; }
+        |   At:at{ return at; }
+        |   LPAREN{ s = span; } Expression:expr RPAREN{ s.end = span.end; return new cmsx.assembly.ParenthesizedExpression(s, expr); }
+        |   UnaryOperator:op{ s = span; } PrimaryExpression:primaryExpr{ s.end = span.end; return new cmsx.assembly.UnaryExpression(s, op, primaryExpr); }
+        ;
 
-        InstructionLine(List<UniquePtr<Instruction>>* instructionList)
-            ::= Instruction:left{ instructionList->Add(UniquePtr<Instruction>(left)); } (S? ';' Instruction:right{ instructionList->Add(UniquePtr<Instruction>(right)); })* Comment? NL
-            ;
+    UnaryOperator : cmsx.assembly.Operator
+        ::= PLUS{ return cmsx.assembly.Operator.unaryPlus; }
+        |   MINUS{ return cmsx.assembly.Operator.unaryMinus; }
+        |   TILDE{ return cmsx.assembly.Operator.complement; }
+        |   DOLLAR{ return cmsx.assembly.Operator.register; }
+        |   AMP{ return cmsx.assembly.Operator.serial; }
+        ;
 
-        Label : Node*
-            ::= LocalSymbol{ value = LocalSymbol; }
-            |   Symbol{ value = Symbol; }
-            |   empty{ value = null; }
-            ;
+    LocalSymbol : cmsx.assembly.Node*
+        ::= LOCAL_SYMBOL{ return cmsx.assembly.MakeLocalSymbolNode(span, lexer.GetToken(pos)); }
+        ;
 
-        OpCode : OpCode*
-            ::= token((letter | digit)+){ value = new OpCode(span, ToUtf8(ustring(matchBegin, matchEnd))); }
-            ;
+    Constant : cmsx.assembly.Node*
+        ::= DECIMAL_CONSTANT{ return new cmsx.assembly.DecimalConstant(span, ParseULong(ToUtf8(lexer.GetMatch(span)))); }
+        |   HEX_CONSTANT{ return cmsx.assembly.MakeHexConstant(span, lexer.GetToken(pos)); }
+        |   CHAR_CONSTANT{ return cmsx.assembly.MakeCharConstant(span, lexer.GetToken(pos)); }
+        |   STRING_CONSTANT{ return cmsx.assembly.MakeStringConstant(span, lexer.GetToken(pos)); }
+        |   CLSID_CONSTANT{ return cmsx.assembly.MakeClsIdConstant(span, lexer.GetToken(pos)); }
+        ;
 
-        Operands : OperandList*
-            ::= token(S Expression:left{ value = new OperandList(span, left); } (',' Expression:right{ value->AddOperand(right); })*
-            |   S? empty{ value = new OperandList(span, new DecimalConstant(span, 0u)); }
-            )
-            ;
+    Symbol : cmsx.assembly.Node*
+        ::= SYMBOL{ return cmsx.assembly.MakeSymbolNode(span, lexer.GetToken(pos)); }
+        ;
 
-        S   ::= token([ \t]+)
-            ;
-
-        SNL(Node* label) ::= token(S (NL S)? | empty{ if (label != null) pass = true; else pass = false; } NL S)
-            ;
-
-        NL  ::= token("\r\n" | '\n' | '\r')
-            ;
-
-        Comment
-            ::= S? (anychar - (idstart | ':' | '_' | '@' | ';' | '.' | NL)) (anychar - NL)*
-            ;
-
-        CommentLine
-            ::= Comment NL
-            ;
-
-        EmptyLine
-            ::= S? NL
-            ;
-
-        ModeLine(List<UniquePtr<Instruction>>* instructionList)
-            ::= token(S? '.' [cC][oO][dD][eE]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".CODE"), null))); } S? NL
-            |   token(S? '.' [dD][aA][tT][aA]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".DATA"), null))); } S? NL
-            |   token(S? '.' [dD][eE][bB][uU][gG]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".DEBUG"), null))); } S? NL
-            ;
-
-        AssemblyLine(List<UniquePtr<Instruction>>* instructionList)
-            ::= CommentLine
-            |   EmptyLine
-            |   ModeLine(instructionList)
-            |   InstructionLine(instructionList)
-            ;
-
-        AssemblyFile(List<UniquePtr<Instruction>>* instructionList)
-            ::= AssemblyLine(instructionList)*
-            ;
-    }
+    At : cmsx.assembly.Node*
+        ::= AT{ return new cmsx.assembly.At(span); }
+        ;
 }

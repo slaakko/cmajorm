@@ -71,6 +71,19 @@
         <span>
             Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#65">65</a>
              of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#variable_mtx_F3E0C60CBBCCE7113505C5C0E39E774041CD4D21">mtx</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#variable_profileData_6BBB4B46B14DC7E492FBE83E58D8DC25F7005B74">profileData</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="./struct_FunctionProfileData_AA22C6CFC6D99F9B8AAF33A728699A34883E3361.html">FunctionProfileData</a><span class="other">></span><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="./struct_FunctionProfileData_AA22C6CFC6D99F9B8AAF33A728699A34883E3361.html">FunctionProfileData</a><span class="other">></span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#variable_profileData_6BBB4B46B14DC7E492FBE83E58D8DC25F7005B74">profileData</a><span class="other">.</span><span class="identifier">back</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -94,6 +107,15 @@
         <span>
             Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#60">60</a>
              of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#variable_instance_A5DEB2D604C584D345F3ADA41C0D255DBD207352">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -111,6 +133,23 @@
         <span>
             Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#109">109</a>
              of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_functionProfileData_2AEAC243B4386FB74937F1257B7B7CCDCB4FCFE1">functionProfileData</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_functionProfileData_2AEAC243B4386FB74937F1257B7B7CCDCB4FCFE1">functionProfileData</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">CreateFunctionProfileData</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_functionProfileData_2AEAC243B4386FB74937F1257B7B7CCDCB4FCFE1">functionProfileData</a><span class="other">-></span><span class="identifier">push_back</span><span class="other">(</span><a href="./struct_FunctionProfileData_AA22C6CFC6D99F9B8AAF33A728699A34883E3361.html">FunctionProfileData</a><span class="other">(</span><a href="./enum_TimePointKind_9D4A4B106FD289026C6CC7A2C3C65672E96AC93B.html">TimePointKind</a><span class="other">::</span><a href="./enum_TimePointKind_9D4A4B106FD289026C6CC7A2C3C65672E96AC93B.html#enumerator_end_39179AEC0A9528A52E4F35FFA63363CA5D928A9D">end</a><span class="other">,&nbsp;</span><span class="identifier">functionId</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -133,6 +172,15 @@
         <span>
             Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#55">55</a>
              of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#variable_instance_A5DEB2D604C584D345F3ADA41C0D255DBD207352">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html">Profiler</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -150,8 +198,12 @@
         <span>
             Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#42">42</a>
              of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#variable_instance_A5DEB2D604C584D345F3ADA41C0D255DBD207352">instance</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_StartFunction_93B42F519C23D1CA3FE49822DB9574AB080D68E6">StartFunction Member Function</h3>
@@ -162,6 +214,23 @@
         <span>
             Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#100">100</a>
              of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_functionProfileData_2AEAC243B4386FB74937F1257B7B7CCDCB4FCFE1">functionProfileData</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_functionProfileData_2AEAC243B4386FB74937F1257B7B7CCDCB4FCFE1">functionProfileData</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">CreateFunctionProfileData</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#variable_functionProfileData_2AEAC243B4386FB74937F1257B7B7CCDCB4FCFE1">functionProfileData</a><span class="other">-></span><span class="identifier">push_back</span><span class="other">(</span><a href="./struct_FunctionProfileData_AA22C6CFC6D99F9B8AAF33A728699A34883E3361.html">FunctionProfileData</a><span class="other">(</span><a href="./enum_TimePointKind_9D4A4B106FD289026C6CC7A2C3C65672E96AC93B.html">TimePointKind</a><span class="other">::</span><a href="./enum_TimePointKind_9D4A4B106FD289026C6CC7A2C3C65672E96AC93B.html#enumerator_start_69220B6C3154076356B389B1A8B19827FFF12020">start</a><span class="other">,&nbsp;</span><span class="identifier">functionId</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>

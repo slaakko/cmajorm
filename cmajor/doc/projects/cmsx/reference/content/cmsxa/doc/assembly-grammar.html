@@ -1,0 +1,188 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Assembly Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Assembly Grammar</h1>
+  <table class="grammar">
+   <tr id="assembly-file">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      assembly&#8209;file</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#assembly-line">assembly&#8209;line</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="assembly-line">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      assembly&#8209;line</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#comment-line">comment&#8209;line</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#empty-line">empty&#8209;line</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#mode-line">mode&#8209;line</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#instruction-line">instruction&#8209;line</a></span></td>
+   </tr>
+   <tr id="comment-line">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      comment&#8209;line</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#comment">comment</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#newline">newline</a></span></td>
+   </tr>
+   <tr id="comment">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      comment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">&lt;any></span><span class="ruleOp"> &minus; </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#newline">newline</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#symbol">symbol</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#local-symbol">local&#8209;symbol</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#dot">dot</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#semicolon">semicolon</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#at">at</a></span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">&lt;any></span><span class="ruleOp"> &minus; </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#newline">newline</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="empty-line">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      empty&#8209;line</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#newline">newline</a></span></td>
+   </tr>
+   <tr id="mode-line">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      mode&#8209;line</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#dot">dot</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#symbol">symbol</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#newline">newline</a></span></td>
+   </tr>
+   <tr id="instruction-line">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      instruction&#8209;line</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#instruction">instruction</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#semicolon">semicolon</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#instruction">instruction</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#comment">comment</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#newline">newline</a></span></td>
+   </tr>
+   <tr id="instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#label">label</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#split-line">split&#8209;line</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#opcode">opcode</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operands">operands</a></span></td>
+   </tr>
+   <tr id="label">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      label</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#local-symbol">local&#8209;symbol</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#symbol">symbol</a></span><span class="ruleOp"> | </span><span class="ruleOp">&lt;empty></span></td>
+   </tr>
+   <tr id="split-line">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      split&#8209;line</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#newline">newline</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#newline">newline</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span></td>
+   </tr>
+   <tr id="opcode">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      opcode</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#decimal-constant">decimal&#8209;constant</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#symbol">symbol</a></span></td>
+   </tr>
+   <tr id="operands">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      operands</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#expression">expression</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#comma">comma</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#expression">expression</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#space">space</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="expression">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#term">term</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#weak-operator">weak&#8209;operator</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#term">term</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="weak-operator">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      weak&#8209;operator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#plus">plus</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#minus">minus</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#bar">bar</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#caret">caret</a></span></td>
+   </tr>
+   <tr id="term">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      term</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#primary-expression">primary&#8209;expression</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#strong-operator">strong&#8209;operator</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#primary-expression">primary&#8209;expression</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="strong-operator">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      strong&#8209;operator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#ast">ast</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#slash">slash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#slash-slash">slash&#8209;slash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#percent">percent</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#shift-left">shift&#8209;left</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#shift-right">shift&#8209;right</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#amp">amp</a></span></td>
+   </tr>
+   <tr id="primary-expression">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      primary&#8209;expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#local-symbol">local&#8209;symbol</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#constant">constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#symbol">symbol</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#at">at</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#lparen">lparen</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#expression">expression</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#rparen">rparen</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#unary-operator">unary&#8209;operator</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#primary-expression">primary&#8209;expression</a></span></td>
+   </tr>
+   <tr id="unary-operator">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      unary&#8209;operator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#plus">plus</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#minus">minus</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#tilde">tilde</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#dollar">dollar</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#amp">amp</a></span></td>
+   </tr>
+   <tr id="local-symbol">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      local&#8209;symbol</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#local-symbol">local&#8209;symbol</a></span></td>
+   </tr>
+   <tr id="constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#decimal-constant">decimal&#8209;constant</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#hexadecimal-constant">hexadecimal&#8209;constant</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#character-constant">character&#8209;constant</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#string-constant">string&#8209;constant</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#clsid-constant">clsid&#8209;constant</a></span></td>
+   </tr>
+   <tr id="symbol">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      symbol</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#symbol">symbol</a></span></td>
+   </tr>
+   <tr id="at">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      at</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-assembly-grammar.html#at">at</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

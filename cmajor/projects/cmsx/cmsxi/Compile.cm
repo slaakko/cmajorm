@@ -8,7 +8,8 @@ namespace cmsx.intermediate
         try
         {
             Context context;
-            ParseIntermediateCodeFile(intermediateCodeFileName, &context);
+            IntermediateCodeLexer lexer(ToUtf32(File.ReadAllText(intermediateCodeFileName)), intermediateCodeFileName, 0);
+            IntermediateCodeFileParser.Parse(lexer, &context);
             context.compileUnit.MapInstructions();
             context.compileUnit.Validate();
             context.compileUnit.CombineBasicBlocks();

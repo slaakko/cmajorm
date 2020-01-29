@@ -1,0 +1,168 @@
+using System;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cmsx/cmsxmdb/MdbLexer.lexer' using soulcm lexer generator scmlg version 3.0.0
+
+namespace MdbTokens
+{
+    public const int END = 0;
+
+    public const int SEG = 1;
+
+    public const int REG = 2;
+
+    public const int HEX = 3;
+
+    public const int DEC = 4;
+
+    public const int ID = 5;
+
+    public const int PLUS = 6;
+
+    public const int MINUS = 7;
+
+    public const int BAR = 8;
+
+    public const int CARET = 9;
+
+    public const int AST = 10;
+
+    public const int SLASH = 11;
+
+    public const int PERCENT = 12;
+
+    public const int SHIFT_LEFT = 13;
+
+    public const int SHIFT_RIGHT = 14;
+
+    public const int AMP = 15;
+
+    public const int TILDE = 16;
+
+    public const int DOT = 17;
+
+    public const int LPAREN = 18;
+
+    public const int RPAREN = 19;
+
+    public const int PRINT = 20;
+
+    public const int TRACE = 21;
+
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"AMP"] = 15;
+            tokenIdMap[u"AST"] = 10;
+            tokenIdMap[u"BAR"] = 8;
+            tokenIdMap[u"CARET"] = 9;
+            tokenIdMap[u"DEC"] = 4;
+            tokenIdMap[u"DOT"] = 17;
+            tokenIdMap[u"HEX"] = 3;
+            tokenIdMap[u"ID"] = 5;
+            tokenIdMap[u"LPAREN"] = 18;
+            tokenIdMap[u"MINUS"] = 7;
+            tokenIdMap[u"PERCENT"] = 12;
+            tokenIdMap[u"PLUS"] = 6;
+            tokenIdMap[u"PRINT"] = 20;
+            tokenIdMap[u"REG"] = 2;
+            tokenIdMap[u"RPAREN"] = 19;
+            tokenIdMap[u"SEG"] = 1;
+            tokenIdMap[u"SHIFT_LEFT"] = 13;
+            tokenIdMap[u"SHIFT_RIGHT"] = 14;
+            tokenIdMap[u"SLASH"] = 11;
+            tokenIdMap[u"TILDE"] = 16;
+            tokenIdMap[u"TRACE"] = 21;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"SEG");
+            tokenInfoList.Add(u"seg");
+            tokenNameList.Add(u"REG");
+            tokenInfoList.Add(u"reg");
+            tokenNameList.Add(u"HEX");
+            tokenInfoList.Add(u"hex");
+            tokenNameList.Add(u"DEC");
+            tokenInfoList.Add(u"dec");
+            tokenNameList.Add(u"ID");
+            tokenInfoList.Add(u"identifier");
+            tokenNameList.Add(u"PLUS");
+            tokenInfoList.Add(u"'+'");
+            tokenNameList.Add(u"MINUS");
+            tokenInfoList.Add(u"'-'");
+            tokenNameList.Add(u"BAR");
+            tokenInfoList.Add(u"'|'");
+            tokenNameList.Add(u"CARET");
+            tokenInfoList.Add(u"'^'");
+            tokenNameList.Add(u"AST");
+            tokenInfoList.Add(u"'*'");
+            tokenNameList.Add(u"SLASH");
+            tokenInfoList.Add(u"'/'");
+            tokenNameList.Add(u"PERCENT");
+            tokenInfoList.Add(u"'%'");
+            tokenNameList.Add(u"SHIFT_LEFT");
+            tokenInfoList.Add(u"'<<'");
+            tokenNameList.Add(u"SHIFT_RIGHT");
+            tokenInfoList.Add(u"'>>'");
+            tokenNameList.Add(u"AMP");
+            tokenInfoList.Add(u"'&'");
+            tokenNameList.Add(u"TILDE");
+            tokenInfoList.Add(u"'~'");
+            tokenNameList.Add(u"DOT");
+            tokenInfoList.Add(u"'.'");
+            tokenNameList.Add(u"LPAREN");
+            tokenInfoList.Add(u"'()");
+            tokenNameList.Add(u"RPAREN");
+            tokenInfoList.Add(u"')'");
+            tokenNameList.Add(u"PRINT");
+            tokenInfoList.Add(u"print");
+            tokenNameList.Add(u"TRACE");
+            tokenInfoList.Add(u"trace");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace MdbTokens

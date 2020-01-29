@@ -1,0 +1,672 @@
+using System;
+using System.Collections;
+using System.Text;
+
+namespace soulcm.scm2html
+{
+    public const uchar eps = '\0';
+
+    public abstract class Symbol
+    {
+        public Symbol() :
+            contained(false), dontSetContained(false)
+        {
+        }
+        public virtual ~Symbol()
+        {
+        }
+        public const string& Name() const
+        {
+            return name;
+        }
+        public bool Contained() const
+        {
+            return contained;
+        }
+        public void SetContained()
+        {
+            if (!dontSetContained) contained = true;
+        }
+        public void DontSetContained()
+        {
+            dontSetContained = true;
+        }
+        public void SetName(const string& name_)
+        {
+            name = name_;
+        }
+        public abstract bool Match(uchar c);
+        public abstract void Accept(Visitor& visitor);
+        public virtual bool IsClass() const
+        {
+            return false;
+        }
+        public virtual bool IsChar() const
+        {
+            return false;
+        }
+        public virtual bool IsAny() const
+        {
+            return false;
+        }
+        public virtual bool IsRange() const
+        {
+            return false;
+        }
+        private string name;
+        private bool contained;
+        private bool dontSetContained;
+    }
+
+    public class Char : Symbol
+    {
+        public Char(uchar chr_) :
+            chr(chr_)
+        {
+            SetName("(" + ToUtf8(ustring(chr, 1)) + ")");
+        }
+        public uchar Chr() const
+        {
+            return chr;
+        }
+        public override bool IsChar() const
+        {
+            return true;
+        }
+        public override bool Match(uchar c)
+        {
+            return chr == c;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private uchar chr;
+    }
+
+    public class Any : Symbol
+    {
+        public Any()
+        {
+            SetName("(*)");
+        }
+        public override bool IsAny() const
+        {
+            return true;
+        }
+        public override bool Match(uchar c)
+        {
+            return true;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class Range : Symbol
+    {
+        public Range(uchar start_, uchar end_) :
+            start(start_), end(end_)
+        {
+            SetName("(" + ToUtf8(ustring(start, 1)) + "-" + ToUtf8(ustring(end, 1)) + ")");
+        }
+        public bool IsEmpty() const
+        {
+            return start > end;
+        }
+        public uchar Start() const
+        {
+            return start;
+        }
+        public uchar End() const
+        {
+            return end;
+        }
+        public void Print(CodeFormatter& formatter)
+        {
+            formatter.Write(ToUtf8(CharStr(start)));
+            formatter.Write("-");
+            formatter.Write(ToUtf8(CharStr(end)));
+        }
+        public override bool IsRange() const
+        {
+            return true;
+        }
+        public override bool Match(uchar c)
+        {
+            return c >= start && c <= end;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private uchar start;
+        private uchar end;
+    }
+
+    public inline bool operator==(const Range& left, const Range& right)
+    {
+        return left.Start() == right.Start() && left.End() == right.End();
+    }
+
+    public inline bool operator<(const Range& left, const Range& right)
+    {
+        if (left.Start() < right.Start()) return true;
+        if (left.Start() > right.Start()) return false;
+        return left.End() < right.End();
+    }
+
+    public class Class : Symbol
+    {
+        public Class(int index_) :
+            index(index_), inverse(false)
+        {
+            SetName("[" + ToString(index) + "]");
+        }
+        public bool Inverse() const
+        {
+            return inverse;
+        }
+        public void SetInverse()
+        {
+            inverse = true;
+        }
+        public const List<Symbol*>& Symbols() const
+        {
+            return symbols;
+        }
+        public int Index() const
+        {
+            return index;
+        }
+        public const List<uchar>& Chars() const
+        {
+            return chars;
+        }
+        public bool IsEmpty() const
+        {
+            return symbols.IsEmpty();
+        }
+        public const LinkedList<Range>& Ranges() const
+        {
+            return ranges;
+        }
+        public LinkedList<Range>& Ranges()
+        {
+            return ranges;
+        }
+        public void SetIndex(int index_)
+        {
+            index = index_;
+            SetName("[" + ToString(index) + "]");
+        }
+        public Class* MakeCanonical(LexerContext& lexerContext)
+        {
+            List<Range> rangeVec;
+            Class* canonicalClass = new Class(-1);
+            for (Symbol* symbol : symbols)
+            {
+                if (symbol->IsChar())
+                {
+                    Char* chr = cast<Char*>(symbol);
+                    rangeVec.Add(Range(chr->Chr(), chr->Chr()));
+                }
+                else if (symbol->IsRange())
+                {
+                    Range* range = cast<Range*>(symbol);
+                    rangeVec.Add(*range);
+                }
+                else if (symbol->IsAny())
+                {
+                    throw Exception("class contains any");
+                }
+                else if (symbol->IsClass())
+                {
+                    throw Exception("class contains class");
+                }
+            }
+            for (const Range& range : rangeVec)
+            {
+                canonicalClass->ranges.Add(range);
+            }
+            if (inverse)
+            {
+                canonicalClass->MakeInverse(lexerContext);
+            }
+            return canonicalClass;
+        }
+        public void MakeMinimal(LexerContext& lexerContext)
+        {
+            List<Range> rangeVec;
+            for (const Range& range : ranges)
+            {
+                rangeVec.Add(range);
+            }
+            ranges.Clear();
+            Sort(rangeVec.Begin(), rangeVec.End());
+            rangeVec.Resize(Unique(rangeVec.Begin(), rangeVec.End()) - rangeVec.Begin());
+            bool changed = true;
+            while (changed)
+            {
+                changed = false;
+                List<Range> combinedRanges;
+                for (int i = 0; i < cast<int>(rangeVec.Count()); ++i)
+                {
+                    bool combined = false;
+                    Range current = rangeVec[i];
+                    if (i > 0)
+                    {
+                        Range left = rangeVec[i - 1];
+                        if (cast<int>(left.End()) + 1 == cast<int>(current.Start()))
+                        {
+                            combinedRanges.Add(Range(left.Start(), current.End()));
+                            combined = true;
+                        }
+                    }
+                    if (i < rangeVec.Count() - 1)
+                    {
+                        Range right = rangeVec[i + 1];
+                        if (cast<int>(current.End()) + 1 == cast<int>(right.Start()))
+                        {
+                            combinedRanges.Add(Range(current.Start(), right.End()));
+                            combined = true;
+                        }
+                    }
+                    if (combined)
+                    {
+                        changed = true;
+                    }
+                    else
+                    {
+                        combinedRanges.Add(current);
+                    }
+                }
+                Sort(combinedRanges.Begin(), combinedRanges.End());
+                combinedRanges.Resize(Unique(combinedRanges.Begin(), combinedRanges.End()) - combinedRanges.Begin());
+                Swap(rangeVec, combinedRanges);
+            }
+            symbols.Clear();
+            chars.Clear();
+            for (const Range& range : rangeVec)
+            {
+                if (range.IsEmpty()) continue;
+                ranges.Add(range);
+                if (chars.IsEmpty())
+                {
+                    AddChar(range.Start());
+                }
+            }
+        }
+        public void MakeInverse(LexerContext& lexerContext)
+        {
+            List<Range> rangeVec;
+            for (const Range& range : ranges)
+            {
+                rangeVec.Add(range);
+            }
+            ranges.Clear();
+            List<Range> inverseRanges;
+            inverseRanges.Add(Range(cast<uchar>(1), cast<uchar>(1114111)));
+            for (const Range& range : rangeVec)
+            {
+                List<Range> newInverse;
+                for (const Range& i : inverseRanges)
+                {
+                    if (Intersect(range, i))
+                    {
+                        Range intersection = range & i;
+                        Range left = Range(i.Start(), cast<uchar>(cast<int>(intersection.Start()) - 1));
+                        if (!left.IsEmpty())
+                        {
+                            newInverse.Add(left);
+                        }
+                        Range right = Range(cast<uchar>(cast<int>(intersection.End()) + 1), i.End());
+                        if (!right.IsEmpty())
+                        {
+                            newInverse.Add(right);
+                        }
+                    }
+                    else
+                    {
+                        newInverse.Add(i);
+                    }
+                }
+                Swap(inverseRanges, newInverse);
+            }
+            symbols.Clear();
+            chars.Clear();
+            for (const Range& range : inverseRanges)
+            {
+                ranges.Add(range);
+                if (chars.IsEmpty())
+                {
+                    AddChar(range.Start());
+                }
+            }
+            MakeMinimal(lexerContext);
+            inverse = false;
+        }
+        public Class* Clone()
+        {
+            Class* cls = new Class(-1);
+            for (Symbol* symbol : symbols)
+            {
+                cls->AddSymbol(symbol);
+            }
+            for (uchar c : chars)
+            {
+                cls->AddChar(c);
+            }
+            return cls;
+        }
+        public void AddSymbol(Symbol* symbol)
+        {
+            symbol->SetContained();
+            symbols.Add(symbol);
+        }
+        public void AddChar(uchar c)
+        {
+            chars.Add(c);
+        }
+        public void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("{");
+            for (Range& range : ranges)
+            {
+                range.Print(formatter);
+            }
+            formatter.Write("}");
+        }
+        public override bool IsClass() const
+        {
+            return true;
+        }
+        public override bool Match(uchar c)
+        {
+            bool match = false;
+            for (Symbol* symbol : symbols)
+            {
+                if (symbol->Match(c))
+                {
+                    match = true;
+                    break;
+                }
+            }
+            return match != inverse;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private int index;
+        private bool inverse;
+        private List<Symbol*> symbols;
+        private List<uchar> chars;
+        private LinkedList<Range> ranges;
+    }
+
+    public bool Intersect(const Range& left, const Range& right)
+    {
+        if (left.IsEmpty() || right.IsEmpty()) return false;
+        if (left.Start() <= right.Start())
+        {
+            return right.Start() >= left.Start() && right.Start() <= left.End();
+        }
+        else
+        {
+            return left.Start() >= right.Start() && left.Start() <= right.End();
+        }
+    }
+
+    public Range operator&(const Range& left, const Range& right)
+    {
+        if (Intersect(left, right))
+        {
+            Range intersection(Max(left.Start(), right.Start()), Min(left.End(), right.End()));
+            return intersection;
+        }
+        return Range(cast<uchar>(1), cast<uchar>(0));
+    }
+
+    public List<Range> operator-(const Range& left, const Range& right)
+    {
+        List<Range> ranges;
+        if (right.Start() <= left.Start() && right.End() >= left.End())
+        {
+            return ranges;
+        }
+        else if (right.Start() > left.End() || right.End() < left.Start())
+        {
+            ranges.Add(left);
+        }
+        else
+        {
+            if (right.Start() >= left.Start() && right.Start() <= left.End())
+            {
+                if (left.Start() <= cast<uchar>(cast<int>(right.Start()) - 1))
+                {
+                    ranges.Add(Range(left.Start(), cast<uchar>(cast<int>(right.Start()) - 1)));
+                }
+            }
+            if (right.End() >= left.Start() && right.End() <= left.End())
+            {
+                if (cast<uchar>(cast<int>(right.End()) + 1) <= left.End())
+                {
+                    ranges.Add(Range(cast<uchar>(cast<int>(right.End()) + 1), left.End()));
+                }
+            }
+        }
+        return ranges;
+    }
+
+    public List<Range> operator~(const Range& that)
+    {
+        List<Range> result;
+        if (that.Start() > cast<uchar>(1))
+        {
+            result.Add(Range(cast<uchar>(1), cast<uchar>(cast<int>(that.Start()) - 1)));
+        }
+        if (cast<int>(that.End()) < 1114112)
+        {
+            result.Add(Range(cast<uchar>(cast<int>(that.End()) + 1), cast<uchar>(1114111)));
+        }
+        return result;
+    }
+
+    public bool operator==(const Class& left, const Class& right)
+    {
+        if (left.Symbols().Count() != right.Symbols().Count()) return false;
+        int n = cast<int>(left.Symbols().Count());
+        for (int i = 0; i < n; ++i)
+        {
+            Symbol* leftSymbol = left.Symbols()[i];
+            Symbol* rightSymbol = right.Symbols()[i];
+            if (leftSymbol->IsRange() && rightSymbol->IsRange())
+            {
+                const Range* leftRange = cast<const Range*>(leftSymbol);
+                const Range* rightRange = cast<const Range*>(rightSymbol);
+                if (!(*leftRange == *rightRange))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public class RangeEndLess : Rel<Range>
+    {
+        public bool operator()(const Range& left, const Range& right) const
+        {
+            if (left.End() < right.End()) return true;
+            if (left.End() > right.End()) return false;
+            return left.Start() < right.Start();
+        }
+    }
+
+    public bool Intersect(const Class& left, const Class& right)
+    {
+        for (Symbol* leftSymbol : left.Symbols())
+        {
+            if (leftSymbol->IsRange())
+            {
+                Range* leftRange = cast<Range*>(leftSymbol);
+                for (Symbol* rightSymbol : right.Symbols())
+                {
+                    if (rightSymbol->IsRange())
+                    {
+                        Range* rightRange = cast<Range*>(rightSymbol);
+                        if (Intersect(*leftRange, *rightRange))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public Class* MakeIntertersection(const Class& left, const Class& right, LexerContext& lexerContext)
+    {
+        List<Range> leftRanges;
+        for (Symbol* leftSymbol : left.Symbols())
+        {
+            if (leftSymbol->IsRange())
+            {
+                Range* leftRange = cast<Range*>(leftSymbol);
+                leftRanges.Add(*leftRange);
+            }
+        }
+        List<Range> rightRanges;
+        for (Symbol* rightSymbol : right.Symbols())
+        {
+            if (rightSymbol->IsRange())
+            {
+                Range* rightRange = cast<Range*>(rightSymbol);
+                rightRanges.Add(*rightRange);
+            }
+        }
+        List<Range> intersection;
+        for (const Range& left : leftRanges)
+        {
+            List<Range>.Iterator start = LowerBound(rightRanges.Begin(), rightRanges.End(), left);
+            List<Range>.Iterator end = UpperBound(rightRanges.Begin(), rightRanges.End(), left, RangeEndLess());
+            if (start != rightRanges.Begin()) --start;
+            if (end < rightRanges.End()) ++end;
+            for (List<Range>.Iterator i = start; i != end; ++i)
+            {
+                const Range& right = *i;
+                if (left == right)
+                {
+                    intersection.Add(left);
+                    break;
+                }
+                else if (Intersect(left, right))
+                {
+                    intersection.Add(left & right);
+                }
+            }
+        }
+        Sort(intersection.Begin(), intersection.End());
+        intersection.Resize(Unique(intersection.Begin(), intersection.End()) - intersection.Begin());
+        Class* cls = lexerContext.MakeClass();
+        for (const Range& i : intersection)
+        {
+            cls->AddSymbol(lexerContext.MakeRange(i.Start(), i.End()));
+            if (cls->Chars().IsEmpty())
+            {
+                cls->AddChar(i.Start());
+            }
+        }
+        return cls;
+    }
+
+    public Class* MakeDifference(const Class& left, const Class& right, LexerContext& lexerContext)
+    {
+        List<Range> leftRanges;
+        for (Symbol* leftSymbol : left.Symbols())
+        {
+            if (leftSymbol->IsRange())
+            {
+                Range* leftRange = cast<Range*>(leftSymbol);
+                leftRanges.Add(*leftRange);
+            }
+        }
+        List<Range> rightRanges;
+        for (Symbol* rightSymbol : right.Symbols())
+        {
+            if (rightSymbol->IsRange())
+            {
+                Range* rightRange = cast<Range*>(rightSymbol);
+                rightRanges.Add(*rightRange);
+            }
+        }
+        List<Range> difference;
+        for (const Range& left : leftRanges)
+        {
+            bool found = false;
+            List<Range> diffs;
+            List<Range>.Iterator start = LowerBound(rightRanges.Begin(), rightRanges.End(), left);
+            List<Range>.Iterator end = UpperBound(rightRanges.Begin(), rightRanges.End(), left, RangeEndLess());
+            if (start != rightRanges.Begin()) --start;
+            if (end < rightRanges.End()) ++end;
+            for (List<Range>.Iterator i = start; i != end; ++i)
+            {
+                const Range& right = *i;
+                if (left == right)
+                {
+                    found = true;
+                    break;
+                }
+                else
+                {
+                    if (Intersect(left, right))
+                    {
+                        Range intersection = left & right;
+                        Range l = Range(left.Start(), cast<uchar>(cast<int>(intersection.Start()) - 1));
+                        if (!l.IsEmpty())
+                        {
+                            diffs.Add(l);
+                        }
+                        Range r = Range(cast<uchar>(cast<int>(intersection.End()) + 1), left.End());
+                        if (!r.IsEmpty())
+                        {
+                            diffs.Add(r);
+                        }
+                    }
+                }
+            }
+            if (!found)
+            {
+                if (diffs.IsEmpty())
+                {
+                    difference.Add(left);
+                }
+                else
+                {
+                    for (const Range& diff : diffs)
+                    {
+                        difference.Add(diff);
+                    }
+                }
+            }
+        }
+        Class* d = lexerContext.MakeClass();
+        for (const Range& r : difference)
+        {
+            d->AddSymbol(lexerContext.MakeRange(r.Start(), r.End()));
+            if (d->Chars().IsEmpty())
+            {
+                d->AddChar(r.Start());
+            }
+        }
+        d->MakeMinimal(lexerContext);
+        return d;
+    }
+} // namespace soulcm.scm2html

@@ -1,0 +1,137 @@
+using System;
+
+namespace RegExTokens
+{
+    public const int END = 0;
+
+    public const int LPAREN = 1;
+
+    public const int RPAREN = 2;
+
+    public const int LBRACKET = 3;
+
+    public const int RBRACKET = 4;
+
+    public const int LBRACE = 5;
+
+    public const int RBRACE = 6;
+
+    public const int ALT = 7;
+
+    public const int STAR = 8;
+
+    public const int PLUS = 9;
+
+    public const int QUEST = 10;
+
+    public const int DOT = 11;
+
+    public const int ESCAPE = 12;
+
+    public const int INVERSE = 13;
+
+    public const int MINUS = 14;
+
+    public const int CHAR = 15;
+
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"ALT"] = 7;
+            tokenIdMap[u"CHAR"] = 15;
+            tokenIdMap[u"DOT"] = 11;
+            tokenIdMap[u"ESCAPE"] = 12;
+            tokenIdMap[u"INVERSE"] = 13;
+            tokenIdMap[u"LBRACE"] = 5;
+            tokenIdMap[u"LBRACKET"] = 3;
+            tokenIdMap[u"LPAREN"] = 1;
+            tokenIdMap[u"MINUS"] = 14;
+            tokenIdMap[u"PLUS"] = 9;
+            tokenIdMap[u"QUEST"] = 10;
+            tokenIdMap[u"RBRACE"] = 6;
+            tokenIdMap[u"RBRACKET"] = 4;
+            tokenIdMap[u"RPAREN"] = 2;
+            tokenIdMap[u"STAR"] = 8;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"LPAREN");
+            tokenInfoList.Add(u"\'(\'");
+            tokenNameList.Add(u"RPAREN");
+            tokenInfoList.Add(u"\')\'");
+            tokenNameList.Add(u"LBRACKET");
+            tokenInfoList.Add(u"\'[\'");
+            tokenNameList.Add(u"RBRACKET");
+            tokenInfoList.Add(u"\']\'");
+            tokenNameList.Add(u"LBRACE");
+            tokenInfoList.Add(u"\'{\'");
+            tokenNameList.Add(u"RBRACE");
+            tokenInfoList.Add(u"\'}");
+            tokenNameList.Add(u"ALT");
+            tokenInfoList.Add(u"\'|\'");
+            tokenNameList.Add(u"STAR");
+            tokenInfoList.Add(u"\'*\'");
+            tokenNameList.Add(u"PLUS");
+            tokenInfoList.Add(u"\'+\'");
+            tokenNameList.Add(u"QUEST");
+            tokenInfoList.Add(u"\'?\'");
+            tokenNameList.Add(u"DOT");
+            tokenInfoList.Add(u"\'.\'");
+            tokenNameList.Add(u"ESCAPE");
+            tokenInfoList.Add(u"escape");
+            tokenNameList.Add(u"INVERSE");
+            tokenInfoList.Add(u"\'^\'");
+            tokenNameList.Add(u"MINUS");
+            tokenInfoList.Add(u"\'-\'");
+            tokenNameList.Add(u"CHAR");
+            tokenInfoList.Add(u"character");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace RegExTokens

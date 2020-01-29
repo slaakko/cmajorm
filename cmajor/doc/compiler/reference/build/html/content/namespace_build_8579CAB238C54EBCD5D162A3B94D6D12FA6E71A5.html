@@ -131,6 +131,10 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_InstallSystemWindowsLibraries_79801815921060CCF0B307C4DD5E8FB224197753">InstallSystemWindowsLibraries</a>(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* systemInstallWindowsModule)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_Link_D73207264DF00CBD1658A391EEF552CF5421B261">Link</a>(<span class="kw">const </span>std::string&amp; executableFilePath, <span class="kw">const </span>std::string&amp; libraryFilePath, <span class="kw">const </span>std::vector&lt;std::string>&amp; libraryFilePaths, <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>&amp; module)</td>
             </tr>
             <tr>
@@ -152,6 +156,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="./../../../sngcm/ast/html/content/class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a>>></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_ParseSourcesInMainThread_CF3C5BD17A5CC5C48AE27DA17D5032AE06D441A8">ParseSourcesInMainThread</a>(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* module, <span class="kw">const </span>std::vector&lt;std::string>&amp; sourceFilePaths, <span class="kw">bool</span>&amp; stop)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_Preprocess_1E3E07238FFBAE06506E86766486D967C80A1C47">Preprocess</a>(std::vector&lt;std::unique_ptr&lt;<a href="./../../../sngcm/ast/html/content/class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a>>>&amp; compileUnits)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -201,17 +209,17 @@
              cmajor::build::BindStatements(<a href="./../../../binder/html/content/class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>
             &amp; boundCompileUnit)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#342">342</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#353">353</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;343</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;354</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;344</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./../../../binder/html/content/class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html">StatementBinder</a>&nbsp;<span class="identifier">statementBinder</span><span class="other">(</span><span class="identifier">boundCompileUnit</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;355</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./../../../binder/html/content/class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html">StatementBinder</a>&nbsp;<span class="identifier">statementBinder</span><span class="other">(</span><span class="identifier">boundCompileUnit</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;345</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boundCompileUnit</span><span class="other">.</span><span class="identifier">GetCompileUnitNode</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="identifier">statementBinder</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;356</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boundCompileUnit</span><span class="other">.</span><span class="identifier">GetCompileUnitNode</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="identifier">statementBinder</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;346</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;357</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -232,7 +240,7 @@
             * attributeBinder, <span class="kw">bool</span>
             &amp; stop)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#322">322</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#333">333</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -249,7 +257,7 @@
             std::vector&lt;std::string>&amp; referenceFiles, std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             >&amp; rootModule)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1892">1892</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1985">1985</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -274,7 +282,7 @@
             &amp; stop, <span class="kw">bool</span>
              resetRootModule)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1356">1356</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1435">1435</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -312,7 +320,7 @@
             std::string&amp; projectFilePath, std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             >&amp; rootModule)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1553">1553</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1646">1646</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -337,19 +345,19 @@
             std::string&amp; solutionFilePath, std::vector&lt;std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             >>&amp; rootModules)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1707">1707</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1800">1800</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1708</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1801</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1709</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<span class="identifier">solutionName</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1802</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<span class="identifier">solutionName</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1710</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">></span>&nbsp;<span class="identifier">moduleNames</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1803</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">></span>&nbsp;<span class="identifier">moduleNames</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1711</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BuildSolution</span><span class="other">(</span><span class="identifier">solutionFilePath</span><span class="other">,&nbsp;</span><span class="identifier">rootModules</span><span class="other">,&nbsp;</span><span class="identifier">solutionName</span><span class="other">,&nbsp;</span><span class="identifier">moduleNames</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1804</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">BuildSolution</span><span class="other">(</span><span class="identifier">solutionFilePath</span><span class="other">,&nbsp;</span><span class="identifier">rootModules</span><span class="other">,&nbsp;</span><span class="identifier">solutionName</span><span class="other">,&nbsp;</span><span class="identifier">moduleNames</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1712</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1805</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -368,7 +376,7 @@
             std::string&amp; solutionFilePath, std::vector&lt;std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             >>&amp; rootModules, std::u32string&amp; solutionName, std::vector&lt;std::u32string>&amp; moduleNames)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1714">1714</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1807">1807</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -385,7 +393,7 @@
             , <a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html#function_Put_2FDCA2CF89ECB7217F6F3BA55B6D1E42AA3BC281">cmajor::build::ProjectQueue::Put</a>
             , <a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_GetTarget_E8041BC30FA9A4D0C40CD1E93FB5CD210D0BFEFA">sngcm::ast::Project::GetTarget</a>
             , <a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_Name_42F3C1984DEE80E7BAD436C9E104C94DE303D0DE">sngcm::ast::Project::Name</a>
-            , <a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_Ready_291E8E9ED501D7C186861FA25CCFCC0DD85E3A81">sngcm::ast::Project::Ready</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_Ready_865025B6A95C283A486820EC8D9DEC710F310599">sngcm::ast::Project::Ready</a>
             , <a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_SetIndex_B5C2FE65440D25C7492ED37A41A5C8FC2D798EBB">sngcm::ast::Project::SetIndex</a>
             , <a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_SetLogStreamId_28A2183C727391D166FCDD01086884533F3F172D">sngcm::ast::Project::SetLogStreamId</a>
             , <a href="./../../../soulng/util/html/content/class_MappedInputFile_CDC51953280288D9743911E04818086031195A14.html#function_Begin_58C55862D0E423BB924FEE210B28BD674E9DD291">soulng::util::MappedInputFile::Begin</a>
@@ -400,7 +408,7 @@
              cmajor::build::CheckMainFunctionSymbol(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             &amp; module)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#747">747</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#758">758</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -425,7 +433,7 @@
              cmajor::build::CleanProject(<a href="./../../../sngcm/ast/html/content/class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>
             * project)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#725">725</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#736">736</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -450,7 +458,7 @@
             >>&amp; boundCompileUnits, std::vector&lt;std::string>&amp; objectFilePaths, <span class="kw">bool</span>
             &amp; stop)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1255">1255</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1320">1320</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -482,7 +490,7 @@
             , cmdoclib::File>&amp; docFileMap, <span class="kw">bool</span>
             &amp; stop)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1088">1088</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1149">1149</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -507,7 +515,7 @@
             std::string&amp; dynamicListFilePath, <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             &amp; module)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#620">620</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#631">631</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -532,7 +540,7 @@
             &amp; emittingContext, <a href="./../../../binder/html/content/class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html">AttributeBinder</a>
             * attributeBinder)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#778">778</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#789">789</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -563,7 +571,7 @@
             &amp; emittingContext, <a href="./../../../binder/html/content/class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html">AttributeBinder</a>
             * attributeBinder)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#815">815</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#826">826</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -602,7 +610,7 @@
             &amp; emittingContext, <a href="./../../../binder/html/content/class_AttributeBinder_A166E03F4DDEAC28BFA479759072EC6377E33482.html">AttributeBinder</a>
             * attributeBinder)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#939">939</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#953">953</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -639,7 +647,7 @@
             >>&amp; compileUnits, <span class="kw">bool</span>
             &amp; stop)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#308">308</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#319">319</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -654,15 +662,15 @@
         <h4>
             std::string cmajor::build::CurrentCompileDebugMsStr()</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1139">1139</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1200">1200</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1140</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1201</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">FormatTimeMs</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">CurrentMs</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><a href="./namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_compileDebugStart_C4106302CAF30EFB60A9252A9EBC81F3E0DC991C">compileDebugStart</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">FormatTimeMs</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">CurrentMs</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><a href="./namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_compileDebugStart_C4106302CAF30EFB60A9252A9EBC81F3E0DC991C">compileDebugStart</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1142</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1203</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -672,15 +680,15 @@
         <h4>
             std::string cmajor::build::CurrentProjectDebugMsStr()</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1581">1581</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1674">1674</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1582</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1675</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1583</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">FormatTimeMs</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">CurrentMs</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><a href="./namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_buildDebugStart_8C8F3F568C1C8C9ABB187346C62DE61F57FB8C0D">buildDebugStart</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1676</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">FormatTimeMs</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">int32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">CurrentMs</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><a href="./namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_buildDebugStart_8C8F3F568C1C8C9ABB187346C62DE61F57FB8C0D">buildDebugStart</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1584</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1677</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -699,7 +707,7 @@
             * data, <span class="kw">int</span>
              threadId)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1214">1214</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1281">1281</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -708,7 +716,6 @@
             Calls: <a href="./../../../binder/html/content/class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_ObjectFilePath_34513E3CFA3250DCAF9AD21CEEC9BDEFD5982113">cmajor::binder::BoundCompileUnit::ObjectFilePath</a>
             , <a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#function_Get_0C5D493EA2EB5DA7BDD9DE4BF93911D190AA23A3">cmajor::build::CompileQueue::Get</a>
             , <a href="./class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html#function_Put_3D523F107AE3D2D4CF9B94CA59BD9B0F1A731EAA">cmajor::build::CompileQueue::Put</a>
-            , <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_LogStreamId_780A19BD95D16A9CE7CAFD29ECA4A36EDC283384">cmajor::symbols::Module::LogStreamId</a>
         </span>
         <br/>
         <br/>
@@ -721,7 +728,7 @@
             std::vector&lt;std::string>&amp; objectFilePaths, <span class="kw">const </span>
             std::string&amp; libraryFilePath)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#468">468</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#479">479</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -740,7 +747,7 @@
             std::vector&lt;std::string>&amp; objectFilePaths, <span class="kw">const </span>
             std::string&amp; libraryFilePath)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#429">429</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#440">440</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -760,7 +767,27 @@
              cmajor::build::InstallSystemLibraries(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             * systemInstallModule)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1041">1041</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1055">1055</a>
+             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_AllReferencedModules_52D6E2969EE452F5726D9E303EDE08B20B2D2DFF">cmajor::symbols::Module::AllReferencedModules</a>
+            , <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_LibraryFilePath_AB17E3AA8984DA337039303E4E503558B1098B9C">cmajor::symbols::Module::LibraryFilePath</a>
+            , <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_LogStreamId_780A19BD95D16A9CE7CAFD29ECA4A36EDC283384">cmajor::symbols::Module::LogStreamId</a>
+            , <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_OriginalFilePath_34BCF6721FD65B89A54AE07EC42481679646600B">cmajor::symbols::Module::OriginalFilePath</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_InstallSystemWindowsLibraries_79801815921060CCF0B307C4DD5E8FB224197753">InstallSystemWindowsLibraries Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::build::InstallSystemWindowsLibraries(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            * systemInstallWindowsModule)</h4>
+        <span>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1102">1102</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -783,7 +810,7 @@
             std::vector&lt;std::string>&amp; libraryFilePaths, <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             &amp; module)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#711">711</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#722">722</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -803,7 +830,7 @@
             std::vector&lt;std::string>&amp; libraryFilePaths, <a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             &amp; module)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#646">646</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#657">657</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -911,13 +938,45 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_Preprocess_1E3E07238FFBAE06506E86766486D967C80A1C47">Preprocess Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::build::Preprocess(std::vector&lt;std::unique_ptr&lt;<a href="./../../../sngcm/ast/html/content/class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a>
+            >>&amp; compileUnits)</h4>
+        <span>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#308">308</a>
+             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;309</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;310</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./../../../sngcm/ast/html/content/class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">compileUnit</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">compileUnits</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;311</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;312</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">compileUnit</span><span class="other">-></span><span class="identifier">GlobalNs</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">HasUnnamedNs</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;313</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;314</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./../../../sngcm/ast/html/content/namespace_sngcm_975C28CB050EF72705B56A2E3FD08C3FFBBD07E0.html">sngcm</a><span class="other">::</span><a href="./../../../sngcm/ast/html/content/namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">ast</a><span class="other">::</span><span class="identifier">AddNamespaceImportsForUnnamedNamespaces</span><span class="other">(</span><span class="other">*</span><span class="identifier">compileUnit</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;315</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;316</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;317</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_ProjectBuilder_312559BBF7152DEDAC8B1144457D2BA4CA346B4B">ProjectBuilder Function</h3>
         <h4>
             <span class="kw">void</span>
              cmajor::build::ProjectBuilder(<a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html">BuildData</a>
             * buildData)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1671">1671</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1764">1764</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
@@ -939,7 +998,7 @@
             * module, <span class="kw">const </span>
             std::string&amp; definesFilePath)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1009">1009</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1023">1023</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>

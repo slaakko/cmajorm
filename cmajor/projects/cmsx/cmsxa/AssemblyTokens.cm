@@ -1,0 +1,208 @@
+using System;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cmsx/cmsxa/AssemblyLexer.lexer' using soulcm lexer generator scmlg version 3.0.0
+
+namespace AssemblyTokens
+{
+    public const int END = 0;
+
+    public const int DECIMAL_CONSTANT = 1;
+
+    public const int HEX_CONSTANT = 2;
+
+    public const int CHAR_CONSTANT = 3;
+
+    public const int STRING_CONSTANT = 4;
+
+    public const int CLSID_CONSTANT = 5;
+
+    public const int LOCAL_SYMBOL = 6;
+
+    public const int SYMBOL = 7;
+
+    public const int AT = 8;
+
+    public const int PLUS = 9;
+
+    public const int MINUS = 10;
+
+    public const int TILDE = 11;
+
+    public const int DOLLAR = 12;
+
+    public const int AMP = 13;
+
+    public const int AST = 14;
+
+    public const int SLASHSLASH = 15;
+
+    public const int SLASH = 16;
+
+    public const int PERCENT = 17;
+
+    public const int SHIFT_LEFT = 18;
+
+    public const int SHIFT_RIGHT = 19;
+
+    public const int BAR = 20;
+
+    public const int CARET = 21;
+
+    public const int DOT = 22;
+
+    public const int SPACE = 23;
+
+    public const int NEWLINE = 24;
+
+    public const int LPAREN = 25;
+
+    public const int RPAREN = 26;
+
+    public const int SEMICOLON = 27;
+
+    public const int COMMA = 28;
+
+    public const int CHAR = 29;
+
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"AMP"] = 13;
+            tokenIdMap[u"AST"] = 14;
+            tokenIdMap[u"AT"] = 8;
+            tokenIdMap[u"BAR"] = 20;
+            tokenIdMap[u"CARET"] = 21;
+            tokenIdMap[u"CHAR"] = 29;
+            tokenIdMap[u"CHAR_CONSTANT"] = 3;
+            tokenIdMap[u"CLSID_CONSTANT"] = 5;
+            tokenIdMap[u"COMMA"] = 28;
+            tokenIdMap[u"DECIMAL_CONSTANT"] = 1;
+            tokenIdMap[u"DOLLAR"] = 12;
+            tokenIdMap[u"DOT"] = 22;
+            tokenIdMap[u"HEX_CONSTANT"] = 2;
+            tokenIdMap[u"LOCAL_SYMBOL"] = 6;
+            tokenIdMap[u"LPAREN"] = 25;
+            tokenIdMap[u"MINUS"] = 10;
+            tokenIdMap[u"NEWLINE"] = 24;
+            tokenIdMap[u"PERCENT"] = 17;
+            tokenIdMap[u"PLUS"] = 9;
+            tokenIdMap[u"RPAREN"] = 26;
+            tokenIdMap[u"SEMICOLON"] = 27;
+            tokenIdMap[u"SHIFT_LEFT"] = 18;
+            tokenIdMap[u"SHIFT_RIGHT"] = 19;
+            tokenIdMap[u"SLASH"] = 16;
+            tokenIdMap[u"SLASHSLASH"] = 15;
+            tokenIdMap[u"SPACE"] = 23;
+            tokenIdMap[u"STRING_CONSTANT"] = 4;
+            tokenIdMap[u"SYMBOL"] = 7;
+            tokenIdMap[u"TILDE"] = 11;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"DECIMAL_CONSTANT");
+            tokenInfoList.Add(u"'decimal constant'");
+            tokenNameList.Add(u"HEX_CONSTANT");
+            tokenInfoList.Add(u"'hex constant'");
+            tokenNameList.Add(u"CHAR_CONSTANT");
+            tokenInfoList.Add(u"'char constant'");
+            tokenNameList.Add(u"STRING_CONSTANT");
+            tokenInfoList.Add(u"'string constant'");
+            tokenNameList.Add(u"CLSID_CONSTANT");
+            tokenInfoList.Add(u"'clsid constant'");
+            tokenNameList.Add(u"LOCAL_SYMBOL");
+            tokenInfoList.Add(u"'local symbol'");
+            tokenNameList.Add(u"SYMBOL");
+            tokenInfoList.Add(u"'symbol'");
+            tokenNameList.Add(u"AT");
+            tokenInfoList.Add(u"'at'");
+            tokenNameList.Add(u"PLUS");
+            tokenInfoList.Add(u"'plus'");
+            tokenNameList.Add(u"MINUS");
+            tokenInfoList.Add(u"'minus'");
+            tokenNameList.Add(u"TILDE");
+            tokenInfoList.Add(u"'tilde'");
+            tokenNameList.Add(u"DOLLAR");
+            tokenInfoList.Add(u"'$'");
+            tokenNameList.Add(u"AMP");
+            tokenInfoList.Add(u"'amp'");
+            tokenNameList.Add(u"AST");
+            tokenInfoList.Add(u"'ast'");
+            tokenNameList.Add(u"SLASHSLASH");
+            tokenInfoList.Add(u"'slashslash'");
+            tokenNameList.Add(u"SLASH");
+            tokenInfoList.Add(u"'slash'");
+            tokenNameList.Add(u"PERCENT");
+            tokenInfoList.Add(u"'percent'");
+            tokenNameList.Add(u"SHIFT_LEFT");
+            tokenInfoList.Add(u"'shift left'");
+            tokenNameList.Add(u"SHIFT_RIGHT");
+            tokenInfoList.Add(u"'shift right'");
+            tokenNameList.Add(u"BAR");
+            tokenInfoList.Add(u"'bar'");
+            tokenNameList.Add(u"CARET");
+            tokenInfoList.Add(u"'caret'");
+            tokenNameList.Add(u"DOT");
+            tokenInfoList.Add(u"'dot'");
+            tokenNameList.Add(u"SPACE");
+            tokenInfoList.Add(u"'space'");
+            tokenNameList.Add(u"NEWLINE");
+            tokenInfoList.Add(u"'newline'");
+            tokenNameList.Add(u"LPAREN");
+            tokenInfoList.Add(u"'('");
+            tokenNameList.Add(u"RPAREN");
+            tokenInfoList.Add(u"')'");
+            tokenNameList.Add(u"SEMICOLON");
+            tokenInfoList.Add(u"';'");
+            tokenNameList.Add(u"COMMA");
+            tokenInfoList.Add(u"','");
+            tokenNameList.Add(u"CHAR");
+            tokenInfoList.Add(u"'char'");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace AssemblyTokens

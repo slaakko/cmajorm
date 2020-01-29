@@ -1,0 +1,483 @@
+using System;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cmsx/cmsxi/IntermediateCodeFileLexer.lexer' using soulcm lexer generator scmlg version 3.0.0
+
+namespace IntermediateCodeTokens
+{
+    public const int END = 0;
+
+    public const int CU = 1;
+
+    public const int ID = 2;
+
+    public const int TYPES = 3;
+
+    public const int DATA = 4;
+
+    public const int FUNCTION = 5;
+
+    public const int ONCE = 6;
+
+    public const int STORE = 7;
+
+    public const int ARG = 8;
+
+    public const int JMP = 9;
+
+    public const int BRANCH = 10;
+
+    public const int CALL = 11;
+
+    public const int RET = 12;
+
+    public const int SWITCH = 13;
+
+    public const int NOP = 14;
+
+    public const int SAVE = 15;
+
+    public const int NOT = 16;
+
+    public const int NEG = 17;
+
+    public const int SIGNEXTEND = 18;
+
+    public const int ZEROEXTEND = 19;
+
+    public const int TRUNCATE = 20;
+
+    public const int BITCAST = 21;
+
+    public const int INTTOFLOAT = 22;
+
+    public const int FLOATTOINT = 23;
+
+    public const int INTTOPTR = 24;
+
+    public const int PTRTOINT = 25;
+
+    public const int ADD = 26;
+
+    public const int SUB = 27;
+
+    public const int MUL = 28;
+
+    public const int DIV = 29;
+
+    public const int MOD = 30;
+
+    public const int AND = 31;
+
+    public const int OR = 32;
+
+    public const int XOR = 33;
+
+    public const int SHL = 34;
+
+    public const int SHR = 35;
+
+    public const int EQUAL = 36;
+
+    public const int LESS = 37;
+
+    public const int PARAM = 38;
+
+    public const int LOCAL = 39;
+
+    public const int LOAD = 40;
+
+    public const int ELEMADDR = 41;
+
+    public const int PTROFFSET = 42;
+
+    public const int PTRDIFF = 43;
+
+    public const int TRAP = 44;
+
+    public const int TYPE = 45;
+
+    public const int OFFSET = 46;
+
+    public const int SIZE = 47;
+
+    public const int ALIGNMENT = 48;
+
+    public const int VOID = 49;
+
+    public const int BOOL = 50;
+
+    public const int SBYTE = 51;
+
+    public const int BYTE = 52;
+
+    public const int SHORT = 53;
+
+    public const int USHORT = 54;
+
+    public const int INT = 55;
+
+    public const int UINT = 56;
+
+    public const int LONG = 57;
+
+    public const int ULONG = 58;
+
+    public const int FLOAT = 59;
+
+    public const int DOUBLE = 60;
+
+    public const int TRUE = 61;
+
+    public const int FALSE = 62;
+
+    public const int NULL = 63;
+
+    public const int CONV = 64;
+
+    public const int METADATA = 65;
+
+    public const int LPAREN = 66;
+
+    public const int RPAREN = 67;
+
+    public const int COMMA = 68;
+
+    public const int LBRACE = 69;
+
+    public const int RBRACE = 70;
+
+    public const int AST = 71;
+
+    public const int COLON = 72;
+
+    public const int SEMICOLON = 73;
+
+    public const int LBRACKET = 74;
+
+    public const int RBRACKET = 75;
+
+    public const int ASSIGN = 76;
+
+    public const int AT = 77;
+
+    public const int DOLLAR = 78;
+
+    public const int EXCLAMATION = 79;
+
+    public const int TYPEID = 80;
+
+    public const int CLSID = 81;
+
+    public const int STRING = 82;
+
+    public const int NUMBER = 83;
+
+    public const int HEXNUM = 84;
+
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"ADD"] = 26;
+            tokenIdMap[u"ALIGNMENT"] = 48;
+            tokenIdMap[u"AND"] = 31;
+            tokenIdMap[u"ARG"] = 8;
+            tokenIdMap[u"ASSIGN"] = 76;
+            tokenIdMap[u"AST"] = 71;
+            tokenIdMap[u"AT"] = 77;
+            tokenIdMap[u"BITCAST"] = 21;
+            tokenIdMap[u"BOOL"] = 50;
+            tokenIdMap[u"BRANCH"] = 10;
+            tokenIdMap[u"BYTE"] = 52;
+            tokenIdMap[u"CALL"] = 11;
+            tokenIdMap[u"CLSID"] = 81;
+            tokenIdMap[u"COLON"] = 72;
+            tokenIdMap[u"COMMA"] = 68;
+            tokenIdMap[u"CONV"] = 64;
+            tokenIdMap[u"CU"] = 1;
+            tokenIdMap[u"DATA"] = 4;
+            tokenIdMap[u"DIV"] = 29;
+            tokenIdMap[u"DOLLAR"] = 78;
+            tokenIdMap[u"DOUBLE"] = 60;
+            tokenIdMap[u"ELEMADDR"] = 41;
+            tokenIdMap[u"EQUAL"] = 36;
+            tokenIdMap[u"EXCLAMATION"] = 79;
+            tokenIdMap[u"FALSE"] = 62;
+            tokenIdMap[u"FLOAT"] = 59;
+            tokenIdMap[u"FLOATTOINT"] = 23;
+            tokenIdMap[u"FUNCTION"] = 5;
+            tokenIdMap[u"HEXNUM"] = 84;
+            tokenIdMap[u"ID"] = 2;
+            tokenIdMap[u"INT"] = 55;
+            tokenIdMap[u"INTTOFLOAT"] = 22;
+            tokenIdMap[u"INTTOPTR"] = 24;
+            tokenIdMap[u"JMP"] = 9;
+            tokenIdMap[u"LBRACE"] = 69;
+            tokenIdMap[u"LBRACKET"] = 74;
+            tokenIdMap[u"LESS"] = 37;
+            tokenIdMap[u"LOAD"] = 40;
+            tokenIdMap[u"LOCAL"] = 39;
+            tokenIdMap[u"LONG"] = 57;
+            tokenIdMap[u"LPAREN"] = 66;
+            tokenIdMap[u"METADATA"] = 65;
+            tokenIdMap[u"MOD"] = 30;
+            tokenIdMap[u"MUL"] = 28;
+            tokenIdMap[u"NEG"] = 17;
+            tokenIdMap[u"NOP"] = 14;
+            tokenIdMap[u"NOT"] = 16;
+            tokenIdMap[u"NULL"] = 63;
+            tokenIdMap[u"NUMBER"] = 83;
+            tokenIdMap[u"OFFSET"] = 46;
+            tokenIdMap[u"ONCE"] = 6;
+            tokenIdMap[u"OR"] = 32;
+            tokenIdMap[u"PARAM"] = 38;
+            tokenIdMap[u"PTRDIFF"] = 43;
+            tokenIdMap[u"PTROFFSET"] = 42;
+            tokenIdMap[u"PTRTOINT"] = 25;
+            tokenIdMap[u"RBRACE"] = 70;
+            tokenIdMap[u"RBRACKET"] = 75;
+            tokenIdMap[u"RET"] = 12;
+            tokenIdMap[u"RPAREN"] = 67;
+            tokenIdMap[u"SAVE"] = 15;
+            tokenIdMap[u"SBYTE"] = 51;
+            tokenIdMap[u"SEMICOLON"] = 73;
+            tokenIdMap[u"SHL"] = 34;
+            tokenIdMap[u"SHORT"] = 53;
+            tokenIdMap[u"SHR"] = 35;
+            tokenIdMap[u"SIGNEXTEND"] = 18;
+            tokenIdMap[u"SIZE"] = 47;
+            tokenIdMap[u"STORE"] = 7;
+            tokenIdMap[u"STRING"] = 82;
+            tokenIdMap[u"SUB"] = 27;
+            tokenIdMap[u"SWITCH"] = 13;
+            tokenIdMap[u"TRAP"] = 44;
+            tokenIdMap[u"TRUE"] = 61;
+            tokenIdMap[u"TRUNCATE"] = 20;
+            tokenIdMap[u"TYPE"] = 45;
+            tokenIdMap[u"TYPEID"] = 80;
+            tokenIdMap[u"TYPES"] = 3;
+            tokenIdMap[u"UINT"] = 56;
+            tokenIdMap[u"ULONG"] = 58;
+            tokenIdMap[u"USHORT"] = 54;
+            tokenIdMap[u"VOID"] = 49;
+            tokenIdMap[u"XOR"] = 33;
+            tokenIdMap[u"ZEROEXTEND"] = 19;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"CU");
+            tokenInfoList.Add(u"'cu'");
+            tokenNameList.Add(u"ID");
+            tokenInfoList.Add(u"identifier");
+            tokenNameList.Add(u"TYPES");
+            tokenInfoList.Add(u"'types'");
+            tokenNameList.Add(u"DATA");
+            tokenInfoList.Add(u"'data'");
+            tokenNameList.Add(u"FUNCTION");
+            tokenInfoList.Add(u"'function'");
+            tokenNameList.Add(u"ONCE");
+            tokenInfoList.Add(u"'once'");
+            tokenNameList.Add(u"STORE");
+            tokenInfoList.Add(u"'store'");
+            tokenNameList.Add(u"ARG");
+            tokenInfoList.Add(u"'arg'");
+            tokenNameList.Add(u"JMP");
+            tokenInfoList.Add(u"'jmp'");
+            tokenNameList.Add(u"BRANCH");
+            tokenInfoList.Add(u"'branch'");
+            tokenNameList.Add(u"CALL");
+            tokenInfoList.Add(u"'call'");
+            tokenNameList.Add(u"RET");
+            tokenInfoList.Add(u"'ret'");
+            tokenNameList.Add(u"SWITCH");
+            tokenInfoList.Add(u"'switch'");
+            tokenNameList.Add(u"NOP");
+            tokenInfoList.Add(u"'nop'");
+            tokenNameList.Add(u"SAVE");
+            tokenInfoList.Add(u"'save'");
+            tokenNameList.Add(u"NOT");
+            tokenInfoList.Add(u"'not'");
+            tokenNameList.Add(u"NEG");
+            tokenInfoList.Add(u"'neg'");
+            tokenNameList.Add(u"SIGNEXTEND");
+            tokenInfoList.Add(u"'signextend'");
+            tokenNameList.Add(u"ZEROEXTEND");
+            tokenInfoList.Add(u"'zeroextend'");
+            tokenNameList.Add(u"TRUNCATE");
+            tokenInfoList.Add(u"'truncate'");
+            tokenNameList.Add(u"BITCAST");
+            tokenInfoList.Add(u"'bitcast'");
+            tokenNameList.Add(u"INTTOFLOAT");
+            tokenInfoList.Add(u"'inttofloat'");
+            tokenNameList.Add(u"FLOATTOINT");
+            tokenInfoList.Add(u"'floattoint'");
+            tokenNameList.Add(u"INTTOPTR");
+            tokenInfoList.Add(u"'inttoptr'");
+            tokenNameList.Add(u"PTRTOINT");
+            tokenInfoList.Add(u"'ptrtoint'");
+            tokenNameList.Add(u"ADD");
+            tokenInfoList.Add(u"'add'");
+            tokenNameList.Add(u"SUB");
+            tokenInfoList.Add(u"'sub'");
+            tokenNameList.Add(u"MUL");
+            tokenInfoList.Add(u"'mul'");
+            tokenNameList.Add(u"DIV");
+            tokenInfoList.Add(u"'div'");
+            tokenNameList.Add(u"MOD");
+            tokenInfoList.Add(u"'mod'");
+            tokenNameList.Add(u"AND");
+            tokenInfoList.Add(u"'and'");
+            tokenNameList.Add(u"OR");
+            tokenInfoList.Add(u"'or'");
+            tokenNameList.Add(u"XOR");
+            tokenInfoList.Add(u"'xor'");
+            tokenNameList.Add(u"SHL");
+            tokenInfoList.Add(u"'shl'");
+            tokenNameList.Add(u"SHR");
+            tokenInfoList.Add(u"'shr'");
+            tokenNameList.Add(u"EQUAL");
+            tokenInfoList.Add(u"'equal'");
+            tokenNameList.Add(u"LESS");
+            tokenInfoList.Add(u"'less'");
+            tokenNameList.Add(u"PARAM");
+            tokenInfoList.Add(u"'param'");
+            tokenNameList.Add(u"LOCAL");
+            tokenInfoList.Add(u"'local'");
+            tokenNameList.Add(u"LOAD");
+            tokenInfoList.Add(u"'load'");
+            tokenNameList.Add(u"ELEMADDR");
+            tokenInfoList.Add(u"'elemaddr'");
+            tokenNameList.Add(u"PTROFFSET");
+            tokenInfoList.Add(u"'ptroffset'");
+            tokenNameList.Add(u"PTRDIFF");
+            tokenInfoList.Add(u"'ptrdiff'");
+            tokenNameList.Add(u"TRAP");
+            tokenInfoList.Add(u"'trap'");
+            tokenNameList.Add(u"TYPE");
+            tokenInfoList.Add(u"'type'");
+            tokenNameList.Add(u"OFFSET");
+            tokenInfoList.Add(u"'offset'");
+            tokenNameList.Add(u"SIZE");
+            tokenInfoList.Add(u"'size'");
+            tokenNameList.Add(u"ALIGNMENT");
+            tokenInfoList.Add(u"'alignment'");
+            tokenNameList.Add(u"VOID");
+            tokenInfoList.Add(u"'void'");
+            tokenNameList.Add(u"BOOL");
+            tokenInfoList.Add(u"'bool'");
+            tokenNameList.Add(u"SBYTE");
+            tokenInfoList.Add(u"'sbyte'");
+            tokenNameList.Add(u"BYTE");
+            tokenInfoList.Add(u"'byte'");
+            tokenNameList.Add(u"SHORT");
+            tokenInfoList.Add(u"'short'");
+            tokenNameList.Add(u"USHORT");
+            tokenInfoList.Add(u"'ushort'");
+            tokenNameList.Add(u"INT");
+            tokenInfoList.Add(u"'int'");
+            tokenNameList.Add(u"UINT");
+            tokenInfoList.Add(u"'uint'");
+            tokenNameList.Add(u"LONG");
+            tokenInfoList.Add(u"'long'");
+            tokenNameList.Add(u"ULONG");
+            tokenInfoList.Add(u"'ulong'");
+            tokenNameList.Add(u"FLOAT");
+            tokenInfoList.Add(u"'float'");
+            tokenNameList.Add(u"DOUBLE");
+            tokenInfoList.Add(u"'double'");
+            tokenNameList.Add(u"TRUE");
+            tokenInfoList.Add(u"'true'");
+            tokenNameList.Add(u"FALSE");
+            tokenInfoList.Add(u"'false'");
+            tokenNameList.Add(u"NULL");
+            tokenInfoList.Add(u"'null'");
+            tokenNameList.Add(u"CONV");
+            tokenInfoList.Add(u"'conv'");
+            tokenNameList.Add(u"METADATA");
+            tokenInfoList.Add(u"'metadata'");
+            tokenNameList.Add(u"LPAREN");
+            tokenInfoList.Add(u"'('");
+            tokenNameList.Add(u"RPAREN");
+            tokenInfoList.Add(u"')'");
+            tokenNameList.Add(u"COMMA");
+            tokenInfoList.Add(u"','");
+            tokenNameList.Add(u"LBRACE");
+            tokenInfoList.Add(u"'{'");
+            tokenNameList.Add(u"RBRACE");
+            tokenInfoList.Add(u"'}'");
+            tokenNameList.Add(u"AST");
+            tokenInfoList.Add(u"'*'");
+            tokenNameList.Add(u"COLON");
+            tokenInfoList.Add(u"':'");
+            tokenNameList.Add(u"SEMICOLON");
+            tokenInfoList.Add(u"';'");
+            tokenNameList.Add(u"LBRACKET");
+            tokenInfoList.Add(u"'['");
+            tokenNameList.Add(u"RBRACKET");
+            tokenInfoList.Add(u"']'");
+            tokenNameList.Add(u"ASSIGN");
+            tokenInfoList.Add(u"'='");
+            tokenNameList.Add(u"AT");
+            tokenInfoList.Add(u"'@'");
+            tokenNameList.Add(u"DOLLAR");
+            tokenInfoList.Add(u"'$'");
+            tokenNameList.Add(u"EXCLAMATION");
+            tokenInfoList.Add(u"'!'");
+            tokenNameList.Add(u"TYPEID");
+            tokenInfoList.Add(u"type identifier");
+            tokenNameList.Add(u"CLSID");
+            tokenInfoList.Add(u"class identifier");
+            tokenNameList.Add(u"STRING");
+            tokenInfoList.Add(u"string");
+            tokenNameList.Add(u"NUMBER");
+            tokenInfoList.Add(u"number");
+            tokenNameList.Add(u"HEXNUM");
+            tokenInfoList.Add(u"hex number");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace IntermediateCodeTokens

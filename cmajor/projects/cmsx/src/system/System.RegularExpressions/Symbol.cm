@@ -1,0 +1,223 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.RegularExpressions
+{
+    public const uchar eps = '\0';
+
+    public abstract class Symbol
+    {
+        public default virtual ~Symbol();
+        public abstract nothrow bool Match(uchar c) const;
+        public abstract nothrow string ToString() const;
+        public abstract void Accept(Visitor& visitor);
+    }
+
+    public class Char : Symbol
+    {
+        public nothrow Char(uchar c_) : chr(c_)
+        {
+        }
+        public override nothrow bool Match(uchar c) const
+        {
+            return chr == c;
+        }
+        public override nothrow string ToString() const
+        {
+            if (chr == eps)
+            {
+                return "<eps>";
+            }
+            else
+            {
+                return ToUtf8(ustring(chr));
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public inline nothrow uchar Chr() const
+        {
+            return chr;
+        }
+        private uchar chr;
+    }
+
+    public class Any : Symbol
+    {
+        public override nothrow bool Match(uchar c) const
+        {
+            return true;
+        }
+        public override nothrow string ToString() const
+        {
+            return "<any>";
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class Range : Symbol
+    {
+        public nothrow Range(uchar start_, uchar end_) : start(start_), end(end_)
+        {
+        }
+        public override nothrow bool Match(uchar c) const
+        {
+            return c >= start && c <= end;
+        }
+        public nothrow inline uchar Start() const
+        {
+            return start;
+        }
+        public nothrow inline uchar End() const
+        {
+            return end;
+        }
+        public nothrow inline bool IsEmpty() const
+        {
+            return start > end;
+        }
+        public override nothrow string ToString() const
+        {
+            string s;
+            if (start >= cast<uchar>(32) && start <= cast<uchar>(127) && end >= cast<uchar>(32) && end <= cast<uchar>(127))
+            {
+                s.Append(ToUtf8(ustring(start))).Append('-').Append(ToUtf8(ustring(end)));
+            }
+            else
+            {
+                s.Append('#').Append(ToHexString(cast<uint>(start))).Append('-').Append('#').Append(ToHexString(cast<uint>(end)));
+            }
+            return s;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private uchar start;
+        private uchar end;
+    }
+
+    public nothrow inline bool operator==(const Range& left, const Range& right)
+    {
+        return left.Start() == right.Start() && left.End() == right.End();
+    }
+    
+    public nothrow bool Intersect(const Range& left, const Range& right)
+    {
+        if (left.IsEmpty() || right.IsEmpty())
+        {
+            return false;
+        }
+        if (left.Start() <= right.Start())
+        {
+            return right.Start() >= left.Start() && right.Start() <= left.End();
+        }
+        else
+        {
+            return left.Start() >= right.Start() && left.Start() <= right.End();
+        }
+    }
+    
+    public nothrow Range operator&(const Range& left, const Range& right)
+    {
+        if (Intersect(left, right))
+        {
+            Range intersection(Max(left.Start(), right.Start()), Min(left.End(), right.End()));
+            return intersection;
+        }
+        else
+        {
+            return Range(cast<uchar>(1), cast<uchar>(0));
+        }
+    }
+    
+    public nothrow List<Range> operator~(const Range& r)
+    {
+        List<Range> result;
+        if (cast<uint>(r.Start()) > 1)
+        {
+            result.Add(Range(cast<uchar>(1), cast<uchar>(cast<uint>(r.Start()) - 1u)));
+        }
+        if (cast<uint>(r.End()) < 0xFFFFFFFFu)
+        {
+            result.Add(Range(cast<uchar>(cast<uint>(r.End()) + 1u), cast<uchar>(0xFFFFFFFFu)));
+        }
+        return result;
+    }
+    
+    public nothrow inline bool operator<(const Range& left, const Range& right)
+    {
+        return left.Start() < right.Start();
+    }
+
+    public nothrow ulong GetHashCode(const Range& range)
+    {
+        return (cast<ulong>(range.Start()) << 32u) | cast<ulong>(range.End());
+    }
+
+    public class Class : Symbol
+    {
+        public nothrow Class() : inverse(false)
+        {
+        }
+        public inline nothrow bool Inverse() const
+        {
+            return inverse;
+        }
+        public nothrow void SetInverse()
+        {
+            inverse = true;
+        }
+        public nothrow void AddSymbol(Symbol* symbol)
+        {
+            symbols.Add(symbol);
+        }
+        public override nothrow bool Match(uchar c) const
+        {
+            bool match = false;
+            for (Symbol* symbol : symbols)
+            {
+                if (symbol->Match(c))
+                {
+                    match = true;
+                    break;
+                }
+            }
+            return match != inverse;
+        }
+        public override nothrow string ToString() const
+        {
+            string s = "[";
+            if (inverse)
+            {
+                s.Append('^');
+            }
+            for (Symbol* symbol : symbols)
+            {
+                s.Append(symbol->ToString());
+            }
+            s.Append(']');
+            return s;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public inline nothrow const List<Symbol*>& Symbols() const
+        {
+            return symbols;
+        }
+        private bool inverse;
+        private List<Symbol*> symbols;
+    }
+}

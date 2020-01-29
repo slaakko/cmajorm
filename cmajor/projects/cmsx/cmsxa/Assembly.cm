@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Collections;
-using Span = System.Text.Parsing.Span;
+using Span = System.Lex.Span;
 
 namespace cmsx.assembly
 {
@@ -179,6 +179,18 @@ namespace cmsx.assembly
         }
     }
 
+    public HexConstant* MakeHexConstant(const Span& span, const System.Lex.Token& token)
+    {
+        uchar* p = token.match.begin;
+        uchar* e = token.match.end;
+        if (p != e && *p == '#')
+        {
+            ++p;
+        }
+        string s = ToUtf8(ustring(p, e));
+        return new HexConstant(span, ParseHexULong(s));
+    }
+
     public class CharacterConstant : Constant
     {
         public nothrow CharacterConstant(const Span& span_, uchar value_) : base(span_), value(value_)
@@ -189,6 +201,17 @@ namespace cmsx.assembly
             visitor.Visit(*this);
         }
         public uchar value;
+    }
+
+    public CharacterConstant* MakeCharConstant(const Span& span, const System.Lex.Token& token)
+    {
+        uchar* p = token.match.begin;
+        uchar* e = token.match.end;
+        if (p != e && *p == '\'')
+        {
+            ++p;
+        }
+        return new CharacterConstant(span, *p);
     }
 
     public class StringConstant : Constant
@@ -203,6 +226,32 @@ namespace cmsx.assembly
         public ustring value;
     }
 
+    public StringConstant* MakeStringConstant(const Span& span, const System.Lex.Token& token)
+    {
+        uchar* p = token.match.begin;
+        uchar* e = token.match.end;
+        if (p != e && *p == '"')
+        {
+            ++p;
+        }
+        uchar* start = p;
+        uchar* end = p;
+        while (p != e && *p != '"')
+        {
+            ++p;
+            end = p;
+        }
+        if (p != e && *p == '"')
+        {
+            ++p;
+        }
+        if (p != e)
+        {
+            Error("invalid string constant", span);
+        }
+        return new StringConstant(span, ustring(start, end));
+    }
+
     public class ClsIdConstant : Constant
     {
         public nothrow ClsIdConstant(const Span& span_, const string& typeId_) : base(span_), typeId(typeId_)
@@ -213,6 +262,61 @@ namespace cmsx.assembly
             visitor.Visit(*this);
         }
         public string typeId;
+    }
+
+    public ClsIdConstant* MakeClsIdConstant(const Span& span, const System.Lex.Token& token)
+    {
+        uchar* p = token.match.begin;
+        uchar* e = token.match.end;
+        uchar* start = p;
+        uchar* end = p;
+        if (p != e && *p == '$')
+        {
+            ++p;
+            if (p != e && *p == 'C')
+            {
+                ++p;
+                if (p != e && *p == 'L')
+                {
+                    ++p;
+                    if (p != e && *p == 'S')
+                    {
+                        ++p;
+                        if (p != e && *p == 'I')
+                        {
+                            ++p;
+                            if (p != e && *p == 'D')
+                            {
+                                ++p;
+                                if (p != e && *p == '(')
+                                {
+                                    ++p;
+                                    start = p;
+                                    while (p != e && *p != ')')
+                                    {
+                                        ++p;
+                                        end = p;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ustring s(start, end);
+        if (s.IsEmpty())
+        {
+            Error("invalid class identifier constant", span);
+        }
+        for (uchar c : s)
+        {
+            if (!IsAsciiHexDigit(c))
+            {
+                Error("invalid class identifier constant", span);
+            }
+        }
+        return new ClsIdConstant(span, ToUtf8(s));
     }
 
     public class SymbolNode : Node
@@ -226,6 +330,16 @@ namespace cmsx.assembly
         }
         public string name;
         public bool local;
+    }
+
+    public SymbolNode* MakeLocalSymbolNode(const Span& span, const System.Lex.Token& token)
+    {
+        return new SymbolNode(span, ToUtf8(token.match.ToString()), true);
+    }
+
+    public SymbolNode* MakeSymbolNode(const Span& span, const System.Lex.Token& token)
+    {
+        return new SymbolNode(span, ToUtf8(token.match.ToString()), false);
     }
 
     public enum Direction
@@ -303,6 +417,11 @@ namespace cmsx.assembly
         public int value;
     }
 
+    public nothrow OpCode* MakeOpCode(const Span& span, const ustring& name)
+    {
+        return new OpCode(span, ToUtf8(name));
+    }
+
     public class OperandList : Node
     {
         public nothrow OperandList(const Span& span_, Node* firstOperand_) : base(span_)
@@ -342,36 +461,37 @@ namespace cmsx.assembly
         public UniquePtr<OperandList> operandList;
     }
 
-    public class AssemblyFileParser
+    Instruction* MakeModeInst(const Span& span, const System.Lex.Token& token)
     {
-        static AssemblyFileParser() : instance(new AssemblyFileParser())
+        ustring mode = ToLower(token.match.ToString());
+        if (mode == u"code")
         {
+            return new Instruction(span, null, new OpCode(span, ".CODE"), null);
         }
-        public static nothrow AssemblyFileParser& Instance()
+        else if (mode == u"data")
         {
-            return *instance;
+            return new Instruction(span, null, new OpCode(span, ".DATA"), null);
         }
-        private AssemblyFileParser() : grammar(new AssemblyGrammar())
+        else if (mode == u"debug")
         {
+            return new Instruction(span, null, new OpCode(span, ".DEBUG"), null);
         }
-        public void Parse(long index, const ustring& assemblyFileContent, const string& assemblyFileName, List<UniquePtr<Instruction>>* instructions)
+        else
         {
-            grammar->Parse(assemblyFileContent.Chars(), assemblyFileContent.Chars() + assemblyFileContent.Length(), cast<int>(index), assemblyFileName, instructions);
+            return null;
         }
-        private static UniquePtr<AssemblyFileParser> instance;
-        private AssemblyGrammar* grammar;
     }
 
-    public void ProcessAssemblyFile(long index, const string& assemblyFilePath, bool verbose, const string& outdir)
+    public void ProcessAssemblyFile(int index, const string& assemblyFilePath, bool verbose, const string& outdir)
     {
         if (verbose)
         {
             Console.Out() << "> " << assemblyFilePath << endl();
         }
-        string utf8Content = File.ReadAllText(assemblyFilePath);
-        ustring assemblyFileContent = ToUtf32(utf8Content);
         List<UniquePtr<Instruction>> instructions;
-        AssemblyFileParser.Instance().Parse(index, assemblyFileContent, assemblyFilePath, &instructions);
+        AssemblyLexer lexer(ToUtf32(File.ReadAllText(assemblyFilePath)), assemblyFilePath, index);
+        ScopedAssemblyLexerPtr lexerPtr(&lexer);
+        AssemblyParser.Parse(lexer, &instructions);
         string objectFilePath = Path.ChangeExtension(assemblyFilePath, ".o");
         if (!outdir.IsEmpty())
         {

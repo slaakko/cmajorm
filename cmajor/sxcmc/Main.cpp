@@ -116,8 +116,8 @@ using namespace cmajor::build;
 int main(int argc, const char** argv)
 {
     SetBackEnd(cmajor::symbols::BackEnd::cmsx);
-    SetNumBuildThreads(1);
-    SetGlobalFlag(GlobalFlags::singleThreadedCompile);
+    //SetNumBuildThreads(1);
+    //SetGlobalFlag(GlobalFlags::singleThreadedCompile);
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
     try

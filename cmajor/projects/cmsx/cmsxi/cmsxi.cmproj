@@ -1,43 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Label="Globals">
-    <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-    <ProjectGuid>e5024167-1bfe-4e2e-812b-4919ff665441</ProjectGuid>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetType>library</TargetType>
-  </PropertyGroup>
-  <ItemGroup>
-    <CmCompile Include="AddressDescriptor.cm" />
-    <CmCompile Include="BasicBlock.cm" />
-    <CmCompile Include="Compile.cm" />
-    <CmCompile Include="CompileUnit.cm" />
-    <CmCompile Include="Context.cm" />
-    <CmCompile Include="Data.cm" />
-    <CmCompile Include="Flags.cm" />
-    <CmCompile Include="Function.cm" />
-    <CmCompile Include="Instruction.cm" />
-    <CmCompile Include="IntermediateCodeFileGrammar.cm" />
-    <CmCompile Include="IntermediateCodeFileParser.cm" />
-    <CmCompile Include="Location.cm" />
-    <CmCompile Include="MachineCode.cm" />
-    <CmCompile Include="Metadata.cm" />
-    <CmCompile Include="Operand.cm" />
-    <CmCompile Include="Register.cm" />
-    <CmCompile Include="RegisterDescriptor.cm" />
-    <CmCompile Include="Type.cm" />
-    <CmCompile Include="Value.cm" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="IntermediateCodeFileGrammar.parser" />
-    <None Include="IntermediateCodeFileGrammar.pl" />
-    <None Include="IntermediateCodeFileGrammar.pp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="../cmsxa/cmsxa.cmproj" />
-    <ProjectReference Include="../cmsxm/cmsxm.cmproj" />
-    <ProjectReference Include="../cmsxu/cmsxu.cmproj" />
-  </ItemGroup>
-  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
-  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>bb297086-b032-4fa7-b6b5-556ae986e1c6</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="AddressDescriptor.cm"/>
+  <CmCompile Include="BasicBlock.cm"/>
+  <CmCompile Include="Compile.cm"/>
+  <CmCompile Include="CompileUnit.cm"/>
+  <CmCompile Include="Context.cm"/>
+  <CmCompile Include="Data.cm"/>
+  <CmCompile Include="Flags.cm"/>
+  <CmCompile Include="Function.cm"/>
+  <CmCompile Include="Instruction.cm"/>
+  <CmCompile Include="IntermediateCodeLexer.cm"/>
+  <CmCompile Include="IntermediateCodeTokens.cm"/>
+  <CmCompile Include="IntermediateCodeKeywords.cm"/>
+  <CmCompile Include="IntermediateCodeClassMap.cm"/>
+  <CmCompile Include="IntermediateCodeFileParser.cm"/>
+  <CmCompile Include="IntermediateCodeFileParser.cm"/>
+  <CmCompile Include="Location.cm"/>
+  <CmCompile Include="MachineCode.cm"/>
+  <CmCompile Include="Metadata.cm"/>
+  <CmCompile Include="Operand.cm"/>
+  <CmCompile Include="Register.cm"/>
+  <CmCompile Include="RegisterDescriptor.cm"/>
+  <CmCompile Include="Type.cm"/>
+  <CmCompile Include="Value.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="IntermediateCodeFileLexer.lexer"/>
+  <None Include="IntermediateCodeFileParser.parser"/>
+  <None Include="IntermediateCodeFileParser.spg"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../cmsxa/cmsxa.cmproj"/>
+  <ProjectReference Include="../cmsxm/cmsxm.cmproj"/>
+  <ProjectReference Include="../cmsxu/cmsxu.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
 </Project>

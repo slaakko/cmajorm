@@ -1,0 +1,183 @@
+using System;
+using System.Collections;
+using System.IO;
+
+namespace soulcm.scm2html
+{
+    public string MakeFilePath(const string& fileName, const System.Lex.Token& token)
+    {
+        ustring s;
+        const uchar* p = token.match.begin;
+        const uchar* e = token.match.end;
+        if (p != e && *p == '<')
+        {
+            ++p;
+        }
+        while (p != e && *p != '>')
+        {
+            s.Append(*p, 1);
+            ++p;
+        }
+        if (p != e && *p == '>')
+        {
+            ++p;
+        }
+        if (p != e)
+        {
+            throw Exception("invalid file path at " + fileName + ":" + ToString(token.line) + " : \'" + ToUtf8(token.match.ToString()) + "\'");
+        }
+        return ToUtf8(s);
+    }
+
+    public ustring ParseStringLiteral(const string& fileName, const System.Lex.Token& token)
+    {
+        ustring stringLiteral;
+        const uchar* p = token.match.begin;
+        const uchar* e = token.match.end;
+        if (p != e && *p == '\"')
+        {
+            ++p;
+            while (p != e && *p != '\r' && *p != '\n' && *p != '\"')
+            {
+                if (*p == '\\')
+                {
+                    ++p;
+                    stringLiteral.Append(ParseEscape(fileName, p, e, token), 1);
+                }
+                else
+                {
+                    stringLiteral.Append(*p, 1);
+                    ++p;
+                }
+            }
+            if (p != e && *p == '\"')
+            {
+                ++p;
+            }
+            if (p != e)
+            {
+                throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+            }
+        }
+        else
+        {
+            throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+        }
+        return stringLiteral;
+    }
+
+    public uchar ParseCharLiteral(const string& fileName, const System.Lex.Token& token)
+    {
+        uchar charLit = '\0';
+        const uchar* p = token.match.begin;
+        const uchar* e = token.match.end;
+        bool first = true;
+        if (p != e && *p == '\'')
+        {
+            ++p;
+            while (p != e && *p != '\r' && *p != '\n' && *p != '\'')
+            {
+                if (*p == '\\')
+                {
+                    ++p;
+                    if (first)
+                    {
+                        charLit = ParseEscape(fileName, p, e, token);
+                        first = false;
+                    }
+                    else
+                    {
+                        throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+                    }
+                }
+                else
+                {
+                    if (first)
+                    {
+                        charLit = *p;
+                        first = false;
+                    }
+                    else
+                    {
+                        throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+                    }
+                    ++p;
+                }
+            }
+            if (p != e && *p == '\'')
+            {
+                ++p;
+            }
+            if (p != e)
+            {
+                throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+            }
+        }
+        else
+        {
+            throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+        }
+        return charLit;
+    }
+
+    public CharSet ParseCharSet(const string& fileName, const System.Lex.Token& token, const ustring& str)
+    {
+        CharSet set;
+        const uchar* p = str.Chars();
+        const uchar* e = str.Chars() + str.Length();
+        bool inverse = false;
+        if (p != e && *p == '[')
+        {
+            ++p;
+            if (p != e && *p == '^')
+            {
+                set.SetInverse();
+                ++p;
+            }
+            while (p != e - 1)
+            {
+                uchar first = *p;
+                ++p;
+                uchar last = first;
+                if (p != e - 1)
+                {
+                    if (*p == '-')
+                    {
+                        ++p;
+                        if (p != e - 1)
+                        {
+                            last = *p;
+                            ++p;
+                        }
+                        else
+                        {
+                            System.Parsing.Range range;
+                            range.first = cast<int>(first);
+                            range.last = cast<int>(first);
+                            set.AddRange(range);
+                            first = '-';
+                            last = '-';
+                        }
+                    }
+                }
+                System.Parsing.Range range;
+                range.first = cast<int>(first);
+                range.last = cast<int>(last);
+                set.AddRange(range);
+            }
+            if (p != e && *p == ']')
+            {
+                ++p;
+            }
+            if (p != e)
+            {
+                throw Exception("invalid character set literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+            }
+        }
+        else
+        {
+            throw Exception("invalid character set literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+        }
+        return set;
+    }
+} // namespace soulcm.scm2html

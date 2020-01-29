@@ -11,7 +11,7 @@
   <br/>
   <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;</span>
   <br/>
-  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmsx.machine</span></span>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmsx</span><span class="other">.</span><span class="identifier">machine</span></span>
   <br/>
   <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;<span class="other">{</span></span>
   <br/>
@@ -633,33 +633,46 @@
   <br/>
   <span class="code" id="314" xml:space="preserve"><span class="lineNumber">314</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="315" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;<span class="other">/</span><span class="other">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">previous</span>&nbsp;<span class="identifier">interrupt</span>&nbsp;<span class="identifier">checking</span>&nbsp;<span class="identifier">code</span><span class="other">:</span></span>
+  <span class="code" id="315" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;<span class="comment">/*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;previous&nbsp;interrupt&nbsp;checking&nbsp;code:
+</span></span>
   <br/>
   <span class="code" id="316" xml:space="preserve"><span class="lineNumber">316</span>&nbsp;</span>
   <br/>
-  <span class="code" id="317" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">irq</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">irqMax</span>&nbsp;<span class="other">-</span>&nbsp;<span class="number">1</span><span class="other">;</span>&nbsp;<span class="identifier">irq</span>&nbsp;<span class="other">></span><span class="other">=</span>&nbsp;<span class="number">0</span><span class="other">;</span>&nbsp;<span class="other">-</span><span class="other">-</span><span class="identifier">irq</span><span class="other">)</span></span>
+  <span class="code" id="317" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(int&nbsp;irq&nbsp;=&nbsp;irqMax&nbsp;-&nbsp;1;&nbsp;irq&nbsp;>=&nbsp;0;&nbsp;--irq)
+</span></span>
   <br/>
-  <span class="code" id="318" xml:space="preserve"><span class="lineNumber">318</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="318" xml:space="preserve"><span class="lineNumber">318</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+</span></span>
   <br/>
-  <span class="code" id="319" xml:space="preserve"><span class="lineNumber">319</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ulong</span>&nbsp;<span class="identifier">irqBit</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">cast</span><span class="other">&lt;</span><span class="kw">ulong</span><span class="other">></span><span class="other">(</span><span class="number">1</span><span class="other">)</span>&nbsp;<span class="other">&lt;</span><span class="other">&lt;</span>&nbsp;<span class="kw">cast</span><span class="other">&lt;</span><span class="kw">ulong</span><span class="other">></span><span class="other">(</span><span class="identifier">irq</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="319" xml:space="preserve"><span class="lineNumber">319</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ulong&nbsp;irqBit&nbsp;=&nbsp;cast&lt;ulong>(1)&nbsp;&lt;&lt;&nbsp;cast&lt;ulong>(irq);
+</span></span>
   <br/>
-  <span class="code" id="320" xml:space="preserve"><span class="lineNumber">320</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">irqBitSet</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">(</span><span class="identifier">bits</span>&nbsp;<span class="other">&amp;</span>&nbsp;<span class="identifier">irqBit</span><span class="other">)</span>&nbsp;<span class="other">!</span><span class="other">=</span>&nbsp;<span class="number">0u</span><span class="other">;</span></span>
+  <span class="code" id="320" xml:space="preserve"><span class="lineNumber">320</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool&nbsp;irqBitSet&nbsp;=&nbsp;(bits&nbsp;&amp;&nbsp;irqBit)&nbsp;!=&nbsp;0u;
+</span></span>
   <br/>
-  <span class="code" id="321" xml:space="preserve"><span class="lineNumber">321</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">irqBitSet</span><span class="other">)</span></span>
+  <span class="code" id="321" xml:space="preserve"><span class="lineNumber">321</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(irqBitSet)
+</span></span>
   <br/>
-  <span class="code" id="322" xml:space="preserve"><span class="lineNumber">322</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="322" xml:space="preserve"><span class="lineNumber">322</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+</span></span>
   <br/>
-  <span class="code" id="323" xml:space="preserve"><span class="lineNumber">323</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ulong</span>&nbsp;<span class="identifier">handlerPtrAddress</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">regs.GetSpecial</span><span class="other">(</span><span class="identifier">Registers.rTT</span><span class="other">)</span>&nbsp;<span class="other">+</span>&nbsp;<span class="number">8u</span>&nbsp;<span class="other">*</span>&nbsp;<span class="kw">cast</span><span class="other">&lt;</span><span class="kw">ulong</span><span class="other">></span><span class="other">(</span><span class="identifier">irq</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="323" xml:space="preserve"><span class="lineNumber">323</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ulong&nbsp;handlerPtrAddress&nbsp;=&nbsp;regs.GetSpecial(Registers.rTT)&nbsp;+&nbsp;8u&nbsp;*&nbsp;cast&lt;ulong>(irq);
+</span></span>
   <br/>
-  <span class="code" id="324" xml:space="preserve"><span class="lineNumber">324</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">HandleInterrupt</span><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">irq</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="identifier">handlerPtrAddress</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="324" xml:space="preserve"><span class="lineNumber">324</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HandleInterrupt(cast&lt;byte>(irq),&nbsp;handlerPtrAddress);
+</span></span>
   <br/>
-  <span class="code" id="325" xml:space="preserve"><span class="lineNumber">325</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">regs.ResetInterrupt</span><span class="other">(</span><span class="identifier">irqBit</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="325" xml:space="preserve"><span class="lineNumber">325</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;regs.ResetInterrupt(irqBit);
+</span></span>
   <br/>
-  <span class="code" id="326" xml:space="preserve"><span class="lineNumber">326</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="326" xml:space="preserve"><span class="lineNumber">326</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+</span></span>
   <br/>
-  <span class="code" id="327" xml:space="preserve"><span class="lineNumber">327</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="327" xml:space="preserve"><span class="lineNumber">327</span>&nbsp;<span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+</span></span>
   <br/>
-  <span class="code" id="328" xml:space="preserve"><span class="lineNumber">328</span>&nbsp;<span class="other">*</span><span class="other">/</span></span>
+  <span class="code" id="328" xml:space="preserve"><span class="lineNumber">328</span>&nbsp;<span class="comment">*/
+</span></span>
   <br/>
   <span class="code" id="329" xml:space="preserve"><span class="lineNumber">329</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Processor_7D84949499729E33711280E96109B03701955F19.html#member_function_CheckInterrupts_Processor_7FD361CC070DB3BF2EC2D342763C415486FD9161">CheckInterrupts</a><span class="other">(</span><a href="../doc/class_Instruction_61CA97905FA327FF82F3A21A4CE02020705D3A00.html">Instruction</a><span class="other">*</span><span class="other">&amp;</span>&nbsp;<span class="identifier">inst</span><span class="other">,&nbsp;</span><span class="kw">byte</span><span class="other">&amp;</span>&nbsp;<span class="identifier">x</span><span class="other">,&nbsp;</span><span class="kw">byte</span><span class="other">&amp;</span>&nbsp;<span class="identifier">y</span><span class="other">,&nbsp;</span><span class="kw">byte</span><span class="other">&amp;</span>&nbsp;<span class="identifier">z</span><span class="other">)</span></span>
   <br/>

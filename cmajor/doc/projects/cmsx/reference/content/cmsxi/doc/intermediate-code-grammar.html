@@ -1,0 +1,660 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Intermediate Code Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Intermediate Code Grammar</h1>
+  <table class="grammar">
+   <tr id="intermediate-code-file">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      intermediate&#8209;code&#8209;file</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#compile-unit-header">compile&#8209;unit&#8209;header</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-declarations">type&#8209;declarations</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#data-definitions">data&#8209;definitions</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#functions">functions</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#metadata">metadata</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="compile-unit-header">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      compile&#8209;unit&#8209;header</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">cu</span><span class="ruleOp"> </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#compile-unit-id">compile&#8209;unit&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#md-struct-ref">md&#8209;struct&#8209;ref</a></span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="compile-unit-id">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      compile&#8209;unit&#8209;id</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#hexnum">hexnum</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#id">id</a></span></td>
+   </tr>
+   <tr id="type-declarations">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      type&#8209;declarations</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">types</span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-declaration">type&#8209;declaration</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="type-declaration">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      type&#8209;declaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#str-type-id">str&#8209;type&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleKeyword">type</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#structure-type">structure&#8209;type</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#array-type">array&#8209;type</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#function-type">function&#8209;type</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="str-type-id">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      str&#8209;type&#8209;id</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#type-identifier">type&#8209;identifier</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#primitive-type-name">primitive&#8209;type&#8209;name</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">*</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="structure-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      structure&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#str-type-id">str&#8209;type&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">:</span><span class="ruleOp"> </span><span class="ruleKeyword">offset</span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">}</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">size</span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleKeyword">alignment</span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="array-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      array&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#str-type-id">str&#8209;type&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleChar">]</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">size</span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleKeyword">alignment</span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="function-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      function&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">function</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#str-type-id">str&#8209;type&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#str-type-id">str&#8209;type&#8209;id</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="data-definitions">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      data&#8209;definitions</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">data</span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#data-definition">data&#8209;definition</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="data-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      data&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleKeyword">once</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">;</span><span class="ruleOp"> | </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#constant">constant</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="functions">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      functions</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#function">function</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="function">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      function</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#function-header">function&#8209;header</a></span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#basic-block">basic&#8209;block</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="function-header">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      function&#8209;header</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">function</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleKeyword">once</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#md-struct-ref">md&#8209;struct&#8209;ref</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="basic-block">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      basic&#8209;block</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#label">label</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#instructions">instructions</a></span></td>
+   </tr>
+   <tr id="label">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      label</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">@</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="instructions">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      instructions</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#instruction">instruction</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#md-struct-ref">md&#8209;struct&#8209;ref</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#store-instruction">store&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#arg-instruction">arg&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#jump-instruction">jump&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#branch-instruction">branch&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#procedure-call-instruction">procedure&#8209;call&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#ret-instruction">ret&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#switch-instruction">switch&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#value-instruction">value&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#no-operation-instruction">no&#8209;operation&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#save-instruction">save&#8209;instruction</a></span></td>
+   </tr>
+   <tr id="store-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      store&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">store</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span></td>
+   </tr>
+   <tr id="arg-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      arg&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">arg</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span></td>
+   </tr>
+   <tr id="jump-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      jump&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">jmp</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#label">label</a></span></td>
+   </tr>
+   <tr id="branch-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      branch&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">branch</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#label">label</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#label">label</a></span></td>
+   </tr>
+   <tr id="procedure-call-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      procedure&#8209;call&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">call</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span></td>
+   </tr>
+   <tr id="ret-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ret&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">ret</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">void</span><span class="ruleOp"> &minus; </span><span class="ruleOp">(</span><span class="ruleKeyword">void</span><span class="ruleOp"> </span><span class="ruleChar">*</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="switch-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      switch&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">switch</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#label">label</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#label">label</a></span><span class="ruleOp"> % </span><span class="ruleChar">:</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">]</span></td>
+   </tr>
+   <tr id="value-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      value&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operation">operation</a></span></td>
+   </tr>
+   <tr id="operation">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      operation</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#unary-instruction">unary&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#binary-instruction">binary&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#param-instruction">param&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#local-instruction">local&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#load-instruction">load&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#elem-addr-instruction">elem&#8209;addr&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#ptr-offset-instruction">ptr&#8209;offset&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#ptr-diff-instruction">ptr&#8209;diff&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#function-call-instruction">function&#8209;call&#8209;instruction</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#trap-instruction">trap&#8209;instruction</a></span></td>
+   </tr>
+   <tr id="unary-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      unary&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#unary-inst">unary&#8209;inst</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span></td>
+   </tr>
+   <tr id="unary-inst">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      unary&#8209;inst</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">not</span><span class="ruleOp"> | </span><span class="ruleKeyword">neg</span><span class="ruleOp"> | </span><span class="ruleKeyword">signextend</span><span class="ruleOp"> | </span><span class="ruleKeyword">zeroextend</span><span class="ruleOp"> | </span><span class="ruleKeyword">truncate</span><span class="ruleOp"> | </span><span class="ruleKeyword">bitcast</span><span class="ruleOp"> | </span><span class="ruleKeyword">inttofloat</span><span class="ruleOp"> | </span><span class="ruleKeyword">floattoint</span><span class="ruleOp"> | </span><span class="ruleKeyword">inttoptr</span><span class="ruleOp"> | </span><span class="ruleKeyword">ptrtoint</span></td>
+   </tr>
+   <tr id="binary-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      binary&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#binary-inst">binary&#8209;inst</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span></td>
+   </tr>
+   <tr id="binary-inst">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      binary&#8209;inst</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">add</span><span class="ruleOp"> | </span><span class="ruleKeyword">sub</span><span class="ruleOp"> | </span><span class="ruleKeyword">mul</span><span class="ruleOp"> | </span><span class="ruleKeyword">div</span><span class="ruleOp"> | </span><span class="ruleKeyword">mod</span><span class="ruleOp"> | </span><span class="ruleKeyword">and</span><span class="ruleOp"> | </span><span class="ruleKeyword">or</span><span class="ruleOp"> | </span><span class="ruleKeyword">xor</span><span class="ruleOp"> | </span><span class="ruleKeyword">shl</span><span class="ruleOp"> | </span><span class="ruleKeyword">shr</span><span class="ruleOp"> | </span><span class="ruleKeyword">equal</span><span class="ruleOp"> | </span><span class="ruleKeyword">less</span></td>
+   </tr>
+   <tr id="param-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      param&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">param</span></td>
+   </tr>
+   <tr id="local-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      local&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">local</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span></td>
+   </tr>
+   <tr id="load-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      load&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">load</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span></td>
+   </tr>
+   <tr id="elem-addr-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      elem&#8209;addr&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">elemaddr</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span></td>
+   </tr>
+   <tr id="ptr-offset-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ptr&#8209;offset&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">ptroffset</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span></td>
+   </tr>
+   <tr id="ptr-diff-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ptr&#8209;diff&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">ptrdiff</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#operand">operand</a></span></td>
+   </tr>
+   <tr id="function-call-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      function&#8209;call&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">call</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span></td>
+   </tr>
+   <tr id="trap-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      trap&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">trap</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span></td>
+   </tr>
+   <tr id="no-operation-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      no&#8209;operation&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">nop</span></td>
+   </tr>
+   <tr id="save-instruction">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      save&#8209;instruction</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">save</span></td>
+   </tr>
+   <tr id="operand">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      operand</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#typed-value">typed&#8209;value</a></span></td>
+   </tr>
+   <tr id="type-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      type&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#postfix-type-expr">postfix&#8209;type&#8209;expr</a></span></td>
+   </tr>
+   <tr id="postfix-type-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      postfix&#8209;type&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#primary-type-expr">primary&#8209;type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleChar">*</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="primary-type-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      primary&#8209;type&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#type-id">type&#8209;id</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#primitive-type">primitive&#8209;type</a></span></td>
+   </tr>
+   <tr id="type-id">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      type&#8209;id</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#type-identifier">type&#8209;identifier</a></span></td>
+   </tr>
+   <tr id="primitive-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      primitive&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">void</span><span class="ruleOp"> | </span><span class="ruleKeyword">bool</span><span class="ruleOp"> | </span><span class="ruleKeyword">sbyte</span><span class="ruleOp"> | </span><span class="ruleKeyword">byte</span><span class="ruleOp"> | </span><span class="ruleKeyword">short</span><span class="ruleOp"> | </span><span class="ruleKeyword">ushort</span><span class="ruleOp"> | </span><span class="ruleKeyword">int</span><span class="ruleOp"> | </span><span class="ruleKeyword">uint</span><span class="ruleOp"> | </span><span class="ruleKeyword">long</span><span class="ruleOp"> | </span><span class="ruleKeyword">ulong</span><span class="ruleOp"> | </span><span class="ruleKeyword">float</span><span class="ruleOp"> | </span><span class="ruleKeyword">double</span></td>
+   </tr>
+   <tr id="primitive-type-name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      primitive&#8209;type&#8209;name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">void</span><span class="ruleOp"> | </span><span class="ruleKeyword">bool</span><span class="ruleOp"> | </span><span class="ruleKeyword">sbyte</span><span class="ruleOp"> | </span><span class="ruleKeyword">byte</span><span class="ruleOp"> | </span><span class="ruleKeyword">short</span><span class="ruleOp"> | </span><span class="ruleKeyword">ushort</span><span class="ruleOp"> | </span><span class="ruleKeyword">int</span><span class="ruleOp"> | </span><span class="ruleKeyword">uint</span><span class="ruleOp"> | </span><span class="ruleKeyword">long</span><span class="ruleOp"> | </span><span class="ruleKeyword">ulong</span><span class="ruleOp"> | </span><span class="ruleKeyword">float</span><span class="ruleOp"> | </span><span class="ruleKeyword">double</span></td>
+   </tr>
+   <tr id="typed-value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      typed&#8209;value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#id-value">id&#8209;value</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#symbol-value">symbol&#8209;value</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#literal-value">literal&#8209;value</a></span></td>
+   </tr>
+   <tr id="id-value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      id&#8209;value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">$</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="symbol-value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      symbol&#8209;value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">@</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#id">id</a></span></td>
+   </tr>
+   <tr id="literal-value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      literal&#8209;value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">true</span><span class="ruleOp"> | </span><span class="ruleKeyword">false</span><span class="ruleOp"> | </span><span class="ruleKeyword">null</span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#id">id</a></span></td>
+   </tr>
+   <tr id="constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#conversion-constant">conversion&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#cls-id-constant">cls&#8209;id&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#ptr-constant">ptr&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#symbol-constant">symbol&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#bool-constant">bool&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#sbyte-constant">sbyte&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#byte-constant">byte&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#short-constant">short&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#ushort-constant">ushort&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#int-constant">int&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#uint-constant">uint&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#long-constant">long&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#ulong-constant">ulong&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#float-constant">float&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#double-constant">double&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#array-constant">array&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#structure-constant">structure&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#string-constant">string&#8209;constant</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#string-array-constant">string&#8209;array&#8209;constant</a></span></td>
+   </tr>
+   <tr id="conversion-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      conversion&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleKeyword">conv</span><span class="ruleOp"> </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#constant">constant</a></span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="cls-id-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      cls&#8209;id&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#cls-id">cls&#8209;id</a></span></td>
+   </tr>
+   <tr id="ptr-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ptr&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleKeyword">null</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#literal-value">literal&#8209;value</a></span></td>
+   </tr>
+   <tr id="symbol-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      symbol&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#symbol-value">symbol&#8209;value</a></span></td>
+   </tr>
+   <tr id="bool-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      bool&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">bool</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">true</span><span class="ruleOp"> | </span><span class="ruleKeyword">false</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="sbyte-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      sbyte&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">sbyte</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="byte-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      byte&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">byte</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="short-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      short&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">short</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="ushort-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ushort&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">ushort</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="int-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      int&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">int</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="uint-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      uint&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">uint</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="long-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      long&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">long</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="ulong-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ulong&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">ulong</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="float-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      float&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">float</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="double-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      double&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">double</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="array-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      array&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#constant">constant</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">]</span></td>
+   </tr>
+   <tr id="structure-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      structure&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#constant">constant</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="string-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      string&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#string">string</a></span></td>
+   </tr>
+   <tr id="string-array-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      string&#8209;array&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#string-array-prefix">string&#8209;array&#8209;prefix</a></span><span class="ruleOp"> </span><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#constant">constant</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">]</span></td>
+   </tr>
+   <tr id="string-array-prefix">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      string&#8209;array&#8209;prefix</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#id">id</a></span></td>
+   </tr>
+   <tr id="metadata">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      metadata</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">metadata</span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#md-struct">md&#8209;struct</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="md-item">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      md&#8209;item</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#md-bool">md&#8209;bool</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#md-long">md&#8209;long</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#md-string">md&#8209;string</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#md-struct-ref">md&#8209;struct&#8209;ref</a></span></td>
+   </tr>
+   <tr id="md-bool">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      md&#8209;bool</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">true</span><span class="ruleOp"> | </span><span class="ruleKeyword">false</span></td>
+   </tr>
+   <tr id="md-long">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      md&#8209;long</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="md-string">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      md&#8209;string</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#string">string</a></span></td>
+   </tr>
+   <tr id="md-struct-ref">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      md&#8209;struct&#8209;ref</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">!</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span></td>
+   </tr>
+   <tr id="md-struct">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      md&#8209;struct</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">!</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#number">number</a></span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#md-field">md&#8209;field</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="md-field">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      md&#8209;field</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-intermediate-code-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleChar">:</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#md-item">md&#8209;item</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

@@ -1,0 +1,41 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+classmap RegExClassMap;
+
+tokens RegExTokens
+{
+    (LPAREN, "'('"), (RPAREN, "')'"), (LBRACKET, "'['"), (RBRACKET, "']'"), (LBRACE, "'{'"), (RBRACE, "'}"),
+    (ALT, "'|'"), (STAR, "'*'"), (PLUS, "'+'"), (QUEST, "'?'"), (DOT, "'.'"), (ESCAPE, "escape"), (INVERSE, "'^'"), (MINUS, "'-'"), (CHAR, "character")
+}
+
+expressions
+{
+    decdigit="[0-9]";
+    octaldigit="[0-7]";
+    hexdigit="[0-9a-fA-F]";
+    hex4 = "{hexdigit}{hexdigit}{hexdigit}{hexdigit}";
+    hex8 = "{hex4}{hex4}";
+    escape = "\\((x|X){hexdigit}+|(d|D){decdigit}+|{octaldigit}+|u{hex4}|U{hex8}|(a|b|f|n|r|t|v|.))";
+}
+
+lexer RegExLexer
+{
+    "\(" { return LPAREN; }
+    "\)" { return RPAREN; }
+    "\[" { return LBRACKET; }
+    "\]" { return RBRACKET; }
+    "\{" { return LBRACE; }
+    "\}" { return RBRACE; }
+    "\|" { return ALT; }
+    "\*" { return STAR; }
+    "\+" { return PLUS; }
+    "\?" { return QUEST; }
+    "\." { return DOT; }
+    "{escape}" { return ESCAPE; }
+    "^" { return INVERSE; }
+    "-" { return MINUS; }
+    "[^\x0\r\n{}\\()[\]|*+?.^-]" { return CHAR; }
+}

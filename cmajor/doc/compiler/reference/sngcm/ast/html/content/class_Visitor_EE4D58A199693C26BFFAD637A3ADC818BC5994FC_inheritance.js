@@ -273,7 +273,8 @@ function drawClassInheritanceDiagram() {
         { name: "sngcm::ast::MergeVisitor", id: "class_2", level: 1, subject: false, hasDerivedClasses: false, link: "./class_MergeVisitor_E8FFA1FA557BF7F131310905158C5B5EDF5F9BC9.html" },
         { name: "sngcm::ast::NamespaceCombiner", id: "class_3", level: 1, subject: false, hasDerivedClasses: false, link: "./class_NamespaceCombiner_7EC250E492C0D32A4B33D57C9791890B7191204D.html" },
         { name: "sngcm::ast::NodeSelectorVisitor", id: "class_4", level: 1, subject: false, hasDerivedClasses: false, link: "./class_NodeSelectorVisitor_AAA270BCE20049B10A2B4588F9EEF8AC78A524A2.html" },
-        { name: "sngcm::ast::SourceWriter", id: "class_5", level: 1, subject: false, hasDerivedClasses: false, link: "./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html" }];
+        { name: "sngcm::ast::SourceWriter", id: "class_5", level: 1, subject: false, hasDerivedClasses: false, link: "./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html" },
+        { name: "sngcm::ast::UnnamedNamespaceProcessor", id: "class_6", level: 1, subject: false, hasDerivedClasses: false, link: "./class_UnnamedNamespaceProcessor_3FA2CED94EB2DBF38D8D6A2B8A90F878073D0290.html" }];
     drawDiagram(classes);
 }
 

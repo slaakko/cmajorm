@@ -19,7 +19,7 @@
   <br/>
   <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;</span>
   <br/>
-  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmsx.kernel</span></span>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmsx</span><span class="other">.</span><span class="identifier">kernel</span></span>
   <br/>
   <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="other">{</span></span>
   <br/>
@@ -315,7 +315,8 @@
   <br/>
   <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ushort</span>&nbsp;<span class="identifier">attrs</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">ushort</span><span class="other">></span><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">foregroundColor</span><span class="other">)</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">ushort</span><span class="other">></span><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">backgroundColor</span><span class="other">)</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="number">8u</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;Note&nbsp;if&nbsp;passing&nbsp;OsGetStdHandle(stdout)&nbsp;from&nbsp;here&nbsp;as&nbsp;a&nbsp;parameter,&nbsp;the&nbsp;following&nbsp;call&nbsp;fails,&nbsp;but&nbsp;it&nbsp;does&nbsp;not&nbsp;fail&nbsp;if&nbsp;we&nbsp;call&nbsp;GetStdHandle()&nbsp;from&nbsp;the&nbsp;DLL!!!</span></span>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">//&nbsp;Note&nbsp;if&nbsp;passing&nbsp;OsGetStdHandle(stdout)&nbsp;from&nbsp;here&nbsp;as&nbsp;a&nbsp;parameter,&nbsp;the&nbsp;following&nbsp;call&nbsp;fails,&nbsp;but&nbsp;it&nbsp;does&nbsp;not&nbsp;fail&nbsp;if&nbsp;we&nbsp;call&nbsp;GetStdHandle()&nbsp;from&nbsp;the&nbsp;DLL!!!
+</span></span>
   <br/>
   <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><a href="../../../../../../system/content/System.Runtime/index.html#OsSetConsoleTextAttribute">OsSetConsoleTextAttribute</a><span class="other">(</span><span class="identifier">attrs</span><span class="other">)</span><span class="other">)</span></span>
   <br/>
@@ -441,7 +442,7 @@
   <br/>
   <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a>&nbsp;<span class="identifier">buffer</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">uchar</span>&nbsp;<span class="identifier">c</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../../../../../system/content/System.Core/index.html#74d811b6-f6b4-4236-ad70-56c9a3378c35">u</a><span class="other">)</span></span>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">uchar</span>&nbsp;<span class="identifier">c</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../../../../../system/content/System.Core/index.html#3fd49d04-424f-42d8-aebe-c56bf1527689">u</a><span class="other">)</span></span>
   <br/>
   <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
@@ -535,7 +536,7 @@
   <br/>
   <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a>&nbsp;<span class="identifier">chars</span><span class="other">&nbsp;=&nbsp;</span><a href="../doc/class_ConsoleDriver_3CFD144DAAFC1DF1B4688E47236028D7BBF8CAA3.html#member_function_GetCharsFromInputBuffer_ConsoleDriver_4E8904F7559D9A371895499C706E77B7A34FA23C">GetCharsFromInputBuffer</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">uchar</span>&nbsp;<span class="identifier">c</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../../../../../system/content/System.Core/index.html#74d811b6-f6b4-4236-ad70-56c9a3378c35">chars</a><span class="other">)</span></span>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">uchar</span>&nbsp;<span class="identifier">c</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../../../../../system/content/System.Core/index.html#3fd49d04-424f-42d8-aebe-c56bf1527689">chars</a><span class="other">)</span></span>
   <br/>
   <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
@@ -1019,7 +1020,7 @@
   <br/>
   <span class="code" id="507" xml:space="preserve"><span class="lineNumber">507</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_Mutex_CAF802A5F8A71934B07EA6C23937F60D9AECD650.html">Mutex</a>&nbsp;<span class="identifier">inputBufferMutex</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="508" xml:space="preserve"><span class="lineNumber">508</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Core/index.html#9ae6a0ac-03f4-422a-8101-272cc51c35c9">ustring</a>&nbsp;<span class="identifier">line</span><span class="other">;</span></span>
+  <span class="code" id="508" xml:space="preserve"><span class="lineNumber">508</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Core/index.html#e37fd881-abc6-4f2c-9077-22a9dcc7090d">ustring</a>&nbsp;<span class="identifier">line</span><span class="other">;</span></span>
   <br/>
   <span class="code" id="509" xml:space="preserve"><span class="lineNumber">509</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">ustring</a><span class="other">></span>&nbsp;<span class="identifier">lines</span><span class="other">;</span></span>
   <br/>

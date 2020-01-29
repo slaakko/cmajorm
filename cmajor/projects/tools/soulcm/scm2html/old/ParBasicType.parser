@@ -1,0 +1,35 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Ast;
+using ParserFileTokens;
+
+parser ParBasicTypeParser
+{
+    uselexer ParserFileLexer;
+
+    BasicType : Node*
+        ::= BOOL{ return new BoolNode(span); }
+        |   SBYTE{ return new SByteNode(span); }
+        |   BYTE{ return new ByteNode(span); }
+        |   SHORT{ return new ShortNode(span); }
+        |   USHORT{ return new UShortNode(span); }
+        |   INT{ return new IntNode(span); }
+        |   UINT{ return new UIntNode(span); }
+        |   LONG{ return new LongNode(span); }
+        |   ULONG{ return new ULongNode(span); }
+        |   FLOAT{ return new FloatNode(span); }
+        |   DOUBLE{ return new DoubleNode(span); }
+        |   CHAR{ return new CharNode(span); }
+        |   WCHAR{ return new WCharNode(span); }
+        |   UCHAR{ return new UCharNode(span); }
+        |   VOID{ return new VoidNode(span); }
+        ;
+
+    ruleinfo
+    {
+        (BasicType, "basic type")
+    }
+}

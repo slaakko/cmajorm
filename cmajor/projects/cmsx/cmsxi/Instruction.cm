@@ -320,8 +320,12 @@ namespace cmsx.intermediate
 
     public abstract class ValueInstruction : Instruction
     {
-        public nothrow ValueInstruction(Value* result_, int line_) : base(line_), result(result_), valueNumber(-1)
+        public nothrow ValueInstruction(int line_) : base(line_), valueNumber(-1)
         {
+        }
+        public nothrow void SetResult(Value* result_)
+        {
+            result = result_;
         }
         public override void Validate(Function& function, int numArgs)
         {
@@ -380,8 +384,12 @@ namespace cmsx.intermediate
 
     public abstract class UnaryInstruction : ValueInstruction
     {
-        public nothrow UnaryInstruction(Value* result_, Value* arg_, int line_) : base(result_, line_), arg(arg_)
+        public nothrow UnaryInstruction(int line_) : base(line_)
         {
+        }
+        public nothrow void SetOperand(Value* arg_)
+        {
+            arg = arg_;
         }
         public override void Validate(Function& function, int numArgs)
         {
@@ -424,8 +432,13 @@ namespace cmsx.intermediate
 
     public abstract class BinaryInstruction : ValueInstruction
     {
-        public nothrow BinaryInstruction(Value* result_, Value* left_, Value* right_, int line_, Operator binOp_) : base(result_, line_), left(left_), right(right_), binOp(binOp_)
+        public nothrow BinaryInstruction(int line_, Operator binOp_) : base(line_), binOp(binOp_)
         {
+        }
+        public nothrow void SetOperands(Value* left_, Value* right_)
+        {
+            left = left_;
+            right = right_;
         }
         public override void Validate(Function& function, int numArgs)
         {
@@ -724,7 +737,7 @@ namespace cmsx.intermediate
 
     public class NotInstruction : UnaryInstruction
     {
-        public nothrow NotInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow NotInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -798,7 +811,7 @@ namespace cmsx.intermediate
 
     public class NegInstruction : UnaryInstruction
     {
-        public nothrow NegInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow NegInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -866,7 +879,7 @@ namespace cmsx.intermediate
 
     public class AddInstruction : BinaryInstruction
     {
-        public nothrow AddInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.add)
+        public nothrow AddInstruction(int line_) : base(line_, Operator.add)
         {
         }
         public override nothrow string OperationName() const
@@ -882,7 +895,7 @@ namespace cmsx.intermediate
 
     public class SubInstruction : BinaryInstruction
     {
-        public nothrow SubInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.sub)
+        public nothrow SubInstruction(int line_) : base(line_, Operator.sub)
         {
         }
         public override nothrow string OperationName() const
@@ -898,7 +911,7 @@ namespace cmsx.intermediate
 
     public class MulInstruction : BinaryInstruction
     {
-        public nothrow MulInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.mul)
+        public nothrow MulInstruction(int line_) : base(line_, Operator.mul)
         {
         }
         public override nothrow string OperationName() const
@@ -914,7 +927,7 @@ namespace cmsx.intermediate
 
     public class DivInstruction : BinaryInstruction
     {
-        public nothrow DivInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.div)
+        public nothrow DivInstruction(int line_) : base(line_, Operator.div)
         {
         }
         public override nothrow string OperationName() const
@@ -930,7 +943,7 @@ namespace cmsx.intermediate
 
     public class ModInstruction : BinaryInstruction
     {
-        public nothrow ModInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.mod)
+        public nothrow ModInstruction(int line_) : base(line_, Operator.mod)
         {
         }
         public override nothrow string OperationName() const
@@ -966,7 +979,7 @@ namespace cmsx.intermediate
 
     public class AndInstruction : BinaryInstruction
     {
-        public nothrow AndInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.and_)
+        public nothrow AndInstruction(int line_) : base(line_, Operator.and_)
         {
         }
         public override nothrow string OperationName() const
@@ -982,7 +995,7 @@ namespace cmsx.intermediate
 
     public class OrInstruction : BinaryInstruction
     {
-        public nothrow OrInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.or_)
+        public nothrow OrInstruction(int line_) : base(line_, Operator.or_)
         {
         }
         public override nothrow string OperationName() const
@@ -998,7 +1011,7 @@ namespace cmsx.intermediate
     
     public class XorInstruction : BinaryInstruction
     {
-        public nothrow XorInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.xor_)
+        public nothrow XorInstruction(int line_) : base(line_, Operator.xor_)
         {
         }
         public override nothrow string OperationName() const
@@ -1014,7 +1027,7 @@ namespace cmsx.intermediate
 
     public class ShlInstruction : BinaryInstruction
     {
-        public nothrow ShlInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.shl)
+        public nothrow ShlInstruction(int line_) : base(line_, Operator.shl)
         {
         }
         public override nothrow string OperationName() const
@@ -1030,7 +1043,7 @@ namespace cmsx.intermediate
 
     public class ShrInstruction : BinaryInstruction
     {
-        public nothrow ShrInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.shr)
+        public nothrow ShrInstruction(int line_) : base(line_, Operator.shr)
         {
         }
         public override nothrow string OperationName() const
@@ -1046,7 +1059,7 @@ namespace cmsx.intermediate
 
     public class EqualInstruction : BinaryInstruction
     {
-        public nothrow EqualInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.equal)
+        public nothrow EqualInstruction(int line_) : base(line_, Operator.equal)
         {
         }
         public override nothrow string OperationName() const
@@ -1090,7 +1103,7 @@ namespace cmsx.intermediate
 
     public class LessInstruction : BinaryInstruction
     {
-        public nothrow LessInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_, Operator.less)
+        public nothrow LessInstruction(int line_) : base(line_, Operator.less)
         {
         }
         public override nothrow string OperationName() const
@@ -1134,7 +1147,7 @@ namespace cmsx.intermediate
 
     public class SignExtendInstruction : UnaryInstruction
     {
-        public nothrow SignExtendInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow SignExtendInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -1207,7 +1220,7 @@ namespace cmsx.intermediate
 
     public class ZeroExtendInstruction : UnaryInstruction
     {
-        public nothrow ZeroExtendInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow ZeroExtendInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -1273,7 +1286,7 @@ namespace cmsx.intermediate
 
     public class TruncateInstruction : UnaryInstruction
     {
-        public nothrow TruncateInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow TruncateInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -1361,7 +1374,7 @@ namespace cmsx.intermediate
 
     public class BitCastInstruction : UnaryInstruction
     {
-        public nothrow BitCastInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow BitCastInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -1469,7 +1482,7 @@ namespace cmsx.intermediate
 
     public class IntToFloatInstruction : UnaryInstruction
     {
-        public nothrow IntToFloatInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow IntToFloatInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -1558,7 +1571,7 @@ namespace cmsx.intermediate
 
     public class FloatToIntInstruction : UnaryInstruction
     {
-        public nothrow FloatToIntInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow FloatToIntInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -1633,7 +1646,7 @@ namespace cmsx.intermediate
 
     public class IntToPtrInstruction : UnaryInstruction
     {
-        public nothrow IntToPtrInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow IntToPtrInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -1695,7 +1708,7 @@ namespace cmsx.intermediate
 
     public class PtrToIntInstruction : UnaryInstruction
     {
-        public nothrow PtrToIntInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        public nothrow PtrToIntInstruction(int line_) : base(line_)
         {
         }
         public override nothrow string OperationName() const
@@ -1757,8 +1770,9 @@ namespace cmsx.intermediate
 
     public class ParamInstruction : ValueInstruction
     {
-        public nothrow ParamInstruction(Value* result_, int line_) : base(result_, line_), homeLocation(null)
+        public nothrow ParamInstruction(Value* result_, int line_) : base(line_), homeLocation(null)
         {
+            SetResult(result_);
         }
         public override nothrow string OperationName() const
         {
@@ -1809,8 +1823,9 @@ namespace cmsx.intermediate
 
     public class LocalInstruction : ValueInstruction
     {
-        public nothrow LocalInstruction(Value* result_, Type* localType_, int line_) : base(result_, line_), localType(localType_), homeLocation(null)
+        public nothrow LocalInstruction(Value* result_, Type* localType_, int line_) : base(line_), localType(localType_), homeLocation(null)
         {
+            SetResult(result_);
         }
         public override nothrow string OperationName() const
         {
@@ -1865,8 +1880,9 @@ namespace cmsx.intermediate
 
     public class LoadInstruction : ValueInstruction
     {
-        public nothrow LoadInstruction(Value* result_, Value* ptr_, int line_) : base(result_, line_), ptr(ptr_)
+        public nothrow LoadInstruction(Value* result_, Value* ptr_, int line_) : base(line_), ptr(ptr_)
         {
+            SetResult(result_);
         }
         public override nothrow string OperationName() const
         {
@@ -2140,8 +2156,9 @@ namespace cmsx.intermediate
 
     public class ElemAddrInstruction : ValueInstruction
     {
-        public nothrow ElemAddrInstruction(Value* result_, Value* ptr_, Value* index_, int line_) : base(result_, line_), ptr(ptr_), index(index_)
+        public nothrow ElemAddrInstruction(Value* result_, Value* ptr_, Value* index_, int line_) : base(line_), ptr(ptr_), index(index_)
         {
+            SetResult(result_);
         }
         public override nothrow string OperationName() const
         {
@@ -2326,8 +2343,9 @@ namespace cmsx.intermediate
 
     public class PtrOffsetInstruction : ValueInstruction
     {
-        public nothrow PtrOffsetInstruction(Value* result_, Value* ptr_, Value* offset_, int line_) : base(result_, line_), ptr(ptr_), offset(offset_)
+        public nothrow PtrOffsetInstruction(Value* result_, Value* ptr_, Value* offset_, int line_) : base(line_), ptr(ptr_), offset(offset_)
         {
+            SetResult(result_);
         }
         public override nothrow string OperationName() const
         {
@@ -2489,8 +2507,9 @@ namespace cmsx.intermediate
 
     public class PtrDiffInstruction : ValueInstruction
     {
-        public nothrow PtrDiffInstruction(Value* result_, Value* leftPtr_, Value* rightPtr_, int line_) : base(result_, line_), leftPtr(leftPtr_), rightPtr(rightPtr_)
+        public nothrow PtrDiffInstruction(Value* result_, Value* leftPtr_, Value* rightPtr_, int line_) : base(line_), leftPtr(leftPtr_), rightPtr(rightPtr_)
         {
+            SetResult(result_);
         }
         public override nothrow string OperationName() const
         {
@@ -3060,8 +3079,9 @@ namespace cmsx.intermediate
 
     public class FunctionCallInstruction : ValueInstruction
     {
-        public nothrow FunctionCallInstruction(Value* result_, Value* callee_, int line_) : base(result_, line_), callee(callee_)
+        public nothrow FunctionCallInstruction(Value* result_, Value* callee_, int line_) : base(line_), callee(callee_)
         {
+            SetResult(result_);
         }
         public override nothrow string OperationName() const
         {
@@ -3199,8 +3219,9 @@ namespace cmsx.intermediate
 
     public class TrapInstruction : ValueInstruction
     {
-        public nothrow TrapInstruction(Value* result_, Value* b0_, Value* b1_, Value* b2_, int line_) : base(result_, line_), b0(b0_), b1(b1_), b2(b2_)
+        public nothrow TrapInstruction(Value* result_, Value* b0_, Value* b1_, Value* b2_, int line_) : base(line_), b0(b0_), b1(b1_), b2(b2_)
         {
+            SetResult(result_);
         }
         public override nothrow string OperationName() const
         {

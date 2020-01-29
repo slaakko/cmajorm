@@ -204,6 +204,10 @@ parser ParserFileParser
         {
             return new soulcm.scmpg.EmptyParser();
         }
+        |   ANY
+        {
+            return new soulcm.scmpg.AnyParser();
+        }
         |   ID
         {
             ustring tokenName = lexer.GetMatch(span);

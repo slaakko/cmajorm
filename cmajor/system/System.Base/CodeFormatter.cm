@@ -163,6 +163,27 @@ namespace System.Text
         return formatter;
     }
 
+    public CodeFormatter& operator<<(CodeFormatter& formatter, char c)
+    {
+        string s = ToString(c);
+        formatter.Write(s);
+        return formatter;
+    }
+
+    public CodeFormatter& operator<<(CodeFormatter& formatter, wchar c)
+    {
+        string s = ToString(c);
+        formatter.Write(s);
+        return formatter;
+    }
+
+    public CodeFormatter& operator<<(CodeFormatter& formatter, uchar c)
+    {
+        string s = ToString(c);
+        formatter.Write(s);
+        return formatter;
+    }
+
     public CodeFormatter& operator<<(CodeFormatter& formatter, const Endl&)
     {
         formatter.WriteLine();

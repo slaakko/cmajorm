@@ -1,0 +1,122 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.RegularExpressions
+{
+    public class ComplementMakerVisitor : Visitor
+    {
+        public override void Visit(Char& c) 
+        {
+            Range range(c.Chr(), c.Chr());
+            ranges = ~range;
+        }
+        public override void Visit(Any& a) 
+        {
+        }
+        public override void Visit(Range& r) 
+        {
+            ranges = ~r;
+        }
+        public nothrow inline const List<Range>& Ranges() const
+        {
+            return ranges;
+        }
+        private List<Range> ranges;
+    }
+    
+    public class RangeCreatorVisitor : Visitor
+    {
+        public nothrow RangeCreatorVisitor(const List<Range>& ranges_) : ranges(ranges_)
+        {
+        }
+        public override void Visit(Char& c) 
+        {
+            Range range(c.Chr(), c.Chr());
+            AddRange(range);
+        }
+        public override void Visit(Range& r) 
+        {
+            AddRange(r);
+        }
+        public override void Visit(Class& c) 
+        {
+            if (c.Inverse())
+            {
+                for (Symbol* s : c.Symbols())
+                {
+                    ComplementMakerVisitor v;
+                    s->Accept(v);
+                    for (const Range& range : v.Ranges())
+                    {
+                        AddRange(range);
+                    }
+                }
+            }
+            else
+            {
+                for (Symbol* s : c.Symbols())
+                {
+                    s->Accept(*this);
+                }
+            }
+        }
+        private void AddRange(const Range& range)
+        {
+            Range newRange = range;
+            List<Range> newRanges;
+            for (const Range& r : ranges)
+            {
+                if (Intersect(newRange, r))
+                {
+                    Range intersection = newRange & r;
+                    if (r < newRange)
+                    {
+                        Range left(r.Start(), cast<uchar>(cast<uint>(intersection.Start()) - 1u));
+                        if (!left.IsEmpty())
+                        {
+                            newRanges.Add(left);
+                        }
+                    }
+                    else
+                    {
+                        Range left(newRange.Start(), cast<uchar>(cast<uint>(intersection.Start()) - 1u));
+                        if (!left.IsEmpty())
+                        {
+                            newRanges.Add(left);
+                        }
+                    }
+                    newRanges.Add(intersection);
+                    if (r.End() > newRange.End())
+                    {
+                        Range right(cast<uchar>(cast<uint>(intersection.End()) + 1u), r.End());
+                        newRange = right;
+                    }
+                    else
+                    {
+                        Range right(cast<uchar>(cast<uint>(intersection.End()) + 1u), newRange.End());
+                        newRange = right;
+                    }
+                }
+                else 
+                {
+                    newRanges.Add(r);
+                }
+            }
+            if (!newRange.IsEmpty())
+            {
+                newRanges.Add(newRange);
+            }
+            Swap(ranges, newRanges);
+        }
+        public nothrow inline const List<Range>& Ranges()
+        {
+            return ranges;
+        }
+        private List<Range> ranges;
+    }
+}

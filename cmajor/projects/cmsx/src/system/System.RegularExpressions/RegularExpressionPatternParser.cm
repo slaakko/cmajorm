@@ -1,0 +1,331 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System.RegularExpressions
+{
+    public class RegularExpressionPatternParser
+    {
+        private const int END = 0;
+        private const int SYMBOL = 1;
+        private const int SANCHOR = 2;
+        private const int EANCHOR = 3;
+        private const int AST = 4;
+        private const int PLUS = 5;
+        private const int QUEST = 6;
+        private const int ALT = 7;
+        private const int LPAREN = 8;
+        private const int RPAREN = 9;
+        
+        public nothrow RegularExpressionPatternParser(Context& context_, const ustring& pattern_) : 
+            context(context_), pattern(pattern_), start(pattern.Chars()), end(pattern.Chars() + pattern.Length()), pos(start), token(END)
+        {
+        }
+        public Nfa Parse()
+        {
+            token = GetToken();
+            Nfa nfa;
+            if (token == SANCHOR)
+            {
+                token = GetToken();
+                nfa = ParseAlt();
+            }
+            else
+            {
+                nfa = Kleene(context, MakeNfa(context, context.MakeAny()));
+                Nfa alt = ParseAlt();
+                nfa = Cat(context, nfa, alt);
+            }
+            if (token == EANCHOR)
+            {
+                token = GetToken();
+            }
+            else
+            {
+                nfa = Cat(context, nfa, Kleene(context, MakeNfa(context, context.MakeAny())));
+            }
+            if (token != END)
+            {
+                throw Exception("invalid pattern '" + ToUtf8(pattern) + "'");
+            }
+            return nfa;
+        }
+        private Nfa ParseAlt()
+        {
+            Nfa left = ParseCat();
+            while (token == ALT)
+            {
+                token = GetToken();
+                left = Alt(context, left, ParseCat());
+            }
+            return left;
+        }
+        private Nfa ParseCat()
+        {
+            Nfa left = ParseRep();
+            while (token != END && token != EANCHOR && token != RPAREN)
+            {
+                left = Cat(left, ParseRep());
+            }
+            return left;
+        }
+        private Nfa ParseRep()
+        {
+            Nfa nfa = ParsePrimary();
+            if (token == AST || token == PLUS || token == QUEST)
+            {
+                switch (token)
+                {
+                    case AST:
+                    {
+                        nfa = Kleene(context, nfa);
+                        token = GetToken();
+                        break;
+                    }
+                    case PLUS:
+                    {   
+                        nfa = Pos(context, nfa);
+                        token = GetToken();
+                        break;
+                    }
+                    case QUEST:
+                    {
+                        nfa = Opt(context, nfa);
+                        token = GetToken();
+                        break;
+                    }
+                }
+            }
+            return nfa;
+        }
+        private Nfa ParsePrimary()
+        {
+            if (token == LPAREN)
+            {
+                token = GetToken();
+                Nfa nfa = ParseAlt();
+                if (token == RPAREN)
+                {
+                    token = GetToken();
+                }
+                else
+                {
+                    throw Exception(ToUtf8(pattern) + " position " + ToString(pos - start) + ": right parenthesis expected");
+                }
+            }
+            else if (token == SYMBOL)
+            {
+                Nfa nfa = MakeNfa(context, symbol);
+                token = GetToken();
+                return nfa;
+            }
+            else
+            {
+                throw Exception(ToUtf8(pattern) + " position " + ToString(pos - start) + ": symbol or subexpression expected");
+            }
+        }
+        private int GetToken()
+        {
+            uchar rangeStart;
+            Class* cls = null;
+            int state = 0;
+            while (pos != end)
+            {
+                uchar c = *pos;
+                switch (state)
+                {
+                    case 0:
+                    {
+                        switch (c)
+                        {
+                            case '^':
+                            {
+                                ++pos;
+                                return SANCHOR;
+                            }
+                            case '$':
+                            {
+                                ++pos;
+                                return EANCHOR;
+                            }
+                            case '*':
+                            {
+                                ++pos;
+                                return AST;
+                            }
+                            case '+':
+                            {
+                                ++pos;
+                                return PLUS;
+                            }
+                            case '?':
+                            {
+                                ++pos;
+                                return QUEST;
+                            }
+                            case '|':
+                            {
+                                ++pos;
+                                return ALT;
+                            }
+                            case '(':
+                            {
+                                ++pos;
+                                return LPAREN;
+                            }
+                            case ')':
+                            {
+                                ++pos;
+                                return RPAREN;
+                            }
+                            case '[':
+                            {
+                                state = 1;
+                                cls = context.MakeClass();
+                                break;
+                            }
+                            case '\\':
+                            {
+                                state = 6;
+                                break;
+                            }
+                            case '.':
+                            {
+                                symbol = context.MakeAny();
+                                ++pos;
+                                return SYMBOL;
+                            }
+                            default: 
+                            {
+                                symbol = context.MakeChar(c);
+                                ++pos;
+                                return SYMBOL;
+                            }
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        switch (c)
+                        {
+                            case '^':
+                            {
+                                cls->SetInverse();
+                                state = 2;
+                                break;
+                            }
+                            case '\\':
+                            {
+                                state = 5;
+                                break;
+                            }
+                            default:
+                            {
+                                rangeStart = c;
+                                state = 3;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        switch (c)
+                        {
+                            case '\\':
+                            {
+                                state = 5;
+                                break;
+                            }
+                            case ']':
+                            {
+                                symbol = cls;
+                                ++pos;
+                                return SYMBOL;
+                            }
+                            default:
+                            {
+                                rangeStart = c;
+                                state = 3;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        switch (c)
+                        {
+                            case '-':
+                            {
+                                state = 4;
+                                break;
+                            }
+                            case '\\':
+                            {
+                                state = 5;
+                                break;
+                            }
+                            case ']':
+                            {
+                                cls->AddSymbol(context.MakeChar(rangeStart));
+                                symbol = cls;
+                                ++pos;
+                                return SYMBOL;
+                            }
+                            default:
+                            {
+                                cls->AddSymbol(context.MakeChar(rangeStart));
+                                rangeStart = c;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 4:
+                    {
+                        if (c == ']')
+                        {
+                            cls->AddSymbol(context.MakeChar('-'));
+                            symbol = cls;
+                            ++pos;
+                            return SYMBOL;
+                        }
+                        else
+                        {
+                            cls->AddSymbol(context.MakeRange(rangeStart, c));
+                            state = 2;
+                        }
+                        break;
+                    }
+                    case 5:
+                    {
+                        rangeStart = c;
+                        state = 3;
+                        break;
+                    }
+                    case 6:
+                    {
+                        symbol = context.MakeChar(c);
+                        ++pos;
+                        return SYMBOL;
+                    }
+                }
+                ++pos;
+            }
+            if (state != 0)
+            {
+                throw Exception("invalid pattern '" + ToUtf8(pattern) + "'");
+            }
+            return END;
+        }
+        private Context& context;
+        private ustring pattern;
+        private uchar* start;
+        private uchar* end;
+        private uchar* pos;
+        private Symbol* symbol;
+        private int token;
+    }
+}

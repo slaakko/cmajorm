@@ -1,5 +1,6 @@
 using System;
-using System.Text.Parsing;
+using Span = System.Lex.Span;
+using ParsingException = System.Lex.ParsingException;
 
 namespace cmsx.debug
 {
@@ -245,39 +246,14 @@ namespace cmsx.debug
         public UniquePtr<Node> expression;
     }
 
-    public class Parser
-    {
-        static Parser() : instance(new Parser())
-        {
-        }
-        public static Parser& Instance()
-        {
-            return *instance;
-        }
-        private Parser() : grammar(new StatementGrammar())
-        {
-        }
-        public UniquePtr<Node> Parse(const ustring& line)
-        {
-            UniquePtr<Node> node = grammar->Parse(line.Chars(), line.Chars() + line.Length(), 0, "");
-            return node;
-        }
-        private static UniquePtr<Parser> instance;
-        private StatementGrammar* grammar;
-    }
-
     public void Evaluate(Debugger* debugger, const ustring& line)
     {
         try
         {
-            UniquePtr<Node> node = Parser.Instance().Parse(line);
+            MdbLexer lexer(line, "<line>", 0);
+            UniquePtr<Node> node = StatementParser.Parse(lexer);
             Evaluator evaluator(debugger);
             node->Accept(evaluator);
-        }
-        catch (const ExpectationFailure& ex)
-        {
-            string error = "error: " + ex.Message();
-            debugger->AddOutputLine(ToUtf32(error), 0u);
         }
         catch (const ParsingException& ex)
         {

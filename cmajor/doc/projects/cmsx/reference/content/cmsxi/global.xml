@@ -3,13 +3,13 @@
         <baseClass classId="class_BinaryInstruction_08C442F5ED9A7D52121855254F6041AB7638A2E6">
             <derivedClass classId="class_AddInstruction_0B16B30C9897CAC555F57BB71D50D23F14560991"/>
             <derivedClass classId="class_AndInstruction_7D8B9FE1E6398AD3263DEBB95835DD51930F045E"/>
-            <derivedClass classId="class_ShlInstruction_3FA5AE59780212F9F39EAFDE04E40BC3DED730A3"/>
             <derivedClass classId="class_MulInstruction_39816FCB8CD7660853CBE82E1EB198FD4EF4916F"/>
             <derivedClass classId="class_DivInstruction_4E48982E8D214590A5940C6733B43677A26880A7"/>
             <derivedClass classId="class_ModInstruction_58BA0F21F75CEC55AD8B6A29C0471C202108B159"/>
             <derivedClass classId="class_EqualInstruction_923BD0DEA90221CBB0F457E6AAA23A0F93265533"/>
             <derivedClass classId="class_LessInstruction_3CA7A9F9878AC16CC962AF9DC1193FF4EE8851ED"/>
             <derivedClass classId="class_OrInstruction_336769D20B8FA6267A18231AE3831856D6465B48"/>
+            <derivedClass classId="class_ShlInstruction_3FA5AE59780212F9F39EAFDE04E40BC3DED730A3"/>
             <derivedClass classId="class_ShrInstruction_DA68839D5B1ADE7D105AEFA0C18F6D1E18132266"/>
             <derivedClass classId="class_SubInstruction_9F5D798DCD2981A02DFABBB92D121A9CAAB705C8"/>
             <derivedClass classId="class_XorInstruction_235859F3127AE57E64F2866391C7F389A439ED8D"/>
@@ -21,7 +21,6 @@
         <baseClass classId="class_ValueInstruction_417B4E9734C5B191C070E73F51D43C8545054B69">
             <derivedClass classId="class_BinaryInstruction_08C442F5ED9A7D52121855254F6041AB7638A2E6"/>
             <derivedClass classId="class_ElemAddrInstruction_3834E2AD56BCC2E27A51A96A92D17486F2C1408B"/>
-            <derivedClass classId="class_TrapInstruction_0D64725C22BFE6EBF7678B8DDAFAC6B9223B5E92"/>
             <derivedClass classId="class_LocalInstruction_7E0436EB9D76A7661F6823E59DED6004A7358F23"/>
             <derivedClass classId="class_ParamInstruction_805B3BFA4FFB1600D5C8F63F77BC29989D74FC4F"/>
             <derivedClass classId="class_UnaryInstruction_83DFD4DD0B93E1F3583BA15151745AA9DF839635"/>
@@ -29,6 +28,7 @@
             <derivedClass classId="class_LoadInstruction_B530E075DCF44DFAACB54BDBD6A0EF22892D39BB"/>
             <derivedClass classId="class_PtrDiffInstruction_3C87B69AEAD3D5898F21B768971AAA6E4BFACFC3"/>
             <derivedClass classId="class_PtrOffsetInstruction_733661BF8D265FD0B1E1A50054F0A87738556F6F"/>
+            <derivedClass classId="class_TrapInstruction_0D64725C22BFE6EBF7678B8DDAFAC6B9223B5E92"/>
         </baseClass>
         <baseClass classId="class_AggregateValue_E29E107A41FC02B5858FD93FD1825EB5783627D2">
             <derivedClass classId="class_ArrayValue_EEF0C9382F538AEDF258F1F8F76F8E1B07D21C9D"/>
@@ -66,7 +66,6 @@
             <derivedClass classId="class_SymbolOperand_30D5FD9BD886AA7A72BAA0EDA260A90E9F26366D"/>
         </baseClass>
         <baseClass classId="class_UnaryInstruction_83DFD4DD0B93E1F3583BA15151745AA9DF839635">
-            <derivedClass classId="class_TruncateInstruction_B22EF09C6EBE2155A1B2CF8575D726740281BCAA"/>
             <derivedClass classId="class_IntToFloatInstruction_9DA26DE1992B1FEFA92BACE1E6D44DEBA2F018E9"/>
             <derivedClass classId="class_BitCastInstruction_0DFE589DF2F64E1988E1854FF9EB4A02D72BF89F"/>
             <derivedClass classId="class_FloatToIntInstruction_EB7C8C7569608621D19BD776DC6F11B228CAC34B"/>
@@ -75,6 +74,7 @@
             <derivedClass classId="class_NotInstruction_A35DFCD9C51C7775A539653F67EF5C1BBAF6F211"/>
             <derivedClass classId="class_NegInstruction_488EF344D5729AA5AB8D574DA3F27ED289BDBA12"/>
             <derivedClass classId="class_SignExtendInstruction_1004F75A8D85849750C671247EA722F0EA502FEE"/>
+            <derivedClass classId="class_TruncateInstruction_B22EF09C6EBE2155A1B2CF8575D726740281BCAA"/>
             <derivedClass classId="class_ZeroExtendInstruction_BAF183E9484C28A803CAB87844250BF17FB97DF4"/>
         </baseClass>
         <baseClass classId="class_ScalarType_5341F9001A6FFDDF82FD76BC23120B1D83899F59">
@@ -91,9 +91,9 @@
             <derivedClass classId="class_ByteValue_7115CF5E68332E8ADA8BADEB356B893B5C61B5D1"/>
             <derivedClass classId="class_DoubleValue_25546824C5571F8B04A0FB46A71BB3EBB8296DED"/>
             <derivedClass classId="class_FloatValue_ABC1F20FB0D3B0F1804659B27CD7D6B7FC29554B"/>
-            <derivedClass classId="class_ShortValue_87B3415FDEC7C98960533A6CBA5FC52A644387F0"/>
             <derivedClass classId="class_LongValue_2F8A26DC1D25D30EB96F33EAA7B3E2DC3FFB9E5F"/>
             <derivedClass classId="class_SByteValue_1B481216AE0861E4AF18C29D7966870EDA74EA07"/>
+            <derivedClass classId="class_ShortValue_87B3415FDEC7C98960533A6CBA5FC52A644387F0"/>
             <derivedClass classId="class_UIntValue_5292BA4E650BBCD809C006E6F252E4CCFE13AE4D"/>
             <derivedClass classId="class_ULongValue_FA9640B50B01DFFB90B95206825ECB112548D967"/>
             <derivedClass classId="class_UShortValue_E416282C50A294FD452C16D78E8CB375028578A9"/>

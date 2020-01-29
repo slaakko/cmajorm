@@ -1,0 +1,92 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Debugger Expression Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Debugger Expression Grammar</h1>
+  <table class="grammar">
+   <tr id="expression">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#format-expression">format&#8209;expression</a></span></td>
+   </tr>
+   <tr id="format-expression">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      format&#8209;expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#binary-expression">binary&#8209;expression</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">.</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#format">format</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="format">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      format</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-mdb-grammar.html#id">id</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-mdb-grammar.html#dec">dec</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-mdb-grammar.html#id">id</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="binary-expression">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      binary&#8209;expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#term">term</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#weak-operator">weak&#8209;operator</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#term">term</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="weak-operator">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      weak&#8209;operator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">+</span><span class="ruleOp"> | </span><span class="ruleChar">-</span><span class="ruleOp"> | </span><span class="ruleChar">|</span><span class="ruleOp"> | </span><span class="ruleChar">^</span></td>
+   </tr>
+   <tr id="term">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      term</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#unary-expression">unary&#8209;expression</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#strong-operator">strong&#8209;operator</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#unary-expression">unary&#8209;expression</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="strong-operator">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      strong&#8209;operator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">*</span><span class="ruleOp"> | </span><span class="ruleChar">/</span><span class="ruleOp"> | </span><span class="ruleChar">%</span><span class="ruleOp"> | </span><span class="ruleChar">&lt;</span><span class="ruleChar">&lt;</span><span class="ruleOp"> | </span><span class="ruleChar">></span><span class="ruleChar">></span><span class="ruleOp"> | </span><span class="ruleChar">&amp;</span></td>
+   </tr>
+   <tr id="unary-expression">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      unary&#8209;expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#expression">expression</a></span><span class="ruleOp"> </span><span class="ruleChar">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#unary-operator">unary&#8209;operator</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#unary-expression">unary&#8209;expression</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#primary-expression">primary&#8209;expression</a></span></td>
+   </tr>
+   <tr id="unary-operator">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      unary&#8209;operator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">+</span><span class="ruleOp"> | </span><span class="ruleChar">-</span><span class="ruleOp"> | </span><span class="ruleChar">~</span><span class="ruleOp"> | </span><span class="ruleChar">*</span></td>
+   </tr>
+   <tr id="primary-expression">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      primary&#8209;expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-mdb-grammar.html#seg">seg</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-mdb-grammar.html#reg">reg</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-mdb-grammar.html#hex">hex</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-mdb-grammar.html#dec">dec</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-mdb-grammar.html#id">id</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

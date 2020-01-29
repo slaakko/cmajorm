@@ -1,0 +1,145 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.RegularExpressions
+{
+    public class Context
+    {
+        public nothrow Context() : nextNfaStateId(0), nextDfaStateId(0), any(), epsilon(eps)
+        {
+        }
+        public ~Context()
+        {
+            for (NfaState* state: nfaStates)
+            {
+                delete state;
+            }
+            nfaStates.Clear();
+            for (DfaState* state : dfaStates)
+            {
+                delete state;
+            }
+            dfaStates.Clear();
+            for (Symbol* symbol : symbols)
+            {
+                delete symbol;
+            }
+            symbols.Clear();
+        }
+        public nothrow NfaState* MakeNfaState()
+        {
+            NfaState* state = new NfaState(nextNfaStateId++);
+            nfaStates.Add(state);
+            return state;
+        }
+        public nothrow Symbol* MakeChar(uchar c)
+        {
+            HashMap<uchar, Symbol*>.ConstIterator it = charSymbols.CFind(c);
+            if (it != charSymbols.CEnd())
+            {
+                return it->second;
+            }
+            Symbol* symbol = new Char(c);
+            symbols.Add(symbol);
+            charSymbols[c] = symbol;
+            return symbol;
+        }
+        public nothrow Symbol* MakeEpsilon()
+        {
+            return &epsilon;
+        }
+        public nothrow Symbol* MakeAny()
+        {
+            return &any;
+        }
+        public nothrow Symbol* MakeRange(uchar start, uchar end)
+        {
+            Range range(start, end);
+            HashMap<Range, Symbol*>.ConstIterator it = rangeSymbols.CFind(range);
+            if (it != rangeSymbols.CEnd())
+            {
+                return it->second;
+            }
+            Symbol* symbol = new Range(start, end);
+            symbols.Add(symbol);
+            rangeSymbols[range] = symbol;
+            return symbol;
+        }
+        public nothrow Class* MakeClass()
+        {
+            Class* cls = new Class();
+            symbols.Add(cast<Symbol*>(cls));
+            return cls;
+        }
+        public nothrow const List<NfaState*>& NfaStates() const
+        {
+            return nfaStates;
+        }
+        public void MakeRanges()
+        {
+            ranges.Add(Range(cast<uchar>(1), cast<uchar>(0xFFFFFFFFu)));
+            RangeCreatorVisitor visitor(ranges);
+            for (Symbol* symbol : symbols)
+            {
+                symbol->Accept(visitor);
+            }
+            ranges = visitor.Ranges();
+        }
+        public nothrow void PrintRanges()
+        {
+            long n = ranges.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                Range range = ranges[i];
+                Console.Out() << i << ": " << range.ToString() << endl();
+            }
+        }
+        public DfaState* MakeDfaState(const List<NfaState*>& nfaStates)
+        {
+            List<NfaState*> s(nfaStates);
+            Sort(s);
+            for (DfaState* state : dfaStates)
+            {
+                if (state->NfaStates() == s)
+                {
+                    return state;
+                }
+            }
+            DfaState* state = new DfaState(nextDfaStateId++, s);
+            dfaStates.Add(state);
+            return state;
+        }
+        public nothrow inline const List<Range>& Ranges() const
+        {
+            return ranges;
+        }
+        public nothrow int GetSymbolIndex(uchar c) const
+        {
+            long n = ranges.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                const Range& range = ranges[i];
+                if (range.Match(c))
+                {
+                    return cast<int>(i);
+                }
+            }
+            return -1;
+        }
+        private int nextNfaStateId;
+        private int nextDfaStateId;
+        private List<NfaState*> nfaStates;
+        private List<Symbol*> symbols;
+        private HashMap<uchar, Symbol*> charSymbols;
+        private HashMap<Range, Symbol*> rangeSymbols;
+        private Any any;
+        private Char epsilon;
+        private List<Range> ranges;
+        private List<DfaState*> dfaStates;
+    }
+}

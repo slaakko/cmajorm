@@ -1,0 +1,48 @@
+classmap MdbClassMap;
+
+tokens MdbTokens
+{
+    (SEG, "seg"), (REG, "reg"), (HEX, "hex"), (DEC, "dec"), (ID, "identifier"), (PLUS, "'+'"), (MINUS, "'-'"), (BAR, "'|'"), (CARET, "'^'"), (AST, "'*'"), (SLASH, "'/'"), (PERCENT, "'%'"),
+    (SHIFT_LEFT, "'<<'"), (SHIFT_RIGHT, "'>>'"), (AMP, "'&'"), (TILDE, "'~'"), (DOT, "'.'"), (LPAREN, "'()"), (RPAREN, "')'"), (PRINT, "print"), (TRACE, "trace")
+}
+
+keywords MdbKeywords
+{
+    ("print", PRINT), ("trace", TRACE), ("p", PRINT), ("t", TRACE)
+}
+
+expressions
+{
+    ws = "[\t\r\n ]+";
+    digit = "[0-9]";
+    seg = "$[tdpsk]";
+    reg ="${digit}+";
+    hexdigit = "[0-9a-fA-F]";
+    hex = "#{hexdigit}+";
+    dec = "{digit}+";
+    id = "{idstart}{idcont}*";
+}
+
+lexer MdbLexer
+{
+    "{ws}" {}
+    "{seg}" { return SEG; }
+    "{reg}" { return REG; }
+    "{hex}" { return HEX; }
+    "{dec}" { return DEC; }
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "\+" { return PLUS; }
+    "-" { return MINUS; }
+    "\|" { return BAR; }
+    "^" { return CARET; }
+    "\*" { return AST; }
+    "/" { return SLASH; }
+    "%" { return PERCENT; }
+    "<<" { return SHIFT_LEFT; }
+    ">>" { return SHIFT_RIGHT; }
+    "&" { return AMP; }
+    "~" { return TILDE; }
+    "\." { return DOT; }
+    "\(" { return LPAREN; }
+    "\)" { return RPAREN; }
+}

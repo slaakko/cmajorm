@@ -1,0 +1,126 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.RegularExpressions
+{
+    public class DfaState
+    {
+        public nothrow DfaState(int id_, const List<NfaState*>& nfaStates_) : id(id_), nfaStates(nfaStates_), marked(false), accept(false)
+        {
+            for (NfaState* s : nfaStates)
+            {
+                if (s->Accept())
+                {
+                    accept = true;
+                }
+            }
+        }
+        public nothrow inline int Id() const
+        {
+            return id;
+        }
+        public nothrow inline bool Accept() const
+        {
+            return accept;
+        }
+        public nothrow inline const List<NfaState*>& NfaStates() const
+        {
+            return nfaStates;
+        }
+        public nothrow inline bool IsMarked() const
+        {
+            return marked;
+        }
+        public nothrow inline void Mark()
+        {
+            marked = true;
+        }
+        public nothrow string ToString() const
+        {
+            string s;
+            s.Append(ToString(id)).Append(':').Append('{');
+            bool first = true;
+            for (NfaState* nfaState : nfaStates)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    s.Append(", ");
+                }
+                s.Append(ToString(nfaState->Id()));
+            }
+            s.Append('}').Append('\n');
+            long n = next.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                DfaState* ns = next[i];
+                s.Append("    ").Append(ToString(i)).Append("->");
+                if (ns != null)
+                {
+                    s.Append(ToString(ns->Id()));
+                }
+                else
+                {
+                    s.Append("null");
+                }
+                s.Append('\n');
+            }
+            return s;
+        }
+        public nothrow void AddNext(DfaState* n)
+        {
+            next.Add(n);
+        }
+        public nothrow DfaState* Next(int i)
+        {
+            if (i >= 0 && i < next.Count())
+            {
+                return next[i];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        private int id;
+        private List<NfaState*> nfaStates;
+        private List<DfaState*> next;
+        private bool marked;
+        private bool accept;
+    }
+    
+    public class Dfa
+    {
+        public nothrow Dfa() : states()
+        {
+        }
+        public nothrow string ToString() const
+        {
+            string s;
+            long n = states.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                DfaState* state = states[i];
+                s.Append(state->ToString());
+            }
+            return s;
+        }
+        public nothrow void AddState(DfaState* state)
+        {
+            states.Add(state);
+        }
+        public nothrow inline const List<DfaState*>& States() const
+        {
+            return states;
+        }
+        private List<DfaState*> states;
+    }
+}

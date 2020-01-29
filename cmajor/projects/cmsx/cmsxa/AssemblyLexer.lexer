@@ -1,0 +1,81 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+classmap AssemblyClassMap;
+
+tokens AssemblyTokens
+{
+    (DECIMAL_CONSTANT, "'decimal constant'"), (HEX_CONSTANT, "'hex constant'"), (CHAR_CONSTANT, "'char constant'"), (STRING_CONSTANT, "'string constant'"), (CLSID_CONSTANT, "'clsid constant'"),
+    (LOCAL_SYMBOL, "'local symbol'"), (SYMBOL, "'symbol'"), (AT, "'at'"), (PLUS, "'plus'"), (MINUS, "'minus'"), (TILDE, "'tilde'"), (DOLLAR, "'$'"), (AMP, "'amp'"), (AST, "'ast'"),
+    (SLASHSLASH, "'slashslash'"), (SLASH, "'slash'"), (PERCENT, "'percent'"), (SHIFT_LEFT, "'shift left'"), (SHIFT_RIGHT, "'shift right'"), (BAR, "'bar'"), (CARET, "'caret'"), (DOT, "'dot'"),
+    (SPACE, "'space'"), (NEWLINE, "'newline'"), (LPAREN, "'('"), (RPAREN, "')'"), (SEMICOLON, "';'"), (COMMA, "','"), (CHAR, "'char'")
+}
+
+expressions
+{
+    space = "[ \t]+";
+    newline = "\n\r|\n|\r";
+    digit = "[0-9]";
+    decimalConstant = "{digit}+";
+    hexdigit = "[0-9a-fA-F]";
+    hexConstant = "#{hexdigit}+";
+    charConstant = "'[^'\n\r]'";
+    stringConstant = "\"[^\"\n\r]*\"";
+    clsIdConstant = "$CLSID\({hexdigit}+\)";
+    localSymbol = "@{digit}+";
+    symbol = "({idstart}|:|_)({idcont}|:|_|@)*";
+    at = "@";
+    plus = "\+";
+    minus = "-";
+    tilde = "~";
+    dollar = "$";
+    amp = "&";
+    ast = "\*";
+    slashSlash = "//";
+    slash = "/";
+    percent = "%";
+    shiftLeft = "<<";
+    shiftRight = ">>";
+    bar = "\|";
+    caret = "^";
+    dot = "\.";
+    lparen = "\(";
+    rparen = "\)";
+    semicolon = ";";
+    comma = ",";
+}
+
+lexer AssemblyLexer
+{
+    "{space}" { return SPACE; }
+    "{newline}" { return NEWLINE; }
+    "{decimalConstant}" { return DECIMAL_CONSTANT; }
+    "{hexConstant}" { return HEX_CONSTANT; }
+    "{charConstant}" { return CHAR_CONSTANT; }
+    "{stringConstant}" { return STRING_CONSTANT; }
+    "{clsIdConstant}" { return CLSID_CONSTANT; }
+    "{localSymbol}" { return LOCAL_SYMBOL; }
+    "{symbol}" { return SYMBOL; }
+    "{at}" { return AT; }
+    "{plus}" { return PLUS; }
+    "{minus}" { return MINUS; }
+    "{tilde}" { return TILDE; }
+    "{dollar}" { return DOLLAR; }
+    "{amp}" { return AMP; }
+    "{ast}" { return AST; }
+    "{slashSlash}" { return SLASHSLASH; }
+    "{slash}" { return SLASH; }
+    "{percent}" { return PERCENT; }
+    "{shiftLeft}" { return SHIFT_LEFT; }
+    "{shiftRight}" { return SHIFT_RIGHT; }
+    "{bar}" { return BAR; }
+    "{caret}" { return CARET; }
+    "{dot}" { return DOT; }
+    "{lparen}" { return LPAREN; }
+    "{rparen}" { return RPAREN; }
+    "{semicolon}" { return SEMICOLON; }
+    "{comma}" { return COMMA; }
+    "." { return CHAR; }
+}

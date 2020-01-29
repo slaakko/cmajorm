@@ -107,6 +107,21 @@ namespace soulcm.scmpg
             visitor.Visit(*this);
         }
     }
+    public class AnyParser : Parser
+    {
+        public AnyParser() :
+            base(u"any")
+        {
+        }
+        public override Parser* Clone() const
+        {
+            return new AnyParser();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
     public class TokenParser : Parser
     {
         public TokenParser(const ustring& tokenName_) :

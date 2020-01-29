@@ -137,7 +137,7 @@ public int main(int argc, const char** argv)
         }
         soulcm.scmpg.LinkerVisitor linkerVisitor;
         domain.Accept(linkerVisitor);
-        soulcm.scmpg.CodeGeneratorVisitor codeGeneratorVisitor(verbose, noParserDebugSupport);
+        soulcm.scmpg.CodeGeneratorVisitor codeGeneratorVisitor(verbose, debug, noParserDebugSupport);
         domain.Accept(codeGeneratorVisitor);
     }
     catch (const Exception& ex)

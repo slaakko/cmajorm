@@ -55,16 +55,16 @@ namespace System.Lex
             currentSpan = spanStack.Pop();
             return s;
         }
-        public void SetSpan()
+        public void SetSpan(long pos)
         {
             if (currentSpan.start == -1)
             {
                 currentSpan.line = line;
-                currentSpan.start = cast<int>(GetPos());
+                currentSpan.start = cast<int>(pos);
             }
             else
             {
-                currentSpan.end = cast<int>(GetPos());
+                currentSpan.end = cast<int>(pos);
             }
         }    
         public nothrow inline Span GetCurrentSpan() const
@@ -233,7 +233,11 @@ namespace System.Lex
         {
             Token startToken = GetToken(span.start);
             span.start = cast<int>(startToken.match.begin - start);
-            Token endToken = GetToken(span.end);
+            Token endToken = startToken;
+            if (span.end != -1)
+            {
+                endToken = GetToken(span.end);
+            }
             span.end = cast<int>(endToken.match.end - start);
         }
         public Token GetToken(long pos) const
@@ -326,7 +330,7 @@ namespace System.Lex
             Token startToken = GetToken(span.start);
             Token endToken = startToken;
             const uchar* lineStart = LineStart(start, startToken.match.begin);
-            if (span.end != span.start)
+            if (span.end != -1 && span.end != span.start)
             {
                 endToken = GetToken(span.end);
             }
@@ -355,7 +359,7 @@ namespace System.Lex
             Token startToken = GetToken(span.start);
             Token endToken = startToken;
             const uchar* lineStart = LineStart(start, startToken.match.begin);
-            if (span.end != span.start)
+            if (span.end != -1 && span.end != span.start)
             {
                 endToken = GetToken(span.end);
             }
