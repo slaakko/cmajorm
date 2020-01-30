@@ -1337,7 +1337,7 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
     }
     compileDebugStart = CurrentMs();
     rootModule->StartBuild();
-    std::atomic<bool> ready = false;
+    std::atomic<bool> ready(false);
     CompileQueue input("input", stop, ready, rootModule->LogStreamId());
     CompileQueue output("output", stop, ready, rootModule->LogStreamId());
     CompileData compileData(rootModule, boundCompileUnits, objectFilePaths, stop, ready, numThreads, input, output);

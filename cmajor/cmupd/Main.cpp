@@ -11,6 +11,7 @@
 #include <sngcm/cmparser/SolutionFile.hpp>
 #include <sngcm/cmparser/ParsingContext.hpp>
 #include <sngcm/ast/SourceWriter.hpp>
+#include <sngcm/ast/Identifier.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -20,6 +21,7 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <cmath>
 
 using namespace soulng::unicode;
 
