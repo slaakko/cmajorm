@@ -24,6 +24,7 @@ build:
 	$(MAKE) -C bdt2dom
 	$(MAKE) -C build
 	$(MAKE) -C compiler
+	$(MAKE) -C cmupd
 	$(MAKE) -C cm2html
 	$(MAKE) -C cmdoc
 	$(MAKE) -C cmmdump
@@ -73,6 +74,7 @@ clean:
 	$(MAKE) -C bdt2dom clean
 	$(MAKE) -C build clean
 	$(MAKE) -C compiler clean
+	$(MAKE) -C cmupd clean
 	$(MAKE) -C cm2html clean
 	$(MAKE) -C cmdoc clean
 	$(MAKE) -C cmmdump clean
