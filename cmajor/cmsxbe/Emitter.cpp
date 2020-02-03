@@ -1551,6 +1551,11 @@ void Emitter::SetFunctionLinkageToLinkOnceODRLinkage(void* function)
     //static_cast<cmsxi::Function*>(function)->SetLinkOnce();
 }
 
+void Emitter::SetFunctionCallConventionToStdCall(void* function)
+{
+    // todo
+}
+
 void Emitter::SetFunction(void* function_)
 {
     currentFunction = static_cast<cmsxi::Function*>(function_);

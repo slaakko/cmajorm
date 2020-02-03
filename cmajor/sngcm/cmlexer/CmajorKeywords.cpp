@@ -52,6 +52,7 @@ namespace CmajorKeywords
         {U"abstract", ABSTRACT}, 
         {U"override", OVERRIDE}, 
         {U"suppress", SUPPRESS}, 
+        {U"winapi", WINAPI}, 
         {U"operator", OPERATOR}, 
         {U"class", CLASS}, 
         {U"return", RETURN}, 

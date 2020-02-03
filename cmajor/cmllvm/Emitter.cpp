@@ -1673,6 +1673,13 @@ void Emitter::SetFunctionLinkageToLinkOnceODRLinkage(void* function)
     fun->setLinkage(llvm::GlobalValue::LinkageTypes::LinkOnceODRLinkage);
 }
 
+void Emitter::SetFunctionCallConventionToStdCall(void* function)
+{
+    llvm::Function* fun = static_cast<llvm::Function*>(function);
+    fun->setCallingConv(llvm::CallingConv::X86_StdCall);
+    //fun->setCallingConv(llvm::CallingConv::X86_ThisCall);
+}
+
 void* Emitter::CreateSubroutineType(const std::vector<void*>& elementTypes)
 {
     std::vector<llvm::Metadata*> elements;

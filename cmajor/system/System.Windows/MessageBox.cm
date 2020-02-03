@@ -1,0 +1,21 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public static class MessageBox
+    {
+        public static void Show(const string& message)
+        {
+            WinShowMessageBox(message.Chars(), null);
+        }
+        public static void Show(const string& message, const string& caption)
+        {
+            WinShowMessageBox(message.Chars(), caption.Chars());
+        }
+    }
+}

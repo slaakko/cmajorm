@@ -1047,6 +1047,19 @@ soulng::parser::Match ProjectFileParser::Target(ContainerFileLexer& lexer)
             }
             break;
         }
+        case WINGUIAPP:
+        {
+            ++lexer;
+            {
+                {
+                    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                    if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Target"));
+                    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                    return soulng::parser::Match(true, new soulng::parser::Value<sngcm::ast::Target>(sngcm::ast::Target::winguiapp));
+                }
+            }
+            break;
+        }
         case WINAPP:
         {
             ++lexer;

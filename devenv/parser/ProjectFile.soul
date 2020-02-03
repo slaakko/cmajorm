@@ -44,7 +44,8 @@ namespace parser
 
         TargetDeclaration: Target
                     ::= keyword("target") '='!
-                    (   keyword("program"){ value = Target.program; } | keyword("winapp"){ value = Target.winapp; } |
+                    (   keyword("program"){ value = Target.program; } | keyword("winguiapp"){ value = Target.winguiapp; } |
+                        keyword("winapp"){ value = Target.winapp; } |
                         keyword("library"){ value = Target.library; } | keyword("winlib"){ value = Target.winlib; } |
                         keyword("unitTest"){ value = Target.unitTest; }
                     ) ';'!

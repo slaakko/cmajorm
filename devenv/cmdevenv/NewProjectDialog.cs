@@ -12,9 +12,8 @@ namespace cmdevenv
 {
     public enum ProjectType
     {
-        consoleApp, winapp, library, winlib, unitTestProject, blankSolution
+        consoleApp, winguiapp, winapp, library, winlib, unitTestProject, blankSolution
     }
-
     public partial class NewProjectDialog : Form
     {
         public NewProjectDialog(bool solution, bool solutionOpen)

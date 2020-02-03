@@ -287,14 +287,14 @@ namespace cmdevenv
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             buildToolStripMenuItem1.Enabled = editing && solutionHasProjects;
             buildActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet &&
-                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winapp ||
+                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winguiapp  || solution.ActiveProject.Target == Target.winapp ||
                 solution.ActiveProject.Target == Target.library || solution.ActiveProject.Target == Target.winlib);
             rebuildToolStripMenuItem.Enabled = editing && solutionHasProjects;
             rebuildActiveProjcectToolStripMenuItem.Enabled = editing && activeProjectSet &&
-                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winapp || 
+                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winguiapp || solution.ActiveProject.Target == Target.winapp ||
                 solution.ActiveProject.Target == Target.library || solution.ActiveProject.Target == Target.winlib);
             rebuildToolStripMenuItem1.Enabled = editing && activeProjectSet &&
-                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winapp ||
+                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winguiapp || solution.ActiveProject.Target == Target.winapp ||
                 solution.ActiveProject.Target == Target.library || solution.ActiveProject.Target == Target.winlib);
             runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             profileActiveProjectToolStripMenuItem1.Enabled = editing && activeProjectSet &&
@@ -886,6 +886,10 @@ namespace cmdevenv
                         if (dialog.SelectedProjectType == ProjectType.consoleApp)
                         {
                             project.Target = Target.program;
+                        }
+                        else if (dialog.SelectedProjectType == ProjectType.winguiapp)
+                        {
+                            project.Target = Target.winguiapp;
                         }
                         else if (dialog.SelectedProjectType == ProjectType.winapp)
                         {
@@ -1808,6 +1812,10 @@ namespace cmdevenv
                     {
                         project.Target = Target.program;
                     }
+                    else if (dialog.SelectedProjectType == ProjectType.winguiapp)
+                    {
+                        project.Target = Target.winguiapp;
+                    }
                     else if (dialog.SelectedProjectType == ProjectType.winapp)
                     {
                         project.Target = Target.winapp;
@@ -2008,7 +2016,7 @@ namespace cmdevenv
                     Project activeProject = solution.ActiveProject;
                     if (activeProject != null)
                     {
-                        if (activeProject.Target != Target.program && activeProject.Target != Target.winapp)
+                        if (activeProject.Target != Target.program && activeProject.Target != Target.winguiapp && activeProject.Target != Target.winapp)
                         {
                             throw new Exception("cannot execute: active project is not a program");
                         }

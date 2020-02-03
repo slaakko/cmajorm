@@ -43,14 +43,14 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>cmrt330d</TargetName>
+    <TargetName>cmrt340d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -82,7 +82,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>cmrt330</TargetName>
+    <TargetName>cmrt340</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -93,12 +93,12 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;RT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..;../..;C:\Boost\include\boost-1_71;D:\work\cmajorm\cmajor\system\ext\gnutls\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4311;4302</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4312;4141;4146;4244;4267;4291;4624;4996;4251;4311;4302</DisableSpecificWarnings>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>pdcurses.lib;libbz2.lib;zlibstat.lib;cmrt330gmp.lib;libgnutls-30.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pdcurses.lib;libbz2.lib;zlibstat.lib;cmrt340gmp.lib;libgnutls-30.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);C:\Boost\lib;..\lib</AdditionalLibraryDirectories>
       <AdditionalOptions>/EXPORT:__CxxFrameHandler3 /EXPORT:_CxxThrowException /EXPORT:__chkstk /EXPORT:_fltused /EXPORT:memcpy %(AdditionalOptions)</AdditionalOptions>
       <ModuleDefinitionFile>
@@ -150,7 +150,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;RT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..;../..;C:\Boost\include\boost-1_71;D:\work\cmajorm\cmajor\system\ext\gnutls\include</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4311;4302</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4312;4141;4146;4244;4267;4291;4624;4996;4251;4311;4302</DisableSpecificWarnings>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
@@ -158,7 +158,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>pdcurses.lib;libbz2.lib;zlibstat.lib;cmrt330gmp.lib;libgnutls-30.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pdcurses.lib;libbz2.lib;zlibstat.lib;cmrt340gmp.lib;libgnutls-30.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir);C:\Boost\lib;..\lib</AdditionalLibraryDirectories>
       <AdditionalOptions>/EXPORT:__CxxFrameHandler3 /EXPORT:_CxxThrowException /EXPORT:__chkstk /EXPORT:_fltused  /EXPORT:memset /EXPORT:memcpy %(AdditionalOptions)</AdditionalOptions>
     </Link>

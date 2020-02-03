@@ -340,24 +340,11 @@ bool Project::IsUpToDate(const std::string& systemModuleFilePath) const
     return true;
 }
 
-bool Project::Built() 
+bool Project::Ready() const
 {
-    std::lock_guard<std::mutex> lock(mtx);
-    return built;
-}
-
-void Project::SetBuilt()
-{
-    std::lock_guard<std::mutex> lock(mtx);
-    built = true;
-}
-
-bool Project::Ready() 
-{
-    std::lock_guard<std::mutex> lock(mtx);
     for (Project* dependOn : dependsOn)
     {
-        if (!dependOn->built)
+        if (!dependOn->Built())
         {
             return false;
         }

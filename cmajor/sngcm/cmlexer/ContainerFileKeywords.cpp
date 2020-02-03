@@ -17,6 +17,7 @@ namespace ContainerFileKeywords
         {U"text", TEXT}, 
         {U"target", TARGET}, 
         {U"program", PROGRAM}, 
+        {U"winguiapp", WINGUIAPP}, 
         {U"winapp", WINAPP}, 
         {U"library", LIBRARY}, 
         {U"winlib", WINLIB}, 

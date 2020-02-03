@@ -66,7 +66,7 @@ using namespace cmajor::build;
 using namespace cmajor::binder;
 using namespace sngxml::dom;
 
-const char* version = "3.3.0";
+const char* version = "3.4.0";
 
 void PrintHelp()
 {
@@ -116,7 +116,7 @@ void BindStatements(BoundCompileUnit& boundCompileUnit)
 }
 
 void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder, const std::string& testName,
-    int32_t numAssertions, const std::string& unitTestFilePath)
+    int32_t numAssertions, const std::string& unitTestFilePath, std::string& mainObjectFilePath)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
@@ -203,7 +203,7 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, c
         AnalyzeControlFlow(boundMainCompileUnit);
     }
     GenerateCode(emittingContext, boundMainCompileUnit);
-    objectFilePaths.push_back(boundMainCompileUnit.ObjectFilePath());
+    mainObjectFilePath = boundMainCompileUnit.ObjectFilePath();
 }
 
 struct UnitTest
@@ -258,10 +258,11 @@ void TestUnit(FileTable* fileTable, sngcm::ast::Project* project, CompileUnitNod
             GenerateCode(emittingContext, *boundCompileUnit);
             objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
         }
+        std::string mainObjectFilePath;
         int32_t numUnitTestAssertions = GetNumUnitTestAssertions();
-        CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder, testName, numUnitTestAssertions, unitTestFilePath);
+        CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder, testName, numUnitTestAssertions, unitTestFilePath, mainObjectFilePath);
         GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
-        Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
+        Link(Target::program, project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), mainObjectFilePath, *rootModule);
         boost::filesystem::remove(unitTestFilePath);
         if (GetGlobalFlag(GlobalFlags::verbose))
         {

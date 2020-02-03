@@ -3,8 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
+public extern cdecl void WinSetInstance();
 public extern cdecl nothrow ulong WinGetLastError();
-public extern cdecl nothrow void WinFormatMessage(ulong errorCode, char* buffer);
+public extern cdecl nothrow void WinFormatMessage(ulong errorCode, wchar* buffer);
 public extern cdecl nothrow void* WinCreateEvent();
 public extern cdecl nothrow bool WinSetEvent(void* eventHandle);
 public extern cdecl nothrow bool WinResetEvent(void* eventHandle);
@@ -15,3 +16,19 @@ public extern cdecl nothrow void* WinFindFirstChangeNotification(const char* dir
 public extern cdecl nothrow bool WinFindNextChangeNotification(void* handle);
 public extern cdecl nothrow bool WinFindCloseChangeNotification(void* handle);
 public extern cdecl nothrow bool WinShellExecute(const char* filePath, long& errorCode);
+public extern cdecl nothrow int WinRun();
+public extern cdecl nothrow ushort WinRegisterWindowClass(const char* windowClassName, uint style, int backgroundColor);
+public extern cdecl nothrow void* WinCreateWindowByClassAtom(ushort windowClass, const char* windowName, long style, long exStyle, int x, int y, int w, int h, void* parentHandle);
+public extern cdecl nothrow void* WinCreateWindowByClassName(const char* windowClass, const char* windowName, long style, long exStyle, int x, int y, int w, int h, void* parentHandle);
+public extern cdecl nothrow void WinShowMessageBox(const char* text, const char* caption);
+public extern cdecl nothrow void WinPostQuitMessage(int exitCode);
+public extern cdecl nothrow bool WinShowWindow(void* windowHandle, int commandShow);
+public extern cdecl nothrow bool WinUpdateWindow(void* windowHandle);
+public extern cdecl nothrow bool WinMoveWindow(void* windowHandle, int x, int y, int w, int h, bool repaint);
+public extern cdecl nothrow void WinSetMessageProcessorFunctionAddress(void* messageProcessorFunctionAddress);
+public extern cdecl nothrow bool WinGetClientRect(void* windowHandle, void* rect);
+public extern cdecl nothrow bool WinGetWindowRect(void* windowHandle, void* rect);
+public extern cdecl nothrow bool WinClientToScreen(void* windowHandle, void* point);
+public extern cdecl nothrow bool WinScreenToClient(void* windowHandle, void* point);
+public extern cdecl nothrow bool WinPtInRect(void* rect, void* point);
+public extern cdecl nothrow bool WinSetWindowText(void* windowHandle, const char* text);

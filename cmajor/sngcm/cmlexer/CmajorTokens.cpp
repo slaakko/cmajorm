@@ -11,125 +11,126 @@ namespace CmajorTokens
     void InitTokenIdMap()
     {
         tokenIdMap[U"ABSTRACT"] = 40;
-        tokenIdMap[U"AMP"] = 91;
-        tokenIdMap[U"AMPAMP"] = 88;
-        tokenIdMap[U"AND"] = 76;
-        tokenIdMap[U"ARROW"] = 107;
+        tokenIdMap[U"AMP"] = 92;
+        tokenIdMap[U"AMPAMP"] = 89;
+        tokenIdMap[U"AND"] = 77;
+        tokenIdMap[U"ARROW"] = 108;
         tokenIdMap[U"AS"] = 28;
         tokenIdMap[U"ASSERT"] = 1;
-        tokenIdMap[U"ASSIGN"] = 117;
-        tokenIdMap[U"AXIOM"] = 75;
-        tokenIdMap[U"BASE"] = 64;
-        tokenIdMap[U"BITOR"] = 89;
-        tokenIdMap[U"BITXOR"] = 90;
+        tokenIdMap[U"ASSIGN"] = 118;
+        tokenIdMap[U"AXIOM"] = 76;
+        tokenIdMap[U"BASE"] = 65;
+        tokenIdMap[U"BITOR"] = 90;
+        tokenIdMap[U"BITXOR"] = 91;
         tokenIdMap[U"BOOL"] = 4;
-        tokenIdMap[U"BREAK"] = 54;
+        tokenIdMap[U"BREAK"] = 55;
         tokenIdMap[U"BYTE"] = 8;
-        tokenIdMap[U"CASE"] = 49;
+        tokenIdMap[U"CASE"] = 50;
         tokenIdMap[U"CAST"] = 22;
-        tokenIdMap[U"CATCH"] = 71;
+        tokenIdMap[U"CATCH"] = 72;
         tokenIdMap[U"CDECL"] = 33;
         tokenIdMap[U"CHAR"] = 17;
-        tokenIdMap[U"CHARLIT"] = 83;
-        tokenIdMap[U"CLASS"] = 44;
-        tokenIdMap[U"COLON"] = 118;
-        tokenIdMap[U"COMMA"] = 116;
-        tokenIdMap[U"CONCEPT"] = 73;
-        tokenIdMap[U"CONST"] = 60;
-        tokenIdMap[U"CONSTEXPR"] = 61;
-        tokenIdMap[U"CONSTRUCT"] = 65;
-        tokenIdMap[U"CONTINUE"] = 55;
-        tokenIdMap[U"CPL"] = 105;
-        tokenIdMap[U"DEFAULT"] = 50;
+        tokenIdMap[U"CHARLIT"] = 84;
+        tokenIdMap[U"CLASS"] = 45;
+        tokenIdMap[U"COLON"] = 119;
+        tokenIdMap[U"COMMA"] = 117;
+        tokenIdMap[U"CONCEPT"] = 74;
+        tokenIdMap[U"CONST"] = 61;
+        tokenIdMap[U"CONSTEXPR"] = 62;
+        tokenIdMap[U"CONSTRUCT"] = 66;
+        tokenIdMap[U"CONTINUE"] = 56;
+        tokenIdMap[U"CPL"] = 106;
+        tokenIdMap[U"DEFAULT"] = 51;
         tokenIdMap[U"DELEGATE"] = 31;
-        tokenIdMap[U"DELETE"] = 68;
-        tokenIdMap[U"DESTROY"] = 66;
-        tokenIdMap[U"DISJUNCTION"] = 87;
-        tokenIdMap[U"DIV"] = 101;
-        tokenIdMap[U"DO"] = 52;
-        tokenIdMap[U"DOT"] = 106;
+        tokenIdMap[U"DELETE"] = 69;
+        tokenIdMap[U"DESTROY"] = 67;
+        tokenIdMap[U"DISJUNCTION"] = 88;
+        tokenIdMap[U"DIV"] = 102;
+        tokenIdMap[U"DO"] = 53;
+        tokenIdMap[U"DOT"] = 107;
         tokenIdMap[U"DOUBLE"] = 16;
         tokenIdMap[U"ELIF"] = 2;
-        tokenIdMap[U"ELSE"] = 47;
+        tokenIdMap[U"ELSE"] = 48;
         tokenIdMap[U"ENDIF"] = 3;
         tokenIdMap[U"ENUM"] = 21;
-        tokenIdMap[U"EQ"] = 92;
-        tokenIdMap[U"EQUIVALENCE"] = 85;
-        tokenIdMap[U"EXCLAMATION"] = 78;
+        tokenIdMap[U"EQ"] = 93;
+        tokenIdMap[U"EQUIVALENCE"] = 86;
+        tokenIdMap[U"EXCLAMATION"] = 79;
         tokenIdMap[U"EXPLICIT"] = 30;
         tokenIdMap[U"EXTERN"] = 27;
         tokenIdMap[U"FALSE"] = 6;
         tokenIdMap[U"FLOAT"] = 15;
-        tokenIdMap[U"FLOATINGLIT"] = 81;
-        tokenIdMap[U"FOR"] = 53;
-        tokenIdMap[U"GEQ"] = 95;
-        tokenIdMap[U"GOTO"] = 56;
-        tokenIdMap[U"HASH"] = 120;
-        tokenIdMap[U"ID"] = 80;
-        tokenIdMap[U"IF"] = 46;
-        tokenIdMap[U"IMPLICATION"] = 86;
+        tokenIdMap[U"FLOATINGLIT"] = 82;
+        tokenIdMap[U"FOR"] = 54;
+        tokenIdMap[U"GEQ"] = 96;
+        tokenIdMap[U"GOTO"] = 57;
+        tokenIdMap[U"HASH"] = 121;
+        tokenIdMap[U"ID"] = 81;
+        tokenIdMap[U"IF"] = 47;
+        tokenIdMap[U"IMPLICATION"] = 87;
         tokenIdMap[U"INLINE"] = 32;
         tokenIdMap[U"INT"] = 11;
         tokenIdMap[U"INTERFACE"] = 23;
         tokenIdMap[U"INTERNAL"] = 38;
-        tokenIdMap[U"INTLIT"] = 82;
+        tokenIdMap[U"INTLIT"] = 83;
         tokenIdMap[U"IS"] = 29;
-        tokenIdMap[U"LANGLE"] = 112;
-        tokenIdMap[U"LBRACE"] = 114;
-        tokenIdMap[U"LBRACKET"] = 108;
-        tokenIdMap[U"LEQ"] = 94;
+        tokenIdMap[U"LANGLE"] = 113;
+        tokenIdMap[U"LBRACE"] = 115;
+        tokenIdMap[U"LBRACKET"] = 109;
+        tokenIdMap[U"LEQ"] = 95;
         tokenIdMap[U"LONG"] = 13;
-        tokenIdMap[U"LPAREN"] = 110;
-        tokenIdMap[U"MINUS"] = 99;
-        tokenIdMap[U"MINUSMINUS"] = 104;
+        tokenIdMap[U"LPAREN"] = 111;
+        tokenIdMap[U"MINUS"] = 100;
+        tokenIdMap[U"MINUSMINUS"] = 105;
         tokenIdMap[U"NAMESPACE"] = 24;
-        tokenIdMap[U"NEQ"] = 93;
-        tokenIdMap[U"NEW"] = 67;
+        tokenIdMap[U"NEQ"] = 94;
+        tokenIdMap[U"NEW"] = 68;
         tokenIdMap[U"NOTHROW"] = 34;
-        tokenIdMap[U"NULLLIT"] = 62;
-        tokenIdMap[U"OPERATOR"] = 43;
-        tokenIdMap[U"OR"] = 77;
+        tokenIdMap[U"NULLLIT"] = 63;
+        tokenIdMap[U"OPERATOR"] = 44;
+        tokenIdMap[U"OR"] = 78;
         tokenIdMap[U"OVERRIDE"] = 41;
-        tokenIdMap[U"PLUS"] = 98;
-        tokenIdMap[U"PLUSPLUS"] = 103;
+        tokenIdMap[U"PLUS"] = 99;
+        tokenIdMap[U"PLUSPLUS"] = 104;
         tokenIdMap[U"PRIVATE"] = 37;
         tokenIdMap[U"PROTECTED"] = 36;
         tokenIdMap[U"PUBLIC"] = 35;
-        tokenIdMap[U"RANGLE"] = 113;
-        tokenIdMap[U"RBRACE"] = 115;
-        tokenIdMap[U"RBRACKET"] = 109;
-        tokenIdMap[U"REM"] = 102;
-        tokenIdMap[U"RETURN"] = 45;
-        tokenIdMap[U"RPAREN"] = 111;
+        tokenIdMap[U"RANGLE"] = 114;
+        tokenIdMap[U"RBRACE"] = 116;
+        tokenIdMap[U"RBRACKET"] = 110;
+        tokenIdMap[U"REM"] = 103;
+        tokenIdMap[U"RETURN"] = 46;
+        tokenIdMap[U"RPAREN"] = 112;
         tokenIdMap[U"SBYTE"] = 7;
-        tokenIdMap[U"SEMICOLON"] = 119;
-        tokenIdMap[U"SHIFTLEFT"] = 96;
-        tokenIdMap[U"SHIFTRIGHT"] = 97;
+        tokenIdMap[U"SEMICOLON"] = 120;
+        tokenIdMap[U"SHIFTLEFT"] = 97;
+        tokenIdMap[U"SHIFTRIGHT"] = 98;
         tokenIdMap[U"SHORT"] = 9;
-        tokenIdMap[U"SIZEOF"] = 69;
-        tokenIdMap[U"STAR"] = 100;
+        tokenIdMap[U"SIZEOF"] = 70;
+        tokenIdMap[U"STAR"] = 101;
         tokenIdMap[U"STATIC"] = 26;
-        tokenIdMap[U"STRINGLIT"] = 84;
+        tokenIdMap[U"STRINGLIT"] = 85;
         tokenIdMap[U"SUPPRESS"] = 42;
-        tokenIdMap[U"SWITCH"] = 48;
-        tokenIdMap[U"THIS"] = 63;
-        tokenIdMap[U"THROW"] = 72;
+        tokenIdMap[U"SWITCH"] = 49;
+        tokenIdMap[U"THIS"] = 64;
+        tokenIdMap[U"THROW"] = 73;
         tokenIdMap[U"TRUE"] = 5;
-        tokenIdMap[U"TRY"] = 70;
-        tokenIdMap[U"TYPEDEF"] = 57;
-        tokenIdMap[U"TYPEID"] = 59;
-        tokenIdMap[U"TYPENAME"] = 58;
+        tokenIdMap[U"TRY"] = 71;
+        tokenIdMap[U"TYPEDEF"] = 58;
+        tokenIdMap[U"TYPEID"] = 60;
+        tokenIdMap[U"TYPENAME"] = 59;
         tokenIdMap[U"UCHAR"] = 19;
         tokenIdMap[U"UINT"] = 12;
         tokenIdMap[U"ULONG"] = 14;
-        tokenIdMap[U"UNIT_TEST"] = 79;
+        tokenIdMap[U"UNIT_TEST"] = 80;
         tokenIdMap[U"USHORT"] = 10;
         tokenIdMap[U"USING"] = 25;
         tokenIdMap[U"VIRTUAL"] = 39;
         tokenIdMap[U"VOID"] = 20;
         tokenIdMap[U"WCHAR"] = 18;
-        tokenIdMap[U"WHERE"] = 74;
-        tokenIdMap[U"WHILE"] = 51;
+        tokenIdMap[U"WHERE"] = 75;
+        tokenIdMap[U"WHILE"] = 52;
+        tokenIdMap[U"WINAPI"] = 43;
     }
 
     int GetTokenId(const std::u32string& tokenName)
@@ -190,6 +191,7 @@ namespace CmajorTokens
         "ABSTRACT",
         "OVERRIDE",
         "SUPPRESS",
+        "WINAPI",
         "OPERATOR",
         "CLASS",
         "RETURN",
@@ -320,6 +322,7 @@ namespace CmajorTokens
         "'abstract'",
         "'override'",
         "'suppress'",
+        "'winapi'",
         "'operator'",
         "'class'",
         "'return'",

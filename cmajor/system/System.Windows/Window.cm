@@ -1,0 +1,124 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public class Window : ContainerControl
+    {
+        public Window(const char* windowClassName, WindowClassStyle classStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle, 
+            const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
+            base(windowClassName, classStyle, windowClassBackgroundColor, style, exStyle, text, location, size, anchors, dock), isMainWindow(false), state(WindowState.normal)
+        {
+        }
+        public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
+            this(windowClassName, cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW), WindowColor.COLOR_WINDOW, style, exStyle, text, location, size, anchors, dock)
+        {
+        }
+        public Window(const string& caption) : this("System.Windows.Window", WindowStyle.WS_OVERLAPPEDWINDOW, ExtendedWindowStyle.WS_EX_DEFAULT, caption, Point.Default(), Size.Default(), Anchors.none, Dock.none)
+        {
+        }
+        protected virtual void OnWindowClosing(bool& cancelClose)
+        {
+        }
+        protected virtual void OnWindowClosed(bool& processed)
+        {
+            if (isMainWindow)
+            {
+                Application.Exit();
+                processed = true;
+            }
+        }
+        public override bool ProcessMessage(Message& message)
+        {
+            switch (message.msg)
+            {
+                case WM_CLOSE:
+                {
+                    bool cancelClose = false;
+                    OnWindowClosing(cancelClose);
+                    if (cancelClose)
+                    {
+                        message.result = 0;
+                        return true;
+                    }
+                    break;
+                }
+                case WM_DESTROY:
+                {
+                    bool processed = false;
+                    OnWindowClosed(processed);
+                    if (processed)
+                    {
+                        message.result = 0;
+                        return true;
+                    }
+                    break;
+                }
+            }
+            return false;
+        }
+        public nothrow void SetAsMainWindow()
+        {
+            isMainWindow = true;
+        }
+        public nothrow inline bool IsMainWindow() const
+        {
+            return isMainWindow;
+        }
+        public void SetWindowState(WindowState newState)
+        {
+            if (state != newState)
+            {
+                switch (state)
+                {
+                    case WindowState.normal:
+                    {
+                        switch (newState)
+                        {
+                            case WindowState.minimized:
+                            {
+                                ShowWindow(ShowCommand.SW_MINIMIZE);
+                                break;
+                            }
+                            case WindowState.maximized:
+                            {
+                                ShowWindow(ShowCommand.SW_MAXIMIZE);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case WindowState.minimized: case WindowState.maximized: 
+                    {
+                        switch (newState)
+                        {
+                            case WindowState.normal:
+                            {
+                                ShowWindow(ShowCommand.SW_RESTORE);
+                                break;
+                            }
+                            case WindowState.minimized:
+                            {
+                                ShowWindow(ShowCommand.SW_MINIMIZE);
+                                break;
+                            }
+                            case WindowState.maximized:
+                            {
+                                ShowWindow(ShowCommand.SW_MAXIMIZE);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                state = newState;
+            }
+        }
+        private bool isMainWindow;
+        private WindowState state;
+    }
+}

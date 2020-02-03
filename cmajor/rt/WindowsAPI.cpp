@@ -4,8 +4,13 @@
 // =================================
 
 #include <cmajor/rt/WindowsAPI.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <Windows.h>
 #include <map>
+#include <string>
+
+using namespace soulng::unicode;
+using namespace soulng::util;
 
 struct CodeMapping
 {
@@ -102,9 +107,9 @@ uint64_t WinGetLastError()
     return GetLastError();
 }
 
-void WinFormatMessage(uint64_t errorCode, char* buffer)
+void WinFormatMessage(uint64_t errorCode, char16_t* buffer)
 {
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, errorCode, LANG_SYSTEM_DEFAULT, buffer, 4096, nullptr);
+    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, errorCode, LANG_SYSTEM_DEFAULT, (LPWSTR)buffer, 4096, nullptr);
 }
 
 void* WinCreateEvent()
@@ -194,4 +199,183 @@ bool WinShellExecute(const char* filePath, int64_t& errorCode)
     }
     errorCode = MapWinCodeToExtCode(code);
     return false;
+}
+
+typedef bool (*messageProcessorFunction)(void* windowHandle, uint32_t message, uint32_t wparam, int64_t lparam, int64_t& result);
+
+messageProcessorFunction messageProcessor = nullptr;
+
+void WinSetMessageProcessorFunctionAddress(void* messageProcessorFunctionAddress)
+{
+    messageProcessor = static_cast<messageProcessorFunction>(messageProcessorFunctionAddress);
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    int64_t result = 0;
+    bool handled = messageProcessor(hWnd, message, wParam, lParam, result);
+    if (!handled)
+    {
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return result;
+}
+
+void Tester(HINSTANCE instance)
+{
+    char16_t className[] = u"TesterApp";
+    char16_t title[] = u"Tester";
+    WNDCLASSEX wc;
+    wc.cbSize = sizeof(wc);
+    wc.style = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc = WndProc;
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hInstance = instance;
+    wc.hIcon = LoadIcon(instance, IDI_APPLICATION);
+    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wc.lpszMenuName = nullptr;
+    wc.lpszClassName = (LPWSTR)(&className[0]);
+    wc.hIconSm = LoadIcon(instance, IDI_APPLICATION);
+    if (!RegisterClassEx(&wc))
+    {
+        MessageBox(nullptr, (LPWSTR)u"register class failed", (LPWSTR)u"TesterApp", MB_OK);
+        return;
+    }
+    HWND hWnd = CreateWindow(
+        (LPWSTR)className,
+        (LPWSTR)title,
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        NULL,
+        NULL,
+        instance,
+        NULL
+    );
+    if (!hWnd)
+    {
+        MessageBox(nullptr, (LPWSTR)u"create window failed", (LPWSTR)u"TesterApp", MB_OK);
+        return;
+    }
+    ShowWindow(hWnd, SW_SHOWDEFAULT);
+    UpdateWindow(hWnd);
+}
+
+HINSTANCE applicationInstance = nullptr;
+
+void WinSetInstance()
+{
+    applicationInstance = GetModuleHandle(nullptr);
+}
+
+int WinRun()
+{
+    MSG msg;
+    while (GetMessage(&msg, nullptr, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return msg.wParam;
+}
+
+ uint16_t WinRegisterWindowClass(const char* windowClassName, uint32_t style, int backgroundColor)
+{
+    std::u16string className = ToUtf16(windowClassName);
+    WNDCLASSEXW wc;
+    wc.cbSize = sizeof(wc);
+    wc.style = style;
+    wc.lpfnWndProc = WndProc;
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hInstance = applicationInstance;
+    wc.hIcon = LoadIcon(applicationInstance, IDI_APPLICATION);
+    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(backgroundColor + 1);
+    wc.lpszMenuName = nullptr;
+    wc.lpszClassName = (LPWSTR)className.c_str();
+    wc.hIconSm = LoadIcon(applicationInstance, IDI_APPLICATION);
+    uint16_t atom = RegisterClassExW(&wc);
+    return atom;
+}
+
+void WinShowMessageBox(const char* text, const char* caption)
+{
+    std::u16string str = ToUtf16(text);
+    LPCWSTR captionStr = nullptr;
+    std::u16string cap;
+    if (caption != nullptr)
+    {
+        cap = ToUtf16(caption);
+        captionStr = (LPCWSTR)cap.c_str();
+    }
+    MessageBoxW(nullptr, (LPCWSTR)str.c_str(), captionStr, MB_OK);
+}
+
+void* WinCreateWindowByClassAtom(uint16_t windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle)
+{
+    std::u16string name = ToUtf16(windowName);
+    HWND handle = CreateWindowExW(exStyle, (LPCWSTR)windowClass, (LPCWSTR)name.c_str(), style, x, y, w, h, (HWND)parentHandle, nullptr, applicationInstance, nullptr);
+    return handle;
+}
+
+void* WinCreateWindowByClassName(const char* windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle)
+{
+    std::u16string windowClassName = ToUtf16(windowClass);
+    std::u16string name = ToUtf16(windowName);
+    HWND handle = CreateWindowExW(exStyle, (LPCWSTR)windowClassName.c_str(), (LPCWSTR)name.c_str(), style, x, y, w, h, (HWND)parentHandle, nullptr, applicationInstance, nullptr);
+    return handle;
+}
+
+void WinPostQuitMessage(int exitCode)
+{
+    PostQuitMessage(exitCode);
+}
+
+bool WinShowWindow(void* windowHandle, int commandShow)
+{
+    return ShowWindow((HWND)windowHandle, commandShow);
+}
+
+bool WinUpdateWindow(void* windowHandle)
+{
+    return UpdateWindow((HWND)windowHandle);
+}
+
+bool WinMoveWindow(void* windowHandle, int x, int y, int w, int h, bool repaint)
+{
+    return MoveWindow((HWND)windowHandle, x, y, w, h, repaint);
+}
+
+bool WinGetClientRect(void* windowHandle, void* rect)
+{
+    return GetClientRect((HWND)windowHandle, (LPRECT)rect);
+}
+
+bool WinGetWindowRect(void* windowHandle, void* rect)
+{
+    return GetWindowRect((HWND)windowHandle, (LPRECT)rect);
+}
+
+bool WinClientToScreen(void* windowHandle, void* point)
+{
+    return ClientToScreen((HWND)windowHandle, (LPPOINT)point);
+}
+
+bool WinScreenToClient(void* windowHandle, void* point)
+{
+    return ScreenToClient((HWND)windowHandle, (LPPOINT)point);
+}
+
+bool WinPtInRect(void* rect, void* point)
+{
+    return PtInRect((const RECT*)rect, *(POINT*)point);
+}
+
+bool WinSetWindowText(void* windowHandle, const char* text)
+{
+    std::u16string str(ToUtf16(text));
+    return SetWindowTextW((HWND)windowHandle, (LPWSTR)str.c_str());
 }

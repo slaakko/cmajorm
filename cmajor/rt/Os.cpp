@@ -14,6 +14,8 @@
 #include <soulng/util/Time.hpp>
 #include <soulng/util/MemoryWriter.hpp>
 
+using namespace soulng::unicode;
+
 #ifdef _WIN32
 
 extern "C" RT_API uint64_t OsAllocateMemoryPage(uint64_t pageSize)
@@ -426,9 +428,9 @@ extern "C" RT_API uint64_t OsGetLastError()
     return GetLastError();
 }
 
-extern "C" RT_API void OsFormatMessage(uint64_t errorCode, char* buffer)
+extern "C" RT_API void OsFormatMessage(uint64_t errorCode, char16_t* buffer)
 {
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, errorCode, LANG_SYSTEM_DEFAULT, buffer, 4096, nullptr);
+    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, errorCode, LANG_SYSTEM_DEFAULT, (LPWSTR)buffer, 4096, nullptr);
 }
 
 extern "C" RT_API bool OsGetLogicalDrives(char* buffer, int bufSize)
@@ -500,7 +502,8 @@ extern "C" RT_API int64_t OsGetFileSize(void* fileHandle)
 
 extern "C" RT_API uint32_t OsGetFileAttributes(const char* filePath)
 {
-    uint32_t attrs = GetFileAttributes(filePath);
+    std::u16string fp = ToUtf16(std::string(filePath));
+    uint32_t attrs = GetFileAttributes((LPWSTR)fp.c_str());
     if (attrs != INVALID_FILE_ATTRIBUTES)
     {
         return attrs;
@@ -555,7 +558,8 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
     WIN32_FILE_ATTRIBUTE_DATA fileInfo;
     SYSTEMTIME systemTime;
     SYSTEMTIME localTime;
-    if (GetFileAttributesEx(filePath, GetFileExInfoStandard, &fileInfo))
+    std::u16string fp = ToUtf16(std::string(filePath));
+    if (GetFileAttributesEx((LPWSTR)fp.c_str(), GetFileExInfoStandard, &fileInfo))
     {
         if (FileTimeToSystemTime(&fileInfo.ftCreationTime, &systemTime))
         {

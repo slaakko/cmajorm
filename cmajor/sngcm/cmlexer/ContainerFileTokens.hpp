@@ -17,16 +17,17 @@ namespace ContainerFileTokens
     const int TEXT = 5;
     const int TARGET = 6;
     const int PROGRAM = 7;
-    const int WINAPP = 8;
-    const int LIBRARY = 9;
-    const int WINLIB = 10;
-    const int UNITTEST = 11;
-    const int ACTIVEPROJECT = 12;
-    const int ID = 13;
-    const int FILEPATH = 14;
-    const int ASSIGN = 15;
-    const int SEMICOLON = 16;
-    const int DOT = 17;
+    const int WINGUIAPP = 8;
+    const int WINAPP = 9;
+    const int LIBRARY = 10;
+    const int WINLIB = 11;
+    const int UNITTEST = 12;
+    const int ACTIVEPROJECT = 13;
+    const int ID = 14;
+    const int FILEPATH = 15;
+    const int ASSIGN = 16;
+    const int SEMICOLON = 17;
+    const int DOT = 18;
 
     SNGCM_LEXER_API void InitTokenIdMap();
     SNGCM_LEXER_API int GetTokenId(const std::u32string& tokenName);

@@ -354,6 +354,19 @@ soulng::parser::Match SpecifierParser::Specifier(CmajorLexer& lexer)
             }
             break;
         }
+        case WINAPI:
+        {
+            ++lexer;
+            {
+                {
+                    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                    if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Specifier"));
+                    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                    return soulng::parser::Match(true, new soulng::parser::Value<sngcm::ast::Specifiers>(sngcm::ast::Specifiers::winapi));
+                }
+            }
+            break;
+        }
     }
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     if (parser_debug_write_to_log)

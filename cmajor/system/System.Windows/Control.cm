@@ -1,0 +1,187 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows.API;
+
+namespace System.Windows
+{
+    public class Control
+    {
+        public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowColor windowClassBackgroundColor_, WindowStyle style_, ExtendedWindowStyle exStyle_, 
+            const string& text_, const Point& location_, const Size& size_, Anchors anchors_, Dock dock_) : 
+            windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), windowClassBackgroundColor(windowClassBackgroundColor_), style(style_), exStyle(exStyle_), 
+            handle(null), parent(null), nextSibling(null), prevSibling(null), 
+            text(text_), location(location_), size(size_), anchors(anchors_), dock(dock_)
+        {
+            Application.Init();
+            if ((style & WindowStyle.WS_CHILD) == 0)
+            {
+                CreateWindow();
+            }
+        }
+        public Control(const char* windowClassName, WindowClassStyle windowClassStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle,
+            const string& text_, const Point& location_, const Size& size_) :
+            this(windowClassName, windowClassStyle, windowClassBackgroundColor, style, exStyle, text_, location_, size_, cast<Anchors>(Anchors.top | Anchors.left), Dock.none)
+        {
+        }
+        public virtual ~Control()
+        {
+            if (handle != null)
+            {
+                Application.GetWindowManager().RemoveWindow(this);
+            } 
+        }
+        protected void CreateWindow()
+        {
+            CreateWindowInternal();
+        }
+        internal void CreateWindowInternal()
+        {
+            if (handle != null) return;
+            if (Application.GetWindowManager().IsSystemClassName(windowClassName))
+            {
+                handle = CreateWindowByClassName(windowClassName, text.Chars(), style, exStyle, location, size, parent);
+            }
+            else
+            {
+                ushort windowClass = Application.GetWindowManager().RegisterWindowClass(windowClassName, windowClassStyle, windowClassBackgroundColor);
+                handle = CreateWindowByClassAtom(windowClass, text.Chars(), style, exStyle, location, size, parent);
+            }            
+            Application.GetWindowManager().AddWindow(this);
+        }
+        public void Show()
+        {
+            ShowWindow(ShowCommand.SW_SHOW);
+        }
+        public void Hide()
+        {
+            ShowWindow(ShowCommand.SW_HIDE);
+        }
+        public void ShowWindow(ShowCommand showCommand)
+        {
+            WinShowWindow(handle, showCommand);
+        }
+        public void Update()
+        {
+            WinUpdateWindow(handle);
+        }
+        public const string& Text() const
+        {
+            return text;
+        }
+        public void SetText(const string& text_)
+        {
+            if (text != text_)
+            {
+                text = text_;
+                SetWindowText(handle, text);
+            }
+        }
+        public const Point& Location() const
+        {
+            return location;
+        }
+        public void SetLocation(const Point& loc)
+        {
+            if (location != loc)
+            {
+                location = loc;
+                MoveWindow(handle, location, size, true);
+            }
+        }
+        public const Size& GetSize() const
+        {
+            return size;
+        }
+        public void SetSize(const Size& sz)
+        {
+            if (size != sz)
+            {
+                size = sz;
+                MoveWindow(handle, location, size, true);
+            }
+        }
+        public Rect GetClientRect() const
+        {
+            return GetClientRect(handle);
+        }
+        public Rect GetWindowRect() const
+        {
+            return GetWindowRect(handle);
+        }
+        public Point ClientToScreen(const Point& point) const
+        {
+            return ClientToScreen(handle, point);
+        }
+        public Point ScreenToClient(const Point& point) const
+        {
+            return ScreenToClient(handle, point);
+        }
+        public virtual bool ProcessMessage(Message& message)
+        {
+            return false;
+        }
+        public nothrow inline void* Handle() const
+        {
+            return handle;
+        }
+        public nothrow Control* Parent() const
+        {
+            return parent;
+        }
+        internal nothrow void SetParent(Control* parent_)
+        {
+            parent = parent_;
+        }    
+        public nothrow Control* NextSibling() const
+        {
+            return nextSibling;
+        }
+        public nothrow Control* PrevSibling() const
+        {
+            return prevSibling;
+        }
+        internal nothrow void LinkAfter(Control* control)
+        {
+            control->prevSibling = this;
+            control->nextSibling = nextSibling;
+            nextSibling = control;
+        }    
+        internal nothrow void Unlink()
+        {
+            if (prevSibling != null)
+            {
+                prevSibling->nextSibling = nextSibling;
+            }
+            if (nextSibling != null)
+            {
+                nextSibling->prevSibling = prevSibling;
+            }
+        }
+        public inline nothrow WindowStyle GetWindowStyle() const
+        {
+            return style;
+        }
+        public inline nothrow ExtendedWindowStyle GetExtendedWindowStyle() const
+        {
+            return exStyle;
+        }
+        private const char* windowClassName;
+        private WindowClassStyle windowClassStyle;
+        private WindowColor windowClassBackgroundColor;
+        private WindowStyle style;
+        private ExtendedWindowStyle exStyle;
+        private void* handle;
+        private Control* parent;
+        private Control* nextSibling;
+        private Control* prevSibling;
+        private string text;
+        private Point location;
+        private Size size;
+        private Anchors anchors;
+        private Dock dock;
+    }
+}

@@ -10,8 +10,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <mutex>
-#include <atomic>
 
 namespace sngcm { namespace ast {
 
@@ -81,7 +79,7 @@ private:
 
 enum class Target
 {
-    program, winapp, library, winlib, unitTest
+    program, winguiapp, winapp, library, winlib, unitTest
 };
 
 class SNGCM_AST_API TargetDeclaration : public ProjectDeclaration
@@ -130,9 +128,9 @@ public:
     void SetIndex(int index_) { index = index_; }
     int Index() const { return index; }
     const std::vector<Project*>& DependsOnProjects() { return dependsOn; }
-    bool Built();
-    void SetBuilt();
-    bool Ready();
+    bool Built() const { return built; }
+    void SetBuilt() { built = true; }
+    bool Ready() const;
     void SetExcludeSourceFilePath(const std::string& excludeSourceFilePath_);
 private:
     std::u32string name;
@@ -156,11 +154,10 @@ private:
     std::vector<std::string> relativeTextFilePaths;
     std::vector<std::string> textFilePaths;
     std::vector<Project*> dependsOn;
-    std::atomic<bool> built;
+    bool built;
     bool isSystemProject;
     int logStreamId;
     int index;
-    std::mutex mtx;
 };
 
 

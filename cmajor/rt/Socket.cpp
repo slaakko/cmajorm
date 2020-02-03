@@ -9,6 +9,7 @@
 #include <cmajor/rt/InitDone.hpp>
 #include <soulng/util/Error.hpp>
 #include <soulng/util/TextUtils.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <memory>
 #include <vector>
 #include <atomic>
@@ -37,6 +38,7 @@
 namespace cmajor { namespace rt {
 
 using namespace soulng::util;
+using namespace soulng::unicode;
 
 struct SocketData
 {
@@ -90,9 +92,9 @@ void SocketTable::Done()
 
 std::string GetSocketErrorMessage(int errorCode)
 {
-    char buf[1024];
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, buf, sizeof(buf), NULL);
-    return std::string(buf);
+    char16_t buf[1024];
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, (LPWSTR)(&buf[0]), sizeof(buf), NULL);
+    return ToUtf8(std::u16string(buf));
 }
 
 int GetLastSocketError()

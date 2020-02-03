@@ -59,7 +59,7 @@ bool ContainsWildCard(const std::string& filePath)
     return filePath.find('*') != std::string::npos || filePath.find('?') != std::string::npos;
 }
 
-CommandLineProcessor::CommandLineProcessor() : commandLine(ToUtf32(GetCommandLine())), argc(0), argv(nullptr) 
+CommandLineProcessor::CommandLineProcessor() : commandLine(ToUtf32(std::u16string((char16_t*)GetCommandLineW()))), argc(0), argv(nullptr) 
 {
     commandLine.append(1, '\n');
     TrivialLexer lexer(commandLine, "", 0);
@@ -138,19 +138,19 @@ std::vector<std::string> CommandLineProcessor::ExpandArgument(const std::string&
 {
     std::vector<std::string> expandedArg;
     WIN32_FIND_DATA findData;
-    std::string filePath = GetFullPath(arg);
-    HANDLE findHandle = FindFirstFile(filePath.c_str(), &findData);
+    std::u16string filePath = ToUtf16(GetFullPath(arg));
+    HANDLE findHandle = FindFirstFile((LPCWSTR)filePath.c_str(), &findData);
     if (findHandle == INVALID_HANDLE_VALUE)
     {
         expandedArg.push_back(arg);
     }
     else
     {
-        std::string directory = Path::GetDirectoryName(filePath);
-        expandedArg.push_back(Path::Combine(directory, findData.cFileName));
+        std::u16string directory = ToUtf16(Path::GetDirectoryName(ToUtf8(filePath)));
+        expandedArg.push_back(Path::Combine(ToUtf8(directory), ToUtf8(std::u16string((const char16_t*)(&findData.cFileName[0])))));
         while (FindNextFile(findHandle, &findData))
         {
-            expandedArg.push_back(Path::Combine(directory, findData.cFileName));
+            expandedArg.push_back(Path::Combine(ToUtf8(directory), ToUtf8(std::u16string((const char16_t*)(&findData.cFileName[0])))));
         }
         FindClose(findHandle);
     }

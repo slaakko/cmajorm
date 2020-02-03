@@ -466,7 +466,7 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
                 Module* referencedModule = it->second;
                 if (rootModule->IsSystemModule() ||
                     ((target == sngcm::ast::Target::program || target == sngcm::ast::Target::library || target == sngcm::ast::Target::unitTest) && referencedModule->Name() != U"System" ||
-                    (target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib) && referencedModule->Name() != U"System.Windows"))
+                    (target == sngcm::ast::Target::winguiapp || target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib) && referencedModule->Name() != U"System.Windows"))
                 {
                     module->AddReferencedModule(referencedModule);
                 }
@@ -502,7 +502,7 @@ void ImportModulesWithReferences(sngcm::ast::Target target,
         {
             backend = sngcm::ast::BackEnd::cmsx;
         }
-        if (target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib)
+        if (target == sngcm::ast::Target::winguiapp || target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib)
         {
             allReferences.push_back(CmajorSystemWindowsModuleFilePath(GetConfig()));
         }

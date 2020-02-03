@@ -281,6 +281,7 @@ public:
     void AddInlineFunctionAttribute(void* function) override;
     void SetFunctionLinkage(void* function, bool setInline) override;
     void SetFunctionLinkageToLinkOnceODRLinkage(void* function) override;
+    void SetFunctionCallConventionToStdCall(void* function) override;
     void SetFunction(void* function_) override;
     void SetInPrologue(bool inPrologue_) override;
     void* CreateSubroutineType(const std::vector<void*>& elementTypes) override;

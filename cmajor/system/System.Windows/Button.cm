@@ -1,0 +1,22 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public class Button : Control
+    {
+        public Button(const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
+            base("BUTTON", WindowClassStyle.CS_DEFAULT, WindowColor.COLOR_BTNFACE, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_TABSTOP | WindowStyle.WS_VISIBLE), ExtendedWindowStyle.WS_EX_DEFAULT, 
+            text, location, size, anchors, dock)
+        {
+        }
+        public Button(const string& text, const Point& location, const Size& size) :
+            this(text, location, size, cast<Anchors>(Anchors.top | Anchors.left), Dock.none)
+        {
+        }
+    }
+}

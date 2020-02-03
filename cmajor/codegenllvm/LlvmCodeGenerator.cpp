@@ -284,10 +284,6 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->MangledName() == U"destructor_UriReference_8CBF77C6F886CEDF4CA6604B8E45644C02F0A53E")
-    {
-        int x = 0;
-    }
     void* functionType = functionSymbol->IrType(*emitter);
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
     bool setInline = false;
@@ -300,6 +296,10 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     {
         setInline = true;
         void* comdat = emitter->GetOrInsertAnyFunctionComdat(ToUtf8(functionSymbol->MangledName()), function);
+    }
+    if (functionSymbol->GetFlag(FunctionSymbolFlags::winapi))
+    {
+        emitter->SetFunctionCallConventionToStdCall(function);
     }
     emitter->SetFunctionLinkage(function, setInline);
     emitter->SetFunction(function);

@@ -33,7 +33,7 @@ using namespace soulng::util;
 using namespace soulng::unicode;
 using namespace cmajor::cmproj;
 
-const char* version = "3.3.0";
+const char* version = "3.4.0";
 
 void PrintHelp()
 {

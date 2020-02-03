@@ -34,6 +34,7 @@ enum class Specifiers : int32_t
     new_ = 1 << 17,
     const_ = 1 << 18,
     unit_test_ = 1 << 19,
+    winapi = 1 << 20,
     access_ = public_ | protected_ | private_ | internal_
 };
 

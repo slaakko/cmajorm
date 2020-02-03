@@ -11,7 +11,7 @@ namespace devcore
 {
     public enum Target
     {
-        program, winapp, library, winlib, unitTest
+        program, winguiapp, winapp, library, winlib, unitTest
     }
 
     public class Project : IComparable<Project>
@@ -37,7 +37,11 @@ namespace devcore
             {
                 writer.WriteLine("project " + name + ";");
                 string targetStr = "program";
-                if (target == Target.winapp)
+                if (target == Target.winguiapp)
+                {
+                    targetStr = "winguiapp";
+                }
+                else if (target == Target.winapp)
                 {
                     targetStr = "winapp";
                 }

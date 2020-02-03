@@ -1,0 +1,61 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows.API;
+
+namespace System.Windows
+{
+    public delegate bool MessageProcessorFunction(void* windowHandle, uint msg, uint wparam, long lparam, long& result);
+    
+    public static class Application
+    {
+        static Application()
+        {            
+            MessageProcessorFunction messageProcessorFunction = ProcessMessage;
+            void* messageProcessorFunctionAddress = cast<void*>(messageProcessorFunction);
+            WinSetMessageProcessorFunctionAddress(messageProcessorFunctionAddress);
+        }
+        public static void Init()
+        {
+        }
+        public static int Run(Window& mainWindow)
+        {
+            mainWindow.SetAsMainWindow();
+            mainWindow.ShowWindow(ShowCommand.SW_SHOWNORMAL);
+            mainWindow.Update();
+            int exitCode = WinRun();
+            return exitCode;
+        }
+        public static void Exit(int exitCode)
+        {
+            WinPostQuitMessage(exitCode);
+        }
+        public static void Exit()
+        {
+            Exit(0);
+        }
+        private static bool ProcessMessage(void* windowHandle, uint msg, uint wparam, long lparam, long& result)
+        {
+            Control* window = windowManager.GetWindow(windowHandle);
+            if (window != null)
+            {
+                Message message(windowHandle, msg, wparam, lparam, result);
+                bool handled = window->ProcessMessage(message);
+                if (handled)
+                {
+                    result = message.result;
+                }                
+                return handled;
+            }
+            return false;
+        }
+        public static nothrow WindowManager& GetWindowManager()
+        {
+            return windowManager;
+        }
+        private static WindowManager windowManager;
+    }
+}

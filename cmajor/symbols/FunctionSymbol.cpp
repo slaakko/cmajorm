@@ -1103,9 +1103,9 @@ bool FunctionSymbol::IsCopyAssignment() const
 bool FunctionSymbol::IsMoveAssignment() const
 {
     return parameters.size() == 2 && groupName == U"operator=" &&
-        parameters[0]->GetType()->PointerCount() == 1 &&
-        parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
-        TypesEqual(parameters[0]->GetType()->BaseType()->AddRvalueReference(GetSpan()), parameters[1]->GetType());
+parameters[0]->GetType()->PointerCount() == 1 &&
+parameters[0]->GetType()->RemovePointer(GetSpan())->IsClassTypeSymbol() &&
+TypesEqual(parameters[0]->GetType()->BaseType()->AddRvalueReference(GetSpan()), parameters[1]->GetType());
 }
 
 void FunctionSymbol::AddLocalVariable(LocalVariableSymbol* localVariable)
@@ -1201,6 +1201,10 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
         {
             throw Exception(GetRootModuleForCurrentThread(), "function symbol cannot be unit_test", GetSpan());
         }
+    }
+    if ((specifiers & Specifiers::winapi) != Specifiers::none)
+    {
+        SetFlag(FunctionSymbolFlags::winapi);
     }
 }
 

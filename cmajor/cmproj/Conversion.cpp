@@ -42,6 +42,10 @@ void ConvertProject(Project* project, const std::string& cmprojFilePath, const s
     {
         targetTypeStr = U"winapp";
     }
+    else if (project->GetTarget() == Target::winguiapp)
+    {
+        targetTypeStr = U"winguiapp";
+    }
     else if (project->GetTarget() == Target::library)
     {
         targetTypeStr = U"library";

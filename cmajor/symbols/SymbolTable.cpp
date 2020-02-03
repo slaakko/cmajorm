@@ -429,12 +429,13 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode, int32_t functionInde
         CloneContext cloneContext;
         functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
     }
-    if (functionSymbol->GroupName() == U"main")
+    if (functionSymbol->GroupName() == U"main" || functionSymbol->GroupName() == U"WinMain")
     {
         if (functionNode.IsProgramMain())
         {
             functionSymbol->SetCDecl();
             functionSymbol->SetProgramMain();
+            functionSymbol->SetNothrow();
         }
         else
         {

@@ -84,7 +84,8 @@ enum class FunctionSymbolFlags : uint32_t
     hasSource = 1 << 15,
     includeConstraint = 1 << 16,
     copy = 1 << 17,
-    varArg = 1 << 18
+    varArg = 1 << 18,
+    winapi = 1 << 19
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)

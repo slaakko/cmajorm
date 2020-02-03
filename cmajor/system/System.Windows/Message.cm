@@ -1,0 +1,25 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public const uint WM_DESTROY = 0x2u;
+    public const uint WM_CLOSE = 0x0010u;
+    public const uint WM_ERASEBKGND = 0x0014u;
+    
+    public class Message
+    {
+        public nothrow Message(void* windowHandle_, uint msg_, uint wparam_, long lparam_, long result_) : windowHandle(windowHandle_), msg(msg_), wparam(wparam_), lparam(lparam_), result(result_)
+        {
+        }
+        public void* windowHandle;
+        public uint msg;
+        public uint wparam;
+        public long lparam;
+        public long result;
+    }
+}

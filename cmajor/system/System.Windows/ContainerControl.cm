@@ -1,0 +1,76 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public class ContainerControl : Control
+    {
+        public ContainerControl(const char* windowClassName, WindowClassStyle windowClassStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle, 
+            const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
+            base(windowClassName, windowClassStyle, windowClassBackgroundColor, style, exStyle, text, location, size, anchors, dock), 
+            firstChild(null), lastChild(null)
+        {
+        }
+        public ~ContainerControl()
+        {
+            Control* child = firstChild;
+            while (child != null)
+            {
+                Control* next = child->NextSibling();
+                delete child;
+                child = next;
+            }
+        }
+        public void AddChild(Control* child)
+        {
+            Control* parentOfChild = child->Parent();
+            if (parentOfChild != null)
+            {
+                if (parentOfChild is ContainerControl*)
+                {
+                    ContainerControl* containerParent = cast<ContainerControl*>(parentOfChild);
+                    UniquePtr<Control> removedChild = containerParent->RemoveChild(child);
+                    child = removedChild.Release();
+                }
+            }
+            if (lastChild != null)
+            {
+                lastChild->LinkAfter(child);
+            }
+            if (firstChild == null)
+            {
+                firstChild = child;
+            }
+            child->SetParent(this);
+            lastChild = child;
+            if (child->Handle() == null)
+            {
+                child->CreateWindowInternal();
+            }
+            if ((child->GetWindowStyle() & WindowStyle.WS_VISIBLE) != 0)
+            {
+                child->Show();
+            }
+        }
+        public UniquePtr<Control> RemoveChild(Control* child)
+        {
+            child->Unlink();
+            if (child == firstChild)
+            {
+                firstChild = child->NextSibling();
+            }
+            if (child == lastChild)
+            {
+                lastChild = child->PrevSibling();
+            }
+            child->SetParent(null);
+            return UniquePtr<Control>(child);
+        }
+        private Control* firstChild;
+        private Control* lastChild;
+    }
+}

@@ -44,7 +44,7 @@ extern "C" RT_API void OsSwitchToFiber(void* fiber);
 extern "C" RT_API void* OsGetFiberData();
 extern "C" RT_API void OsDeleteFiber(void* fiber);
 extern "C" RT_API uint64_t OsGetLastError();
-extern "C" RT_API void OsFormatMessage(uint64_t errorCode, char* buffer);
+extern "C" RT_API void OsFormatMessage(uint64_t errorCode, char16_t* buffer);
 extern "C" RT_API bool OsGetLogicalDrives(char* buffer, int bufSize);
 extern "C" RT_API uint32_t OsGetDriveType(const char* rootPathName);
 extern "C" RT_API int64_t OsGetFileSize(void* fileHandle);

@@ -100,18 +100,15 @@ namespace parser
                             new AlternativeParser(
                                 new AlternativeParser(
                                     new AlternativeParser(
-                                        new AlternativeParser(
-                                            new ActionParser("A0",
-                                                new KeywordParser("program")),
-                                            new ActionParser("A1",
-                                                new KeywordParser("winguiapp"))),
-                                        new ActionParser("A2",
+                                        new ActionParser("A0",
+                                            new KeywordParser("program")),
+                                        new ActionParser("A1",
                                             new KeywordParser("winapp"))),
-                                    new ActionParser("A3",
+                                    new ActionParser("A2",
                                         new KeywordParser("library"))),
-                                new ActionParser("A4",
+                                new ActionParser("A3",
                                     new KeywordParser("winlib"))),
-                            new ActionParser("A5",
+                            new ActionParser("A4",
                                 new KeywordParser("unitTest")))),
                     new ExpectationParser(
                         new CharParser(';')))));
@@ -401,8 +398,6 @@ namespace parser
                 a3ActionParser.Action = A3Action;
                 ActionParser a4ActionParser = GetAction("A4");
                 a4ActionParser.Action = A4Action;
-                ActionParser a5ActionParser = GetAction("A5");
-                a5ActionParser.Action = A5Action;
             }
             public override void Enter(Stack<object> stack)
             {
@@ -423,21 +418,17 @@ namespace parser
             }
             private void A1Action(string match, string content, Position position, string fileName, ref bool pass)
             {
-                context.value = Target.winguiapp;
+                context.value = Target.winapp;
             }
             private void A2Action(string match, string content, Position position, string fileName, ref bool pass)
             {
-                context.value = Target.winapp;
+                context.value = Target.library;
             }
             private void A3Action(string match, string content, Position position, string fileName, ref bool pass)
             {
-                context.value = Target.library;
-            }
-            private void A4Action(string match, string content, Position position, string fileName, ref bool pass)
-            {
                 context.value = Target.winlib;
             }
-            private void A5Action(string match, string content, Position position, string fileName, ref bool pass)
+            private void A4Action(string match, string content, Position position, string fileName, ref bool pass)
             {
                 context.value = Target.unitTest;
             }

@@ -28,9 +28,9 @@ namespace System.Windows.API
     
     public string GetWindowsAPIErrorMessage(ulong errorCode)
     {
-        char[4096] buffer;
-        OsFormatMessage(errorCode, &buffer[0]);
-        return string(&buffer[0]);
+        wchar[4096] buffer;
+        WinFormatMessage(errorCode, &buffer[0]);
+        return ToUtf8(wstring(&buffer[0]));
     }
     
     public class WindowsAPIException : Exception
@@ -218,6 +218,119 @@ namespace System.Windows.API
             }
             errorMessage.Append(error);
             throw Exception(errorMessage);
+        }
+    }
+    
+    public ushort RegisterWindowClass(const char* windowClassName, uint style, int backgroundColor)
+    {
+        ushort windowClass = WinRegisterWindowClass(windowClassName, style, backgroundColor);
+        if (windowClass == 0u)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return windowClass;
+    }
+    
+    public void* CreateWindowByClassAtom(ushort windowClass, const char* windowName, long style, long exStyle, Point location, Size size, Control* parent)
+    {
+        void* parentHandle = null;
+        if (parent != null)
+        {
+            parentHandle = parent->Handle();
+        }
+        void* result = WinCreateWindowByClassAtom(windowClass, windowName, style, exStyle, location.x, location.y, size.w, size.h, parentHandle);
+        if (result == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        else
+        {
+            return result;
+        }
+    }
+
+    public void* CreateWindowByClassName(const char* windowClass, const char* windowName, long style, long exStyle, Point location, Size size, Control* parent)
+    {
+        void* parentHandle = null;
+        if (parent != null)
+        {
+            parentHandle = parent->Handle();
+        }
+        void* result = WinCreateWindowByClassName(windowClass, windowName, style, exStyle, location.x, location.y, size.w, size.h, parentHandle);
+        if (result == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        else
+        {
+            return result;
+        }
+    }
+    
+    public void MoveWindow(void* windowHandle, Point location, Size size, bool repaint)
+    {
+        bool succeeded = WinMoveWindow(windowHandle, location.x, location.y, size.w, size.h, repaint);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+    
+    public Rect GetClientRect(void* windowHandle)
+    {
+        Rect rect;
+        bool succeeded = WinGetClientRect(windowHandle, &rect);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return rect;
+    }
+
+    public Rect GetWindowRect(void* windowHandle)
+    {
+        Rect rect;
+        bool succeeded = WinGetWindowRect(windowHandle, &rect);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return rect;
+    }
+    
+    public Point ClientToScreen(void* windowHandle, const Point& point)
+    {
+        Point pt(point);
+        bool succeeded = WinClientToScreen(windowHandle, &pt);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return pt;
+    }
+    
+    public Point ScreenToClient(void* windowHandle, const Point& point)
+    {
+        Point pt(point);
+        bool succeeded = WinScreenToClient(windowHandle, &pt);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return pt;
+    }
+    
+    public nothrow bool PtInRect(const Point& point, const Rect& rect)
+    {
+        return WinPtInRect(&rect, &point);
+    }
+    
+    public void SetWindowText(void* windowHandle, const string& text)
+    {
+        bool succeeded = WinSetWindowText(windowHandle, text.Chars());
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
         }
     }
 }

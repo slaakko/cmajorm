@@ -31,9 +31,10 @@ namespace cmdevenv
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Console Application", 0);
             System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Windows Application", 0);
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Library", 0);
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Windows Library", 0);
-            System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem("Unit Test Project", 0);
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Windows GUI Application", 0);
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Library", 0);
+            System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem("Windows Library", 0);
+            System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem("Unit Test Project", 0);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewProjectDialog));
             this.projectItemsListView = new System.Windows.Forms.ListView();
             this.cmajImageList = new System.Windows.Forms.ImageList(this.components);
@@ -63,12 +64,13 @@ namespace cmdevenv
             listViewItem2,
             listViewItem3,
             listViewItem4,
-            listViewItem5});
+            listViewItem5,
+            listViewItem6});
             this.projectItemsListView.LargeImageList = this.cmajImageList;
             this.projectItemsListView.Location = new System.Drawing.Point(0, 0);
             this.projectItemsListView.MultiSelect = false;
             this.projectItemsListView.Name = "projectItemsListView";
-            this.projectItemsListView.Size = new System.Drawing.Size(601, 208);
+            this.projectItemsListView.Size = new System.Drawing.Size(687, 208);
             this.projectItemsListView.TabIndex = 0;
             this.projectItemsListView.UseCompatibleStateImageBehavior = false;
             this.projectItemsListView.SelectedIndexChanged += new System.EventHandler(this.projectItemsListView_SelectedIndexChanged);
@@ -85,7 +87,7 @@ namespace cmdevenv
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(601, 208);
+            this.panel1.Size = new System.Drawing.Size(687, 208);
             this.panel1.TabIndex = 1;
             // 
             // panel2
@@ -102,7 +104,7 @@ namespace cmdevenv
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(0, 113);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(601, 95);
+            this.panel2.Size = new System.Drawing.Size(687, 95);
             this.panel2.TabIndex = 0;
             // 
             // solutionComboBox
@@ -113,7 +115,7 @@ namespace cmdevenv
             "Create new solution"});
             this.solutionComboBox.Location = new System.Drawing.Point(64, 62);
             this.solutionComboBox.Name = "solutionComboBox";
-            this.solutionComboBox.Size = new System.Drawing.Size(354, 21);
+            this.solutionComboBox.Size = new System.Drawing.Size(449, 21);
             this.solutionComboBox.TabIndex = 8;
             this.solutionComboBox.Visible = false;
             // 
@@ -131,7 +133,7 @@ namespace cmdevenv
             // 
             this.locationTextBox.Location = new System.Drawing.Point(64, 38);
             this.locationTextBox.Name = "locationTextBox";
-            this.locationTextBox.Size = new System.Drawing.Size(354, 20);
+            this.locationTextBox.Size = new System.Drawing.Size(449, 20);
             this.locationTextBox.TabIndex = 2;
             this.locationTextBox.TextChanged += new System.EventHandler(this.locationTextBox_TextChanged);
             // 
@@ -148,7 +150,7 @@ namespace cmdevenv
             // 
             this.nameTextBox.Location = new System.Drawing.Point(64, 12);
             this.nameTextBox.Name = "nameTextBox";
-            this.nameTextBox.Size = new System.Drawing.Size(354, 20);
+            this.nameTextBox.Size = new System.Drawing.Size(449, 20);
             this.nameTextBox.TabIndex = 1;
             this.nameTextBox.TextChanged += new System.EventHandler(this.nameTextBox_TextChanged);
             // 
@@ -163,7 +165,7 @@ namespace cmdevenv
             // 
             // browseButton
             // 
-            this.browseButton.Location = new System.Drawing.Point(424, 36);
+            this.browseButton.Location = new System.Drawing.Point(519, 41);
             this.browseButton.Name = "browseButton";
             this.browseButton.Size = new System.Drawing.Size(75, 23);
             this.browseButton.TabIndex = 3;
@@ -174,7 +176,7 @@ namespace cmdevenv
             // cancelButton
             // 
             this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelButton.Location = new System.Drawing.Point(505, 60);
+            this.cancelButton.Location = new System.Drawing.Point(600, 65);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 5;
@@ -183,7 +185,7 @@ namespace cmdevenv
             // 
             // okButton
             // 
-            this.okButton.Location = new System.Drawing.Point(424, 60);
+            this.okButton.Location = new System.Drawing.Point(519, 65);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 4;
@@ -197,7 +199,7 @@ namespace cmdevenv
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelButton;
-            this.ClientSize = new System.Drawing.Size(601, 208);
+            this.ClientSize = new System.Drawing.Size(687, 208);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;

@@ -281,6 +281,7 @@ public:
     void AddInlineFunctionAttribute(void* function) override;
     void SetFunctionLinkage(void* function, bool setInline) override;
     void SetFunctionLinkageToLinkOnceODRLinkage(void* function) override;
+    void SetFunctionCallConventionToStdCall(void* function) override;
     void* CreateSubroutineType(const std::vector<void*>& elementTypes) override;
      unsigned GetPureVirtualVirtuality() override;
     unsigned GetVirtualVirtuality() override;
