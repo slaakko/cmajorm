@@ -989,7 +989,12 @@ void ClassDelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vecto
     void* thatPtr = emitter.Stack().Pop();
     void* thatObjectPtr = emitter.GetObjectFromClassDelegate(thatPtr);
     void* objectValue = emitter.CreateLoad(thatObjectPtr);
-    genObjects[0]->Load(emitter, OperationFlags::none);
+    OperationFlags loadFlags = OperationFlags::none;
+    if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
+    {
+        loadFlags = loadFlags | OperationFlags::leaveFirstArg;
+    }
+    genObjects[0]->Load(emitter, loadFlags);
     void* thisPtr = emitter.Stack().Pop();
     void* thisObjectPtr = emitter.GetObjectFromClassDelegate(thisPtr);
     emitter.CreateStore(objectValue, thisObjectPtr);
@@ -1024,7 +1029,12 @@ void ClassDelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vecto
     void* thatPtr = emitter.Stack().Pop();
     void* thatObjectPtr = emitter.GetObjectFromClassDelegate(thatPtr);
     void* objectValue = emitter.CreateLoad(thatObjectPtr);
-    genObjects[0]->Load(emitter, OperationFlags::none);
+    OperationFlags loadFlags = OperationFlags::none;
+    if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
+    {
+        loadFlags = loadFlags | OperationFlags::leaveFirstArg;
+    }
+    genObjects[0]->Load(emitter, loadFlags);
     void* thisPtr = emitter.Stack().Pop();
     void* thisObjectPtr = emitter.GetObjectFromClassDelegate(thisPtr);
     emitter.CreateStore(objectValue, thisObjectPtr);

@@ -52,6 +52,10 @@ namespace System.Windows
             }            
             Application.GetWindowManager().AddWindow(this);
         }
+        internal void SetParentWindow(Control* parentWindow)
+        {
+            SetParentWindow(handle, parentWindow->handle);
+        }
         public void Show()
         {
             ShowWindow(ShowCommand.SW_SHOW);
@@ -120,7 +124,11 @@ namespace System.Windows
         {
             return ScreenToClient(handle, point);
         }
-        public virtual bool ProcessMessage(Message& message)
+        internal bool ProcessMessageInternal(Message& message)
+        {
+            return ProcessMessage(message);
+        }
+        protected virtual bool ProcessMessage(Message& message)
         {
             return false;
         }

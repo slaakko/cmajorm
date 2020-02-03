@@ -24,7 +24,24 @@ namespace System.Windows
         public static int Run(Window& mainWindow)
         {
             mainWindow.SetAsMainWindow();
-            mainWindow.ShowWindow(ShowCommand.SW_SHOWNORMAL);
+            switch (mainWindow.GetWindowState())
+            {
+                case WindowState.normal:
+                {
+                    mainWindow.ShowWindow(ShowCommand.SW_SHOWNORMAL);
+                    break;
+                }
+                case WindowState.minimized:
+                {
+                    mainWindow.ShowWindow(ShowCommand.SW_MINIMIZE);
+                    break;
+                }
+                case WindowState.maximized:
+                {
+                    mainWindow.ShowWindow(ShowCommand.SW_MAXIMIZE);
+                    break;
+                }
+            }
             mainWindow.Update();
             int exitCode = WinRun();
             return exitCode;
@@ -43,7 +60,7 @@ namespace System.Windows
             if (window != null)
             {
                 Message message(windowHandle, msg, wparam, lparam, result);
-                bool handled = window->ProcessMessage(message);
+                bool handled = window->ProcessMessageInternal(message);
                 if (handled)
                 {
                     result = message.result;

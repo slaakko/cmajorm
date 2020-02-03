@@ -7,6 +7,10 @@ using System;
 
 namespace System.Windows
 {
+    public class delegate void WindowClosingEventHandler(bool& cancelClose);
+    
+    public class delegate void WindowClosedEventHandler();
+    
     public class Window : ContainerControl
     {
         public Window(const char* windowClassName, WindowClassStyle classStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle, 
@@ -23,16 +27,25 @@ namespace System.Windows
         }
         protected virtual void OnWindowClosing(bool& cancelClose)
         {
+            windowClosingEvent.Fire(cancelClose);
         }
         protected virtual void OnWindowClosed(bool& processed)
         {
-            if (isMainWindow)
+            if (windowClosedEvent.Handlers().IsEmpty())
             {
-                Application.Exit();
+                if (isMainWindow)
+                {
+                    Application.Exit();
+                    processed = true;
+                }
+            }            
+            else
+            {
+                windowClosedEvent.Fire();
                 processed = true;
             }
         }
-        public override bool ProcessMessage(Message& message)
+        protected override bool ProcessMessage(Message& message)
         {
             switch (message.msg)
             {
@@ -58,6 +71,10 @@ namespace System.Windows
                     }
                     break;
                 }
+                case WM_COMMAND:
+                {
+                    return base->ProcessMessage(message);
+                }
             }
             return false;
         }
@@ -68,6 +85,10 @@ namespace System.Windows
         public nothrow inline bool IsMainWindow() const
         {
             return isMainWindow;
+        }
+        public WindowState GetWindowState() const
+        {
+            return state;
         }
         public void SetWindowState(WindowState newState)
         {
@@ -118,7 +139,17 @@ namespace System.Windows
                 state = newState;
             }
         }
+        public nothrow Event<WindowClosingEventHandler, bool>& WindowClosingEvent()
+        {
+            return windowClosingEvent;
+        }
+        public nothrow Event<WindowClosedEventHandler>& WindowClosedEvent()
+        {
+            return windowClosedEvent;
+        }
         private bool isMainWindow;
         private WindowState state;
+        private Event<WindowClosingEventHandler, bool> windowClosingEvent;
+        private Event<WindowClosedEventHandler> windowClosedEvent;
     }
 }

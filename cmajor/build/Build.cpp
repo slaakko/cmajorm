@@ -1109,7 +1109,7 @@ void CreateMainUnitWindowGUI(std::vector<std::string>& objectFilePaths, Module& 
     CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
     CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
     tryStatement->AddCatch(catchAll);
-    InvokeNode* invokeWinShowMessageBox = new InvokeNode(Span(), new IdentifierNode(Span(), U"WinShowMessageBox"));
+    InvokeNode* invokeWinShowMessageBox = new InvokeNode(Span(), new IdentifierNode(Span(), U"WinShowMessageBoxWithType"));
     InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
     ConstructionStatementNode* constructExStr = new ConstructionStatementNode(Span(), new IdentifierNode(Span(), U"string"), new IdentifierNode(Span(), U"exStr"));
     constructExStr->AddArgument(exToString);
@@ -1120,6 +1120,8 @@ void CreateMainUnitWindowGUI(std::vector<std::string>& objectFilePaths, Module& 
     constructExCharPtr->AddArgument(invokeExChars);
     invokeWinShowMessageBox->AddArgument(new IdentifierNode(Span(), U"exCharPtr"));
     invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span()));
+    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span()));
+    invokeWinShowMessageBox->AddArgument(new UIntLiteralNode(Span(), 0x00000010 | 0x00000000)); // MB_ICONSTOP | MB_OK
     ExpressionStatementNode* showMessageBoxStatement = new ExpressionStatementNode(Span(), invokeWinShowMessageBox);
     catchBlock->AddStatement(showMessageBoxStatement);
     AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));

@@ -51,6 +51,10 @@ namespace System.Windows
             {
                 child->CreateWindowInternal();
             }
+            else
+            {
+                child->SetParentWindow(this);
+            }            
             if ((child->GetWindowStyle() & WindowStyle.WS_VISIBLE) != 0)
             {
                 child->Show();
@@ -69,6 +73,38 @@ namespace System.Windows
             }
             child->SetParent(null);
             return UniquePtr<Control>(child);
+        }
+        protected override bool ProcessMessage(Message& message)
+        {
+            switch (message.msg)
+            {
+                case WM_COMMAND:
+                {
+                    void* childWindowHandle = message.LParamHandle();
+                    ushort notificationCode = message.WParamHiWord();
+                    ushort controlId = message.WParamLoWord();
+                    Control* child = Application.GetWindowManager().GetWindow(childWindowHandle);
+                    if (child != null)
+                    {
+                        switch (notificationCode)
+                        {
+                            case BN_CLICKED:
+                            {
+                                if (child is ButtonBase*)
+                                {
+                                    ButtonBase* button = cast<ButtonBase*>(child);
+                                    button->OnClickInternal();
+                                    message.result = 0;
+                                    return true;
+                                }                            
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+            return false;
         }
         private Control* firstChild;
         private Control* lastChild;

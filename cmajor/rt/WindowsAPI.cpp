@@ -212,6 +212,10 @@ void WinSetMessageProcessorFunctionAddress(void* messageProcessorFunctionAddress
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    if (message == WM_COMMAND)
+    {
+        int x = 0;
+    }
     int64_t result = 0;
     bool handled = messageProcessor(hWnd, message, wParam, lParam, result);
     if (!handled)
@@ -219,48 +223,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return result;
-}
-
-void Tester(HINSTANCE instance)
-{
-    char16_t className[] = u"TesterApp";
-    char16_t title[] = u"Tester";
-    WNDCLASSEX wc;
-    wc.cbSize = sizeof(wc);
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WndProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = instance;
-    wc.hIcon = LoadIcon(instance, IDI_APPLICATION);
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.lpszMenuName = nullptr;
-    wc.lpszClassName = (LPWSTR)(&className[0]);
-    wc.hIconSm = LoadIcon(instance, IDI_APPLICATION);
-    if (!RegisterClassEx(&wc))
-    {
-        MessageBox(nullptr, (LPWSTR)u"register class failed", (LPWSTR)u"TesterApp", MB_OK);
-        return;
-    }
-    HWND hWnd = CreateWindow(
-        (LPWSTR)className,
-        (LPWSTR)title,
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        NULL,
-        NULL,
-        instance,
-        NULL
-    );
-    if (!hWnd)
-    {
-        MessageBox(nullptr, (LPWSTR)u"create window failed", (LPWSTR)u"TesterApp", MB_OK);
-        return;
-    }
-    ShowWindow(hWnd, SW_SHOWDEFAULT);
-    UpdateWindow(hWnd);
 }
 
 HINSTANCE applicationInstance = nullptr;
@@ -312,6 +274,19 @@ void WinShowMessageBox(const char* text, const char* caption)
         captionStr = (LPCWSTR)cap.c_str();
     }
     MessageBoxW(nullptr, (LPCWSTR)str.c_str(), captionStr, MB_OK);
+}
+
+int WinShowMessageBoxWithType(const char* text, const char* caption, void* ownerWindowHandle, uint32_t type)
+{
+    std::u16string str = ToUtf16(text);
+    LPCWSTR captionStr = nullptr;
+    std::u16string cap;
+    if (caption != nullptr)
+    {
+        cap = ToUtf16(caption);
+        captionStr = (LPCWSTR)cap.c_str();
+    }
+    return MessageBoxW((HWND)ownerWindowHandle, (LPCWSTR)str.c_str(), captionStr, type);
 }
 
 void* WinCreateWindowByClassAtom(uint16_t windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle)
@@ -378,4 +353,9 @@ bool WinSetWindowText(void* windowHandle, const char* text)
 {
     std::u16string str(ToUtf16(text));
     return SetWindowTextW((HWND)windowHandle, (LPWSTR)str.c_str());
+}
+
+void* WinSetParent(void* childWindowHandle, void* parentWindowHandle)
+{
+    return SetParent((HWND)childWindowHandle, (HWND)parentWindowHandle);
 }

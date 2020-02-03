@@ -10,11 +10,28 @@ namespace System.Windows
     public const uint WM_DESTROY = 0x2u;
     public const uint WM_CLOSE = 0x0010u;
     public const uint WM_ERASEBKGND = 0x0014u;
+    public const uint WM_COMMAND = 0x0111u;
+    public const uint WM_LBUTTONDOWN = 0x0201u;
+    public const uint WM_LBUTTONUP = 0x0202u;
+    
+    public const ushort BN_CLICKED = 0u;
     
     public class Message
     {
         public nothrow Message(void* windowHandle_, uint msg_, uint wparam_, long lparam_, long result_) : windowHandle(windowHandle_), msg(msg_), wparam(wparam_), lparam(lparam_), result(result_)
         {
+        }
+        public nothrow inline ushort WParamLoWord() const
+        {
+            return cast<ushort>(wparam & 0xFFFFu);
+        }
+        public nothrow inline ushort WParamHiWord() const
+        {
+            return cast<ushort>((wparam >> 16u) & 0xFFFFu);
+        }
+        public nothrow inline void* LParamHandle() const
+        {
+            return cast<void*>(cast<ulong>(lparam));
         }
         public void* windowHandle;
         public uint msg;

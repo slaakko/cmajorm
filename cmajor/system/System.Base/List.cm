@@ -188,6 +188,34 @@ namespace System.Collections
             destroy(end.Ptr());
             return result;
         }
+        public void Remove(const ValueType& item)
+        {
+            Iterator i = Begin();
+            Iterator e = End();
+            Iterator p = i;
+            while (i != e)
+            {
+                if (*i == item)
+                {
+                    ++i;
+                }
+                else if (i != p)
+                {
+                    *p++ = *i++;
+                }
+                else
+                {
+                    ++i;
+                    ++p;
+                }
+            }
+            while (p != e)
+            {
+                destroy(p.Ptr());
+                --count;
+                ++p;
+            }
+        }
         public nothrow inline const ValueType& operator[](long index) const
         {
             #assert(index >= 0 && index < count);

@@ -4,18 +4,53 @@
 // =================================
 
 using System;
+using System.Collections;
 
 namespace System.Windows
 {
-    public class Button : Control
+    public enum ButtonStyle : long
     {
-        public Button(const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
-            base("BUTTON", WindowClassStyle.CS_DEFAULT, WindowColor.COLOR_BTNFACE, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_TABSTOP | WindowStyle.WS_VISIBLE), ExtendedWindowStyle.WS_EX_DEFAULT, 
+        BS_PUSHBUTTON = 0,
+        BS_DEFPUSHBUTTON = 1
+    }
+    
+    public class delegate void ClickEventHandler();
+    
+    public class ButtonBase : Control
+    {
+        public ButtonBase(const char* windowClassName, WindowClassStyle windowClassStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle, 
+            const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
+            base(windowClassName, windowClassStyle, windowClassBackgroundColor, style, exStyle, text, location, size, anchors, dock)
+        {
+        }
+        internal void OnClickInternal()
+        {
+            OnClick();
+        }
+        protected virtual void OnClick()
+        {
+            clickEvent.Fire();
+        }
+        public nothrow Event<ClickEventHandler>& ClickEvent()
+        {
+            return clickEvent;
+        }
+        private Event<ClickEventHandler> clickEvent;
+    }
+    
+    public class Button : ButtonBase
+    {
+        public Button(ButtonStyle buttonStyle, const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) :
+            base("BUTTON", WindowClassStyle.CS_DEFAULT, WindowColor.COLOR_BTNFACE, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_TABSTOP | WindowStyle.WS_VISIBLE | buttonStyle), ExtendedWindowStyle.WS_EX_DEFAULT, 
             text, location, size, anchors, dock)
         {
         }
-        public Button(const string& text, const Point& location, const Size& size) :
-            this(text, location, size, cast<Anchors>(Anchors.top | Anchors.left), Dock.none)
+        public Button(ButtonStyle buttonStyle, const string& text, const Point& location, const Size& size) :
+            this(buttonStyle, text, location, size, cast<Anchors>(Anchors.top | Anchors.left), Dock.none)
+        {
+        }
+        public Button(const string& text, const Point& location, const Size& size) : 
+            this(ButtonStyle.BS_PUSHBUTTON, text, location, size)
         {
         }
     }

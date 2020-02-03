@@ -26,6 +26,7 @@ extern "C" RT_API uint16_t WinRegisterWindowClass(const char* windowClassName, u
 extern "C" RT_API void* WinCreateWindowByClassAtom(uint16_t windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle);
 extern "C" RT_API void* WinCreateWindowByClassName(const char* windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle);
 extern "C" RT_API void WinShowMessageBox(const char* text, const char* caption);
+extern "C" RT_API int WinShowMessageBoxWithType(const char* text, const char* caption, void* ownerWindowHandle, uint32_t type);
 extern "C" RT_API void WinSetMessageProcessorFunctionAddress(void* messageProcessorFunctionAddress);
 extern "C" RT_API void WinPostQuitMessage(int exitCode);
 extern "C" RT_API bool WinShowWindow(void* windowHandle, int commandShow);
@@ -37,6 +38,7 @@ extern "C" RT_API bool WinClientToScreen(void* windowHandle, void* point);
 extern "C" RT_API bool WinScreenToClient(void* windowHandle, void* point);
 extern "C" RT_API bool WinPtInRect(void* rect, void* point);
 extern "C" RT_API bool WinSetWindowText(void* windowHandle, const char* text);
+extern "C" RT_API void* WinSetParent(void* childWindowHandle, void* parentWindowHandle);
 
 #endif // CMAJOR_RT_WINDOWS_API_INCLUDED
 

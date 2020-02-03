@@ -21,6 +21,7 @@ public extern cdecl nothrow ushort WinRegisterWindowClass(const char* windowClas
 public extern cdecl nothrow void* WinCreateWindowByClassAtom(ushort windowClass, const char* windowName, long style, long exStyle, int x, int y, int w, int h, void* parentHandle);
 public extern cdecl nothrow void* WinCreateWindowByClassName(const char* windowClass, const char* windowName, long style, long exStyle, int x, int y, int w, int h, void* parentHandle);
 public extern cdecl nothrow void WinShowMessageBox(const char* text, const char* caption);
+public extern cdecl nothrow void WinShowMessageBoxWithType(const char* text, const char* caption, void* ownerWindowHandle, uint type);
 public extern cdecl nothrow void WinPostQuitMessage(int exitCode);
 public extern cdecl nothrow bool WinShowWindow(void* windowHandle, int commandShow);
 public extern cdecl nothrow bool WinUpdateWindow(void* windowHandle);
@@ -32,3 +33,4 @@ public extern cdecl nothrow bool WinClientToScreen(void* windowHandle, void* poi
 public extern cdecl nothrow bool WinScreenToClient(void* windowHandle, void* point);
 public extern cdecl nothrow bool WinPtInRect(void* rect, void* point);
 public extern cdecl nothrow bool WinSetWindowText(void* windowHandle, const char* text);
+public extern cdecl nothrow void* WinSetParent(void* childWindowHandle, void* parentWindowHandle);

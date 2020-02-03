@@ -14,7 +14,7 @@ namespace System.Windows
         {
             systemClassNames.Insert("BUTTON");
         }
-        public ushort RegisterWindowClass(const char* windowClassName, WindowClassStyle windowClassStyle, int backgroundColor)
+        public ushort RegisterWindowClass(const char* windowClassName, WindowClassStyle windowClassStyle, int windowClassBackgroundColor)
         {
             string className = windowClassName;
             HashMap<string, ushort>.ConstIterator it = registeredWindowClasses.CFind(className);
@@ -24,7 +24,7 @@ namespace System.Windows
             }
             else
             {
-                ushort windowClass = System.Windows.API.RegisterWindowClass(windowClassName, windowClassStyle, backgroundColor);
+                ushort windowClass = System.Windows.API.RegisterWindowClass(windowClassName, windowClassStyle, windowClassBackgroundColor);
                 registeredWindowClasses[className] = windowClass;
                 return windowClass;
             }        

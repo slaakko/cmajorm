@@ -333,4 +333,13 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
+    
+    public void SetParentWindow(void* childWindowHandle, void* parentWindowHandle)
+    {
+        void* result = WinSetParent(childWindowHandle, parentWindowHandle);
+        if (result == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
 }
