@@ -1,0 +1,34 @@
+using System;
+using System.Windows;
+using System.IO;
+
+class MainWindow : Window
+{
+    public MainWindow() : base("ASTViewer")
+    {
+    }
+}
+
+int main()
+{
+    try
+    {
+        MainWindow mainWindow;
+        int exitCode = Application.Run(mainWindow);
+        return exitCode;
+    }
+    catch (const Exception& ex)
+    {
+        MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+        try
+        {
+            StreamWriter errorWriter = File.CreateText("error.txt");
+            errorWriter << ex.ToString() << endl();
+        }
+        catch (const Exception&)
+        {
+        }
+        return 1;
+    }
+    return 0;
+}

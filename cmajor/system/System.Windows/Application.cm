@@ -9,14 +9,15 @@ using System.Windows.API;
 namespace System.Windows
 {
     public delegate bool MessageProcessorFunction(void* windowHandle, uint msg, uint wparam, long lparam, long& result);
-    
+
     public static class Application
     {
         static Application()
         {            
             MessageProcessorFunction messageProcessorFunction = ProcessMessage;
             void* messageProcessorFunctionAddress = cast<void*>(messageProcessorFunction);
-            WinSetMessageProcessorFunctionAddress(messageProcessorFunctionAddress);
+            int result = WinInit(messageProcessorFunctionAddress);
+            CheckGraphicsStatus(cast<GraphicsStatus>(result));
         }
         public static void Init()
         {
@@ -68,6 +69,10 @@ namespace System.Windows
                 return handled;
             }
             return false;
+        }
+        private static void Debug(int level, const char* message)
+        {
+            MessageBox.Show(message);
         }
         public static nothrow WindowManager& GetWindowManager()
         {

@@ -8,11 +8,11 @@ using System;
 namespace System.Windows
 {
     public const uint WM_DESTROY = 0x2u;
+    public const uint WM_SIZE = 0x0005u;
+    public const uint WM_PAINT = 0x000Fu;
     public const uint WM_CLOSE = 0x0010u;
     public const uint WM_ERASEBKGND = 0x0014u;
     public const uint WM_COMMAND = 0x0111u;
-    public const uint WM_LBUTTONDOWN = 0x0201u;
-    public const uint WM_LBUTTONUP = 0x0202u;
     
     public const ushort BN_CLICKED = 0u;
     
@@ -32,6 +32,14 @@ namespace System.Windows
         public nothrow inline void* LParamHandle() const
         {
             return cast<void*>(cast<ulong>(lparam));
+        }
+        public nothrow inline uint LParamLoDWord() const
+        {
+            return cast<uint>(lparam);
+        }
+        public nothrow inline uint LParamHiDWord() const
+        {
+            return cast<uint>((lparam >> 32u) & 0xFFFFFFFFu);
         }
         public void* windowHandle;
         public uint msg;

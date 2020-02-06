@@ -19,8 +19,8 @@ namespace System.Windows
     public class ButtonBase : Control
     {
         public ButtonBase(const char* windowClassName, WindowClassStyle windowClassStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle, 
-            const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
-            base(windowClassName, windowClassStyle, windowClassBackgroundColor, style, exStyle, text, location, size, anchors, dock)
+            const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
+            base(windowClassName, windowClassStyle, windowClassBackgroundColor, style, exStyle, text, location, size, dock, anchors)
         {
         }
         internal void OnClickInternal()
@@ -40,13 +40,17 @@ namespace System.Windows
     
     public class Button : ButtonBase
     {
-        public Button(ButtonStyle buttonStyle, const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) :
+        public Button(ButtonStyle buttonStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("BUTTON", WindowClassStyle.CS_DEFAULT, WindowColor.COLOR_BTNFACE, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_TABSTOP | WindowStyle.WS_VISIBLE | buttonStyle), ExtendedWindowStyle.WS_EX_DEFAULT, 
-            text, location, size, anchors, dock)
+            text, location, size, dock, anchors)
+        {
+        }
+        public Button(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(ButtonStyle.BS_PUSHBUTTON, text, location, size, dock, anchors)
         {
         }
         public Button(ButtonStyle buttonStyle, const string& text, const Point& location, const Size& size) :
-            this(buttonStyle, text, location, size, cast<Anchors>(Anchors.top | Anchors.left), Dock.none)
+            this(buttonStyle, text, location, size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left))
         {
         }
         public Button(const string& text, const Point& location, const Size& size) : 

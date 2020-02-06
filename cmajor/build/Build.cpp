@@ -1127,6 +1127,8 @@ void CreateMainUnitWindowGUI(std::vector<std::string>& objectFilePaths, Module& 
     AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
     catchBlock->AddStatement(assignExitCodeStatement);
     mainFunctionBody->AddStatement(tryStatement);
+    ExpressionStatementNode* winDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"WinDone")));
+    mainFunctionBody->AddStatement(winDoneCall);
     ExpressionStatementNode* rtDoneCall = nullptr;
     rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
     mainFunctionBody->AddStatement(rtDoneCall);

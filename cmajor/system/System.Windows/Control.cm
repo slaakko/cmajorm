@@ -8,24 +8,21 @@ using System.Windows.API;
 
 namespace System.Windows
 {
+    public class delegate void PaintEventHandler(PaintEventArgs& paintEventArgs);
+
     public class Control
     {
         public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowColor windowClassBackgroundColor_, WindowStyle style_, ExtendedWindowStyle exStyle_, 
-            const string& text_, const Point& location_, const Size& size_, Anchors anchors_, Dock dock_) : 
+            const string& text_, const Point& location_, const Size& size_, Dock dock_, Anchors anchors_) : 
             windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), windowClassBackgroundColor(windowClassBackgroundColor_), style(style_), exStyle(exStyle_), 
             handle(null), parent(null), nextSibling(null), prevSibling(null), 
-            text(text_), location(location_), size(size_), anchors(anchors_), dock(dock_)
+            name(), text(text_), location(location_), size(size_), dock(dock_), anchors(anchors_)
         {
             Application.Init();
             if ((style & WindowStyle.WS_CHILD) == 0)
             {
                 CreateWindow();
             }
-        }
-        public Control(const char* windowClassName, WindowClassStyle windowClassStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle,
-            const string& text_, const Point& location_, const Size& size_) :
-            this(windowClassName, windowClassStyle, windowClassBackgroundColor, style, exStyle, text_, location_, size_, cast<Anchors>(Anchors.top | Anchors.left), Dock.none)
-        {
         }
         public virtual ~Control()
         {
@@ -51,10 +48,21 @@ namespace System.Windows
                 handle = CreateWindowByClassAtom(windowClass, text.Chars(), style, exStyle, location, size, parent);
             }            
             Application.GetWindowManager().AddWindow(this);
+            WinRect clientRect = GetClientRect();
+            if ((style & WindowStyle.WS_CHILD) == 0)
+            {
+                WinRect windowRect = GetWindowRect();
+                location.x = windowRect.left;
+                location.y = windowRect.top;
+            }
+            size.w = clientRect.right - clientRect.left;
+            size.h = clientRect.bottom - clientRect.top;
+            DockWindow();
         }
-        internal void SetParentWindow(Control* parentWindow)
+        internal void SetParentWindow(ContainerControl* parentWindow)
         {
             SetParentWindow(handle, parentWindow->handle);
+            DockWindow();
         }
         public void Show()
         {
@@ -72,7 +80,7 @@ namespace System.Windows
         {
             WinUpdateWindow(handle);
         }
-        public const string& Text() const
+        public nothrow const string& Text() const
         {
             return text;
         }
@@ -84,8 +92,14 @@ namespace System.Windows
                 SetWindowText(handle, text);
             }
         }
-        public const Point& Location() const
+        public const Point& Location()
         {
+            if ((style & WindowStyle.WS_CHILD) == 0)
+            {
+                WinRect windowRect = GetWindowRect();
+                location.x = windowRect.left;
+                location.y = windowRect.top;
+            }
             return location;
         }
         public void SetLocation(const Point& loc)
@@ -96,9 +110,13 @@ namespace System.Windows
                 MoveWindow(handle, location, size, true);
             }
         }
-        public const Size& GetSize() const
+        public nothrow const Size& GetSize() const
         {
             return size;
+        }
+        internal nothrow void SetSizeInternal(const Size& sz)
+        {
+            size = sz;
         }
         public void SetSize(const Size& sz)
         {
@@ -108,11 +126,114 @@ namespace System.Windows
                 MoveWindow(handle, location, size, true);
             }
         }
-        public Rect GetClientRect() const
+        public inline nothrow Dock GetDock() const
+        {
+            return dock;
+        }
+        public void SetDock(Dock dock_)
+        {
+            dock = dock_;
+            if (dock != Dock.none)
+            {
+                DockWindow();
+            }
+        }
+        internal void DockWindow()
+        {
+            if (parent != null)
+            {
+                DockWindow(parent->GetSize());
+            }
+        }
+        internal void DockWindow(const Size& parentSize)
+        {
+            if (dock == Dock.none) return;
+            Point newLocation = location;
+            Size newSize = size;
+            switch (dock)
+            {
+                case Dock.left:
+                {
+                    newLocation = Point(0, 0);
+                    newSize.h = parentSize.h;
+                    break;
+                }
+                case Dock.top:
+                {
+                    newLocation = Point(0, 0);
+                    newSize.w = parentSize.w;
+                    break;
+                }
+                case Dock.right:
+                {
+                    newLocation = Point(parentSize.w - size.w, 0);
+                    newSize.h = parentSize.h;
+                    break;
+                }
+                case Dock.bottom:
+                {
+                    newLocation = Point(0, parentSize.h - size.h);
+                    newSize.w = parentSize.w;
+                    break;
+                }
+                case Dock.fill:
+                {
+                    newLocation = Point(0, 0);
+                    newSize = parentSize;
+                    break;
+                }
+            }
+            if (location != newLocation || size != newSize)
+            {
+                location = newLocation;
+                size = newSize;
+                MoveWindow(handle, location, size, true);
+            }
+        }
+        internal void MoveWindow(int dx, int dy)
+        {
+            Point newLocation = location;
+            Size newSize = size;
+            bool leftAnchored = cast<Anchors>(anchors & Anchors.left) != Anchors.none;
+            bool rightAnchored = cast<Anchors>(anchors & Anchors.right) != Anchors.none;
+            if (!leftAnchored)
+            {
+                newLocation.x = newLocation.x + dx;
+            }
+            else if (rightAnchored)
+            {
+                newSize.w = newSize.w + dx;
+            }
+            bool topAnchored = cast<Anchors>(anchors & Anchors.top) != Anchors.none;
+            bool bottomAnchored = cast<Anchors>(anchors & Anchors.bottom) != Anchors.none;
+            if (!topAnchored)
+            {
+                newLocation.y = newLocation.y + dy;
+            }
+            else if (bottomAnchored)
+            {
+                newSize.h = newSize.h + dy;
+            }
+            if (location != newLocation || size != newSize)
+            {
+                location = newLocation;
+                size = newSize;
+                MoveWindow(handle, location, size, true);
+            }
+        }
+        public inline nothrow Anchors GetAnchors() const
+        {
+            return anchors;
+        }
+        public inline nothrow void SetAnchors(Anchors anchors_) 
+        {
+            anchors = anchors_;
+        }
+        public WinRect GetClientRect() const
         {
             return GetClientRect(handle);
         }
-        public Rect GetWindowRect() const
+        public WinRect GetWindowRect() const
         {
             return GetWindowRect(handle);
         }
@@ -130,25 +251,61 @@ namespace System.Windows
         }
         protected virtual bool ProcessMessage(Message& message)
         {
+            switch (message.msg)
+            {
+                case WM_PAINT:
+                {
+                    if (!paintEvent.Handlers().IsEmpty())
+                    {
+                        OnPaint();
+                        message.result = 0;
+                        return true;
+                    }
+                    break;
+                }
+            }
             return false;
+        }
+        protected virtual void OnPaint()
+        {
+            void* paintStruct = null;
+            void* hdc = BeginPaint(handle, paintStruct);
+            Rect clipRect;
+            WinGetClipRect(paintStruct, clipRect.location.x, clipRect.location.y, clipRect.size.w, clipRect.size.h);
+            PaintGuard paintGuard(hdc, paintStruct);
+            Graphics graphics(hdc);
+            PaintEventArgs args(graphics, clipRect);
+            paintEvent.Fire(args);
+        }
+        public void Invalidate()
+        {
+            InvalidateRect(handle, null, true);
+        }
+        public void Invalidate(const WinRect& rect)
+        {
+            InvalidateRect(handle, &rect, false);
+        }
+        public void Invalidate(const WinRect& rect, bool eraseBackground)
+        {
+            InvalidateRect(handle, &rect, eraseBackground);
         }
         public nothrow inline void* Handle() const
         {
             return handle;
         }
-        public nothrow Control* Parent() const
+        public nothrow inline ContainerControl* Parent() const
         {
             return parent;
         }
-        internal nothrow void SetParent(Control* parent_)
+        internal nothrow void SetParent(ContainerControl* parent_)
         {
             parent = parent_;
         }    
-        public nothrow Control* NextSibling() const
+        public nothrow inline Control* NextSibling() const
         {
             return nextSibling;
         }
-        public nothrow Control* PrevSibling() const
+        public nothrow inline Control* PrevSibling() const
         {
             return prevSibling;
         }
@@ -177,19 +334,25 @@ namespace System.Windows
         {
             return exStyle;
         }
+        public nothrow Event<PaintEventHandler, PaintEventArgs>& PaintEvent()
+        {
+            return paintEvent;
+        }
         private const char* windowClassName;
         private WindowClassStyle windowClassStyle;
         private WindowColor windowClassBackgroundColor;
         private WindowStyle style;
         private ExtendedWindowStyle exStyle;
         private void* handle;
-        private Control* parent;
+        private ContainerControl* parent;
         private Control* nextSibling;
         private Control* prevSibling;
+        private string name;
         private string text;
         private Point location;
         private Size size;
-        private Anchors anchors;
         private Dock dock;
+        private Anchors anchors;
+        private Event<PaintEventHandler, PaintEventArgs> paintEvent;
     }
 }

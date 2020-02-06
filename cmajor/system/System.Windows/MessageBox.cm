@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Windows.API;
 
 namespace System.Windows
 {
@@ -26,25 +27,54 @@ namespace System.Windows
         MB_ICONERROR = 0x00000010u,
         MB_ICONHAND = 0x00000010u
     }
-    
+
+    public enum MessageBoxResult : int
+    {
+        ok = 1,
+        cancel = 2,
+        abort = 3,
+        retry = 4,
+        ignore = 5,
+        yes = 6,
+        no = 7,
+        tryAgain = 10,
+        continue_ = 11
+    }
+
     public static class MessageBox
     {
         public static void Show(const string& message)
         {
-            WinShowMessageBox(message.Chars(), null);
+            int result = WinShowMessageBox(message.Chars(), null);
+            if (result == 0)
+            {
+                throw WindowsAPIException(WinGetLastError());
+            }
         }
         public static void Show(const string& message, const string& caption)
         {
-            WinShowMessageBox(message.Chars(), caption.Chars());
+            int result = WinShowMessageBox(message.Chars(), caption.Chars());
+            if (result == 0)
+            {
+                throw WindowsAPIException(WinGetLastError());
+            }
         }
-        public static void Show(const string& message, const string& caption, Control* owner, MessageBoxType type)
+        public static MessageBoxResult Show(const string& message, const string& caption, Control* owner, MessageBoxType type)
         {
             void* ownerWindowHandle = null;
             if (owner != null)
             {
                 ownerWindowHandle = owner->Handle();
             }
-            WinShowMessageBoxWithType(message.Chars(), caption.Chars(), ownerWindowHandle, type);
+            int result = WinShowMessageBoxWithType(message.Chars(), caption.Chars(), ownerWindowHandle, type);
+            if (result == 0)
+            {
+                throw WindowsAPIException(WinGetLastError());
+            }
+            else
+            {
+                return cast<MessageBoxResult>(result);
+            }
         }
     }
 }

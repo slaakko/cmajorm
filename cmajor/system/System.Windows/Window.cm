@@ -14,15 +14,15 @@ namespace System.Windows
     public class Window : ContainerControl
     {
         public Window(const char* windowClassName, WindowClassStyle classStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle, 
-            const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
-            base(windowClassName, classStyle, windowClassBackgroundColor, style, exStyle, text, location, size, anchors, dock), isMainWindow(false), state(WindowState.normal)
+            const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
+            base(windowClassName, classStyle, windowClassBackgroundColor, style, exStyle, text, location, size, dock, anchors), isMainWindow(false), state(WindowState.normal)
         {
         }
-        public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
-            this(windowClassName, cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW), WindowColor.COLOR_WINDOW, style, exStyle, text, location, size, anchors, dock)
+        public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
+            this(windowClassName, cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW), WindowColor.COLOR_WINDOW, style, exStyle, text, location, size, dock, anchors)
         {
         }
-        public Window(const string& caption) : this("System.Windows.Window", WindowStyle.WS_OVERLAPPEDWINDOW, ExtendedWindowStyle.WS_EX_DEFAULT, caption, Point.Default(), Size.Default(), Anchors.none, Dock.none)
+        public Window(const string& caption) : this("System.Windows.Window", WindowStyle.WS_OVERLAPPEDWINDOW, ExtendedWindowStyle.WS_EX_DEFAULT, caption, Point.Default(), Size.Default(), Dock.none, Anchors.none)
         {
         }
         protected virtual void OnWindowClosing(bool& cancelClose)
@@ -71,7 +71,7 @@ namespace System.Windows
                     }
                     break;
                 }
-                case WM_COMMAND:
+                case WM_COMMAND: case WM_SIZE: case WM_PAINT:
                 {
                     return base->ProcessMessage(message);
                 }

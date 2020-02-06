@@ -10,8 +10,8 @@ namespace System.Windows
     public class ContainerControl : Control
     {
         public ContainerControl(const char* windowClassName, WindowClassStyle windowClassStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle, 
-            const string& text, const Point& location, const Size& size, Anchors anchors, Dock dock) : 
-            base(windowClassName, windowClassStyle, windowClassBackgroundColor, style, exStyle, text, location, size, anchors, dock), 
+            const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
+            base(windowClassName, windowClassStyle, windowClassBackgroundColor, style, exStyle, text, location, size, dock, anchors), 
             firstChild(null), lastChild(null)
         {
         }
@@ -27,15 +27,11 @@ namespace System.Windows
         }
         public void AddChild(Control* child)
         {
-            Control* parentOfChild = child->Parent();
-            if (parentOfChild != null)
+            ContainerControl* parent = child->Parent();
+            if (parent != null)
             {
-                if (parentOfChild is ContainerControl*)
-                {
-                    ContainerControl* containerParent = cast<ContainerControl*>(parentOfChild);
-                    UniquePtr<Control> removedChild = containerParent->RemoveChild(child);
-                    child = removedChild.Release();
-                }
+                UniquePtr<Control> removedChild = parent->RemoveChild(child);
+                child = removedChild.Release();
             }
             if (lastChild != null)
             {
@@ -102,6 +98,39 @@ namespace System.Windows
                         }
                     }
                     break;
+                }
+                case WM_SIZE:
+                {
+                    uint s = message.LParamLoDWord();
+                    ushort sw = cast<ushort>(s);
+                    ushort sh = cast<ushort>(s >> 16u);
+                    Size newSize(cast<int>(sw), cast<int>(sh));
+                    Size oldSize = GetSize();
+                    if (newSize != oldSize)
+                    {
+                        int dx = newSize.w - oldSize.w;
+                        int dy = newSize.h - oldSize.h;
+                        Control* child = firstChild;
+                        while (child != null)
+                        {
+                            if (child->GetDock() != Dock.none)
+                            {
+                                child->DockWindow(newSize);
+                            }
+                            else
+                            {
+                                child->MoveWindow(dx, dy);
+                            }
+                            child = child->NextSibling();
+                        }                
+                        SetSizeInternal(newSize);
+                    }                    
+                    message.result = 0;
+                    return true;
+                }
+                case WM_PAINT:
+                {
+                    return base->ProcessMessage(message);
                 }
             }
             return false;

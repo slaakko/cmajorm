@@ -8,9 +8,12 @@
 #include <Windows.h>
 #include <map>
 #include <string>
+#include <gdiplus.h>
+#pragma comment (lib,"Gdiplus.lib")
 
 using namespace soulng::unicode;
 using namespace soulng::util;
+using namespace Gdiplus;
 
 struct CodeMapping
 {
@@ -205,17 +208,8 @@ typedef bool (*messageProcessorFunction)(void* windowHandle, uint32_t message, u
 
 messageProcessorFunction messageProcessor = nullptr;
 
-void WinSetMessageProcessorFunctionAddress(void* messageProcessorFunctionAddress)
-{
-    messageProcessor = static_cast<messageProcessorFunction>(messageProcessorFunctionAddress);
-}
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    if (message == WM_COMMAND)
-    {
-        int x = 0;
-    }
     int64_t result = 0;
     bool handled = messageProcessor(hWnd, message, wParam, lParam, result);
     if (!handled)
@@ -230,6 +224,21 @@ HINSTANCE applicationInstance = nullptr;
 void WinSetInstance()
 {
     applicationInstance = GetModuleHandle(nullptr);
+}
+
+ULONG_PTR gdiplusToken;
+GdiplusStartupInput gdiplusStartupInput;
+
+int WinInit(void* messageProcessorFunctionAddress)
+{
+    messageProcessor = static_cast<messageProcessorFunction>(messageProcessorFunctionAddress);
+    Status status = GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    return static_cast<int>(status);
+}
+
+void WinDone()
+{
+    GdiplusShutdown(gdiplusToken);
 }
 
 int WinRun()
@@ -263,7 +272,7 @@ int WinRun()
     return atom;
 }
 
-void WinShowMessageBox(const char* text, const char* caption)
+int WinShowMessageBox(const char* text, const char* caption)
 {
     std::u16string str = ToUtf16(text);
     LPCWSTR captionStr = nullptr;
@@ -273,7 +282,7 @@ void WinShowMessageBox(const char* text, const char* caption)
         cap = ToUtf16(caption);
         captionStr = (LPCWSTR)cap.c_str();
     }
-    MessageBoxW(nullptr, (LPCWSTR)str.c_str(), captionStr, MB_OK);
+    return MessageBoxW(nullptr, (LPCWSTR)str.c_str(), captionStr, MB_OK);
 }
 
 int WinShowMessageBoxWithType(const char* text, const char* caption, void* ownerWindowHandle, uint32_t type)
@@ -358,4 +367,168 @@ bool WinSetWindowText(void* windowHandle, const char* text)
 void* WinSetParent(void* childWindowHandle, void* parentWindowHandle)
 {
     return SetParent((HWND)childWindowHandle, (HWND)parentWindowHandle);
+}
+
+bool WinInvalidateRect(void* windowHandle, void* rect, bool eraseBackground)
+{
+    return InvalidateRect((HWND)windowHandle, (const RECT*)rect, eraseBackground);
+}
+
+void* WinBeginPaint(void* windowHandle, void*& paintStruct)
+{
+    paintStruct = new PAINTSTRUCT();
+    return BeginPaint((HWND)windowHandle, (LPPAINTSTRUCT)paintStruct);
+}
+
+void WinEndPaint(void* windowHandle, void* paintStruct)
+{
+    EndPaint((HWND)windowHandle, (const PAINTSTRUCT*)paintStruct);
+    delete paintStruct;
+}
+
+void WinGetClipRect(void* paintStruct, int& x, int& y, int& w, int& h)
+{
+    PAINTSTRUCT* ps = static_cast<PAINTSTRUCT*>(paintStruct);
+    x = ps->rcPaint.left;
+    y = ps->rcPaint.top;
+    w = ps->rcPaint.right - x;
+    h = ps->rcPaint.bottom - y;
+}
+
+void* WinCreateGraphics(void* hdc)
+{
+    Graphics* graphics = new Graphics((HDC)hdc);
+    return graphics;
+}
+
+void WinDeleteGraphics(void* nativeGraphics)
+{
+    delete static_cast<Graphics*>(nativeGraphics);
+}
+
+int WinGraphicsGetLastStatus(void* graphics)
+{
+    return static_cast<Graphics*>(graphics)->GetLastStatus();
+}
+
+int WinGraphicsFontGetLastStatus(void* font)
+{
+    return static_cast<Font*>(font)->GetLastStatus();
+}
+
+void* WinGraphicsGetHDC(void* nativeGraphics)
+{
+    return static_cast<Graphics*>(nativeGraphics)->GetHDC();
+}
+
+void* WinGraphicsCreatePen(uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue, float width)
+{
+    return new Pen(Color(alpha, red, green, blue), width);
+}
+
+void WinGraphicsDeletePen(void* pen)
+{
+    delete static_cast<Pen*>(pen);
+}
+
+void* WinGraphicsClonePen(void* pen)
+{
+    return static_cast<Pen*>(pen)->Clone();
+}
+
+int WinGraphicsPenGetLastStatus(void* pen)
+{
+    return static_cast<Pen*>(pen)->GetLastStatus();
+}
+
+void* WinGraphicsCreateSolidBrush(uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue)
+{
+    return new SolidBrush(Color(alpha, red, green, blue));
+}
+
+void* WinGraphicsCloneSolidBrush(void* solidBrush)
+{
+    return static_cast<SolidBrush*>(solidBrush)->Clone();
+}
+
+void WinGraphicsDeleteSolidBrush(void* solidBrush)
+{
+    delete static_cast<SolidBrush*>(solidBrush);
+}
+
+int WinGraphicsBrushGetLastStatus(void* brush)
+{
+    return static_cast<Brush*>(brush)->GetLastStatus();
+}
+
+void* WinGraphicsCreateFontFamily(const char* familyName)
+{
+    std::u16string name = ToUtf16(std::string(familyName));
+    return new FontFamily((const WCHAR*)name.c_str(), nullptr);
+}
+
+void* WinGraphicsCloneFontFamily(void* fontFamily)
+{
+    return static_cast<FontFamily*>(fontFamily)->Clone();
+}
+
+void WinGraphicsDeleteFontFamily(void* fontFamily)
+{
+    delete static_cast<FontFamily*>(fontFamily);
+}
+
+const void* WinGraphicsGetGenericMonospaceFontFamily()
+{
+    return FontFamily::GenericMonospace();
+}
+
+const void* WinGraphicsGetGenericSansSerifFontFamily()
+{
+    return FontFamily::GenericSansSerif();
+}
+
+const void* WinGraphicsGetGenericSerifFontFamily()
+{
+    return FontFamily::GenericSerif();
+}
+
+int WinGraphicsFontFamilyGetLastStatus(void* fontFamily)
+{
+    return static_cast<FontFamily*>(fontFamily)->GetLastStatus();
+}
+
+void* WinGraphicsCreateFont(const void* fontFamily, float emSize, int style, int unit)
+{
+    return new Font(static_cast<const FontFamily*>(fontFamily), emSize, style, static_cast<Gdiplus::Unit>(unit));
+}
+
+void* WinGraphicsCloneFont(void* font)
+{
+    return static_cast<Font*>(font)->Clone();
+}
+
+void WinGraphicsDeleteFont(void* font)
+{
+    delete static_cast<Font*>(font);
+}
+
+float WinGraphicsGetFontHeight(void* font, const void* graphics)
+{
+    return static_cast<Font*>(font)->GetHeight(static_cast<const Graphics*>(graphics));
+}
+
+int WinGraphicsDrawLine(void* graphics, void* pen, int startX, int startY, int endX, int endY)
+{
+    return static_cast<Graphics*>(graphics)->DrawLine(static_cast<Pen*>(pen), Point(startX, startY), Point(endX, endY));
+}
+
+int WinGraphicsDrawString(void* graphics, const char* str, void* font, float x, float y, void* brush)
+{
+    std::u16string s(ToUtf16(std::string(str)));
+    return static_cast<Graphics*>(graphics)->DrawString((const WCHAR*)s.c_str(), s.length(), static_cast<const Font*>(font), PointF(x, y), static_cast<const Brush*>(brush));
+}
+
+int WinGraphicsClear(void* graphics, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue)
+{
+    return static_cast<Graphics*>(graphics)->Clear(Color(alpha, red, green, blue));
 }

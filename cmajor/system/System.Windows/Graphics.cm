@@ -1,0 +1,443 @@
+
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows.API;
+
+namespace System.Windows
+{
+    public enum GraphicsStatus : int
+    {
+        ok = 0,
+        genericError = 1,
+        invalidParameter = 2,
+        outOfMemory = 3,
+        objectBusy = 4,
+        insufficientBuffer = 5,
+        notImplemented = 6,
+        win32Error = 7,
+        wrongState = 8,
+        aborted = 9,
+        fileNotFound = 10,
+        valueOverflow = 11,
+        accessDenied = 12,
+        unknownImageFormat = 13,
+        fontFamilyNotFound = 14,
+        fontStyleNotFound = 15,
+        notTrueTypeFont = 16,
+        unsupportedGdiplusVersion = 17,
+        gdiplusNotInitialized = 18,
+        propertyNotFound = 19,
+        propertyNotSupported = 20,
+        profileNotFound = 21
+    }
+
+    public string GraphicsStatusStr(GraphicsStatus status)
+    {
+        switch (status)
+        {
+            case GraphicsStatus.ok: return "ok";
+            case GraphicsStatus.genericError: return "generic error";
+            case GraphicsStatus.invalidParameter: return "invalid parameter";
+            case GraphicsStatus.outOfMemory: return "out of memory";
+            case GraphicsStatus.objectBusy: return "object busy";
+            case GraphicsStatus.insufficientBuffer: return "insufficient buffer";
+            case GraphicsStatus.notImplemented: return "not implemented";
+            case GraphicsStatus.win32Error: return "WIN32 error";
+            case GraphicsStatus.wrongState: return "wrong state";
+            case GraphicsStatus.aborted: return "aborted";
+            case GraphicsStatus.fileNotFound: return "file not found";
+            case GraphicsStatus.valueOverflow: return "value overflow";
+            case GraphicsStatus.accessDenied: return "access denied";
+            case GraphicsStatus.unknownImageFormat: return "unknown image format";
+            case GraphicsStatus.fontFamilyNotFound: return "font family not found";
+            case GraphicsStatus.fontStyleNotFound: return "font style not found";
+            case GraphicsStatus.notTrueTypeFont: return "not True Type font";
+            case GraphicsStatus.unsupportedGdiplusVersion: return "unsupported GDI+ version";
+            case GraphicsStatus.gdiplusNotInitialized: return "GDI+ not initialized";
+            case GraphicsStatus.propertyNotFound: return "property not found";
+            case GraphicsStatus.propertyNotSupported: return "property not supported";
+            case GraphicsStatus.profileNotFound: return "profile not found";
+        }
+        return "graphics error";
+    }
+
+    public void CheckGraphicsStatus(GraphicsStatus status)
+    {
+        if (status != GraphicsStatus.ok)
+        {
+            throw Exception("GDI+ error: " + GraphicsStatusStr(status));
+        }
+    }
+
+    public class Color
+    {
+        public nothrow Color() : alpha(255u), red(0u), green(0u), blue(0u)
+        {
+        }
+        public nothrow Color(byte alpha_, byte red_, byte green_, byte blue_) : alpha(alpha_), red(red_), green(green_), blue(blue_)
+        {
+        }
+        public nothrow Color(byte red_, byte green_, byte blue_) : alpha(255u), red(red_), green(green_), blue(blue_)
+        {
+        }
+        public byte alpha;
+        public byte red;
+        public byte green;
+        public byte blue;
+    }
+
+    public class PointF
+    {
+        public nothrow PointF() : x(0.0f), y(0.0f)
+        {
+        }
+        public nothrow PointF(float x_, float y_) : x(x_), y(y_)
+        {
+        }
+        public float x;
+        public float y;
+    }
+
+    public class Rect
+    {
+        public nothrow Rect() : location(), size()
+        {
+        }
+        public nothrow Rect(const Point& location_, const Size& size_) : location(location_), size(size_)
+        {
+        }
+        public nothrow Rect(const WinRect& winRect) : location(winRect.left, winRect.top), size(winRect.right - winRect.left, winRect.bottom - winRect.top)
+        {
+        }
+        public nothrow WinRect ToWinRect() const
+        {
+            return WinRect(location.x, location.y, location.x + size.w, location.y + size.h);
+        }
+        public Point location;
+        public Size size;
+    }
+
+    public class Pen
+    {
+        public Pen(const Color& color, float width) : nativePen(WinGraphicsCreatePen(color.alpha, color.red, color.green, color.blue, width))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsPenGetLastStatus(nativePen)));
+        }
+        public Pen(const Color& color) : this(color, 1.0f)
+        {
+        }
+        public Pen(const Pen& that) : nativePen(WinGraphicsClonePen(that.nativePen))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsPenGetLastStatus(nativePen)));
+        }
+        public nothrow Pen(Pen&& that) : nativePen(that.nativePen)
+        {
+            that.nativePen = null;
+        }
+        public void operator=(const Pen& that)
+        {
+            if (nativePen != that.nativePen)
+            {
+                if (nativePen != null)
+                {
+                    WinGraphicsDeletePen(nativePen);
+                }
+                nativePen = WinGraphicsClonePen(that.nativePen);
+                CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsPenGetLastStatus(nativePen)));
+            }
+        }
+        public default nothrow void operator=(Pen&& that);
+        public ~Pen()
+        {
+            if (nativePen != null)
+            {
+                WinGraphicsDeletePen(nativePen);
+            }
+        }
+        public nothrow inline void* NativePen() const
+        {
+            return nativePen;
+        }
+        private void* nativePen;
+    }
+
+    public abstract class Brush
+    {
+        public virtual ~Brush()
+        {
+        }
+        public abstract nothrow const void* NativeBrush() const;
+    }
+
+    public class SolidBrush : Brush
+    {
+        public SolidBrush(const Color& color) : nativeSolidBrush(WinGraphicsCreateSolidBrush(color.alpha, color.red, color.green, color.blue))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsBrushGetLastStatus(nativeSolidBrush)));
+        }
+        public SolidBrush(const SolidBrush& that) : nativeSolidBrush(WinGraphicsCloneSolidBrush(that.nativeSolidBrush))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsBrushGetLastStatus(nativeSolidBrush)));
+        }
+        public nothrow SolidBrush(SolidBrush&& that) : nativeSolidBrush(that.nativeSolidBrush)
+        {
+            that.nativeSolidBrush = null;
+        }
+        public void operator=(const SolidBrush& that)
+        {
+            if (nativeSolidBrush != that.nativeSolidBrush)
+            {
+                if (nativeSolidBrush != null)
+                {
+                    WinGraphicsDeleteSolidBrush(nativeSolidBrush);
+                }
+                nativeSolidBrush = WinGraphicsCloneSolidBrush(that.nativeSolidBrush);
+                CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsBrushGetLastStatus(nativeSolidBrush)));
+            }
+        }
+        public default nothrow void operator=(SolidBrush&& that);
+        public ~SolidBrush()
+        {
+            if (nativeSolidBrush != null)
+            {
+                WinGraphicsDeleteSolidBrush(nativeSolidBrush);
+            }
+        }
+        public override nothrow const void* NativeBrush() const
+        {
+            return nativeSolidBrush;
+        }
+        private void* nativeSolidBrush;
+    }
+
+    public class NativeHandle
+    {
+        public explicit nothrow NativeHandle(const void* handle_) : handle(handle_)
+        {
+        }
+        public void* handle;
+    }
+
+    public class FontFamily
+    {
+        public FontFamily(const string& familyName) : nativeFontFamily(WinGraphicsCreateFontFamily(familyName.Chars())), owned(true)
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsFontFamilyGetLastStatus(nativeFontFamily)));
+        }
+        public explicit nothrow FontFamily(const NativeHandle& nativeHandle_) : nativeFontFamily(nativeHandle_.handle), owned(false) // stock font family not owned
+        {
+        }
+        public FontFamily(const FontFamily& that) : nativeFontFamily(null), owned(that.owned)
+        {
+            if (owned)
+            {
+                nativeFontFamily = WinGraphicsCloneFontFamily(that.nativeFontFamily);
+                CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsFontFamilyGetLastStatus(nativeFontFamily)));
+            }
+            else
+            {
+                nativeFontFamily = that.nativeFontFamily; // stock font family not cloned
+            }
+        }
+        public nothrow FontFamily(FontFamily&& that) : nativeFontFamily(that.nativeFontFamily), owned(that.owned)
+        {
+            that.nativeFontFamily = null;
+            that.owned = false;
+        }
+        public void operator=(const FontFamily& that)
+        {
+            if (nativeFontFamily != that.nativeFontFamily)
+            {
+                if (nativeFontFamily != null && owned)
+                {
+                    WinGraphicsDeleteFontFamily(nativeFontFamily);
+                }
+                if (that.owned)
+                {
+                    nativeFontFamily = WinGraphicsCloneFontFamily(that.nativeFontFamily);
+                    CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsFontFamilyGetLastStatus(nativeFontFamily)));
+                    owned = true;
+                }
+                else
+                {
+                    nativeFontFamily = that.nativeFontFamily; // stock font family not cloned
+                    owned = false;
+                }
+            }
+        }
+        public default nothrow void operator=(FontFamily&&);
+        public ~FontFamily()
+        {
+            if (nativeFontFamily != null && owned)
+            {
+                WinGraphicsDeleteFontFamily(nativeFontFamily);
+            }
+        }
+        public static nothrow FontFamily GenericMonospace()
+        {
+            NativeHandle nativeHandle(WinGraphicsGetGenericMonospaceFontFamily());
+            return FontFamily(nativeHandle);
+        }
+        public static nothrow FontFamily GenericSansSerif()
+        {
+            NativeHandle nativeHandle(WinGraphicsGetGenericSansSerifFontFamily());
+            return FontFamily(nativeHandle);
+        }
+        public static nothrow FontFamily GenericSerif()
+        {
+            NativeHandle nativeHandle(WinGraphicsGetGenericSerifFontFamily());
+            return FontFamily(nativeHandle);
+        }
+        public nothrow inline void* NativeFontFamily() const
+        {
+            return nativeFontFamily;
+        }
+        private void* nativeFontFamily;
+        private bool owned;
+    }
+
+    public enum FontStyle : int
+    {
+        regular = 0,
+        bold = 1 << 0,
+        italic = 1 << 1,
+        boldItalic = bold | italic,
+        underline = 1 << 2,
+        strikeOut = 1 << 3
+    }
+
+    public enum Unit : int
+    {
+        world = 0,
+        display = 1,
+        pixel = 2,
+        point = 3,
+        inch = 4,
+        document = 5,
+        millimeter = 6
+    }
+
+    public class Font
+    {
+        public Font(const FontFamily& family, float emSize, FontStyle style, Unit unit) : nativeFont(WinGraphicsCreateFont(family.NativeFontFamily(), emSize, style, unit))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsFontGetLastStatus(nativeFont)));
+        }
+        public Font(const FontFamily& family, float emSize) : this(family, emSize, FontStyle.regular, Unit.point)
+        {
+        }
+        public Font(const Font& that) : nativeFont(WinGraphicsCloneFont(that.nativeFont))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsFontGetLastStatus(nativeFont)));
+        }
+        public nothrow Font(Font&& that) : nativeFont(that.nativeFont)
+        {
+            that.nativeFont = null;
+        }
+        public void operator=(const Font& that)
+        {
+            if (nativeFont != that.nativeFont)
+            {
+                if (nativeFont != null)
+                {
+                    WinGraphicsDeleteFont(nativeFont);
+                }
+                nativeFont = WinGraphicsCloneFont(that.nativeFont);
+            }
+        }
+        public default nothrow void operator=(Font&&);
+        public ~Font()
+        {
+            if (nativeFont != null)
+            {
+                WinGraphicsDeleteFont(nativeFont);
+            }
+        }
+        public nothrow float GetHeight(const Graphics& graphics) const
+        {
+            return WinGraphicsGetFontHeight(nativeFont, graphics.NativeGraphics());
+        }
+        public nothrow inline void* NativeFont() const
+        {
+            return nativeFont;
+        }
+        private void* nativeFont;
+    }
+
+    public class PaintEventArgs
+    {
+        public nothrow PaintEventArgs(Graphics& graphics_, const Rect& clipRect_) : graphics(graphics_), clipRect(clipRect_)
+        {
+        }
+        public Graphics& graphics;
+        public Rect clipRect;
+    }
+
+    internal class PaintGuard
+    {
+        public nothrow PaintGuard(void* hdc_, void* paintStruct_) : hdc(hdc_), paintStruct(paintStruct_)
+        {
+        }
+        public ~PaintGuard()
+        {
+            if (hdc != null)
+            {
+                EndPaint(hdc, paintStruct);
+            }
+        }
+        private void* hdc;
+        private void* paintStruct;
+    }
+
+    public class Graphics
+    {
+        public nothrow Graphics(void* hdc) : nativeGraphics(WinCreateGraphics(hdc))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsGetLastStatus(nativeGraphics)));
+        }
+        public ~Graphics()
+        {
+            if (nativeGraphics != null)
+            {
+                WinDeleteGraphics(nativeGraphics);
+            }
+        }
+        public nothrow void* GetHDC() const
+        {
+            return WinGraphicsGetHDC(nativeGraphics);
+        }
+        public nothrow GraphicsStatus DrawLine(const Pen& pen, const Point& start, const Point& end)
+        {
+            return cast<GraphicsStatus>(WinGraphicsDrawLine(nativeGraphics, pen.NativePen(), start.x, start.y, end.x, end.y));
+        }
+        public void DrawLineChecked(const Pen& pen, const Point& start, const Point& end)
+        {
+            CheckGraphicsStatus(DrawLine(pen, start, end));
+        }
+        public nothrow GraphicsStatus DrawString(const string& str, const Font& font, const PointF& origin, const Brush& brush)
+        {
+            return cast<GraphicsStatus>(WinGraphicsDrawString(nativeGraphics, str.Chars(), font.NativeFont(), origin.x, origin.y, brush.NativeBrush()));
+        }
+        public void DrawStringChecked(const string& str, const Font& font, const PointF& origin, const Brush& brush)
+        {
+            CheckGraphicsStatus(DrawString(str, font, origin, brush));
+        }
+        public nothrow GraphicsStatus Clear(const Color& color)
+        {
+            return cast<GraphicsStatus>(WinGraphicsClear(nativeGraphics, color.alpha, color.red, color.green, color.blue));
+        }
+        public void ClearChecked(const Color& color)
+        {
+            CheckGraphicsStatus(Clear(color));
+        }
+        public nothrow const void* NativeGraphics() const
+        {
+            return nativeGraphics;
+        }
+        private void* nativeGraphics;
+    }
+}

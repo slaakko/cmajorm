@@ -267,7 +267,7 @@ namespace System.Windows.API
         }
     }
     
-    public void MoveWindow(void* windowHandle, Point location, Size size, bool repaint)
+    public void MoveWindow(void* windowHandle, const Point& location, const Size& size, bool repaint)
     {
         bool succeeded = WinMoveWindow(windowHandle, location.x, location.y, size.w, size.h, repaint);
         if (!succeeded)
@@ -276,9 +276,9 @@ namespace System.Windows.API
         }
     }
     
-    public Rect GetClientRect(void* windowHandle)
+    public WinRect GetClientRect(void* windowHandle)
     {
-        Rect rect;
+        WinRect rect;
         bool succeeded = WinGetClientRect(windowHandle, &rect);
         if (!succeeded)
         {
@@ -287,9 +287,9 @@ namespace System.Windows.API
         return rect;
     }
 
-    public Rect GetWindowRect(void* windowHandle)
+    public WinRect GetWindowRect(void* windowHandle)
     {
-        Rect rect;
+        WinRect rect;
         bool succeeded = WinGetWindowRect(windowHandle, &rect);
         if (!succeeded)
         {
@@ -320,7 +320,7 @@ namespace System.Windows.API
         return pt;
     }
     
-    public nothrow bool PtInRect(const Point& point, const Rect& rect)
+    public nothrow bool PtInRect(const Point& point, const WinRect& rect)
     {
         return WinPtInRect(&rect, &point);
     }
@@ -338,6 +338,30 @@ namespace System.Windows.API
     {
         void* result = WinSetParent(childWindowHandle, parentWindowHandle);
         if (result == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void* BeginPaint(void* windowHandle, void*& paintStruct)
+    {
+        void* result = WinBeginPaint(windowHandle, paintStruct);
+        if (result == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return result;
+    }
+
+    public void EndPaint(void* windowHandle, void* paintStruct)
+    {
+        WinEndPaint(windowHandle, paintStruct);
+    }
+
+    public void InvalidateRect(void* windowHandle, WinRect* rect, bool eraseBackground)
+    {
+        bool succeeded = WinInvalidateRect(windowHandle, rect, eraseBackground);
+        if (!succeeded)
         {
             throw WindowsAPIException(WinGetLastError());
         }

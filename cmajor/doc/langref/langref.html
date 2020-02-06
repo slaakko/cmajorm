@@ -194,8 +194,9 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;18.3.3 <a href="#unnamed-namespaces">Unnamed Namespaces</a><br />
         19 <a href="#projects">Projects</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;19.1 <a href="#projects-syntax">Syntax</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;19.2 <a href="#projects-example">Example</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;19.3 <a href="#projects-programs">Programs</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;19.2 <a href="#projects-types">Project Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;19.3 <a href="#projects-example">Example</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;19.4 <a href="#projects-programs">Programs</a><br />
         20 <a href="#solutions">Solutions</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;20.1 <a href="#solutions-syntax">Syntax</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;20.2 <a href="#solutions-example">Example</a><br />
@@ -5354,7 +5355,7 @@
 
     <p>
         There is one project for each Cmajor program and library. By convention each project should be in its own directory and have
-        a <a href="#rule.project-file">project file</a> that ends with <span class="mono">.cmp</span> extension. A project file contains the name of the project and lists the source files belonging to it.
+        a <a href="#rule.project-file">project file</a> that ends with <span class="mono">.cmp</span> extension. A project file contains the name and type of the project and lists the source files belonging to it.
         A project can <em>reference</em> another project. Reference dependencies must be acyclic.
     </p>
 
@@ -5437,7 +5438,10 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="kw">program</span> |
+                <span class="kw">winguiapp</span> |
+                <span class="kw">winapp</span> |
                 <span class="kw">library</span> |
+                <span class="kw">winlib</span> |
                 <span class="kw">unitTest</span>
             </td>
         </tr>
@@ -5452,7 +5456,25 @@
         </tr>
     </table>
 
-    <h3 id="projects-example">19.2 Example</h3>
+    <h3 id="projects-types">19.2 Project Types</h3>
+    
+    <p>
+        The <a href="#rule.target-declaration">target</a> declaration defines the type of the project:
+        <ul>
+        <li><strong>program</strong> is a console application.</li>
+        <li><strong>winguiapp</strong> is a Windows desktop application that has a graphical user interface.</li>
+        <li><strong>winapp</strong> is a console application that uses Windows API.</li>
+        <li><strong>library</strong> is a library.</li>
+        <li><strong>winlib</strong> is a library that uses Windows API.</li>
+        <li><strong>unitTest</strong> is a unit test project.</li>
+        </ul>
+    </p>
+
+    <p>
+       The <strong>winguiapp</strong>, <strong>winapp</strong> and <strong>winlib</strong> project types are available only on Windows platform.
+    </p>
+
+    <h3 id="projects-example">19.3 Example</h3>
 
     <p>
         Here's a project file <span class="mono">alpha.cmp</span> for a project named <em>Alpha</em> that references two library projects <em>Beta</em> and <em>Gamma</em>:
@@ -5509,7 +5531,7 @@
            +--gamma.cm
     </pre>
 
-    <h3 id="projects-programs">19.3 Programs</h3>
+    <h3 id="projects-programs">19.4 Programs</h3>
 
     <p>
         Each valid Cmajor program must have a <em>main</em> function where the execution of the program starts. The possible signatures of the <em>main</em> function are:
