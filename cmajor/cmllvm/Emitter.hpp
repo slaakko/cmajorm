@@ -119,7 +119,7 @@ public:
         uint64_t sizeInBits, uint32_t alignInBits, void* underlyingDIType) override;
     void MapFwdDeclaration(void* fwdDeclaration, const boost::uuids::uuid& typeId) override;
     void* GetDITypeByTypeId(const boost::uuids::uuid& typeId) const override;
-    void SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType) override;
+    void SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType, const std::string& typeName) override;
     void* GetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId) override;
     void SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId, void* diType) override;
     void* CreateDIMemberType(void* scope, const std::string& name, const Span& span, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType) override;
@@ -128,7 +128,7 @@ public:
     void* CreateRValueRefDIType(void* diType) override;
     void* CreatePointerDIType(void* diType) override;
     void* CreateUnspecifiedDIType(const std::string& name) override;
-    void MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr) override;
+    void MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr, const std::string& className) override;
     uint64_t GetSizeInBits(void* irType) override;
     uint64_t GetAlignmentInBits(void* irType) override;
     void SetCurrentDebugLocation(const Span& span) override;
@@ -351,6 +351,7 @@ public:
     void* CreateInsertValue(void* aggregate, void* value, const std::vector<unsigned int>& indeces) override;
     void* CreateUndefValue(void* type) override;
     void CreateResume(void* exception) override;
+    void DebugPrintDebugInfo(const std::string& filePath) override;
 private:
     cmajor::ir::EmittingContext& emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;
@@ -373,9 +374,11 @@ private:
     bool inPrologue;
     std::unordered_map<int32_t, llvm::DIFile*> fileMap;
     std::unordered_map<boost::uuids::uuid, llvm::DIType*, boost::hash<boost::uuids::uuid>> diTypeTypeIdMap;
+    std::unordered_map<llvm::DIType*, std::string> diTypeNameMap;
     std::unordered_map<std::pair<boost::uuids::uuid, int32_t>, llvm::DIDerivedType*, boost::hash<std::pair<boost::uuids::uuid, int32_t>>> diMemberTypeMap;
     std::unordered_map<llvm::DIType*, boost::uuids::uuid> fwdDeclarationMap;
     std::unordered_map<boost::uuids::uuid, void*, boost::hash<boost::uuids::uuid>> classPtrMap;
+    std::unordered_map<void*, std::string> classNameMap;
     std::unordered_map<void*, llvm::Value*> irObjectMap;
     std::unordered_map<void*, llvm::Type*> irTypeMap;
     std::unordered_map<boost::uuids::uuid, llvm::Type*, boost::hash<boost::uuids::uuid>> irTypeTypeIdMap;

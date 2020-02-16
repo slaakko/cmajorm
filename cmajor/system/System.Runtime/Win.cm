@@ -24,6 +24,7 @@ public extern cdecl nothrow void* WinCreateWindowByClassAtom(ushort windowClass,
 public extern cdecl nothrow void* WinCreateWindowByClassName(const char* windowClass, const char* windowName, long style, long exStyle, int x, int y, int w, int h, void* parentHandle);
 public extern cdecl nothrow int WinShowMessageBox(const char* text, const char* caption);
 public extern cdecl nothrow int WinShowMessageBoxWithType(const char* text, const char* caption, void* ownerWindowHandle, uint type);
+public extern cdecl nothrow bool WinMessageBeep(uint beepType);
 public extern cdecl nothrow void WinPostQuitMessage(int exitCode);
 public extern cdecl nothrow bool WinShowWindow(void* windowHandle, int commandShow);
 public extern cdecl nothrow bool WinUpdateWindow(void* windowHandle);
@@ -34,6 +35,8 @@ public extern cdecl nothrow bool WinClientToScreen(void* windowHandle, void* poi
 public extern cdecl nothrow bool WinScreenToClient(void* windowHandle, void* point);
 public extern cdecl nothrow bool WinPtInRect(void* rect, void* point);
 public extern cdecl nothrow bool WinSetWindowText(void* windowHandle, const char* text);
+public extern cdecl nothrow void* WinGetDC(void* windowHandle);
+public extern cdecl nothrow bool WinTrackMouseEvent(void* windowHandle, uint flags, uint hoverTimeMs);
 public extern cdecl nothrow void* WinSetParent(void* childWindowHandle, void* parentWindowHandle);
 public extern cdecl nothrow void* WinBeginPaint(void* windowHandle, void*& paintStruct);
 public extern cdecl nothrow void WinEndPaint(void* windowHandle, void* paintStruct);
@@ -41,6 +44,7 @@ public extern cdecl nothrow void WinGetClipRect(void* paintStruct, int& x, int& 
 public extern cdecl nothrow bool WinInvalidateRect(void* windowHandle, void* rect, bool eraseBackground);
 public extern cdecl nothrow void* WinCreateGraphics(void* hdc);
 public extern cdecl nothrow void WinDeleteGraphics(void* nativeGraphics);
+public extern cdecl nothrow void* WinCreateGraphicsFromWindowHandle(void* windowHandle);
 public extern cdecl nothrow int WinGraphicsGetLastStatus(void* graphics);
 public extern cdecl nothrow void* WinGraphicsGetHDC(void* graphics);
 public extern cdecl nothrow void* WinGraphicsCreatePen(byte alpha, byte red, byte green, byte blue, float width);
@@ -63,6 +67,40 @@ public extern cdecl nothrow void* WinGraphicsCloneFont(void* font);
 public extern cdecl nothrow void WinGraphicsDeleteFont(void* font);
 public extern cdecl nothrow float WinGraphicsGetFontHeight(void* font, const void* graphics);
 public extern cdecl nothrow int WinGraphicsFontGetLastStatus(void* font);
+public extern cdecl nothrow void* WinGraphicsCreateDefaultStringFormat();
+public extern cdecl nothrow void* WinGraphicsCreateStringFormat(int formatFlags, ushort languageId);
+public extern cdecl nothrow void* WinGraphicsCloneStringFormat(void* stringFormat);
+public extern cdecl nothrow void WinGraphicsDeleteStringFormat(void* stringFormat);
+public extern cdecl nothrow int WinGraphicsStringFormatGetLastStatus(void* stringFormat);
+public extern cdecl nothrow int WinGraphicsStringFormatSetAlignment(void* stringFormat, int alignment);
+public extern cdecl nothrow int WinGraphicsStringFormatSetLineAlignment(void* stringFormat, int alignment);
+public extern cdecl nothrow int WinGraphicsStringFormatSetHotKeyPrefix(void* stringFormat, int hotKeyPrefix);
 public extern cdecl nothrow int WinGraphicsDrawLine(void* graphics, void* pen, int startX, int startY, int endX, int endY);
+public extern cdecl nothrow int WinGraphicsDrawLines(void* graphics, void* pen, int count, void* points);
 public extern cdecl nothrow int WinGraphicsDrawString(void* graphics, const char* str, void* font, float x, float y, void* brush);
+public extern cdecl nothrow int WinGraphicsDrawStringFormatPoint(void* graphics, const char* str, void* font, float x, float y, void* format, void* brush);
+public extern cdecl nothrow int WinGraphicsDrawStringFormatRect(void* graphics, const char* str, void* font, float x, float y, float w, float h, void* format, void* brush);
+public extern cdecl nothrow int WinGraphicsMeasureStringFormatSize(void* graphics, const char* str, void* font, float w, float h, void* format,
+    float& outSizeW, float& outSizeH, int* codePointsFitted, int* linesFilled);
+public extern cdecl nothrow int WinGraphicsMeasureStringFormatRect(void* graphics, const char* str, void* font, float x, float y, float w, float h, void* format,
+    float& outX, float& outY, float& outW, float& outH, int* codePointsFitted, int* linesFilled);
+public extern cdecl nothrow int WinGraphicsMeasureStringFormatPoint(void* graphics, const char* str, void* font, float x, float y, void* format,
+    float& outX, float& outY, float& outW, float& outH);
 public extern cdecl nothrow int WinGraphicsClear(void* graphics, byte alpha, byte red, byte green, byte blue);
+public extern cdecl nothrow int WinGraphicsDrawRectangle(void* graphics, void* pen, int x, int y, int w, int h);
+public extern cdecl nothrow int WinGraphicsDrawRectangleF(void* graphics, void* pen, float x, float y, float w, float h);
+public extern cdecl nothrow int WinGraphicsFillRectangle(void* graphics, void* brush, int x, int y, int w, int h);
+public extern cdecl nothrow int WinGraphicsFillRectangleF(void* graphics, void* brush, float x, float y, float w, float h);
+public extern cdecl nothrow int WinGraphicsFillPolygon(void* graphics, void* brush, int count, void* points);
+public extern cdecl nothrow void WinGetSysColor(int index, byte& red, byte& green, byte& blue);
+public extern cdecl nothrow void* WinGraphicsCreateRegion();
+public extern cdecl nothrow void* WinGraphicsCloneRegion(void* region);
+public extern cdecl nothrow void WinGraphicsDeleteRegion(void* region);
+public extern cdecl nothrow int WinGraphicsRegionGetLastStatus(void* region);
+public extern cdecl nothrow int WinGraphicsGetClip(void* graphics, void* region);
+public extern cdecl nothrow int WinGraphicsSetClipRect(void* graphics, int x, int y, int w, int h, int combineMode);
+public extern cdecl nothrow int WinGraphicsSetClipRegion(void* graphics, void* region);
+public extern cdecl nothrow void WinGetMessagePos(int& x, int& y);
+public extern cdecl nothrow bool WinSetBkColor(void* hdc, byte red, byte green, byte blue);
+public extern cdecl nothrow void* WinGetFocus();
+public extern cdecl nothrow void* WinSetFocus(void* windowHandle);

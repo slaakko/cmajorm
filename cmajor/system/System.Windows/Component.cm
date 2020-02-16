@@ -1,0 +1,64 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public abstract class Component
+    {
+        public nothrow Component() : name(), container(null), nextSibling(null), prevSibling(null)
+        {
+        }
+        public virtual ~Component()
+        {
+        }
+        public nothrow inline Container* GetContainer() const
+        {
+            return container;
+        }
+        internal nothrow void SetContainer(Container* container_)
+        {
+            container = container_;
+        }    
+        public nothrow inline Component* NextSibling() const
+        {
+            return nextSibling;
+        }
+        internal nothrow void SetNextSibling(Component* nextSibling_)
+        {
+            nextSibling = nextSibling_;
+        }
+        public nothrow inline Component* PrevSibling() const
+        {
+            return prevSibling;
+        }
+        internal nothrow void SetPrevSibling(Component* prevSibling_)
+        {
+            prevSibling = prevSibling_;
+        }
+        internal nothrow void LinkAfter(Component* component)
+        {
+            component->prevSibling = this;
+            component->nextSibling = nextSibling;
+            nextSibling = component;
+        }    
+        internal nothrow void Unlink()
+        {
+            if (prevSibling != null)
+            {
+                prevSibling->nextSibling = nextSibling;
+            }
+            if (nextSibling != null)
+            {
+                nextSibling->prevSibling = prevSibling;
+            }
+        }
+        private string name;
+        private Container* container;
+        private Component* nextSibling;
+        private Component* prevSibling;
+    }
+}

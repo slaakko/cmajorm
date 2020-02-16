@@ -10,5 +10,6 @@
 
 extern "C" RT_API double RtPow(double x, int32_t exponent);
 extern "C" RT_API double Pow(double x, double y);
+extern "C" RT_API double RtSqrt(double x);
 
 #endif // CMAJOR_RT_MATH_INCLUDED

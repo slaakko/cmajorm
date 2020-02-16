@@ -298,6 +298,11 @@ int WinShowMessageBoxWithType(const char* text, const char* caption, void* owner
     return MessageBoxW((HWND)ownerWindowHandle, (LPCWSTR)str.c_str(), captionStr, type);
 }
 
+bool WinMessageBeep(uint32_t messageBeepType)
+{
+    return MessageBeep(messageBeepType);
+}
+
 void* WinCreateWindowByClassAtom(uint16_t windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle)
 {
     std::u16string name = ToUtf16(windowName);
@@ -364,6 +369,21 @@ bool WinSetWindowText(void* windowHandle, const char* text)
     return SetWindowTextW((HWND)windowHandle, (LPWSTR)str.c_str());
 }
 
+void* WinGetDC(void* windowHandle)
+{
+    return GetDC((HWND)windowHandle);
+}
+
+bool WinTrackMouseEvent(void* windowHandle, uint32_t flags, uint32_t hoverTimeMs)
+{
+    TRACKMOUSEEVENT eventTrack;
+    eventTrack.hwndTrack = (HWND)windowHandle;
+    eventTrack.cbSize = sizeof(eventTrack);
+    eventTrack.dwFlags = flags;
+    eventTrack.dwHoverTime = hoverTimeMs;
+    return TrackMouseEvent(&eventTrack);
+}
+
 void* WinSetParent(void* childWindowHandle, void* parentWindowHandle)
 {
     return SetParent((HWND)childWindowHandle, (HWND)parentWindowHandle);
@@ -404,6 +424,12 @@ void* WinCreateGraphics(void* hdc)
 void WinDeleteGraphics(void* nativeGraphics)
 {
     delete static_cast<Graphics*>(nativeGraphics);
+}
+
+void* WinCreateGraphicsFromWindowHandle(void* hwnd)
+{
+    Graphics* graphics = new Graphics((HWND)hwnd);
+    return graphics;
 }
 
 int WinGraphicsGetLastStatus(void* graphics)
@@ -517,9 +543,54 @@ float WinGraphicsGetFontHeight(void* font, const void* graphics)
     return static_cast<Font*>(font)->GetHeight(static_cast<const Graphics*>(graphics));
 }
 
+void* WinGraphicsCreateDefaultStringFormat()
+{
+    return new StringFormat();
+}
+
+void* WinGraphicsCreateStringFormat(int formatFlags, uint16_t languageId)
+{
+    return new StringFormat(formatFlags, languageId);
+}
+
+void* WinGraphicsCloneStringFormat(void* stringFormat)
+{
+    return new StringFormat(static_cast<const StringFormat*>(stringFormat));
+}
+
+void WinGraphicsDeleteStringFormat(void* stringFormat)
+{
+    delete static_cast<StringFormat*>(stringFormat);
+}
+
+int WinGraphicsStringFormatGetLastStatus(void* stringFormat)
+{
+    return static_cast<StringFormat*>(stringFormat)->GetLastStatus();
+}
+
+int WinGraphicsStringFormatSetAlignment(void* stringFormat, int alignment)
+{
+    return static_cast<StringFormat*>(stringFormat)->SetAlignment(static_cast<StringAlignment>(alignment));
+}
+
+int WinGraphicsStringFormatSetLineAlignment(void* stringFormat, int alignment)
+{
+    return static_cast<StringFormat*>(stringFormat)->SetLineAlignment(static_cast<StringAlignment>(alignment));
+}
+
+int WinGraphicsStringFormatSetHotKeyPrefix(void* stringFormat, int hotKeyPrefix)
+{
+    return static_cast<StringFormat*>(stringFormat)->SetHotkeyPrefix(static_cast<HotkeyPrefix>(hotKeyPrefix));
+}
+
 int WinGraphicsDrawLine(void* graphics, void* pen, int startX, int startY, int endX, int endY)
 {
     return static_cast<Graphics*>(graphics)->DrawLine(static_cast<Pen*>(pen), Point(startX, startY), Point(endX, endY));
+}
+
+int WinGraphicsDrawLines(void* graphics, void* pen, int count, void* points)
+{
+    return static_cast<Graphics*>(graphics)->DrawLines(static_cast<Pen*>(pen), static_cast<const Point*>(points), count);
 }
 
 int WinGraphicsDrawString(void* graphics, const char* str, void* font, float x, float y, void* brush)
@@ -528,7 +599,156 @@ int WinGraphicsDrawString(void* graphics, const char* str, void* font, float x, 
     return static_cast<Graphics*>(graphics)->DrawString((const WCHAR*)s.c_str(), s.length(), static_cast<const Font*>(font), PointF(x, y), static_cast<const Brush*>(brush));
 }
 
+int WinGraphicsDrawStringFormatPoint(void* graphics, const char* str, void* font, float x, float y, void* format, void* brush)
+{
+    std::u16string s(ToUtf16(std::string(str)));
+    return static_cast<Graphics*>(graphics)->DrawString((const WCHAR*)s.c_str(), s.length(), static_cast<const Font*>(font), PointF(x, y),
+        static_cast<const StringFormat*>(format), static_cast<const Brush*>(brush));
+}
+
+int WinGraphicsDrawStringFormatRect(void* graphics, const char* str, void* font, float x, float y, float w, float h, void* format, void* brush)
+{
+    std::u16string s(ToUtf16(std::string(str)));
+    return static_cast<Graphics*>(graphics)->DrawString((const WCHAR*)s.c_str(), s.length(), static_cast<const Font*>(font), RectF(x, y, w, h),
+        static_cast<const StringFormat*>(format), static_cast<const Brush*>(brush));
+}
+
+int WinGraphicsMeasureStringFormatSize(void* graphics, const char* str, void* font, float w, float h, void* format,
+    float& outSizeW, float& outSizeH, int* codePointsFitted, int* linesFilled)
+{
+    std::u16string s(ToUtf16(std::string(str)));
+    SizeF size;
+    Status status = static_cast<Graphics*>(graphics)->MeasureString((const WCHAR*)s.c_str(), s.length(), static_cast<const Font*>(font), SizeF(w, h),
+        static_cast<const StringFormat*>(format), &size, codePointsFitted, linesFilled);
+    outSizeW = size.Width;
+    outSizeH = size.Height;
+    return status;
+}
+
+int WinGraphicsMeasureStringFormatRect(void* graphics, const char* str, void* font, float x, float y, float w, float h, void* format,
+    float& outX, float& outY, float& outW, float& outH, int* codePointsFitted, int* linesFilled)
+{
+    std::u16string s(ToUtf16(std::string(str)));
+    RectF boundingBox;
+    Status status = static_cast<Graphics*>(graphics)->MeasureString((const WCHAR*)s.c_str(), s.length(), static_cast<const Font*>(font), RectF(x, y, w, h),
+        static_cast<const StringFormat*>(format), &boundingBox, codePointsFitted, linesFilled);
+    outX = boundingBox.X;
+    outY = boundingBox.Y;
+    outW = boundingBox.Width;
+    outH = boundingBox.Height;
+    return status;
+}
+
+int WinGraphicsMeasureStringFormatPoint(void* graphics, const char* str, void* font, float x, float y, void* format,
+    float& outX, float& outY, float& outW, float& outH)
+{
+    std::u16string s(ToUtf16(std::string(str)));
+    RectF boundingBox;
+    Status status = static_cast<Graphics*>(graphics)->MeasureString((const WCHAR*)s.c_str(), s.length(), static_cast<const Font*>(font), PointF(x, y), &boundingBox);
+    outX = boundingBox.X;
+    outY = boundingBox.Y;
+    outW = boundingBox.Width;
+    outH = boundingBox.Height;
+    return status;
+}
+
 int WinGraphicsClear(void* graphics, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue)
 {
     return static_cast<Graphics*>(graphics)->Clear(Color(alpha, red, green, blue));
+}
+
+int WinGraphicsDrawRectangle(void* graphics, void* pen, int x, int y, int w, int h)
+{
+    return static_cast<Graphics*>(graphics)->DrawRectangle(static_cast<const Pen*>(pen), Rect(x, y, w, h));
+}
+
+int WinGraphicsDrawRectangleF(void* graphics, void* pen, float x, float y, float w, float h)
+{
+    return static_cast<Graphics*>(graphics)->DrawRectangle(static_cast<const Pen*>(pen), RectF(x, y, w, h));
+}
+
+int WinGraphicsFillRectangle(void* graphics, void* brush, int x, int y, int w, int h)
+{
+    return static_cast<Graphics*>(graphics)->FillRectangle(static_cast<const Brush*>(brush), Rect(x, y, w, h));
+}
+
+int WinGraphicsFillRectangleF(void* graphics, void* brush, float x, float y, float w, float h)
+{
+    return static_cast<Graphics*>(graphics)->FillRectangle(static_cast<const Brush*>(brush), x, y, w, h);
+}
+
+int WinGraphicsFillPolygon(void* graphics, void* brush, int count, void* points)
+{
+    return static_cast<Graphics*>(graphics)->FillPolygon(static_cast<const Brush*>(brush), static_cast<const Point*>(points), count);
+}
+
+void* WinGraphicsCreateRegion()
+{
+    return new Region();
+}
+
+void* WinGraphicsCloneRegion(void* region)
+{
+    return static_cast<Region*>(region)->Clone();
+}
+
+void WinGraphicsDeleteRegion(void* region)
+{
+    delete static_cast<Region*>(region);
+}
+
+int WinGraphicsRegionGetLastStatus(void* region)
+{
+    return static_cast<Region*>(region)->GetLastStatus();
+}
+
+int WinGraphicsGetClip(void* graphics, void* region)
+{
+    return static_cast<Graphics*>(graphics)->GetClip(static_cast<Region*>(region));
+}
+
+int WinGraphicsSetClipRect(void* graphics, int x, int y, int w, int h, int combineMode)
+{
+    return static_cast<Graphics*>(graphics)->SetClip(Rect(x, y, w, h), static_cast<CombineMode>(combineMode));
+}
+
+int WinGraphicsSetClipRegion(void* graphics, void* region)
+{
+    return static_cast<Graphics*>(graphics)->SetClip(static_cast<Region*>(region));
+}
+
+void WinGetSysColor(int index, uint8_t& red, uint8_t& green, uint8_t& blue)
+{
+    uint32_t rgb = GetSysColor(index);
+    red = GetRValue(rgb);
+    green = GetGValue(rgb);
+    blue = GetBValue(rgb);
+}
+
+bool WinSetBkColor(void* hdc, uint8_t red, uint8_t green, uint8_t blue)
+{
+    COLORREF color = RGB(red, green, blue);
+    COLORREF col = SetBkColor((HDC)hdc, color);
+    if (col == CLR_INVALID)
+    {
+        return false;
+    }
+    return true;
+}
+
+void WinGetMessagePos(int32_t& x, int32_t& y)
+{
+    DWORD pos = GetMessagePos();
+    x = pos & 0xFFFF;
+    y = (pos >> 16) & 0xFFFF;
+}
+
+void* WinGetFocus()
+{
+    return GetFocus();
+}
+
+void* WinSetFocus(void* windowHandle)
+{
+    return SetFocus((HWND)windowHandle);
 }

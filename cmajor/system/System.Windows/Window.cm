@@ -13,37 +13,20 @@ namespace System.Windows
     
     public class Window : ContainerControl
     {
-        public Window(const char* windowClassName, WindowClassStyle classStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle, 
-            const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
-            base(windowClassName, classStyle, windowClassBackgroundColor, style, exStyle, text, location, size, dock, anchors), isMainWindow(false), state(WindowState.normal)
+        public Window(const char* windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle, 
+            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
+            base(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors), isMainWindow(false), state(WindowState.normal),
+            menuBar(null)
         {
         }
         public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
-            this(windowClassName, cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW), WindowColor.COLOR_WINDOW, style, exStyle, text, location, size, dock, anchors)
+            this(windowClassName, cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW), style, exStyle, GetSystemColor(SystemColor.COLOR_WINDOW),
+            text, location, size, dock, anchors)
         {
         }
-        public Window(const string& caption) : this("System.Windows.Window", WindowStyle.WS_OVERLAPPEDWINDOW, ExtendedWindowStyle.WS_EX_DEFAULT, caption, Point.Default(), Size.Default(), Dock.none, Anchors.none)
+        public Window(const string& caption) :
+            this("System.Windows.Window", WindowStyle.WS_OVERLAPPEDWINDOW, ExtendedWindowStyle.WS_EX_DEFAULT, caption, Point.Default(), Size.Default(), Dock.none, Anchors.none)
         {
-        }
-        protected virtual void OnWindowClosing(bool& cancelClose)
-        {
-            windowClosingEvent.Fire(cancelClose);
-        }
-        protected virtual void OnWindowClosed(bool& processed)
-        {
-            if (windowClosedEvent.Handlers().IsEmpty())
-            {
-                if (isMainWindow)
-                {
-                    Application.Exit();
-                    processed = true;
-                }
-            }            
-            else
-            {
-                windowClosedEvent.Fire();
-                processed = true;
-            }
         }
         protected override bool ProcessMessage(Message& message)
         {
@@ -71,12 +54,75 @@ namespace System.Windows
                     }
                     break;
                 }
-                case WM_COMMAND: case WM_SIZE: case WM_PAINT:
+                case WM_COMMAND: case WM_SIZE: case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP:
+                case WM_SYSCOMMAND:
                 {
                     return base->ProcessMessage(message);
                 }
             }
             return false;
+        }
+        protected virtual void OnWindowClosing(bool& cancelClose)
+        {
+            windowClosingEvent.Fire(cancelClose);
+        }
+        protected virtual void OnWindowClosed(bool& processed)
+        {
+            if (windowClosedEvent.Handlers().IsEmpty())
+            {
+                if (isMainWindow)
+                {
+                    Application.Exit();
+                    processed = true;
+                }
+            }            
+            else
+            {
+                windowClosedEvent.Fire();
+                processed = true;
+            }
+        }
+        protected override void OnControlAdded(ControlEventArgs& args)
+        {
+            base->OnControlAdded(args);
+            Control* control = args.control;
+            if (control is MenuBar*)
+            {
+                menuBar = cast<MenuBar*>(control);
+            }
+        }
+        protected override void OnControlRemoved(ControlEventArgs& args)
+        {
+            base->OnControlRemoved(args);
+            Control* control = args.control;
+            if (control == menuBar)
+            {
+                menuBar = null;
+            }
+        }
+        protected override void OnMouseMove(MouseEventArgs& args)
+        {
+            base->OnMouseMove(args);
+            if (menuBar != null)
+            {
+                menuBar->MouseMoveInternal(args);
+            }
+        }
+        protected override void OnMouseDown(MouseEventArgs& args)
+        {
+            base->OnMouseDown(args);
+            if (menuBar != null)
+            {
+                menuBar->MouseDownInternal(args);
+            }
+        }
+        protected override void OnMouseUp(MouseEventArgs& args)
+        {
+            base->OnMouseUp(args);
+            if (menuBar != null)
+            {
+                menuBar->MouseUpInternal(args);
+            }
         }
         public nothrow void SetAsMainWindow()
         {
@@ -139,6 +185,10 @@ namespace System.Windows
                 state = newState;
             }
         }
+        public nothrow MenuBar* GetMenuBar() const
+        {
+            return menuBar;
+        }
         public nothrow Event<WindowClosingEventHandler, bool>& WindowClosingEvent()
         {
             return windowClosingEvent;
@@ -149,6 +199,7 @@ namespace System.Windows
         }
         private bool isMainWindow;
         private WindowState state;
+        private MenuBar* menuBar;
         private Event<WindowClosingEventHandler, bool> windowClosingEvent;
         private Event<WindowClosedEventHandler> windowClosedEvent;
     }

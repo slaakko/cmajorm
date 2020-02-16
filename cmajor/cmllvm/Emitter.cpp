@@ -20,6 +20,9 @@
 #include <llvm/Support/SourceMgr.h>
 #include <boost/filesystem.hpp>
 #include <fstream>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
 
 namespace cmllvm {
 
@@ -1020,12 +1023,16 @@ void* Emitter::GetDITypeByTypeId(const boost::uuids::uuid& typeId) const
     {
         return it->second;
     }
-    return nullptr;
+    else
+    {
+        return nullptr;
+    }
 }
 
-void Emitter::SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType)
+void Emitter::SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType, const std::string& typeName)
 {
     diTypeTypeIdMap[typeId] = static_cast<llvm::DIType*>(diType);
+    diTypeNameMap[static_cast<llvm::DIType*>(diType)] = typeName;
 }
 
 void* Emitter::GetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId) 
@@ -1075,11 +1082,12 @@ void* Emitter::CreateUnspecifiedDIType(const std::string& name)
     return diBuilder->createUnspecifiedType(name);
 }
 
-void Emitter::MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr)
+void Emitter::MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr, const std::string& className)
 {
     if (classPtrMap.find(typeId) == classPtrMap.cend())
     {
         classPtrMap[typeId] = classPtr;
+        classNameMap[classPtr] = className;
     }
 }
 
@@ -1110,14 +1118,20 @@ void Emitter::ReplaceForwardDeclarations()
                 if (it != classPtrMap.cend())
                 {
                     void* classPtr = it->second;
+                    //std::string className = classNameMap[classPtr];
+                    //std::cout << "> create di type for class" << className << std::endl;
                     diType = CreateClassDIType(classPtr);
+                    //std::cout << "< create di type for class" << className << std::endl;
                 }
                 else
                 {
                     throw std::runtime_error("Emitter::ReplaceForwardDeclarations(): class ptr not mapped");
                 }
             }
+            //std::string typeName = diTypeNameMap[static_cast<llvm::DIType*>(diType)];
+            //std::cout << "> replacing " << typeName << std::endl;
             fwdDeclaration->replaceAllUsesWith(static_cast<llvm::DIType*>(diType));
+            //std::cout << "< replacing " << typeName << std::endl;
         }
         currentFwdDeclarationMap.clear();
         std::swap(currentFwdDeclarationMap, fwdDeclarationMap);
@@ -2042,6 +2056,26 @@ void* Emitter::CreateUndefValue(void* type)
 void Emitter::CreateResume(void* exception)
 {
     builder.CreateResume(static_cast<llvm::Value*>(exception));
+}
+
+void Emitter::DebugPrintDebugInfo(const std::string& filePath)
+{
+    std::vector<std::string> info;
+    for (auto& p : diTypeNameMap)
+    {
+        std::stringstream s;
+        s << std::setw(16) << std::setfill('0');
+        s << std::hex << p.first;
+        s << std::setw(0);
+        s << " = " << p.second;
+        info.push_back(s.str());
+    }
+    std::sort(info.begin(), info.end());
+    std::ofstream file(filePath);
+    for (const std::string& line : info)
+    {
+        file << line << std::endl;
+    }
 }
 
 } // namespace cmllvm

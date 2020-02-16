@@ -11,10 +11,87 @@ namespace System.Windows
     public const uint WM_SIZE = 0x0005u;
     public const uint WM_PAINT = 0x000Fu;
     public const uint WM_CLOSE = 0x0010u;
-    public const uint WM_ERASEBKGND = 0x0014u;
+    public const uint WM_DRAWITEM = 0x002bu;
+    public const uint WM_KEYDOWN = 0x0100u;
+    public const uint WM_KEYUP = 0x0101u;
+    public const uint WM_CHAR = 0x0102u;
     public const uint WM_COMMAND = 0x0111u;
+    public const uint WM_SYSCOMMAND = 0x0112u;
+    public const uint WM_MOUSEMOVE = 0x0200u;
+    public const uint WM_LBUTTONDOWN = 0x0201u;
+    public const uint WM_LBUTTONUP = 0x0202u;
+    public const uint WM_MOUSELEAVE = 0x02a3u;
     
     public const ushort BN_CLICKED = 0u;
+
+    public const uint ODT_MENU = 1u;
+
+    public const uint HOVER_DEFAULT = cast<uint>(-1);
+    public const uint TME_LEAVE = 2u;
+
+    public const uint SC_KEYMENU = 0xF100u;
+
+    public class PaintEventArgs
+    {
+        public nothrow PaintEventArgs(Graphics& graphics_, const Rect& clipRect_) : graphics(graphics_), clipRect(clipRect_)
+        {
+        }
+        public Graphics& graphics;
+        public Rect clipRect;
+    }
+
+    public enum MouseButtons : uint
+    {
+        none = 0x0u,
+        lbutton = 0x1u,
+        rbutton = 0x2u,
+        shift = 0x4u,
+        control = 0x8u,
+        mbutton = 0x10u,
+        xbutton1 = 0x20u,
+        xbutton2 = 0x40u
+    }
+
+    public class MouseEventArgs
+    {
+        public nothrow MouseEventArgs(const Point& location_, MouseButtons buttons_) : location(location_), buttons(buttons_)
+        {
+        }
+        public Point location;
+        public MouseButtons buttons;
+    }
+
+    public class KeyPressEventArgs
+    {
+        public nothrow KeyPressEventArgs(wchar keyChar_) : keyChar(keyChar_), handled(false)
+        {
+        }
+        public wchar keyChar;
+        public bool handled;
+    }
+
+    public class KeyEventArgs
+    {
+        public nothrow KeyEventArgs(Keys keyCode_, Keys modifiers_, bool alt_, bool control_, bool shift_) :
+            keyCode(keyCode_), modifiers(modifiers_), alt(alt_), control(control_), shift(shift_), handled(false), suppressKeyPress(false)
+        {
+        }
+        public Keys keyCode;
+        public Keys modifiers;
+        public bool alt;
+        public bool control;
+        public bool shift;
+        public bool handled;
+        public bool suppressKeyPress;
+    }
+
+    public class ControlEventArgs
+    {
+        public nothrow ControlEventArgs(Control* control_) : control(control_)
+        {
+        }
+        public Control* control;
+    }
     
     public class Message
     {
@@ -40,6 +117,21 @@ namespace System.Windows
         public nothrow inline uint LParamHiDWord() const
         {
             return cast<uint>((lparam >> 32u) & 0xFFFFFFFFu);
+        }
+        public nothrow inline int LParamX() const
+        {
+            return cast<int>(cast<short>(LParamLoDWord()));
+        }
+        public nothrow inline int LParamY() const
+        {
+            return cast<int>(cast<short>(LParamLoDWord() >> 16u));
+        }
+        public nothrow inline Size LParamSize() const
+        {
+            uint s = LParamLoDWord();
+            ushort sw = cast<ushort>(s);
+            ushort sh = cast<ushort>(s >> 16u);
+            return Size(cast<int>(sw), cast<int>(sh));
         }
         public void* windowHandle;
         public uint msg;

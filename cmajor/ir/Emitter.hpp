@@ -150,7 +150,7 @@ public:
         const std::string& mangledName, void* baseClassDIType) = 0;
     virtual void MapFwdDeclaration(void* fwdDeclaration, const boost::uuids::uuid& typeId) = 0;
     virtual void* GetDITypeByTypeId(const boost::uuids::uuid& typeId) const = 0;
-    virtual void SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType) = 0;
+    virtual void SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType, const std::string& typeName) = 0;
     virtual void* GetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId) = 0;
     virtual void SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId, void* diType) = 0;
     virtual void* CreateDIMemberType(void* scope, const std::string& name, const Span& span, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType) = 0;
@@ -159,7 +159,7 @@ public:
     virtual void* CreateRValueRefDIType(void* diType) = 0;
     virtual void* CreatePointerDIType(void* diType) = 0;
     virtual void* CreateUnspecifiedDIType(const std::string& name) = 0;
-    virtual void MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr) = 0;
+    virtual void MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr, const std::string& className) = 0;
     virtual uint64_t GetSizeInBits(void* irType) = 0;
     virtual uint64_t GetAlignmentInBits(void* irType) = 0;
     virtual void SetCurrentDebugLocation(const Span& span) = 0;
@@ -364,6 +364,7 @@ public:
     virtual void* CreateInsertValue(void* aggregate, void* value, const std::vector<unsigned int>& indeces) = 0;
     virtual void* CreateUndefValue(void* type) = 0;
     virtual void CreateResume(void* exception) = 0;
+    virtual void DebugPrintDebugInfo(const std::string& filePath) = 0;
 private:
     ValueStack* stack;
 };

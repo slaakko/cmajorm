@@ -578,7 +578,7 @@ void* Emitter::GetDITypeByTypeId(const boost::uuids::uuid& typeId) const
     return nullptr;
 }
 
-void Emitter::SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType)
+void Emitter::SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType, const std::string& typeName)
 {
     // todo
 }
@@ -630,7 +630,7 @@ void* Emitter::CreateUnspecifiedDIType(const std::string& name)
     return nullptr;
 }
 
-void Emitter::MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr)
+void Emitter::MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr, const std::string& className)
 {
     // todo
 }
@@ -1814,6 +1814,10 @@ void* Emitter::CreateUndefValue(void* type)
 }
 
 void Emitter::CreateResume(void* exception)
+{
+}
+
+void Emitter::DebugPrintDebugInfo(const std::string& filePath)
 {
 }
 

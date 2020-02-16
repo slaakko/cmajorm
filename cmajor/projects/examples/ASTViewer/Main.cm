@@ -4,8 +4,44 @@ using System.IO;
 
 class MainWindow : Window
 {
-    public MainWindow() : base("ASTViewer")
+    public MainWindow() : base("Abstract Syntax Tree Viewer")
     {
+        SetBackgroundColor(Color.FloralWhite());
+        UniquePtr<MenuBar> menuBar(new MenuBar());
+        UniquePtr<MenuItem> fileItem(new MenuItem("&File"));
+        UniquePtr<MenuItem> openItem(new MenuItem("&Open"));
+        openItem->AddMenuItem(new MenuItem("&Project..."));
+        openItem->AddMenuItem(new MenuItem("&File..."));
+        fileItem->AddMenuItem(openItem.Release());
+        fileItem->AddMenuItem(new MenuItem("&Close"));
+        fileItem->AddMenuItem(new MenuItemSeparator());
+        fileItem->AddMenuItem(new MenuItem("E&xit"));
+        menuBar->AddMenuItem(fileItem.Release());
+        UniquePtr<MenuItem> windowItem(new MenuItem("&Window"));
+        windowItem->AddMenuItem(new MenuItem("&Close all"));
+        menuBar->AddMenuItem(windowItem.Release());
+        UniquePtr<MenuItem> helpItem(new MenuItem("&Help"));
+        helpItem->AddMenuItem(new MenuItem("&About"));
+        menuBar->AddMenuItem(helpItem.Release());
+        AddChild(menuBar.Release());
+        UniquePtr<LogView> logView(new LogView(Size(0, 400)));
+        Application.SetLogView(logView.Get());
+        AddChild(logView.Release());
+    }
+    protected override bool ProcessMessage(Message& message)
+    {
+        return base->ProcessMessage(message);
+    }
+    protected override void OnKeyPress(KeyPressEventArgs& args)
+    {
+        if (args.keyChar == 'c')
+        {
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                logView->Clear();
+            }
+        }
     }
 }
 

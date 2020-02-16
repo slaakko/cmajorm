@@ -25,22 +25,39 @@ namespace System.Windows
         SW_FORCEMINIMIZE = 11
     }
     
-    public enum WindowColor : int
+    public enum SystemColor : int
     {
+        COLOR_3DDKSHADOW = 21,
+        COLOR_3DFACE = 15,
+        COLOR_3DHIGHLIGHT = 20,
+        COLOR_3DHILIGHT = 20,
+        COLOR_3DLIGHT = 22,
+        COLOR_3DSHADOW = 16,
         COLOR_ACTIVEBORDER = 10,
         COLOR_ACTIVECAPTION = 2,
         COLOR_APPWORKSPACE = 12,
         COLOR_BACKGROUND = 1,
         COLOR_BTNFACE = 15,
+        COLOR_BTNHIGHLIGHT = 20,
+        COLOR_BTNHILIGHT = 20,
         COLOR_BTNSHADOW = 16,
         COLOR_BTNTEXT = 18,
         COLOR_CAPTIONTEXT = 9,
+        COLOR_DESKTOP = 1,
+        COLOR_GRADIENTACTIVECAPTION = 27,
+        COLOR_GRADIENTINACTIVECAPTION = 28,
         COLOR_GRAYTEXT = 17,
         COLOR_HIGHLIGHT = 13,
         COLOR_HIGHLIGHTTEXT = 14,
+        COLOR_HOTLIGHT = 26,
         COLOR_INACTIVEBORDER = 11,
         COLOR_INACTIVECAPTION = 3,
+        COLOR_INACTIVECAPTIONTEXT = 19,
+        COLOR_INFOBK = 24,
+        COLOR_INFOTEXT = 23,
         COLOR_MENU = 4,
+        COLOR_MENUHILIGHT = 29,
+        COLOR_MENUBAR = 30,
         COLOR_MENUTEXT = 7,
         COLOR_SCROLLBAR = 0,
         COLOR_WINDOW = 5,
@@ -128,52 +145,6 @@ namespace System.Windows
         WS_EX_OVERLAPPEDWINDOW = (WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE)
     }
     
-    public class Point
-    {
-        public nothrow Point() : x(0), y(0)
-        {
-        }
-        public nothrow Point(int x_, int y_) : x(x_), y(y_)
-        {
-        }
-        public default nothrow Point(const Point&);
-        public default nothrow void operator=(const Point&);
-        public static nothrow Point Default()
-        {
-            return Point(CW_USEDEFAULT, CW_USEDEFAULT);
-        }
-        public int x; 
-        public int y;
-    }
-    
-    public nothrow inline bool operator==(const Point& left, const Point& right)
-    {
-        return left.x == right.x && left.y == right.y;
-    }
-    
-    public class Size
-    {
-        public nothrow Size() : h(0), w(0)
-        {
-        }
-        public nothrow Size(int w_, int h_) : w(w_), h(h_)
-        {
-        }
-        public default nothrow Size(const Size&);
-        public default nothrow void operator=(const Size&);
-        public static nothrow Size Default()
-        {
-            return Size(CW_USEDEFAULT, CW_USEDEFAULT);
-        }
-        public int w;
-        public int h;
-    }
-    
-    public nothrow inline bool operator==(const Size& left, const Size& right)
-    {
-        return left.w == right.w && left.h == right.h;
-    }
-    
     public class WinRect
     {
         public nothrow WinRect() : left(0), top(0), right(0), bottom(0)
@@ -201,5 +172,27 @@ namespace System.Windows
     public enum Dock : sbyte
     {
         none = 0, top = 1, bottom = 2, left = 3, right = 4, fill = 5
+    }
+
+    public class Padding
+    {
+        public nothrow Padding() : left(0), top(0), right(0), bottom(0)
+        {
+        }
+        public nothrow Padding(int left_, int top_, int right_, int bottom_) : left(left_), top(top_), right(right_), bottom(bottom_)
+        {
+        }
+        public nothrow inline int Vertical() const
+        {
+            return top + bottom;
+        }
+        public nothrow inline int Horizontal() const
+        {
+            return left + right;
+        }
+        public int left;
+        public int top;
+        public int right;
+        public int bottom;
     }
 }

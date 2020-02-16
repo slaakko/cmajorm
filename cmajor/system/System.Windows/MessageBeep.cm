@@ -1,0 +1,40 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows.API;
+
+namespace System.Windows
+{
+    public enum MessageBeepType : uint
+    {
+        MB_ICONASTERISK = 0x00000040u,
+        MB_ICONEXCLAMATION = 0x00000030u,
+        MB_ICONERROR = 0x00000010u,
+        MB_ICONHAND = 0x00000010u,
+        MB_ICONINFORMATION = 0x00000040u,
+        MB_ICONQUESTION = 0x00000020u,
+        MB_ICONSTOP = 0x00000010u,
+        MB_ICONWARNING = 0x00000030u,
+        MB_OK = 0x00000000u,
+        MB_SIMPLE = 0xFFFFFFFFu
+    }
+    public nothrow bool MessageBeep()
+    {
+        return MessageBeep(MessageBeepType.MB_OK);
+    }
+    public nothrow bool MessageBeep(MessageBeepType beepType)
+    {
+        return System.Windows.API.MessageBeep(beepType);
+    }
+    public void MessageBeepChecked()
+    {
+        System.Windows.API.MessageBeepChecked(MessageBeepType.MB_OK);
+    }
+    public void MessageBeepChecked(MessageBeepType beepType)
+    {
+        System.Windows.API.MessageBeepChecked(beepType);
+    }
+}

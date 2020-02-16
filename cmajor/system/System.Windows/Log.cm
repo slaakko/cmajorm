@@ -1,0 +1,77 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public class LogView : Control
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, changed = 1 << 0
+        }
+
+        public LogView(const Font& font_, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("System.Windows.LogView", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE),
+            ExtendedWindowStyle.WS_EX_DEFAULT, backgroundColor, string(), location, size, dock, anchors), font(font_), textBrush(Color.Black()), lines(), textHeight(10), flags(Flags.none)
+        {
+            SetChanged();
+        }
+        public LogView(const Font& font, const Size& size) : this(font, Color(230u, 231u, 232u), Point(), size, Dock.bottom, Anchors.none)
+        {
+        }
+        public LogView(const Size& size) : this(Font(FontFamily.GenericSansSerif(), 9.0f), size)
+        {
+        }
+        public void Clear()
+        {
+            lines.Clear();
+            Invalidate();
+        }
+        public virtual void WriteLine(const string& line)
+        {
+            lines.Add(line);
+            Invalidate();
+        }
+        public override void OnPaint(PaintEventArgs& args)
+        {
+            base->OnPaint(args);
+            if (Changed())
+            {
+                ResetChanged();
+                textHeight = cast<int>(font.GetHeight(args.graphics));
+            }
+            args.graphics.Clear(BackgroundColor());
+            long linesCount = lines.Count();
+            long numLines = Min(linesCount, GetSize().h / textHeight);
+            PointF origin;
+            for (long i = linesCount - numLines; i < linesCount; ++i)
+            {
+                const string& line = lines[i];
+                args.graphics.DrawStringChecked(line, font, origin, textBrush);
+                origin.y = origin.y + textHeight;
+            }
+        }
+        private nothrow inline bool Changed() const
+        {
+            return (flags & Flags.changed) != Flags.none;
+        }
+        private nothrow void SetChanged()
+        {
+            flags = cast<Flags>(flags | Flags.changed);
+        }
+        private nothrow void ResetChanged()
+        {
+            flags = cast<Flags>(flags & ~Flags.changed);
+        }
+        private Font font;
+        private SolidBrush textBrush;
+        private List<string> lines;
+        private int textHeight;
+        private Flags flags;
+    }
+}

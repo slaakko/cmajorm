@@ -13,6 +13,8 @@
 #include <soulng/util/Log.hpp>
 #include <soulng/util/Util.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/Path.hpp>
+#include <iostream>
 
 namespace cmajor { namespace codegenllvm {
 
@@ -86,7 +88,18 @@ void LlvmCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     }
     if (debugInfo)
     {
+/*
+        std::cout << "> finalize: " << boundCompileUnit.GetCompileUnitNode()->FilePath() << std::endl;
+        if (Path::GetFileName(boundCompileUnit.GetCompileUnitNode()->FilePath()) == "Control.cm")
+        {
+            int x = 0;
+        }
+        emitter->DebugPrintDebugInfo(Path::ChangeExtension(boundCompileUnit.LLFilePath(), ".dbg.txt"));
+*/
         emitter->FinalizeDebugInfo();
+/*
+        std::cout << "< finalize: " << boundCompileUnit.GetCompileUnitNode()->FilePath() << std::endl;
+*/
     }
     if (GetGlobalFlag(GlobalFlags::emitLlvm))
     {
@@ -169,7 +182,7 @@ void LlvmCodeGenerator::Visit(BoundClass& boundClass)
     }
     if (debugInfo)
     {
-        emitter->MapClassPtr(currentClass->GetClassTypeSymbol()->TypeId(), currentClass->GetClassTypeSymbol());
+        emitter->MapClassPtr(currentClass->GetClassTypeSymbol()->TypeId(), currentClass->GetClassTypeSymbol(), ToUtf8(currentClass->GetClassTypeSymbol()->FullName()));
         void* diType = emitter->GetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId());
         if (diType)
         {
@@ -197,7 +210,7 @@ void LlvmCodeGenerator::Visit(BoundClass& boundClass)
             }
             void* forwardDeclaration = emitter->CreateIrDIForwardDeclaration(classIrType, ToUtf8(currentClass->GetClassTypeSymbol()->Name()), ToUtf8(currentClass->GetClassTypeSymbol()->MangledName()),
                 classSpan);
-            emitter->SetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId(), forwardDeclaration);
+            emitter->SetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId(), forwardDeclaration, ToUtf8(currentClass->GetClassTypeSymbol()->FullName()));
             std::vector<void*> memberVariableElements;
             for (MemberVariableSymbol* memberVariable : currentClass->GetClassTypeSymbol()->MemberVariables())
             {
@@ -208,7 +221,7 @@ void LlvmCodeGenerator::Visit(BoundClass& boundClass)
             void* clsDIType = emitter->CreateDITypeForClassType(classIrType, memberVariableElements, classSpan, ToUtf8(currentClass->GetClassTypeSymbol()->Name()), vtableHolderClassDIType,
                 ToUtf8(currentClass->GetClassTypeSymbol()->MangledName()), baseClassDIType);
             emitter->MapFwdDeclaration(forwardDeclaration, currentClass->GetClassTypeSymbol()->TypeId());
-            emitter->SetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId(), clsDIType);
+            emitter->SetDITypeByTypeId(currentClass->GetClassTypeSymbol()->TypeId(), clsDIType, ToUtf8(currentClass->GetClassTypeSymbol()->FullName()));
             emitter->PushScope(clsDIType);
         }
     }
@@ -262,7 +275,7 @@ void LlvmCodeGenerator::Visit(BoundEnumTypeDefinition& boundEnumTypeDefinition)
         }
         void* enumTypeDI = emitter->CreateDITypeForEnumType(ToUtf8(enumTypeSymbol->Name()), ToUtf8(enumTypeSymbol->MangledName()), enumTypeSymbol->GetSpan(), elements,
             sizeInBits, alignInBits, enumTypeSymbol->UnderlyingType()->GetDIType(*emitter));
-        emitter->SetDITypeByTypeId(enumTypeSymbol->TypeId(), enumTypeDI);
+        emitter->SetDITypeByTypeId(enumTypeSymbol->TypeId(), enumTypeDI, ToUtf8(enumTypeSymbol->FullName()));
     }
 }
 

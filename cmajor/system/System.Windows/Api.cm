@@ -366,4 +366,23 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
+
+    public nothrow bool MessageBeep(uint beepType)
+    {
+        return WinMessageBeep(beepType);
+    }
+
+    public void MessageBeepChecked(uint beepType)
+    {
+        bool succeeded = WinMessageBeep(beepType);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void* GetDC(void* windowHandle)
+    {
+        return WinGetDC(windowHandle);
+    }
 }

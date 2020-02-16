@@ -1,0 +1,90 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public class Container 
+    {
+        public nothrow Container(Component* parent_) : firstChild(null), lastChild(null), parent(parent_)
+        {
+        }
+        public virtual ~Container()
+        {
+            Component* child = firstChild;
+            while (child != null)
+            {
+                Component* next = child->NextSibling();
+                delete child;
+                child = next;
+            }
+        }
+        public nothrow inline bool IsEmpty() const
+        {
+            return firstChild == null;
+        }
+        public void AddChild(Component* child)
+        {
+            Container* container = child->GetContainer();
+            if (container != null)
+            {
+                UniquePtr<Component> removedChild = container->RemoveChild(child);
+                child = removedChild.Release();
+            }
+            if (lastChild != null)
+            {
+                lastChild->LinkAfter(child);
+            }
+            if (firstChild == null)
+            {
+                firstChild = child;
+            }
+            child->SetContainer(this);
+            lastChild = child;
+            if ((child is Control*) && parent != null && (parent is Control*))
+            {
+                Control* childControl = cast<Control*>(child);
+                Control* parent = cast<Control*>(parent);
+                parent->AddChildVisual(childControl);
+            }
+        }
+        public UniquePtr<Component> RemoveChild(Component* child)
+        {
+            child->Unlink();
+            if (child == firstChild)
+            {
+                firstChild = child->NextSibling();
+            }
+            if (child == lastChild)
+            {
+                lastChild = child->PrevSibling();
+            }
+            child->SetContainer(null);
+            child->SetNextSibling(null);
+            child->SetPrevSibling(null);
+            return UniquePtr<Component>(child);
+        }
+        public nothrow inline Component* FirstChild() const
+        {
+            return firstChild;
+        }
+        public nothrow inline Component* LastChild() const
+        {
+            return lastChild;
+        }
+        public nothrow inline Component* Parent() const
+        {
+            return parent;
+        }
+        internal nothrow void SetParent(Component* parent_)
+        {
+            parent = parent_;
+        }
+        private Component* firstChild;
+        private Component* lastChild;
+        private Component* parent; 
+    }
+}

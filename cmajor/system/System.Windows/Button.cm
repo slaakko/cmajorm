@@ -14,35 +14,24 @@ namespace System.Windows
         BS_DEFPUSHBUTTON = 1
     }
     
-    public class delegate void ClickEventHandler();
-    
     public class ButtonBase : Control
     {
-        public ButtonBase(const char* windowClassName, WindowClassStyle windowClassStyle, WindowColor windowClassBackgroundColor, WindowStyle style, ExtendedWindowStyle exStyle, 
-            const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
-            base(windowClassName, windowClassStyle, windowClassBackgroundColor, style, exStyle, text, location, size, dock, anchors)
+        public ButtonBase(const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle, 
+            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
+            base(windowClassName, windowClassStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors)
         {
         }
         internal void OnClickInternal()
         {
             OnClick();
         }
-        protected virtual void OnClick()
-        {
-            clickEvent.Fire();
-        }
-        public nothrow Event<ClickEventHandler>& ClickEvent()
-        {
-            return clickEvent;
-        }
-        private Event<ClickEventHandler> clickEvent;
     }
     
     public class Button : ButtonBase
     {
         public Button(ButtonStyle buttonStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("BUTTON", WindowClassStyle.CS_DEFAULT, WindowColor.COLOR_BTNFACE, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_TABSTOP | WindowStyle.WS_VISIBLE | buttonStyle), ExtendedWindowStyle.WS_EX_DEFAULT, 
-            text, location, size, dock, anchors)
+            base("BUTTON", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_TABSTOP | WindowStyle.WS_VISIBLE | buttonStyle), ExtendedWindowStyle.WS_EX_DEFAULT, 
+            GetSystemColor(SystemColor.COLOR_BTNFACE), text, location, size, dock, anchors)
         {
         }
         public Button(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :

@@ -12,7 +12,7 @@ namespace System.Windows
 
     public static class Application
     {
-        static Application()
+        static Application() : logView(null)
         {            
             MessageProcessorFunction messageProcessorFunction = ProcessMessage;
             void* messageProcessorFunctionAddress = cast<void*>(messageProcessorFunction);
@@ -78,6 +78,15 @@ namespace System.Windows
         {
             return windowManager;
         }
+        public static nothrow LogView* GetLogView()
+        {
+            return logView;
+        }
+        public static nothrow void SetLogView(LogView* logView_)
+        {
+            logView = logView_;
+        }
         private static WindowManager windowManager;
+        private static LogView* logView;
     }
 }

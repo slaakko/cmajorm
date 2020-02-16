@@ -106,13 +106,13 @@ void* TypeSymbol::GetDIType(Emitter& emitter)
         if (IsClassTypeSymbol())
         {
             ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(this);
-            emitter.MapClassPtr(classTypeSymbol->TypeId(), classTypeSymbol);
+            emitter.MapClassPtr(classTypeSymbol->TypeId(), classTypeSymbol, ToUtf8(classTypeSymbol->FullName()));
             localDiType = classTypeSymbol->CreateDIForwardDeclaration(emitter);
             emitter.MapFwdDeclaration(localDiType, classTypeSymbol->TypeId());
-            emitter.SetDITypeByTypeId(classTypeSymbol->TypeId(), localDiType);
+            emitter.SetDITypeByTypeId(classTypeSymbol->TypeId(), localDiType, ToUtf8(classTypeSymbol->FullName()));
         }
         localDiType = CreateDIType(emitter);
-        emitter.SetDITypeByTypeId(TypeId(), localDiType);
+        emitter.SetDITypeByTypeId(TypeId(), localDiType, ToUtf8(FullName()));
     }
     return localDiType;
 }

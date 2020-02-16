@@ -9,14 +9,22 @@ using System.Windows.API;
 namespace System.Windows
 {
     public class delegate void PaintEventHandler(PaintEventArgs& paintEventArgs);
-
-    public class Control
+    public class delegate void MouseEnterEventHandler();
+    public class delegate void MouseEventHandler(MouseEventArgs& mouseEventargs);
+    public class delegate void MouseLeaveEventHandler();
+    public class delegate void KeyPressEventHandler(KeyPressEventArgs& keyPressEventArgs);
+    public class delegate void ClickEventHandler();
+    
+    public class Control : Component
     {
-        public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowColor windowClassBackgroundColor_, WindowStyle style_, ExtendedWindowStyle exStyle_, 
-            const string& text_, const Point& location_, const Size& size_, Dock dock_, Anchors anchors_) : 
-            windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), windowClassBackgroundColor(windowClassBackgroundColor_), style(style_), exStyle(exStyle_), 
-            handle(null), parent(null), nextSibling(null), prevSibling(null), 
-            name(), text(text_), location(location_), size(size_), dock(dock_), anchors(anchors_)
+        private enum Flags : sbyte
+        {
+            none = 0, mouseInClient = 1 << 0, lbuttonPressed = 1 << 1, menuWantsKeys = 1 << 2, keyDownHandled = 1 << 3
+        }
+        public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowStyle style_, ExtendedWindowStyle exStyle_, 
+            const Color& backgroundColor_, const string& text_, const Point& location_, const Size& size_, Dock dock_, Anchors anchors_) : 
+            windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), style(style_), exStyle(exStyle_),
+            backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), dock(dock_), anchors(anchors_), flags(Flags.none)
         {
             Application.Init();
             if ((style & WindowStyle.WS_CHILD) == 0)
@@ -24,7 +32,7 @@ namespace System.Windows
                 CreateWindow();
             }
         }
-        public virtual ~Control()
+        public ~Control()
         {
             if (handle != null)
             {
@@ -38,15 +46,25 @@ namespace System.Windows
         internal void CreateWindowInternal()
         {
             if (handle != null) return;
+            Control* parentControl = null;
+            Container* container = GetContainer();
+            if (container != null)
+            {
+                Component* parent = container->Parent();
+                if (parent != null && (parent is Control*))
+                {
+                    parentControl = cast<Control*>(parent);
+                }
+            }
             if (Application.GetWindowManager().IsSystemClassName(windowClassName))
             {
-                handle = CreateWindowByClassName(windowClassName, text.Chars(), style, exStyle, location, size, parent);
+                handle = CreateWindowByClassName(windowClassName, text.Chars(), style, exStyle, location, size, parentControl);
             }
             else
             {
-                ushort windowClass = Application.GetWindowManager().RegisterWindowClass(windowClassName, windowClassStyle, windowClassBackgroundColor);
-                handle = CreateWindowByClassAtom(windowClass, text.Chars(), style, exStyle, location, size, parent);
-            }            
+                ushort windowClass = Application.GetWindowManager().RegisterWindowClass(windowClassName, windowClassStyle, 0);
+                handle = CreateWindowByClassAtom(windowClass, text.Chars(), style, exStyle, location, size, parentControl);
+            }
             Application.GetWindowManager().AddWindow(this);
             WinRect clientRect = GetClientRect();
             if ((style & WindowStyle.WS_CHILD) == 0)
@@ -59,7 +77,49 @@ namespace System.Windows
             size.h = clientRect.bottom - clientRect.top;
             DockWindow();
         }
-        internal void SetParentWindow(ContainerControl* parentWindow)
+        internal void AddChildVisual(Control* child)
+        {
+            if (child->Handle() == null)
+            {
+                child->CreateWindowInternal();
+            }
+            else
+            {
+                child->SetParentWindow(this);
+            }            
+            if ((child->GetWindowStyle() & WindowStyle.WS_VISIBLE) != 0)
+            {
+                child->Show();
+                child->Update();
+            }
+        }
+        public Window* GetWindow() const
+        {
+            Control* thisControl = this;
+            if (thisControl is Window*)
+            {
+                return cast<Window*>(this);
+            }
+            Container* container = GetContainer();
+            if (container != null)
+            {
+                Component* parent = container->Parent();
+                if (parent != null)
+                {
+                    if (parent is Window*)
+                    {
+                        return cast<Window*>(parent);
+                    }
+                    else if (parent is Control*)
+                    {
+                        Control* control = cast<Control*>(parent);
+                        return control->GetWindow();
+                    }
+                }
+            }
+            return null;
+        }
+        internal void SetParentWindow(Control* parentWindow)
         {
             SetParentWindow(handle, parentWindow->handle);
             DockWindow();
@@ -140,46 +200,62 @@ namespace System.Windows
         }
         internal void DockWindow()
         {
-            if (parent != null)
+            Container* container = GetContainer();
+            if (container != null)
             {
-                DockWindow(parent->GetSize());
+                Component* parent = container->Parent();
+                if (parent != null && (parent is ContainerControl*))
+                {
+                    ContainerControl* parentControl = cast<ContainerControl*>(parent);
+                    parentControl->DockChildren();
+                }
             }
         }
-        internal void DockWindow(const Size& parentSize)
+        internal void DockWindow(Rect& parentRect)
         {
             if (dock == Dock.none) return;
+            Point parentLoc = parentRect.location;
+            Size parentSize = parentRect.size;
             Point newLocation = location;
             Size newSize = size;
             switch (dock)
             {
                 case Dock.left:
                 {
-                    newLocation = Point(0, 0);
+                    newLocation = parentLoc;
                     newSize.h = parentSize.h;
+                    parentRect.location = Point(parentLoc.x + size.w, parentLoc.y);
+                    parentRect.size = Size(parentSize.w - size.w, parentSize.h);
                     break;
                 }
                 case Dock.top:
                 {
-                    newLocation = Point(0, 0);
+                    newLocation = parentLoc;
                     newSize.w = parentSize.w;
+                    parentRect.location = Point(parentLoc.x, parentLoc.y + size.h);
+                    parentRect.size = Size(parentSize.w, parentSize.h - size.h);
                     break;
                 }
                 case Dock.right:
                 {
-                    newLocation = Point(parentSize.w - size.w, 0);
+                    newLocation = Point(parentLoc.x + parentSize.w - size.w, parentLoc.y);
                     newSize.h = parentSize.h;
+                    parentRect.size = Size(parentSize.w - size.w, parentSize.h);
                     break;
                 }
                 case Dock.bottom:
                 {
-                    newLocation = Point(0, parentSize.h - size.h);
+                    newLocation = Point(parentLoc.x, parentLoc.y + parentSize.h - size.h);
                     newSize.w = parentSize.w;
+                    parentRect.size = Size(parentSize.w, parentSize.h - size.h);
                     break;
                 }
                 case Dock.fill:
                 {
-                    newLocation = Point(0, 0);
+                    newLocation = parentLoc;
                     newSize = parentSize;
+                    parentRect.location = Point();
+                    parentRect.size = Size();
                     break;
                 }
             }
@@ -229,6 +305,10 @@ namespace System.Windows
         {
             anchors = anchors_;
         }
+        public virtual nothrow Padding DefaultPadding() const
+        {
+            return Padding();
+        }
         public WinRect GetClientRect() const
         {
             return GetClientRect(handle);
@@ -255,18 +335,168 @@ namespace System.Windows
             {
                 case WM_PAINT:
                 {
-                    if (!paintEvent.Handlers().IsEmpty())
+                    DoPaint();
+                    message.result = 0;
+                    return true;
+                }
+                case WM_MOUSEMOVE:
+                {
+                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam));
+                    DoMouseMove(args);
+                    message.result = 0;
+                    return true;
+                }
+                case WM_MOUSELEAVE:
+                {
+                    DoMouseLeave();
+                    message.result = 0;
+                    return true;
+                }
+                case WM_LBUTTONDOWN:
+                {
+                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam | MouseButtons.lbutton));
+                    DoMouseDown(args);
+                    message.result = 0;
+                    return true;
+                }
+                case WM_LBUTTONUP:
+                {
+                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam | MouseButtons.lbutton));
+                    DoMouseUp(args);
+                    message.result = 0;
+                    return true;
+                }
+                case WM_CHAR:
+                {
+                    wchar ch = cast<wchar>(message.wparam);
+                    KeyPressEventArgs args(ch);
+                    DoKeyPress(args);
+                    if (args.handled)
                     {
-                        OnPaint();
                         message.result = 0;
                         return true;
+                    }
+                    break;
+                }
+                case WM_KEYDOWN:
+                {
+                    byte virtualKeyCode = cast<byte>(message.wparam);
+                    if (DoKeyDown(virtualKeyCode))
+                    {
+                        message.result = 0;
+                        return true;
+                    }
+                    break;
+                }
+                case WM_KEYUP:
+                {
+                    byte virtualKeyCode = cast<byte>(message.wparam);
+                    if (DoKeyUp(virtualKeyCode))
+                    {
+                        message.result = 0;
+                        return true;
+                    }
+                    break;
+                }
+                case WM_SYSCOMMAND:
+                {
+                    if (message.wparam == SC_KEYMENU)
+                    {
+                        wchar accessKey = cast<wchar>(ToUpper(cast<uchar>(cast<wchar>(message.lparam))));
+                        if (DoMenu(accessKey, Keys.none))
+                        {
+                            message.result = 0;
+                            return true;
+                        }
                     }
                     break;
                 }
             }
             return false;
         }
-        protected virtual void OnPaint()
+        private bool DoKeyDown(byte virtualKeyCode)
+        {
+            ResetKeyDownHandled();
+            if (MenuWantsKeys())
+            {
+                if (DoMenu('\0', cast<Keys>(cast<int>(virtualKeyCode))))
+                {
+                    SetKeyDownHandled();
+                    return true;
+                }
+            }
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                string s = "DOWN: " + keyCodeStr[virtualKeyCode];
+                logView->WriteLine(s);
+            }
+            return false;
+        }
+        private bool DoKeyUp(byte virtualKeyCode)
+        {
+            if (KeyDownHandled() || MenuWantsKeys())
+            {
+                return KeyDownHandled();
+            }
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                string s = "UP: " + keyCodeStr[virtualKeyCode];
+                logView->WriteLine(s);
+            }
+            return false;
+        }
+        private void DoKeyPress(KeyPressEventArgs& args)
+        {
+            if (KeyDownHandled() || MenuWantsKeys())
+            {
+                args.handled = KeyDownHandled();
+                return;
+            }
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                string s = "PRESS: " + ToString(args.keyChar);
+                logView->WriteLine(s);
+            }
+            OnKeyPress(args);
+        }
+        private bool DoMenu(wchar accessKey, Keys keyCode)
+        {
+            ResetKeyDownHandled();
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                string s = "MENU: " + ToString(accessKey) + " " + ToHexString(cast<ushort>(accessKey));
+                logView->WriteLine(s);
+            }
+            Window* window = GetWindow();
+            if (window != null)
+            {
+                MenuBar* menuBar = window->GetMenuBar();
+                if (menuBar != null)
+                {
+                    bool menuWantsKeys = false;
+                    bool handled = menuBar->HandleAccessKey(accessKey, keyCode, menuWantsKeys);
+                    if (handled)
+                    {
+                        SetKeyDownHandled();
+                    }
+                    if (menuWantsKeys)
+                    {
+                        SetMenuWantsKeys();
+                    }
+                    else
+                    {
+                        ResetMenuWantsKeys();
+                    }
+                    return handled;
+                }
+            }
+            return false;
+        }
+        private void DoPaint()
         {
             void* paintStruct = null;
             void* hdc = BeginPaint(handle, paintStruct);
@@ -275,7 +505,83 @@ namespace System.Windows
             PaintGuard paintGuard(hdc, paintStruct);
             Graphics graphics(hdc);
             PaintEventArgs args(graphics, clipRect);
+            OnPaint(args);
+        }
+        protected virtual void OnPaint(PaintEventArgs& args)
+        {
+            args.graphics.Clear(backgroundColor);
             paintEvent.Fire(args);
+        }
+        private void DoMouseMove(MouseEventArgs& args)
+        {
+            if (!MouseInClient())
+            {
+                SetMouseInClient();
+                OnMouseEnter();
+                WinTrackMouseEvent(handle, TME_LEAVE, HOVER_DEFAULT);
+            }
+            else 
+            {
+                OnMouseMove(args);
+            }
+        }
+        private void DoMouseLeave()
+        {
+            ResetMouseInClient();
+            ResetLButtonPressed();
+            OnMouseLeave();
+        }
+        private void DoMouseDown(MouseEventArgs& args)
+        {
+            OnMouseDown(args);
+            if ((args.buttons & MouseButtons.lbutton) != 0)
+            {
+                SetLButtonPressed();
+            }
+        }
+        private void DoMouseUp(MouseEventArgs& args)
+        {
+            OnMouseUp(args);
+            if ((args.buttons & MouseButtons.lbutton) != 0)
+            {
+                if (LButtonPressed())
+                {
+                    ResetLButtonPressed();
+                    OnClick();
+                }
+            }
+        }
+        protected virtual void OnMouseEnter()
+        {
+            mouseEnterEvent.Fire();
+        }
+        protected virtual void OnMouseMove(MouseEventArgs& args)
+        {
+            mouseMoveEvent.Fire(args);
+        }
+        protected virtual void OnMouseLeave()
+        {
+            mouseLeaveEvent.Fire();
+        }
+        protected virtual void OnMouseDown(MouseEventArgs& args)
+        {
+            mouseDownEvent.Fire(args);
+        }
+        protected virtual void OnMouseUp(MouseEventArgs& args)
+        {
+            mouseUpEvent.Fire(args);
+        }
+        protected virtual void OnKeyPress(KeyPressEventArgs& args)
+        {
+            keyPressEvent.Fire(args);
+        }
+        protected virtual void OnClick()
+        {
+            clickEvent.Fire();
+        }
+        public void* GetDC()
+        {
+            return GetDC(handle);
         }
         public void Invalidate()
         {
@@ -289,42 +595,18 @@ namespace System.Windows
         {
             InvalidateRect(handle, &rect, eraseBackground);
         }
+        public nothrow inline const Color& BackgroundColor() const
+        {
+            return backgroundColor;
+        }
+        public void SetBackgroundColor(const Color& backgroundColor_)
+        {
+            backgroundColor = backgroundColor_;
+            Invalidate();
+        }
         public nothrow inline void* Handle() const
         {
             return handle;
-        }
-        public nothrow inline ContainerControl* Parent() const
-        {
-            return parent;
-        }
-        internal nothrow void SetParent(ContainerControl* parent_)
-        {
-            parent = parent_;
-        }    
-        public nothrow inline Control* NextSibling() const
-        {
-            return nextSibling;
-        }
-        public nothrow inline Control* PrevSibling() const
-        {
-            return prevSibling;
-        }
-        internal nothrow void LinkAfter(Control* control)
-        {
-            control->prevSibling = this;
-            control->nextSibling = nextSibling;
-            nextSibling = control;
-        }    
-        internal nothrow void Unlink()
-        {
-            if (prevSibling != null)
-            {
-                prevSibling->nextSibling = nextSibling;
-            }
-            if (nextSibling != null)
-            {
-                nextSibling->prevSibling = prevSibling;
-            }
         }
         public inline nothrow WindowStyle GetWindowStyle() const
         {
@@ -338,21 +620,97 @@ namespace System.Windows
         {
             return paintEvent;
         }
+        public nothrow Event<MouseEnterEventHandler>& MouseEnterEvent() const
+        {
+            return mouseEnterEvent;
+        }
+        public nothrow Event<MouseEventHandler, MouseEventArgs>& MouseMoveEvent() const
+        {
+            return mouseMoveEvent;
+        }
+        public nothrow Event<MouseLeaveEventHandler>& MouseLeaveEvent() const
+        {
+            return mouseLeaveEvent;
+        }
+        public nothrow Event<MouseEventHandler, MouseEventArgs>& MouseDownEvent() const
+        {
+            return mouseDownEvent;
+        }
+        public nothrow Event<MouseEventHandler, MouseEventArgs>& MouseUpEvent() const
+        {
+            return mouseUpEvent;
+        }
+        public nothrow Event<ClickEventHandler>& ClickEvent() const
+        {
+            return clickEvent;
+        }
+        private nothrow inline bool MouseInClient() const
+        {
+            return (flags & Flags.mouseInClient) != 0;
+        }
+        private nothrow inline void SetMouseInClient()
+        {
+            flags = cast<Flags>(flags | Flags.mouseInClient);
+        }
+        private nothrow inline void ResetMouseInClient()
+        {
+            flags = cast<Flags>(flags & ~Flags.mouseInClient);
+        }
+        private nothrow inline bool LButtonPressed() const
+        {
+            return (flags & flags.lbuttonPressed) != 0;
+        }
+        private nothrow inline void SetLButtonPressed()
+        {
+            flags = cast<Flags>(flags | Flags.lbuttonPressed);
+        }
+        private nothrow inline void ResetLButtonPressed()
+        {
+            flags = cast<Flags>(flags & ~Flags.lbuttonPressed);
+        }
+        private nothrow inline bool MenuWantsKeys() const
+        {
+            return (flags & flags.menuWantsKeys) != 0;
+        }
+        private nothrow inline void SetMenuWantsKeys()
+        {
+            flags = cast<Flags>(flags | Flags.menuWantsKeys);
+        }
+        private nothrow inline void ResetMenuWantsKeys()
+        {
+            flags = cast<Flags>(flags & ~Flags.menuWantsKeys);
+        }
+        private nothrow inline bool KeyDownHandled() const
+        {
+            return (flags & flags.keyDownHandled) != 0;
+        }
+        private nothrow inline void SetKeyDownHandled()
+        {
+            flags = cast<Flags>(flags | Flags.keyDownHandled);
+        }
+        private nothrow inline void ResetKeyDownHandled()
+        {
+            flags = cast<Flags>(flags & ~Flags.keyDownHandled);
+        }
         private const char* windowClassName;
         private WindowClassStyle windowClassStyle;
-        private WindowColor windowClassBackgroundColor;
+        private Color backgroundColor;
         private WindowStyle style;
         private ExtendedWindowStyle exStyle;
         private void* handle;
-        private ContainerControl* parent;
-        private Control* nextSibling;
-        private Control* prevSibling;
-        private string name;
         private string text;
         private Point location;
         private Size size;
         private Dock dock;
         private Anchors anchors;
+        private Flags flags;
         private Event<PaintEventHandler, PaintEventArgs> paintEvent;
+        private Event<MouseEnterEventHandler> mouseEnterEvent;
+        private Event<MouseEventHandler, MouseEventArgs> mouseMoveEvent;
+        private Event<MouseLeaveEventHandler> mouseLeaveEvent;
+        private Event<MouseEventHandler, MouseEventArgs> mouseDownEvent;
+        private Event<MouseEventHandler, MouseEventArgs> mouseUpEvent;
+        private Event<KeyPressEventHandler, KeyPressEventArgs> keyPressEvent;
+        private Event<ClickEventHandler> clickEvent;
     }
 }

@@ -119,7 +119,7 @@ public:
         const std::string& mangledName, void* baseClassDIType) override;
     void MapFwdDeclaration(void* fwdDeclaration, const boost::uuids::uuid& typeId) override;
     void* GetDITypeByTypeId(const boost::uuids::uuid& typeId) const override;
-    void SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType) override;
+    void SetDITypeByTypeId(const boost::uuids::uuid& typeId, void* diType, const std::string& typeName) override;
     void* GetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId) override;
     void SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memberVariableId, void* diType) override;
     void* CreateDIMemberType(void* scope, const std::string& name, const Span& span, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType) override;
@@ -128,7 +128,7 @@ public:
     void* CreateRValueRefDIType(void* diType) override;
     void* CreatePointerDIType(void* diType) override;
     void* CreateUnspecifiedDIType(const std::string& name) override;
-    void MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr) override;
+    void MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr, const std::string& className) override;
     uint64_t GetSizeInBits(void* irType) override;
     uint64_t GetAlignmentInBits(void* irType) override;
     void SetCurrentDebugLocation(const Span& span) override;
@@ -333,6 +333,7 @@ public:
     void* CreateInsertValue(void* aggregate, void* value, const std::vector<unsigned int>& indeces) override;
     void* CreateUndefValue(void* type) override;
     void CreateResume(void* exception) override;
+    void DebugPrintDebugInfo(const std::string& filePath) override;
 private:
     cmsxbe::EmittingContext* emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;
