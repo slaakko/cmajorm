@@ -30,6 +30,7 @@ namespace System.Windows
     public const uint TME_LEAVE = 2u;
 
     public const uint SC_KEYMENU = 0xF100u;
+    public const uint SC_CLOSE = 0xF060;
 
     public class PaintEventArgs
     {
@@ -72,12 +73,14 @@ namespace System.Windows
 
     public class KeyEventArgs
     {
-        public nothrow KeyEventArgs(Keys keyCode_, Keys modifiers_, bool alt_, bool control_, bool shift_) :
-            keyCode(keyCode_), modifiers(modifiers_), alt(alt_), control(control_), shift(shift_), handled(false), suppressKeyPress(false)
+        public nothrow KeyEventArgs(Keys keyCode_, Keys modifiers_) :
+            keyCode(keyCode_), modifiers(modifiers_), keyData(cast<Keys>(keyCode | modifiers)),
+            alt((modifiers & Keys.altModifier) != 0), control((modifiers & Keys.controlModifier) != 0), shift((modifiers & Keys.shiftModifier) != 0), handled(false), suppressKeyPress(false)
         {
         }
         public Keys keyCode;
         public Keys modifiers;
+        public Keys keyData;
         public bool alt;
         public bool control;
         public bool shift;

@@ -1,0 +1,57 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.Lexer;
+using Cm.Parser;
+using CmajorTokens;
+
+parser EnumerationParser
+{
+    uselexer CmajorLexer;
+
+    using SpecifierParser.Specifiers;
+    using ExpressionParser.Expression;
+    using TypeExprParser.TypeExpr;
+    using IdentifierParser.Identifier;
+
+    EnumType(ParsingContext* ctx, var UniquePtr<EnumTypeNode> enumType, var Span s, var Span beginBraceSpan, var Span endBraceSpan) : EnumTypeNode*
+        ::= Specifiers:specifiers{ s = span; } ENUM Identifier:enumTypeId!{ s.end = span.end; enumType.Reset(new EnumTypeNode(s, specifiers, enumTypeId)); }
+            (UnderlyingType(ctx):underlyingType{ enumType->SetUnderlyingType(underlyingType); })?
+            LBRACE!{ beginBraceSpan = span; } EnumConstants(ctx, enumType.Get()):enumConstants RBRACE!
+            {
+                endBraceSpan = span;
+                enumType->SetBeginBraceSpan(beginBraceSpan);
+                enumType->SetEndBraceSpan(endBraceSpan); 
+                return enumType.Release(); 
+            }
+        ;
+        
+    UnderlyingType(ParsingContext* ctx) : Node*
+        ::= COLON TypeExpr(ctx):type{ return type; }
+        ;
+        
+    EnumConstants(ParsingContext* ctx, EnumTypeNode* enumType) 
+        ::= EnumConstant(ctx, enumType):enumConstant!{ enumType->AddConstant(enumConstant); } % COMMA
+        ;
+        
+    EnumConstant(ParsingContext* ctx, EnumTypeNode* enumType, var Span s, var UniquePtr<Node> expr) : EnumConstantNode*
+        ::= Identifier:constantId!{ s = span; }
+        (   ASSIGN Expression(ctx):constantValue
+            {
+                expr.Reset(constantValue);
+                expr->SetFullSpan();
+                Span v = expr->GetSpan();
+                s.end = expr->GetSpan().end;
+                EnumConstantNode* value = new EnumConstantNode(s, constantId, expr.Release());
+                value->SetHasValue();
+                value->SetStrValue(lexer.GetMatch(v));
+                return value;
+            }
+        |   empty{ return new EnumConstantNode(s, constantId, MakeNextEnumConstantValue(s, enumType)); }
+        )
+        ;
+}

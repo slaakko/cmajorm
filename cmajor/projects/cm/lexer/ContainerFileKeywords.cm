@@ -1,0 +1,62 @@
+using System;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/lexer/ContainerFileLexer.lexer' using soulcm lexer generator scmlg version 3.0.0
+
+namespace ContainerFileKeywords
+{
+    internal class Keywords
+    {
+        static Keywords() :
+            instance(new Keywords())
+        {
+        }
+        public static Keywords& Instance()
+        {
+            return *instance;
+        }
+        public System.Lex.KeywordMap* GetKeywordMap()
+        {
+            return keywordMap.Get();
+        }
+        private Keywords()
+        {
+            System.Lex.Keyword keyword0(u"project", ContainerFileTokens.PROJECT);
+            keywordList.Add(keyword0);
+            System.Lex.Keyword keyword1(u"solution", ContainerFileTokens.SOLUTION);
+            keywordList.Add(keyword1);
+            System.Lex.Keyword keyword2(u"reference", ContainerFileTokens.REFERENCE);
+            keywordList.Add(keyword2);
+            System.Lex.Keyword keyword3(u"source", ContainerFileTokens.SOURCE);
+            keywordList.Add(keyword3);
+            System.Lex.Keyword keyword4(u"text", ContainerFileTokens.TEXT);
+            keywordList.Add(keyword4);
+            System.Lex.Keyword keyword5(u"target", ContainerFileTokens.TARGET);
+            keywordList.Add(keyword5);
+            System.Lex.Keyword keyword6(u"program", ContainerFileTokens.PROGRAM);
+            keywordList.Add(keyword6);
+            System.Lex.Keyword keyword7(u"winguiapp", ContainerFileTokens.WINGUIAPP);
+            keywordList.Add(keyword7);
+            System.Lex.Keyword keyword8(u"winapp", ContainerFileTokens.WINAPP);
+            keywordList.Add(keyword8);
+            System.Lex.Keyword keyword9(u"library", ContainerFileTokens.LIBRARY);
+            keywordList.Add(keyword9);
+            System.Lex.Keyword keyword10(u"winlib", ContainerFileTokens.WINLIB);
+            keywordList.Add(keyword10);
+            System.Lex.Keyword keyword11(u"unitTest", ContainerFileTokens.UNITTEST);
+            keywordList.Add(keyword11);
+            System.Lex.Keyword keyword12(u"activeProject", ContainerFileTokens.ACTIVEPROJECT);
+            keywordList.Add(keyword12);
+            System.Lex.Keyword nullKeyword(null, -1);
+            keywordList.Add(nullKeyword);
+            keywordMap.Reset(new System.Lex.KeywordMap(keywordList.CBegin().Ptr()));
+        }
+        private static System.UniquePtr<Keywords> instance;
+        private System.Collections.List<System.Lex.Keyword> keywordList;
+        private System.UniquePtr<System.Lex.KeywordMap> keywordMap;
+    }
+
+    public System.Lex.KeywordMap* GetKeywordMap()
+    {
+        return Keywords.Instance().GetKeywordMap();
+    }
+} // namespace ContainerFileKeywords

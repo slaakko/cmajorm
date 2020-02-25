@@ -14,6 +14,7 @@ namespace ContainerFileKeywords
         {U"solution", SOLUTION}, 
         {U"reference", REFERENCE}, 
         {U"source", SOURCE}, 
+        {U"resource", RESOURCE}, 
         {U"text", TEXT}, 
         {U"target", TARGET}, 
         {U"program", PROGRAM}, 

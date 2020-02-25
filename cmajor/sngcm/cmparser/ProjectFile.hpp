@@ -18,6 +18,7 @@ struct SNGCM_PARSER_API ProjectFileParser
     static soulng::parser::Match Declaration(ContainerFileLexer& lexer);
     static soulng::parser::Match ReferenceDeclaration(ContainerFileLexer& lexer);
     static soulng::parser::Match SourceFileDeclaration(ContainerFileLexer& lexer);
+    static soulng::parser::Match ResourceFileDeclaration(ContainerFileLexer& lexer);
     static soulng::parser::Match TextFileDeclaration(ContainerFileLexer& lexer);
     static soulng::parser::Match TargetDeclaration(ContainerFileLexer& lexer);
     static soulng::parser::Match Target(ContainerFileLexer& lexer);

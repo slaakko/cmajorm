@@ -1,0 +1,192 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.Parser;
+using CmajorTokens;
+
+parser ConceptParser
+{
+    uselexer CmajorLexer;
+    
+    using SpecifierParser.Specifiers;
+    using IdentifierParser.Identifier;
+    using IdentifierParser.QualifiedId;
+    using ParameterParser.ParameterList;
+    using ExpressionParser.Expression;
+    using ExpressionParser.InvokeExpr;
+    using TypeExprParser.TypeExpr;
+    using FunctionParser.FunctionGroupId;
+    
+    Concept(ParsingContext* ctx, var UniquePtr<ConceptNode> conceptNode, var UniquePtr<WhereConstraintNode> constraint, var Span s, var Span beginBraceSpan, var Span endBraceSpan) : ConceptNode*
+        ::= empty{ ctx->BeginParsingConcept(); }
+        (   Specifiers:specifiers{ s = span; } CONCEPT Identifier:conceptName!{ s.end = span.end; conceptNode.Reset(new ConceptNode(s, specifiers, conceptName)); }
+            LANGLE! (Identifier:typeParam{ conceptNode->AddTypeParameter(typeParam); } % COMMA) RANGLE!
+            ((Refinement:refinement{ conceptNode->SetRefinement(refinement); })?
+            (WhereConstraint(ctx):c{ s.end = span.end; constraint.Reset(c); constraint->SetHeaderConstraint(); conceptNode->AddConstraint(constraint.Release()); })?){ conceptNode->SetSpan(s); }
+            LBRACE!{ beginBraceSpan = span; } ConceptBody(ctx, conceptNode.Get()):body! RBRACE!{ endBraceSpan = span; }
+        )
+        {
+            ctx->EndParsingConcept();
+            conceptNode->SetBeginBraceSpan(beginBraceSpan);
+            conceptNode->SetEndBraceSpan(endBraceSpan);
+            return conceptNode.Release();
+        }
+        /
+        {
+            ctx->EndParsingConcept();
+        }
+        ;
+        
+    Refinement(var UniquePtr<ConceptIdNode> conceptId ) : ConceptIdNode*
+        ::= 
+        (   COLON QualifiedId:refinedConcept{ conceptId.Reset(new ConceptIdNode(span, refinedConcept)); }
+            LANGLE! (Identifier:typeParam{ conceptId->AddTypeParameter(typeParam); } % COMMA) RANGLE!
+        )
+        {
+            return conceptId.Release();
+        }
+        ;
+        
+    ConceptBody(ParsingContext* ctx, ConceptNode* conceptNode)
+        ::= (ConceptBodyConstraint(ctx, conceptNode):bodyConstraint | Axiom(ctx, conceptNode):a)*
+        ;
+        
+    ConceptBodyConstraint(ParsingContext* ctx, ConceptNode* conceptNode)
+        ::= TypeNameConstraint(ctx):typeNameConstraint{ conceptNode->AddConstraint(typeNameConstraint); }
+        |   SignatureConstraint(ctx, conceptNode->TypeParameters()[0]):signatureConstraint{ conceptNode->AddConstraint(signatureConstraint); }
+        |   EmbeddedConstraint(ctx):embeddedConstraint{ conceptNode->AddConstraint(embeddedConstraint); }
+        ;
+        
+    TypeNameConstraint(ParsingContext* ctx, var Span s) : ConstraintNode*
+        ::= TYPENAME{ s = span; } TypeExpr(ctx):type! SEMICOLON!{ s.end = span.end; return new TypeNameConstraintNode(s, type); }
+        ;
+        
+    SignatureConstraint(ParsingContext* ctx, IdentifierNode* firstTypeParameter) : ConstraintNode*
+        ::= ConstructorConstraint(ctx, firstTypeParameter):constructorConstraint{ return constructorConstraint; }
+        |   DestructorConstraint(ctx, firstTypeParameter):destructorConstraint{ return destructorConstraint; }
+        |   MemberFunctionConstraint(ctx):memberFunctionConstraint{ return memberFunctionConstraint; }
+        |   FunctionConstraint(ctx):functionConstraint{ return functionConstraint; }
+        ;
+        
+    ConstructorConstraint(ParsingContext* ctx, IdentifierNode* firstTypeParameter, var UniquePtr<ConstraintNode> ctorConstraint, var Span e) : ConstraintNode*
+        ::= 
+        (   EXPLICIT? Identifier:id{ ustring className = lexer.GetMatch(span); pass = className == firstTypeParameter->Str(); if (pass) ctorConstraint.Reset(new ConstructorConstraintNode(span, id)); } 
+            ParameterList(ctx, ctorConstraint.Get()):paramList SEMICOLON!{ e = span; }
+        )
+        {
+            ctorConstraint->SetSpanEnd(e.end);
+            return ctorConstraint.Release();
+        }
+        ;
+        
+    DestructorConstraint(ParsingContext* ctx, IdentifierNode* firstTypeParameter, var Span s) : ConstraintNode*
+        ::= 
+        (   CPL{ s = span; } Identifier:id{ ustring className = lexer.GetMatch(span); pass = className == firstTypeParameter->Str(); } LPAREN! RPAREN! SEMICOLON!{ s.end = span.end; }
+        )
+        {
+            return new DestructorConstraintNode(s, id);
+        }
+        ;
+        
+    MemberFunctionConstraint(ParsingContext* ctx, var UniquePtr<ConstraintNode> memberFunctionConstraint) : ConstraintNode*
+        ::= TypeExpr(ctx):returnType Identifier:typeParam DOT FunctionGroupId(ctx):functionGroupId!
+            { 
+                memberFunctionConstraint.Reset(new MemberFunctionConstraintNode(span, returnType, typeParam, functionGroupId)); 
+            }
+            ParameterList(ctx, memberFunctionConstraint.Get()):paramList! SEMICOLON!
+            {
+                memberFunctionConstraint->SetSpanEnd(span.end);
+                return memberFunctionConstraint.Release();
+            }
+        ;
+        
+    FunctionConstraint(ParsingContext* ctx, var UniquePtr<ConstraintNode> functionConstraint) : ConstraintNode*
+        ::= TypeExpr(ctx):returnType FunctionGroupId(ctx):functionGroupId!{ functionConstraint.Reset(new FunctionConstraintNode(span, returnType, functionGroupId)); }
+            ParameterList(ctx, functionConstraint.Get()):paramList! SEMICOLON!{ functionConstraint->SetSpanEnd(span.end); return functionConstraint.Release(); }
+        ;
+        
+    EmbeddedConstraint(ParsingContext* ctx, var UniquePtr<WhereConstraintNode> constraint) : WhereConstraintNode*
+        ::= WhereConstraint(ctx):c SEMICOLON!{ constraint.Reset(c); constraint->SetSemicolon(); return constraint.Release(); }
+        ;
+        
+    WhereConstraint(ParsingContext* ctx, var Span s) : WhereConstraintNode*
+        ::= WHERE{ s = span; } ConstraintExpr(ctx):constraint!{ s.end = span.end; return new WhereConstraintNode(s, constraint); }
+        ;
+        
+    ConstraintExpr(ParsingContext* ctx) : ConstraintNode*
+        ::= DisjunctiveConstraintExpr(ctx):disjunctiveConstraint{ return disjunctiveConstraint; }
+        ;
+        
+    DisjunctiveConstraintExpr(ParsingContext* ctx, var Span s, var UniquePtr<ConstraintNode> constraint) : ConstraintNode*
+        ::=
+        (   ConjunctiveConstraintExpr(ctx):left{ constraint.Reset(left); s = span; }
+            (   OR ConjunctiveConstraintExpr(ctx):right{ s.end = span.end; constraint.Reset(new DisjunctiveConstraintNode(s, constraint.Release(), right)); })*
+        )
+        {
+            return constraint.Release();
+        }
+        ;
+        
+    ConjunctiveConstraintExpr(ParsingContext* ctx, var Span s, var UniquePtr<ConstraintNode> constraint) : ConstraintNode*
+        ::=
+        (   PrimaryConstraintExpr(ctx):left{ constraint.Reset(left); s = span; }
+            (   AND PrimaryConstraintExpr(ctx):right{ s.end = span.end; constraint.Reset(new ConjunctiveConstraintNode(s, constraint.Release(), right)); })*
+        )
+        {
+            return constraint.Release();
+        }
+        ;
+        
+    PrimaryConstraintExpr(ParsingContext* ctx, var Span s) : ConstraintNode*
+        ::= LPAREN{ s = span; } ConstraintExpr(ctx):constraint RPAREN!{ s.end = span.end; return new ParenthesizedConstraintNode(s, constraint); }
+        |   AtomicConstraintExpr(ctx):atomicConstraint{ return atomicConstraint; }
+        ;
+        
+    AtomicConstraintExpr(ParsingContext* ctx) : ConstraintNode*
+        ::= PredicateConstraint(ctx):predicateConstraint{ return predicateConstraint; }
+        |   IsConstraint(ctx):isConstraint{ return isConstraint; }
+        |   MultiParamConstraint(ctx):multiParamConstraint{ return multiParamConstraint; }
+        ;
+        
+    PredicateConstraint(ParsingContext* ctx) : ConstraintNode*
+        ::= InvokeExpr(ctx):invokeExpr{ return new PredicateConstraintNode(span, invokeExpr); }
+        ;
+        
+    IsConstraint(ParsingContext* ctx, var Span s) : ConstraintNode*
+        ::= TypeExpr(ctx):type{ s = span; } IS ConceptOrTypeName(ctx):conceptOrTypeName{ s.end = span.end; return new IsConstraintNode(s, type, conceptOrTypeName); }
+        ;
+        
+    ConceptOrTypeName(ParsingContext* ctx) : Node*
+        ::= TypeExpr(ctx):conceptOrTypeName{ return conceptOrTypeName; }
+        ;
+        
+    MultiParamConstraint(ParsingContext* ctx, var UniquePtr<MultiParamConstraintNode> constraint) : ConstraintNode*
+        ::= QualifiedId:id{ constraint.Reset(new MultiParamConstraintNode(span, id)); }
+            LANGLE (TypeExpr(ctx):typeExpr{ constraint->AddTypeExpr(typeExpr); } % COMMA) RANGLE!{ constraint->SetSpanEnd(span.end); return constraint.Release(); }
+        ;
+        
+    Axiom(ParsingContext* ctx, ConceptNode* conceptNode, var UniquePtr<AxiomNode> axiomNode, var Span axiomSpan, var Span beginBraceSpan, var Span endBraceSpan)
+        ::= 
+        (   AXIOM{ axiomSpan = span; } Identifier:id? empty{ axiomNode.Reset(new AxiomNode(axiomSpan, id)); }
+            ParameterList(ctx, axiomNode.Get()):paramList?
+            LBRACE!{ beginBraceSpan = span; } AxiomBody(ctx, axiomNode.Get()):axiomBody! RBRACE!{ endBraceSpan = span; }
+        )
+        {
+            axiomNode->SetBeginBraceSpan(beginBraceSpan);
+            axiomNode->SetEndBraceSpan(endBraceSpan);
+            conceptNode->AddAxiom(axiomNode.Release());
+        }
+        ;
+        
+    AxiomBody(ParsingContext* ctx, AxiomNode* axiomNode)
+        ::= AxiomStatement(ctx):stmt{ axiomNode->AddStatement(stmt); }
+        ;
+        
+    AxiomStatement(ParsingContext* ctx, var Span s) : AxiomStatementNode*
+        ::= (Expression(ctx):expr{ s = span; } SEMICOLON!{ s.end = span.end; }){ return new AxiomStatementNode(s, expr, lexer.GetMatch(s)); }
+        ;
+}

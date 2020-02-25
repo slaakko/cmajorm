@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using System.IO;
 
 namespace System.Windows.API
 {
@@ -43,6 +44,14 @@ namespace System.Windows.API
             return errorCode;
         }
         private ulong errorCode;
+    }
+
+    public class CommonDialogError : Exception
+    {
+        public CommonDialogError(uint errorCode, const string& errorStr) : base("Common dialog error " + ToString(errorCode) + ": " + errorStr)
+        {
+        }
+        private uint errorCode;
     }
     
     public void* FindFirstChangeNotification(const string& directoryPath)
@@ -384,5 +393,284 @@ namespace System.Windows.API
     public void* GetDC(void* windowHandle)
     {
         return WinGetDC(windowHandle);
+    }
+
+    public void PostMessage(void* windowHandle, uint msg, uint wparam, long lparam)
+    {
+        bool succeeded = WinPostMessage(windowHandle, msg, wparam, lparam);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void ThrowCommonDialogError(uint errorCode)
+    {
+        string errorStr;
+        switch (errorCode)
+        {
+            case 0xFFFFu:
+            {
+                errorStr = "CDERR_DIALOGFAILURE";
+                break;
+            }
+            case 0x0006u:
+            {
+                errorStr = "CDERR_FINDRESFAILURE";
+                break;
+            }
+            case 0x0002u:
+            {
+                errorStr = "CDERR_INITIALIZATION";
+                break;
+            }
+            case 0x0007u:
+            {
+                errorStr = "CDERR_LOADRESFAILURE";
+                break;
+            }
+            case 0x0005u:
+            {
+                errorStr = "CDERR_LOADSTRFAILURE";
+                break;
+            }
+            case 0x0008u:
+            {
+                errorStr = "CDERR_LOCKRESFAILURE";
+                break;
+            }
+            case 0x0009u:
+            {
+                errorStr = "CDERR_MEMALLOCFAILURE";
+                break;
+            }
+            case 0x000Au:
+            {
+                errorStr = "CDERR_MEMLOCKFAILURE";
+                break;
+            }
+            case 0x0004u:
+            {
+                errorStr = "CDERR_NOHINSTANCE";
+                break;
+            }
+            case 0x000Bu:
+            {
+                errorStr = "CDERR_NOHOOK";
+                break;
+            }
+            case 0x0003u:
+            {
+                errorStr = "CDERR_NOTEMPLATE";
+                break;
+            }
+            case 0x000Cu:
+            {
+                errorStr = "CDERR_REGISTERMSGFAIL";
+                break;
+            }
+            case 0x0001u:
+            {
+                errorStr = "CDERR_STRUCTSIZE";
+                break;
+            }
+            case 0x100Au:
+            {
+                errorStr = "PDERR_CREATEICFAILURE";
+                break;
+            }
+            case 0x100Cu:
+            {
+                errorStr = "PDERR_DEFAULTDIFFERENT";
+                break;
+            }
+            case 0x1009u:
+            {
+                errorStr = "PDERR_DNDMMISMATCH";
+                break;
+            }
+            case 0x1005u:
+            {
+                errorStr = "PDERR_GETDEVMODEFAIL";
+                break;
+            }
+            case 0x1006u:
+            {
+                errorStr = "PDERR_INITFAILURE";
+                break;
+            }
+            case 0x1004u:
+            {
+                errorStr = "PDERR_LOADDRVFAILURE";
+                break;
+            }
+            case 0x1008u:
+            {
+                errorStr = "PDERR_NODEFAULTPRN";
+                break;
+            }
+            case 0x1007u:
+            {
+                errorStr = "PDERR_NODEVICES";
+                break;
+            }
+            case 0x1002u:
+            {
+                errorStr = "PDERR_PARSEFAILURE";
+                break;
+            }
+            case 0x100Bu:
+            {
+                errorStr = "PDERR_PRINTERNOTFOUND";
+                break;
+            }
+            case 0x1003u:
+            {
+                errorStr = "PDERR_RETDEFFAILURE";
+                break;
+            }
+            case 0x1001u:
+            {
+                errorStr = "PDERR_SETUPFAILURE";
+                break;
+            }
+            case 0x2002u:
+            {
+                errorStr = "CFERR_MAXLESSTHANMIN";
+                break;
+            }
+            case 0x2001u:
+            {
+                errorStr = "CFERR_NOFONTS";
+                break;
+            }
+            case 0x3003u:
+            {
+                errorStr = "FNERR_BUFFERTOOSMALL";
+                break;
+            }
+            case 0x3002u:
+            {
+                errorStr = "FNERR_INVALIDFILENAME";
+                break;
+            }
+            case 0x3001u:
+            {
+                errorStr = "FNERR_SUBCLASSFAILURE";
+                break;
+            }
+            case 0x4001u:
+            {
+                errorStr = "FRERR_BUFFERLENGTHZERO";
+                break;
+            }
+            default:
+            {
+                errorStr = "generic error";
+                break;
+            }
+        }
+        MessageBox.Show(errorStr);
+        //throw CommonDialogError(errorCode, errorStr);
+    }
+
+    public const uint OFN_READONLY =                0x00000001u;
+    public const uint OFN_OVERWRITEPROMPT =         0x00000002u;
+    public const uint OFN_HIDEREADONLY =            0x00000004u;
+    public const uint OFN_NOCHANGEDIR =             0x00000008u;
+    public const uint OFN_SHOWHELP =                0x00000010u;
+    public const uint OFN_ENABLEHOOK =              0x00000020u;
+    public const uint OFN_ENABLETEMPLATE =          0x00000040u;
+    public const uint OFN_ENABLETEMPLATEHANDLE =    0x00000080u;
+    public const uint OFN_NOVALIDATE =              0x00000100u;
+    public const uint OFN_ALLOWMULTISELECT =        0x00000200u;
+    public const uint OFN_EXTENSIONDIFFERENT =      0x00000400u;
+    public const uint OFN_PATHMUSTEXIST =           0x00000800u;
+    public const uint OFN_FILEMUSTEXIST =           0x00001000u;
+    public const uint OFN_CREATEPROMPT =            0x00002000u;
+    public const uint OFN_SHAREAWARE =              0x00004000u;
+    public const uint OFN_NOREADONLYRETURN =        0x00008000u;
+    public const uint OFN_NOTESTFILECREATE =        0x00010000u;
+    public const uint OFN_NONETWORKBUTTON =         0x00020000u;
+    public const uint OFN_NOLONGNAMES =             0x00040000u;     // force no long names for 4.x modules
+    public const uint OFN_EXPLORER =                0x00080000u;     // new look commdlg
+    public const uint OFN_NODEREFERENCELINKS =      0x00100000u;
+    public const uint OFN_LONGNAMES =               0x00200000u;     // force long names for 3.x modules
+
+    public bool GetOpenFileName(void* windowHandle, const List<Pair<string, string>>& descriptionFilterPairs, const string& initialDirectory, const string& defaultFilePath,
+        const string& defaultExtension, uint flags, string& currentDirectory, List<string>& fileNames)
+    {
+        long filterBufferSize = 0;
+        for (const Pair<string, string>& descriptionFilterPair : descriptionFilterPairs)
+        {
+            wstring description = ToUtf16(descriptionFilterPair.first);
+            wstring filter = ToUtf16(descriptionFilterPair.second);
+            filterBufferSize = filterBufferSize + description.Length() + 1 + filter.Length() + 1;
+        }
+        filterBufferSize = filterBufferSize + 1 + 1;
+        UniquePtr<wchar> filterBuffer = cast<wchar*>(MemAlloc(sizeof(wchar) * filterBufferSize));
+        wchar* filterBufferPtr = filterBuffer.Get();
+        for (const Pair<string, string>& descriptionFilterPair : descriptionFilterPairs)
+        {
+            wstring description = ToUtf16(descriptionFilterPair.first);
+            long descLen = StrCopy(filterBufferPtr, description.Chars(), description.Length());
+            filterBufferPtr = filterBufferPtr + descLen + 1;
+            wstring filter = ToUtf16(descriptionFilterPair.second);
+            long filterLen = StrCopy(filterBufferPtr, filter.Chars(), filter.Length());
+            filterBufferPtr = filterBufferPtr + filterLen + 1;
+        }
+        *filterBufferPtr++ = '\0';
+        *filterBufferPtr++ = '\0';
+        long fileNameBufferSize = 16 * 1024;
+        UniquePtr<wchar> fileNameBuffer = cast<wchar*>(MemAlloc(sizeof(wchar) * fileNameBufferSize));
+        wstring defFilePath = ToUtf16(defaultFilePath);
+        if (defaultFilePath.IsEmpty())
+        {
+            *fileNameBuffer.Get() = '\0';
+        }
+        else
+        {
+            StrCopy(fileNameBuffer.Get(), defFilePath.Chars(), defFilePath.Length());
+        }
+        wstring initialDir = ToUtf16(initialDirectory);
+        wstring defExt = ToUtf16(defaultExtension);
+        bool success = WinGetOpenFileName(windowHandle, filterBuffer.Get(), initialDir.Chars(), fileNameBuffer.Get(), cast<uint>(fileNameBufferSize), flags, defExt.Chars());
+        if (success)
+        {
+            long firstPathLength = StrLen(fileNameBuffer.Get());
+            string firstPath = ToUtf8(wstring(fileNameBuffer.Get(), firstPathLength));
+            if ((flags & OFN_ALLOWMULTISELECT) == 0)
+            {
+                currentDirectory = Path.GetDirectoryName(firstPath);
+                fileNames.Add(Path.GetFileName(firstPath));
+            }
+            else
+            {
+                currentDirectory = firstPath;
+                long pathStart = firstPathLength + 1;
+                wchar* wpath = fileNameBuffer.Get() + pathStart;
+                while (*wpath != '\0')
+                {
+                    long pathLength = StrLen(wpath);
+                    string path = ToUtf8(wstring(wpath, pathLength));
+                    fileNames.Add(path);
+                    wpath = wpath + pathLength + 1;
+                }
+            }
+            return true;
+        }
+        else
+        {
+            uint errorCode = WinCommDlgExtendedError();
+            if (errorCode == 0u)
+            {
+                return false;
+            }
+            else
+            {
+                ThrowCommonDialogError(errorCode);
+            }
+        }
+        return false;
     }
 }

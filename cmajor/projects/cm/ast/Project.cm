@@ -1,0 +1,497 @@
+using System;
+using System.Collections;
+using System.IO;
+
+namespace Cm.Ast
+{
+    private ModuleVersionTagVerifier* moduleVersionTagVerifier = null;
+    private string outDir;
+
+    public enum BackEnd
+    {
+        llvm, cmsx
+    }
+    
+    public abstract class ModuleVersionTagVerifier
+    {
+        public default virtual ~ModuleVersionTagVerifier();
+        abstract void VerifyModuleVersionTag(const string& moduleFilePath);
+    }
+    
+    public nothrow void SetModuleVersionTagVerifier(ModuleVersionTagVerifier* verifier)
+    {
+        moduleVersionTagVerifier = verifier;
+    }
+    
+    public string CmajorRootDir()
+    {
+        string cmajorRootDir;
+        const char* cmajorRootEnv = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        if (cmajorRootEnv != null && *cmajorRootEnv != '\0')
+        {
+            cmajorRootDir = cmajorRootEnv;
+        }
+        if (cmajorRootDir.IsEmpty())
+        {
+            throw Exception("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory.");
+        }
+        return cmajorRootDir;
+    }
+    
+    public string CmajorSystemLibDir(const string& config, BackEnd backend)
+    {
+        if (backend == BackEnd.llvm)
+        {
+            string cmajorRootDir = CmajorRootDir();
+            return GetFullPath(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "system"), "lib"), config));
+        }
+        else if (backend == BackEnd.cmsx)
+        {
+            string cmajorRootDir = CmajorRootDir();
+            return GetFullPath(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cmsx"), "system"), "lib"));
+        }
+        else
+        {
+            return string();
+        }
+    }
+    
+    public string CmajorSystemModuleFilePath(const string& config, BackEnd backend)
+    {
+        return GetFullPath(Path.Combine(CmajorSystemLibDir(config, backend), "System.cmm"));
+    }
+    
+    public string CmajorSystemWindowsModuleFilePath(const string& config)
+    {
+        return GetFullPath(Path.Combine(CmajorSystemLibDir(config, BackEnd.llvm), "System.Windows.cmm"));
+    }
+    
+    public nothrow void SetOutDir(const string& outDir_)
+    {
+        outDir = outDir_;
+    }
+    
+    public nothrow const string& OutDir() 
+    {
+        return outDir;
+    }
+    
+    public enum ProjectDeclarationType
+    {
+        referenceDeclaration, sourceFileDeclaration, textFileDeclaration, targetDeclaration
+    }
+    
+    public abstract class ProjectDeclaration
+    {
+        public nothrow ProjectDeclaration(ProjectDeclarationType declarationType_) : declarationType(declarationType_)
+        {
+        }
+        public default virtual ~ProjectDeclaration();
+        public nothrow ProjectDeclarationType GetDeclarationType() const
+        {
+            return declarationType;
+        }
+        private ProjectDeclarationType declarationType;
+    }
+    
+    public class ReferenceDeclaration : ProjectDeclaration
+    {
+        public nothrow ReferenceDeclaration(const string& filePath_) : base(ProjectDeclarationType.referenceDeclaration), filePath(filePath_)
+        {
+        }
+        public nothrow const string& FilePath() const
+        {
+            return filePath;
+        }
+        private string filePath;
+    }
+
+    public class SourceFileDeclaration : ProjectDeclaration
+    {
+        public nothrow SourceFileDeclaration(const string& filePath_) : base(ProjectDeclarationType.sourceFileDeclaration), filePath(filePath_)
+        {
+        }
+        public nothrow const string& FilePath() const
+        {
+            return filePath;
+        }
+        private string filePath;
+    }
+
+    public class TextFileDeclaration : ProjectDeclaration
+    {
+        public nothrow TextFileDeclaration(const string& filePath_) : base(ProjectDeclarationType.textFileDeclaration), filePath(filePath_)
+        {
+        }
+        public nothrow const string& FilePath() const
+        {
+            return filePath;
+        }
+        private string filePath;
+    }
+    
+    public enum Target 
+    {
+        program, winguiapp, winapp, library, winlib, unitTest
+    }
+    
+    public class TargetDeclaration : ProjectDeclaration
+    {
+        public nothrow TargetDeclaration(Target target_) : base(ProjectDeclarationType.targetDeclaration), target(target_)
+        {
+        }
+        public nothrow Target GetTarget() const
+        {
+            return target;
+        }
+        private Target target;
+    }
+    
+    public class Project
+    {
+        public nothrow Project(const ustring& name_, const string& filePath_, const string& config_, BackEnd backend_) :
+            name(name_), filePath(Path.MakeCanonical(filePath_)), config(config_), backend(backend_), sourceBasePath(Path.GetDirectoryName(filePath))
+        {
+            if (!outDir.IsEmpty())
+            {
+                outDirBasePath = Path.Combine(outDir, ToUtf8(name));
+            }
+            else
+            {
+                outDirBasePath = sourceBasePath;
+            }
+            systemLibDir = CmajorSystemLibDir(config, backend);
+            moduleFilePath = Path.GetDirectoryName(filePath);
+            if (!outDir.IsEmpty())
+            {
+                moduleFilePath = outDirBasePath;
+            }
+            moduleFilePath = GetFullPath(Path.ChangeExtension(Path.Combine(Path.Combine(Path.Combine(moduleFilePath, "lib"), config), Path.GetFileName(filePath)), ".cmm"));
+        #if (WINDOWS)
+            if (backend == BackEnd.cmsx)
+            {
+                libraryFilePath = GetFullPath(Path.ChangeExtension(moduleFilePath, ".a"));
+            }
+            else if (backend == BackEnd.llvm)
+            {
+                libraryFilePath = GetFullPath(Path.ChangeExtension(moduleFilePath, ".lib"));
+            }
+        #else
+            libraryFilePath = GetFullPath(Path.ChangeExtension(moduleFilePath, ".a"));
+        #endif
+            executableFilePath = Path.GetDirectoryName(filePath);
+            if (!outDir.IsEmpty())
+            {
+                executableFilePath = outDirBasePath;
+            }
+            executableFilePath = Path.Combine(Path.Combine(Path.Combine(executableFilePath, "bin"), config), Path.GetFileName(filePath));
+        #if (WINDOWS)
+            if (backend == BackEnd.cmsx)
+            {
+                executableFilePath = GetFullPath(Path.ChangeExtension(executableFilePath, string()));
+            }
+            else if (backend == BackEnd.llvm)
+            {
+                executableFilePath = GetFullPath(Path.ChangeExtension(executableFilePath, ".exe"));
+            }
+        #else
+            executableFilePath = GetFullPath(Path.ChangeExtension(executableFilePath, string()));
+        #endif
+        }
+        public nothrow const ustring& Name() const
+        {
+            return name;
+        }
+        public nothrow const string& FilePath() const
+        {
+            return filePath;
+        }
+        public nothrow Target GetTarget() const
+        {
+            return target;
+        }
+        public nothrow const string& SourceBasePath() const
+        {
+            return sourceBasePath;
+        }
+        public nothrow const string& OutDirBasePath() const
+        {
+            return outDirBasePath;
+        }
+        public nothrow const string& ModuleFilePath() const
+        {
+            return moduleFilePath;
+        }
+        public nothrow const string& LibraryFilePath() const
+        {
+            return libraryFilePath;
+        }
+        public nothrow const string& ExecutableFilePath() const
+        {
+            return executableFilePath;
+        }
+        public nothrow const List<string>& References() const
+        {
+            return references;
+        }
+        public nothrow const List<string>& ReferencedProjectFilePaths() const
+        {
+            return referencedProjectFilePaths;
+        }
+        public nothrow const List<string>& RelativeReferencedProjectFilePaths() const
+        {
+            return relativeReferencedProjectFilePaths;
+        }
+        public nothrow const List<string>& SourceFilePaths() const
+        {
+            return sourceFilePaths;
+        }
+        public nothrow const List<string>& RelativeSourceFilePaths() const
+        {
+            return relativeSourceFilePaths;
+        }
+        public nothrow const List<string>& RelativeTextFilePaths() const
+        {
+            return relativeTextFilePaths;
+        }
+        public nothrow const List<string>& TextFilePaths() const
+        {
+            return textFilePaths;
+        }
+        public nothrow bool DependsOn(Project* that) const
+        {
+            return Find(references.CBegin(), references.CEnd(), that->moduleFilePath) != references.CEnd();
+        }
+        public nothrow void AddDependsOnProject(Project* dependsOnProject)
+        {
+            dependsOn.Add(dependsOnProject);
+        }
+        public nothrow bool IsSystemProject() const
+        {
+            return isSystemProject;
+        }
+        public nothrow void SetSystemProject()
+        {
+            isSystemProject = true;
+        }
+        public nothrow void SetRelativeFilePath(const string& relativeFilePath_)
+        {
+            relativeFilePath = relativeFilePath_;
+        }
+        public nothrow const string& RelativeFilePath() const
+        {
+            return relativeFilePath;
+        }
+        public nothrow void SetModuleFilePath(const string& moduleFilePath_)
+        {
+            moduleFilePath = moduleFilePath_;
+        }
+        public nothrow void SetLibraryFilePath(const string& libraryFilePath_)
+        {
+            libraryFilePath = libraryFilePath_;
+        }
+        public bool IsUpToDate(const string& systemModuleFilePath) const
+        {
+            if (!File.Exists(moduleFilePath)) return false;
+            for (const string& sourceFilePath : sourceFilePaths)
+            {
+                if (File.LastWriteTimeLess(moduleFilePath, sourceFilePath))
+                {
+                    return false;
+                }
+            }
+            for (const string& referenceFilePath : references)
+            {
+                if (File.LastWriteTimeLess(moduleFilePath, referenceFilePath))
+                {
+                    return false;
+                }
+            }
+            if (!systemModuleFilePath.IsEmpty() && !IsSystemProject() && File.Exists(systemModuleFilePath))
+            {
+                if (File.LastWriteTimeLess(moduleFilePath, systemModuleFilePath))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public nothrow int LogStreamId() const
+        {
+            return logStreamId;
+        }
+        public nothrow void SetLogStreamId(int logStreamId_)
+        {
+            logStreamId = logStreamId_;
+        }
+        public nothrow int Index() const
+        {
+            return index;
+        }
+        public nothrow void SetIndex(int index_)
+        {
+            index = index_;
+        }
+        public nothrow const List<Project*>& DependsOnProjects() const
+        {
+            return dependsOn;
+        }
+        public nothrow bool Built() const
+        {
+            return built;
+        }
+        public nothrow void SetBuilt() 
+        {
+            built = true;
+        }
+        public bool Ready() const
+        {
+            for (Project* dependOn : dependsOn)
+            {
+                if (!dependOn->Built())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public nothrow void SetExcludeSourceFilePath(const string& excludeSourceFilePath_)
+        {
+            excludeSourceFilePath = excludeSourceFilePath_;
+        }
+        public nothrow void AddDeclaration(ProjectDeclaration* declaration)
+        {
+            declarations.Add(UniquePtr<ProjectDeclaration>(declaration));
+        }
+        public void ResolveDeclarations()
+        {
+            for (const UniquePtr<ProjectDeclaration>& declaration : declarations)
+            {
+                bool unknown = false;
+                switch (declaration->GetDeclarationType())
+                {
+                    case ProjectDeclarationType.referenceDeclaration:
+                    {
+                        ReferenceDeclaration* referenceDeclaration = cast<ReferenceDeclaration*>(declaration.Get());
+                        string filePath = Path.MakeCanonical(referenceDeclaration->FilePath());
+                        relativeReferencedProjectFilePaths.Add(filePath);
+                        if (Path.IsAbsolute(filePath))
+                        {
+                            referencedProjectFilePaths.Add(GetFullPath(filePath));
+                        }
+                        else
+                        {
+                            string absolutePath = GetFullPath(sourceBasePath, filePath);
+                            referencedProjectFilePaths.Add(absolutePath);
+                        }
+                        string fileName = Path.GetFileName(filePath);
+                        string extension = Path.GetExtension(fileName);
+                        if (extension != ".cmp" && extension != ".cmproj" && extension != ".cmm")
+                        {
+                            throw Exception("invalid reference path extension '" + extension + "' (not .cmp, .cmproj or .cmm)");
+                        }
+                        string referencePath = Path.GetDirectoryName(filePath);
+                        if (Path.IsRelative(referencePath))
+                        {
+                            referencePath = Path.Combine(systemLibDir, referencePath);
+                        }
+                        referencePath = Path.Combine(referencePath, Path.ChangeExtension(fileName, ".cmm"));
+                        if (!File.Exists(referencePath))
+                        {
+                            referencePath = Path.GetDirectoryName(referenceDeclaration->FilePath());
+                            if (Path.IsRelative(referencePath))
+                            {
+                                referencePath = Path.Combine(outDirBasePath, referencePath);
+                            }
+                            referencePath = GetFullPath(Path.ChangeExtension(Path.Combine(Path.Combine(Path.Combine(referencePath, "lib"), config), fileName), ".cmm"));
+                        }
+                        if (Find(references.CBegin(), references.CEnd(), referencePath) == references.CEnd())
+                        {
+                            references.Add(referencePath);
+                        }
+                        break;
+                    }
+                    case ProjectDeclarationType.sourceFileDeclaration:
+                    {
+                        SourceFileDeclaration* sourceFileDeclaration = cast<SourceFileDeclaration*>(declaration.Get());
+                        string filePath = Path.MakeCanonical(sourceFileDeclaration->FilePath());
+                        relativeSourceFilePaths.Add(filePath);
+                        if (Path.IsRelative(filePath))
+                        {
+                            filePath = Path.Combine(sourceBasePath, filePath);
+                        }
+                        string extension = Path.GetExtension(filePath);
+                        if (extension != ".cm")
+                        {
+                            throw Exception("invalid source file extension '" + extension + "' (not .cm)");
+                        }
+                        string sourceFilePath = GetFullPath(filePath);
+                        if (!File.Exists(sourceFilePath))
+                        {
+                            throw Exception("source file path '" + sourceFilePath + "' not found");
+                        }
+                        if (Find(sourceFilePaths.CBegin(), sourceFilePaths.CEnd(), sourceFilePath) == sourceFilePaths.CEnd())
+                        {
+                            sourceFilePaths.Add(sourceFilePath);
+                        }
+                        break;
+                    }
+                    case ProjectDeclarationType.targetDeclaration:
+                    {
+                        TargetDeclaration* targetDeclaration = cast<TargetDeclaration*>(declaration.Get());
+                        target = targetDeclaration->GetTarget();
+                        break;
+                    }
+                    case ProjectDeclarationType.textFileDeclaration:
+                    {
+                        TextFileDeclaration* textFileDeclaration = cast<TextFileDeclaration*>(declaration.Get());
+                        string filePath = Path.MakeCanonical(textFileDeclaration->FilePath());
+                        relativeTextFilePaths.Add(filePath);
+                        if (Path.IsRelative(filePath))
+                        {
+                            filePath = Path.Combine(sourceBasePath, filePath);
+                        }
+                        string textFilePath = GetFullPath(filePath);
+                        textFilePaths.Add(textFilePath);
+                        break;
+                    }
+                    default:
+                    {
+                        unknown = true;
+                        break;
+                    }
+                }
+                if (unknown)
+                {
+                    throw Exception("unknown project declaration");
+                }
+            }
+        }
+        private ustring name;
+        private string filePath;
+        private string config;
+        private BackEnd backend;
+        private Target target;
+        private string sourceBasePath;
+        private string outDirBasePath;
+        private string systemLibDir;
+        private List<UniquePtr<ProjectDeclaration>> declarations;
+        private string relativeFilePath;
+        private string moduleFilePath;
+        private string libraryFilePath;
+        private string executableFilePath;
+        private string excludeSourceFilePath;
+        private List<string> references;
+        private List<string> referencedProjectFilePaths;
+        private List<string> sourceFilePaths;
+        private List<string> relativeSourceFilePaths;
+        private List<string> relativeReferencedProjectFilePaths;
+        private List<string> relativeTextFilePaths;
+        private List<string> textFilePaths;
+        private List<Project*> dependsOn;
+        private bool built;
+        private bool isSystemProject;
+        private int logStreamId;
+        private int index;
+    }
+}

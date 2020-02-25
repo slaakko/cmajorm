@@ -263,7 +263,7 @@ int WinRun()
     wc.cbWndExtra = 0;
     wc.hInstance = applicationInstance;
     wc.hIcon = LoadIcon(applicationInstance, IDI_APPLICATION);
-    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wc.hCursor = nullptr;
     wc.hbrBackground = (HBRUSH)(backgroundColor + 1);
     wc.lpszMenuName = nullptr;
     wc.lpszClassName = (LPWSTR)className.c_str();
@@ -321,6 +321,16 @@ void* WinCreateWindowByClassName(const char* windowClass, const char* windowName
 void WinPostQuitMessage(int exitCode)
 {
     PostQuitMessage(exitCode);
+}
+
+bool WinPostMessage(void* windowHandle, uint32_t msg, uint32_t wparam, int64_t lparam)
+{
+    return PostMessage((HWND)windowHandle, msg, wparam, lparam);
+}
+
+int64_t WinSendMessage(void* windowHandle, uint32_t msg, uint32_t wparam, int64_t lparam)
+{
+    return SendMessage((HWND)windowHandle, msg, wparam, lparam);
 }
 
 bool WinShowWindow(void* windowHandle, int commandShow)
@@ -751,4 +761,54 @@ void* WinGetFocus()
 void* WinSetFocus(void* windowHandle)
 {
     return SetFocus((HWND)windowHandle);
+}
+
+bool WinGetOpenFileName(void* windowHandle, const char16_t* filter, const char16_t* initialDirectory, char16_t* fileNameBuffer, uint32_t fileNameBufferSize, uint32_t flags, const char16_t* defaultExtension)
+{
+    OPENFILENAMEW openFileName;
+    openFileName.lStructSize = sizeof(openFileName);
+    openFileName.hwndOwner = (HWND)windowHandle;
+    openFileName.hInstance = applicationInstance;
+    openFileName.lpstrFilter = (LPCTSTR)filter;
+    openFileName.lpstrCustomFilter = nullptr;
+    openFileName.nMaxCustFilter = 0;
+    openFileName.nFilterIndex = 0;
+    openFileName.lpstrFile = (LPTSTR)fileNameBuffer;
+    openFileName.nMaxFile = fileNameBufferSize;
+    openFileName.lpstrFileTitle = nullptr;
+    openFileName.nMaxFileTitle = 0;
+    openFileName.lpstrInitialDir = (LPCWSTR)initialDirectory;
+    openFileName.lpstrTitle = nullptr;
+    openFileName.Flags = flags;
+    openFileName.nFileOffset = 0;
+    openFileName.nFileExtension = 0;
+    openFileName.lpstrDefExt = (LPCTSTR)defaultExtension;
+    openFileName.lCustData = 0;
+    openFileName.lpfnHook = nullptr;
+    openFileName.lpTemplateName = nullptr;
+    openFileName.pvReserved = nullptr;
+    openFileName.dwReserved = 0;
+    openFileName.FlagsEx = 0;
+    return GetOpenFileNameW(&openFileName);
+}
+
+uint32_t WinCommDlgExtendedError()
+{
+    return CommDlgExtendedError();
+}
+
+void* WinLoadStandardCursor(int cursorId)
+{
+    HCURSOR cursor = LoadCursor(nullptr, MAKEINTRESOURCE(cursorId));
+    return cursor;
+}
+
+void* WinGetCursor()
+{
+    return GetCursor();
+}
+
+void* WinSetCursor(void* cursorHandle)
+{
+    return SetCursor((HCURSOR)cursorHandle);
 }

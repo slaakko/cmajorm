@@ -1,0 +1,49 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Lexer;
+
+classmap ContainerFileClassMap;
+
+tokens ContainerFileTokens
+{
+    (PROJECT, "'project'"), (SOLUTION, "'solution'"), (REFERENCE, "'reference'"), (SOURCE, "'source'"), (TEXT, "'text'"), (TARGET, "'target'"),
+    (PROGRAM, "'program'"), (WINGUIAPP, "'winguiapp'"), (WINAPP, "'winapp'"), (LIBRARY, "'library'"), (WINLIB, "'winlib'"), (UNITTEST, "'unitTest'"), (ACTIVEPROJECT, "'activeProject'"),
+    (ID, "identifier"), (FILEPATH, "file path"), (ASSIGN, "'='"), (SEMICOLON, "';'"), (DOT, "'.'")
+}
+
+keywords ContainerFileKeywords
+{
+    ("project", PROJECT), ("solution", SOLUTION), ("reference", REFERENCE), ("source", SOURCE), ("text", TEXT), ("target", TARGET),
+    ("program", PROGRAM), ("winguiapp", WINGUIAPP), ("winapp", WINAPP), ("library", LIBRARY), ("winlib", WINLIB), ("unitTest", UNITTEST),
+    ("activeProject", ACTIVEPROJECT)
+}
+
+expressions
+{
+    ws = "[\n\r\t ]";
+    newline = "\r\n|\n|\r";
+    linecomment = "//[^\n\r]*{newline}";
+    blockcomment = "/\*([^*]|\*[^/])*\*/";
+    comment = "{linecomment}|{blockcomment}";
+    separators = "({ws}|{comment})+";
+    id = "{idstart}{idcont}*";
+    filepath = "<[^>]*>";
+}
+
+lexer ContainerFileLexer
+{
+    "{separators}" {}
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "{filepath}" { filePath = MakeFilePath(token.match); return FILEPATH; }
+    "=" { return ASSIGN; }
+    ";" { return SEMICOLON; }
+    "\." { return DOT; }
+
+    variables
+    {
+        string filePath;
+    }
+}

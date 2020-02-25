@@ -31,6 +31,8 @@ extern "C" RT_API int WinShowMessageBox(const char* text, const char* caption);
 extern "C" RT_API int WinShowMessageBoxWithType(const char* text, const char* caption, void* ownerWindowHandle, uint32_t type);
 extern "C" RT_API bool WinMessageBeep(uint32_t messageBeepType);
 extern "C" RT_API void WinPostQuitMessage(int exitCode);
+extern "C" RT_API bool WinPostMessage(void* windowHandle, uint32_t msg, uint32_t wparam, int64_t lparam);
+extern "C" RT_API int64_t WinSendMessage(void* windowHandle, uint32_t msg, uint32_t wparam, int64_t lparam);
 extern "C" RT_API bool WinShowWindow(void* windowHandle, int commandShow);
 extern "C" RT_API bool WinUpdateWindow(void* windowHandle);
 extern "C" RT_API bool WinMoveWindow(void* windowHandle, int x, int y, int w, int h, bool repaint);
@@ -109,5 +111,10 @@ extern "C" RT_API bool WinSetBkColor(void* hdc, uint8_t red, uint8_t green, uint
 extern "C" RT_API void WinGetMessagePos(int32_t& x, int32_t& y);
 extern "C" RT_API void* WinGetFocus();
 extern "C" RT_API void* WinSetFocus(void* windowHandle);
+extern "C" RT_API bool WinGetOpenFileName(void* windowHandle, const char16_t* filter, const char16_t* initialDirectory, char16_t* fileNameBuffer, uint32_t fileNameBufferSize, uint32_t flags, const char16_t* defaultExtension);
+extern "C" RT_API uint32_t WinCommDlgExtendedError();
+extern "C" RT_API void* WinLoadStandardCursor(int cursorId);
+extern "C" RT_API void* WinGetCursor();
+extern "C" RT_API void* WinSetCursor(void* cursorHandle);
 
 #endif // CMAJOR_RT_WINDOWS_API_INCLUDED

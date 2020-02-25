@@ -110,6 +110,7 @@ void ParseHexChar(const std::string& fileName, char32_t& value, const char32_t*&
 {
     if (p != e)
     {
+        bool notHex = false;
         switch (*p)
         {
             case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
@@ -127,6 +128,15 @@ void ParseHexChar(const std::string& fileName, char32_t& value, const char32_t*&
                 value = 16 * value + 10 + *p - 'a';
                 break;
             }
+            default:
+            {
+                notHex = true;
+                break;
+            }
+        }
+        if (notHex)
+        {
+            throw std::runtime_error("hex character expected at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));
         }
         ++p;
     }

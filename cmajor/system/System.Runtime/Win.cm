@@ -26,6 +26,8 @@ public extern cdecl nothrow int WinShowMessageBox(const char* text, const char* 
 public extern cdecl nothrow int WinShowMessageBoxWithType(const char* text, const char* caption, void* ownerWindowHandle, uint type);
 public extern cdecl nothrow bool WinMessageBeep(uint beepType);
 public extern cdecl nothrow void WinPostQuitMessage(int exitCode);
+public extern cdecl nothrow bool WinPostMessage(void* windowHandle, uint msg, uint wparam, long lparam);
+public extern cdecl nothrow long WinSendMessage(void* windowHandle, uint msg, uint wparam, long lparam);
 public extern cdecl nothrow bool WinShowWindow(void* windowHandle, int commandShow);
 public extern cdecl nothrow bool WinUpdateWindow(void* windowHandle);
 public extern cdecl nothrow bool WinMoveWindow(void* windowHandle, int x, int y, int w, int h, bool repaint);
@@ -104,3 +106,8 @@ public extern cdecl nothrow void WinGetMessagePos(int& x, int& y);
 public extern cdecl nothrow bool WinSetBkColor(void* hdc, byte red, byte green, byte blue);
 public extern cdecl nothrow void* WinGetFocus();
 public extern cdecl nothrow void* WinSetFocus(void* windowHandle);
+public extern cdecl nothrow bool WinGetOpenFileName(void* windowHandle, const wchar* filter, const wchar* initialDirectory, wchar* fileNameBuffer, uint fileNameBufferSize, uint flags,
+    const wchar* defaultExtension);
+public extern cdecl nothrow uint WinCommDlgExtendedError();
+public extern cdecl nothrow void* WinLoadStandardCursor(int cursorId);
+public extern cdecl nothrow void* WinSetCursor(void* cursorHandle);

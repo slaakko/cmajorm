@@ -1,0 +1,1740 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.Parser;
+using CmajorTokens;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/CompileUnit.parser' using soulcm parser generator scmpg version 3.0.0
+
+public static class CompileUnitParser
+{
+    public static UniquePtr<CompileUnitNode> Parse(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        UniquePtr<CompileUnitNode> value;
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->WriteBeginRule(u"parse");
+                lexer.Log()->IncIndent();
+            }
+        #endif
+        ++lexer;
+        System.Lex.Span span = lexer.GetSpan();
+        Match match = CompileUnit(lexer, ctx);
+        value.Reset(cast<CompileUnitNode*>(match.value));
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->DecIndent();
+                lexer.Log()->WriteEndRule(u"parse");
+            }
+        #endif
+        if (match.hit)
+        {
+            if (*lexer == System.Lex.END_TOKEN)
+            {
+                return value;
+            }
+            else
+            {
+                lexer.ThrowExpectationFailure(lexer.GetSpan(), GetEndTokenInfo());
+            }
+        }
+        else
+        {
+            lexer.ThrowExpectationFailure(span, u"CompileUnit");
+        }
+        return value;
+    }
+    public static Match CompileUnit(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"CompileUnit");
+            }
+        #endif
+        UniquePtr<CompileUnitNode> compileUnit;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long pos = lexer.GetPos();
+                Span span = lexer.GetSpan();
+                Match match(true);
+                if (match.hit)
+                {
+                    compileUnit.Reset(new CompileUnitNode(span, lexer.FileName()));
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch2 = &match;
+            {
+                Match match(false);
+                Match* parentMatch3 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match = CompileUnitParser.NamespaceContent(lexer, ctx, compileUnit.Get(), compileUnit->GlobalNs());
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"CompileUnit");
+                            #endif
+                            return Match(true, compileUnit.Release());
+                        }
+                    }
+                    *parentMatch3 = match;
+                }
+                *parentMatch2 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"CompileUnit");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"CompileUnit");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match NamespaceContent(CmajorLexer& lexer, ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"NamespaceContent");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match = CompileUnitParser.UsingDirectives(lexer, ctx, ns);
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match = CompileUnitParser.Definitions(lexer, ctx, cu, ns);
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"NamespaceContent");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"NamespaceContent");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match UsingDirectives(CmajorLexer& lexer, ParsingContext* ctx, NamespaceNode* ns)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"UsingDirectives");
+            }
+        #endif
+        Match match(true);
+        Match* parentMatch0 = &match;
+        {
+            while (true)
+            {
+                long save = lexer.GetPos();
+                {
+                    Match match = CompileUnitParser.UsingDirective(lexer, ctx, ns);
+                    if (match.hit)
+                    {
+                        *parentMatch0 = match;
+                    }
+                    else
+                    {
+                        lexer.SetPos(save);
+                        break;
+                    }
+                }
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingDirectives");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"UsingDirectives");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match UsingDirective(CmajorLexer& lexer, ParsingContext* ctx, NamespaceNode* ns)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"UsingDirective");
+            }
+        #endif
+        UniquePtr<Node> usingAlias;
+        UniquePtr<Node> usingNs;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long pos = lexer.GetPos();
+                Match match = CompileUnitParser.UsingAliasDirective(lexer);
+                usingAlias.Reset(cast<Node*>(match.value));
+                if (match.hit)
+                {
+                    ns->AddMember(usingAlias.Release());
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = CompileUnitParser.UsingNamespaceDirective(lexer, ctx);
+                        usingNs.Reset(cast<Node*>(match.value));
+                        if (match.hit)
+                        {
+                            ns->AddMember(usingNs.Release());
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingDirective");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"UsingDirective");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match UsingAliasDirective(CmajorLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"UsingAliasDirective");
+            }
+        #endif
+        Span s;
+        UniquePtr<IdentifierNode> id;
+        UniquePtr<IdentifierNode> qid;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Span span = lexer.GetSpan();
+                            Match match(false);
+                            if (*lexer == USING)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                s = span;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match = IdentifierParser.Identifier(lexer);
+                            id.Reset(cast<IdentifierNode*>(match.value));
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch6 = &match;
+                    {
+                        Match match(false);
+                        if (*lexer == ASSIGN)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        *parentMatch6 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch7 = &match;
+                {
+                    Match match(true);
+                    Match* parentMatch8 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match = IdentifierParser.QualifiedId(lexer);
+                        qid.Reset(cast<IdentifierNode*>(match.value));
+                        if (match.hit)
+                        {
+                            *parentMatch8 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, u"QualifiedId");
+                        }
+                    }
+                    *parentMatch7 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch9 = &match;
+            {
+                Match match(false);
+                Match* parentMatch10 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Span span = lexer.GetSpan();
+                    Match match(true);
+                    Match* parentMatch11 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch11 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        s.end = span.end;
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingAliasDirective");
+                            #endif
+                            return Match(true, new AliasNode(s, id.Release(), qid.Release()));
+                        }
+                    }
+                    *parentMatch10 = match;
+                }
+                *parentMatch9 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingAliasDirective");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"UsingAliasDirective");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match UsingNamespaceDirective(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"UsingNamespaceDirective");
+            }
+        #endif
+        Span s;
+        UniquePtr<IdentifierNode> ns;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Span span = lexer.GetSpan();
+                    Match match(false);
+                    if (*lexer == USING)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        s = span;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch3 = &match;
+                {
+                    Match match(true);
+                    Match* parentMatch4 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match = IdentifierParser.QualifiedId(lexer);
+                        ns.Reset(cast<IdentifierNode*>(match.value));
+                        if (match.hit)
+                        {
+                            *parentMatch4 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, u"QualifiedId");
+                        }
+                    }
+                    *parentMatch3 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch5 = &match;
+            {
+                Match match(false);
+                Match* parentMatch6 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Span span = lexer.GetSpan();
+                    Match match(true);
+                    Match* parentMatch7 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch7 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        s.end = span.end;
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingNamespaceDirective");
+                            #endif
+                            return Match(true, new NamespaceImportNode(s, ns.Release()));
+                        }
+                    }
+                    *parentMatch6 = match;
+                }
+                *parentMatch5 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"UsingNamespaceDirective");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"UsingNamespaceDirective");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Definitions(CmajorLexer& lexer, ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Definitions");
+            }
+        #endif
+        UniquePtr<Node> definition;
+        Match match(true);
+        Match* parentMatch0 = &match;
+        {
+            while (true)
+            {
+                long save = lexer.GetPos();
+                {
+                    Match match(false);
+                    Match* parentMatch1 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch2 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = CompileUnitParser.Definition(lexer, ctx, cu, ns);
+                            definition.Reset(cast<Node*>(match.value));
+                            if (match.hit)
+                            {
+                                ns->AddMember(definition.Release());
+                            }
+                            *parentMatch2 = match;
+                        }
+                        *parentMatch1 = match;
+                    }
+                    if (match.hit)
+                    {
+                        *parentMatch0 = match;
+                    }
+                    else
+                    {
+                        lexer.SetPos(save);
+                        break;
+                    }
+                }
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definitions");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Definitions");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Definition(CmajorLexer& lexer, ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Definition");
+            }
+        #endif
+        UniquePtr<NamespaceNode> nsDefinition;
+        UniquePtr<TypedefNode> typedefDeclaration;
+        UniquePtr<ConceptNode> conceptDefinition;
+        UniquePtr<FunctionNode> functionDefinition;
+        UniquePtr<ClassNode> classDefinition;
+        UniquePtr<InterfaceNode> interfaceDefinition;
+        UniquePtr<EnumTypeNode> enumTypeDefinition;
+        UniquePtr<ConstantNode> constantDefinition;
+        UniquePtr<DelegateNode> delegateDefinition;
+        UniquePtr<ClassDelegateNode> classDelegateDefinition;
+        UniquePtr<GlobalVariableNode> globalVariableDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long save = lexer.GetPos();
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long save = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    long save = lexer.GetPos();
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        long save = lexer.GetPos();
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            long save = lexer.GetPos();
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                long save = lexer.GetPos();
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Match match = CompileUnitParser.NamespaceDefinition(lexer, ctx, cu, ns);
+                                                    nsDefinition.Reset(cast<NamespaceNode*>(match.value));
+                                                    if (match.hit)
+                                                    {
+                                                        {
+                                                            #if (DEBUG)
+                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                                            #endif
+                                                            return Match(true, nsDefinition.Release());
+                                                        }
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                                if (!match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch11 = &match;
+                                                    lexer.SetPos(save);
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch12 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match = CompileUnitParser.TypedefDeclaration(lexer, ctx);
+                                                            typedefDeclaration.Reset(cast<TypedefNode*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                {
+                                                                    #if (DEBUG)
+                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                                                    #endif
+                                                                    return Match(true, typedefDeclaration.Release());
+                                                                }
+                                                            }
+                                                            *parentMatch12 = match;
+                                                        }
+                                                        *parentMatch11 = match;
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                            }
+                                            *parentMatch8 = match;
+                                            if (!match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch13 = &match;
+                                                lexer.SetPos(save);
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch14 = &match;
+                                                    {
+                                                        long pos = lexer.GetPos();
+                                                        Match match = CompileUnitParser.ConceptDefinition(lexer, ctx);
+                                                        conceptDefinition.Reset(cast<ConceptNode*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            {
+                                                                #if (DEBUG)
+                                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                                                #endif
+                                                                return Match(true, conceptDefinition.Release());
+                                                            }
+                                                        }
+                                                        *parentMatch14 = match;
+                                                    }
+                                                    *parentMatch13 = match;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                        }
+                                        *parentMatch7 = match;
+                                        if (!match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch15 = &match;
+                                            lexer.SetPos(save);
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch16 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Match match = CompileUnitParser.FunctionDefinition(lexer, ctx);
+                                                    functionDefinition.Reset(cast<FunctionNode*>(match.value));
+                                                    if (match.hit)
+                                                    {
+                                                        {
+                                                            #if (DEBUG)
+                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                                            #endif
+                                                            return Match(true, functionDefinition.Release());
+                                                        }
+                                                    }
+                                                    *parentMatch16 = match;
+                                                }
+                                                *parentMatch15 = match;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                    }
+                                    *parentMatch6 = match;
+                                    if (!match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch17 = &match;
+                                        lexer.SetPos(save);
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch18 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match = CompileUnitParser.ClassDefinition(lexer, ctx);
+                                                classDefinition.Reset(cast<ClassNode*>(match.value));
+                                                if (match.hit)
+                                                {
+                                                    {
+                                                        #if (DEBUG)
+                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                                        #endif
+                                                        return Match(true, classDefinition.Release());
+                                                    }
+                                                }
+                                                *parentMatch18 = match;
+                                            }
+                                            *parentMatch17 = match;
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                }
+                                *parentMatch5 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch19 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch20 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match = CompileUnitParser.InterfaceDefinition(lexer, ctx);
+                                            interfaceDefinition.Reset(cast<InterfaceNode*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                {
+                                                    #if (DEBUG)
+                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                                    #endif
+                                                    return Match(true, interfaceDefinition.Release());
+                                                }
+                                            }
+                                            *parentMatch20 = match;
+                                        }
+                                        *parentMatch19 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                            }
+                            *parentMatch4 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch21 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match(false);
+                                    Match* parentMatch22 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = CompileUnitParser.EnumTypeDefinition(lexer, ctx);
+                                        enumTypeDefinition.Reset(cast<EnumTypeNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            {
+                                                #if (DEBUG)
+                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                                #endif
+                                                return Match(true, enumTypeDefinition.Release());
+                                            }
+                                        }
+                                        *parentMatch22 = match;
+                                    }
+                                    *parentMatch21 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                        }
+                        *parentMatch3 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch23 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(false);
+                                Match* parentMatch24 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = CompileUnitParser.ConstantDefinition(lexer, ctx);
+                                    constantDefinition.Reset(cast<ConstantNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        {
+                                            #if (DEBUG)
+                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                            #endif
+                                            return Match(true, constantDefinition.Release());
+                                        }
+                                    }
+                                    *parentMatch24 = match;
+                                }
+                                *parentMatch23 = match;
+                            }
+                            *parentMatch3 = match;
+                        }
+                    }
+                    *parentMatch2 = match;
+                    if (!match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch25 = &match;
+                        lexer.SetPos(save);
+                        {
+                            Match match(false);
+                            Match* parentMatch26 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match = CompileUnitParser.DelegateDefinition(lexer, ctx);
+                                delegateDefinition.Reset(cast<DelegateNode*>(match.value));
+                                if (match.hit)
+                                {
+                                    {
+                                        #if (DEBUG)
+                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                        #endif
+                                        return Match(true, delegateDefinition.Release());
+                                    }
+                                }
+                                *parentMatch26 = match;
+                            }
+                            *parentMatch25 = match;
+                        }
+                        *parentMatch2 = match;
+                    }
+                }
+                *parentMatch1 = match;
+                if (!match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch27 = &match;
+                    lexer.SetPos(save);
+                    {
+                        Match match(false);
+                        Match* parentMatch28 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = CompileUnitParser.ClassDelegateDefinition(lexer, ctx);
+                            classDelegateDefinition.Reset(cast<ClassDelegateNode*>(match.value));
+                            if (match.hit)
+                            {
+                                {
+                                    #if (DEBUG)
+                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                    #endif
+                                    return Match(true, classDelegateDefinition.Release());
+                                }
+                            }
+                            *parentMatch28 = match;
+                        }
+                        *parentMatch27 = match;
+                    }
+                    *parentMatch1 = match;
+                }
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch29 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(false);
+                    Match* parentMatch30 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = CompileUnitParser.GlobalVariableDefinition(lexer, ctx, cu);
+                        globalVariableDefinition.Reset(cast<GlobalVariableNode*>(match.value));
+                        if (match.hit)
+                        {
+                            {
+                                #if (DEBUG)
+                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                                #endif
+                                return Match(true, globalVariableDefinition.Release());
+                            }
+                        }
+                        *parentMatch30 = match;
+                    }
+                    *parentMatch29 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Definition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Definition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match NamespaceDefinition(CmajorLexer& lexer, ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"NamespaceDefinition");
+            }
+        #endif
+        UniquePtr<NamespaceNode> nsNode;
+        Span s;
+        UniquePtr<IdentifierNode> nsName;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Span span = lexer.GetSpan();
+                            Match match(false);
+                            if (*lexer == NAMESPACE)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                s = span;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    long save = lexer.GetPos();
+                                    Match match(false);
+                                    Match* parentMatch8 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Span span = lexer.GetSpan();
+                                        Match match = IdentifierParser.QualifiedId(lexer);
+                                        nsName.Reset(cast<IdentifierNode*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            s.end = span.end;
+                                            nsNode.Reset(new NamespaceNode(s, nsName.Release()));
+                                        }
+                                        *parentMatch8 = match;
+                                    }
+                                    *parentMatch7 = match;
+                                    if (!match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch9 = &match;
+                                        lexer.SetPos(save);
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch10 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match(true);
+                                                if (match.hit)
+                                                {
+                                                    nsNode.Reset(new NamespaceNode(s, null));
+                                                }
+                                                *parentMatch10 = match;
+                                            }
+                                            *parentMatch9 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch11 = &match;
+                    {
+                        Match match(true);
+                        Match* parentMatch12 = &match;
+                        {
+                            System.Lex.Span span = lexer.GetSpan();
+                            Match match(false);
+                            if (*lexer == LBRACE)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch12 = match;
+                            }
+                            else
+                            {
+                                lexer.ThrowExpectationFailure(span, GetTokenName(LBRACE));
+                            }
+                        }
+                        *parentMatch11 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch13 = &match;
+                {
+                    Match match(true);
+                    Match* parentMatch14 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match = CompileUnitParser.NamespaceContent(lexer, ctx, cu, nsNode.Get());
+                        if (match.hit)
+                        {
+                            *parentMatch14 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, u"NamespaceContent");
+                        }
+                    }
+                    *parentMatch13 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch15 = &match;
+            {
+                Match match(false);
+                Match* parentMatch16 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(true);
+                    Match* parentMatch17 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == RBRACE)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch17 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(RBRACE));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"NamespaceDefinition");
+                            #endif
+                            return Match(true, nsNode.Release());
+                        }
+                    }
+                    *parentMatch16 = match;
+                }
+                *parentMatch15 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"NamespaceDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"NamespaceDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match TypedefDeclaration(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"TypedefDeclaration");
+            }
+        #endif
+        UniquePtr<TypedefNode> typedefDeclaration;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = TypedefParser.Typedef(lexer, ctx);
+            typedefDeclaration.Reset(cast<TypedefNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TypedefDeclaration");
+                    #endif
+                    return Match(true, typedefDeclaration.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TypedefDeclaration");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"TypedefDeclaration");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match ConceptDefinition(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ConceptDefinition");
+            }
+        #endif
+        UniquePtr<ConceptNode> conceptDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = ConceptParser.Concept(lexer, ctx);
+            conceptDefinition.Reset(cast<ConceptNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ConceptDefinition");
+                    #endif
+                    return Match(true, conceptDefinition.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ConceptDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ConceptDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match FunctionDefinition(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"FunctionDefinition");
+            }
+        #endif
+        UniquePtr<FunctionNode> functionDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = FunctionParser.Function(lexer, ctx);
+            functionDefinition.Reset(cast<FunctionNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"FunctionDefinition");
+                    #endif
+                    return Match(true, functionDefinition.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"FunctionDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"FunctionDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match ClassDefinition(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ClassDefinition");
+            }
+        #endif
+        UniquePtr<ClassNode> classDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = ClassParser.Class(lexer, ctx);
+            classDefinition.Reset(cast<ClassNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassDefinition");
+                    #endif
+                    return Match(true, classDefinition.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ClassDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match InterfaceDefinition(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"InterfaceDefinition");
+            }
+        #endif
+        UniquePtr<InterfaceNode> interfaceDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = InterfaceParser.Interface(lexer, ctx);
+            interfaceDefinition.Reset(cast<InterfaceNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"InterfaceDefinition");
+                    #endif
+                    return Match(true, interfaceDefinition.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"InterfaceDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"InterfaceDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match EnumTypeDefinition(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"EnumTypeDefinition");
+            }
+        #endif
+        UniquePtr<EnumTypeNode> enumTypeDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = EnumerationParser.EnumType(lexer, ctx);
+            enumTypeDefinition.Reset(cast<EnumTypeNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"EnumTypeDefinition");
+                    #endif
+                    return Match(true, enumTypeDefinition.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"EnumTypeDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"EnumTypeDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match ConstantDefinition(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ConstantDefinition");
+            }
+        #endif
+        UniquePtr<ConstantNode> constantDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = ConstantParser.Constant(lexer, ctx);
+            constantDefinition.Reset(cast<ConstantNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ConstantDefinition");
+                    #endif
+                    return Match(true, constantDefinition.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ConstantDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ConstantDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match DelegateDefinition(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"DelegateDefinition");
+            }
+        #endif
+        UniquePtr<DelegateNode> delegateDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = DelegateParser.Delegate(lexer, ctx);
+            delegateDefinition.Reset(cast<DelegateNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"DelegateDefinition");
+                    #endif
+                    return Match(true, delegateDefinition.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"DelegateDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"DelegateDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match ClassDelegateDefinition(CmajorLexer& lexer, ParsingContext* ctx)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ClassDelegateDefinition");
+            }
+        #endif
+        UniquePtr<ClassDelegateNode> classDelegateDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = DelegateParser.ClassDelegate(lexer, ctx);
+            classDelegateDefinition.Reset(cast<ClassDelegateNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassDelegateDefinition");
+                    #endif
+                    return Match(true, classDelegateDefinition.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ClassDelegateDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ClassDelegateDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match GlobalVariableDefinition(CmajorLexer& lexer, ParsingContext* ctx, CompileUnitNode* cu)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"GlobalVariableDefinition");
+            }
+        #endif
+        UniquePtr<GlobalVariableNode> globalVariableDefinition;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = GlobalVariableParser.GlobalVariable(lexer, ctx, cu);
+            globalVariableDefinition.Reset(cast<GlobalVariableNode*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"GlobalVariableDefinition");
+                    #endif
+                    return Match(true, globalVariableDefinition.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"GlobalVariableDefinition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"GlobalVariableDefinition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

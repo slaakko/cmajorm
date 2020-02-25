@@ -62,6 +62,10 @@ namespace System.Windows
             }
             return false;
         }
+        public void Close()
+        {
+            PostMessage(Handle(), WM_CLOSE, 0u, 0);
+        }
         protected virtual void OnWindowClosing(bool& cancelClose)
         {
             windowClosingEvent.Fire(cancelClose);

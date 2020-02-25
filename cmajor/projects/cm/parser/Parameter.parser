@@ -1,0 +1,26 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.Lexer;
+using Cm.Parser;
+using CmajorTokens;
+
+parser ParameterParser
+{
+    uselexer CmajorLexer;
+
+    using TypeExprParser.TypeExpr;
+    using IdentifierParser.Identifier;
+    
+    ParameterList(ParsingContext* ctx, Node* owner)
+        ::= LPAREN (Parameter(ctx):param{ owner->AddParameter(param); } % COMMA)? RPAREN!
+        ;
+    
+    Parameter(ParsingContext* ctx, var Span s) : ParameterNode*
+        ::= (TypeExpr(ctx):type{ s = span; } (Identifier:id{ s.end = span.end; })?){ return new ParameterNode(s, type, id); }
+        ;
+}

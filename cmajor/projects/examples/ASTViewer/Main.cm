@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.IO;
+using System.Collections;
 
 class MainWindow : Window
 {
@@ -9,13 +10,15 @@ class MainWindow : Window
         SetBackgroundColor(Color.FloralWhite());
         UniquePtr<MenuBar> menuBar(new MenuBar());
         UniquePtr<MenuItem> fileItem(new MenuItem("&File"));
-        UniquePtr<MenuItem> openItem(new MenuItem("&Open"));
-        openItem->AddMenuItem(new MenuItem("&Project..."));
-        openItem->AddMenuItem(new MenuItem("&File..."));
+        UniquePtr<MenuItem> openItem(new MenuItem("&Open.."));
+        openItem->SetShortcut(Keys.f3);
+        openItem->ClickEvent().AddHandler(OpenClick);
         fileItem->AddMenuItem(openItem.Release());
-        fileItem->AddMenuItem(new MenuItem("&Close"));
         fileItem->AddMenuItem(new MenuItemSeparator());
-        fileItem->AddMenuItem(new MenuItem("E&xit"));
+        UniquePtr<MenuItem> exitMenuItem(new MenuItem("E&xit"));
+        exitMenuItem->SetShortcut(cast<Keys>(Keys.altModifier | Keys.f4));
+        exitMenuItem->ClickEvent().AddHandler(ExitClick);
+        fileItem->AddMenuItem(exitMenuItem.Release());
         menuBar->AddMenuItem(fileItem.Release());
         UniquePtr<MenuItem> windowItem(new MenuItem("&Window"));
         windowItem->AddMenuItem(new MenuItem("&Close all"));
@@ -32,15 +35,59 @@ class MainWindow : Window
     {
         return base->ProcessMessage(message);
     }
-    protected override void OnKeyPress(KeyPressEventArgs& args)
+    protected override void OnKeyDown(KeyEventArgs& args)
     {
-        if (args.keyChar == 'c')
+        base->OnKeyDown(args);
+        if (!args.handled && args.keyData == cast<Keys>(Keys.altModifier | Keys.c))
         {
             LogView* logView = Application.GetLogView();
             if (logView != null)
             {
                 logView->Clear();
             }
+        }
+    }
+    private void ExitClick()
+    {
+        Close();
+    }
+    private void OpenClick()
+    {
+        try
+        {
+            List<Pair<string, string>> descriptionFilterPairs;
+            descriptionFilterPairs.Add(Pair<string, string>("Cmajor source files (*.cm)", "*.cm"));
+            string initialDirectory;
+            const char* cmajorRoot = RtGetEnvironmentVariable("CMAJOR_ROOT");
+            string defaultFilePath;
+            if (cmajorRoot != null && *cmajorRoot != '\0')
+            {
+                initialDirectory = cmajorRoot;
+            }
+            string filePath;
+            string currentDirectory;
+            List<string> fileNames;
+            bool selected = System.Windows.API.GetOpenFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".cm",
+                OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
+            if (selected)
+            {
+                if (!fileNames.IsEmpty())
+                {
+                    filePath = Path.Combine(currentDirectory, fileNames[0]);
+                }
+                if (!filePath.IsEmpty() && File.Exists(filePath))
+                {
+                    
+                }
+                else
+                {
+                    throw Exception("file path is empty or does not exist");
+                }
+            }
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
         }
     }
 }

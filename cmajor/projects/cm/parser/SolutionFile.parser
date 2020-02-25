@@ -1,0 +1,48 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Ast;
+using Cm.Parser;
+using ContainerFileTokens;
+
+parser SolutionFileParser
+{
+    uselexer ContainerFileLexer;
+    main;
+
+    SolutionFile(var UniquePtr<Solution> solution) : Solution*
+        ::=
+        (   SOLUTION QualifiedId:name! SEMICOLON!{ solution.Reset(new Solution(name, lexer.FileName())); }
+            (Declaration:declaration{ solution->AddDeclaration(declaration); })*
+        )
+        {
+            return solution.Release();
+        }
+        ;
+        
+    QualifiedId(var Span s) : ustring
+        ::= 
+        (
+            ID{ s = span; } (DOT ID{ s.end = span.end; })*
+        )
+        {
+            return lexer.GetMatch(s);
+        }
+        ;
+
+    Declaration : SolutionDeclaration*
+        ::= SolutionProjectDeclaration:solutionProjectDeclaration{ return solutionProjectDeclaration; }
+        |   ActiveProjectDeclaration:activeProjectDeclaration{ return activeProjectDeclaration; }
+        ;
+        
+    SolutionProjectDeclaration(var string filePath) : SolutionDeclaration*
+        ::= PROJECT FILEPATH{ filePath = lexer.filePath; } SEMICOLON{ return new Cm.Ast.SolutionProjectDeclaration(filePath); }
+        ;
+        
+    ActiveProjectDeclaration : SolutionDeclaration*
+        ::= ACTIVEPROJECT QualifiedId:activeProjectName SEMICOLON{ return new Cm.Ast.SolutionActiveProjectDeclaration(activeProjectName); }
+        ;
+}

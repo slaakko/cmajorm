@@ -13,6 +13,7 @@ namespace System.Windows
     public class delegate void MouseEventHandler(MouseEventArgs& mouseEventargs);
     public class delegate void MouseLeaveEventHandler();
     public class delegate void KeyPressEventHandler(KeyPressEventArgs& keyPressEventArgs);
+    public class delegate void KeyEventHandler(KeyEventArgs& keyEventArgs);
     public class delegate void ClickEventHandler();
     
     public class Control : Component
@@ -380,7 +381,7 @@ namespace System.Windows
                 }
                 case WM_KEYDOWN:
                 {
-                    byte virtualKeyCode = cast<byte>(message.wparam);
+                    int virtualKeyCode = cast<int>(message.wparam);
                     if (DoKeyDown(virtualKeyCode))
                     {
                         message.result = 0;
@@ -390,7 +391,7 @@ namespace System.Windows
                 }
                 case WM_KEYUP:
                 {
-                    byte virtualKeyCode = cast<byte>(message.wparam);
+                    int virtualKeyCode = cast<int>(message.wparam);
                     if (DoKeyUp(virtualKeyCode))
                     {
                         message.result = 0;
@@ -400,65 +401,176 @@ namespace System.Windows
                 }
                 case WM_SYSCOMMAND:
                 {
-                    if (message.wparam == SC_KEYMENU)
+                    if (DoSysCommand(message.wparam, message.lparam))
                     {
-                        wchar accessKey = cast<wchar>(ToUpper(cast<uchar>(cast<wchar>(message.lparam))));
-                        if (DoMenu(accessKey, Keys.none))
-                        {
-                            message.result = 0;
-                            return true;
-                        }
+                        message.result = 0;
+                        return true;
                     }
                     break;
                 }
             }
             return false;
         }
-        private bool DoKeyDown(byte virtualKeyCode)
+        private bool DoSysCommand(uint wparam, long lparam)
         {
+            switch (wparam)
+            {
+                case SC_KEYMENU:
+                {
+                    wchar accessKey = cast<wchar>(ToUpper(cast<uchar>(cast<wchar>(lparam))));
+                    if (DoMenu(accessKey, Keys.none))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.altModifier);
+                        if (DoKeyDown(cast<int>(accessKey)))
+                        {
+                            currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.altModifier);
+                            return true;
+                        }
+                        currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.altModifier);
+                    }
+                    break;
+                }
+                case SC_CLOSE:
+                {
+                    KeyEventArgs args(Keys.f4, Keys.altModifier);
+                    DoMenu(args);
+                    if (args.handled)
+                    {
+                        return true;
+                    }
+                    break;
+                }
+            }
+            return false;
+        }
+        private bool DoKeyDown(int virtualKeyCode)
+        {
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                string s = "DoKeyDown: " + ToString(cast<Keys>(virtualKeyCode)) + " " + ToHexString(cast<uint>(virtualKeyCode));
+                logView->WriteLine(s);
+            }
             ResetKeyDownHandled();
             if (MenuWantsKeys())
             {
-                if (DoMenu('\0', cast<Keys>(cast<int>(virtualKeyCode))))
+                if (DoMenu('\0', cast<Keys>(virtualKeyCode)))
                 {
                     SetKeyDownHandled();
                     return true;
                 }
             }
-            LogView* logView = Application.GetLogView();
-            if (logView != null)
+            Keys keyCode = cast<Keys>(virtualKeyCode);
+            switch (keyCode)
             {
-                string s = "DOWN: " + keyCodeStr[virtualKeyCode];
-                logView->WriteLine(s);
+                case Keys.controlKey:
+                {
+                    currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.controlModifier);
+                    break;
+                }
+                case Keys.shiftKey:
+                {
+                    currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.shiftModifier);
+                    break;
+                }
+                case Keys.menu:
+                {
+                    currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.altModifier);
+                    break;
+                }
+            }
+            KeyEventArgs args(keyCode, currentModifierKeys);
+            DoMenu(args);
+            if (args.handled)
+            {
+                SetKeyDownHandled();
+                return true;
+            }
+            else
+            {
+                OnKeyDown(args);
+                if (args.handled)
+                {
+                    SetKeyDownHandled();
+                    return true;
+                }
             }
             return false;
         }
-        private bool DoKeyUp(byte virtualKeyCode)
+        private bool DoKeyUp(int virtualKeyCode)
         {
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                string s = "DoKeyUp: " + ToString(cast<Keys>(virtualKeyCode)) + " " + ToHexString(cast<uint>(virtualKeyCode));
+                logView->WriteLine(s);
+            }
             if (KeyDownHandled() || MenuWantsKeys())
             {
                 return KeyDownHandled();
             }
-            LogView* logView = Application.GetLogView();
-            if (logView != null)
+            Keys keyCode = cast<Keys>(virtualKeyCode);
+            Keys modifierKeys;
+            switch (keyCode)
             {
-                string s = "UP: " + keyCodeStr[virtualKeyCode];
-                logView->WriteLine(s);
+                case Keys.controlKey:
+                {
+                    modifierKeys = cast<Keys>(modifierKeys | Keys.controlModifier);
+                    break;
+                }
+                case Keys.shiftKey:
+                {
+                    modifierKeys = cast<Keys>(modifierKeys | Keys.shiftModifier);
+                    break;
+                }
+                case Keys.menu:
+                {
+                    modifierKeys = cast<Keys>(modifierKeys | Keys.altModifier);
+                    break;
+                }
+            }
+            KeyEventArgs args(keyCode, modifierKeys);
+            OnKeyUp(args);
+            switch (keyCode)
+            {
+                case Keys.controlKey:
+                {
+                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.controlModifier);
+                    break;
+                }
+                case Keys.shiftKey:
+                {
+                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.shiftModifier);
+                    break;
+                }
+                case Keys.menu:
+                {
+                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.altModifier);
+                    break;
+                }
+            }
+            if (args.handled)
+            {
+                return true;
             }
             return false;
         }
         private void DoKeyPress(KeyPressEventArgs& args)
         {
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                string s = "DoKeyPress: " + ToString(args.keyChar) + " " + ToHexString(cast<uint>(args.keyChar));
+                logView->WriteLine(s);
+            }
             if (KeyDownHandled() || MenuWantsKeys())
             {
                 args.handled = KeyDownHandled();
                 return;
-            }
-            LogView* logView = Application.GetLogView();
-            if (logView != null)
-            {
-                string s = "PRESS: " + ToString(args.keyChar);
-                logView->WriteLine(s);
             }
             OnKeyPress(args);
         }
@@ -495,6 +607,18 @@ namespace System.Windows
                 }
             }
             return false;
+        }
+        private void DoMenu(KeyEventArgs& args)
+        {
+            Window* window = GetWindow();
+            if (window != null)
+            {
+                MenuBar* menuBar = window->GetMenuBar();
+                if (menuBar != null)
+                {
+                    menuBar->DoKeyDown(args);
+                }
+            }
         }
         private void DoPaint()
         {
@@ -575,6 +699,14 @@ namespace System.Windows
         {
             keyPressEvent.Fire(args);
         }
+        protected virtual void OnKeyDown(KeyEventArgs& args)
+        {
+            keyDownEvent.Fire(args);
+        }
+        protected virtual void OnKeyUp(KeyEventArgs& args)
+        {
+            keyUpEvent.Fire(args);
+        }
         protected virtual void OnClick()
         {
             clickEvent.Fire();
@@ -640,6 +772,18 @@ namespace System.Windows
         {
             return mouseUpEvent;
         }
+        public nothrow Event<KeyPressEventHandler, KeyPressEventArgs>& KeyPressEvent() const
+        {
+            return keyPressEvent;
+        }
+        public nothrow Event<KeyEventHandler, KeyEventArgs>& KeyDownEvent() const
+        {
+            return keyDownEvent;
+        }
+        public nothrow Event<KeyEventHandler, KeyEventArgs>& KeyUpEvent() const
+        {
+            return keyUpEvent;
+        }
         public nothrow Event<ClickEventHandler>& ClickEvent() const
         {
             return clickEvent;
@@ -704,6 +848,7 @@ namespace System.Windows
         private Dock dock;
         private Anchors anchors;
         private Flags flags;
+        private Keys currentModifierKeys;
         private Event<PaintEventHandler, PaintEventArgs> paintEvent;
         private Event<MouseEnterEventHandler> mouseEnterEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseMoveEvent;
@@ -711,6 +856,8 @@ namespace System.Windows
         private Event<MouseEventHandler, MouseEventArgs> mouseDownEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseUpEvent;
         private Event<KeyPressEventHandler, KeyPressEventArgs> keyPressEvent;
+        private Event<KeyEventHandler, KeyEventArgs> keyDownEvent;
+        private Event<KeyEventHandler, KeyEventArgs> keyUpEvent;
         private Event<ClickEventHandler> clickEvent;
     }
 }

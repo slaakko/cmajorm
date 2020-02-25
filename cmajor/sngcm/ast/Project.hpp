@@ -28,6 +28,7 @@ SNGCM_AST_API void SetModuleVersionTagVerifier(ModuleVersionTagVerifier* verifie
 
 SNGCM_AST_API std::string CmajorRootDir();
 SNGCM_AST_API std::string CmajorSystemLibDir(const std::string& config, BackEnd backend);
+SNGCM_AST_API std::string CmajorResourceDir();
 SNGCM_AST_API std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend);
 SNGCM_AST_API std::string CmajorSystemWindowsModuleFilePath(const std::string& config);
 SNGCM_AST_API void SetOutDir(const std::string& outDir_);
@@ -35,7 +36,7 @@ SNGCM_AST_API const std::string& OutDir();
 
 enum class ProjectDeclarationType : uint8_t
 {
-    referenceDeclaration, sourceFileDeclaration, textFileDeclaration, targetDeclaration
+    referenceDeclaration, sourceFileDeclaration, resourceFileDeclaration, textFileDeclaration, targetDeclaration
 };
 
 class SNGCM_AST_API ProjectDeclaration
@@ -63,6 +64,15 @@ class SNGCM_AST_API SourceFileDeclaration : public ProjectDeclaration
 {
 public:
     SourceFileDeclaration(const std::string& filePath_);
+    const std::string& FilePath() const { return filePath; }
+private:
+    std::string filePath;
+};
+
+class SNGCM_AST_API ResourceFileDeclaration : public ProjectDeclaration
+{
+public:
+    ResourceFileDeclaration(const std::string& filePath_);
     const std::string& FilePath() const { return filePath; }
 private:
     std::string filePath;
@@ -111,6 +121,8 @@ public:
     const std::vector<std::string>& RelativeReferencedProjectFilePaths() const { return relativeReferencedProjectFilePaths; }
     const std::vector<std::string>& SourceFilePaths() const { return sourceFilePaths; }
     const std::vector<std::string>& RelativeSourceFilePaths() const { return relativeSourceFilePaths; }
+    const std::vector<std::string>& ResourceFilePaths() const { return resourceFilePaths;  }
+    const std::vector<std::string>& RelativeResourceFilePaths() const { return relativeResourceFilePaths; }
     const std::vector<std::string>& RelativeTextFilePaths() const { return relativeTextFilePaths; }
     const std::vector<std::string>& TextFilePaths() const { return textFilePaths; }
     Target GetTarget() const { return target; }
@@ -150,6 +162,8 @@ private:
     std::vector<std::string> referencedProjectFilePaths;
     std::vector<std::string> sourceFilePaths;
     std::vector<std::string> relativeSourceFilePaths;
+    std::vector<std::string> resourceFilePaths;
+    std::vector<std::string> relativeResourceFilePaths;
     std::vector<std::string> relativeReferencedProjectFilePaths;
     std::vector<std::string> relativeTextFilePaths;
     std::vector<std::string> textFilePaths;

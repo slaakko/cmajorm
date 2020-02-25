@@ -378,6 +378,11 @@ namespace System.Windows
         zoom = 251
     }
 
+    public nothrow ulong GetHashCode(Keys keys)
+    {
+        return cast<ulong>(cast<int>(keys));
+    }
+
     public const char*[] keyCodeStr =
     [
         "None",  
@@ -634,4 +639,24 @@ namespace System.Windows
         "PA1",
         "OEM Clear"
     ];
+
+    public nothrow string ToString(Keys keys)
+    {
+        string s;
+        if ((keys & Keys.controlModifier) != 0)
+        {
+            s.Append("Ctrl+");
+        }
+        if ((keys & Keys.altModifier) != 0)
+        {
+            s.Append("Alt+");
+        }
+        if ((keys & Keys.shiftModifier) != 0)
+        {
+            s.Append("Shift+");
+        }
+        Keys keyCode = cast<Keys>(keys & ~Keys.modifiers);
+        s.Append(keyCodeStr[cast<int>(keyCode)]);
+        return s;
+    }
 }

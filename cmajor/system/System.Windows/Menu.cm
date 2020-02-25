@@ -40,6 +40,7 @@ namespace System.Windows
         public void AddMenuItem(MenuItem* menuItem)
         {
             children.AddChild(menuItem);
+            SetMenuChanged();
         }
         public override nothrow Padding DefaultPadding() const
         {
@@ -52,6 +53,7 @@ namespace System.Windows
             if (MenuChanged())
             {
                 ResetMenuChanged();
+                CollectShortcuts();
                 Size size = GetSize();
                 size.h = cast<int>(font.GetHeight(args.graphics));
                 size.h = size.h + DefaultPadding().Vertical();
@@ -121,6 +123,24 @@ namespace System.Windows
                         ownerWindowGraphics, menuOpenColor, this);
                 }
                 child = child->NextSibling();
+            }
+        }
+        internal void DoKeyDown(KeyEventArgs& args)
+        {
+            OnKeyDown(args);
+        }
+        protected override void OnKeyDown(KeyEventArgs& args)
+        {
+            base->OnKeyDown(args);
+            if (!args.handled)
+            {
+                HashMap<Keys, MenuItem*>.ConstIterator it = shortcuts.CFind(args.keyData);
+                if (it != shortcuts.CEnd())
+                {
+                    MenuItem* menuItem = it->second;
+                    menuItem->DoClick();
+                    args.handled = true;
+                }
             }
         }
         internal void MouseMoveInternal(MouseEventArgs& args)
@@ -241,6 +261,20 @@ namespace System.Windows
                 child = child->NextSibling();
             }
             InvalidateParentRect(menuRect);
+        }
+        private void CollectShortcuts()
+        {
+            shortcuts.Clear();
+            Component* child = children.FirstChild();
+            while (child != null)
+            {
+                if (child is MenuItem*)
+                {
+                    MenuItem* menuItem = cast<MenuItem*>(child);
+                    menuItem->CollectShortcuts(shortcuts);
+                }
+                child = child->NextSibling();
+            }
         }
         internal bool HandleAccessKey(wchar accessKey, Keys keyCode, bool& wantsKeys)
         {
@@ -476,7 +510,7 @@ namespace System.Windows
         {
             return (flags & Flags.menuChanged) != Flags.none;
         }
-        private nothrow inline void SetMenuChanged()
+        internal nothrow inline void SetMenuChanged()
         {
             flags = cast<Flags>(flags | Flags.menuChanged);
         }
@@ -519,6 +553,7 @@ namespace System.Windows
         private MenuItem* latestOpenedMenuItem;
         private MenuItem* selectedMenuItem;
         private MenuItem* latestMouseDownMenuItem;
+        private HashMap<Keys, MenuItem*> shortcuts;
     }
 
     public abstract class MenuItemBase : Component
@@ -578,7 +613,7 @@ namespace System.Windows
         {
             size = size_;
         }
-        public abstract Size MeasureItem(Graphics& graphics, const Font& font, const StringFormat& format);
+        public abstract Size MeasureItem(Graphics& graphics, const Font& font, const StringFormat& format, int& maxShortcutWidth, int& childIndicatorWidth);
         private int level;
         private Point location;
         private Size size;
@@ -594,7 +629,8 @@ namespace System.Windows
         {
             none = 0, selected = 1 << 0, mouseInClient = 1 << 1, lbuttonPressed = 1 << 2
         }
-        public MenuItem(const string& text_) : base(), text(text_), children(this), state(State.closed), childRect(), unionRect(), flags(Flags.none), accessKey('\0')
+        public MenuItem(const string& text_) :
+            base(), text(text_), children(this), state(State.closed), childRect(), unionRect(), flags(Flags.none), accessKey('\0'), shortcut(Keys.none), shortcutFieldWidth(0)
         {
             SetAccessKey();
         }
@@ -675,6 +711,28 @@ namespace System.Windows
             }
             return null;
         }
+        private nothrow MenuBar* GetMenuBar() const
+        {
+            Container* container = GetContainer();
+            if (container != null)
+            {
+                Component* parent = container->Parent();
+                if (parent != null)
+                {
+                    if (parent is MenuItem*)
+                    {
+                        MenuItem* parentItem = cast<MenuItem*>(parent);
+                        return parentItem->GetMenuBar();
+                    }
+                    else if (parent is MenuBar*)
+                    {
+                        MenuBar* menuBar = cast<MenuBar*>(parent);
+                        return menuBar;
+                    }
+                }
+            }
+            return null;
+        }
         internal bool HandleKey(Keys key, bool& wantsKeys, MenuItem* parentMenuItem, MenuBar* menuBar)
         {
             if (key >= Keys.a && key <= Keys.z || key >= Keys.d0 && key <= Keys.d9)
@@ -721,6 +779,66 @@ namespace System.Windows
                         menuBar->SetClosed();
                         Invalidate();
                         return true;
+                    }
+                    case Keys.home:
+                    {
+                        if (Level() == 0)
+                        {
+                            MenuItem* firstMenuItem = menuBar->GetFirstMenuItem();
+                            if (firstMenuItem != null)
+                            {
+                                menuBar->SetSelectedMenuItem(firstMenuItem);
+                                wantsKeys = true;
+                                Invalidate();
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            MenuItem* parentMenuItem = GetParentMenuItem();
+                            if (parentMenuItem != null)
+                            {
+                                MenuItem* firstMenuItem = parentMenuItem->GetFirstMenuItem();
+                                if (firstMenuItem != null)
+                                {
+                                    menuBar->SetSelectedMenuItem(firstMenuItem);
+                                    wantsKeys = true;
+                                    Invalidate();
+                                    return true;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case Keys.end:
+                    {
+                        if (Level() == 0)
+                        {
+                            MenuItem* lastMenuItem = menuBar->GetLastMenuItem();
+                            if (lastMenuItem != null)
+                            {
+                                menuBar->SetSelectedMenuItem(lastMenuItem);
+                                wantsKeys = true;
+                                Invalidate();
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            MenuItem* parentMenuItem = GetParentMenuItem();
+                            if (parentMenuItem != null)
+                            {
+                                MenuItem* lastMenuItem = parentMenuItem->GetLastMenuItem();
+                                if (lastMenuItem != null)
+                                {
+                                    menuBar->SetSelectedMenuItem(lastMenuItem);
+                                    wantsKeys = true;
+                                    Invalidate();
+                                    return true;
+                                }
+                            }
+                        }
+                        break;
                     }
                     case Keys.down:
                     {
@@ -1382,23 +1500,27 @@ namespace System.Windows
         }
         protected virtual void OnClick()
         {
+            clickEvent.Fire();
         }
         public void CalculateChildRect(Graphics& graphics, const Font& font, const StringFormat& format, const Point& location)
         {
             childRect = Rect();
             childRect.location = location;
             Component* child = children.FirstChild();
+            shortcutFieldWidth = 0;
+            childIndicatorFieldWidth = 0;
             while (child != null)
             {
                 if (child is MenuItemBase*)
                 {
                     MenuItemBase* item = cast<MenuItemBase*>(child);
-                    Size size = item->MeasureItem(graphics, font, format);
+                    Size size = item->MeasureItem(graphics, font, format, shortcutFieldWidth, childIndicatorFieldWidth);
                     childRect.size.w = Max(childRect.size.w, size.w);
                     childRect.size.h = childRect.size.h + size.h;
                 }
                 child = child->NextSibling();
             }
+            childRect.size.w = childRect.size.w + shortcutFieldWidth + childIndicatorFieldWidth;
             Rect itemRect(childRect.location, Size(childRect.size.w, 0));
             child = children.FirstChild();
             while (child != null)
@@ -1480,6 +1602,15 @@ namespace System.Windows
                 accessKey = '\0';
             }
         }
+        public nothrow void SetShortcut(Keys shortcut_)
+        {
+            shortcut = shortcut_;
+            MenuBar* menuBar = GetMenuBar();
+            if (menuBar != null)
+            {
+                menuBar->SetMenuChanged();
+            }
+        }
         private nothrow MenuItem* GetChildItemByAccessKey(wchar accessKey)
         {
             Component* child = children.FirstChild();
@@ -1497,6 +1628,23 @@ namespace System.Windows
             }
             return null;
         }
+        internal nothrow void CollectShortcuts(HashMap<Keys, MenuItem*>& shortcuts)
+        {
+            if (shortcut != Keys.none)
+            {
+                shortcuts[shortcut] = this;
+            }
+            Component* child = children.FirstChild();
+            while (child != null)
+            {
+                if (child is MenuItem*)
+                {
+                    MenuItem* menuItem = cast<MenuItem*>(child);
+                    menuItem->CollectShortcuts(shortcuts);
+                }
+                child = child->NextSibling();
+            }
+        }
         public nothrow const Container& Children() const
         {
             return children;
@@ -1510,6 +1658,17 @@ namespace System.Windows
             else
             {
                 return Padding(32, 4, 32, 4);
+            }
+        }
+        public nothrow Padding ShortcutPadding() const
+        {
+            if (Level() == 0)
+            {
+                return Padding(0, 0, 0, 0);
+            }
+            else
+            {
+                return Padding(4, 0, 4, 0);
             }
         }
         public virtual nothrow int ShadowWidth() const
@@ -1588,12 +1747,24 @@ namespace System.Windows
                 }
             }
         }
-        public override Size MeasureItem(Graphics& graphics, const Font& font, const StringFormat& format)
+        public override Size MeasureItem(Graphics& graphics, const Font& font, const StringFormat& format, int& shortcutFieldWidth, int& childIndicatorFieldWidth)
         {
             Padding padding = DefaultPadding();
             RectF rect = graphics.MeasureStringChecked(text, font, PointF(0, 0), format);
             int w = cast<int>(rect.size.w);
             w = w + padding.Horizontal();
+            if (shortcut != Keys.none)
+            {
+                string shortcutText = ToString(shortcut);
+                RectF shortcutRect = graphics.MeasureStringChecked(shortcutText, font, PointF(0, 0), format);
+                Padding shortcutPadding = ShortcutPadding();
+                int shortcutWidth = cast<int>(shortcutRect.size.w + shortcutPadding.Horizontal());
+                shortcutFieldWidth = Max(shortcutFieldWidth, shortcutWidth);
+            }
+            if (Level() > 0 && !children.IsEmpty())
+            {
+                childIndicatorFieldWidth = Max(childIndicatorFieldWidth, ChildIndicatorIndent());
+            }
             int h = cast<int>(rect.size.h);
             h = h + padding.Vertical();
             Size size(w, h);
@@ -1630,6 +1801,7 @@ namespace System.Windows
             {
                 Padding padding = DefaultPadding();
                 graphics.DrawStringChecked(text, font, PointF(loc.x + padding.left, loc.y + padding.top), format, textBrush);
+                DrawShortcut(graphics, textBrush, font, format);
                 DrawChildIndicator(graphics, blackBrush);
             }
         }
@@ -1674,6 +1846,7 @@ namespace System.Windows
                 }
                 Padding padding = DefaultPadding();
                 graphics.DrawStringChecked(text, font, PointF(loc.x + padding.left, loc.y + padding.top), format, textBrush);
+                DrawShortcut(graphics, textBrush, font, format);
                 DrawChildIndicator(graphics, blackBrush);
             }
             if (!childRect.IsEmpty())
@@ -1728,6 +1901,28 @@ namespace System.Windows
                     child = child->NextSibling();
                 }
                 ownerWindowGraphics.SetClipChecked(prevClipRegion);
+            }
+        }
+        private void DrawShortcut(Graphics& graphics, const Brush& textBrush, const Font& font, const StringFormat& format)
+        {
+            if (shortcut != Keys.none)
+            {
+                string shortcutText = ToString(shortcut);
+                Padding shortcutPadding = ShortcutPadding();
+                int shortcutFieldWidth = 0;
+                int childIndicatorFieldWidth = 0;
+                MenuItem* parent = GetParentMenuItem();
+                if (parent != null)
+                {
+                    shortcutFieldWidth = parent->shortcutFieldWidth;
+                    childIndicatorFieldWidth = parent->childIndicatorFieldWidth;
+                }
+                Padding padding = DefaultPadding();
+                int shadowWidth = ShadowWidth();
+                Point loc = Location();
+                Size size = GetSize();
+                graphics.DrawStringChecked(shortcutText, font,
+                    PointF(loc.x + size.w - shadowWidth - shortcutFieldWidth - childIndicatorFieldWidth + shortcutPadding.left, loc.y + padding.top), format, textBrush);
             }
         }
         private void DrawChildIndicator(Graphics& graphics, const Brush& blackBrush)
@@ -1839,6 +2034,9 @@ namespace System.Windows
         private State state;
         private Flags flags;
         private wchar accessKey;
+        private Keys shortcut;
+        private int shortcutFieldWidth;
+        private int childIndicatorFieldWidth; 
     }
 
     public class MenuItemSeparator : MenuItemBase
@@ -1857,7 +2055,7 @@ namespace System.Windows
         {
             return Padding(32, 4, 8, 4);
         }
-        public override Size MeasureItem(Graphics& graphics, const Font& font, const StringFormat& format)
+        public override Size MeasureItem(Graphics& graphics, const Font& font, const StringFormat& format, int& shortcutFieldWidth, int& childIndicatorFieldWidth)
         {
             Padding padding = DefaultPadding();
             RectF rect;

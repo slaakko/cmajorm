@@ -1,0 +1,1159 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using Cm.Ast;
+using Cm.Parser;
+using ContainerFileTokens;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/cm/parser/ProjectFile.parser' using soulcm parser generator scmpg version 3.0.0
+
+public static class ProjectFileParser
+{
+    public static UniquePtr<Project> Parse(ContainerFileLexer& lexer, string config, BackEnd backend)
+    {
+        UniquePtr<Project> value;
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->WriteBeginRule(u"parse");
+                lexer.Log()->IncIndent();
+            }
+        #endif
+        ++lexer;
+        System.Lex.Span span = lexer.GetSpan();
+        Match match = ProjectFile(lexer, config, backend);
+        value.Reset(cast<Project*>(match.value));
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->DecIndent();
+                lexer.Log()->WriteEndRule(u"parse");
+            }
+        #endif
+        if (match.hit)
+        {
+            if (*lexer == System.Lex.END_TOKEN)
+            {
+                return value;
+            }
+            else
+            {
+                lexer.ThrowExpectationFailure(lexer.GetSpan(), GetEndTokenInfo());
+            }
+        }
+        else
+        {
+            lexer.ThrowExpectationFailure(span, u"ProjectFile");
+        }
+        return value;
+    }
+    public static Match ProjectFile(ContainerFileLexer& lexer, string config, BackEnd backend)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ProjectFile");
+            }
+        #endif
+        UniquePtr<Project> project;
+        UniquePtr<Value<ustring>> name;
+        UniquePtr<ProjectDeclaration> declaration;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            if (*lexer == PROJECT)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(true);
+                                Match* parentMatch6 = &match;
+                                {
+                                    System.Lex.Span span = lexer.GetSpan();
+                                    Match match = ProjectFileParser.QualifiedId(lexer);
+                                    name.Reset(cast<Value<ustring>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        *parentMatch6 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.ThrowExpectationFailure(span, u"QualifiedId");
+                                    }
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch7 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch8 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match(true);
+                                Match* parentMatch9 = &match;
+                                {
+                                    System.Lex.Span span = lexer.GetSpan();
+                                    Match match(false);
+                                    if (*lexer == SEMICOLON)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch9 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                                    }
+                                }
+                                if (match.hit)
+                                {
+                                    project.Reset(new Project(name->value, lexer.FileName(), config, backend));
+                                }
+                                *parentMatch8 = match;
+                            }
+                            *parentMatch7 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch10 = &match;
+                    {
+                        Match match(true);
+                        Match* parentMatch11 = &match;
+                        {
+                            while (true)
+                            {
+                                long save = lexer.GetPos();
+                                {
+                                    Match match(false);
+                                    Match* parentMatch12 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch13 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match = ProjectFileParser.Declaration(lexer);
+                                            declaration.Reset(cast<ProjectDeclaration*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                project->AddDeclaration(declaration.Release());
+                                            }
+                                            *parentMatch13 = match;
+                                        }
+                                        *parentMatch12 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch11 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        *parentMatch10 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ProjectFile");
+                    #endif
+                    return Match(true, project.Release());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ProjectFile");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ProjectFile");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match QualifiedId(ContainerFileLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"QualifiedId");
+            }
+        #endif
+        Span s;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == ID)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            s = span;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(true);
+                        Match* parentMatch5 = &match;
+                        {
+                            while (true)
+                            {
+                                long save = lexer.GetPos();
+                                {
+                                    Match match(false);
+                                    Match* parentMatch6 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch7 = &match;
+                                        {
+                                            Match match(false);
+                                            if (*lexer == DOT)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch8 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch9 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Span span = lexer.GetSpan();
+                                                    Match match(false);
+                                                    if (*lexer == ID)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        s.end = span.end;
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch5 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"QualifiedId");
+                    #endif
+                    return Match(true, new Value<ustring>(lexer.GetMatch(s)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"QualifiedId");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"QualifiedId");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Declaration(ContainerFileLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Declaration");
+            }
+        #endif
+        UniquePtr<ProjectDeclaration> referenceDeclaration;
+        UniquePtr<ProjectDeclaration> sourceFileDeclaration;
+        UniquePtr<ProjectDeclaration> textFileDeclaration;
+        UniquePtr<ProjectDeclaration> targetDeclaration;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long save = lexer.GetPos();
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long save = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = ProjectFileParser.ReferenceDeclaration(lexer);
+                        referenceDeclaration.Reset(cast<ProjectDeclaration*>(match.value));
+                        if (match.hit)
+                        {
+                            {
+                                #if (DEBUG)
+                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Declaration");
+                                #endif
+                                return Match(true, referenceDeclaration.Release());
+                            }
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                    if (!match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        lexer.SetPos(save);
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match = ProjectFileParser.SourceFileDeclaration(lexer);
+                                sourceFileDeclaration.Reset(cast<ProjectDeclaration*>(match.value));
+                                if (match.hit)
+                                {
+                                    {
+                                        #if (DEBUG)
+                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Declaration");
+                                        #endif
+                                        return Match(true, sourceFileDeclaration.Release());
+                                    }
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch2 = match;
+                    }
+                }
+                *parentMatch1 = match;
+                if (!match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch6 = &match;
+                    lexer.SetPos(save);
+                    {
+                        Match match(false);
+                        Match* parentMatch7 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = ProjectFileParser.TextFileDeclaration(lexer);
+                            textFileDeclaration.Reset(cast<ProjectDeclaration*>(match.value));
+                            if (match.hit)
+                            {
+                                {
+                                    #if (DEBUG)
+                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Declaration");
+                                    #endif
+                                    return Match(true, textFileDeclaration.Release());
+                                }
+                            }
+                            *parentMatch7 = match;
+                        }
+                        *parentMatch6 = match;
+                    }
+                    *parentMatch1 = match;
+                }
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch8 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(false);
+                    Match* parentMatch9 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = ProjectFileParser.TargetDeclaration(lexer);
+                        targetDeclaration.Reset(cast<ProjectDeclaration*>(match.value));
+                        if (match.hit)
+                        {
+                            {
+                                #if (DEBUG)
+                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Declaration");
+                                #endif
+                                return Match(true, targetDeclaration.Release());
+                            }
+                        }
+                        *parentMatch9 = match;
+                    }
+                    *parentMatch8 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Declaration");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Declaration");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match ReferenceDeclaration(ContainerFileLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ReferenceDeclaration");
+            }
+        #endif
+        string filePath;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                if (*lexer == REFERENCE)
+                {
+                    ++lexer;
+                    match.hit = true;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match(true);
+                        Match* parentMatch4 = &match;
+                        {
+                            System.Lex.Span span = lexer.GetSpan();
+                            Match match(false);
+                            if (*lexer == FILEPATH)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch4 = match;
+                            }
+                            else
+                            {
+                                lexer.ThrowExpectationFailure(span, GetTokenName(FILEPATH));
+                            }
+                        }
+                        if (match.hit)
+                        {
+                            filePath = lexer.filePath;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch5 = &match;
+            {
+                Match match(false);
+                Match* parentMatch6 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(true);
+                    Match* parentMatch7 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch7 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ReferenceDeclaration");
+                            #endif
+                            return Match(true, new Cm.Ast.ReferenceDeclaration(filePath));
+                        }
+                    }
+                    *parentMatch6 = match;
+                }
+                *parentMatch5 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ReferenceDeclaration");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ReferenceDeclaration");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match SourceFileDeclaration(ContainerFileLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"SourceFileDeclaration");
+            }
+        #endif
+        string filePath;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                if (*lexer == SOURCE)
+                {
+                    ++lexer;
+                    match.hit = true;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match(true);
+                        Match* parentMatch4 = &match;
+                        {
+                            System.Lex.Span span = lexer.GetSpan();
+                            Match match(false);
+                            if (*lexer == FILEPATH)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch4 = match;
+                            }
+                            else
+                            {
+                                lexer.ThrowExpectationFailure(span, GetTokenName(FILEPATH));
+                            }
+                        }
+                        if (match.hit)
+                        {
+                            filePath = lexer.filePath;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch5 = &match;
+            {
+                Match match(false);
+                Match* parentMatch6 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(true);
+                    Match* parentMatch7 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch7 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"SourceFileDeclaration");
+                            #endif
+                            return Match(true, new Cm.Ast.SourceFileDeclaration(filePath));
+                        }
+                    }
+                    *parentMatch6 = match;
+                }
+                *parentMatch5 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"SourceFileDeclaration");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"SourceFileDeclaration");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match TextFileDeclaration(ContainerFileLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"TextFileDeclaration");
+            }
+        #endif
+        string filePath;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                if (*lexer == TEXT)
+                {
+                    ++lexer;
+                    match.hit = true;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match(true);
+                        Match* parentMatch4 = &match;
+                        {
+                            System.Lex.Span span = lexer.GetSpan();
+                            Match match(false);
+                            if (*lexer == FILEPATH)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch4 = match;
+                            }
+                            else
+                            {
+                                lexer.ThrowExpectationFailure(span, GetTokenName(FILEPATH));
+                            }
+                        }
+                        if (match.hit)
+                        {
+                            filePath = lexer.filePath;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch5 = &match;
+            {
+                Match match(false);
+                Match* parentMatch6 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(true);
+                    Match* parentMatch7 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch7 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TextFileDeclaration");
+                            #endif
+                            return Match(true, new Cm.Ast.TextFileDeclaration(filePath));
+                        }
+                    }
+                    *parentMatch6 = match;
+                }
+                *parentMatch5 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TextFileDeclaration");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"TextFileDeclaration");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match TargetDeclaration(ContainerFileLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"TargetDeclaration");
+            }
+        #endif
+        UniquePtr<Value<Cm.Ast.Target>> target;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    if (*lexer == TARGET)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(true);
+                        Match* parentMatch4 = &match;
+                        {
+                            System.Lex.Span span = lexer.GetSpan();
+                            Match match(false);
+                            if (*lexer == ASSIGN)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch4 = match;
+                            }
+                            else
+                            {
+                                lexer.ThrowExpectationFailure(span, GetTokenName(ASSIGN));
+                            }
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch5 = &match;
+                {
+                    Match match(true);
+                    Match* parentMatch6 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match = ProjectFileParser.Target(lexer);
+                        target.Reset(cast<Value<Cm.Ast.Target>*>(match.value));
+                        if (match.hit)
+                        {
+                            *parentMatch6 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, u"Target");
+                        }
+                    }
+                    *parentMatch5 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch7 = &match;
+            {
+                Match match(false);
+                Match* parentMatch8 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(true);
+                    Match* parentMatch9 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch9 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TargetDeclaration");
+                            #endif
+                            return Match(true, new Cm.Ast.TargetDeclaration(target->value));
+                        }
+                    }
+                    *parentMatch8 = match;
+                }
+                *parentMatch7 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"TargetDeclaration");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"TargetDeclaration");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Target(ContainerFileLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Target");
+            }
+        #endif
+        Match match(false);
+        long pos = lexer.GetPos();
+        Span span = lexer.GetSpan();
+        switch (*lexer)
+        {
+            case PROGRAM: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Target");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Target>(Cm.Ast.Target.program));
+                }
+                break;
+            }
+            case WINGUIAPP: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Target");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Target>(Cm.Ast.Target.winguiapp));
+                }
+                break;
+            }
+            case WINAPP: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Target");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Target>(Cm.Ast.Target.winapp));
+                }
+                break;
+            }
+            case LIBRARY: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Target");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Target>(Cm.Ast.Target.library));
+                }
+                break;
+            }
+            case WINLIB: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Target");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Target>(Cm.Ast.Target.winlib));
+                }
+                break;
+            }
+            case UNITTEST: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Target");
+                    #endif
+                    return Match(true, new Value<Cm.Ast.Target>(Cm.Ast.Target.unitTest));
+                }
+                break;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Target");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Target");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}
