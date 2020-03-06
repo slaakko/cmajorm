@@ -37,13 +37,19 @@ namespace System.Windows
 
     public class Splitter : Control
     {
-        public Splitter(Orientation orientation_, const Point& location, int width) :
+        private enum Flags : sbyte
+        {
+            none = 0, moveSplitter = 1 << 0
+        }
+        public Splitter(Orientation orientation_, const Point& location, int width, SplitContainer* container_) :
             base("System.Windows.Splitter", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE | WindowStyle.WS_CLIPSIBLINGS),
             ExtendedWindowStyle.WS_EX_DEFAULT,
-            Color.DarkGray(), "splitter", location, SplitSize(orientation_, width), SplitDock(orientation_), Anchors.none), orientation(orientation_)
+            Color.DarkGray(), "splitter", location, SplitSize(orientation_, width), SplitDock(orientation_), Anchors.none), orientation(orientation_),
+            horizontalSplitterCursor(Application.GetResourceManager().GetCursor("horizontal.splitter.system.windows.cursor")),
+            verticalSplitterCursor(Application.GetResourceManager().GetCursor("vertical.splitter.system.windows.cursor")), flags(), container(container_)
         {
         }
-        public Splitter(Orientation orientation, const Point& location) : this(orientation, location, defaultSplitterWidth)
+        public Splitter(Orientation orientation, const Point& location, SplitContainer* container) : this(orientation, location, defaultSplitterWidth, container)
         {
         }
         protected override void OnPaint(PaintEventArgs& args)
@@ -58,19 +64,134 @@ namespace System.Windows
                 MessageBox.Show(ex.Message());
             }
         }
+        protected override void SetCursor()
+        {
+            switch (orientation)
+            {
+                case Orientation.horizontal: SetCursor(horizontalSplitterCursor); break;
+                case Orientation.vertical: SetCursor(verticalSplitterCursor); break;
+            }
+        }
+        protected override void OnMouseDown(MouseEventArgs& args)
+        {
+            try
+            {
+                base->OnMouseDown(args);
+                if (args.buttons == MouseButtons.lbutton)
+                {
+                    SetFlag(Flags.moveSplitter);
+                    switch (orientation)
+                    {
+                        case Orientation.horizontal:
+                        {
+                            x = args.location.x;
+                            break;
+                        }
+                        case Orientation.vertical:
+                        {
+                            y = args.location.y;
+                            break;
+                        }
+                    }
+                    WinSetCapture(Handle());
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnMouseMove(MouseEventArgs& args)
+        {
+            try
+            {
+                if (GetFlag(Flags.moveSplitter))
+                {
+                    switch (orientation)
+                    {
+                        case Orientation.horizontal:
+                        {
+                            int dx = args.location.x - x;
+                            container->SetSplitterDistance(container->SplitterDistance() + dx);
+                            break;
+                        }
+                        case Orientation.vertical:
+                        {
+                            int dy = args.location.y - y;
+                            container->SetSplitterDistance(container->SplitterDistance() + dy);
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnMouseUp(MouseEventArgs& args)
+        {
+            try
+            {
+                base->OnMouseUp(args);
+                if (GetFlag(Flags.moveSplitter))
+                {
+                    ResetFlag(Flags.moveSplitter);
+                    WinReleaseCapture();
+                    switch (orientation)
+                    {
+                        case Orientation.horizontal:
+                        {
+                            int dx = args.location.x - x;
+                            container->SetSplitterDistance(container->SplitterDistance() + dx);
+                            break;
+                        }
+                        case Orientation.vertical:
+                        {
+                            int dy = args.location.y - y;
+                            container->SetSplitterDistance(container->SplitterDistance() + dy);
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        private nothrow inline void SetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags | flag);
+        }
+        private nothrow inline void ResetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags & ~flag);
+        }
+        private nothrow inline bool GetFlag(Flags flag) const
+        {
+            return (flags & flag) != 0;
+        }
         private Orientation orientation;
+        private Cursor& horizontalSplitterCursor;
+        private Cursor& verticalSplitterCursor;
+        private Flags flags;
+        private int x;
+        private int y;
+        private SplitContainer* container;
     }
 
     public class SplitContainer : ContainerControl
     {
-        public SplitContainer(Orientation orientation_, int splitterWidth, int splitterDistance, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+        public SplitContainer(Orientation orientation_, int splitterWidth, int splitterDistance_, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.SplitContainer", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE | WindowStyle.WS_CLIPSIBLINGS),
-                ExtendedWindowStyle.WS_EX_DEFAULT, GetSystemColor(SystemColor.COLOR_MENU), "splitContainer", location, size, dock, anchors), orientation(orientation_)
+                ExtendedWindowStyle.WS_EX_DEFAULT, GetSystemColor(SystemColor.COLOR_MENU), "splitContainer", location, size, dock, anchors), orientation(orientation_),
+                splitterDistance(splitterDistance_)
         {
             UniquePtr<Panel> pnl1(new Panel(location, SplitSize(orientation, splitterDistance), SplitDock(orientation), Anchors.none));
             panel1 = pnl1.Get();
             AddChild(pnl1.Release());
-            UniquePtr<Splitter> splt(new Splitter(orientation, location, splitterWidth));
+            UniquePtr<Splitter> splt(new Splitter(orientation, location, splitterWidth, this));
             splitter = splt.Get();
             AddChild(splt.Release());
             UniquePtr<Panel> pnl2(new Panel(location, Size(0, 0), Dock.fill, Anchors.none));
@@ -81,7 +202,35 @@ namespace System.Windows
             this(orientation, defaultSplitterWidth, splitterDistance, location, size, dock, anchors)
         {
         }
+        public nothrow inline Orientation GetOrientation() const
+        {
+            return orientation;
+        }
+        public nothrow inline Panel& Panel1()
+        {
+            return *panel1;
+        }
+        public nothrow inline Panel& Panel2()
+        {
+            return *panel2;
+        }
+        public nothrow inline int SplitterDistance() const
+        {
+            return splitterDistance;
+        }
+        public void SetSplitterDistance(int splitterDistance_)
+        {
+            splitterDistance = splitterDistance_;
+            switch (orientation)
+            {
+                case Orientation.horizontal: panel1->SetSize(Size(splitterDistance, panel1->GetSize().h)); break;
+                case Orientation.vertical: panel1->SetSize(Size(panel1->GetSize().w, splitterDistance)); break;
+            }
+            DockChildren();
+            Invalidate();
+        }
         private Orientation orientation;
+        private int splitterDistance;
         private Panel* panel1;
         private Splitter* splitter;
         private Panel* panel2;

@@ -1135,3 +1135,13 @@ int WinGetSystemMetrics(int index)
 {
     return GetSystemMetrics(index);
 }
+
+void* WinSetCapture(void* windowHandle)
+{
+    return SetCapture((HWND)windowHandle);
+}
+
+bool WinReleaseCapture()
+{
+    return ReleaseCapture();
+}

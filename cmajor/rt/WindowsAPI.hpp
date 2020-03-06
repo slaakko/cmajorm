@@ -177,5 +177,7 @@ extern "C" RT_API void* WinLoadBitmap(const char* bitmapName);
 extern "C" RT_API bool WinDestroyBitmap(void* bitmapHandle);
 extern "C" RT_API bool WinDeleteObject(void* handle);
 extern "C" RT_API int WinGetSystemMetrics(int index);
+extern "C" RT_API void* WinSetCapture(void* windowHandle);
+extern "C" RT_API bool WinReleaseCapture();
 
 #endif // CMAJOR_RT_WINDOWS_API_INCLUDED

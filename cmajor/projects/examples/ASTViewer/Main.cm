@@ -31,11 +31,14 @@ class MainWindow : Window
         helpItem->AddMenuItem(new MenuItem("&About"));
         menuBar->AddMenuItem(helpItem.Release());
         AddChild(menuBar.Release());
-        UniquePtr<SplitContainer> splitContainer(new SplitContainer(Orientation.horizontal, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-        AddChild(splitContainer.Release());
-        UniquePtr<LogView> logView(new LogView(Size(0, 200)));
+        UniquePtr<SplitContainer> verticalSplitContainer(new SplitContainer(Orientation.vertical, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+        UniquePtr<LogView> logView(new LogView(Size(0, 0)));
+        logView->SetDock(Dock.fill);
         Application.SetLogView(logView.Get());
-        AddChild(logView.Release());
+        verticalSplitContainer->Panel2().AddChild(logView.Release());
+        UniquePtr<SplitContainer> horizontalSplitContainer(new SplitContainer(Orientation.horizontal, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+        verticalSplitContainer->Panel1().AddChild(horizontalSplitContainer.Release());
+        AddChild(verticalSplitContainer.Release());
     }
     protected override void OnPaint(PaintEventArgs& args)
     {
