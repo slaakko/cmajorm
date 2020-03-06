@@ -1,0 +1,89 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public enum Orientation
+    {
+        horizontal, vertical
+    }
+
+    internal nothrow Dock SplitDock(Orientation orientation)
+    {
+        switch (orientation)
+        {
+            case Orientation.horizontal: return Dock.left;
+            case Orientation.vertical: return Dock.top;
+        }
+        return Dock.none;
+    }
+
+    internal nothrow Size SplitSize(Orientation orientation, int width)
+    {
+        switch (orientation)
+        {
+            case Orientation.horizontal: return Size(width, 0);
+            case Orientation.vertical: return Size(0, width);
+        }
+        return Size();
+    }
+
+    public const int defaultSplitterWidth = 5;
+
+    public class Splitter : Control
+    {
+        public Splitter(Orientation orientation_, const Point& location, int width) :
+            base("System.Windows.Splitter", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE | WindowStyle.WS_CLIPSIBLINGS),
+            ExtendedWindowStyle.WS_EX_DEFAULT,
+            Color.DarkGray(), "splitter", location, SplitSize(orientation_, width), SplitDock(orientation_), Anchors.none), orientation(orientation_)
+        {
+        }
+        public Splitter(Orientation orientation, const Point& location) : this(orientation, location, defaultSplitterWidth)
+        {
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            try
+            {
+                base->OnPaint(args);
+                args.graphics.Clear(BackgroundColor());
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        private Orientation orientation;
+    }
+
+    public class SplitContainer : ContainerControl
+    {
+        public SplitContainer(Orientation orientation_, int splitterWidth, int splitterDistance, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("System.Windows.SplitContainer", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE | WindowStyle.WS_CLIPSIBLINGS),
+                ExtendedWindowStyle.WS_EX_DEFAULT, GetSystemColor(SystemColor.COLOR_MENU), "splitContainer", location, size, dock, anchors), orientation(orientation_)
+        {
+            UniquePtr<Panel> pnl1(new Panel(location, SplitSize(orientation, splitterDistance), SplitDock(orientation), Anchors.none));
+            panel1 = pnl1.Get();
+            AddChild(pnl1.Release());
+            UniquePtr<Splitter> splt(new Splitter(orientation, location, splitterWidth));
+            splitter = splt.Get();
+            AddChild(splt.Release());
+            UniquePtr<Panel> pnl2(new Panel(location, Size(0, 0), Dock.fill, Anchors.none));
+            panel2 = pnl2.Get();
+            AddChild(pnl2.Release());
+        }
+        public SplitContainer(Orientation orientation, int splitterDistance, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(orientation, defaultSplitterWidth, splitterDistance, location, size, dock, anchors)
+        {
+        }
+        private Orientation orientation;
+        private Panel* panel1;
+        private Splitter* splitter;
+        private Panel* panel2;
+    }
+}

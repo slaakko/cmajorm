@@ -5,6 +5,7 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.Windows.API;
 
 namespace System.Windows
@@ -1229,7 +1230,7 @@ namespace System.Windows
         {
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsRegionGetLastStatus(nativeRegion)));
         }
-        public Region(const Region& that) : nativeRegion(WinGraphicsCloneRegion(nativeRegion))
+        public Region(const Region& that) : nativeRegion(WinGraphicsCloneRegion(that.nativeRegion))
         {
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsRegionGetLastStatus(nativeRegion)));
         }
@@ -1243,7 +1244,7 @@ namespace System.Windows
             {
                 WinGraphicsDeleteRegion(nativeRegion);
             }
-            nativeRegion = WinGraphicsCloneRegion(nativeRegion);
+            nativeRegion = WinGraphicsCloneRegion(that.nativeRegion);
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsRegionGetLastStatus(nativeRegion)));
         }
         public nothrow default void operator=(Region&&);
@@ -1259,6 +1260,334 @@ namespace System.Windows
             return nativeRegion;
         }
         private void* nativeRegion;
+    }
+
+    public class Image
+    {
+        public nothrow Image() : nativeImage(null)
+        {
+        }
+        public nothrow Image(void* nativeImage_) : nativeImage(nativeImage_)
+        {
+        }
+        public Image(const string& fileName, bool useEmbeddedColorManagement) : nativeImage(WinGraphicsCreateImage(fileName.Chars(), useEmbeddedColorManagement))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageGetLastStatus(nativeImage)));
+        }
+        public Image(const Image& that) : nativeImage(WinGraphicsCloneImage(that.nativeImage))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageGetLastStatus(nativeImage)));
+        }
+        public nothrow Image(Image&& that) : nativeImage(that.nativeImage)
+        {
+            that.nativeImage = null;
+        }
+        public void operator=(const Image& that)
+        {
+            if (nativeImage != null)
+            {
+                WinGraphicsDeleteImage(nativeImage);
+            }
+            nativeImage = WinGraphicsCloneImage(that.nativeImage);
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageGetLastStatus(nativeImage)));
+        }
+        public nothrow default void operator=(Image&&);
+        public virtual ~Image()
+        {
+            if (nativeImage != null)
+            {
+                WinGraphicsDeleteImage(nativeImage);
+            }
+        }
+        public nothrow void* NativeImage() const
+        {
+            return nativeImage;
+        }
+        private void* nativeImage;
+    }
+
+    public class Bitmap : Image
+    {
+        public nothrow Bitmap() : base()
+        {
+        }
+        public nothrow Bitmap(void* nativeHandle_) : base(nativeHandle_)
+        {
+        }
+        public Bitmap(const string& fileName, bool useEmbeddedColorManagement) : base(WinGraphicsCreateBitmap(fileName.Chars(), useEmbeddedColorManagement))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageGetLastStatus(NativeImage())));
+        }
+        public Bitmap(int width, int height, const Graphics& graphics) : base(WinGraphicsCreateBitmapWidthHeight(width, height, graphics.NativeGraphics()))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageGetLastStatus(NativeImage())));
+        }
+        public Bitmap(const WinBitmap& winBitmap, void* palette) : base(WinGraphicsCreateBitmapWinBitmap(winBitmap.Handle(), palette))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageGetLastStatus(NativeImage())));
+        }
+        public Bitmap(const Icon& icon) : base(WinGraphicsCreateBitmapIcon(icon.Handle()))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageGetLastStatus(NativeImage())));
+        }
+        public static Bitmap FromResource(const string& resourceName)
+        {
+            Bitmap bitmap(WinGraphicsCreateBitmapResource(resourceName.Chars()));
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageGetLastStatus(bitmap.NativeImage())));
+            return bitmap;
+        }
+        public ~Bitmap()
+        {
+        }
+    }
+
+    public enum MatrixOrder
+    {
+        prepend, append
+    }
+
+    public class Matrix
+    {
+        public Matrix() : nativeMatrix(WinGraphicsCreateMatrix())
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsMatrixGetLastStatus(nativeMatrix)));
+        }
+        public Matrix(const Rect& rect, const Point& pt) : nativeMatrix(WinGraphicsCreateMatrixRectPoint(rect.location.x, rect.location.y, rect.size.w, rect.size.h, pt.x, pt.y))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsMatrixGetLastStatus(nativeMatrix)));
+        }
+        public Matrix(const RectF& rect, const PointF& pt) : nativeMatrix(WinGraphicsCreateMatrixRectFPointF(rect.location.x, rect.location.y, rect.size.w, rect.size.h, pt.x, pt.y))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsMatrixGetLastStatus(nativeMatrix)));
+        }
+        public Matrix(const Matrix& that) : nativeMatrix(WinGraphicsCloneMatrix(that.nativeMatrix))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsMatrixGetLastStatus(nativeMatrix)));
+        }
+        public nothrow Matrix(Matrix&& that) : nativeMatrix(that.nativeMatrix)
+        {
+            that.nativeMatrix = null;
+        }
+        public void operator=(const Matrix& that)
+        {
+            if (nativeMatrix != null)
+            {
+                WinGraphicsDeleteMatrix(nativeMatrix);
+            }
+            nativeMatrix = WinGraphicsCloneMatrix(that.nativeMatrix);
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsMatrixGetLastStatus(nativeMatrix)));
+        }
+        public nothrow default void operator=(Matrix&&);
+        public ~Matrix()
+        {
+            if (nativeMatrix != null)
+            {
+                WinGraphicsDeleteMatrix(nativeMatrix);
+            }
+        }
+        public GraphicsStatus Multiply(const Matrix& that, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMultiplyMatrix(nativeMatrix, that.nativeMatrix, cast<int>(order)));
+        }
+        public GraphicsStatus Multiply(const Matrix& that)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMultiplyMatrix(nativeMatrix, that.nativeMatrix, cast<int>(MatrixOrder.prepend)));
+        }
+        public void MultiplyChecked(const Matrix& that, MatrixOrder order)
+        {
+            CheckGraphicsStatus(Multiply(that, order));
+        }
+        public void MultiplyChecked(const Matrix& that)
+        {
+            CheckGraphicsStatus(Multiply(that, MatrixOrder.prepend));
+        }
+        public nothrow GraphicsStatus Reset()
+        {
+            return cast<GraphicsStatus>(WinGraphicsResetMatrix(nativeMatrix));
+        }
+        public void ResetChecked()
+        {
+            CheckGraphicsStatus(Reset());
+        }
+        public nothrow GraphicsStatus Invert()
+        {
+            return cast<GraphicsStatus>(WinGraphicsInvertMatrix(nativeMatrix));
+        }
+        public void InvertChecked()
+        {
+            CheckGraphicsStatus(Invert());
+        }
+        public nothrow float OffsetX() const
+        {
+            return WinGraphicsMatrixOffsetX(nativeMatrix);
+        }
+        public nothrow float OffsetY() const
+        {
+            return WinGraphicsMatrixOffsetY(nativeMatrix);
+        }
+        public nothrow GraphicsStatus Rotate(float angle, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMatrixRotate(nativeMatrix, angle, cast<int>(order)));
+        }
+        public nothrow GraphicsStatus Rotate(float angle)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMatrixRotate(nativeMatrix, angle, cast<int>(MatrixOrder.prepend)));
+        }
+        public void RotateChecked(float angle, MatrixOrder order)
+        {
+            CheckGraphicsStatus(Rotate(angle));
+        }
+        public void RotateChecked(float angle)
+        {
+            CheckGraphicsStatus(Rotate(angle, MatrixOrder.prepend));
+        }
+        public nothrow GraphicsStatus RotateAt(float angle, const PointF& center, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMatrixRotateAt(nativeMatrix, angle, center.x, center.y, cast<int>(order)));
+        }
+        public void RotateAtChecked(float angle, const PointF& center, MatrixOrder order)
+        {
+            CheckGraphicsStatus(RotateAt(angle, center, order));
+        }
+        public nothrow GraphicsStatus RotateAt(float angle, const PointF& center)
+        {
+            return RotateAt(angle, center, MatrixOrder.prepend);
+        }
+        public void RotateAtChecked(float angle, const PointF& center)
+        {
+            CheckGraphicsStatus(RotateAt(angle, center, MatrixOrder.prepend));
+        }
+        public nothrow GraphicsStatus Scale(float scaleX, float scaleY, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMatrixScale(nativeMatrix, scaleX, scaleY, cast<int>(order)));
+        }
+        public void ScaleChecked(float scaleX, float scaleY, MatrixOrder order)
+        {
+            CheckGraphicsStatus(Scale(scaleX, scaleY, order));
+        }
+        public nothrow GraphicsStatus Scale(float scaleX, float scaleY)
+        {
+            return Scale(scaleX, scaleY, MatrixOrder.prepend);
+        }
+        public void ScaleChecked(float scaleX, float scaleY)
+        {
+            CheckGraphicsStatus(Scale(scaleX, scaleY, MatrixOrder.prepend));
+        }
+        public nothrow GraphicsStatus Shear(float shearX, float shearY, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMatrixShear(nativeMatrix, shearX, shearY, cast<int>(order)));
+        }
+        public void ShearChecked(float shearX, float shearY, MatrixOrder order)
+        {
+            CheckGraphicsStatus(Shear(shearX, shearY, order));
+        }
+        public nothrow GraphicsStatus Shear(float shearX, float shearY)
+        {
+            return Shear(shearX, shearY, MatrixOrder.prepend);
+        }
+        public void ShearChecked(float shearX, float shearY)
+        {
+            ShearChecked(shearX, shearY, MatrixOrder.prepend);
+        }
+        public nothrow GraphicsStatus Translate(float offsetX, float offsetY, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMatrixTranslate(nativeMatrix, offsetX, offsetY, cast<int>(order)));
+        }
+        public void TranslateChecked(float offsetX, float offsetY, MatrixOrder order)
+        {
+            CheckGraphicsStatus(Translate(offsetX, offsetY, order));
+        }
+        public nothrow GraphicsStatus Translate(float offsetX, float offsetY)
+        {
+            return Translate(offsetX, offsetY, MatrixOrder.prepend);
+        }
+        public void TranslateChecked(float offsetX, float offsetY)
+        {
+            TranslateChecked(offsetX, offsetY, MatrixOrder.prepend);
+        }
+        public nothrow GraphicsStatus SetElements(float m11, float m12, float m21, float m22, float dx, float dy)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMatrixSetElements(nativeMatrix, m11, m12, m21, m22, dx, dy));
+        }
+        public void SetElementsChecked(float m11, float m12, float m21, float m22, float dx, float dy)
+        {
+            CheckGraphicsStatus(SetElements(m11, m12, m21, m22, dx, dy));
+        }
+        public nothrow GraphicsStatus TransformPoints(List<Point>& points)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMatrixTransformPoints(nativeMatrix, points.Begin().Ptr(), cast<int>(points.Count())));
+        }
+        public void TransformPointsChecked(List<Point>& points)
+        {
+            CheckGraphicsStatus(TransformPoints(points));
+        }
+        public nothrow GraphicsStatus TransformPoints(List<PointF>& points)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMatrixTransformPointsF(nativeMatrix, points.Begin().Ptr(), cast<int>(points.Count())));
+        }
+        public void TransformPointsChecked(List<PointF>& points)
+        {
+            CheckGraphicsStatus(TransformPoints(points));
+        }
+        public nothrow inline void* NativeMatrix() const
+        {
+            return nativeMatrix;
+        }
+        private void* nativeMatrix;
+    }
+
+    public Matrix operator*(const Matrix& left, const Matrix& right) // multiply matrix 'right' from left by matrix 'left' and return result
+    {
+        Matrix product(right);
+        product.MultiplyChecked(left);
+        return product;
+    }
+
+    public Matrix Rotate(const Matrix& m, float angle) // create clockwise rotation matrix from given matrix and angle in degrees and return it
+    {
+        Matrix rm(m);
+        rm.RotateChecked(angle);
+        return rm;
+    }
+
+    public Matrix RotateAt(const Matrix& m, float angle, const PointF& center) // create clockwise rotation matrix of rotation about point 'center' and return it
+    {
+        Matrix rm(m);
+        rm.RotateAtChecked(angle, center);
+        return rm;
+    }
+
+    public Matrix Scale(const Matrix& m, float scaleX, float scaleY) // create scaling matrix from given matrix and scale factors in X and Y direction and return it
+    {
+        Matrix sm(m);
+        sm.ScaleChecked(scaleX, scaleY);
+        return sm;
+    }
+
+    public Matrix Shear(const Matrix& m, float shearX, float shearY) // create shearing matrix from given matrix and horizontal and vertical shearing factors and return it
+    {
+        Matrix sm(m);
+        sm.ShearChecked(shearX, shearY);
+        return sm;
+    }
+
+    public Matrix Translate(const Matrix& m, float offsetX, float offsetY) // create translation matrix from given matrix and horizontal and vertical offsets and return it
+    {
+        Matrix tm(m);
+        tm.TranslateChecked(offsetX, offsetY);
+        return tm;
+    }
+
+    public Matrix Invert(const Matrix& m)
+    {
+        Matrix im(m);
+        im.InvertChecked();
+        return im;
+    }
+
+    public enum GraphicsState : uint
+    {
+        state = 0u
     }
 
     public class Graphics
@@ -1277,6 +1606,11 @@ namespace System.Windows
         public static Graphics FromWindowHandle(void* windowHandle)
         {
             NativeHandle nativeHandle = WinCreateGraphicsFromWindowHandle(windowHandle);
+            return Graphics(nativeHandle);
+        }
+        public static Graphics FromImage(const Image& image)
+        {
+            NativeHandle nativeHandle = WinCreateGraphicsFromImage(image.NativeImage());
             return Graphics(nativeHandle);
         }
         suppress Graphics(const Graphics&);
@@ -1443,6 +1777,22 @@ namespace System.Windows
         {
             CheckGraphicsStatus(FillPolygon(brush, numPoints, points));
         }
+        public nothrow GraphicsStatus DrawImage(const Image& image, const PointF& point)
+        {
+            return cast<GraphicsStatus>(WinGraphicsDrawImagePoint(nativeGraphics, image.NativeImage(), point.x, point.y));
+        }
+        public void DrawImageChecked(const Image& image, const PointF& point)
+        {
+            CheckGraphicsStatus(DrawImage(image, point));
+        }
+        public nothrow GraphicsStatus DrawImage(const Image& image, const RectF& rect)
+        {
+            return cast<GraphicsStatus>(WinGraphicsDrawImageRect(nativeGraphics, image.NativeImage(), rect.location.x, rect.location.y, rect.size.w, rect.size.h));
+        }
+        public void DrawImageChecked(const Image& image, const RectF& rect)
+        {
+            CheckGraphicsStatus(DrawImage(image, rect));
+        }
         public nothrow GraphicsStatus GetClip(Region& region)
         {
             return cast<GraphicsStatus>(WinGraphicsGetClip(nativeGraphics, region.NativeRegion()));
@@ -1476,6 +1826,152 @@ namespace System.Windows
         public void SetClipChecked(const Region& region)
         {
             CheckGraphicsStatus(SetClip(region));
+        }
+        public nothrow GraphicsState Save()
+        {
+            return cast<GraphicsState>(WinGraphicsSave(nativeGraphics));
+        }
+        public GraphicsState SaveChecked()
+        {
+            GraphicsState state = Save();
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsGetLastStatus(nativeGraphics)));
+            return state;
+        }
+        public nothrow GraphicsStatus Restore(GraphicsState graphicsState)
+        {
+            return cast<GraphicsStatus>(WinGraphicsRestore(nativeGraphics, cast<uint>(graphicsState)));
+        }
+        public void RestoreChecked(GraphicsState graphicsState)
+        {
+            CheckGraphicsStatus(Restore(graphicsState));
+        }
+        public nothrow GraphicsStatus GetTransform(Matrix& m)
+        {
+            return cast<GraphicsStatus>(WinGraphicsGetTransform(nativeGraphics, m.NativeMatrix()));
+        }
+        public void GetTransformChecked(Matrix& m)
+        {
+            CheckGraphicsStatus(GetTransform(m));
+        }
+        public nothrow GraphicsStatus SetTransform(Matrix& m)
+        {
+            return cast<GraphicsStatus>(WinGraphicsSetTransform(m.NativeMatrix()));
+        }
+        public nothrow GraphicsStatus MultiplyTransform(const Matrix& matrix, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsMultiplyTransform(nativeGraphics, matrix.NativeMatrix(), cast<int>(order)));
+        }
+        public void MultiplyTransformChecked(const Matrix& matrix, MatrixOrder order)
+        {
+            CheckGraphicsStatus(MultiplyTransform(matrix, order));
+        }
+        public nothrow GraphicsStatus MultiplyTransform(const Matrix& matrix)
+        {
+            return MultiplyTransform(matrix, MatrixOrder.prepend);
+        }
+        public void MultiplyTransformChecked(const Matrix& matrix)
+        {
+            CheckGraphicsStatus(MultiplyTransform(matrix));
+        }
+        public nothrow GraphicsStatus ResetTransform()
+        {
+            return cast<GraphicsStatus>(WinGraphicsResetTransform(nativeGraphics));
+        }
+        public void ResetTransformChecked()
+        {
+            CheckGraphicsStatus(ResetTransform());
+        }
+        public nothrow GraphicsStatus RotateTransform(float angle, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsRotateTransform(nativeGraphics, angle, cast<int>(order)));
+        }
+        public void RotateTransformChecked(float angle, MatrixOrder order)
+        {
+            CheckGraphicsStatus(RotateTransform(angle, order));
+        }
+        public nothrow GraphicsStatus RotateTransform(float angle)
+        {
+            return RotateTransform(angle, MatrixOrder.prepend);
+        }
+        public void RotateTransformChecked(float angle)
+        {
+            RotateTransformChecked(angle, MatrixOrder.prepend);
+        }
+        public nothrow GraphicsStatus ScaleTransform(float scaleX, float scaleY, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsScaleTransform(nativeGraphics, scaleX, scaleY, cast<int>(order)));
+        }
+        public void ScaleTransformChecked(float scaleX, float scaleY, MatrixOrder order)
+        {
+            CheckGraphicsStatus(ScaleTransform(scaleX, scaleY, order));
+        }
+        public nothrow GraphicsStatus ScaleTransform(float scaleX, float scaleY)
+        {
+            return ScaleTransform(scaleX, scaleY, MatrixOrder.prepend);
+        }
+        public void ScaleTransformChecked(float scaleX, float scaleY)
+        {
+            ScaleTransformChecked(scaleX, scaleY, MatrixOrder.prepend);
+        }
+        public nothrow GraphicsStatus TranslateTransform(float offsetX, float offsetY, MatrixOrder order)
+        {
+            return cast<GraphicsStatus>(WinGraphicsTranslateTransform(nativeGraphics, offsetX, offsetY, cast<int>(order)));
+        }
+        public void TranslateTransformChecked(float offsetX, float offsetY, MatrixOrder order)
+        {
+            CheckGraphicsStatus(TranslateTransform(offsetX, offsetY, order));
+        }
+        public nothrow GraphicsStatus TranslateTransform(float offsetX, float offsetY)
+        {
+            return TranslateTransform(offsetX, offsetY, MatrixOrder.prepend);
+        }
+        public void TranslateTransformChecked(float offsetX, float offsetY)
+        {
+            TranslateTransformChecked(offsetX, offsetY, MatrixOrder.prepend);
+        }
+        public nothrow Unit GetPageUnit()
+        {
+            return cast<Unit>(WinGraphicsGetPageUnit(nativeGraphics));
+        }
+        public Unit GetPageUnitChecked()
+        {
+            Unit unit = GetPageUnit();
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsGetLastStatus(nativeGraphics)));
+            return unit;
+        }
+        public nothrow GraphicsStatus SetPageUnit(Unit unit)
+        {
+            return cast<GraphicsStatus>(WinGraphicsSetPageUnit(nativeGraphics, cast<int>(unit)));
+        }
+        public void SetPageUnitChecked(Unit unit)
+        {
+            CheckGraphicsStatus(SetPageUnit(unit));
+        }
+        public nothrow float GetPageScale()
+        {
+            return WinGraphicsGetPageScale(nativeGraphics);
+        }
+        public float GetPageScaleChecked()
+        {
+            float scale = GetPageScale();
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsGetLastStatus(nativeGraphics)));
+            return scale;
+        }
+        public nothrow GraphicsStatus SetPageScale(float scale)
+        {
+            return cast<GraphicsStatus>(WinGraphicsSetPageScale(nativeGraphics, scale));
+        }
+        public void SetPageScaleChecked(float scale)
+        {
+            CheckGraphicsStatus(SetPageScale(scale));
+        }
+        public nothrow float GetDpiX()
+        {
+            return WinGraphicsGetDpiX(nativeGraphics);
+        }
+        public nothrow float GetDpiY()
+        {
+            return WinGraphicsGetDpiY(nativeGraphics);
         }
         public nothrow inline const void* NativeGraphics() const
         {

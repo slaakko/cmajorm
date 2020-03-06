@@ -1,0 +1,203 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Windows/Cursor.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Windows.API</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Windows</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">enum</span>&nbsp;<a href="../doc/enumerated_type_StandardCursorId_DD723FDC0B54E7668D1B32056B641CD8D7A0315E.html">StandardCursorId</a><span class="other">&nbsp;:&nbsp;</span><span class="kw">int</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_APPSTARTING</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32650</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_ARROW</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32512</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_CROSS</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32515</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_HAND</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32649</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_HELP</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32651</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_IBEAM</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32513</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_NO</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32648</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_SIZEALL</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32646</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_SIZENESW</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32643</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_SIZENS</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32645</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_SIZENWSE</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32642</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_SIZEWE</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32644</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_UPARROW</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32516</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">IDC_WAIT</span><span class="other">&nbsp;=&nbsp;</span><span class="number">32514</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html">Cursor</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Resource_AADB58A1BF11D0115B13CE047B489A55CE894929.html">Resource</a></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#default_constructor_Cursor_4C07A77834307545A2EA6B3B3157123D61F05526">Cursor</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">cursorHandle</span><span class="other">(</span><span class="kw">null</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">standard</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#constructor_Cursor_5327EF5EA2130F0B9BB27DC7EA70BBF11D1302CC">Cursor</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">cursorHandle_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">cursorHandle</span><span class="other">(</span><span class="identifier">cursorHandle_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">standard</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#constructor_Cursor_27E12DC27B69E721695621AC2496CB5CD3C6907D">Cursor</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">cursorHandle_</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">standard_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">cursorHandle</span><span class="other">(</span><span class="identifier">cursorHandle_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">standard</span><span class="other">(</span><span class="identifier">standard_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#move_constructor_Cursor_7021926C7CCA5869BE9F9F87F147D2E40FE628D0">Cursor</a><span class="other">(</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html">Cursor</a><span class="other">&amp;&amp;</span>&nbsp;<span class="identifier">that</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">cursorHandle</span><span class="other">(</span><span class="identifier">that</span><span class="other">.</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_cursorHandle_24E586DB105F8AC8D5328BF5E6CCDD213C3CC72B">cursorHandle</a><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">standard</span><span class="other">(</span><span class="identifier">that</span><span class="other">.</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_standard_0B9620129CE8D6252DD9EBBE84A627CB3151BF9E">standard</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">that</span><span class="other">.</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_cursorHandle_24E586DB105F8AC8D5328BF5E6CCDD213C3CC72B">cursorHandle</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">null</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">that</span><span class="other">.</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_standard_0B9620129CE8D6252DD9EBBE84A627CB3151BF9E">standard</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="other">~</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#destructor_Cursor_22D3DE3F130F9FDADFA554FD5A8F98B201D82648">Cursor</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_cursorHandle_24E586DB105F8AC8D5328BF5E6CCDD213C3CC72B">cursorHandle</a><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">!</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_standard_0B9620129CE8D6252DD9EBBE84A627CB3151BF9E">standard</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#WinDestroyCursor">WinDestroyCursor</a><span class="other">(</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_cursorHandle_24E586DB105F8AC8D5328BF5E6CCDD213C3CC72B">cursorHandle</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#move_assignment_op_assign_Cursor_F1B0CC3C5F50C44F45040BC085D0A9A28423E376">operator=</a><span class="other">(</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html">Cursor</a><span class="other">&amp;&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">suppress</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#copy_constructor_Cursor_A3BFB42D7FF46797B308484D92FB05A5706C4524">Cursor</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html">Cursor</a><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">suppress</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#copy_assignment_op_assign_Cursor_623B04E1BB21DC81AD5C51A8DE6EE43126CD8DFF">operator=</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html">Cursor</a><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_function_Handle_Cursor_18A4F95190B0CA27ACB64FA52B72C97E81BDAC10">Handle</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_cursorHandle_24E586DB105F8AC8D5328BF5E6CCDD213C3CC72B">cursorHandle</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_function_IsStandard_Cursor_6A1CEC33DCDFF47F7B883F35F6F212E4211FD41B">IsStandard</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_standard_0B9620129CE8D6252DD9EBBE84A627CB3151BF9E">standard</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_function_SetStandard_Cursor_DC86C3466EF726F39994B89859AF10FAADF15141">SetStandard</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_variable_standard_0B9620129CE8D6252DD9EBBE84A627CB3151BF9E">standard</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">cursorHandle</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">standard</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html">Cursor</a>&nbsp;<a href="../doc/ns_System.Windows.html#function_LoadStandardCursor_ACBB8409C599D4192F4346966CC0DA39CD72BC55">LoadStandardCursor</a><span class="other">(</span><a href="../doc/enumerated_type_StandardCursorId_DD723FDC0B54E7668D1B32056B641CD8D7A0315E.html">StandardCursorId</a>&nbsp;<span class="identifier">cursorId</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">cursorHandle</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinLoadStandardCursor">WinLoadStandardCursor</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">cursorId</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">cursorHandle</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#constructor_Cursor_27E12DC27B69E721695621AC2496CB5CD3C6907D">Cursor</a><span class="other">(</span><span class="identifier">cursorHandle</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">80</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html">Cursor</a>&nbsp;<a href="../doc/ns_System.Windows.html#function_LoadCursor_DE6F2B48D834D17B3779B000DC1BC2FFD834B549">LoadCursor</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cursorName</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#constructor_Cursor_5327EF5EA2130F0B9BB27DC7EA70BBF11D1302CC">Cursor</a><span class="other">(</span><a href="../doc/ns_System.Windows.API.html#function_LoadCursor_E0CA847C01490BE31ADB10900842A700434CC09E">LoadCursor</a><span class="other">(</span><span class="identifier">cursorName</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Chars_String_CharT_F23E248DC46A5AA9215CDB25B6779E94681FBAB6">Chars</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">85</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html">Cursor</a>&nbsp;<a href="../doc/ns_System.Windows.html#function_GetCursor_72B2EAA025528A7856AA13B250A6D7A170901B55">GetCursor</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#constructor_Cursor_27E12DC27B69E721695621AC2496CB5CD3C6907D">Cursor</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetCursor">WinGetCursor</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">90</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.html#function_SetCursor_54EC7A245194584CB6EC6E9B15F873F73960C7E7">SetCursor</a><span class="other">(</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html">Cursor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cursor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#WinSetCursor">WinSetCursor</a><span class="other">(</span><span class="identifier">cursor</span><span class="other">.</span><a href="../doc/class_Cursor_B718391F1AC55C0C378C87AA76282DEFD77B7B4D.html#member_function_Handle_Cursor_18A4F95190B0CA27ACB64FA52B72C97E81BDAC10">Handle</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">95</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

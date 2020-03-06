@@ -673,4 +673,106 @@ namespace System.Windows.API
         }
         return false;
     }
+
+    public void* LoadImage(const char* name, uint type, int cx, int cy)
+    {
+        void* result = WinLoadImage(name, type, cx, cy);
+        if (result == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return result;
+    }
+
+    public void* LoadCursor(const char* name)
+    {
+        void* result = WinLoadCursor(name);
+        if (result == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return result;
+    }
+
+    public void* LoadIcon(const char* name)
+    {
+        void* result = WinLoadIcon(name);
+        if (result == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return result;
+    }
+
+    public void* LoadBitmap(const char* name)
+    {
+        void* result = WinLoadBitmap(name);
+        if (result == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return result;
+    }
+
+    public int GetSystemMetrics(int index)
+    {
+        int result = WinGetSystemMetrics(index);
+        if (result == 0)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return result;
+    }
+
+    public void* GetTopWindow(void* windowHandle)
+    {
+        return WinGetTopWindow(windowHandle);
+    }
+
+    public void BringWindowToTop(void* windowHandle)
+    {
+        bool succeeded = WinBringWindowToTop(windowHandle);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public enum WindowPos : int
+    {
+        top = 0, bottom = 1, topmost = -1, noTopmost = -2
+    }
+   
+    public nothrow void* WindowPosHandle(WindowPos pos)
+    {
+        return cast<void*>(cast<ulong>(cast<int>(pos)));
+    }
+
+    public enum SetWindowPosFlags : uint
+    {
+        SWP_ASYNCWINDOWPOS = 0x4000u,
+        SWP_DEFERERASE = 0x2000u,
+        SWP_DRAWFRAME = 0x20u,
+        SWP_FRAMECHANGED = 0x20u,
+        SWP_HIDEWINDOW = 0x80u,
+        SWP_NOACTIVATE = 0x10u,
+        SWP_NOCOPYBITS = 0x100u,
+        SWP_NOMOVE = 0x2u,
+        SWP_NOOWNERZORDER = 0x200u,
+        SWP_NOREDRAW = 0x8u,
+        SWP_NOREPOSITION = 0x200u,
+        SWP_NOSENDCHANGING = 0x400u,
+        SWP_NOSIZE = 0x1u,
+        SWP_NOZORDER = 0x4u,
+        SWP_SHOWWINDOW = 0x40u
+    }
+
+    public void SetWindowPos(void* windowHandle, void* insertAfterWindowHandle, int x, int y, int cx, int cy, SetWindowPosFlags flags)
+    {
+        bool succeeded = WinSetWindowPos(windowHandle, insertAfterWindowHandle, x, y, cx, cy, cast<uint>(flags));
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
 }

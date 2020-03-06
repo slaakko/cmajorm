@@ -5,6 +5,7 @@
 
 #include <cmajor/rt/WindowsAPI.hpp>
 #include <soulng/util/Unicode.hpp>
+#define OEMRESOURCE
 #include <Windows.h>
 #include <map>
 #include <string>
@@ -442,6 +443,11 @@ void* WinCreateGraphicsFromWindowHandle(void* hwnd)
     return graphics;
 }
 
+void* WinCreateGraphicsFromImage(void* image)
+{
+    return Graphics::FromImage(static_cast<Image*>(image));
+}
+
 int WinGraphicsGetLastStatus(void* graphics)
 {
     return static_cast<Graphics*>(graphics)->GetLastStatus();
@@ -727,6 +733,245 @@ int WinGraphicsSetClipRegion(void* graphics, void* region)
     return static_cast<Graphics*>(graphics)->SetClip(static_cast<Region*>(region));
 }
 
+void* WinGraphicsCreateImage(const char* fileName, bool useEmbeddedColorManagement)
+{
+    std::u16string fname(ToUtf16(fileName));
+    Image* image = new Image((const WCHAR*)fname.c_str(), useEmbeddedColorManagement);
+    return image;
+}
+
+int WinGraphicsImageGetLastStatus(void* image)
+{
+    return static_cast<Image*>(image)->GetLastStatus();
+}
+
+void* WinGraphicsCloneImage(void* image)
+{
+    return static_cast<Image*>(image)->Clone();
+}
+
+void WinGraphicsDeleteImage(void* image)
+{
+    delete static_cast<Image*>(image);
+}
+
+void* WinGraphicsCreateBitmap(const char* fileName, bool useEmbeddedColorManagement)
+{
+    std::u16string fname(ToUtf16(fileName));
+    return new Bitmap((const WCHAR*)fname.c_str(), useEmbeddedColorManagement);
+}
+
+void* WinGraphicsCreateBitmapWidthHeight(int w, int h, void* graphics)
+{
+    return new Bitmap(w, h, static_cast<Graphics*>(graphics));
+}
+
+void* WinGraphicsCreateBitmapWinBitmap(void* winBitmap, void* palette)
+{
+    return new Bitmap((HBITMAP)winBitmap, (HPALETTE)palette);
+}
+
+void* WinGraphicsCreateBitmapIcon(void* icon)
+{
+    return new Bitmap((HICON)icon);
+}
+
+void* WinGraphicsCreateBitmapResource(const char* resourceName)
+{
+    std::u16string rname = ToUtf16(resourceName);
+    return Bitmap::FromResource(applicationInstance, (const WCHAR*)rname.c_str());
+}
+
+uint32_t WinGraphicsSave(void* graphics)
+{
+    return static_cast<Graphics*>(graphics)->Save();
+}
+
+int WinGraphicsRestore(void* graphics, uint32_t graphicsState)
+{
+    return static_cast<Graphics*>(graphics)->Restore(graphicsState);
+}
+
+int WinGraphicsDrawImagePoint(void* graphics, void* image, float x, float y)
+{
+    return static_cast<Graphics*>(graphics)->DrawImage(static_cast<Image*>(image), PointF(x, y));
+}
+
+int WinGraphicsDrawImageRect(void* graphics, void* image, float x, float y, float w, float h)
+{
+    return static_cast<Graphics*>(graphics)->DrawImage(static_cast<Image*>(image), RectF(x, y, w, h));
+}
+
+int WinGraphicsGetTransform(void* graphics, void* matrix)
+{
+    return static_cast<Graphics*>(graphics)->GetTransform(static_cast<Matrix*>(matrix));
+}
+
+int WinGraphicsSetTransform(void* graphics, void* matrix)
+{
+    return static_cast<Graphics*>(graphics)->SetTransform(static_cast<const Matrix*>(matrix));
+}
+
+int WinGraphicsMultiplyTransform(void* graphics, void* matrix, int order)
+{
+    return static_cast<Graphics*>(graphics)->MultiplyTransform(static_cast<const Matrix*>(matrix), static_cast<MatrixOrder>(order));
+}
+
+int WinGraphicsResetTransform(void* graphics)
+{
+    return static_cast<Graphics*>(graphics)->ResetTransform();
+}
+
+int WinGraphicsRotateTransform(void* graphics, float angle, int order)
+{
+    return static_cast<Graphics*>(graphics)->RotateTransform(angle, static_cast<MatrixOrder>(order));
+}
+
+int WinGraphicsScaleTransform(void* graphics, float scaleX, float scaleY, int order)
+{
+    return static_cast<Graphics*>(graphics)->ScaleTransform(scaleX, scaleY, static_cast<MatrixOrder>(order));
+}
+
+int WinGraphicsTranslateTransform(void* graphics, float offsetX, float offsetY, int order)
+{
+    return static_cast<Graphics*>(graphics)->TranslateTransform(offsetX, offsetY, static_cast<MatrixOrder>(order));
+}
+
+void* WinGraphicsCreateMatrixFromElements(float m11, float m12, float m21, float m22, float dx, float dy)
+{
+    return new Matrix(m11, m12, m21, m22, dx, dy);
+}
+
+void* WinGraphicsCreateMatrix()
+{
+    return new Matrix();
+}
+
+void* WinGraphicsCreateMatrixRectFPointF(float rectX, float rectY, float rectW, float rectH, float ptX, float ptY)
+{
+    RectF rect(PointF(rectX, rectY), SizeF(rectW, rectH));
+    PointF pt(ptX, ptY);
+    return new Matrix(rect, &pt);
+}
+
+void* WinGraphicsCreateMatrixRectPoint(int rectX, int rectY, int rectW, int rectH, int ptX, int ptY)
+{
+    Rect rect(Point(rectX, rectY), Size(rectW, rectH));
+    Point pt(ptX, ptY);
+    return new Matrix(rect, &pt);
+}
+
+int WinGraphicsMatrixGetLastStatus(void* matrix)
+{
+    return static_cast<Matrix*>(matrix)->GetLastStatus();
+}
+
+void* WinGraphicsCloneMatrix(void* matrix)
+{
+    return static_cast<Matrix*>(matrix)->Clone();
+}
+
+void WinGraphicsDeleteMatrix(void* matrix)
+{
+    delete static_cast<Matrix*>(matrix);
+}
+
+int WinGraphicsMultiplyMatrix(void* matrix, void* factorMatrix, int order)
+{
+    return static_cast<Matrix*>(matrix)->Multiply(static_cast<const Matrix*>(factorMatrix), static_cast<MatrixOrder>(order));
+}
+
+int WinGraphicsResetMatrix(void* matrix)
+{
+    return static_cast<Matrix*>(matrix)->Reset();
+}
+
+int WinGraphicsInvertMatrix(void* matrix)
+{
+    return static_cast<Matrix*>(matrix)->Invert();
+}
+
+float WinGraphicsMatrixOffsetX(void* matrix)
+{
+    return static_cast<Matrix*>(matrix)->OffsetX();
+}
+
+float WinGraphicsMatrixOffsetY(void* matrix)
+{
+    return static_cast<Matrix*>(matrix)->OffsetY();
+}
+
+int WinGraphicsMatrixRotate(void* matrix, float angle, int order)
+{
+    return static_cast<Matrix*>(matrix)->Rotate(angle, static_cast<MatrixOrder>(order));
+}
+
+int WinGraphicsMatrixRotateAt(void* matrix, float angle, float centerX, float centerY, int order)
+{
+    PointF center(centerX, centerY);
+    return static_cast<Matrix*>(matrix)->RotateAt(angle, center, static_cast<MatrixOrder>(order));
+}
+
+int WinGraphicsMatrixScale(void* matrix, float scaleX, float scaleY, int order)
+{
+    return static_cast<Matrix*>(matrix)->Scale(scaleX, scaleY, static_cast<MatrixOrder>(order));
+}
+
+int WinGraphicsMatrixSetElements(void* matrix, float m11, float m12, float m21, float m22, float dx, float dy)
+{
+    return static_cast<Matrix*>(matrix)->SetElements(m11, m12, m21, m22, dx, dy);
+}
+
+int WinGraphicsMatrixShear(void* matrix, float shearX, float shearY, int order)
+{
+    return static_cast<Matrix*>(matrix)->Shear(shearX, shearY, static_cast<MatrixOrder>(order));
+}
+
+int WinGraphicsMatrixTranslate(void* matrix, float offsetX, float offsetY, int order)
+{
+    return static_cast<Matrix*>(matrix)->Translate(offsetX, offsetY, static_cast<MatrixOrder>(order));
+}
+
+int WinGraphicsMatrixTransformPoints(void* matrix, void* points, int numPoints)
+{
+    return static_cast<Matrix*>(matrix)->TransformPoints(static_cast<Point*>(points), numPoints);
+}
+
+int WinGraphicsMatrixTransformPointsF(void* matrix, void* points, int numPoints)
+{
+    return static_cast<Matrix*>(matrix)->TransformPoints(static_cast<PointF*>(points), numPoints);
+}
+
+int WinGraphicsGetPageUnit(void* graphics)
+{
+    return static_cast<int>(static_cast<Graphics*>(graphics)->GetPageUnit());
+}
+
+int WinGraphicsSetPageUnit(void* graphics, int unit)
+{
+    return static_cast<Graphics*>(graphics)->SetPageUnit(static_cast<Unit>(unit));
+}
+
+float WinGraphicsGetPageScale(void* graphics)
+{
+    return static_cast<Graphics*>(graphics)->GetPageScale();
+}
+
+int WinGraphicsSetPageScale(void* graphics, float scale)
+{
+    return static_cast<Graphics*>(graphics)->SetPageScale(scale);
+}
+
+float WinGraphicsGetDpiX(void* graphics)
+{
+    return static_cast<Graphics*>(graphics)->GetDpiX();
+}
+
+float WinGraphicsGetDpiY(void* graphics)
+{
+    return static_cast<Graphics*>(graphics)->GetDpiY();
+}
+
 void WinGetSysColor(int index, uint8_t& red, uint8_t& green, uint8_t& blue)
 {
     uint32_t rgb = GetSysColor(index);
@@ -763,6 +1008,21 @@ void* WinSetFocus(void* windowHandle)
     return SetFocus((HWND)windowHandle);
 }
 
+void* WinGetTopWindow(void* windowHandle)
+{
+    return GetTopWindow((HWND)windowHandle);
+}
+
+bool WinBringWindowToTop(void* windowHandle)
+{
+    return BringWindowToTop((HWND)windowHandle);
+}
+
+bool WinSetWindowPos(void* windowHandle, void* insertAfterWindowHandle, int x, int y, int cx, int cy, uint32_t flags)
+{
+    return SetWindowPos((HWND)windowHandle, (HWND)insertAfterWindowHandle, x, y, cx, cy, flags);
+}
+
 bool WinGetOpenFileName(void* windowHandle, const char16_t* filter, const char16_t* initialDirectory, char16_t* fileNameBuffer, uint32_t fileNameBufferSize, uint32_t flags, const char16_t* defaultExtension)
 {
     OPENFILENAMEW openFileName;
@@ -797,10 +1057,26 @@ uint32_t WinCommDlgExtendedError()
     return CommDlgExtendedError();
 }
 
+void* WinLoadImage(const char* name, uint32_t type, int32_t cx, int32_t cy)
+{
+    std::u16string wname(ToUtf16(name));
+    uint32_t fuLoad = 0;
+    if (cx == 0 && cy == 0)
+    {
+        fuLoad = LR_DEFAULTSIZE;
+    }
+    return LoadImageW(applicationInstance, (LPCWSTR)wname.c_str(), type, cx, cy, fuLoad);
+}
+
 void* WinLoadStandardCursor(int cursorId)
 {
     HCURSOR cursor = LoadCursor(nullptr, MAKEINTRESOURCE(cursorId));
     return cursor;
+}
+
+void* WinLoadCursor(const char* cursorName)
+{
+    return WinLoadImage(cursorName, IMAGE_CURSOR, 0, 0);
 }
 
 void* WinGetCursor()
@@ -811,4 +1087,51 @@ void* WinGetCursor()
 void* WinSetCursor(void* cursorHandle)
 {
     return SetCursor((HCURSOR)cursorHandle);
+}
+
+bool WinDestroyCursor(void* cursorHandle)
+{
+    return DestroyCursor((HCURSOR)cursorHandle);
+}
+
+void* WinLoadStandardIcon(int iconId)
+{
+    HICON icon = LoadIcon(nullptr, MAKEINTRESOURCE(iconId));
+    return icon;
+}
+
+void* WinLoadIcon(const char* iconName)
+{
+    return WinLoadImage(iconName, IMAGE_ICON, 0, 0);
+}
+
+bool WinDestroyIcon(void* iconHandle)
+{
+    return DestroyIcon((HICON)iconHandle);
+}
+
+void* WinLoadStandardBitmap(int bitmapId)
+{
+    HBITMAP bitmap = LoadBitmap(nullptr, MAKEINTRESOURCE(bitmapId));
+    return bitmap;
+}
+
+void* WinLoadBitmap(const char* bitmapName)
+{
+    return WinLoadImage(bitmapName, IMAGE_BITMAP, 0, 0);
+}
+
+bool WinDestroyBitmap(void* bitmapHandle)
+{
+    return DeleteObject((HGDIOBJ)bitmapHandle);
+}
+
+bool WinDeleteObject(void* handle)
+{
+    return DeleteObject((HGDIOBJ)handle);
+}
+
+int WinGetSystemMetrics(int index)
+{
+    return GetSystemMetrics(index);
 }

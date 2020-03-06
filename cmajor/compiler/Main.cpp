@@ -12,10 +12,12 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/Warning.hpp>
+#include <cmajor/cmres/InitDone.hpp>
 #include <soulng/lexer/ParsingException.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/CharacterData.hpp>
+#include <sngxml/xpath/InitDone.hpp>
 #include <soulng/util/Util.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Json.hpp>
@@ -34,9 +36,13 @@ struct InitDone
         soulng::util::Init();
         sngcm::ast::Init();
         cmajor::symbols::Init();
+        sngxml::xpath::Init();
+        cmajor::resources::Init();
     }
     ~InitDone()
     {
+        cmajor::resources::Done();
+        sngxml::xpath::Done();
         cmajor::symbols::Done();
         sngcm::ast::Done();
         soulng::util::Done();
@@ -205,6 +211,7 @@ int main(int argc, const char** argv)
         std::string target = "program";
         std::vector<std::string> files;
         std::vector<std::string> sourceFiles;
+        std::vector<std::string> resourceFiles;
         std::vector<std::string> referenceFiles;
         if (argc < 2)
         {
@@ -371,6 +378,16 @@ int main(int argc, const char** argv)
                                 }
                                 referenceFiles.push_back(file);
                             }
+                            else if (components[0] == "--resource")
+                            {
+                                std::string file = components[1];
+                                boost::filesystem::path fp(file);
+                                if (!boost::filesystem::exists(fp))
+                                {
+                                    throw std::runtime_error("resource XML file '" + fp.generic_string() + "' not found");
+                                }
+                                resourceFiles.push_back(file);
+                            }
                             else if (components[0] == "--target" || components[0] == "-a")
                             {
                                 target = components[1];
@@ -516,7 +533,7 @@ int main(int argc, const char** argv)
             if (GetGlobalFlag(GlobalFlags::msbuild))
             {
                 SetGlobalFlag(GlobalFlags::rebuild);
-                BuildMsBuildProject(projectName, projectDirectory, target, sourceFiles, referenceFiles, rootModule);
+                BuildMsBuildProject(projectName, projectDirectory, target, sourceFiles, resourceFiles, referenceFiles, rootModule);
             }
             if (rootModule && !rootModule->WarningCollection().Warnings().empty())
             {

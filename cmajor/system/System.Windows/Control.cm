@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.Windows.API;
 
 namespace System.Windows
@@ -25,7 +26,8 @@ namespace System.Windows
         public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowStyle style_, ExtendedWindowStyle exStyle_, 
             const Color& backgroundColor_, const string& text_, const Point& location_, const Size& size_, Dock dock_, Anchors anchors_) : 
             windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), style(style_), exStyle(exStyle_),
-            backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), dock(dock_), anchors(anchors_), flags(Flags.none)
+            backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), dock(dock_), anchors(anchors_), flags(Flags.none),
+            arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW))
         {
             Application.Init();
             if ((style & WindowStyle.WS_CHILD) == 0)
@@ -66,6 +68,14 @@ namespace System.Windows
                 ushort windowClass = Application.GetWindowManager().RegisterWindowClass(windowClassName, windowClassStyle, 0);
                 handle = CreateWindowByClassAtom(windowClass, text.Chars(), style, exStyle, location, size, parentControl);
             }
+            if (!createList.IsEmpty())
+            {
+                for (Control* childControl : createList)
+                {
+                    childControl->CreateWindowInternal();
+                }
+                createList.Clear();
+            }
             Application.GetWindowManager().AddWindow(this);
             WinRect clientRect = GetClientRect();
             if ((style & WindowStyle.WS_CHILD) == 0)
@@ -76,22 +86,37 @@ namespace System.Windows
             }
             size.w = clientRect.right - clientRect.left;
             size.h = clientRect.bottom - clientRect.top;
-            DockWindow();
+            if (parentControl != null && parentControl->createList.IsEmpty())
+            {
+                DockWindow();
+            }
+            if ((style & WindowStyle.WS_VISIBLE) != 0)
+            {
+                Show();
+                Update();
+            }
         }
         internal void AddChildVisual(Control* child)
         {
-            if (child->Handle() == null)
+            if (handle != null)
             {
-                child->CreateWindowInternal();
+                if (child->Handle() == null)
+                {
+                    child->CreateWindowInternal();
+                }
+                else
+                {
+                    child->SetParentWindow(this);
+                }
+                if ((child->GetWindowStyle() & WindowStyle.WS_VISIBLE) != 0)
+                {
+                    child->Show();
+                    child->Update();
+                }
             }
             else
             {
-                child->SetParentWindow(this);
-            }            
-            if ((child->GetWindowStyle() & WindowStyle.WS_VISIBLE) != 0)
-            {
-                child->Show();
-                child->Update();
+                createList.Add(child);
             }
         }
         public Window* GetWindow() const
@@ -124,6 +149,22 @@ namespace System.Windows
         {
             SetParentWindow(handle, parentWindow->handle);
             DockWindow();
+        }
+        public void BringToFront()
+        {
+            BringWindowToTop(handle);
+        }
+        public Control* TopControl() const
+        {
+            void* topWindowHandle = GetTopWindow(handle);
+            if (topWindowHandle != null)
+            {
+                return Application.GetWindowManager().GetWindow(topWindowHandle);
+            }
+            else
+            {
+                return null;
+            }
         }
         public void Show()
         {
@@ -215,6 +256,7 @@ namespace System.Windows
         internal void DockWindow(Rect& parentRect)
         {
             if (dock == Dock.none) return;
+            LogView* logView = Application.GetLogView();
             Point parentLoc = parentRect.location;
             Size parentSize = parentRect.size;
             Point newLocation = location;
@@ -227,6 +269,10 @@ namespace System.Windows
                     newSize.h = parentSize.h;
                     parentRect.location = Point(parentLoc.x + size.w, parentLoc.y);
                     parentRect.size = Size(parentSize.w - size.w, parentSize.h);
+                    if (logView != null)
+                    {
+                        logView->WriteLine("Dock.left " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                    }
                     break;
                 }
                 case Dock.top:
@@ -235,6 +281,10 @@ namespace System.Windows
                     newSize.w = parentSize.w;
                     parentRect.location = Point(parentLoc.x, parentLoc.y + size.h);
                     parentRect.size = Size(parentSize.w, parentSize.h - size.h);
+                    if (logView != null)
+                    {
+                        logView->WriteLine("Dock.top " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                    }
                     break;
                 }
                 case Dock.right:
@@ -242,6 +292,10 @@ namespace System.Windows
                     newLocation = Point(parentLoc.x + parentSize.w - size.w, parentLoc.y);
                     newSize.h = parentSize.h;
                     parentRect.size = Size(parentSize.w - size.w, parentSize.h);
+                    if (logView != null)
+                    {
+                        logView->WriteLine("Dock.right " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                    }
                     break;
                 }
                 case Dock.bottom:
@@ -249,6 +303,10 @@ namespace System.Windows
                     newLocation = Point(parentLoc.x, parentLoc.y + parentSize.h - size.h);
                     newSize.w = parentSize.w;
                     parentRect.size = Size(parentSize.w, parentSize.h - size.h);
+                    if (logView != null)
+                    {
+                        logView->WriteLine("Dock.bottom " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                    }
                     break;
                 }
                 case Dock.fill:
@@ -257,6 +315,10 @@ namespace System.Windows
                     newSize = parentSize;
                     parentRect.location = Point();
                     parentRect.size = Size();
+                    if (logView != null)
+                    {
+                        logView->WriteLine("Dock.fill " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                    }
                     break;
                 }
             }
@@ -633,14 +695,25 @@ namespace System.Windows
         }
         protected virtual void OnPaint(PaintEventArgs& args)
         {
-            args.graphics.Clear(backgroundColor);
             paintEvent.Fire(args);
+        }
+        internal virtual void PaintAll(PaintEventArgs& args)
+        {
+            try
+            {
+                OnPaint(args);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
         }
         private void DoMouseMove(MouseEventArgs& args)
         {
             if (!MouseInClient())
             {
                 SetMouseInClient();
+                SetCursor();
                 OnMouseEnter();
                 WinTrackMouseEvent(handle, TME_LEAVE, HOVER_DEFAULT);
             }
@@ -674,6 +747,10 @@ namespace System.Windows
                     OnClick();
                 }
             }
+        }
+        protected virtual void SetCursor()
+        {
+            SetCursor(arrowCursor);
         }
         protected virtual void OnMouseEnter()
         {
@@ -849,6 +926,8 @@ namespace System.Windows
         private Anchors anchors;
         private Flags flags;
         private Keys currentModifierKeys;
+        private List<Control*> createList;
+        private Cursor arrowCursor;
         private Event<PaintEventHandler, PaintEventArgs> paintEvent;
         private Event<MouseEnterEventHandler> mouseEnterEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseMoveEvent;

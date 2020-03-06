@@ -282,7 +282,8 @@ function drawInheritanceDiagram() {
         { name: "System.Net.Sockets.SocketException", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Sockets/doc/class_SocketException_543E6533D1008D044BED00CE9B250109F27F18FB.html" },
         { name: "System.Threading.ThreadingException", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_ThreadingException_4952259FBBDB6BDFCF1A52EABE2C1A61BF601670.html" },
         { name: "System.Unicode.UnicodeException", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_UnicodeException_F535D36BB8009200467ACEA05819217182306079.html" },
-        { name: "System.Windows.API.WindowsAPIException", id: "diagram_node_15", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html" },
+        { name: "System.Windows.API.CommonDialogError", id: "diagram_node_15", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_CommonDialogError_C6319F4DC1EB231FB66D7540C953A8F0E20B3979.html" },
+        { name: "System.Windows.API.WindowsAPIException", id: "diagram_node_16", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html" },
         { name: "System.Xml.XmlProcessingException", id: "diagram_node_11", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Xml/doc/class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5.html" }];
     drawDiagram(diagramNodes);
 }

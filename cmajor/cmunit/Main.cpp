@@ -262,7 +262,8 @@ void TestUnit(FileTable* fileTable, sngcm::ast::Project* project, CompileUnitNod
         int32_t numUnitTestAssertions = GetNumUnitTestAssertions();
         CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder, testName, numUnitTestAssertions, unitTestFilePath, mainObjectFilePath);
         GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
-        Link(Target::program, project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), mainObjectFilePath, *rootModule);
+        Link(Target::program, project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), rootModule->ResourceFilePaths(),
+            mainObjectFilePath, *rootModule);
         boost::filesystem::remove(unitTestFilePath);
         if (GetGlobalFlag(GlobalFlags::verbose))
         {

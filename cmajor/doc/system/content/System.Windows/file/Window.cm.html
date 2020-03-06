@@ -1,0 +1,433 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Windows/Window.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Windows</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<span class="kw">delegate</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.html#class_delegate_WindowClosingEventHandler_05EBF33FF5DD0803B03A723AF69C2854EA95FE44">WindowClosingEventHandler</a><span class="other">(</span><span class="kw">bool</span><span class="other">&amp;</span>&nbsp;<span class="identifier">cancelClose</span><span class="other">);</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<span class="kw">delegate</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.html#class_delegate_WindowClosedEventHandler_FD58A1ECF7E1F209744A669F274F6CC82324BC0E">WindowClosedEventHandler</a><span class="other">(</span><span class="other">);</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html">Window</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_ContainerControl_C51C940ECF1618F86A97329C20B6483B7DF45EF5.html">ContainerControl</a></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#constructor_Window_03AF0F5AB9BD8A63B1610649BAC8EBF021E44583">Window</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">windowClassName</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_WindowClassStyle_9AF8C072E4C7AC8BBE1842749422AE3A2BE8D1DE.html">WindowClassStyle</a>&nbsp;<span class="identifier">classStyle</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_WindowStyle_806A1C8963A34D4762FE7E31D38263FD829C82CF.html">WindowStyle</a>&nbsp;<span class="identifier">style</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_ExtendedWindowStyle_9A8C249B50D7D809CA46BF1569A905CC79F84E46.html">ExtendedWindowStyle</a>&nbsp;<span class="identifier">exStyle</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<a href="../doc/class_Color_102B8BF2A966C6BE688EE449F8242854F5D69103.html">Color</a><span class="other">&amp;</span>&nbsp;<span class="identifier">backgroundColor</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">text</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a><span class="other">&amp;</span>&nbsp;<span class="identifier">location</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a><span class="other">&amp;</span>&nbsp;<span class="identifier">size</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a>&nbsp;<span class="identifier">dock</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a>&nbsp;<span class="identifier">anchors</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">(</span><span class="identifier">windowClassName</span><span class="other">,&nbsp;</span><span class="identifier">classStyle</span><span class="other">,&nbsp;</span><span class="identifier">style</span><span class="other">,&nbsp;</span><span class="identifier">exStyle</span><span class="other">,&nbsp;</span><span class="identifier">backgroundColor</span><span class="other">,&nbsp;</span><span class="identifier">text</span><span class="other">,&nbsp;</span><span class="identifier">location</span><span class="other">,&nbsp;</span><span class="identifier">size</span><span class="other">,&nbsp;</span><span class="identifier">dock</span><span class="other">,&nbsp;</span><span class="identifier">anchors</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">isMainWindow</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">state</span><span class="other">(</span><a href="../doc/enumerated_type_WindowState_46A84E256E77B8BD07296D5830CC3596052F8801.html">WindowState</a><span class="other">.</span><a href="../doc/enumerated_type_WindowState_46A84E256E77B8BD07296D5830CC3596052F8801.html#enumeration_constant_normal_8B11BDF81B42D21EBDAAE335A11BBA4AD64FE6FE">normal</a><span class="other">)</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">menuBar</span><span class="other">(</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#constructor_Window_29702E0D84B48467F90575E0E622F53765637312">Window</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">windowClassName</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_WindowStyle_806A1C8963A34D4762FE7E31D38263FD829C82CF.html">WindowStyle</a>&nbsp;<span class="identifier">style</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_ExtendedWindowStyle_9A8C249B50D7D809CA46BF1569A905CC79F84E46.html">ExtendedWindowStyle</a>&nbsp;<span class="identifier">exStyle</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">text</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a><span class="other">&amp;</span>&nbsp;<span class="identifier">location</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a><span class="other">&amp;</span>&nbsp;<span class="identifier">size</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a>&nbsp;<span class="identifier">dock</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a>&nbsp;<span class="identifier">anchors</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">this</span><span class="other">(</span><span class="identifier">windowClassName</span><span class="other">,&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><a href="../doc/enumerated_type_WindowClassStyle_9AF8C072E4C7AC8BBE1842749422AE3A2BE8D1DE.html">WindowClassStyle</a><span class="other">></span><span class="other">(</span><a href="../doc/enumerated_type_WindowClassStyle_9AF8C072E4C7AC8BBE1842749422AE3A2BE8D1DE.html">WindowClassStyle</a><span class="other">.</span><a href="../doc/enumerated_type_WindowClassStyle_9AF8C072E4C7AC8BBE1842749422AE3A2BE8D1DE.html#enumeration_constant_CS_VREDRAW_2211D42C839EEBBE1F96265D287C0B6D02BDF9FA">CS_VREDRAW</a><span class="other">&nbsp;|&nbsp;</span><a href="../doc/enumerated_type_WindowClassStyle_9AF8C072E4C7AC8BBE1842749422AE3A2BE8D1DE.html">WindowClassStyle</a><span class="other">.</span><a href="../doc/enumerated_type_WindowClassStyle_9AF8C072E4C7AC8BBE1842749422AE3A2BE8D1DE.html#enumeration_constant_CS_HREDRAW_CCDDE81E075048D1B9E25C8D3CABC7B3D9EDBE74">CS_HREDRAW</a><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">style</span><span class="other">,&nbsp;</span><span class="identifier">exStyle</span><span class="other">,&nbsp;</span><a href="../doc/ns_System.Windows.html#function_GetSystemColor_74AF3DB5D2717582DDC6A9F2C09FA359E2746C1A">GetSystemColor</a><span class="other">(</span><a href="../doc/enumerated_type_SystemColor_952609C9CAAA3D193F31BCF7C26ACA7BB3A344CF.html">SystemColor</a><span class="other">.</span><a href="../doc/enumerated_type_SystemColor_952609C9CAAA3D193F31BCF7C26ACA7BB3A344CF.html#enumeration_constant_COLOR_WINDOW_B4ABAFC1D8EC04E9A8CCA05F8F84126FC24F88F4">COLOR_WINDOW</a><span class="other">)</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">text</span><span class="other">,&nbsp;</span><span class="identifier">location</span><span class="other">,&nbsp;</span><span class="identifier">size</span><span class="other">,&nbsp;</span><span class="identifier">dock</span><span class="other">,&nbsp;</span><span class="identifier">anchors</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#constructor_Window_4BE597D520D694FD295B1582D794933D9B70519E">Window</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">caption</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">this</span><span class="other">(</span><span class="string">"System.Windows.Window"</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_WindowStyle_806A1C8963A34D4762FE7E31D38263FD829C82CF.html">WindowStyle</a><span class="other">.</span><a href="../doc/enumerated_type_WindowStyle_806A1C8963A34D4762FE7E31D38263FD829C82CF.html#enumeration_constant_WS_OVERLAPPEDWINDOW_C0FE13B8190546E24694C1A06BBABFCB7CBE0F50">WS_OVERLAPPEDWINDOW</a><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_ExtendedWindowStyle_9A8C249B50D7D809CA46BF1569A905CC79F84E46.html">ExtendedWindowStyle</a><span class="other">.</span><a href="../doc/enumerated_type_ExtendedWindowStyle_9A8C249B50D7D809CA46BF1569A905CC79F84E46.html#enumeration_constant_WS_EX_DEFAULT_802868AB274D985AD69413EB79BE0537D2F0B5BA">WS_EX_DEFAULT</a><span class="other">,&nbsp;</span><span class="identifier">caption</span><span class="other">,&nbsp;</span><a href="../doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a><span class="other">.</span><a href="../doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html#member_function_Default_Point_BB45219FCEB66F8278923E916D73FE5B79E2D6A5">Default</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a><span class="other">.</span><a href="../doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html#member_function_Default_Size_E1D5B347159EE2DA24C95DCDCE790A9441D7AEE4">Default</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a><span class="other">.</span><a href="../doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html#enumeration_constant_none_DDB70A1BFD52088ED442B008152AF5E39E19CBB4">none</a><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a><span class="other">.</span><a href="../doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html#enumeration_constant_none_45D8E37A878B7BFC39CA4D1C7C6CD54E5894DE28">none</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_ProcessMessage_Window_C7EBDF2EAD97CEC1176992E17DA618230AA469FA">ProcessMessage</a><span class="other">(</span><a href="../doc/class_Message_B1E71FBE8116A9B77A1F42BE4D58EBF56664A00D.html">Message</a><span class="other">&amp;</span>&nbsp;<span class="identifier">message</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch</span>&nbsp;<span class="other">(</span><span class="identifier">message</span><span class="other">.</span><a href="../doc/class_Message_B1E71FBE8116A9B77A1F42BE4D58EBF56664A00D.html#member_variable_msg_A294F18806C65C5932BFC09E12FA047C1501F4C5">msg</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_CLOSE</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">cancelClose</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_OnWindowClosing_Window_7E22669F826DA70A9415320DEEEB84C04952D2CA">OnWindowClosing</a><span class="other">(</span><span class="identifier">cancelClose</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">cancelClose</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">message</span><span class="other">.</span><a href="../doc/class_Message_B1E71FBE8116A9B77A1F42BE4D58EBF56664A00D.html#member_variable_result_5F96A6998217F2F92612C742F568D3EB10C26841">result</a><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_DESTROY</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">processed</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_OnWindowClosed_Window_3676B2028E0B233907C7C344B281943EB2CE85D6">OnWindowClosed</a><span class="other">(</span><span class="identifier">processed</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">processed</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">message</span><span class="other">.</span><a href="../doc/class_Message_B1E71FBE8116A9B77A1F42BE4D58EBF56664A00D.html#member_variable_result_5F96A6998217F2F92612C742F568D3EB10C26841">result</a><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_COMMAND</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_SIZE</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_PAINT</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_MOUSEMOVE</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_MOUSELEAVE</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_LBUTTONDOWN</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_LBUTTONUP</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_CHAR</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_KEYDOWN</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_KEYUP</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WM_SYSCOMMAND</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">base</span><span class="other">-></span><a href="../doc/class_ContainerControl_C51C940ECF1618F86A97329C20B6483B7DF45EF5.html#member_function_ProcessMessage_ContainerControl_637DFA920B34450EEDF5D18AE7AEDE3D958DCAD5">ProcessMessage</a><span class="other">(</span><span class="identifier">message</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_Close_Window_7402FAEA7FDAB18D3B16243529A282B6CDD9E936">Close</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.Windows.API.html#function_PostMessage_1898685024A9491ED3CDF17D19F9FF732E6F50E2">PostMessage</a><span class="other">(</span><a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_Handle_Control_39597934F7C88849DCB9AB5454FF32587F28C6FE">Handle</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../doc/ns_System.Windows.html#constant_WM_CLOSE_ECB68B4BDB164A24A298D8DB907868955059C8DA">WM_CLOSE</a><span class="other">,&nbsp;</span><span class="number">0u</span><span class="other">,&nbsp;</span><span class="number">0</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_OnWindowClosing_Window_7E22669F826DA70A9415320DEEEB84C04952D2CA">OnWindowClosing</a><span class="other">(</span><span class="kw">bool</span><span class="other">&amp;</span>&nbsp;<span class="identifier">cancelClose</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_windowClosingEvent_6F74CE267DCB3EA209B5FC00314FA347CB042A86">windowClosingEvent</a><span class="other">.</span><a href="../doc/class_Event_Handler_Args_6357F10179232929FBED1BC40D35731A9597AAAB.html#member_function_Fire_Event_Handler_Args_C854809935E6C519376FC2DA16F00367EAB69485">Fire</a><span class="other">(</span><span class="identifier">cancelClose</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_OnWindowClosed_Window_3676B2028E0B233907C7C344B281943EB2CE85D6">OnWindowClosed</a><span class="other">(</span><span class="kw">bool</span><span class="other">&amp;</span>&nbsp;<span class="identifier">processed</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_windowClosedEvent_9106AF51D70BD09D1BAEEBBF74688804B57B268E">windowClosedEvent</a><span class="other">.</span><a href="../doc/class_Event_Handler_Args_6357F10179232929FBED1BC40D35731A9597AAAB.html#member_function_Handlers_Event_Handler_Args_F6FDD35745022FF1079E7FBF6F89F4C2A252145A">Handlers</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_IsEmpty_List_T_9D2D6FCD118AECF7D6172A1DA09ACD9A5837CED0">IsEmpty</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_isMainWindow_73A5801C6C88314E649B8EB8A3D248AD10A792C0">isMainWindow</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Application_86A298E9CF00426AD55A3E9242E02EE39B587AF4.html">Application</a><span class="other">.</span><a href="../doc/class_Application_86A298E9CF00426AD55A3E9242E02EE39B587AF4.html#member_function_Exit_Application_CC3714BDDC1084F5E68522A5620C0B3B61A9656C">Exit</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">processed</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_windowClosedEvent_9106AF51D70BD09D1BAEEBBF74688804B57B268E">windowClosedEvent</a><span class="other">.</span><a href="../doc/class_Event_Handler_Args_6357F10179232929FBED1BC40D35731A9597AAAB.html#member_function_Fire_Event_Handler_Args_11293EB03145B2024280815EBD337AF2BC257168">Fire</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">processed</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_OnControlAdded_Window_673BD08B6864A0EFCEFA39B172562AB0F80FB5A4">OnControlAdded</a><span class="other">(</span><a href="../doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a><span class="other">&amp;</span>&nbsp;<span class="identifier">args</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">-></span><a href="../doc/class_ContainerControl_C51C940ECF1618F86A97329C20B6483B7DF45EF5.html#member_function_OnControlAdded_ContainerControl_AB001E3FA9F11EEB6B6062C8BE787D3FB27241F3">OnControlAdded</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a><span class="other">*</span>&nbsp;<span class="identifier">control</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">args</span><span class="other">.</span><a href="../doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html#member_variable_control_775993A16AB0B20CBDB64B409AB0E6457E5762EC">control</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">control</span><span class="kw">&nbsp;is&nbsp;</span><a href="../doc/class_MenuBar_C9C6DE89C20C49C579DD7E2B480C24CA9E189CF6.html">MenuBar</a><span class="other">*</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><a href="../doc/class_MenuBar_C9C6DE89C20C49C579DD7E2B480C24CA9E189CF6.html">MenuBar</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">control</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_OnControlRemoved_Window_72F366848F03092DBAC21199B1CCE90101A4F577">OnControlRemoved</a><span class="other">(</span><a href="../doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html">ControlEventArgs</a><span class="other">&amp;</span>&nbsp;<span class="identifier">args</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">-></span><a href="../doc/class_ContainerControl_C51C940ECF1618F86A97329C20B6483B7DF45EF5.html#member_function_OnControlRemoved_ContainerControl_6CDC167286D869409B49DB1D808808E5682580EB">OnControlRemoved</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html">Control</a><span class="other">*</span>&nbsp;<span class="identifier">control</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">args</span><span class="other">.</span><a href="../doc/class_ControlEventArgs_BCD2FFDE3BCD23FBA6EC6DD01D8448A7E3B418C6.html#member_variable_control_775993A16AB0B20CBDB64B409AB0E6457E5762EC">control</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">control</span><span class="other">&nbsp;==&nbsp;</span><a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">null</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_OnMouseMove_Window_BE3EE2CD99111245C7955E3B6D5D5E0234B0D513">OnMouseMove</a><span class="other">(</span><a href="../doc/class_MouseEventArgs_14444E11BA5CD6BB0759E82F3D34DDB60D3A1043.html">MouseEventArgs</a><span class="other">&amp;</span>&nbsp;<span class="identifier">args</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">-></span><a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_OnMouseMove_Control_C2BFACB0ED1D950DEC394A3271731F13D212018B">OnMouseMove</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">-></span><a href="../doc/class_MenuBar_C9C6DE89C20C49C579DD7E2B480C24CA9E189CF6.html#member_function_MouseMoveInternal_MenuBar_CF0B85804B000451E04DC19E7E90F13233750715">MouseMoveInternal</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_OnMouseDown_Window_7E9E46DFE3F3B4BDFFD521A550924117F93CFD33">OnMouseDown</a><span class="other">(</span><a href="../doc/class_MouseEventArgs_14444E11BA5CD6BB0759E82F3D34DDB60D3A1043.html">MouseEventArgs</a><span class="other">&amp;</span>&nbsp;<span class="identifier">args</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">-></span><a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_OnMouseDown_Control_BF0282A0D2F1D44D72F6EF8E11906F40C15F171B">OnMouseDown</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">-></span><a href="../doc/class_MenuBar_C9C6DE89C20C49C579DD7E2B480C24CA9E189CF6.html#member_function_MouseDownInternal_MenuBar_0669CAE4B54684BF95E1F9739C0A096F0CC95CCD">MouseDownInternal</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_OnMouseUp_Window_1618D41B7C03B0C26AE65B0268A1C51E5DFB2C38">OnMouseUp</a><span class="other">(</span><a href="../doc/class_MouseEventArgs_14444E11BA5CD6BB0759E82F3D34DDB60D3A1043.html">MouseEventArgs</a><span class="other">&amp;</span>&nbsp;<span class="identifier">args</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">-></span><a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_OnMouseUp_Control_701DC839A73024A5186E0978DBB279B06C6CE070">OnMouseUp</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">-></span><a href="../doc/class_MenuBar_C9C6DE89C20C49C579DD7E2B480C24CA9E189CF6.html#member_function_MouseUpInternal_MenuBar_A37C6D7CFA9937EDBA45EB86AEAB31BD9B5F9F6F">MouseUpInternal</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_SetAsMainWindow_Window_3FF66DCB0FA2BB02A9578A094D2F984DB25E6327">SetAsMainWindow</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_isMainWindow_73A5801C6C88314E649B8EB8A3D248AD10A792C0">isMainWindow</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_IsMainWindow_Window_08A731D494A21F24981DA549152B73FAFB40FD7D">IsMainWindow</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_isMainWindow_73A5801C6C88314E649B8EB8A3D248AD10A792C0">isMainWindow</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/enumerated_type_WindowState_46A84E256E77B8BD07296D5830CC3596052F8801.html">WindowState</a>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_GetWindowState_Window_757A12754B5278F46A44B325CA57DA845DD4A252">GetWindowState</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_state_5E5DA28E8EE9BCE2024AFDD89BE65FA42E32E059">state</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_SetWindowState_Window_EC54CC5C1E7988384ED0854FD616D7E748C83314">SetWindowState</a><span class="other">(</span><a href="../doc/enumerated_type_WindowState_46A84E256E77B8BD07296D5830CC3596052F8801.html">WindowState</a>&nbsp;<span class="identifier">newState</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_state_5E5DA28E8EE9BCE2024AFDD89BE65FA42E32E059">state</a><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">newState</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch</span>&nbsp;<span class="other">(</span><a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_state_5E5DA28E8EE9BCE2024AFDD89BE65FA42E32E059">state</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WindowState</span><span class="other">.</span><span class="identifier">normal</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch</span>&nbsp;<span class="other">(</span><span class="identifier">newState</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WindowState</span><span class="other">.</span><span class="identifier">minimized</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_ShowWindow_Control_2987A3A4CADDF645EDBB049111A11BC587BA6B2C">ShowWindow</a><span class="other">(</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html">ShowCommand</a><span class="other">.</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html#enumeration_constant_SW_MINIMIZE_BA73CDEC3A5BF0AFDFB73263161DBE66625A25B9">SW_MINIMIZE</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WindowState</span><span class="other">.</span><span class="identifier">maximized</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_ShowWindow_Control_2987A3A4CADDF645EDBB049111A11BC587BA6B2C">ShowWindow</a><span class="other">(</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html">ShowCommand</a><span class="other">.</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html#enumeration_constant_SW_MAXIMIZE_31107D58900C0CF0FCA80A8EA70D9378E25E77C7">SW_MAXIMIZE</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WindowState</span><span class="other">.</span><span class="identifier">minimized</span><span class="other">:</span>&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WindowState</span><span class="other">.</span><span class="identifier">maximized</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch</span>&nbsp;<span class="other">(</span><span class="identifier">newState</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WindowState</span><span class="other">.</span><span class="identifier">normal</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_ShowWindow_Control_2987A3A4CADDF645EDBB049111A11BC587BA6B2C">ShowWindow</a><span class="other">(</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html">ShowCommand</a><span class="other">.</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html#enumeration_constant_SW_RESTORE_BCAEC0E132B2E972408938EF1F45FAECC6D67EEB">SW_RESTORE</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WindowState</span><span class="other">.</span><span class="identifier">minimized</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_ShowWindow_Control_2987A3A4CADDF645EDBB049111A11BC587BA6B2C">ShowWindow</a><span class="other">(</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html">ShowCommand</a><span class="other">.</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html#enumeration_constant_SW_MINIMIZE_BA73CDEC3A5BF0AFDFB73263161DBE66625A25B9">SW_MINIMIZE</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">WindowState</span><span class="other">.</span><span class="identifier">maximized</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_ShowWindow_Control_2987A3A4CADDF645EDBB049111A11BC587BA6B2C">ShowWindow</a><span class="other">(</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html">ShowCommand</a><span class="other">.</span><a href="../doc/enumerated_type_ShowCommand_304A402408105F901529F48D082CE6A87A9D88D4.html#enumeration_constant_SW_MAXIMIZE_31107D58900C0CF0FCA80A8EA70D9378E25E77C7">SW_MAXIMIZE</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_state_5E5DA28E8EE9BCE2024AFDD89BE65FA42E32E059">state</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">newState</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../System.Core/index.html#eab401da-0cac-4899-a229-2c0e1e38b76b">MenuBar</a><span class="other">*</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_GetMenuBar_Window_C07B3AE4DA7851C6B976777C6DD9F31EF6F8CDB1">GetMenuBar</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_menuBar_D73EE368C0DC8724C34AFB9E8D908AF61BDEEF4E">menuBar</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_Event_Handler_Args_6357F10179232929FBED1BC40D35731A9597AAAB.html">Event</a><span class="other">&lt;</span><a href="../doc/ns_System.Windows.html#class_delegate_WindowClosingEventHandler_05EBF33FF5DD0803B03A723AF69C2854EA95FE44">WindowClosingEventHandler</a><span class="other">,&nbsp;</span><span class="kw">bool</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_WindowClosingEvent_Window_E660D96EC49326F70380D2C261F813D63CAC74AC">WindowClosingEvent</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_windowClosingEvent_6F74CE267DCB3EA209B5FC00314FA347CB042A86">windowClosingEvent</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_Event_Handler_Args_6357F10179232929FBED1BC40D35731A9597AAAB.html">Event</a><span class="other">&lt;</span><a href="../doc/ns_System.Windows.html#class_delegate_WindowClosedEventHandler_FD58A1ECF7E1F209744A669F274F6CC82324BC0E">WindowClosedEventHandler</a><span class="other">></span><span class="other">&amp;</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_function_WindowClosedEvent_Window_9E98C9C86F0833424445E2E86844FB369CD9101C">WindowClosedEvent</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Window_BA670D53C2CDC48F933EC93554F3CA3BBDF067F0.html#member_variable_windowClosedEvent_9106AF51D70BD09D1BAEEBBF74688804B57B268E">windowClosedEvent</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">isMainWindow</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../doc/enumerated_type_WindowState_46A84E256E77B8BD07296D5830CC3596052F8801.html">WindowState</a>&nbsp;<span class="identifier">state</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../System.Core/index.html#eab401da-0cac-4899-a229-2c0e1e38b76b">MenuBar</a><span class="other">*</span>&nbsp;<span class="identifier">menuBar</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../doc/class_Event_Handler_Args_6357F10179232929FBED1BC40D35731A9597AAAB.html">Event</a><span class="other">&lt;</span><a href="../doc/ns_System.Windows.html#class_delegate_WindowClosingEventHandler_05EBF33FF5DD0803B03A723AF69C2854EA95FE44">WindowClosingEventHandler</a><span class="other">,&nbsp;</span><span class="kw">bool</span><span class="other">></span>&nbsp;<span class="identifier">windowClosingEvent</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../doc/class_Event_Handler_Args_6357F10179232929FBED1BC40D35731A9597AAAB.html">Event</a><span class="other">&lt;</span><a href="../doc/ns_System.Windows.html#class_delegate_WindowClosedEventHandler_FD58A1ECF7E1F209744A669F274F6CC82324BC0E">WindowClosedEventHandler</a><span class="other">></span>&nbsp;<span class="identifier">windowClosedEvent</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

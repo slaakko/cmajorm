@@ -30,6 +30,12 @@ namespace System.Windows
             OnControlRemoved(args);
             return UniquePtr<Control>(childComponent.Release() as Control*);
         }
+        public void InsertChildAfter(Control* child, Control* after)
+        {
+            children.InsertAfter(child, after);
+            ControlEventArgs args(child);
+            OnControlAdded(args);
+        }
         protected override bool ProcessMessage(Message& message)
         {
             switch (message.msg)
@@ -100,15 +106,78 @@ namespace System.Windows
         internal void DockChildren()
         {
             Rect parentRect(Point(), GetSize());
+            List<Control*> filledControls;
+            List<ContainerControl*> containers;
             Component* child = children.FirstChild();
             while (child != null)
             {
                 if (child is Control*)
                 {
                     Control* childControl = cast<Control*>(child);
-                    childControl->DockWindow(parentRect);
+                    switch (childControl->GetDock())
+                    {
+                        case Dock.none: break;
+                        case Dock.fill: filledControls.Add(childControl); break;
+                        default:
+                        {
+                            childControl->DockWindow(parentRect);
+                            break;
+                        }
+                    }
+                    if (childControl is ContainerControl*)
+                    {
+                        ContainerControl* containerChild = cast<ContainerControl*>(childControl);
+                        containers.Add(containerChild);
+                    }
                 }
                 child = child->NextSibling();
+            }
+            for (Control* filledControl : filledControls)
+            {
+                filledControl->DockWindow(parentRect);
+            }
+            for (ContainerControl* container : containers)
+            {
+                container->DockChildren();
+            }
+        }
+        internal override void PaintAll(PaintEventArgs& args)
+        {
+            try
+            {
+                base->PaintAll(args);
+                Control* topControl = TopControl();
+                Component* child = children.FirstChild();
+                while (child != null)
+                {
+                    if (child is Control*)
+                    {
+                        Control* childControl = cast<Control*>(child);
+                        if (childControl != topControl)
+                        {
+                            GraphicsState state = args.graphics.SaveChecked();
+                            Point loc = childControl->Location();
+                            args.graphics.SetClipChecked(Rect(childControl->Location(), childControl->GetSize()));
+                            args.graphics.TranslateTransformChecked(loc.x, loc.y);
+                            childControl->PaintAll(args);
+                            args.graphics.RestoreChecked(state);
+                        }
+                    }
+                    child = child->NextSibling();
+                }
+                if (topControl != null)
+                {
+                    GraphicsState state = args.graphics.SaveChecked();
+                    Point loc = topControl->Location();
+                    args.graphics.SetClipChecked(Rect(topControl->Location(), topControl->GetSize()));
+                    args.graphics.TranslateTransformChecked(loc.x, loc.y);
+                    topControl->PaintAll(args);
+                    args.graphics.RestoreChecked(state);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
             }
         }
         protected virtual void OnControlAdded(ControlEventArgs& args)

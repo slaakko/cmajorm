@@ -37,6 +37,7 @@
 #include <cmajor/cmdoclib/SourceCodePrinter.hpp>
 #include <cmajor/cmdoclib/SymbolTableXml.hpp>
 #include <cmajor/cmdoclib/File.hpp>
+#include <cmajor/cmres/ResourceProcessor.hpp>
 #include <sngcm/ast/Attribute.hpp>
 #include <sngcm/ast/Function.hpp>
 #include <sngcm/ast/BasicType.hpp>
@@ -517,8 +518,8 @@ void CreateDefFile(const std::string& defFilePath, Module& module)
     }
 }
 
-void LinkLlvm(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string mainObjectFilePath,
-    Module& module)
+void LinkLlvm(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths,
+    const std::vector<std::string>& resourceFilePaths, const std::string mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -560,6 +561,11 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
     for (int i = 0; i < n; ++i)
     {
         args.push_back(QuotedPath(libraryFilePaths[i]));
+    }
+    int m = resourceFilePaths.size();
+    for (int i = 0; i < m; ++i)
+    {
+        args.push_back(QuotedPath(resourceFilePaths[i]));
     }
     std::string linkCommandLine;
     std::string linkErrorFilePath;
@@ -666,7 +672,8 @@ void CreateDynamicListFile(const std::string& dynamicListFilePath, Module& modul
     formatter.WriteLine("};");
 }
 
-void LinkLlvm(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
+void LinkLlvm(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths,
+    const std::vector<std::string>& resourceFilePaths, const std::string& mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -690,6 +697,11 @@ void LinkLlvm(const std::string& executableFilePath, const std::string& libraryF
     for (int i = 0; i < n - 1; ++i)
     {
         args.push_back(QuotedPath(libraryFilePaths[i]));
+    }
+    int m = resourceFilePaths.size();
+    for (int i = 0; i < m; ++i)
+    {
+        args.push_back(QuotedPath(resourceFilePaths[i]));
     }
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
@@ -732,12 +744,12 @@ void LinkLlvm(const std::string& executableFilePath, const std::string& libraryF
 
 #endif
 
-void Link(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string mainObjectFilePath,
-    Module& module)
+void Link(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths,
+    const std::vector<std::string>& resourceFilePaths, const std::string mainObjectFilePath, Module& module)
 {
     if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
     {
-        LinkLlvm(target, executableFilePath, libraryFilePath, libraryFilePaths, mainObjectFilePath, module);
+        LinkLlvm(target, executableFilePath, libraryFilePath, libraryFilePaths, resourceFilePaths, mainObjectFilePath, module);
     }
 #ifdef _WIN32
     else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
@@ -1229,6 +1241,20 @@ void InstallSystemLibraries(Module* systemInstallModule)
                 LogMessage(systemInstallModule->LogStreamId(), from.generic_string() + " -> " + to.generic_string());
             }
         }
+        if (systemModule->HasResourceFile())
+        {
+            from = systemModule->ResourceFilePath();
+            to = systemLibDir / from.filename();
+            if (boost::filesystem::exists(to))
+            {
+                boost::filesystem::remove(to);
+            }
+            boost::filesystem::copy(from, to);
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(systemInstallModule->LogStreamId(), from.generic_string() + " -> " + to.generic_string());
+            }
+        }
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -1265,6 +1291,20 @@ void InstallSystemWindowsLibraries(Module* systemInstallWindowsModule)
         if (!systemModule->LibraryFilePath().empty())
         {
             from = systemModule->LibraryFilePath();
+            to = systemLibDir / from.filename();
+            if (boost::filesystem::exists(to))
+            {
+                boost::filesystem::remove(to);
+            }
+            boost::filesystem::copy(from, to);
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(systemInstallWindowsModule->LogStreamId(), from.generic_string() + " -> " + to.generic_string());
+            }
+        }
+        if (systemModule->HasResourceFile())
+        {
+            from = systemModule->ResourceFilePath();
             to = systemLibDir / from.filename();
             if (boost::filesystem::exists(to))
             {
@@ -1695,7 +1735,6 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             if (GetGlobalFlag(GlobalFlags::cmdoc))
             {
                 cmdoclib::GenerateSymbolTableXml(rootModule.get(), docFileMap);
-                //cmdoclib::GeneratePPXml(project); 
             }
             else
             {
@@ -1736,9 +1775,11 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 {
                     GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
                 }
+                cmajor::resources::ProcessResourcesInProject(*project, *rootModule);
                 if (project->GetTarget() == Target::program || project->GetTarget() == Target::winguiapp || project->GetTarget() == Target::winapp)
                 {
-                    Link(project->GetTarget(), project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), mainObjectFilePath, *rootModule);
+                    Link(project->GetTarget(), project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), rootModule->ResourceFilePaths(),
+                        mainObjectFilePath, *rootModule);
                 }
                 if (GetGlobalFlag(GlobalFlags::verbose))
                 {
@@ -2134,7 +2175,8 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
 }
 
 void BuildMsBuildProject(const std::string& projectName, const std::string& projectDirectory, const std::string& target, 
-    const std::vector<std::string>& sourceFiles, const std::vector<std::string>& referenceFiles, std::unique_ptr<Module>& rootModule)
+    const std::vector<std::string>& sourceFiles, const std::vector<std::string>& resourceFiles, const std::vector<std::string>& referenceFiles,
+    std::unique_ptr<Module>& rootModule)
 {
     std::string projectFilePath = GetFullPath(Path::Combine(projectDirectory, projectName + ".cmproj"));
     std::unique_ptr<Project> project(new Project(ToUtf32(projectName), projectFilePath, GetConfig(), sngcm::ast::BackEnd::llvm));
@@ -2169,6 +2211,10 @@ void BuildMsBuildProject(const std::string& projectName, const std::string& proj
     for (const std::string& sourceFile : sourceFiles)
     {
         project->AddDeclaration(new SourceFileDeclaration(sourceFile));
+    }
+    for (const std::string& resourceFile : resourceFiles)
+    {
+        project->AddDeclaration(new ResourceFileDeclaration(resourceFile));
     }
     for (const std::string& referenceFile : referenceFiles)
     {

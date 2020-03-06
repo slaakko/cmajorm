@@ -47,8 +47,8 @@ namespace System.Windows
             if ((child is Control*) && parent != null && (parent is Control*))
             {
                 Control* childControl = cast<Control*>(child);
-                Control* parent = cast<Control*>(parent);
-                parent->AddChildVisual(childControl);
+                Control* parentControl = cast<Control*>(parent);
+                parentControl->AddChildVisual(childControl);
             }
         }
         public UniquePtr<Component> RemoveChild(Component* child)
@@ -66,6 +66,28 @@ namespace System.Windows
             child->SetNextSibling(null);
             child->SetPrevSibling(null);
             return UniquePtr<Component>(child);
+        }
+        public void InsertAfter(Component* child, Component* after)
+        {
+            if (after == null)
+            {
+                AddChild(child);
+            }
+            else
+            {
+                child->SetContainer(this);
+                after->LinkAfter(child);
+                if (after == lastChild)
+                {
+                    lastChild = child;
+                }
+                if ((child is Control*) && parent != null && (parent is Control*))
+                {
+                    Control* childControl = cast<Control*>(child);
+                    Control* parentControl = cast<Control*>(parent);
+                    parentControl->AddChildVisual(childControl);
+                }
+            }
         }
         public nothrow inline Component* FirstChild() const
         {

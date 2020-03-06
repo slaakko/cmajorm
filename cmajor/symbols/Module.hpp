@@ -34,11 +34,12 @@ const uint8_t moduleFormat_4 = uint8_t('4');
 const uint8_t moduleFormat_5 = uint8_t('5');
 const uint8_t moduleFormat_6 = uint8_t('6');
 const uint8_t moduleFormat_7 = uint8_t('7');
-const uint8_t currentModuleFormat = moduleFormat_7;
+const uint8_t moduleFormat_8 = uint8_t('8');
+const uint8_t currentModuleFormat = moduleFormat_8;
 
 enum class ModuleFlags : uint8_t
 {
-    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4
+    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4, hasResourceFile = 1 << 5
 };
 
 inline ModuleFlags operator|(ModuleFlags left, ModuleFlags right)
@@ -99,6 +100,7 @@ public:
     const std::string& OriginalFilePath() const { return originalFilePath; }
     const std::string& FilePathReadFrom() const { return filePathReadFrom; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
+    std::string ResourceFilePath() const;
     const std::vector<Module*> AllReferencedModules() const { return allRefModules; }
     void PrepareForCompilation(const std::vector<std::string>& references, sngcm::ast::Target target);
     SymbolTable& GetSymbolTable() { return *symbolTable; }
@@ -116,6 +118,7 @@ public:
     void SetDirectoryPath(const std::string& directoryPath_);
     const std::string& DirectoryPath() const { return directoryPath; }
     const std::vector<std::string>& LibraryFilePaths() const { return libraryFilePaths; }
+    const std::vector<std::string>& ResourceFilePaths() const { return resourceFilePaths; }
     bool IsSystemModule () const { return GetFlag(ModuleFlags::system); }
     void SetSystemModule() { SetFlag(ModuleFlags::system); }
     bool IsRootModule() const { return GetFlag(ModuleFlags::root); }
@@ -124,6 +127,8 @@ public:
     void SetImmutable() { SetFlag(ModuleFlags::immutable); }
     bool IsCore() const { return GetFlag(ModuleFlags::core); }
     void SetCore() { SetFlag(ModuleFlags::core); }
+    bool HasResourceFile() const { return GetFlag(ModuleFlags::hasResourceFile); }
+    void SetHasResourceFile() { SetFlag(ModuleFlags::hasResourceFile); }
     bool GetFlag(ModuleFlags flag) const { return (flags & flag) != ModuleFlags::none; }
     void SetFlag(ModuleFlags flag) { flags = flags | flag; }
     void ResetFlag(ModuleFlags flag) { flags = flags & ~flag; }
@@ -166,6 +171,8 @@ public:
     int GetBuildTimeMs();
     bool Preparing() const { return preparing; }
     void SetPreparing(bool preparing_) { preparing = preparing_; }
+    void CollectResourceNames(std::set<std::u32string>& resourceNameSet);
+    void AddResourceName(const std::u32string& resourceName);
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -173,8 +180,10 @@ private:
     std::string originalFilePath;
     std::string filePathReadFrom;
     std::string libraryFilePath;
+    std::string resourceFilePath;
     std::vector<std::string> referenceFilePaths;
     FileTable fileTable;
+    std::vector<std::u32string> resourceNames;
     std::vector<FileTable*> fileTables;
     std::vector<std::unique_ptr<CmajorLexer>> lexers;
     std::vector<soulng::lexer::Lexer*> lexerVec;
@@ -190,6 +199,7 @@ private:
     std::unique_ptr<SymbolTable> symbolTable;
     std::string directoryPath;
     std::vector<std::string> libraryFilePaths;
+    std::vector<std::string> resourceFilePaths;
     std::u32string currentProjectName;
     std::u32string currentToolName;
     CompileWarningCollection warnings;

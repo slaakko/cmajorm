@@ -1,0 +1,93 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Windows/MessageBeep.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Windows.API</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Windows</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">enum</span>&nbsp;<a href="../doc/enumerated_type_MessageBeepType_75A71F91671B35CD38449E4AD521456DA5339456.html">MessageBeepType</a><span class="other">&nbsp;:&nbsp;</span><span class="kw">uint</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_ICONASTERISK</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x00000040u</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_ICONEXCLAMATION</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x00000030u</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_ICONERROR</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x00000010u</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_ICONHAND</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x00000010u</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_ICONINFORMATION</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x00000040u</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_ICONQUESTION</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x00000020u</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_ICONSTOP</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x00000010u</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_ICONWARNING</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x00000030u</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_OK</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x00000000u</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">MB_SIMPLE</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0xFFFFFFFFu</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/ns_System.Windows.html#function_MessageBeep_50F4B4BAB4ADE13B2CAC4527347F82D55B684D59">MessageBeep</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/ns_System.Windows.html#function_MessageBeep_A17F60962A9AAAB0A1B00D15BD0067E5AB079829">MessageBeep</a><span class="other">(</span><a href="../doc/enumerated_type_MessageBeepType_75A71F91671B35CD38449E4AD521456DA5339456.html">MessageBeepType</a><span class="other">.</span><a href="../doc/enumerated_type_MessageBeepType_75A71F91671B35CD38449E4AD521456DA5339456.html#enumeration_constant_MB_OK_E2F96730FFE6DB57982F2F4A4F62934A1DAC3BD7">MB_OK</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/ns_System.Windows.html#function_MessageBeep_A17F60962A9AAAB0A1B00D15BD0067E5AB079829">MessageBeep</a><span class="other">(</span><a href="../doc/enumerated_type_MessageBeepType_75A71F91671B35CD38449E4AD521456DA5339456.html">MessageBeepType</a>&nbsp;<span class="identifier">beepType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Windows</span><span class="other">.</span><span class="identifier">API</span><span class="other">.</span><a href="../doc/ns_System.Windows.API.html#function_MessageBeep_2FD44C7158BDF9B4C35164DA68409E7024B30EDD">MessageBeep</a><span class="other">(</span><span class="identifier">beepType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.html#function_MessageBeepChecked_F0FAE6D3002253F80C4194D17083DB79EF2ADE31">MessageBeepChecked</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Windows</span><span class="other">.</span><span class="identifier">API</span><span class="other">.</span><a href="../doc/ns_System.Windows.API.html#function_MessageBeepChecked_154F65F4DDA6C000D04248655F9727F791C32BC3">MessageBeepChecked</a><span class="other">(</span><a href="../doc/enumerated_type_MessageBeepType_75A71F91671B35CD38449E4AD521456DA5339456.html">MessageBeepType</a><span class="other">.</span><a href="../doc/enumerated_type_MessageBeepType_75A71F91671B35CD38449E4AD521456DA5339456.html#enumeration_constant_MB_OK_E2F96730FFE6DB57982F2F4A4F62934A1DAC3BD7">MB_OK</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.html#function_MessageBeepChecked_46E11A4B2752CA334C52ED314D3DC8DF390AA579">MessageBeepChecked</a><span class="other">(</span><a href="../doc/enumerated_type_MessageBeepType_75A71F91671B35CD38449E4AD521456DA5339456.html">MessageBeepType</a>&nbsp;<span class="identifier">beepType</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Windows</span><span class="other">.</span><span class="identifier">API</span><span class="other">.</span><a href="../doc/ns_System.Windows.API.html#function_MessageBeepChecked_154F65F4DDA6C000D04248655F9727F791C32BC3">MessageBeepChecked</a><span class="other">(</span><span class="identifier">beepType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

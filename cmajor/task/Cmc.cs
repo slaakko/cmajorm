@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -66,7 +67,14 @@ namespace CmajorTasks
                     foreach (ITaskItem taskItem in Sources)
                     {
                         string sourceFile = taskItem.ItemSpec;
-                        arguments.Append(" \"").Append(sourceFile).Append("\"");
+                        if (Path.GetExtension(sourceFile) == ".xml")
+                        {
+                            arguments.Append(" --resource=\"").Append(sourceFile).Append("\"");
+                        }
+                        else
+                        {
+                            arguments.Append(" \"").Append(sourceFile).Append("\"");
+                        }
                     }
                 }
                 if (References != null)

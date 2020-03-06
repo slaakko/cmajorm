@@ -69,6 +69,12 @@ void ConvertProject(Project* project, const std::string& cmprojFilePath, const s
         compileElement->SetAttribute(U"Include", ToUtf32(sourceFilePath));
         compileItemGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(compileElement.release()));
     }
+    for (const std::string& resourceFilePath : project->RelativeResourceFilePaths())
+    {
+        std::unique_ptr<sngxml::dom::Element> compileElement(new sngxml::dom::Element(U"CmCompile"));
+        compileElement->SetAttribute(U"Include", ToUtf32(resourceFilePath));
+        compileItemGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(compileElement.release()));
+    }
     projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(compileItemGroupElement.release()));
     std::unique_ptr<sngxml::dom::Element> textItemGroupElement(new sngxml::dom::Element(U"ItemGroup"));
     for (const std::string& textFilePath : project->RelativeTextFilePaths())

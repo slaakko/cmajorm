@@ -17,7 +17,7 @@ namespace System.Windows
 
         public LogView(const Font& font_, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.LogView", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE),
-            ExtendedWindowStyle.WS_EX_DEFAULT, backgroundColor, string(), location, size, dock, anchors), font(font_), textBrush(Color.Black()), lines(), textHeight(10), flags(Flags.none)
+            ExtendedWindowStyle.WS_EX_DEFAULT, backgroundColor, "logView", location, size, dock, anchors), font(font_), textBrush(Color.Black()), lines(), textHeight(10), flags(Flags.none)
         {
             SetChanged();
         }
@@ -39,21 +39,28 @@ namespace System.Windows
         }
         public override void OnPaint(PaintEventArgs& args)
         {
-            base->OnPaint(args);
-            if (Changed())
+            try
             {
-                ResetChanged();
-                textHeight = cast<int>(font.GetHeight(args.graphics));
+                base->OnPaint(args);
+                if (Changed())
+                {
+                    ResetChanged();
+                    textHeight = cast<int>(font.GetHeight(args.graphics));
+                }
+                args.graphics.Clear(BackgroundColor());
+                long linesCount = lines.Count();
+                long numLines = Min(linesCount, GetSize().h / textHeight);
+                PointF origin;
+                for (long i = linesCount - numLines; i < linesCount; ++i)
+                {
+                    const string& line = lines[i];
+                    args.graphics.DrawStringChecked(line, font, origin, textBrush);
+                    origin.y = origin.y + textHeight;
+                }
             }
-            args.graphics.Clear(BackgroundColor());
-            long linesCount = lines.Count();
-            long numLines = Min(linesCount, GetSize().h / textHeight);
-            PointF origin;
-            for (long i = linesCount - numLines; i < linesCount; ++i)
+            catch (const Exception& ex)
             {
-                const string& line = lines[i];
-                args.graphics.DrawStringChecked(line, font, origin, textBrush);
-                origin.y = origin.y + textHeight;
+                MessageBox.Show(ex.Message());
             }
         }
         private nothrow inline bool Changed() const

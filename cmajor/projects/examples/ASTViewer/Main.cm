@@ -10,7 +10,11 @@ class MainWindow : Window
         SetBackgroundColor(Color.FloralWhite());
         UniquePtr<MenuBar> menuBar(new MenuBar());
         UniquePtr<MenuItem> fileItem(new MenuItem("&File"));
-        UniquePtr<MenuItem> openItem(new MenuItem("&Open.."));
+        UniquePtr<MenuItem> newItem(new MenuItem("&New"));
+        newItem->AddMenuItem(new MenuItem("&Item"));
+        newItem->AddMenuItem(new MenuItem("&Project"));
+        fileItem->AddMenuItem(newItem.Release());
+        UniquePtr<MenuItem> openItem(new MenuItem("&Open..."));
         openItem->SetShortcut(Keys.f3);
         openItem->ClickEvent().AddHandler(OpenClick);
         fileItem->AddMenuItem(openItem.Release());
@@ -27,9 +31,15 @@ class MainWindow : Window
         helpItem->AddMenuItem(new MenuItem("&About"));
         menuBar->AddMenuItem(helpItem.Release());
         AddChild(menuBar.Release());
-        UniquePtr<LogView> logView(new LogView(Size(0, 400)));
+        UniquePtr<SplitContainer> splitContainer(new SplitContainer(Orientation.horizontal, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+        AddChild(splitContainer.Release());
+        UniquePtr<LogView> logView(new LogView(Size(0, 200)));
         Application.SetLogView(logView.Get());
         AddChild(logView.Release());
+    }
+    protected override void OnPaint(PaintEventArgs& args)
+    {
+        base->OnPaint(args);
     }
     protected override bool ProcessMessage(Message& message)
     {
