@@ -368,7 +368,7 @@ void FinishReads(Module* rootModule, std::vector<Module*>& finishReadOrder, bool
 }
 
 void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
-    std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap)
+    std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap, bool& first)
 {
 #ifdef MODULE_READING_DEBUG
     LogMessage(rootModule->LogStreamId(), "Import: begin " + ToUtf8(module->Name()), rootModule->DebugLogIndent());
@@ -425,9 +425,9 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
             readMap[moduleFilePath] = referencedModule;
             importSet.insert(moduleFilePath);
             SymbolReader reader(moduleFilePath);
-            referencedModule->ReadHeader(target, reader, rootModule, importSet, modules, moduleDependencyMap, readMap);
+            referencedModule->ReadHeader(target, reader, rootModule, importSet, modules, moduleDependencyMap, readMap, first);
             module->AddReferencedModule(referencedModule);
-            Import(target, rootModule, module, referencedModule->ReferenceFilePaths(), importSet, modules, moduleDependencyMap, readMap);
+            Import(target, rootModule, module, referencedModule->ReferenceFilePaths(), importSet, modules, moduleDependencyMap, readMap, first);
         }
         else
         {
@@ -473,8 +473,10 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
             {
                 Module* referencedModule = it->second;
                 if (rootModule->IsSystemModule() ||
-                    ((target == sngcm::ast::Target::program || target == sngcm::ast::Target::library || target == sngcm::ast::Target::unitTest) && referencedModule->Name() != U"System" ||
-                    (target == sngcm::ast::Target::winguiapp || target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib) && referencedModule->Name() != U"System.Windows"))
+                    ((target == sngcm::ast::Target::program || target == sngcm::ast::Target::library || target == sngcm::ast::Target::unitTest) &&
+                        referencedModule->Name() != U"System" ||
+                    (target == sngcm::ast::Target::winguiapp || target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib) &&
+                        referencedModule->Name() != U"System.Windows"))
                 {
                     module->AddReferencedModule(referencedModule);
                 }
@@ -496,7 +498,7 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
 
 void ImportModulesWithReferences(sngcm::ast::Target target,
     Module* rootModule, Module* module, const std::vector<std::string>& references, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
-    std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap)
+    std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap, bool& first)
 {
 #ifdef MODULE_READING_DEBUG
     LogMessage(rootModule->LogStreamId(), "ImportModulesWithReferences: begin " + ToUtf8(module->Name()), rootModule->DebugLogIndent());
@@ -510,16 +512,20 @@ void ImportModulesWithReferences(sngcm::ast::Target target,
         {
             backend = sngcm::ast::BackEnd::cmsx;
         }
-        if (target == sngcm::ast::Target::winguiapp || target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib)
+        if (first)
         {
-            allReferences.push_back(CmajorSystemWindowsModuleFilePath(GetConfig()));
-        }
-        else
-        {
-            allReferences.push_back(CmajorSystemModuleFilePath(GetConfig(), backend));
+            first = false;
+            if (target == sngcm::ast::Target::winguiapp || target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib)
+            {
+                allReferences.push_back(CmajorSystemWindowsModuleFilePath(GetConfig()));
+            }
+            else
+            {
+                allReferences.push_back(CmajorSystemModuleFilePath(GetConfig(), backend));
+            }
         }
     }
-    Import(target, rootModule, module, allReferences, importSet, modules, moduleDependencyMap, readMap);
+    Import(target, rootModule, module, allReferences, importSet, modules, moduleDependencyMap, readMap, first);
 #ifdef MODULE_READING_DEBUG
     rootModule->DecDebugLogIndent();
     LogMessage(rootModule->LogStreamId(), "ImportModulesWithReferences: end " + ToUtf8(module->Name()), rootModule->DebugLogIndent());
@@ -527,13 +533,13 @@ void ImportModulesWithReferences(sngcm::ast::Target target,
 }
 
 void ImportModules(sngcm::ast::Target target, Module* rootModule, Module* module, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
-    std::unordered_map<std::string, ModuleDependency*>& dependencyMap, std::unordered_map<std::string, Module*>& readMap)
+    std::unordered_map<std::string, ModuleDependency*>& dependencyMap, std::unordered_map<std::string, Module*>& readMap, bool& first)
 {
 #ifdef MODULE_READING_DEBUG
     LogMessage(rootModule->LogStreamId(), "ImportModules: begin " + ToUtf8(module->Name()), rootModule->DebugLogIndent());
     rootModule->IncDebugLogIndent();
 #endif 
-    ImportModulesWithReferences(target, rootModule, module, module->ReferenceFilePaths(), importSet, modules, dependencyMap, readMap);
+    ImportModulesWithReferences(target, rootModule, module, module->ReferenceFilePaths(), importSet, modules, dependencyMap, readMap, first);
 #ifdef MODULE_READING_DEBUG
     rootModule->DecDebugLogIndent();
     LogMessage(rootModule->LogStreamId(), "ImportModules: end " + ToUtf8(module->Name()), rootModule->DebugLogIndent());
@@ -577,7 +583,8 @@ Module::Module(const std::string& filePath)  :
     std::unordered_map<std::string, Module*> readMap;
     if (SystemModuleSet::Instance().IsSystemModule(name)) SetSystemModule();
     SymbolReader reader2(filePath);
-    ReadHeader(sngcm::ast::Target::library, reader2, rootModule, importSet, modules, moduleDependencyMap, readMap);
+    bool first = true;
+    ReadHeader(sngcm::ast::Target::library, reader2, rootModule, importSet, modules, moduleDependencyMap, readMap, first);
     moduleDependencyMap[originalFilePath] = &moduleDependency;
     std::unordered_map<Module*, ModuleDependency*> dependencyMap;
     for (const auto& p : moduleDependencyMap)
@@ -645,7 +652,8 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
     std::unordered_map<std::string, ModuleDependency*> moduleDependencyMap;
     std::unordered_map<std::string, Module*> readMap;
     std::vector<Module*> modules;
-    ImportModulesWithReferences(target, rootModule, rootModule, references, importSet, modules, moduleDependencyMap, readMap);
+    bool first = true;
+    ImportModulesWithReferences(target, rootModule, rootModule, references, importSet, modules, moduleDependencyMap, readMap, first);
     modules.push_back(this);
     moduleDependencyMap[originalFilePath] = &moduleDependency;
     std::unordered_map<Module*, ModuleDependency*> dependencyMap;
@@ -834,7 +842,7 @@ void Module::AddReferencedModule(Module* referencedModule)
 }
 
 void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
-    std::unordered_map<std::string, ModuleDependency*>& dependencyMap, std::unordered_map<std::string, Module*>& readMap)
+    std::unordered_map<std::string, ModuleDependency*>& dependencyMap, std::unordered_map<std::string, Module*>& readMap, bool& first)
 {
     if (headerRead)
     {
@@ -856,7 +864,7 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
                 rootModule->allExportedData.push_back(data);
             }
         }
-        ImportModules(target, rootModule, this, importSet, modules, dependencyMap, readMap); 
+        ImportModules(target, rootModule, this, importSet, modules, dependencyMap, readMap, first); 
 #ifdef MODULE_READING_DEBUG
         rootModule->DecDebugLogIndent();
         LogMessage(rootModule->LogStreamId(), "ReadHeader: cached end " + ToUtf8(name), rootModule->DebugLogIndent());
@@ -943,7 +951,7 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
     }
     CheckUpToDate();
     symbolTablePos = reader.GetBinaryReader().Pos();
-    ImportModules(target, rootModule, this, importSet, modules, dependencyMap, readMap); 
+    ImportModules(target, rootModule, this, importSet, modules, dependencyMap, readMap, first); 
 #ifdef MODULE_READING_DEBUG
     rootModule->DecDebugLogIndent();
     LogMessage(rootModule->LogStreamId(), "ReadHeader: read end " + ToUtf8(name), rootModule->DebugLogIndent());

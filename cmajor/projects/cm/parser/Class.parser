@@ -199,7 +199,7 @@ parser ClassParser
         }
         ;
 
-    MemberVariable(ParsingContext* ctx, var Span s, var Span specifierSpan) : MemberFunctionNode*
+    MemberVariable(ParsingContext* ctx, var Span s, var Span specifierSpan) : Node*
         ::= empty{ s = span; } Attributes:attrs? Specifiers:specifiers{ specifierSpan = span; } TypeExpr(ctx):type Identifier:id SEMICOLON
         {
             s.end = span.end;

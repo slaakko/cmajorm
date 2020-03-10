@@ -25,8 +25,8 @@ namespace System.Windows
             return shadowColor;
         }
 
-        public MenuBar(const Font& font_) : base("System.Windows.MenuBar", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE),
-            ExtendedWindowStyle.WS_EX_DEFAULT, GetSystemColor(SystemColor.COLOR_MENU), "menuBar", Point(), Size(0, initialHeight), Dock.top, Anchors.none),
+        public MenuBar(const Font& font_) : base("System.Windows.MenuBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            GetSystemColor(SystemColor.COLOR_MENU), "menuBar", Point(), Size(0, initialHeight), Dock.top, Anchors.none),
             font(font_), textColor(GetSystemColor(SystemColor.COLOR_MENUTEXT)), mouseOverColor(201u, 222u, 245u), menuOpenColor(Color.White()),
             shadowColor(ShadowColor()), textBrush(textColor), backgroundBrush(BackgroundColor()), mouseOverBrush(mouseOverColor), menuOpenBrush(menuOpenColor),
             shadowBrush(shadowColor), blackBrush(Color.Black()), blackPen(Color.Black()), darkPen(Color.DarkGray()),
@@ -47,16 +47,32 @@ namespace System.Windows
         {
             return Padding(6, 2, 6, 2);
         }
+        public override void PrintWindowTree(int level)
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(string(' ', level) + "MenuBar." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+            }
+        }
         protected override void OnPaint(PaintEventArgs& args)
         {
             try
             {
+                if (Debug.Paint())
+                {
+                    Rect r(Location(), GetSize());
+                    LogView* log = Application.GetLogView();
+                    if (log != null)
+                    {
+                        log->WriteLine("MenuBar.OnPaint: " + r.ToString());
+                    }
+                }
                 if (!MenuBoxAdded())
                 {
                     SetMenuBoxAdded();
                     AddMenuBox();
                 }
-                base->OnPaint(args);
                 args.graphics.Clear(BackgroundColor());
                 if (MenuChanged())
                 {
@@ -69,6 +85,7 @@ namespace System.Windows
                     LocateMenuItems(args.graphics, size);
                 }
                 DrawMenuItems(args, false, Location());
+                base->OnPaint(args);
             }
             catch (const Exception& ex)
             {
@@ -666,14 +683,31 @@ namespace System.Windows
 
     public class MenuBox : Control
     {
-        public MenuBox(MenuBar* menuBar_) : base("System.Windows.MenuBox", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_CLIPSIBLINGS),
-            ExtendedWindowStyle.WS_EX_DEFAULT, Color.White(), "menuBox", Point(), Size(), Dock.none, Anchors.none), menuBar(menuBar_)
+        public MenuBox(MenuBar* menuBar_) : base("System.Windows.MenuBox", DefaultWindowClassStyle(), cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_CLIPSIBLINGS),
+            DefaultExtendedWindowStyle(), Color.White(), "menuBox", Point(), Size(), Dock.none, Anchors.none), menuBar(menuBar_)
         {
+        }
+        public override void PrintWindowTree(int level)
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(string(' ', level) + "MenuBox." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+            }
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
             try
             {
+                if (Debug.Paint())
+                {
+                    Rect r(Location(), GetSize());
+                    LogView* log = Application.GetLogView();
+                    if (log != null)
+                    {
+                        log->WriteLine("MenuBox.OnPaint: " + r.ToString());
+                    }
+                }
                 Point loc = Location();
                 if (!paintMenu)
                 {
@@ -756,7 +790,7 @@ namespace System.Windows
 
     public abstract class MenuItemBase : Component
     {
-        public nothrow MenuItemBase() : level(0), location(), size()
+        public nothrow MenuItemBase() : location(), size()
         {
         }
         public abstract void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
@@ -812,7 +846,6 @@ namespace System.Windows
             size = size_;
         }
         public abstract Size MeasureItem(Graphics& graphics, const Font& font, const StringFormat& format, int& maxShortcutWidth, int& childIndicatorWidth);
-        private int level;
         private Point location;
         private Size size;
     }

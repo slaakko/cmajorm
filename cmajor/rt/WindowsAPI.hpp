@@ -153,6 +153,8 @@ extern "C" RT_API float WinGraphicsGetPageScale(void* graphics);
 extern "C" RT_API int WinGraphicsSetPageScale(void* graphics, float scale);
 extern "C" RT_API float WinGraphicsGetDpiX(void* graphics);
 extern "C" RT_API float WinGraphicsGetDpiY(void* graphics);
+extern "C" RT_API int WinGraphicsGetSmoothingMode(void* graphics);
+extern "C" RT_API int WinGraphicsSetSmoothingMode(void* graphics, int smoothingMode);
 extern "C" RT_API void WinGetSysColor(int index, uint8_t& red, uint8_t& green, uint8_t& blue);
 extern "C" RT_API bool WinSetBkColor(void* hdc, uint8_t red, uint8_t green, uint8_t blue);
 extern "C" RT_API void WinGetMessagePos(int32_t& x, int32_t& y);

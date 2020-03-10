@@ -158,7 +158,7 @@ public:
     void AddReferencedModule(Module* referencedModule);
     const std::vector<std::string>& ReferenceFilePaths() const { return referenceFilePaths; }
     void ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
-        std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
+        std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap, bool& first);
     int DebugLogIndent() const { return debugLogIndent; }
     void IncDebugLogIndent() { ++debugLogIndent; }
     void DecDebugLogIndent() { --debugLogIndent; }

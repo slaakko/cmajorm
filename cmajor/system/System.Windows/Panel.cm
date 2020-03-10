@@ -11,17 +11,43 @@ namespace System.Windows
     public class Panel : ContainerControl
     {
         public Panel(const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("System.Windows.Panel", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE | WindowStyle.WS_CLIPSIBLINGS),
-                ExtendedWindowStyle.WS_EX_DEFAULT, GetSystemColor(SystemColor.COLOR_MENU),
+            base("System.Windows.Panel", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), GetSystemColor(SystemColor.COLOR_MENU),
                 "panel", location, size, dock, anchors)
         {
+        }
+        public override void PrintWindowTree(int level)
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(string(' ', level) + "Panel." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+            }
+            Component* child = Children().FirstChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* childControl = cast<Control*>(child);
+                    childControl->PrintWindowTree(level + 1);
+                }
+                child = child->NextSibling();
+            }
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
             try
             {
-                base->OnPaint(args);
+                if (Debug.Paint())
+                {
+                    Rect r(Location(), GetSize());
+                    LogView* log = Application.GetLogView();
+                    if (log != null)
+                    {
+                        log->WriteLine("Panel.OnPaint: " + r.ToString());
+                    }
+                }
                 args.graphics.Clear(BackgroundColor());
+                base->OnPaint(args);
             }
             catch (const Exception& ex)
             {

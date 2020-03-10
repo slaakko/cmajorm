@@ -32,13 +32,41 @@ class MainWindow : Window
         menuBar->AddMenuItem(helpItem.Release());
         AddChild(menuBar.Release());
         UniquePtr<SplitContainer> verticalSplitContainer(new SplitContainer(Orientation.vertical, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-        UniquePtr<LogView> logView(new LogView(Size(0, 0)));
-        logView->SetDock(Dock.fill);
-        Application.SetLogView(logView.Get());
-        verticalSplitContainer->Panel2().AddChild(logView.Release());
+        UniquePtr<LogView> logView;
+        if (Debug.Log())
+        {
+            logView.Reset(new LogView(Size(0, 0)));
+            logView->SetDock(Dock.fill);
+            Application.SetLogView(logView.Get());
+            verticalSplitContainer->Pane2Container()->AddChild(logView.Release());
+        }
         UniquePtr<SplitContainer> horizontalSplitContainer(new SplitContainer(Orientation.horizontal, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-        verticalSplitContainer->Panel1().AddChild(horizontalSplitContainer.Release());
+        treeView = new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
+        UniquePtr<Control> borderedTreeView(new BorderedControl(treeView, BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+        horizontalSplitContainer->Pane1Container()->AddChild(borderedTreeView.Release());
+        UniquePtr<Control> treeView2(new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+        UniquePtr<Control> borderedTreeView2(new BorderedControl(treeView2.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+        horizontalSplitContainer->Pane2Container()->AddChild(borderedTreeView2.Release());
+        verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainer.Release());
         AddChild(verticalSplitContainer.Release());
+    }
+    public override void PrintWindowTree(int level)
+    {
+        LogView* log = Application.GetLogView();
+        if (log != null)
+        {
+            log->WriteLine("MainWindow." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+        }
+        Component* child = Children().FirstChild();
+        while (child != null)
+        {
+            if (child is Control*)
+            {
+                Control* childControl = cast<Control*>(child);
+                childControl->PrintWindowTree(level + 1);
+            }
+            child = child->NextSibling();
+        }
     }
     protected override void OnPaint(PaintEventArgs& args)
     {
@@ -90,7 +118,14 @@ class MainWindow : Window
                 }
                 if (!filePath.IsEmpty() && File.Exists(filePath))
                 {
-                    
+                    treeView->SetRoot(null);
+                    content = ToUtf32(File.ReadAllText(filePath));
+                    lexer = CmajorLexer(content.Chars(), content.Chars() + content.Length(), filePath, 0);
+                    Cm.Parser.ParsingContext ctx;
+                    compileUnit = CompileUnitParser.Parse(lexer, &ctx);
+                    SyntaxTreeBuilder syntaxTreeBuilder;
+                    compileUnit->Accept(syntaxTreeBuilder);
+                    treeView->SetRoot(syntaxTreeBuilder.GetRoot());
                 }
                 else
                 {
@@ -103,13 +138,25 @@ class MainWindow : Window
             MessageBox.Show(ex.Message());
         }
     }
+    private TreeView* treeView;
+    private ustring content;
+    private CmajorLexer lexer;
+    private UniquePtr<Cm.Ast.CompileUnitNode> compileUnit;
 }
 
 int main()
 {
     try
     {
+        Debug.SetLog();
+        //Debug.SetDocking();
+        //Debug.SetWindowTree();
+        //Debug.SetPaint();
         MainWindow mainWindow;
+        if (Debug.WindowTree())
+        {
+            mainWindow.PrintWindowTree(0);
+        }
         int exitCode = Application.Run(mainWindow);
         return exitCode;
     }

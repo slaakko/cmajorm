@@ -750,7 +750,7 @@ public static class ClassParser
         UniquePtr<Node> destructor;
         UniquePtr<Node> memberFunction;
         UniquePtr<Node> conversionFunction;
-        UniquePtr<MemberFunctionNode> memberVariable;
+        UniquePtr<Node> memberVariable;
         UniquePtr<TypedefNode> typeDefinition;
         UniquePtr<ClassNode> cls;
         UniquePtr<EnumTypeNode> enumType;
@@ -946,7 +946,7 @@ public static class ClassParser
                                             {
                                                 long pos = lexer.GetPos();
                                                 Match match = ClassParser.MemberVariable(lexer, ctx);
-                                                memberVariable.Reset(cast<MemberFunctionNode*>(match.value));
+                                                memberVariable.Reset(cast<Node*>(match.value));
                                                 if (match.hit)
                                                 {
                                                     {

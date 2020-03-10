@@ -2,16 +2,21 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>2916dd0d-3502-4ccb-b4f0-46e9ce609423</ProjectGuid>
+  <ProjectGuid>2dc9a043-49db-464d-a671-97779de8a403</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>winguiapp</TargetType>
  </PropertyGroup>
  <ItemGroup>
   <CmCompile Include="Main.cm"/>
+  <CmCompile Include="SyntaxTreeBuilder.cm"/>
  </ItemGroup>
  <ItemGroup/>
- <ItemGroup/>
+ <ItemGroup>
+  <ProjectReference Include="../../cm/ast/Cm.Ast.cmproj"/>
+  <ProjectReference Include="../../cm/lexer/Cm.Lexer.cmproj"/>
+  <ProjectReference Include="../../cm/parser/Cm.Parser.cmproj"/>
+ </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
 </Project>

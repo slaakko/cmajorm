@@ -13,7 +13,7 @@ namespace System.Windows
         horizontal, vertical
     }
 
-    internal nothrow Dock SplitDock(Orientation orientation)
+    public nothrow Dock SplitDock(Orientation orientation)
     {
         switch (orientation)
         {
@@ -23,7 +23,7 @@ namespace System.Windows
         return Dock.none;
     }
 
-    internal nothrow Size SplitSize(Orientation orientation, int width)
+    public nothrow Size SplitSize(Orientation orientation, int width)
     {
         switch (orientation)
         {
@@ -41,21 +41,41 @@ namespace System.Windows
         {
             none = 0, moveSplitter = 1 << 0
         }
-        public Splitter(Orientation orientation_, const Point& location, int width, SplitContainer* container_) :
-            base("System.Windows.Splitter", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE | WindowStyle.WS_CLIPSIBLINGS),
-            ExtendedWindowStyle.WS_EX_DEFAULT,
-            Color.DarkGray(), "splitter", location, SplitSize(orientation_, width), SplitDock(orientation_), Anchors.none), orientation(orientation_),
+        public Splitter(Orientation orientation_, const Color& backgroundColor, const Point& location, int width) :
+            base("System.Windows.Splitter", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            backgroundColor, "splitter", location, SplitSize(orientation_, width), SplitDock(orientation_), Anchors.none), orientation(orientation_),
             horizontalSplitterCursor(Application.GetResourceManager().GetCursor("horizontal.splitter.system.windows.cursor")),
-            verticalSplitterCursor(Application.GetResourceManager().GetCursor("vertical.splitter.system.windows.cursor")), flags(), container(container_)
+            verticalSplitterCursor(Application.GetResourceManager().GetCursor("vertical.splitter.system.windows.cursor")), flags(), container(null)
         {
         }
-        public Splitter(Orientation orientation, const Point& location, SplitContainer* container) : this(orientation, location, defaultSplitterWidth, container)
+        public Splitter(Orientation orientation, const Point& location) : this(orientation, GetSystemColor(SystemColor.COLOR_MENU), location, defaultSplitterWidth)
         {
+        }
+        public nothrow void SetContainer(SplitContainer* container_)
+        {
+            container = container_;
+        }
+        public override void PrintWindowTree(int level)
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(string(' ', level) + "Splitter." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+            }
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
             try
             {
+                if (Debug.Paint())
+                {
+                    Rect r(Location(), GetSize());
+                    LogView* log = Application.GetLogView();
+                    if (log != null)
+                    {
+                        log->WriteLine("Splitter.OnPaint: " + r.ToString());
+                    }
+                }
                 base->OnPaint(args);
                 args.graphics.Clear(BackgroundColor());
             }
@@ -183,36 +203,62 @@ namespace System.Windows
 
     public class SplitContainer : ContainerControl
     {
-        public SplitContainer(Orientation orientation_, int splitterWidth, int splitterDistance_, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("System.Windows.SplitContainer", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE | WindowStyle.WS_CLIPSIBLINGS),
-                ExtendedWindowStyle.WS_EX_DEFAULT, GetSystemColor(SystemColor.COLOR_MENU), "splitContainer", location, size, dock, anchors), orientation(orientation_),
-                splitterDistance(splitterDistance_)
+        public SplitContainer(Orientation orientation_, Control* pane1_, Splitter* splitter_, Control* pane2_, int splitterWidth, int splitterDistance_,
+            const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("System.Windows.SplitContainer", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+                GetSystemColor(SystemColor.COLOR_MENU), "splitContainer", location, size, dock, anchors),
+                orientation(orientation_), pane1(pane1_), splitter(splitter_), pane2(pane2_), splitterDistance(splitterDistance_)
         {
-            UniquePtr<Panel> pnl1(new Panel(location, SplitSize(orientation, splitterDistance), SplitDock(orientation), Anchors.none));
-            panel1 = pnl1.Get();
-            AddChild(pnl1.Release());
-            UniquePtr<Splitter> splt(new Splitter(orientation, location, splitterWidth, this));
-            splitter = splt.Get();
-            AddChild(splt.Release());
-            UniquePtr<Panel> pnl2(new Panel(location, Size(0, 0), Dock.fill, Anchors.none));
-            panel2 = pnl2.Get();
-            AddChild(pnl2.Release());
+            pane1->SetSize(SplitSize(orientation, splitterDistance));
+            pane1->SetDock(SplitDock(orientation));
+            AddChild(pane1);
+            splitter->SetContainer(this);
+            AddChild(splitter);
+            pane2->SetLocation(location);
+            pane2->SetDock(Dock.fill);
+            AddChild(pane2);
         }
         public SplitContainer(Orientation orientation, int splitterDistance, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            this(orientation, defaultSplitterWidth, splitterDistance, location, size, dock, anchors)
+            this(orientation,
+                new Panel(location, SplitSize(orientation, splitterDistance), SplitDock(orientation), Anchors.none),
+                new Splitter(orientation, location),
+                new Panel(location, SplitSize(orientation, splitterDistance), SplitDock(orientation), Anchors.none),
+                defaultSplitterWidth, splitterDistance, location, size, dock, anchors)
         {
+        }
+        public override void PrintWindowTree(int level)
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(string(' ', level) + "SplitContainer." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+            }
+            Component* child = Children().FirstChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* childControl = cast<Control*>(child);
+                    childControl->PrintWindowTree(level + 1);
+                }
+                child = child->NextSibling();
+            }
         }
         public nothrow inline Orientation GetOrientation() const
         {
             return orientation;
         }
-        public nothrow inline Panel& Panel1()
+        public nothrow inline ContainerControl* Pane1Container() const
         {
-            return *panel1;
+            return pane1->GetContainerControl();
         }
-        public nothrow inline Panel& Panel2()
+        public nothrow inline Splitter* GetSplitter() const
         {
-            return *panel2;
+            return splitter;
+        }
+        public nothrow inline ContainerControl* Pane2Container() const
+        {
+            return pane2->GetContainerControl();
         }
         public nothrow inline int SplitterDistance() const
         {
@@ -223,16 +269,16 @@ namespace System.Windows
             splitterDistance = splitterDistance_;
             switch (orientation)
             {
-                case Orientation.horizontal: panel1->SetSize(Size(splitterDistance, panel1->GetSize().h)); break;
-                case Orientation.vertical: panel1->SetSize(Size(panel1->GetSize().w, splitterDistance)); break;
+                case Orientation.horizontal: pane1->SetSize(Size(splitterDistance, pane1->GetSize().h)); break;
+                case Orientation.vertical: pane1->SetSize(Size(pane1->GetSize().w, splitterDistance)); break;
             }
             DockChildren();
             Invalidate();
         }
         private Orientation orientation;
         private int splitterDistance;
-        private Panel* panel1;
+        private Control* pane1;
         private Splitter* splitter;
-        private Panel* panel2;
+        private Control* pane2;
     }
 }

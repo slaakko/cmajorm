@@ -1,0 +1,50 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public class Debug
+    {
+        public static nothrow bool Docking() const
+        {
+            return (flags & Flags.docking) != Flags.none;
+        }
+        public static nothrow void SetDocking()
+        {
+            flags = cast<Flags>(flags | Flags.docking);
+        }
+        public static nothrow bool WindowTree() const
+        {
+            return (flags & Flags.windowTree) != Flags.none;
+        }
+        public static nothrow void SetWindowTree()
+        {
+            flags = cast<Flags>(flags | Flags.windowTree);
+        }
+        public static nothrow bool Log() const
+        {
+            return (flags & Flags.log) != Flags.none;
+        }
+        public static nothrow void SetLog()
+        {
+            flags = cast<Flags>(flags | Flags.log);
+        }
+        public static nothrow bool Paint() const
+        {
+            return (flags & Flags.paint) != Flags.none;
+        }
+        public static nothrow void SetPaint()
+        {
+            flags = cast<Flags>(flags | Flags.paint);
+        }
+        private enum Flags : sbyte
+        {
+            none = 0, log = 1 << 0, paint = 1 << 1, windowTree = 1 << 2, docking = 1 << 3
+        }
+        private static Flags flags;
+    }
+}

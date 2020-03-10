@@ -1,0 +1,1240 @@
+using System;
+using System.Windows;
+using Cm.Ast;
+
+class SyntaxTreeBuilder : Visitor
+{
+    public TreeViewNode* GetRoot() const
+    {
+        return node.Release();
+    }
+    public override void Visit(BoolNode& boolNode)
+    {
+        node.Reset(new TreeViewNode(typename(BoolNode)));
+        node->SetData(&boolNode);
+    }
+    public override void Visit(SByteNode& sbyteNode)
+    {
+        node.Reset(new TreeViewNode(typename(SByteNode)));
+        node->SetData(&sbyteNode);
+    }
+    public override void Visit(ByteNode& byteNode)
+    {
+        node.Reset(new TreeViewNode(typename(ByteNode)));
+        node->SetData(&byteNode);
+    }
+    public override void Visit(ShortNode& shortNode)
+    {
+        node.Reset(new TreeViewNode(typename(ShortNode)));
+        node->SetData(&shortNode);
+    }
+    public override void Visit(UShortNode& ushortNode)
+    {
+        node.Reset(new TreeViewNode(typename(UShortNode)));
+        node->SetData(&ushortNode);
+    }
+    public override void Visit(IntNode& intNode)
+    {
+        node.Reset(new TreeViewNode(typename(IntNode)));
+        node->SetData(&intNode);
+    }
+    public override void Visit(UIntNode& uintNode)
+    {
+        node.Reset(new TreeViewNode(typename(UIntNode)));
+        node->SetData(&uintNode);
+    }
+    public override void Visit(LongNode& longNode)
+    {
+        node.Reset(new TreeViewNode(typename(LongNode)));
+        node->SetData(&longNode);
+    }
+    public override void Visit(ULongNode& ulongNode)
+    {
+        node.Reset(new TreeViewNode(typename(ULongNode)));
+        node->SetData(&ulongNode);
+    }
+    public override void Visit(FloatNode& floatNode)
+    {
+        node.Reset(new TreeViewNode(typename(FloatNode)));
+        node->SetData(&floatNode);
+    }
+    public override void Visit(DoubleNode& doubleNode)
+    {
+        node.Reset(new TreeViewNode(typename(DoubleNode)));
+        node->SetData(&doubleNode);
+    }
+    public override void Visit(CharNode& charNode)
+    {
+        node.Reset(new TreeViewNode(typename(CharNode)));
+        node->SetData(&charNode);
+    }
+    public override void Visit(WCharNode& wcharNode)
+    {
+        node.Reset(new TreeViewNode(typename(WCharNode)));
+        node->SetData(&wcharNode);
+    }
+    public override void Visit(UCharNode& ucharNode)
+    {
+        node.Reset(new TreeViewNode(typename(UCharNode)));
+        node->SetData(&ucharNode);
+    }
+    public override void Visit(VoidNode& voidNode)
+    {
+        node.Reset(new TreeViewNode(typename(VoidNode)));
+        node->SetData(&voidNode);
+    }
+    public override void Visit(BooleanLiteralNode& booleanLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(BooleanLiteralNode)));
+        node->SetData(&booleanLiteralNode);
+    }
+    public override void Visit(SByteLiteralNode& sbyteLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(SByteLiteralNode)));
+        node->SetData(&sbyteLiteralNode);
+    }
+    public override void Visit(ByteLiteralNode& byteLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(ByteLiteralNode)));
+        node->SetData(&byteLiteralNode);
+    }
+    public override void Visit(ShortLiteralNode& shortLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(ShortLiteralNode)));
+        node->SetData(&shortLiteralNode);
+    }
+    public override void Visit(UShortLiteralNode& ushortLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(UShortLiteralNode)));
+        node->SetData(&ushortLiteralNode);
+    }
+    public override void Visit(IntLiteralNode& intLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(IntLiteralNode)));
+        node->SetData(&intLiteralNode);
+    }
+    public override void Visit(UIntLiteralNode& uintLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(UIntLiteralNode)));
+        node->SetData(&uintLiteralNode);
+    }
+    public override void Visit(LongLiteralNode& longLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(LongLiteralNode)));
+        node->SetData(&longLiteralNode);
+    }
+    public override void Visit(ULongLiteralNode& ulongLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(ULongLiteralNode)));
+        node->SetData(&ulongLiteralNode);
+    }
+    public override void Visit(FloatLiteralNode& floatLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(FloatLiteralNode)));
+        node->SetData(&floatLiteralNode);
+    }
+    public override void Visit(DoubleLiteralNode& doubleLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(DoubleLiteralNode)));
+        node->SetData(&doubleLiteralNode);
+    }
+    public override void Visit(CharLiteralNode& charLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(CharLiteralNode)));
+        node->SetData(&charLiteralNode);
+    }
+    public override void Visit(WCharLiteralNode& wcharLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(WCharLiteralNode)));
+        node->SetData(&wcharLiteralNode);
+    }
+    public override void Visit(UCharLiteralNode& ucharLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(UCharLiteralNode)));
+        node->SetData(&ucharLiteralNode);
+    }
+    public override void Visit(StringLiteralNode& stringLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(StringLiteralNode)));
+        node->SetData(&stringLiteralNode);
+    }
+    public override void Visit(WStringLiteralNode& wstringLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(WStringLiteralNode)));
+        node->SetData(&wstringLiteralNode);
+    }
+    public override void Visit(UStringLiteralNode& ustringLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(UStringLiteralNode)));
+        node->SetData(&ustringLiteralNode);
+    }
+    public override void Visit(NullLiteralNode& nullLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(NullLiteralNode)));
+        node->SetData(&nullLiteralNode);
+    }
+    public override void Visit(ArrayLiteralNode& arrayLiteralNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ArrayLiteralNode)));
+        int n = arrayLiteralNode.Values().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            arrayLiteralNode.Values()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&arrayLiteralNode);
+    }
+    public override void Visit(StructuredLiteralNode& structuredLiteralNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(StructuredLiteralNode)));
+        int n = structuredLiteralNode.Members().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            structuredLiteralNode.Members()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&structuredLiteralNode);
+    }
+    public override void Visit(UuidLiteralNode& uuidLiteralNode)
+    {
+        node.Reset(new TreeViewNode(typename(UuidLiteralNode)));
+        node->SetData(&uuidLiteralNode);
+    }
+    public override void Visit(CompileUnitNode& compileUnitNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(CompileUnitNode)));
+        compileUnitNode.GlobalNs()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&compileUnitNode);
+    }
+    public override void Visit(NamespaceNode& namespaceNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(NamespaceNode)));
+        int n = namespaceNode.Members().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            namespaceNode.Members()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&namespaceNode);
+    }
+    public override void Visit(AliasNode& aliasNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(AliasNode)));
+        aliasNode.Id()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        aliasNode.Qid()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&aliasNode);
+    }
+    public override void Visit(NamespaceImportNode& namespaceImportNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(NamespaceImportNode)));
+        namespaceImportNode.Ns()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&namespaceImportNode);
+    }
+    public override void Visit(IdentifierNode& identifierNode)
+    {
+        node.Reset(new TreeViewNode(typename(IdentifierNode)));
+        node->SetData(&identifierNode);
+    }
+    public override void Visit(TemplateIdNode& templateIdNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(TemplateIdNode)));
+        templateIdNode.Primary()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int n = templateIdNode.TemplateArguments().Count();
+        for (int i = 0; i < n; ++i)
+        {
+            templateIdNode.TemplateArguments()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&templateIdNode);
+    }
+    public override void Visit(FunctionNode& functionNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(FunctionNode)));
+        if (functionNode.GetAttributes() != null)
+        {
+            functionNode.GetAttributes()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        functionNode.ReturnTypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int nt = functionNode.TemplateParameters().Count();
+        for (int i = 0; i < nt; ++i)
+        {
+            functionNode.TemplateParameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        int np = functionNode.Parameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            functionNode.Parameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (functionNode.WhereConstraint() != null)
+        {
+            functionNode.WhereConstraint()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (functionNode.Body() != null)
+        {
+            functionNode.Body()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&functionNode);
+    }
+    public override void Visit(ClassNode& classNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ClassNode)));
+        if (classNode.GetAttributes() != null)
+        {
+            classNode.GetAttributes()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        classNode.Id()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int nt = classNode.TemplateParameters().Count();
+        for (int i = 0; i < nt; ++i)
+        {
+            classNode.TemplateParameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        int nb = classNode.BaseClassOrInterfaces().Count();
+        for (int i = 0; i < nb; ++i)
+        {
+            classNode.BaseClassOrInterfaces()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (classNode.WhereConstraint() != null)
+        {
+            classNode.WhereConstraint()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        int nm = classNode.Members().Count();
+        for (int i = 0; i < nm; ++i)
+        {
+            classNode.Members()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&classNode);
+    }
+    public override void Visit(ThisInitializerNode& thisInitializerNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ThisInitializerNode)));
+        int na = thisInitializerNode.Arguments().Count();
+        for (int i = 0; i < na; ++i)
+        {
+            thisInitializerNode.Arguments()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&thisInitializerNode);
+    }
+    public override void Visit(BaseInitializerNode& baseInitializerNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(BaseInitializerNode)));
+        int na = baseInitializerNode.Arguments().Count();
+        for (int i = 0; i < na; ++i)
+        {
+            baseInitializerNode.Arguments()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&baseInitializerNode);
+    }
+    public override void Visit(MemberInitializerNode& memberInitializerNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(MemberInitializerNode)));
+        memberInitializerNode.MemberId()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int na = memberInitializerNode.Arguments().Count();
+        for (int i = 0; i < na; ++i)
+        {
+            memberInitializerNode.Arguments()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&memberInitializerNode);
+    }
+    public override void Visit(StaticConstructorNode& staticConstructorNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(StaticConstructorNode)));
+        if (staticConstructorNode.GetAttributes() != null)
+        {
+            staticConstructorNode.GetAttributes()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        staticConstructorNode.ClassId()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int ni = staticConstructorNode.Initializers().Count();
+        for (int i = 0; i < ni; ++i)
+        {
+            staticConstructorNode.Initializers()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (staticConstructorNode.WhereConstraint() != null)
+        {
+            staticConstructorNode.WhereConstraint()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (staticConstructorNode.Body() != null)
+        {
+            staticConstructorNode.Body()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&staticConstructorNode);
+    }
+    public override void Visit(ConstructorNode& constructorNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConstructorNode)));
+        if (constructorNode.GetAttributes() != null)
+        {
+            constructorNode.GetAttributes()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        constructorNode.ClassId()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int np = constructorNode.Parameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            constructorNode.Parameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        int ni = constructorNode.Initializers().Count();
+        for (int i = 0; i < ni; ++i)
+        {
+            constructorNode.Initializers()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (constructorNode.WhereConstraint() != null)
+        {
+            constructorNode.WhereConstraint()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (constructorNode.Body() != null)
+        {
+            constructorNode.Body()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&constructorNode);
+    }
+    public override void Visit(DestructorNode& destructorNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(DestructorNode)));
+        if (destructorNode.GetAttributes() != null)
+        {
+            destructorNode.GetAttributes()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        destructorNode.ClassId()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        if (destructorNode.WhereConstraint() != null)
+        {
+            destructorNode.WhereConstraint()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (destructorNode.Body() != null)
+        {
+            destructorNode.Body()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&destructorNode);
+    }
+    public override void Visit(MemberFunctionNode& memberFunctionNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(MemberFunctionNode)));
+        if (memberFunctionNode.GetAttributes() != null)
+        {
+            memberFunctionNode.GetAttributes()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        memberFunctionNode.ReturnTypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int np = memberFunctionNode.Parameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            memberFunctionNode.Parameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (memberFunctionNode.WhereConstraint() != null)
+        {
+            memberFunctionNode.WhereConstraint()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (memberFunctionNode.Body() != null)
+        {
+            memberFunctionNode.Body()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&memberFunctionNode);
+    }
+    public override void Visit(ConversionFunctionNode& conversionFunctionNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConversionFunctionNode)));
+        if (conversionFunctionNode.GetAttributes() != null)
+        {
+            conversionFunctionNode.GetAttributes()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        conversionFunctionNode.ReturnTypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        if (conversionFunctionNode.WhereConstraint() != null)
+        {
+            conversionFunctionNode.WhereConstraint()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (conversionFunctionNode.Body() != null)
+        {
+            conversionFunctionNode.Body()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&conversionFunctionNode);
+    }
+    public override void Visit(MemberVariableNode& memberVariableNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(MemberVariableNode)));
+        if (memberVariableNode.GetAttributes() != null)
+        {
+            memberVariableNode.GetAttributes()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        memberVariableNode.TypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        memberVariableNode.Id()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&memberVariableNode);
+    }
+    public override void Visit(InterfaceNode& interfaceNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(InterfaceNode)));
+        if (interfaceNode.GetAttributes() != null)
+        {
+            interfaceNode.GetAttributes()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        interfaceNode.Id()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int nm = interfaceNode.Members().Count();
+        for (int i = 0; i < nm; ++i)
+        {
+            interfaceNode.Members()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&interfaceNode);
+    }
+    public override void Visit(DelegateNode& delegateNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(DelegateNode)));
+        delegateNode.ReturnTypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        delegateNode.Id()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int np = delegateNode.Parameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            delegateNode.Parameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&delegateNode);
+    }
+    public override void Visit(ClassDelegateNode& classDelegateNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ClassDelegateNode)));
+        classDelegateNode.ReturnTypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        classDelegateNode.Id()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int np = classDelegateNode.Parameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            classDelegateNode.Parameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&classDelegateNode);
+    }
+    public override void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ParenthesizedConstraintNode)));
+        parenthesizedConstraintNode.Constraint()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&parenthesizedConstraintNode);
+    }
+    public override void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(DisjunctiveConstraintNode)));
+        disjunctiveConstraintNode.Left()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        disjunctiveConstraintNode.Right()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&disjunctiveConstraintNode);
+    }
+    public override void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConjunctiveConstraintNode)));
+        conjunctiveConstraintNode.Left()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        conjunctiveConstraintNode.Right()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&conjunctiveConstraintNode);
+    }
+    public override void Visit(WhereConstraintNode& whereConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(WhereConstraintNode)));
+        whereConstraintNode.Constraint()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&whereConstraintNode);
+    }
+    public override void Visit(PredicateConstraintNode& predicateConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(PredicateConstraintNode)));
+        predicateConstraintNode.InvokeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&predicateConstraintNode);
+    }
+    public override void Visit(IsConstraintNode& isConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(IsConstraintNode)));
+        isConstraintNode.TypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        isConstraintNode.ConceptOrTypeName()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&isConstraintNode);
+    }
+    public override void Visit(MultiParamConstraintNode& multiParamConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(MultiParamConstraintNode)));
+        multiParamConstraintNode.ConceptId()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int nt = multiParamConstraintNode.TypeExprs().Count();
+        for (int i = 0; i < nt; ++i)
+        {
+            multiParamConstraintNode.TypeExprs()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&multiParamConstraintNode);
+    }
+    public override void Visit(TypeNameConstraintNode& typeNameConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(TypeNameConstraintNode)));
+        typeNameConstraintNode.TypeId()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&typeNameConstraintNode);
+    }
+    public override void Visit(ConstructorConstraintNode& constructorConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConstructorConstraintNode)));
+        constructorConstraintNode.TypeParamId()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int np = constructorConstraintNode.Parameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            constructorConstraintNode.Parameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&constructorConstraintNode);
+    }
+    public override void Visit(DestructorConstraintNode& destructorConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(DestructorConstraintNode)));
+        destructorConstraintNode.TypeParamId()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&destructorConstraintNode);
+    }
+    public override void Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(MemberFunctionConstraintNode)));
+        memberFunctionConstraintNode.ReturnTypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        memberFunctionConstraintNode.TypeParamId()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int np = memberFunctionConstraintNode.Parameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            memberFunctionConstraintNode.Parameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&memberFunctionConstraintNode);
+    }
+    public override void Visit(FunctionConstraintNode& functionConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(FunctionConstraintNode)));
+        functionConstraintNode.ReturnTypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int np = functionConstraintNode.Parameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            functionConstraintNode.Parameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&functionConstraintNode);
+    }
+    public override void Visit(AxiomStatementNode& axiomStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(AxiomStatementNode)));
+        axiomStatementNode.Expression()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&axiomStatementNode);
+    }
+    public override void Visit(AxiomNode& axiomNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(AxiomNode)));
+        if (axiomNode.Id() != null)
+        {
+            axiomNode.Id()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        int np = axiomNode.Parameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            axiomNode.Parameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        int ns = axiomNode.Statements().Count();
+        for (int i = 0; i < ns; ++i)
+        {
+            axiomNode.Statements()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&axiomNode);
+    }
+    public override void Visit(ConceptIdNode& conceptIdNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConceptIdNode)));
+        conceptIdNode.Id()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int np = conceptIdNode.TypeParameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            conceptIdNode.TypeParameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&conceptIdNode);
+    }
+    public override void Visit(ConceptNode& conceptNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConceptNode)));
+        conceptNode.Id()->Accept(*this);
+        int np = conceptNode.TypeParameters().Count();
+        for (int i = 0; i < np; ++i)
+        {
+            conceptNode.TypeParameters()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (conceptNode.Refinement() != null)
+        {
+            conceptNode.Refinement()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        int nc = conceptNode.Constraints().Count();
+        for (int i = 0; i < nc; ++i)
+        {
+            conceptNode.Constraints()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        int na = conceptNode.Axioms().Count();
+        for (int i = 0; i < na; ++i)
+        {
+            conceptNode.Axioms()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&conceptNode);
+    }
+    public override void Visit(SameConstraintNode& sameConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(SameConstraintNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&sameConstraintNode);
+    }
+    public override void Visit(DerivedConstraintNode& derivedConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(DerivedConstraintNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&derivedConstraintNode);
+    }
+    public override void Visit(ConvertibleConstraintNode& convertibleConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConvertibleConstraintNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&convertibleConstraintNode);
+    }
+    public override void Visit(ExplicitlyConvertibleConstraintNode& explicitlyConvertibleConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ExplicitlyConvertibleConstraintNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&explicitlyConvertibleConstraintNode);
+    }
+    public override void Visit(CommonConstraintNode& commonConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(CommonConstraintNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&commonConstraintNode);
+    }
+    public override void Visit(NonreferenceTypeConstraintNode& nonreferenceTypeConstraintNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(NonreferenceTypeConstraintNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&nonreferenceTypeConstraintNode);
+    }
+    public override void Visit(LabelNode& labelNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(LabelNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&labelNode);
+    }
+    public override void Visit(LabeledStatementNode& labeledStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(LabeledStatementNode)));
+        labeledStatementNode.Label()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        labeledStatementNode.Stmt()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&labeledStatementNode);
+    }
+    public override void Visit(CompoundStatementNode& compoundStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(CompoundStatementNode)));
+        int ns = compoundStatementNode.Statements().Count();
+        for (int i = 0; i < ns; ++i)
+        {
+            compoundStatementNode.Statements()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&compoundStatementNode);
+    }
+    public override void Visit(ReturnStatementNode& returnStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ReturnStatementNode)));
+        if (returnStatementNode.Expression() != null)
+        {
+            returnStatementNode.Expression()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&returnStatementNode);
+    }
+    public override void Visit(IfStatementNode& ifStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(IfStatementNode)));
+        ifStatementNode.Condition()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        ifStatementNode.ThenS()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        if (ifStatementNode.ElseS() != null)
+        {
+            ifStatementNode.ElseS()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&ifStatementNode);
+    }
+    public override void Visit(WhileStatementNode& whileStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(WhileStatementNode)));
+        whileStatementNode.Condition()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        whileStatementNode.Statement()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&whileStatementNode);
+    }
+    public override void Visit(DoStatementNode& doStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(DoStatementNode)));
+        doStatementNode.Statement()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        doStatementNode.Condition()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&doStatementNode);
+    }
+    public override void Visit(ForStatementNode& forStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ForStatementNode)));
+        forStatementNode.InitS()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        if (forStatementNode.Condition() != null)
+        {
+            forStatementNode.Condition()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        forStatementNode.LoopS()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        forStatementNode.ActionS()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&forStatementNode);
+    }
+    public override void Visit(BreakStatementNode& breakStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(BreakStatementNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&breakStatementNode);
+    }
+    public override void Visit(ContinueStatementNode& continueStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ContinueStatementNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&continueStatementNode);
+    }
+    public override void Visit(GotoStatementNode& gotoStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(GotoStatementNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&gotoStatementNode);
+    }
+    public override void Visit(ConstructionStatementNode& constructionStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConstructionStatementNode)));
+        constructionStatementNode.TypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        constructionStatementNode.Id()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int na = constructionStatementNode.Arguments().Count();
+        for (int i = 0; i < na; ++i)
+        {
+            constructionStatementNode.Arguments()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&constructionStatementNode);
+    }
+    public override void Visit(DeleteStatementNode& deleteStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(DeleteStatementNode)));
+        deleteStatementNode.Expression()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&deleteStatementNode);
+    }
+    public override void Visit(DestroyStatementNode& destroyStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(DestroyStatementNode)));
+        destroyStatementNode.Expression()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&destroyStatementNode);
+    }
+    public override void Visit(AssignmentStatementNode& assignmentStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(AssignmentStatementNode)));
+        assignmentStatementNode.TargetExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        assignmentStatementNode.SourceExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&assignmentStatementNode);
+    }
+    public override void Visit(ExpressionStatementNode& expressionStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ExpressionStatementNode)));
+        expressionStatementNode.Expression()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&expressionStatementNode);
+    }
+    public override void Visit(EmptyStatementNode& emptyStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(EmptyStatementNode)));
+        node.Reset(treeViewNode.Release());
+        node->SetData(&emptyStatementNode);
+    }
+    public override void Visit(RangeForStatementNode& rangeForStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(RangeForStatementNode)));
+        rangeForStatementNode.TypeExpr()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        rangeForStatementNode.Id()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        rangeForStatementNode.Container()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        rangeForStatementNode.Action()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        node.Reset(treeViewNode.Release());
+        node->SetData(&rangeForStatementNode);
+    }
+    public override void Visit(SwitchStatementNode& switchStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(SwitchStatementNode)));
+        switchStatementNode.Condition()->Accept(*this);
+        treeViewNode->AddChild(node.Release());
+        int nc = switchStatementNode.Cases().Count();
+        for (int i = 0; i < nc; ++i)
+        {
+            switchStatementNode.Cases()[i]->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        if (switchStatementNode.Default() != null)
+        {
+            switchStatementNode.Default()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
+        node.Reset(treeViewNode.Release());
+        node->SetData(&switchStatementNode);
+    }
+    public override void Visit(CaseStatementNode& caseStatementNode)
+    {
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(CaseStatementNode)));
+    }
+    public override void Visit(DefaultStatementNode& defaultStatementNode)
+    {
+    }
+    public override void Visit(GotoCaseStatementNode& gotoCaseStatementNode)
+    {
+    }
+    public override void Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
+    {
+    }
+    public override void Visit(ThrowStatementNode& throwStatementNode)
+    {
+    }
+    public override void Visit(TryStatementNode& tryStatementNode)
+    {
+    }
+    public override void Visit(CatchNode& catchNode)
+    {
+    }
+    public override void Visit(AssertStatementNode& assertStatementNode)
+    {
+    }
+    public override void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode)
+    {
+    }
+    public override void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode)
+    {
+    }
+    public override void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode)
+    {
+    }
+    public override void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode)
+    {
+    }
+    public override void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
+    {
+    }
+    public override void Visit(ParenthesizedConditionalCompilationExpressionNode& parenthesizeCondCompExprNode)
+    {
+    }
+    public override void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
+    {
+    }
+    public override void Visit(TypedefNode& typedefNode)
+    {
+    }
+    public override void Visit(ConstantNode& constantNode)
+    {
+    }
+    public override void Visit(EnumTypeNode& enumTypeNode)
+    {
+    }
+    public override void Visit(EnumConstantNode& enumConstantNode)
+    {
+    }
+    public override void Visit(ParameterNode& parameterNode)
+    {
+    }
+    public override void Visit(TemplateParameterNode& templateParameterNode)
+    {
+    }
+    public override void Visit(ConstNode& constNode)
+    {
+    }
+    public override void Visit(LValueRefNode& lvalueRefNode)
+    {
+    }
+    public override void Visit(RValueRefNode& rvalueRefNode)
+    {
+    }
+    public override void Visit(PointerNode& pointerNode)
+    {
+    }
+    public override void Visit(ArrayNode& arrayNode)
+    {
+    }
+    public override void Visit(DotNode& dotNode)
+    {
+    }
+    public override void Visit(ArrowNode& arrowNode)
+    {
+    }
+    public override void Visit(EquivalenceNode& equivalenceNode)
+    {
+    }
+    public override void Visit(ImplicationNode& implicationNode)
+    {
+    }
+    public override void Visit(DisjunctionNode& disjunctionNode)
+    {
+    }
+    public override void Visit(ConjunctionNode& conjunctionNode)
+    {
+    }
+    public override void Visit(BitOrNode& bitOrNode)
+    {
+    }
+    public override void Visit(BitXorNode& bitXorNode)
+    {
+    }
+    public override void Visit(BitAndNode& bitAndNode)
+    {
+    }
+    public override void Visit(EqualNode& equalNode)
+    {
+    }
+    public override void Visit(NotEqualNode& notEqualNode)
+    {
+    }
+    public override void Visit(LessNode& lessNode)
+    {
+    }
+    public override void Visit(GreaterNode& greaterNode)
+    {
+    }
+    public override void Visit(LessOrEqualNode& lessOrEqualNode)
+    {
+    }
+    public override void Visit(GreaterOrEqualNode& greaterOrEqualNode)
+    {
+    }
+    public override void Visit(ShiftLeftNode& shiftLeftNode)
+    {
+    }
+    public override void Visit(ShiftRightNode& shiftRightNode)
+    {
+    }
+    public override void Visit(AddNode& addNode)
+    {
+    }
+    public override void Visit(SubNode& subNode)
+    {
+    }
+    public override void Visit(MulNode& mulNode)
+    {
+    }
+    public override void Visit(DivNode& divNode)
+    {
+    }
+    public override void Visit(RemNode& remNode)
+    {
+    }
+    public override void Visit(NotNode& notNode)
+    {
+    }
+    public override void Visit(UnaryPlusNode& unaryPlusNode)
+    {
+    }
+    public override void Visit(UnaryMinusNode& unaryMinusNode)
+    {
+    }
+    public override void Visit(PrefixIncrementNode& prefixIncrementNode)
+    {
+    }
+    public override void Visit(PrefixDecrementNode& prefixDecrementNode)
+    {
+    }
+    public override void Visit(DerefNode& derefNode)
+    {
+    }
+    public override void Visit(AddrOfNode& addrOfNode)
+    {
+    }
+    public override void Visit(ComplementNode& complementNode)
+    {
+    }
+    public override void Visit(IsNode& isNode)
+    {
+    }
+    public override void Visit(AsNode& asNode)
+    {
+    }
+    public override void Visit(IndexingNode& indexingNode)
+    {
+    }
+    public override void Visit(InvokeNode& invokeNode)
+    {
+    }
+    public override void Visit(PostfixIncrementNode& postfixIncrementNode)
+    {
+    }
+    public override void Visit(PostfixDecrementNode& postfixDecrementNode)
+    {
+    }
+    public override void Visit(SizeOfNode& sizeOfNode)
+    {
+    }
+    public override void Visit(TypeNameNode& typeNameNode)
+    {
+    }
+    public override void Visit(TypeIdNode& typeIdNode)
+    {
+    }
+    public override void Visit(CastNode& castNode)
+    {
+    }
+    public override void Visit(ConstructNode& constructNode)
+    {
+    }
+    public override void Visit(NewNode& newNode)
+    {
+    }
+    public override void Visit(ThisNode& thisNode)
+    {
+    }
+    public override void Visit(BaseNode& baseNode)
+    {
+    }
+    public override void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
+    {
+    }
+    public override void Visit(GlobalVariableNode& globalVariableNode)
+    {
+    }
+    public override void Visit(Attribute& attribute)
+    {
+    }
+    public override void Visit(Attributes& attributes)
+    {
+    }
+    public override void Visit(CommentNode& commentNode)
+    {
+    }
+    private UniquePtr<TreeViewNode> node;
+}

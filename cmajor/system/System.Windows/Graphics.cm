@@ -655,6 +655,11 @@ namespace System.Windows
         public byte blue;
     }
 
+    public nothrow bool operator==(const Color& left, const Color& right)
+    {
+        return left.alpha == right.alpha && left.red == right.red && left.green == right.green && left.blue == right.blue;
+    }
+
     public Color GetSystemColor(SystemColor color)
     {
         byte red;
@@ -1590,6 +1595,16 @@ namespace System.Windows
         state = 0u
     }
 
+    public enum SmoothingMode : int
+    {
+        invalid = -1,
+        default_ = 0,
+        highSpeed = 1,
+        highQuality = 2,
+        none = 3,
+        antiAlias = 4
+    }
+
     public class Graphics
     {
         public nothrow Graphics() : nativeGraphics(null)
@@ -1972,6 +1987,24 @@ namespace System.Windows
         public nothrow float GetDpiY()
         {
             return WinGraphicsGetDpiY(nativeGraphics);
+        }
+        public nothrow SmoothingMode GetSmoothingMode()
+        {
+            return cast<SmoothingMode>(WinGraphicsGetSmoothingMode(nativeGraphics));
+        }
+        public SmoothingMode GetSmoothingModeChecked()
+        {
+            SmoothingMode smoothingMode = GetSmoothingMode();
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsGetLastStatus(nativeGraphics)));
+            return smoothingMode;
+        }
+        public nothrow GraphicsStatus SetSmoothingMode(SmoothingMode smoothingMode)
+        {
+            return cast<GraphicsStatus>(WinGraphicsSetSmoothingMode(nativeGraphics, smoothingMode));
+        }
+        public void SetSmoothingModeChecked(SmoothingMode smoothingMode)
+        {
+            CheckGraphicsStatus(SetSmoothingMode(smoothingMode));
         }
         public nothrow inline const void* NativeGraphics() const
         {

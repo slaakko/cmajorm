@@ -1,0 +1,140 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public enum BorderStyle : sbyte
+    {
+        single, style3D
+    }
+
+    public nothrow int GetBorderWidth(BorderStyle borderStyle)
+    {
+        switch (borderStyle)
+        {
+            case BorderStyle.single: return 1;
+            case BorderStyle.style3D: return 2;
+        }
+        return 0;
+    }
+
+    public class BorderedControl : Control
+    {
+        public BorderedControl(Control* child_, BorderStyle borderStyle_, const Color& singleBorderColor_,
+            const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("System.Windows.BorderedControl", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            child_->BackgroundColor(), "borderedControl", location, size, dock, anchors),
+            container(this), borderStyle(borderStyle_), singleBorderColor(singleBorderColor_), borderWidth(GetBorderWidth(borderStyle)), child(child_)
+        {
+            container.AddChild(child);
+        }
+        public BorderedControl(Control* child, BorderStyle borderStyle,
+            const Point& location, const Size& size, Dock dock, Anchors anchors) : this(child, borderStyle, Color.Black(), location, size, dock, anchors)
+        {
+        }
+        public nothrow override ContainerControl* GetContainerControl() const
+        {
+            if (child is ContainerControl*)
+            {
+                return cast<ContainerControl*>(child);
+            }
+            return base->GetContainerControl();
+        }
+        public override void PrintWindowTree(int level)
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(string(' ', level) + "BorderedControl." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+            }
+            Component* child = container.FirstChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* childControl = cast<Control*>(child);
+                    childControl->PrintWindowTree(level + 1);
+                }
+                child = child->NextSibling();
+            }
+        }
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+            SetChildPos();
+        }
+        protected override void OnSizeChanged()
+        {
+            base->OnSizeChanged();
+            SetChildPos();
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            if (Debug.Paint())
+            {
+                Rect r(Location(), GetSize());
+                LogView* log = Application.GetLogView();
+                if (log != null)
+                {
+                    log->WriteLine("BorderedControl.OnPaint: " + r.ToString());
+                }
+            }
+            child->OnPaint(args);
+            DrawBorder(args.graphics);
+            base->OnPaint(args);
+        }
+        private void SetChildPos()
+        {
+            Point loc = Location();
+            Size size = GetSize();
+            Rect childRect(loc, size);
+            childRect.Inflate(-borderWidth, -borderWidth);
+            child->SetLocation(childRect.location);
+            child->SetSize(childRect.size);
+        }
+        private void DrawBorder(Graphics& graphics)
+        {
+            switch (borderStyle)
+            {
+                case BorderStyle.single: DrawSingleBorder(graphics); break;
+                case BorderStyle.style3D: Draw3DBorder(graphics); break;
+            }
+        }
+        private void DrawSingleBorder(Graphics& graphics)
+        {
+            Rect r(Point(), GetSize());
+            r.size.w = r.size.w - 1;
+            r.size.h = r.size.h - 1;
+            Pen pen(singleBorderColor, 1);
+            graphics.DrawRectangleChecked(pen, r);
+        }
+        private void Draw3DBorder(Graphics& graphics)
+        {
+            Rect r(Point(), GetSize());
+            r.size.w = r.size.w - 1;
+            r.size.h = r.size.h - 1;
+            Pen outerLeftTopEdgePen(Color(160u, 160u, 160u), 1);
+            graphics.DrawLineChecked(outerLeftTopEdgePen, r.location, Point(r.location.x + r.size.w - 1, r.location.y));
+            graphics.DrawLineChecked(outerLeftTopEdgePen, r.location, Point(r.location.x, r.location.y + r.size.h - 1));
+            Pen outerRightBottomEdgePen(Color.White(), 1);
+            graphics.DrawLineChecked(outerRightBottomEdgePen, Point(r.location.x + r.size.w, r.location.y), Point(r.location.x + r.size.w, r.location.y + r.size.h));
+            graphics.DrawLineChecked(outerRightBottomEdgePen, Point(r.location.x, r.location.y + r.size.h), Point(r.location.x + r.size.w, r.location.y + r.size.h));
+            r.Inflate(-1, -1);
+            Pen innerLeftTopEdgePen(Color(105u, 105u, 105u), 1);
+            graphics.DrawLineChecked(innerLeftTopEdgePen, r.location, Point(r.location.x + r.size.w - 1, r.location.y));
+            graphics.DrawLineChecked(innerLeftTopEdgePen, r.location, Point(r.location.x, r.location.y + r.size.h - 1));
+            Pen innerRightBottomEdgePen(Color(227u, 227u, 227u), 1);
+            graphics.DrawLineChecked(innerRightBottomEdgePen, Point(r.location.x + r.size.w, r.location.y), Point(r.location.x + r.size.w, r.location.y + r.size.h));
+            graphics.DrawLineChecked(innerRightBottomEdgePen, Point(r.location.x, r.location.y + r.size.h), Point(r.location.x + r.size.w, r.location.y + r.size.h));
+        }
+        private Container container;
+        private BorderStyle borderStyle;
+        private int borderWidth;
+        private Color singleBorderColor;
+        private Control* child;
+    }
+}

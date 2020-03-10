@@ -16,8 +16,25 @@ namespace System.Windows
     public class delegate void KeyPressEventHandler(KeyPressEventArgs& keyPressEventArgs);
     public class delegate void KeyEventHandler(KeyEventArgs& keyEventArgs);
     public class delegate void ClickEventHandler();
+    public class delegate void SizeChangedEventHandler();
+    public class delegate void LocationChangedEventHandler();
+
+    public inline nothrow WindowClassStyle DefaultWindowClassStyle()
+    {
+        return WindowClassStyle.CS_DEFAULT;
+    }
+
+    public inline nothrow WindowStyle DefaultChildWindowStyle()
+    {
+        return cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE | WindowStyle.WS_CLIPSIBLINGS);
+    }
+
+    public inline nothrow ExtendedWindowStyle DefaultExtendedWindowStyle()
+    {
+        return ExtendedWindowStyle.WS_EX_DEFAULT;
+    }
     
-    public class Control : Component
+    public abstract class Control : Component
     {
         private enum Flags : sbyte
         {
@@ -46,9 +63,8 @@ namespace System.Windows
         {
             CreateWindowInternal();
         }
-        internal void CreateWindowInternal()
+        public nothrow Control* ParentControl() const
         {
-            if (handle != null) return;
             Control* parentControl = null;
             Container* container = GetContainer();
             if (container != null)
@@ -59,6 +75,22 @@ namespace System.Windows
                     parentControl = cast<Control*>(parent);
                 }
             }
+            return parentControl;
+        }
+        public nothrow string ParentText() const
+        {
+            string parentText;
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentText = "parent:" + string(typename(*parentControl)) + "." + parentControl->Text() + ".parentHandle=" + ToHexString(cast<ulong>(parentControl->Handle()));
+            }
+            return parentText;
+        }
+        internal void CreateWindowInternal()
+        {
+            if (handle != null) return;
+            Control* parentControl = ParentControl();
             if (Application.GetWindowManager().IsSystemClassName(windowClassName))
             {
                 handle = CreateWindowByClassName(windowClassName, text.Chars(), style, exStyle, location, size, parentControl);
@@ -118,6 +150,15 @@ namespace System.Windows
             {
                 createList.Add(child);
             }
+        }
+        public nothrow virtual ContainerControl* GetContainerControl() const
+        {
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                return parentControl->GetContainerControl();
+            }
+            return null;
         }
         public Window* GetWindow() const
         {
@@ -209,8 +250,16 @@ namespace System.Windows
             if (location != loc)
             {
                 location = loc;
-                MoveWindow(handle, location, size, true);
+                if (handle != null)
+                {
+                    MoveWindow(handle, location, size, true);
+                }
+                OnLocationChanged();
             }
+        }
+        protected virtual void OnLocationChanged()
+        {
+            locationChangedEvent.Fire();
         }
         public nothrow const Size& GetSize() const
         {
@@ -218,15 +267,26 @@ namespace System.Windows
         }
         internal nothrow void SetSizeInternal(const Size& sz)
         {
-            size = sz;
+            if (size != sz)
+            {
+                size = sz;
+                OnSizeChanged();
+            }
         }
         public void SetSize(const Size& sz)
         {
             if (size != sz)
             {
-                size = sz;
-                MoveWindow(handle, location, size, true);
+                SetSizeInternal(sz);
+                if (handle != null)
+                {
+                    MoveWindow(handle, location, size, true);
+                }
             }
+        }
+        protected virtual void OnSizeChanged()
+        {
+            sizeChangedEvent.Fire();
         }
         public inline nothrow Dock GetDock() const
         {
@@ -242,20 +302,20 @@ namespace System.Windows
         }
         internal void DockWindow()
         {
-            Container* container = GetContainer();
-            if (container != null)
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
             {
-                Component* parent = container->Parent();
-                if (parent != null && (parent is ContainerControl*))
+                if (parentControl is ContainerControl*)
                 {
-                    ContainerControl* parentControl = cast<ContainerControl*>(parent);
-                    parentControl->DockChildren();
+                    ContainerControl* containerParent = cast<ContainerControl*>(parentControl);
+                    containerParent->DockChildren();
                 }
             }
         }
         internal void DockWindow(Rect& parentRect)
         {
             if (dock == Dock.none) return;
+            if (handle == null) return;
             LogView* logView = Application.GetLogView();
             Point parentLoc = parentRect.location;
             Size parentSize = parentRect.size;
@@ -269,9 +329,12 @@ namespace System.Windows
                     newSize.h = parentSize.h;
                     parentRect.location = Point(parentLoc.x + size.w, parentLoc.y);
                     parentRect.size = Size(parentSize.w - size.w, parentSize.h);
-                    if (logView != null)
+                    if (Debug.Docking())
                     {
-                        logView->WriteLine("Dock.left " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        if (logView != null)
+                        {
+                            logView->WriteLine("Dock.left " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        }
                     }
                     break;
                 }
@@ -281,9 +344,12 @@ namespace System.Windows
                     newSize.w = parentSize.w;
                     parentRect.location = Point(parentLoc.x, parentLoc.y + size.h);
                     parentRect.size = Size(parentSize.w, parentSize.h - size.h);
-                    if (logView != null)
+                    if (Debug.Docking())
                     {
-                        logView->WriteLine("Dock.top " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        if (logView != null)
+                        {
+                            logView->WriteLine("Dock.top " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        }
                     }
                     break;
                 }
@@ -292,9 +358,12 @@ namespace System.Windows
                     newLocation = Point(parentLoc.x + parentSize.w - size.w, parentLoc.y);
                     newSize.h = parentSize.h;
                     parentRect.size = Size(parentSize.w - size.w, parentSize.h);
-                    if (logView != null)
+                    if (Debug.Docking())
                     {
-                        logView->WriteLine("Dock.right " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        if (logView != null)
+                        {
+                            logView->WriteLine("Dock.right " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        }
                     }
                     break;
                 }
@@ -303,9 +372,12 @@ namespace System.Windows
                     newLocation = Point(parentLoc.x, parentLoc.y + parentSize.h - size.h);
                     newSize.w = parentSize.w;
                     parentRect.size = Size(parentSize.w, parentSize.h - size.h);
-                    if (logView != null)
+                    if (Debug.Docking())
                     {
-                        logView->WriteLine("Dock.bottom " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        if (logView != null)
+                        {
+                            logView->WriteLine("Dock.bottom " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        }
                     }
                     break;
                 }
@@ -315,17 +387,20 @@ namespace System.Windows
                     newSize = parentSize;
                     parentRect.location = Point();
                     parentRect.size = Size();
-                    if (logView != null)
+                    if (Debug.Docking())
                     {
-                        logView->WriteLine("Dock.fill " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        if (logView != null)
+                        {
+                            logView->WriteLine("Dock.fill " + text + ": [" + Rect(newLocation, newSize).ToString() + "], [" + parentRect.ToString() + "]");
+                        }
                     }
                     break;
                 }
             }
             if (location != newLocation || size != newSize)
             {
-                location = newLocation;
-                size = newSize;
+                SetLocation(newLocation);
+                SetSize(newSize);
                 MoveWindow(handle, location, size, true);
             }
         }
@@ -355,8 +430,8 @@ namespace System.Windows
             }
             if (location != newLocation || size != newSize)
             {
-                location = newLocation;
-                size = newSize;
+                SetLocation(newLocation);
+                SetSize(newSize);
                 MoveWindow(handle, location, size, true);
             }
         }
@@ -392,6 +467,14 @@ namespace System.Windows
         {
             return ProcessMessage(message);
         }
+        public virtual void PrintWindowTree(int level)
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(string(' ', level) + "Control." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+            }
+        }
         protected virtual bool ProcessMessage(Message& message)
         {
             switch (message.msg)
@@ -404,7 +487,7 @@ namespace System.Windows
                 }
                 case WM_MOUSEMOVE:
                 {
-                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam));
+                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam), 0);
                     DoMouseMove(args);
                     message.result = 0;
                     return true;
@@ -417,15 +500,22 @@ namespace System.Windows
                 }
                 case WM_LBUTTONDOWN:
                 {
-                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam | MouseButtons.lbutton));
+                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam | MouseButtons.lbutton), 1);
                     DoMouseDown(args);
                     message.result = 0;
                     return true;
                 }
                 case WM_LBUTTONUP:
                 {
-                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam | MouseButtons.lbutton));
+                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam | MouseButtons.lbutton), 1);
                     DoMouseUp(args);
+                    message.result = 0;
+                    return true;
+                }
+                case WM_LBUTTONDBLCLK:
+                {
+                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam | MouseButtons.lbutton), 2);
+                    DoMouseDoubleClick(args);
                     message.result = 0;
                     return true;
                 }
@@ -748,6 +838,10 @@ namespace System.Windows
                 }
             }
         }
+        private void DoMouseDoubleClick(MouseEventArgs& args)
+        {
+            OnMouseDoubleClick(args);
+        }
         protected virtual void SetCursor()
         {
             SetCursor(arrowCursor);
@@ -771,6 +865,10 @@ namespace System.Windows
         protected virtual void OnMouseUp(MouseEventArgs& args)
         {
             mouseUpEvent.Fire(args);
+        }
+        protected virtual void OnMouseDoubleClick(MouseEventArgs& args)
+        {
+            mouseDoubleClickEvent.Fire(args);
         }
         protected virtual void OnKeyPress(KeyPressEventArgs& args)
         {
@@ -849,6 +947,10 @@ namespace System.Windows
         {
             return mouseUpEvent;
         }
+        public nothrow Event<MouseEventHandler, MouseEventArgs>& MouseDoubleClickEvent() const
+        {
+            return mouseDoubleClickEvent;
+        }
         public nothrow Event<KeyPressEventHandler, KeyPressEventArgs>& KeyPressEvent() const
         {
             return keyPressEvent;
@@ -864,6 +966,14 @@ namespace System.Windows
         public nothrow Event<ClickEventHandler>& ClickEvent() const
         {
             return clickEvent;
+        }
+        public nothrow Event<SizeChangedEventHandler>& SizeChangedEvent() const
+        {
+            return sizeChangedEvent;
+        }
+        public nothrow Event<LocationChangedEventHandler>& LocationChangedEvent() const
+        {
+            return locationChangedEvent;
         }
         private nothrow inline bool MouseInClient() const
         {
@@ -934,9 +1044,12 @@ namespace System.Windows
         private Event<MouseLeaveEventHandler> mouseLeaveEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseDownEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseUpEvent;
+        private Event<MouseEventHandler, MouseEventArgs> mouseDoubleClickEvent;
         private Event<KeyPressEventHandler, KeyPressEventArgs> keyPressEvent;
         private Event<KeyEventHandler, KeyEventArgs> keyDownEvent;
         private Event<KeyEventHandler, KeyEventArgs> keyUpEvent;
         private Event<ClickEventHandler> clickEvent;
+        private Event<SizeChangedEventHandler> sizeChangedEvent;
+        private Event<LocationChangedEventHandler> locationChangedEvent;
     }
 }

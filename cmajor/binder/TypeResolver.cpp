@@ -334,6 +334,15 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
     {
         symbolTable.MapSymbol(idNode, classTemplate);
     }
+    if (classTemplate->IsProject() && !classTemplate->IsBound())
+    {
+        Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(classTemplate);
+        if (node && node->GetNodeType() == NodeType::classNode)
+        {
+            TypeBinder typeBinder(boundCompileUnit);
+            typeBinder.BindClass(classTemplate, static_cast<ClassNode*>(node), false);
+        }
+    }
     std::vector<TypeSymbol*> templateArgumentTypes;
     int n = arity;
     for (int i = 0; i < n; ++i)

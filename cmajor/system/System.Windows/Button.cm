@@ -30,7 +30,7 @@ namespace System.Windows
     public class Button : ButtonBase
     {
         public Button(ButtonStyle buttonStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("BUTTON", WindowClassStyle.CS_DEFAULT, cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_TABSTOP | WindowStyle.WS_VISIBLE | buttonStyle), ExtendedWindowStyle.WS_EX_DEFAULT, 
+            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle), DefaultExtendedWindowStyle(), 
             GetSystemColor(SystemColor.COLOR_BTNFACE), text, location, size, dock, anchors)
         {
         }
@@ -45,6 +45,14 @@ namespace System.Windows
         public Button(const string& text, const Point& location, const Size& size) : 
             this(ButtonStyle.BS_PUSHBUTTON, text, location, size)
         {
+        }
+        public override void PrintWindowTree(int level)
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(string(' ', level) + "Button." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+            }
         }
     }
 }

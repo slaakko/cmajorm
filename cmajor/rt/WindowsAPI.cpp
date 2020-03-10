@@ -972,6 +972,16 @@ float WinGraphicsGetDpiY(void* graphics)
     return static_cast<Graphics*>(graphics)->GetDpiY();
 }
 
+int WinGraphicsGetSmoothingMode(void* graphics)
+{
+    return static_cast<Graphics*>(graphics)->GetSmoothingMode();
+}
+
+int WinGraphicsSetSmoothingMode(void* graphics, int smoothingMode)
+{
+    return static_cast<Graphics*>(graphics)->SetSmoothingMode(static_cast<SmoothingMode>(smoothingMode));
+}
+
 void WinGetSysColor(int index, uint8_t& red, uint8_t& green, uint8_t& blue)
 {
     uint32_t rgb = GetSysColor(index);
