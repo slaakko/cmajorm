@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +12,7 @@ namespace devcore
     {
         public enum Kind
         {
-            cm, text
+            cm, xml, text
         }
         public SourceFile(string name, string filePath, Kind kind)
         {

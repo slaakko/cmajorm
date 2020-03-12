@@ -4,18 +4,21 @@
 // =================================
 
 #include <cmajor/cmproj/Conversion.hpp>
+#include <sngxml/dom/Parser.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/CharacterData.hpp>
+#include <sngxml/xpath/XPathEvaluate.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <iostream>
 
 namespace cmajor { namespace cmproj {
 
 using namespace soulng::unicode;
 
-void ConvertProject(Project* project, const std::string& cmprojFilePath, const std::string& projectGuid, bool verbose)
+void ConvertProjectToCmProject(Project* project, const std::string& cmprojFilePath, const std::string& projectGuid, bool verbose)
 {
     sngxml::dom::Document cmprojDoc;
     cmprojDoc.SetXmlVersion(U"1.0");
@@ -106,6 +109,141 @@ void ConvertProject(Project* project, const std::string& cmprojFilePath, const s
     if (verbose)
     {
         std::cout << "==> " << cmprojFilePath << std::endl;
+    }
+}
+
+void ConvertCmProjectToProject(const std::string& cmprojFilePath, const std::string& projectFilePath, bool verbose)
+{
+    if (verbose)
+    {
+        std::cout << "> " << cmprojFilePath << std::endl;
+    }
+    std::unique_ptr<sngxml::dom::Document> cmprojectDoc = sngxml::dom::ReadDocument(cmprojFilePath);
+    std::string projectName = Path::GetFileNameWithoutExtension(cmprojFilePath);
+    std::ofstream cmpFile(projectFilePath);
+    CodeFormatter formatter(cmpFile);
+    formatter.WriteLine("project " + projectName + ";");
+    std::unique_ptr<sngxml::xpath::XPathObject> targetResult = sngxml::xpath::Evaluate(U"/Project/PropertyGroup/TargetType", cmprojectDoc.get());
+    if (targetResult)
+    {
+        if (targetResult->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+        {
+            sngxml::xpath::XPathNodeSet* targetTypes = static_cast<sngxml::xpath::XPathNodeSet*>(targetResult.get());
+            if (targetTypes->Length() == 1)
+            {
+                sngxml::dom::Node* targetTypeNode = (*targetTypes)[0];
+                if (targetTypeNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                {
+                    sngxml::dom::Element* targetTypeElement = static_cast<sngxml::dom::Element*>(targetTypeNode);
+                    sngxml::dom::Node* targetNode = targetTypeElement->FirstChild();
+                    if (targetNode)
+                    {
+                        if (targetNode->GetNodeType() == sngxml::dom::NodeType::textNode)
+                        {
+                            sngxml::dom::Text* targetText = static_cast<sngxml::dom::Text*>(targetNode);
+                            const std::u32string& target = targetText->Data();
+                            if (target == U"program")
+                            {
+                                formatter.WriteLine("target=program;");
+                            }
+                            else if (target == U"winapp")
+                            {
+                                formatter.WriteLine("target=winapp;");
+                            }
+                            else if (target == U"winguiapp")
+                            {
+                                formatter.WriteLine("target=winguiapp;");
+                            }
+                            else if (target == U"library")
+                            {
+                                formatter.WriteLine("target=library;");
+                            }
+                            else if (target == U"winlib")
+                            {
+                                formatter.WriteLine("target=winlib;");
+                            }
+                            else if (target == U"unitTest")
+                            {
+                                formatter.WriteLine("target=unitTest;");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    std::unique_ptr<sngxml::xpath::XPathObject> referenceFileResult = sngxml::xpath::Evaluate(U"/Project/ItemGroup/ProjectReference", cmprojectDoc.get());
+    if (referenceFileResult)
+    {
+        if (referenceFileResult->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+        {
+            sngxml::xpath::XPathNodeSet* references = static_cast<sngxml::xpath::XPathNodeSet*>(referenceFileResult.get());
+            int n = references->Length();
+            for (int i = 0; i < n; ++i)
+            {
+                sngxml::dom::Node* referenceNode = (*references)[i];
+                if (referenceNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                {
+                    sngxml::dom::Element* referenceElement = static_cast<sngxml::dom::Element*>(referenceNode);
+                    std::u32string referencePath = referenceElement->GetAttribute(U"Include");
+                    if (!referencePath.empty())
+                    {
+                        std::string referenceProjectPath = Path::ChangeExtension(ToUtf8(referencePath), ".cmp");
+                        formatter.WriteLine("reference <" + referenceProjectPath + ">;");
+                    }
+                }
+            }
+
+        }
+    }
+    std::unique_ptr<sngxml::xpath::XPathObject> sourceFileResult = sngxml::xpath::Evaluate(U"/Project/ItemGroup/CmCompile", cmprojectDoc.get());
+    if (sourceFileResult)
+    {
+        if (sourceFileResult->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+        {
+            sngxml::xpath::XPathNodeSet* sourceFiles = static_cast<sngxml::xpath::XPathNodeSet*>(sourceFileResult.get());
+            int n = sourceFiles->Length();
+            for (int i = 0; i < n; ++i)
+            {
+                sngxml::dom::Node* sourceFileNode = (*sourceFiles)[i];
+                if (sourceFileNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                {
+                    sngxml::dom::Element* sourceFileElement = static_cast<sngxml::dom::Element*>(sourceFileNode);
+                    std::string sourceFilePath = ToUtf8(sourceFileElement->GetAttribute(U"Include"));
+                    if (Path::GetExtension(sourceFilePath) == ".cm")
+                    {
+                        formatter.WriteLine("source <" + sourceFilePath + ">;");
+                    }
+                    else if (Path::GetExtension(sourceFilePath) == ".xml")
+                    {
+                        formatter.WriteLine("resource <" + sourceFilePath + ">;");
+                    }
+                }
+            }
+        }
+    }
+    std::unique_ptr<sngxml::xpath::XPathObject> textFileResult = sngxml::xpath::Evaluate(U"/Project/ItemGroup/None", cmprojectDoc.get());
+    if (textFileResult)
+    {
+        if (textFileResult->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+        {
+            sngxml::xpath::XPathNodeSet* textFiles = static_cast<sngxml::xpath::XPathNodeSet*>(textFileResult.get());
+            int n = textFiles->Length();
+            for (int i = 0; i < n; ++i)
+            {
+                sngxml::dom::Node* textFileNode = (*textFiles)[i];
+                if (textFileNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                {
+                    sngxml::dom::Element* textFileElement = static_cast<sngxml::dom::Element*>(textFileNode);
+                    std::string textFilePath = ToUtf8(textFileElement->GetAttribute(U"Include"));
+                    formatter.WriteLine("text <" + textFilePath + ">;");
+                }
+            }
+        }
+    }
+    if (verbose)
+    {
+        std::cout << "==> " << projectFilePath << std::endl;
     }
 }
 

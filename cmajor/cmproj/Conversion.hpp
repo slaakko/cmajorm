@@ -12,7 +12,8 @@ using namespace sngcm::ast;
 
 namespace cmajor { namespace cmproj {
 
-void ConvertProject(Project* project, const std::string& cmprojFilePath, const std::string& projectGuid, bool verbose);
+void ConvertProjectToCmProject(Project* project, const std::string& cmprojFilePath, const std::string& projectGuid, bool verbose);
+void ConvertCmProjectToProject(const std::string& cmprojFilePath, const std::string& projectFilePath, bool verbose);
 
 } } // namespace cmajor::cmproj
 

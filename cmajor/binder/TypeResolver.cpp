@@ -336,11 +336,11 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
     }
     if (classTemplate->IsProject() && !classTemplate->IsBound())
     {
+        TypeBinder typeBinder(boundCompileUnit);
         Node* node = boundCompileUnit.GetSymbolTable().GetNodeNoThrow(classTemplate);
         if (node && node->GetNodeType() == NodeType::classNode)
         {
-            TypeBinder typeBinder(boundCompileUnit);
-            typeBinder.BindClass(classTemplate, static_cast<ClassNode*>(node), false);
+            typeBinder.AddUsingNodesToCurrentCompileUnit(static_cast<ClassNode*>(node));
         }
     }
     std::vector<TypeSymbol*> templateArgumentTypes;

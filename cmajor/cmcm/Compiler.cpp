@@ -5,6 +5,7 @@
 
 #include <cmajor/cmcm/Compiler.hpp>
 #include <cmajor/Build/Build.hpp>
+#include <cmajor/cmres/InitDone.hpp>
 #include <sngcm/ast/InitDone.hpp>
 #include <soulng/lexer/ParsingException.hpp>
 #include <soulng/util/InitDone.hpp>
@@ -15,6 +16,7 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <sngxml/dom/Parser.hpp>
 #include <sngxml/dom/CharacterData.hpp>
+#include <sngxml/xpath/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
@@ -103,12 +105,16 @@ extern "C" void Init()
     CompileData::Init();
     soulng::util::SetLogMode(soulng::util::LogMode::queue); 
     soulng::util::DisableConsoleWindow();
+    sngxml::xpath::Init();
+    cmajor::resources::Init();
     initialized = true;
 }
 
 extern "C" void Done()
 {
     initialized = false;
+    cmajor::resources::Done();
+    sngxml::xpath::Done();
     CompileData::Done();
     cmajor::symbols::Done();
     sngcm::ast::Done();

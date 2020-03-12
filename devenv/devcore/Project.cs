@@ -68,6 +68,7 @@ namespace devcore
                     switch (sourceFile.GetKind())
                     {
                         case SourceFile.Kind.cm: writer.WriteLine("source <" + PathUtil.GetRelativePath(sourceFile.FilePath, basePath) + ">;"); break;
+                        case SourceFile.Kind.xml: writer.WriteLine("resource <" + PathUtil.GetRelativePath(sourceFile.FilePath, basePath) + ">;"); break;
                         case SourceFile.Kind.text: writer.WriteLine("text <" + PathUtil.GetRelativePath(sourceFile.FilePath, basePath) + ">;"); break;
                     }
                 }

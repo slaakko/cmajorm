@@ -39,6 +39,7 @@ namespace parser
                     ::= TargetDeclaration{ project.Target = TargetDeclaration; }
                     |   (ProjectReference:prf){ project.AddReference(prf); } ';'!
                     |   (SourceFile:src){ project.AddSourceFile(src, SourceFile.Kind.cm); } ';'!
+                    |   (ResourceFile:res){ project.AddSourceFile(res, SourceFile.Kind.xml); } ';'!
                     |   (TextFile:txt){ project.AddSourceFile(txt, SourceFile.Kind.text); } ';'!
                     ;
 
@@ -57,6 +58,10 @@ namespace parser
                     
         SourceFile: string
                     ::= keyword("source") FilePath!{ value = FilePath; }
+                    ;
+                    
+        ResourceFile : string
+                    ::= keyword("resource") FilePath!{ value = FilePath; }
                     ;
                 
         TextFile: string

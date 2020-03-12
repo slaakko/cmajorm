@@ -58,7 +58,7 @@ void ConvertSolution(sngcm::ast::Solution* solution, const std::string& slnFileP
         boost::uuids::uuid guid = boost::uuids::random_generator()();
         std::string projectGuidStr = boost::uuids::to_string(guid);
         projectGuids.push_back(projectGuidStr);
-        ConvertProject(project.get(), cmprojFilePath, projectGuidStr, verbose);
+        ConvertProjectToCmProject(project.get(), cmprojFilePath, projectGuidStr, verbose);
         std::string relativeProjectFilePath = Path::ChangeExtension(solution->RelativeProjectFilePaths()[i], ".cmproj");
         std::string projectLine = "Project(\"{A8A06387-5A08-470D-8F9C-CD5ECF2DDB09}\") = \"";
         projectLine.append(ToUtf8(project->Name())).append("\", \"").append(relativeProjectFilePath).append("\", \"{").append(projectGuidStr).append("}\"");

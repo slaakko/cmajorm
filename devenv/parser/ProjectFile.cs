@@ -72,20 +72,26 @@ namespace parser
                 new AlternativeParser(
                     new AlternativeParser(
                         new AlternativeParser(
-                            new ActionParser("A0",
-                                new NonTerminalParser("TargetDeclaration", "TargetDeclaration", "TargetDeclaration", 0)),
+                            new AlternativeParser(
+                                new ActionParser("A0",
+                                    new NonTerminalParser("TargetDeclaration", "TargetDeclaration", "TargetDeclaration", 0)),
+                                new SequenceParser(
+                                    new ActionParser("A1",
+                                        new NonTerminalParser("prf", "ProjectReference.prf", "ProjectReference", 0)),
+                                    new ExpectationParser(
+                                        new CharParser(';')))),
                             new SequenceParser(
-                                new ActionParser("A1",
-                                    new NonTerminalParser("prf", "ProjectReference.prf", "ProjectReference", 0)),
+                                new ActionParser("A2",
+                                    new NonTerminalParser("src", "SourceFile.src", "SourceFile", 0)),
                                 new ExpectationParser(
                                     new CharParser(';')))),
                         new SequenceParser(
-                            new ActionParser("A2",
-                                new NonTerminalParser("src", "SourceFile.src", "SourceFile", 0)),
+                            new ActionParser("A3",
+                                new NonTerminalParser("res", "ResourceFile.res", "ResourceFile", 0)),
                             new ExpectationParser(
                                 new CharParser(';')))),
                     new SequenceParser(
-                        new ActionParser("A3",
+                        new ActionParser("A4",
                             new NonTerminalParser("txt", "TextFile.txt", "TextFile", 0)),
                         new ExpectationParser(
                             new CharParser(';'))))));
@@ -124,6 +130,12 @@ namespace parser
             AddRule(new SourceFileRuleParser("SourceFile", "parser.ProjectFile.SourceFile",
                 new SequenceParser(
                     new KeywordParser("source"),
+                    new ActionParser("A0",
+                        new ExpectationParser(
+                            new NonTerminalParser("FilePath", "FilePath", "FilePath", 0))))));
+            AddRule(new ResourceFileRuleParser("ResourceFile", "parser.ProjectFile.ResourceFile",
+                new SequenceParser(
+                    new KeywordParser("resource"),
                     new ActionParser("A0",
                         new ExpectationParser(
                             new NonTerminalParser("FilePath", "FilePath", "FilePath", 0))))));
@@ -293,6 +305,7 @@ namespace parser
                 public Target fromTargetDeclaration;
                 public string fromprf;
                 public string fromsrc;
+                public string fromres;
                 public string fromtxt;
             }
             public ProjectFileDeclarationRuleParser(string name, string fullName, Parser definition)
@@ -311,12 +324,16 @@ namespace parser
                 a2ActionParser.Action = A2Action;
                 ActionParser a3ActionParser = GetAction("A3");
                 a3ActionParser.Action = A3Action;
+                ActionParser a4ActionParser = GetAction("A4");
+                a4ActionParser.Action = A4Action;
                 NonTerminalParser targetDeclarationNonTerminalParser = GetNonTerminal("TargetDeclaration");
                 targetDeclarationNonTerminalParser.PostCall = PostTargetDeclaration;
                 NonTerminalParser prfNonTerminalParser = GetNonTerminal("prf");
                 prfNonTerminalParser.PostCall = Postprf;
                 NonTerminalParser srcNonTerminalParser = GetNonTerminal("src");
                 srcNonTerminalParser.PostCall = Postsrc;
+                NonTerminalParser resNonTerminalParser = GetNonTerminal("res");
+                resNonTerminalParser.PostCall = Postres;
                 NonTerminalParser txtNonTerminalParser = GetNonTerminal("txt");
                 txtNonTerminalParser.PostCall = Posttxt;
             }
@@ -344,6 +361,10 @@ namespace parser
             }
             private void A3Action(string match, string content, Position position, string fileName, ref bool pass)
             {
+                context.project.AddSourceFile(context.fromres, SourceFile.Kind.xml);
+            }
+            private void A4Action(string match, string content, Position position, string fileName, ref bool pass)
+            {
                 context.project.AddSourceFile(context.fromtxt, SourceFile.Kind.text);
             }
             private void PostTargetDeclaration(Stack<object> stack, bool matched)
@@ -365,6 +386,13 @@ namespace parser
                 if (matched)
                 {
                     context.fromsrc = (string)stack.Pop();
+                }
+            }
+            private void Postres(Stack<object> stack, bool matched)
+            {
+                if (matched)
+                {
+                    context.fromres = (string)stack.Pop();
                 }
             }
             private void Posttxt(Stack<object> stack, bool matched)
@@ -499,6 +527,53 @@ namespace parser
                 public string fromFilePath;
             }
             public SourceFileRuleParser(string name, string fullName, Parser definition)
+                : base(name, fullName, definition)
+            {
+                contextStack = new Stack<Context>();
+                ValueTypeName = "string";
+            }
+            public override void Link()
+            {
+                ActionParser a0ActionParser = GetAction("A0");
+                a0ActionParser.Action = A0Action;
+                NonTerminalParser filePathNonTerminalParser = GetNonTerminal("FilePath");
+                filePathNonTerminalParser.PostCall = PostFilePath;
+            }
+            public override void Enter(Stack<object> stack)
+            {
+                contextStack.Push(context);
+                context = new Context();
+            }
+            public override void Leave(Stack<object> stack, bool matched)
+            {
+                if (matched)
+                {
+                    stack.Push(context.value);
+                }
+                context = contextStack.Pop();
+            }
+            private void A0Action(string match, string content, Position position, string fileName, ref bool pass)
+            {
+                context.value = context.fromFilePath;
+            }
+            private void PostFilePath(Stack<object> stack, bool matched)
+            {
+                if (matched)
+                {
+                    context.fromFilePath = (string)stack.Pop();
+                }
+            }
+            private Context context;
+            private Stack<Context> contextStack;
+        }
+        private class ResourceFileRuleParser : soul.parsing.RuleParser
+        {
+            private class Context
+            {
+                public string value;
+                public string fromFilePath;
+            }
+            public ResourceFileRuleParser(string name, string fullName, Parser definition)
                 : base(name, fullName, definition)
             {
                 contextStack = new Stack<Context>();

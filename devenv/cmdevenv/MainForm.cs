@@ -936,7 +936,14 @@ namespace cmdevenv
                     SourceFile.Kind kind = SourceFile.Kind.cm;
                     if (!sourceFileName.EndsWith(".cm"))
                     {
-                        kind = SourceFile.Kind.text;
+                        if (sourceFileName.EndsWith(".xml"))
+                        {
+                            kind = SourceFile.Kind.xml;
+                        }
+                        else
+                        {
+                            kind = SourceFile.Kind.text;
+                        }
                     }
                     SourceFile sourceFile = project.AddSourceFile(sourceFileName, kind);
                     using (StreamWriter writer = File.CreateText(sourceFile.FilePath))
@@ -1474,7 +1481,19 @@ namespace cmdevenv
                             SourceFile sourceFile = solution.GetSourceFileByPath(filePath);
                             if (sourceFile == null)
                             {
-                                sourceFile = new SourceFile(Path.GetFileName(filePath), filePath, (filePath.EndsWith(".cm") ? SourceFile.Kind.cm : SourceFile.Kind.text));
+                                SourceFile.Kind kind = SourceFile.Kind.cm;
+                                if (!filePath.EndsWith(".cm"))
+                                {
+                                    if (filePath.EndsWith(".xml"))
+                                    {
+                                        kind = SourceFile.Kind.xml;
+                                    }
+                                    else
+                                    {
+                                        kind = SourceFile.Kind.text;
+                                    }
+                                }
+                                sourceFile = new SourceFile(Path.GetFileName(filePath), filePath, kind);
                             }
                             Editor editor = EditSourceFile(sourceFile);
                             int line = span.Line;
@@ -1754,7 +1773,14 @@ namespace cmdevenv
                     SourceFile.Kind kind = SourceFile.Kind.cm;
                     if (!fileName.EndsWith(".cm"))
                     {
-                        kind = SourceFile.Kind.text;
+                        if (fileName.EndsWith(".xml"))
+                        {
+                            kind = SourceFile.Kind.xml;
+                        }
+                        else
+                        {
+                            kind = SourceFile.Kind.text;
+                        }
                     }
                     project.AddSourceFile(fileName, kind);
                     solution.Save();
@@ -2603,6 +2629,56 @@ namespace cmdevenv
         private string profileOutFile;
         private string unitTestOutFile;
         private bool editModuleBuilt;
+
+        private async void newResourceFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Project project = (Project)solutionExplorerTreeView.SelectedNode.Tag;
+                NewResourceFileDialog dialog = new NewResourceFileDialog();
+                dialog.ResourceFileName = "file1.xml";
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    string resourceFileName = dialog.ResourceFileName;
+                    SourceFile.Kind kind = SourceFile.Kind.xml;
+                    SourceFile sourceFile = project.AddSourceFile(resourceFileName, kind);
+                    using (StreamWriter writer = File.CreateText(sourceFile.FilePath))
+                    {
+                    }
+                    solution.Save();
+                    await SetupSolutionExplorer(project);
+                    SetMenuItemStatus();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+        private async void existingResourceFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Project project = (Project)solutionExplorerTreeView.SelectedNode.Tag;
+                addExistingResourceFileDialog.InitialDirectory = project.BasePath;
+                if (addExistingResourceFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string fileName = addExistingResourceFileDialog.FileName;
+                    SourceFile.Kind kind = SourceFile.Kind.xml;
+                    project.AddSourceFile(fileName, kind);
+                    solution.Save();
+                    await SetupSolutionExplorer(project);
+                    SetMenuItemStatus();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
     }
 
     public static class KeyboardUtil

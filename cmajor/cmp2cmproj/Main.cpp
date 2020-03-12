@@ -1,5 +1,6 @@
 #include <sngcm/ast/InitDone.hpp>
 #include <soulng/util/InitDone.hpp>
+#include <sngxml/xpath/InitDone.hpp>
 #include <sngcm/cmlexer/ContainerFileLexer.hpp>
 #include <sngcm/cmparser/ProjectFile.hpp>
 #include <cmajor/cmproj/Conversion.hpp>
@@ -19,11 +20,13 @@ struct InitDone
 {
     InitDone()
     {
-        sngcm::ast::Init();
         soulng::util::Init();
+        sngcm::ast::Init();
+        sngxml::xpath::Init();
     }
     ~InitDone()
     {
+        sngxml::xpath::Done();
         soulng::util::Done();
         sngcm::ast::Done();
     }
@@ -97,7 +100,7 @@ int main(int argc, const char** argv)
             std::string cmprojFilePath = GetFullPath(Path::ChangeExtension(projectFilePath, ".cmproj"));
             boost::uuids::uuid guid = boost::uuids::random_generator()();
             std::string guidStr = boost::uuids::to_string(guid);
-            ConvertProject(project.get(), cmprojFilePath, guidStr, verbose);
+            ConvertProjectToCmProject(project.get(), cmprojFilePath, guidStr, verbose);
         }
     }
     catch (const std::exception& ex)
