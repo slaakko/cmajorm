@@ -1,0 +1,225 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows.API;
+
+namespace System.Windows
+{
+    public class ScrollableControl : Control
+    {
+        public ScrollableControl(Control* child_, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("System.Windows.ScrollableControl", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            child_->BackgroundColor(), "scrollableControl", location, size, dock, anchors), container(this), child(child_),
+            verticalScrollUnit(0), horizontalScrollUnit(0), vpage(0u), vpos(0), vmin(0), vmax(0), hpage(0u), hpos(0), hmin(0), hmax(0), verticalScrollBarShown(false), horizontalScrollBarShown(false)
+        {
+            container.AddChild(child);
+        }
+        protected nothrow override bool IsDecoratorControl() const
+        {
+            return true;
+        }
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+            child->SetLocation(Point());
+            child->SetSize(GetSize());
+        }
+        protected override void OnSizeChanged()
+        {
+            base->OnSizeChanged();
+            child->SetLocation(Point());
+            child->SetSize(GetSize());
+        }
+        protected override void OnChildContentSizeChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentSizeChanged(args);
+            scrolledChild = args.control;
+            Pair<int, int> scrollUnits = scrolledChild->GetScrollUnits();
+            verticalScrollUnit = scrollUnits.first;
+            horizontalScrollUnit = scrollUnits.second;
+            Size scrolledChildClientSize = scrolledChild->GetSize();
+            Size scrolledChildContentSize = scrolledChild->ContentSize();
+            if (scrolledChildContentSize.h > scrolledChildClientSize.h)
+            {
+                vmin = 0;
+                vmax = scrolledChildContentSize.h / verticalScrollUnit;
+                vpage = cast<uint>(scrolledChildClientSize.h / verticalScrollUnit);
+                SetScrollInfo(Handle(), ScrollBar.SB_VERT, cast<ScrollInfoMask>(ScrollInfoMask.SIF_POS | ScrollInfoMask.SIF_PAGE | ScrollInfoMask.SIF_RANGE), true,
+                    vpage, vpos, vmin, vmax);
+                ShowScrollBar(Handle(), ScrollBar.SB_VERT, true);
+                verticalScrollBarShown = true;
+            }
+            else
+            {
+                ShowScrollBar(Handle(), ScrollBar.SB_VERT, false);
+                verticalScrollBarShown = false;
+            }
+            if (scrolledChildContentSize.w > scrolledChildClientSize.w)
+            {
+                hmin = 0;
+                hmax = scrolledChildContentSize.w / horizontalScrollUnit;
+                hpage = cast<uint>(scrolledChildClientSize.w / horizontalScrollUnit);
+                SetScrollInfo(Handle(), ScrollBar.SB_HORZ, cast<ScrollInfoMask>(ScrollInfoMask.SIF_POS | ScrollInfoMask.SIF_PAGE | ScrollInfoMask.SIF_RANGE), true,
+                    hpage, hpos, hmin, hmax);
+                ShowScrollBar(Handle(), ScrollBar.SB_HORZ, true);
+                horizontalScrollBarShown = true;
+            }
+            else
+            {
+                ShowScrollBar(Handle(), ScrollBar.SB_HORZ, false);
+                horizontalScrollBarShown = false;
+            }
+        }
+        protected override void OnHScroll(ScrollEventArgs& args)
+        {
+            base->OnHScroll(args);
+            int trackPos;
+            GetScrollInfo(Handle(), ScrollBar.SB_HORZ, hpage, hpos, hmin, hmax, trackPos);
+            int prevHPos = hpos;
+            switch (args.request)
+            {
+                case SB_LINELEFT:
+                {
+                    --hpos;
+                    break;
+                }
+                case SB_LINERIGHT:
+                {
+                    ++hpos;
+                    break;
+                }
+                case SB_PAGELEFT:
+                {
+                    hpos = hpos - cast<int>(hpage);
+                    break;
+                }
+                case SB_PAGERIGHT:
+                {
+                    hpos = hpos + cast<int>(hpage);
+                    break;
+                }
+                case SB_THUMBTRACK:
+                {
+                    hpos = trackPos;
+                    break;
+                }
+            }
+            SetScrollInfo(Handle(), ScrollBar.SB_HORZ, ScrollInfoMask.SIF_POS, true, 0u, hpos, 0, 0);
+            GetScrollInfo(Handle(), ScrollBar.SB_HORZ, hpage, hpos, hmin, hmax, trackPos);
+            if (prevHPos != hpos)
+            {
+                ScrollWindow(scrolledChild->Handle(), horizontalScrollUnit * (prevHPos - hpos), 0, null, null);
+                scrolledChild->Update();
+            }
+        }
+        protected override void OnVScroll(ScrollEventArgs& args)
+        {
+            base->OnVScroll(args);
+            int trackPos;
+            GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
+            int prevVPos = vpos;
+            switch (args.request)
+            {
+                case SB_TOP:
+                {
+                    vpos = vmin;
+                    break;
+                }
+                case SB_BOTTOM:
+                {
+                    vpos = vmax;
+                    break;
+                }
+                case SB_LINEUP:
+                {
+                    --vpos;
+                    break;
+                }
+                case SB_LINEDOWN:
+                {
+                    ++vpos;
+                    break;
+                }
+                case SB_PAGEUP:
+                {
+                    vpos = vpos - cast<int>(vpage);
+                    break;
+                }
+                case SB_PAGEDOWN:
+                {
+                    vpos = vpos + cast<int>(vpage);
+                    break;
+                }
+                case SB_THUMBTRACK:
+                {
+                    vpos = trackPos;
+                    break;
+                }
+            }
+            SetScrollInfo(Handle(), ScrollBar.SB_VERT, ScrollInfoMask.SIF_POS, true, 0u, vpos, 0, 0);
+            GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
+            if (prevVPos != vpos)
+            {
+                ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
+                scrolledChild->Update();
+            }
+        }
+        protected override void OnMouseWheel(MouseWheelEventArgs& args)
+        {
+            base->OnMouseWheel(args);
+            if (!args.handled)
+            {
+                if (verticalScrollBarShown)
+                {
+                    int trackPos;
+                    GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
+                    int prevVPos = vpos;
+                    vpos = cast<int>(vpos - args.distance / (2.0 * verticalScrollUnit));
+                    SetScrollInfo(Handle(), ScrollBar.SB_VERT, ScrollInfoMask.SIF_POS, true, 0u, vpos, 0, 0);
+                    GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
+                    if (prevVPos != vpos)
+                    {
+                        ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
+                        scrolledChild->Update();
+                    }
+                    args.handled = true;
+                }
+            }
+        }
+        protected override void TranslateChildGraphics(Graphics& graphics)
+        {
+            int dx = -hpos * horizontalScrollUnit;
+            int dy = -vpos * verticalScrollUnit;
+            if (dx != 0 || dy != 0)
+            {
+                graphics.TranslateTransformChecked(dx, dy);
+            }
+        }
+        protected override void TranslateMousePos(Point& location)
+        {
+            int dx = hpos * horizontalScrollUnit;
+            int dy = vpos * verticalScrollUnit;
+            location.x = location.x + dx;
+            location.y = location.y + dy;
+        }
+        private Container container;
+        private Control* child;
+        private Control* scrolledChild;
+        private int verticalScrollUnit;
+        private int horizontalScrollUnit;
+        private uint vpage;
+        private int vpos;
+        private int vmin;
+        private int vmax;
+        private uint hpage;
+        private int hpos;
+        private int hmin;
+        private int hmax;
+        private bool verticalScrollBarShown;
+        private bool horizontalScrollBarShown;
+    }
+}

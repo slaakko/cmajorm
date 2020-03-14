@@ -44,12 +44,21 @@ namespace System.Windows
         {
             return this;
         }
+        protected override void OnChildContentSizeChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentSizeChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentSizeChanged(args);
+            }
+        }
         public override void PrintWindowTree(int level)
         {
             LogView* log = Application.GetLogView();
             if (log != null)
             {
-                log->WriteLine(string(' ', level) + "ContainerControl." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+                log->WriteLine(string(' ', level) + "ContainerControl." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Point(), GetSize()).ToString() + "]");
             }
             Component* child = children.FirstChild();
             while (child != null)
@@ -120,7 +129,7 @@ namespace System.Windows
                     return true;
                 }
                 case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK:
-                case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND:
+                case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL:
                 {
                     return base->ProcessMessage(message);
                 }

@@ -1,0 +1,67 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public class PaddedControl : Control
+    {
+        public PaddedControl(Control* child_, const Padding& padding_, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("System.Windows.PaddedControl", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            child_->BackgroundColor(), "paddedControl", location, size, dock, anchors), container(this), child(child_), padding(padding_)
+        {
+            container.AddChild(child);
+        }
+        protected nothrow override bool IsDecoratorControl() const
+        {
+            return true;
+        }
+        public override nothrow Padding DefaultPadding() const
+        {
+            return padding;
+        }
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+            SetChildPos();
+        }
+        protected override void OnSizeChanged()
+        {
+            base->OnSizeChanged();
+            SetChildPos();
+        }
+        protected override void OnChildContentSizeChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentSizeChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentSizeChanged(args);
+            }
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            args.graphics.Clear(BackgroundColor());
+            base->OnPaint(args);
+        }
+        private void SetChildPos()
+        {
+            Point loc;
+            Size size = GetSize();
+            Rect childRect(loc, size);
+            childRect.location.x = loc.x + padding.left;
+            childRect.location.y = loc.x + padding.top;
+            childRect.size.w = size.w - padding.Horizontal();
+            childRect.size.h = size.h - padding.Vertical();
+            child->SetLocation(childRect.location);
+            child->SetSize(childRect.size);
+        }
+        private Container container;
+        private Control* child;
+        private Padding padding;
+    }
+}

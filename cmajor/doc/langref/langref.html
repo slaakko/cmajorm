@@ -195,8 +195,9 @@
         19 <a href="#projects">Projects</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;19.1 <a href="#projects-syntax">Syntax</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;19.2 <a href="#projects-types">Project Types</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;19.3 <a href="#projects-example">Example</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;19.4 <a href="#projects-programs">Programs</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;19.3 <a href="#projects-file-types">File Types</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;19.4 <a href="#projects-example">Example</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;19.5 <a href="#projects-programs">Programs</a><br />
         20 <a href="#solutions">Solutions</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;20.1 <a href="#solutions-syntax">Syntax</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;20.2 <a href="#solutions-example">Example</a><br />
@@ -4393,7 +4394,7 @@
     <h2 id="delegates">14 Delegates</h2>
 
     <p>
-        A <a href="#rule.delegate">delegate</a> represents a function signature type.
+        A <a href="#rule.delegate">delegate</a> type represents a function signature type.
     </p>
 
     <h3 id="delegates-syntax">14.1 Syntax</h3>
@@ -4430,8 +4431,10 @@
     </table>
 
     <p>
-        A nonmember function or a static member function can be bound to a delegate.
-        An object of a delegate type contains a pointer to a function.
+        An object of a delegate type can be bound to a nonmember function or a static member function
+        by assigning a name of that function to the delegate type object.
+        If <code>dlg</code> is an object of a delegate type, the function that is
+        currently bound to the <code>dlg</code> object can be called using syntax <code>dlg(arg1, arg2, ...)</code>.
         For an example of a delegate, see <a href="../code/cmdoc/content/Delegate/file/delegate.cm.html">delegate.cm</a>.
     </p>
 
@@ -4445,7 +4448,7 @@
     <h2 id="class-delegates">15 Class Delegates</h2>
 
     <p>
-        A <a href="#rule.class-delegate">class delegate</a> represents a member function signature type.
+        A <a href="#rule.class-delegate">class delegate</a> type represents a member function signature type.
     </p>
 
     <h3 id="class-delegates-syntax">15.1 Syntax</h3>
@@ -4483,8 +4486,9 @@
     </table>
 
     <p>
-        A nonstatic member function can be bound to a class delegate.
-        An object of a class delegate type contains a couple of pointers: a pointer to an object and a pointer to a member function.
+        An object of a class delegate type can be bound to a specific member function of a specific class object.
+        If <code>clsdlg</code> is an object of a class delegate type, the member function that is
+        currently bound to the <code>clsdlg</code> object can be called using syntax <code>clsdlg(arg1, arg2, ...)</code>.
         For an example of a class delegate, see <a href="../code/cmdoc/content/ClassDelegate/file/class_delegate.cm.html">class_delegate.cm</a>.
     </p>
 
@@ -5392,6 +5396,7 @@
             <td class="rcontent">
                 <span class="rule"><a href="#rule.reference-declaration">reference&#8209;declaration</a></span> |
                 <span class="rule"><a href="#rule.source-file-declaration">source&#8209;file&#8209;declaration</a></span> |
+                <span class="rule"><a href="#rule.resource-file-declaration">resource&#8209;file&#8209;declaration</a></span> |
                 <span class="rule"><a href="#rule.text-file-declaration">text&#8209;file&#8209;declaration</a></span> |
                 <span class="rule"><a href="#rule.target-declaration">target&#8209;declaration</a></span>
             </td>
@@ -5410,6 +5415,15 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="kw">source</span>
+                <span class="rule"><a href="#rule.file-path">file&#8209;path</a></span>
+                <span class="mono">;</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.resource-file-declaration">resource&#8209;file&#8209;declaration</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">resource</span>
                 <span class="rule"><a href="#rule.file-path">file&#8209;path</a></span>
                 <span class="mono">;</span>
             </td>
@@ -5457,24 +5471,40 @@
     </table>
 
     <h3 id="projects-types">19.2 Project Types</h3>
-    
+
     <p>
         The <a href="#rule.target-declaration">target</a> declaration defines the type of the project:
         <ul>
-        <li><strong>program</strong> is a console application.</li>
-        <li><strong>winguiapp</strong> is a Windows desktop application that has a graphical user interface.</li>
-        <li><strong>winapp</strong> is a console application that uses Windows API.</li>
-        <li><strong>library</strong> is a library.</li>
-        <li><strong>winlib</strong> is a library that uses Windows API.</li>
-        <li><strong>unitTest</strong> is a unit test project.</li>
+            <li><strong>program</strong> is a console application.</li>
+            <li><strong>winguiapp</strong> is a Windows desktop application that has a graphical user interface.</li>
+            <li><strong>winapp</strong> is a console application that uses Windows API.</li>
+            <li><strong>library</strong> is a library.</li>
+            <li><strong>winlib</strong> is a library that uses Windows API.</li>
+            <li><strong>unitTest</strong> is a unit test project.</li>
         </ul>
     </p>
 
     <p>
-       The <strong>winguiapp</strong>, <strong>winapp</strong> and <strong>winlib</strong> project types are available only on Windows platform.
+        The <strong>winguiapp</strong>, <strong>winapp</strong> and <strong>winlib</strong> project types are available only on Windows platform.
     </p>
 
-    <h3 id="projects-example">19.3 Example</h3>
+    <h3 id="file-types">19.3 File Types</h3>
+
+    <p>
+        The project file can contain declarations for the following file types:
+        <ul>
+            <li><strong>reference declaration</strong> names a relative or absolute path to a library project file that this project references.
+            The referenced file name must have a <strong>.cmp</strong> extension.</li>
+            <li><strong>source file declaration</strong> names a relative or absolute path to a Cmajor source file that is included in this project.
+            The file name must have a <strong>.cm</strong> extension.</li>
+            <li><strong>resource file declaration</strong> names a relative or absolute path to a Cmajor resource file that is included in this project.
+            The file name must have an <strong>.xml</strong> extension.</li>
+            <li><strong>text file declaration</strong> names a relative or absolute path to a text file that is included in this project.
+            The file name may have any extension.</li>
+        </ul>
+    </p>
+
+    <h3 id="projects-example">19.4 Example</h3>
 
     <p>
         Here's a project file <span class="mono">alpha.cmp</span> for a project named <em>Alpha</em> that references two library projects <em>Beta</em> and <em>Gamma</em>:
@@ -5531,7 +5561,7 @@
            +--gamma.cm
     </pre>
 
-    <h3 id="projects-programs">19.4 Programs</h3>
+    <h3 id="projects-programs">19.5 Programs</h3>
 
     <p>
         Each valid Cmajor program must have a <em>main</em> function where the execution of the program starts. The possible signatures of the <em>main</em> function are:

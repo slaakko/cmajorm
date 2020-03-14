@@ -13,15 +13,20 @@ namespace System.Windows
     public class delegate void MouseEnterEventHandler();
     public class delegate void MouseEventHandler(MouseEventArgs& mouseEventargs);
     public class delegate void MouseLeaveEventHandler();
+    public class delegate void MouseWheelEventHandler(MouseWheelEventArgs& mouseWheelEventArgs);
     public class delegate void KeyPressEventHandler(KeyPressEventArgs& keyPressEventArgs);
     public class delegate void KeyEventHandler(KeyEventArgs& keyEventArgs);
     public class delegate void ClickEventHandler();
     public class delegate void SizeChangedEventHandler();
     public class delegate void LocationChangedEventHandler();
+    public class delegate void ContentSizeChangedEventHandler();
+    public class delegate void ChildContentSizeChangedEventHandler(ControlEventArgs& controlEventArgs);
+    public class delegate void HScrollEventHandler(ScrollEventArgs& scrollEventArgs);
+    public class delegate void VScrollEventHandler(ScrollEventArgs& scrollEventArgs);
 
     public inline nothrow WindowClassStyle DefaultWindowClassStyle()
     {
-        return WindowClassStyle.CS_DEFAULT;
+        return WindowClassStyle.CS_DBLCLKS;
     }
 
     public inline nothrow WindowStyle DefaultChildWindowStyle()
@@ -43,7 +48,7 @@ namespace System.Windows
         public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowStyle style_, ExtendedWindowStyle exStyle_, 
             const Color& backgroundColor_, const string& text_, const Point& location_, const Size& size_, Dock dock_, Anchors anchors_) : 
             windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), style(style_), exStyle(exStyle_),
-            backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), dock(dock_), anchors(anchors_), flags(Flags.none),
+            backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), contentSize(), dock(dock_), anchors(anchors_), flags(Flags.none),
             arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW))
         {
             Application.Init();
@@ -288,6 +293,41 @@ namespace System.Windows
         {
             sizeChangedEvent.Fire();
         }
+        public nothrow inline const Size& ContentSize() const
+        {
+            return contentSize;
+        }
+        public void SetContentSize(const Size& contentSize_)
+        {
+            if (contentSize != contentSize_)
+            {
+                contentSize = contentSize_;
+                OnContentSizeChanged();
+                Control* parentControl = ParentControl();
+                if (parentControl != null)
+                {
+                    ControlEventArgs args(this);
+                    parentControl->OnChildContentSizeChanged(args);
+                }
+            }
+        }
+        protected virtual void OnContentSizeChanged()
+        {
+            contentSizeChangedEvent.Fire();
+        }
+        protected virtual void OnChildContentSizeChanged(ControlEventArgs& args)
+        {
+            childContentSizeChangedEvent.Fire(args);
+        }
+        public nothrow void SetScrollUnits(int verticalScrollUnit_, int horizontalScrollUnit_)
+        {
+            verticalScrollUnit = verticalScrollUnit_;
+            horizontalScrollUnit = horizontalScrollUnit_;
+        }
+        public nothrow Pair<int, int> GetScrollUnits() const
+        {
+            return MakePair(verticalScrollUnit, horizontalScrollUnit);
+        }
         public inline nothrow Dock GetDock() const
         {
             return dock;
@@ -472,7 +512,7 @@ namespace System.Windows
             LogView* log = Application.GetLogView();
             if (log != null)
             {
-                log->WriteLine(string(' ', level) + "Control." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+                log->WriteLine(string(' ', level) + "Control." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Point(), GetSize()).ToString() + "]");
             }
         }
         protected virtual bool ProcessMessage(Message& message)
@@ -554,6 +594,33 @@ namespace System.Windows
                 case WM_SYSCOMMAND:
                 {
                     if (DoSysCommand(message.wparam, message.lparam))
+                    {
+                        message.result = 0;
+                        return true;
+                    }
+                    break;
+                }
+                case WM_HSCROLL:
+                {
+                    ushort request = message.WParamLoWord();
+                    DoHScroll(request);
+                    message.result = 0;
+                    return true;
+                    break;
+                }
+                case WM_VSCROLL:
+                {
+                    ushort request = message.WParamLoWord();
+                    DoVScroll(request);
+                    message.result = 0;
+                    return true;
+                    break;
+                }
+                case WM_MOUSEWHEEL:
+                {
+                    MouseWheelEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(cast<uint>(cast<ushort>(message.wparam))), cast<short>(message.wparam >> 16u));
+                    DoMouseWheel(args);
+                    if (args.handled)
                     {
                         message.result = 0;
                         return true;
@@ -772,6 +839,38 @@ namespace System.Windows
                 }
             }
         }
+        private void DoVScroll(ushort request)
+        {
+            OnVScroll(request);
+        }
+        private void DoHScroll(ushort request)
+        {
+            OnHScroll(request);
+        }
+        private void DoMouseWheel(MouseWheelEventArgs& args)
+        {
+            OnMouseWheel(args);
+        }
+        protected nothrow virtual bool IsDecoratorControl() const
+        {
+            return false;
+        }
+        protected virtual void TranslateChildGraphics(Graphics& graphics)
+        {
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->TranslateChildGraphics(graphics);
+            }
+        }
+        protected virtual void TranslateMousePos(Point& location)
+        {
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->TranslateMousePos(location);
+            }
+        }
         private void DoPaint()
         {
             void* paintStruct = null;
@@ -781,6 +880,10 @@ namespace System.Windows
             PaintGuard paintGuard(hdc, paintStruct);
             Graphics graphics(hdc);
             PaintEventArgs args(graphics, clipRect);
+            if (!IsDecoratorControl())
+            {
+                TranslateChildGraphics(graphics);
+            }
             OnPaint(args);
         }
         protected virtual void OnPaint(PaintEventArgs& args)
@@ -809,6 +912,10 @@ namespace System.Windows
             }
             else 
             {
+                if (!IsDecoratorControl())
+                {
+                    TranslateMousePos(args.location);
+                }
                 OnMouseMove(args);
             }
         }
@@ -820,6 +927,10 @@ namespace System.Windows
         }
         private void DoMouseDown(MouseEventArgs& args)
         {
+            if (!IsDecoratorControl())
+            {
+                TranslateMousePos(args.location);
+            }
             OnMouseDown(args);
             if ((args.buttons & MouseButtons.lbutton) != 0)
             {
@@ -828,6 +939,10 @@ namespace System.Windows
         }
         private void DoMouseUp(MouseEventArgs& args)
         {
+            if (!IsDecoratorControl())
+            {
+                TranslateMousePos(args.location);
+            }
             OnMouseUp(args);
             if ((args.buttons & MouseButtons.lbutton) != 0)
             {
@@ -840,6 +955,10 @@ namespace System.Windows
         }
         private void DoMouseDoubleClick(MouseEventArgs& args)
         {
+            if (!IsDecoratorControl())
+            {
+                TranslateMousePos(args.location);
+            }
             OnMouseDoubleClick(args);
         }
         protected virtual void SetCursor()
@@ -885,6 +1004,18 @@ namespace System.Windows
         protected virtual void OnClick()
         {
             clickEvent.Fire();
+        }
+        protected virtual void OnHScroll(ScrollEventArgs& args)
+        {
+            hscrollEvent.Fire(args);
+        }
+        protected virtual void OnVScroll(ScrollEventArgs& args)
+        {
+            vscrollEvent.Fire(args);
+        }
+        protected virtual void OnMouseWheel(MouseWheelEventArgs& args)
+        {
+            mouseWheelEvent.Fire(args);
         }
         public void* GetDC()
         {
@@ -975,6 +1106,26 @@ namespace System.Windows
         {
             return locationChangedEvent;
         }
+        public nothrow Event<ContentSizeChangedEventHandler>& ContentSizeChangedEvent() const
+        {
+            return contentSizeChangedEvent;
+        }
+        public nothrow Event<ChildContentSizeChangedEventHandler, ControlEventArgs>& ChildContentSizeChangedEvent() const
+        {
+            return childContentSizeChangedEvent;
+        }
+        public nothrow Event<HScrollEventHandler, ScrollEventArgs>& HScrollEvent() const
+        {
+            return hscrollEvent;
+        }
+        public nothrow Event<VScrollEventHandler, ScrollEventArgs>& VScrollEvent() const
+        {
+            return vscrollEvent;
+        }
+        public nothrow Event<MouseWheelEventHandler, MouseWheelEventArgs>& MouseWheelEvent() const
+        {
+            return mouseWheelEvent;
+        }
         private nothrow inline bool MouseInClient() const
         {
             return (flags & Flags.mouseInClient) != 0;
@@ -1032,6 +1183,9 @@ namespace System.Windows
         private string text;
         private Point location;
         private Size size;
+        private Size contentSize;
+        private int verticalScrollUnit;
+        private int horizontalScrollUnit;
         private Dock dock;
         private Anchors anchors;
         private Flags flags;
@@ -1051,5 +1205,10 @@ namespace System.Windows
         private Event<ClickEventHandler> clickEvent;
         private Event<SizeChangedEventHandler> sizeChangedEvent;
         private Event<LocationChangedEventHandler> locationChangedEvent;
+        private Event<ContentSizeChangedEventHandler> contentSizeChangedEvent;
+        private Event<ChildContentSizeChangedEventHandler, ControlEventArgs> childContentSizeChangedEvent;
+        private Event<HScrollEventHandler, ScrollEventArgs> hscrollEvent;
+        private Event<VScrollEventHandler, ScrollEventArgs> vscrollEvent;
+        private Event<MouseWheelEventHandler, MouseWheelEventArgs> mouseWheelEvent;
     }
 }

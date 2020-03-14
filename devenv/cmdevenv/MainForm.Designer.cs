@@ -43,6 +43,7 @@ namespace cmdevenv
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem14 = new System.Windows.Forms.ToolStripMenuItem();
             this.systemLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.compilerLibrariesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.examplesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.parserGeneratorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.systemXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -299,6 +300,7 @@ namespace cmdevenv
             this.toolStripMenuItem14.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.systemLibraryToolStripMenuItem,
             this.examplesToolStripMenuItem,
+            this.compilerLibrariesToolStripMenuItem,
             this.parserGeneratorToolStripMenuItem,
             this.systemXToolStripMenuItem,
             this.unitTestsToolStripMenuItem});
@@ -309,35 +311,42 @@ namespace cmdevenv
             // systemLibraryToolStripMenuItem
             // 
             this.systemLibraryToolStripMenuItem.Name = "systemLibraryToolStripMenuItem";
-            this.systemLibraryToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.systemLibraryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.systemLibraryToolStripMenuItem.Text = "System Library";
             this.systemLibraryToolStripMenuItem.Click += new System.EventHandler(this.systemLibraryToolStripMenuItem_Click);
+            // 
+            // compilerLibrariesToolStripMenuItem
+            // 
+            this.compilerLibrariesToolStripMenuItem.Name = "compilerLibrariesToolStripMenuItem";
+            this.compilerLibrariesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.compilerLibrariesToolStripMenuItem.Text = "Compiler Platform";
+            this.compilerLibrariesToolStripMenuItem.Click += new System.EventHandler(this.compilerLibrariesToolStripMenuItem_Click);
             // 
             // examplesToolStripMenuItem
             // 
             this.examplesToolStripMenuItem.Name = "examplesToolStripMenuItem";
-            this.examplesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.examplesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.examplesToolStripMenuItem.Text = "Examples";
             this.examplesToolStripMenuItem.Click += new System.EventHandler(this.examplesToolStripMenuItem_Click);
             // 
             // parserGeneratorToolStripMenuItem
             // 
             this.parserGeneratorToolStripMenuItem.Name = "parserGeneratorToolStripMenuItem";
-            this.parserGeneratorToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.parserGeneratorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.parserGeneratorToolStripMenuItem.Text = "Parser Generator";
             this.parserGeneratorToolStripMenuItem.Click += new System.EventHandler(this.parserGeneratorToolStripMenuItem_Click);
             // 
             // systemXToolStripMenuItem
             // 
             this.systemXToolStripMenuItem.Name = "systemXToolStripMenuItem";
-            this.systemXToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.systemXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.systemXToolStripMenuItem.Text = "System X";
             this.systemXToolStripMenuItem.Click += new System.EventHandler(this.systemXToolStripMenuItem_Click);
             // 
             // unitTestsToolStripMenuItem
             // 
             this.unitTestsToolStripMenuItem.Name = "unitTestsToolStripMenuItem";
-            this.unitTestsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.unitTestsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.unitTestsToolStripMenuItem.Text = "Unit Tests";
             this.unitTestsToolStripMenuItem.Click += new System.EventHandler(this.unitTestsToolStripMenuItem_Click);
             // 
@@ -1533,6 +1542,7 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem newResourceFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem existingResourceFileToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog addExistingResourceFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem compilerLibrariesToolStripMenuItem;
     }
 }
 

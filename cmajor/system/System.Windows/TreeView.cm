@@ -34,12 +34,8 @@ namespace System.Windows
             LogView* log = Application.GetLogView();
             if (log != null)
             {
-                log->WriteLine(string(' ', level) + "TreeView." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+                log->WriteLine(string(' ', level) + "TreeView." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Point(), GetSize()).ToString() + "]");
             }
-        }
-        public override nothrow Padding DefaultPadding() const
-        {
-            return Padding(4, 4, 4, 4);
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
@@ -47,7 +43,7 @@ namespace System.Windows
             {
                 if (Debug.Paint())
                 {
-                    Rect r(Location(), GetSize());
+                    Rect r(Point(), GetSize());
                     LogView* log = Application.GetLogView();
                     if (log != null)
                     {
@@ -76,23 +72,19 @@ namespace System.Windows
                     if (!root.IsNull())
                     {
                         Rect r(Point(), GetSize());
-                        Padding padding = DefaultPadding();
-                        r.location.x = r.location.x + padding.left;
-                        r.location.y = r.location.y + padding.top;
-                        r.size.w = r.size.w - padding.Horizontal();
-                        r.size.h = r.size.h - padding.Vertical();
                         r.size.w = r.size.w - 1;
                         r.size.h = r.size.h - 1;
                         int index = 0;
                         Rect rect;
                         root->Measure(args.graphics, r.location, this, 0, index, rect);
+                        SetContentSize(rect.size);
                     }
                 }
                 args.graphics.Clear(BackgroundColor());
                 if (bitmapIndex != -1)
                 {
-                    Padding padding = DefaultPadding();
-                    PointF loc(padding.left, padding.top);
+                    Point location;
+                    PointF loc(location.x, location.y);
                     args.graphics.DrawImage(stateIndicatorBitmaps[bitmapIndex], loc);
                 }
                 else
@@ -120,9 +112,12 @@ namespace System.Windows
                 root->SetTreeView(null);
             }
             root.Reset(root_);
-            root->SetTreeView(this);
-            SetTreeViewNodeChanged();
-            SetTreeViewNodeStateChanged();
+            if (!root.IsNull())
+            {
+                root->SetTreeView(this);
+                SetTreeViewNodeChanged();
+                SetTreeViewNodeStateChanged();
+            }
             Invalidate();
         }
         public nothrow inline const Font& GetFont() const
@@ -294,6 +289,7 @@ namespace System.Windows
             RectF textRect = graphics.MeasureStringChecked(s, font, PointF(0, 0), format);
             textHeight = textRect.size.h;
             stateIndicatorHeight = stateIndicatorPercentage * textHeight;
+            SetScrollUnits(cast<int>(textHeight), cast<int>(textHeight));
         }
         private void MakeStateIndicatorBitmaps(Graphics& graphics)
         {
@@ -594,6 +590,7 @@ namespace System.Windows
                         TreeViewNode* childNode = cast<TreeViewNode*>(child);
                         ++index;
                         childNode->Measure(graphics, loc, treeView, level + 1, index, childRect);
+                        parentRect = Rect.Union(parentRect, childRect);
                     }
                     child = child->NextSibling();
                 }

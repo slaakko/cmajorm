@@ -40,10 +40,13 @@ class MainWindow : Window
             Application.SetLogView(logView.Get());
             verticalSplitContainer->Pane2Container()->AddChild(logView.Release());
         }
-        UniquePtr<SplitContainer> horizontalSplitContainer(new SplitContainer(Orientation.horizontal, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+        UniquePtr<SplitContainer> horizontalSplitContainer(new SplitContainer(Orientation.horizontal, 600, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         treeView = new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
-        UniquePtr<Control> borderedTreeView(new BorderedControl(treeView, BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-        horizontalSplitContainer->Pane1Container()->AddChild(borderedTreeView.Release());
+        treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
+        UniquePtr<Control> paddedTreeView(new PaddedControl(treeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+        UniquePtr<Control> borderedTreeView(new BorderedControl(paddedTreeView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+        UniquePtr<Control> scrollableTreeView(new ScrollableControl(borderedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+        horizontalSplitContainer->Pane1Container()->AddChild(scrollableTreeView.Release());
         UniquePtr<Control> treeView2(new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> borderedTreeView2(new BorderedControl(treeView2.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         horizontalSplitContainer->Pane2Container()->AddChild(borderedTreeView2.Release());
@@ -136,6 +139,15 @@ class MainWindow : Window
         catch (const Exception& ex)
         {
             MessageBox.Show(ex.Message());
+        }
+    }
+    private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
+    {
+        TreeViewNode* node = args.node;
+        switch (node->GetState())
+        {
+            case TreeViewNode.State.collapsed: node->ExpandAll(); break;
+            case TreeViewNode.State.expanded: node->CollapseAll(); break;
         }
     }
     private TreeView* treeView;

@@ -36,6 +36,10 @@ namespace System.Windows
             const Point& location, const Size& size, Dock dock, Anchors anchors) : this(child, borderStyle, Color.Black(), location, size, dock, anchors)
         {
         }
+        protected nothrow override bool IsDecoratorControl() const
+        {
+            return true;
+        }
         public nothrow override ContainerControl* GetContainerControl() const
         {
             if (child is ContainerControl*)
@@ -43,6 +47,15 @@ namespace System.Windows
                 return cast<ContainerControl*>(child);
             }
             return base->GetContainerControl();
+        }
+        protected override void OnChildContentSizeChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentSizeChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentSizeChanged(args);
+            }
         }
         public override void PrintWindowTree(int level)
         {
@@ -76,20 +89,19 @@ namespace System.Windows
         {
             if (Debug.Paint())
             {
-                Rect r(Location(), GetSize());
+                Rect r(Point(), GetSize());
                 LogView* log = Application.GetLogView();
                 if (log != null)
                 {
                     log->WriteLine("BorderedControl.OnPaint: " + r.ToString());
                 }
             }
-            child->OnPaint(args);
             DrawBorder(args.graphics);
             base->OnPaint(args);
         }
         private void SetChildPos()
         {
-            Point loc = Location();
+            Point loc;
             Size size = GetSize();
             Rect childRect(loc, size);
             childRect.Inflate(-borderWidth, -borderWidth);

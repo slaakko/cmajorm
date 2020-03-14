@@ -775,4 +775,103 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
+
+    public enum WindowLongIndex : int
+    {
+        GWL_EXSTYLE = -20,
+        GWLP_HINSTANCE = -6,
+        GWLP_ID = -12,
+        GWL_STYLE = -16,
+        GWLP_USERDATA = -21,
+        GWLP_WNDPROC = -4
+    }
+
+    public long GetWindowLong(void* windowHandle, WindowLongIndex index)
+    {
+        long value = WinGetWindowLong(windowHandle, cast<int>(index));
+        if (value == 0)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return value;
+    }
+
+    public void SetWindowLong(void* windowHandle, WindowLongIndex index, long newValue)
+    {
+        bool succeeded = WinSetWindowLong(windowHandle, cast<int>(index), newValue);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void ScrollWindow(void* windowHandle, int xAmount, int yAmount, const Rect* clientRect, const Rect* clipRect)
+    {
+        int clientLocX = 0;
+        int clientLocY = 0;
+        int clientSizeW = 0;
+        int clientSizeH = 0;
+        if (clientRect != null)
+        {
+            clientLocX = clientRect->location.x;
+            clientLocY = clientRect->location.y;
+            clientSizeW = clientRect->size.w;
+            clientSizeH = clientRect->size.h;
+        }
+        int clipLocX = 0;
+        int clipLocY = 0;
+        int clipSizeW = 0;
+        int clipSizeH = 0;
+        if (clipRect != null)
+        {
+            clipLocX = clipRect->location.x;
+            clipLocY = clipRect->location.y;
+            clipSizeW = clipRect->size.w;
+            clipSizeH = clipRect->size.h;
+        }
+        bool succeeded = WinScrollWindow(windowHandle, xAmount, yAmount, clientLocX, clientLocY, clientSizeW, clientSizeH, clipLocX, clipLocY, clipSizeW, clipSizeH);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public enum ScrollBar : int
+    {
+        SB_BOTH = 3,
+        SB_CTL = 2,
+        SB_HORZ = 0,
+        SB_VERT = 1
+    }
+
+    public void GetScrollInfo(void* windowHandle, ScrollBar scrollBar, uint& nPage, int& nPos, int& nMin, int& nMax, int& nTrackPos)
+    {
+        bool succeeded = WinGetScrollInfo(windowHandle, cast<int>(scrollBar), nPage, nPos, nMin, nMax, nTrackPos);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public enum ScrollInfoMask : uint
+    {
+        SIF_DISABLENOSCROLL = 8u,
+        SIF_PAGE = 2u,
+        SIF_POS = 4u,
+        SIF_RANGE = 1u
+    }
+
+    public int SetScrollInfo(void* windowHandle, ScrollBar scrollBar, ScrollInfoMask mask, bool redraw, uint nPage, int nPos, int nMin, int nMax)
+    {
+        return WinSetScrollInfo(windowHandle, cast<int>(scrollBar), cast<uint>(mask), redraw, nPage, nPos, nMin, nMax);
+    }
+
+    public void ShowScrollBar(void* windowHandle, ScrollBar scrollBar, bool show)
+    {
+        bool succeeded = WinShowScrollBar(windowHandle, cast<int>(scrollBar), show);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
 }

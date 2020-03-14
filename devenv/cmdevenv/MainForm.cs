@@ -2679,6 +2679,19 @@ namespace cmdevenv
             }
 
         }
+
+        private async void compilerLibrariesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cm"), "Cm.cms"));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
 
     public static class KeyboardUtil

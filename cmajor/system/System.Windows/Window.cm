@@ -33,7 +33,7 @@ namespace System.Windows
             LogView* log = Application.GetLogView();
             if (log != null)
             {
-                log->WriteLine(string(' ', level) + "Window." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Location(), GetSize()).ToString() + "]");
+                log->WriteLine(string(' ', level) + "Window." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Point(), GetSize()).ToString() + "]");
             }
             Component* child = Children().FirstChild();
             while (child != null)
@@ -73,7 +73,7 @@ namespace System.Windows
                     break;
                 }
                 case WM_COMMAND: case WM_SIZE: case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK:
-                case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND:
+                case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL:
                 {
                     return base->ProcessMessage(message);
                 }
@@ -152,7 +152,7 @@ namespace System.Windows
             {
                 if (Debug.Paint())
                 {
-                    Rect r(Location(), GetSize());
+                    Rect r(Point(), GetSize());
                     LogView* log = Application.GetLogView();
                     if (log != null)
                     {

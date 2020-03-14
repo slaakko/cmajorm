@@ -1155,3 +1155,78 @@ bool WinReleaseCapture()
 {
     return ReleaseCapture();
 }
+
+int64_t WinGetWindowLong(void* windowHandle, int index)
+{
+    LONG_PTR result = GetWindowLongPtrW((HWND)windowHandle, index);
+    return (int64_t)result;
+}
+
+bool WinSetWindowLong(void* windowHandle, int index, int64_t newValue)
+{
+    LONG_PTR result = SetWindowLongPtrW((HWND)windowHandle, index, (LONG_PTR)newValue);
+    return result != 0;
+}
+
+bool WinScrollWindow(void* windowHandle, int xAmount, int yAmount, int clientLocX, int clientLocY, int clientSizeW, int clientSizeH, int clipLocX, int clipLocY, int clipSizeW, int clipSizeH)
+{
+    const RECT* pclientRect = nullptr;
+    RECT clientRect;
+    if (clientSizeW != 0 && clientSizeH != 0)
+    {
+        clientRect.left = clientLocX;
+        clientRect.top = clientLocY;
+        clientRect.right = clientLocX + clientSizeW;
+        clientRect.bottom = clientLocY + clientSizeH;
+        pclientRect = &clientRect;
+    }
+    const RECT* pclipRect = nullptr;
+    RECT clipRect;
+    if (clipSizeW != 0 && clipSizeH != 0)
+    {
+        clipRect.left = clipLocX;
+        clipRect.top = clipLocY;
+        clipRect.right = clipLocX + clipSizeW;
+        clipRect.bottom = clipLocY + clipSizeH;
+    }
+    return ScrollWindow((HWND)windowHandle, xAmount, yAmount, pclientRect, pclipRect);
+}
+
+bool WinGetScrollInfo(void* windowHandle, int nBar, uint32_t& nPage, int32_t& nPos, int32_t& nMin, int32_t& nMax, int32_t& nTrackPos)
+{
+    SCROLLINFO si;
+    si.cbSize = sizeof(SCROLLINFO);
+    si.fMask = SIF_PAGE | SIF_POS | SIF_RANGE | SIF_TRACKPOS;
+    bool succeeded = GetScrollInfo((HWND)windowHandle, nBar, &si);
+    if (succeeded)
+    {
+        nPage = si.nPage;
+        nPos = si.nPos;
+        nMin = si.nMin;
+        nMax = si.nMax;
+        nTrackPos = si.nTrackPos;
+    }
+    return succeeded;
+}
+
+int WinSetScrollInfo(void* windowHandle, int nBar, uint32_t fMask, bool redraw, uint32_t nPage, int32_t nPos, int32_t nMin, int32_t nMax)
+{
+    SCROLLINFO si;
+    si.cbSize = sizeof(SCROLLINFO);
+    si.fMask = fMask;
+    si.nPage = nPage;
+    si.nPos = nPos;
+    si.nMin = nMin;
+    si.nMax = nMax;
+    return SetScrollInfo((HWND)windowHandle, nBar, &si, redraw);
+}
+
+int WinGetScrollPos(void* windowHandle, int nBar)
+{
+    return GetScrollPos((HWND)windowHandle, nBar);
+}
+
+bool WinShowScrollBar(void* windowHandle, int nBar, bool show)
+{
+    return ShowScrollBar((HWND)windowHandle, nBar, show);
+}

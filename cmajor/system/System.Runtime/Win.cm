@@ -177,3 +177,10 @@ public extern cdecl nothrow bool WinDeleteObject(void* handle);
 public extern cdecl nothrow int WinGetSystemMetrics(int index);
 public extern cdecl nothrow void* WinSetCapture(void* windowHandle);
 public extern cdecl nothrow bool WinReleaseCapture();
+public extern cdecl nothrow long WinGetWindowLong(void* windowHandle, int index);
+public extern cdecl nothrow bool WinSetWindowLong(void* windowHandle, int index, long newValue);
+public extern cdecl nothrow bool WinScrollWindow(void* windowHandle, int xAmount, int yAmount,
+    int clientLocX, int clientLocY, int clientSizeW, int clientSizeH, int clipLocX, int clipLocY, int clipSizeW, int clipSizeH);
+public extern cdecl nothrow bool WinGetScrollInfo(void* windowHandle, int nBar, uint& nPage, int& nPos, int& nMin, int& nMax, int& nTrackPos);
+public extern cdecl nothrow int WinSetScrollInfo(void* windowHandle, int nBar, uint fMask, bool redraw, uint nPage, int nPos, int nMin, int nMax);
+public extern cdecl nothrow bool WinShowScrollBar(void* windowHandle, int nBar, bool show);
