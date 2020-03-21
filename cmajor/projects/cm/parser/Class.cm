@@ -28,7 +28,7 @@ public static class ClassParser
         Span classSpan;
         Span beginBraceSpan;
         Span endBraceSpan;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
         UniquePtr<IdentifierNode> id;
         UniquePtr<WhereConstraintNode> constraint;
@@ -86,7 +86,7 @@ public static class ClassParser
                                                     Match* parentMatch12 = &match;
                                                     {
                                                         Match match = AttributeParser.Attributes(lexer);
-                                                        attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                                        attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                         if (match.hit)
                                                         {
                                                             *parentMatch12 = match;
@@ -1171,7 +1171,7 @@ public static class ClassParser
         Span s;
         Span specifierSpan;
         ustring className;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
         UniquePtr<IdentifierNode> id;
         UniquePtr<InitializerNode> initializer;
@@ -1232,7 +1232,7 @@ public static class ClassParser
                                                     Match* parentMatch12 = &match;
                                                     {
                                                         Match match = AttributeParser.Attributes(lexer);
-                                                        attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                                        attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                         if (match.hit)
                                                         {
                                                             *parentMatch12 = match;
@@ -1620,7 +1620,7 @@ public static class ClassParser
         UniquePtr<ConstructorNode> ctor;
         Span s;
         Span specifierSpan;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
         UniquePtr<IdentifierNode> id;
         UniquePtr<InitializerNode> initializer;
@@ -1678,7 +1678,7 @@ public static class ClassParser
                                                 Match* parentMatch11 = &match;
                                                 {
                                                     Match match = AttributeParser.Attributes(lexer);
-                                                    attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                                    attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         *parentMatch11 = match;
@@ -2034,7 +2034,7 @@ public static class ClassParser
         Span s;
         Span specifierSpan;
         ustring className;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
         UniquePtr<IdentifierNode> id;
         UniquePtr<WhereConstraintNode> constraint;
@@ -2094,7 +2094,7 @@ public static class ClassParser
                                                     Match* parentMatch12 = &match;
                                                     {
                                                         Match match = AttributeParser.Attributes(lexer);
-                                                        attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                                        attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                         if (match.hit)
                                                         {
                                                             *parentMatch12 = match;
@@ -2807,7 +2807,7 @@ public static class ClassParser
         Span s;
         Span specifierSpan;
         Span groupIdSpan;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
         UniquePtr<Node> returnType;
         UniquePtr<Value<ustring>> groupId;
@@ -2868,7 +2868,7 @@ public static class ClassParser
                                                     Match* parentMatch12 = &match;
                                                     {
                                                         Match match = AttributeParser.Attributes(lexer);
-                                                        attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                                        attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                         if (match.hit)
                                                         {
                                                             *parentMatch12 = match;
@@ -3141,7 +3141,7 @@ public static class ClassParser
         UniquePtr<ConversionFunctionNode> conversionFun;
         Span s;
         Span specifierSpan;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
         UniquePtr<Node> type;
         UniquePtr<WhereConstraintNode> constraint;
@@ -3204,7 +3204,7 @@ public static class ClassParser
                                                         Match* parentMatch13 = &match;
                                                         {
                                                             Match match = AttributeParser.Attributes(lexer);
-                                                            attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                                            attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                             if (match.hit)
                                                             {
                                                                 *parentMatch13 = match;
@@ -3526,7 +3526,7 @@ public static class ClassParser
         #endif
         Span s;
         Span specifierSpan;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
         UniquePtr<Node> type;
         UniquePtr<IdentifierNode> id;
@@ -3569,7 +3569,7 @@ public static class ClassParser
                                 Match* parentMatch7 = &match;
                                 {
                                     Match match = AttributeParser.Attributes(lexer);
-                                    attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                    attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                     if (match.hit)
                                     {
                                         *parentMatch7 = match;

@@ -24,6 +24,7 @@ public:
     NamespaceNode& GetNamespaceNode() { return namespaceNode; }
     void AddMember(std::unique_ptr<BoundNode>&& member);
     const std::vector<std::unique_ptr<BoundNode>>& Members() const { return members; }
+    void ResetCodeGenerated() override;
 private:
     NamespaceNode& namespaceNode;
     std::vector<std::unique_ptr<BoundNode>> members;

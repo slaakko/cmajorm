@@ -18,7 +18,7 @@ namespace Cm.Ast
             base(nodeType_, span_), specifiers(Specifiers.none), returnTypeExpr(), groupId(), parameters(), body(), bodySource(), programMain(false)
         {
         }
-        public nothrow FunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, Attributes* attributes_) :
+        public nothrow FunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, AttributesNode* attributes_) :
             base(NodeType.functionNode, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
         {
             if (!returnTypeExpr.IsNull())
@@ -26,7 +26,7 @@ namespace Cm.Ast
                 returnTypeExpr->SetParent(this);
             }
         }
-        public nothrow FunctionNode(NodeType nodeType_, const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, Attributes* attributes_) :
+        public nothrow FunctionNode(NodeType nodeType_, const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, AttributesNode* attributes_) :
             base(nodeType_, span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), groupId(groupId_), templateParameters(), parameters(), body(), bodySource(), attributes(attributes_), programMain(false)
         {
             if (!returnTypeExpr.IsNull())
@@ -83,7 +83,7 @@ namespace Cm.Ast
         {
             programMain = true;
         }
-        public nothrow Attributes* GetAttributes() const
+        public nothrow AttributesNode* GetAttributes() const
         {
             return attributes.Get();
         }
@@ -107,7 +107,7 @@ namespace Cm.Ast
         {
             if (!attributes.IsNull())
             {
-                clone->attributes.Reset(attributes->Clone());
+                clone->attributes.Reset(cast<AttributesNode*>(attributes->Clone(cloneContext)));
             }
             clone->specifiers = specifiers;
             Node* clonedReturnTypeExpr = null;
@@ -186,10 +186,10 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            Attributes* clonedAttributes = null;
+            AttributesNode* clonedAttributes = null;
             if (!attributes.IsNull())
             {
-                clonedAttributes = attributes->Clone();
+                clonedAttributes = cast<AttributesNode*>(attributes->Clone(cloneContext));
             }
             Node* clonedReturnTypeExpr = null;
             if (!returnTypeExpr.IsNull())
@@ -280,7 +280,7 @@ namespace Cm.Ast
             bool hasAttributes = reader.GetBinaryReader().ReadBool();
             if (hasAttributes)
             {
-                attributes.Reset(new Attributes());
+                attributes.Reset(new AttributesNode());
                 attributes->Read(reader);
             }
             specifiers = reader.ReadSpecifiers();
@@ -335,7 +335,7 @@ namespace Cm.Ast
         private UniquePtr<WhereConstraintNode> whereConstraint;
         private UniquePtr<CompoundStatementNode> body;
         private UniquePtr<CompoundStatementNode> bodySource;
-        private UniquePtr<Attributes> attributes;
+        private UniquePtr<AttributesNode> attributes;
         private bool programMain;
     }
 } // namespace Cm.Ast

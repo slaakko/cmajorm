@@ -55,6 +55,7 @@ void LlvmCodeGenerator::GenerateCode(void* boundCompileUnit)
 
 void LlvmCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
+    boundCompileUnit.ResetCodeGenerated();
     symbolTable = &boundCompileUnit.GetSymbolTable();
     symbolsModule = &boundCompileUnit.GetModule();
     NativeModule nativeModule(emitter, boundCompileUnit.GetCompileUnitNode()->FilePath());
@@ -88,18 +89,7 @@ void LlvmCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     }
     if (debugInfo)
     {
-/*
-        std::cout << "> finalize: " << boundCompileUnit.GetCompileUnitNode()->FilePath() << std::endl;
-        if (Path::GetFileName(boundCompileUnit.GetCompileUnitNode()->FilePath()) == "Control.cm")
-        {
-            int x = 0;
-        }
-        emitter->DebugPrintDebugInfo(Path::ChangeExtension(boundCompileUnit.LLFilePath(), ".dbg.txt"));
-*/
         emitter->FinalizeDebugInfo();
-/*
-        std::cout << "< finalize: " << boundCompileUnit.GetCompileUnitNode()->FilePath() << std::endl;
-*/
     }
     if (GetGlobalFlag(GlobalFlags::emitLlvm))
     {
@@ -297,6 +287,12 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->MangledName() == U"destructor_Edge_int_E57D66B72F5D4567500CC822E3AB34B236FB95FB")
+    {
+        int x = 0;
+    }
+    if (functionSymbol->CodeGenerated()) return;
+    functionSymbol->SetCodeGenerated();
     void* functionType = functionSymbol->IrType(*emitter);
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
     bool setInline = false;

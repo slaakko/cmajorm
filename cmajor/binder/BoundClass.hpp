@@ -27,6 +27,7 @@ public:
     bool ContainsSourceFunctions() const;
     bool IsInlineFunctionContainer() const { return inlineFunctionContainer; }
     void SetInlineFunctionContainer() { inlineFunctionContainer = true; }
+    void ResetCodeGenerated() override;
 private:
     ClassTypeSymbol* classTypeSymbol;
     std::vector<std::unique_ptr<BoundNode>> members;

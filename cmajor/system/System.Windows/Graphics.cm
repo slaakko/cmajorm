@@ -660,6 +660,11 @@ namespace System.Windows
         return left.alpha == right.alpha && left.red == right.red && left.green == right.green && left.blue == right.blue;
     }
 
+    public nothrow ulong GetHashCode(const Color& color)
+    {
+        return (cast<ulong>(color.alpha) << (8u * 3u)) | (cast<ulong>(color.red) << (8u * 2u)) | (cast<ulong>(color.green) << (8u * 1u)) | cast<ulong>(color.blue);
+    }
+
     public Color GetSystemColor(SystemColor color)
     {
         byte red;
@@ -1067,6 +1072,11 @@ namespace System.Windows
         strikeOut = 1 << 3
     }
 
+    public nothrow ulong GetHashCode(FontStyle fontStyle)
+    {
+        return cast<ulong>(cast<int>(fontStyle));
+    }
+
     public enum Unit : int
     {
         world = 0,
@@ -1137,13 +1147,24 @@ namespace System.Windows
 
     public class StringFormat
     {
-        public StringFormat() : nativeFormat(WinGraphicsCreateDefaultStringFormat())
+        public StringFormat() : nativeFormat(WinGraphicsCreateDefaultStringFormat()), owned(true)
         {
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsStringFormatGetLastStatus(nativeFormat)));
         }
-        public StringFormat(const StringFormat& that) : nativeFormat(WinGraphicsCloneStringFormat(that.nativeFormat))
+        public StringFormat(const NativeHandle& nativeHandle_) : nativeFormat(nativeHandle_.handle), owned(false) // generic stock string formats are not owned
         {
-            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsStringFormatGetLastStatus(nativeFormat)));
+        }
+        public StringFormat(const StringFormat& that) : nativeFormat(null), owned(that.owned)
+        {
+            if (owned)
+            {
+                nativeFormat = WinGraphicsCloneStringFormat(that.nativeFormat);
+                CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsStringFormatGetLastStatus(nativeFormat)));
+            }
+            else
+            {
+                nativeFormat = that.nativeFormat;
+            }
         }
         public StringFormat(StringAlignment horizontalAlignment, StringAlignment verticalAlignment, HotKeyPrefix hotKeyPrefix) : this()
         {
@@ -1154,25 +1175,36 @@ namespace System.Windows
         public StringFormat(StringAlignment horizontalAlignment, StringAlignment verticalAlignment) : this(horizontalAlignment, verticalAlignment, HotKeyPrefix.none)
         {
         }
-        public nothrow StringFormat(StringFormat&& that) : nativeFormat(that.nativeFormat)
+        public nothrow StringFormat(StringFormat&& that) : nativeFormat(that.nativeFormat), owned(that.owned)
         {
             that.nativeFormat = null;
+            that.owned = false;
         }
         public void operator=(const StringFormat& that)
         {
             if (nativeFormat != that.nativeFormat)
             {
-                if (nativeFormat != null)
+                if (nativeFormat != null && owned)
                 {
                     WinGraphicsDeleteStringFormat(nativeFormat);
                 }
-                nativeFormat = WinGraphicsCloneStringFormat(that.nativeFormat);
+                if (that.owned)
+                {
+                    nativeFormat = WinGraphicsCloneStringFormat(that.nativeFormat);
+                    CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsStringFormatGetLastStatus(nativeFormat)));
+                    owned = true;
+                }
+                else
+                {
+                    nativeFormat = that.nativeFormat;
+                    owned = false;
+                }
             }
         }
         public default nothrow void operator=(StringFormat&&);
         public ~StringFormat()
         {
-            if (nativeFormat != null)
+            if (nativeFormat != null && owned)
             {
                 WinGraphicsDeleteStringFormat(nativeFormat);
             }
@@ -1205,7 +1237,28 @@ namespace System.Windows
         {
             return nativeFormat;
         }
+        public static nothrow StringFormat GenericDefault()
+        {
+            NativeHandle nativeHandle(WinGraphicsGetGenericDefaultStringFormat());
+            return StringFormat(nativeHandle);
+        }
+        public static nothrow StringFormat GenericTypographic()
+        {
+            NativeHandle nativeHandle(WinGraphicsGetGenericTypographicStringFormat());
+            return StringFormat(nativeHandle);
+        }
         private void* nativeFormat;
+        private bool owned;
+    }
+
+    public enum TextRenderingHint : int
+    {
+        systemDefault = 0,
+        singleBitPerPixelGridFit = 1,
+        singleBitPerPixel = 2,
+        antiAliasGridFit = 3,
+        antiAlias = 4,
+        clearTypeGridFit = 5
     }
 
     internal class PaintGuard
@@ -1751,6 +1804,18 @@ namespace System.Windows
             RectF boundingBox;
             CheckGraphicsStatus(MeasureString(str, font, origin, format, boundingBox));
             return boundingBox;
+        }
+        public nothrow TextRenderingHint GetTextRenderingHint()
+        {
+            return cast<TextRenderingHint>(WinGraphicsGetTextRenderingHint(nativeGraphics));
+        }
+        public nothrow GraphicsStatus SetTextRenderingHint(TextRenderingHint textRenderingHint)
+        {
+            return cast<GraphicsStatus>(WinGraphicsSetTextRenderingHint(nativeGraphics, cast<int>(textRenderingHint)));
+        }
+        public void SetTextRenderingHintChecked(TextRenderingHint textRenderingHint)
+        {
+            CheckGraphicsStatus(SetTextRenderingHint(textRenderingHint));
         }
         public nothrow GraphicsStatus Clear(const Color& color)
         {

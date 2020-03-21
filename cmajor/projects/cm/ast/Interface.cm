@@ -13,7 +13,7 @@ namespace Cm.Ast
             base(NodeType.interfaceNode, span_), specifiers(), id(), members()
         {
         }
-        public nothrow InterfaceNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_) :
+        public nothrow InterfaceNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_, AttributesNode* attributes_) :
             base(NodeType.interfaceNode, span_), specifiers(specifiers_), id(id_), members(), attributes(attributes_)
         {
             id->SetParent(this);
@@ -26,7 +26,7 @@ namespace Cm.Ast
         {
             return members;
         }
-        public nothrow Attributes* GetAttributes() const
+        public nothrow AttributesNode* GetAttributes() const
         {
             return attributes.Get();
         }
@@ -65,10 +65,10 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            Attributes* clonedAttributes = null;
+            AttributesNode* clonedAttributes = null;
             if (!attributes.IsNull())
             {
-                clonedAttributes = attributes->Clone();
+                clonedAttributes = cast<AttributesNode*>(attributes->Clone(cloneContext));
             }
             InterfaceNode* clone = new InterfaceNode(GetSpan(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
             int n = members.Count();
@@ -106,7 +106,7 @@ namespace Cm.Ast
             bool hasAttributes = reader.GetBinaryReader().ReadBool();
             if (hasAttributes)
             {
-                attributes.Reset(new Attributes());
+                attributes.Reset(new AttributesNode());
                 attributes->Read(reader);
             }
             id.Reset(reader.ReadIdentifierNode());
@@ -123,6 +123,6 @@ namespace Cm.Ast
         private System.Lex.Span endBraceSpan;
         private UniquePtr<IdentifierNode> id;
         private NodeList<Node> members;
-        private UniquePtr<Attributes> attributes;
+        private UniquePtr<AttributesNode> attributes;
     }
 } // namespace Cm.Ast

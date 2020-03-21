@@ -7,22 +7,17 @@ using System.Collections;
 
 namespace Cm.Ast
 {
-    public class Attribute
+    public class AttributeNode : Node
     {
-        public suppress nothrow Attribute(const Attribute& );
-        public nothrow Attribute() :
-            span(), name(), value()
+        public suppress nothrow AttributeNode(const AttributeNode& );
+        public nothrow AttributeNode(const System.Lex.Span& span_) : base(NodeType.attributeNode, span_), name(), value()
         {
         }
-        public nothrow Attribute(const System.Lex.Span& span_, const ustring& name_, const ustring& value_) :
-            span(span_), name(name_), value(value_)
+        public nothrow AttributeNode(const System.Lex.Span& span_, const ustring& name_, const ustring& value_) :
+            base(NodeType.attributeNode, span_), name(name_), value(value_)
         {
         }
-        public suppress nothrow Attribute& operator=(const Attribute& );
-        public nothrow const System.Lex.Span& GetSpan() const
-        {
-            return span;
-        }
+        public suppress nothrow AttributeNode& operator=(const AttributeNode& );
         public nothrow const ustring& Name() const
         {
             return name;
@@ -31,40 +26,43 @@ namespace Cm.Ast
         {
             return value;
         }
-        public void Accept(Visitor& visitor)
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new AttributeNode(GetSpan(), name, value);
+        }
+        public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
         }
         public nothrow void Write(AstWriter& writer)
         {
-            writer.Write(span);
+            base->Write(writer);
             writer.GetBinaryWriter().Write(name);
             writer.GetBinaryWriter().Write(value);
         }
         public void Read(AstReader& reader)
         {
-            span = reader.ReadSpan();
+            base->Read(reader);
             name = reader.GetBinaryReader().ReadUString();
             value = reader.GetBinaryReader().ReadUString();
         }
-        private System.Lex.Span span;
         private ustring name;
         private ustring value;
     }
-    public class Attributes
+    public class AttributesNode : Node
     {
-        public suppress nothrow Attributes(const Attributes& );
-        public nothrow Attributes()
+        public suppress nothrow AttributesNode(const AttributesNode& );
+        public nothrow AttributesNode(const System.Lex.Span& span_) : base(NodeType.attributesNode, span_)
         {
         }
-        public suppress nothrow Attributes& operator=(const Attributes& );
-        public nothrow const List<UniquePtr<Attribute>>& GetAttributes() const
+        public suppress nothrow AttributesNode& operator=(const AttributesNode& );
+        public nothrow const List<UniquePtr<AttributeNode>>& GetAttributes() const
         {
             return attributes;
         }
-        public nothrow Attribute* GetAttribute(const ustring& name) const
+        public nothrow AttributeNode* GetAttribute(const ustring& name) const
         {
-            Map<ustring, Attribute*>.ConstIterator it = attributeMap.CFind(name);
+            Map<ustring, AttributeNode*>.ConstIterator it = attributeMap.CFind(name);
             if (it != attributeMap.CEnd())
             {
                 return it->second;
@@ -77,52 +75,54 @@ namespace Cm.Ast
         }
         public void AddAttribute(const System.Lex.Span& span, const ustring& name, const ustring& value)
         {
-            Attribute* prev = GetAttribute(name);
+            AttributeNode* prev = GetAttribute(name);
             if (prev != null)
             {
                 throw AttributeNotUniqueException("attribute \'" + ToUtf8(name) + "\' not unique", span, prev->GetSpan());
             }
-            Attribute* attribute = new Attribute(span, name, value);
+            AttributeNode* attribute = new AttributeNode(span, name, value);
             AddAttribute(attribute);
         }
-        public void AddAttribute(Attribute* attribute)
+        public void AddAttribute(AttributeNode* attribute)
         {
-            attributes.Add(UniquePtr<Attribute>(attribute));
+            attributes.Add(UniquePtr<AttributeNode>(attribute));
             attributeMap[attribute->Name()] = attribute;
         }
-        public Attributes* Clone() const
+        public override Node* Clone(CloneContext& cloneContext) const
         {
-            UniquePtr<Attributes> clone(new Attributes());
-            for (const UniquePtr<Attribute>& attribute : attributes)
+            UniquePtr<AttributesNode> clone(new AttributesNode(GetSpan()));
+            for (const UniquePtr<AttributeNode>& attribute : attributes)
             {
                 clone->AddAttribute(attribute->GetSpan(), attribute->Name(), attribute->Value());
             }
             return clone.Release();
         }
-        public void Accept(Visitor& visitor)
+        public override void Accept(Visitor& visitor)
         {
             visitor.Visit(*this);
         }
         public nothrow void Write(AstWriter& writer)
         {
+            base->Write(writer);
             writer.GetBinaryWriter().WriteULEB128UInt(cast<uint>(attributes.Count()));
-            for (const UniquePtr<Attribute>& attribute : attributes)
+            for (const UniquePtr<AttributeNode>& attribute : attributes)
             {
                 attribute->Write(writer);
             }
         }
         public void Read(AstReader& reader)
         {
+            base->Read(reader);
             uint n = reader.GetBinaryReader().ReadULEB128UInt();
             for (uint i = 0u; i < n; ++i)
             {
-                Attribute* attribute = new Attribute();
+                AttributeNode* attribute = new AttributeNode();
                 attribute->Read(reader);
                 AddAttribute(attribute);
             }
         }
-        private List<UniquePtr<Attribute>> attributes;
-        private Map<ustring, Attribute*> attributeMap;
+        private List<UniquePtr<AttributeNode>> attributes;
+        private Map<ustring, AttributeNode*> attributeMap;
     }
     public class AttributeNotUniqueException : Exception
     {

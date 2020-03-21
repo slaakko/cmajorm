@@ -15,13 +15,13 @@ namespace System.Windows
     {
         private enum Flags : sbyte
         {
-            none = 0, changed = 1 << 0, treeViewNodeChanged = 1 << 1, treeViewNodeStateChanged = 1 << 2
+            none = 0, changed = 1 << 0, treeViewNodeChanged = 1 << 1, treeViewNodeStateChanged = 1 << 2, toolTipWindowAdded = 1 << 3
         }
         public TreeView(const Font& font_, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("System.Windows.TreeView", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, "treeView",
+            base("System.Windows.TreeView", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, "treeView",
                 location, size, dock, anchors), flags(Flags.none), root(), font(font_), textBrush(Color.Black()), textHeight(0), stateIndicatorPercentage(0.5f),
                 stateIndicatorColor(Color.Red()), nodeSelectedColor(201u, 222u, 245u), nodeSelectedBrush(nodeSelectedColor),
-                format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5), selectedNode(null), trackedNode(null)
+                format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5), selectedNode(null), trackedNode(null), toolTipWindow(new ToolTip())
         {
             SetChanged();
         }
@@ -48,6 +48,15 @@ namespace System.Windows
                     if (log != null)
                     {
                         log->WriteLine("TreeView.OnPaint: " + r.ToString());
+                    }
+                }
+                if (!ToolTipWindowAdded())
+                {
+                    SetToolTipWindowAdded();
+                    Window* window = GetWindow();
+                    if (window != null)
+                    {
+                        window->AddChild(toolTipWindow);
                     }
                 }
                 if (Changed())
@@ -117,6 +126,7 @@ namespace System.Windows
                 root->SetTreeView(this);
                 SetTreeViewNodeChanged();
                 SetTreeViewNodeStateChanged();
+                SetContentChanged();
             }
             Invalidate();
         }
@@ -170,6 +180,66 @@ namespace System.Windows
         public nothrow void SetAnimationMs(int animationMs_)
         {
             animationMs = animationMs_;
+        }
+        public void ShowToolTipWindow(const string& toolTipText, TreeViewNode* node)
+        {
+            toolTipWindow->Hide();
+            Point loc = node->Location();
+            Size size = node->GetSize();
+            Point pt(loc.x + size.w, loc.y);
+            if (!node->Children().IsEmpty())
+            {
+                pt.x = pt.x + cast<int>(textHeight + 2.0f);
+            }
+            TranslateContentLocation(pt);
+            pt = ClientToScreen(pt);
+            toolTipWindow->SetText(toolTipText);
+            toolTipWindow->MeasureExtent();
+            Window* window = GetWindow();
+            if (window != null)
+            {
+                pt = window->ScreenToClient(pt);
+                Size sz = toolTipWindow->GetSize();
+                Point wloc = window->Location();
+                Size wsz = window->GetSize();
+                if (pt.y + sz.h > wloc.y + wsz.h)
+                {
+                    pt.y = wloc.y + wsz.h - sz.h;
+                }
+                if (pt.x + sz.w > wloc.x + wsz.w)
+                {
+                    pt.x = wloc.x + wsz.w - sz.w;
+                }
+                toolTipWindow->SetLocation(pt);
+                toolTipWindow->BringToFront();
+                toolTipWindow->Show();
+                toolTipWindow->Invalidate();
+                toolTipWindow->Update();
+            }
+        }
+        public void HideToolTipWindow()
+        {
+            toolTipWindow->Hide();
+        }
+        public nothrow Event<TreeViewNodeMouseClickEventHandler, TreeViewNodeMouseClickEventArgs>& NodeClickEvent()
+        {
+            return nodeClickEvent;
+        }
+        public nothrow Event<TreeViewNodeMouseClickEventHandler, TreeViewNodeMouseClickEventArgs>& NodeDoubleClickEvent()
+        {
+            return nodeDoubleClickEvent;
+        }
+        public nothrow Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs>& NodeEnterEvent()
+        {
+            return nodeEnterEvent;
+        }
+        public nothrow Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs>& NodeLeaveEvent()
+        {
+            return nodeLeaveEvent;
+        }
+        public nothrow Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs>& NodeSelectedEvent()
+        {
+            return nodeSelectedEvent;
         }
         protected override void OnMouseDown(MouseEventArgs& args)
         {
@@ -282,6 +352,18 @@ namespace System.Windows
         internal nothrow inline void SetTreeViewNodeStateChanged()
         {
             flags = cast<Flags>(flags | Flags.treeViewNodeStateChanged);
+        }
+        private nothrow inline bool ToolTipWindowAdded() const
+        {
+            return (flags & Flags.toolTipWindowAdded) != Flags.none;
+        }
+        private nothrow inline void SetToolTipWindowAdded()
+        {
+            flags = cast<Flags>(flags | Flags.toolTipWindowAdded);
+        }
+        private nothrow inline void ResetToolTipWindowAdded()
+        {
+            flags = cast<Flags>(flags & ~Flags.toolTipWindowAdded);
         }
         private void Measure(Graphics& graphics)
         {
@@ -437,41 +519,50 @@ namespace System.Windows
         {
             trackedNode = trackedNode_;
         }
-        public nothrow Event<TreeViewNodeMouseClickEventHandler, TreeViewNodeMouseClickEventArgs>& NodeClickEvent()
+        protected virtual void OnNodeClick(TreeViewNodeMouseClickEventArgs& args)
         {
-            return nodeClickEvent;
-        }
-        public nothrow Event<TreeViewNodeMouseClickEventHandler, TreeViewNodeMouseClickEventArgs>& NodeDoubleClickEvent()
-        {
-            return nodeDoubleClickEvent;
-        }
-        public nothrow Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs>& NodeEnterEvent()
-        {
-            return nodeEnterEvent;
-        }
-        public nothrow Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs>& NodeLeaveEvent()
-        {
-            return nodeLeaveEvent;
+            nodeClickEvent.Fire(args);
         }
         internal void NodeClick(const Point& location, MouseButtons buttons, TreeViewNode* node)
         {
             TreeViewNodeMouseClickEventArgs args(location, buttons, 1, node);
-            nodeClickEvent.Fire(args);
+            OnNodeClick(args);
+        }
+        protected virtual void OnNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
+        {
+            nodeDoubleClickEvent.Fire(args);
         }
         internal void NodeDoubleClick(const Point& location, MouseButtons buttons, TreeViewNode* node)
         {
             TreeViewNodeMouseClickEventArgs args(location, buttons, 2, node);
-            nodeDoubleClickEvent.Fire(args);
+            OnNodeDoubleClick(args);
+        }
+        protected virtual void OnNodeEnter(TreeViewNodeEventArgs& args)
+        {
+            nodeEnterEvent.Fire(args);
         }
         internal void NodeEnter(TreeViewNode* node)
         {
             TreeViewNodeEventArgs args(node);
-            nodeEnterEvent.Fire(args);
+            OnNodeEnter(args);
+        }
+        protected virtual void OnNodeLeave(TreeViewNodeEventArgs& args)
+        {
+            nodeLeaveEvent.Fire(args);
         }
         internal void NodeLeave(TreeViewNode* node)
         {
             TreeViewNodeEventArgs args(node);
-            nodeLeaveEvent.Fire(args);
+            OnNodeLeave(args);
+        }
+        protected virtual void OnNodeSelected(TreeViewNodeEventArgs& args)
+        {
+            nodeSelectedEvent.Fire(args);
+        }
+        internal void NodeSelected(TreeViewNode* node)
+        {
+            TreeViewNodeEventArgs args(node);
+            OnNodeSelected(args);
         }
         private Flags flags;
         private UniquePtr<TreeViewNode> root;
@@ -489,10 +580,12 @@ namespace System.Windows
         private int animationMs;
         private TreeViewNode* selectedNode;
         private TreeViewNode* trackedNode;
+        private ToolTip* toolTipWindow;
         private Event<TreeViewNodeMouseClickEventHandler, TreeViewNodeMouseClickEventArgs> nodeClickEvent;
         private Event<TreeViewNodeMouseClickEventHandler, TreeViewNodeMouseClickEventArgs> nodeDoubleClickEvent;
         private Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs> nodeEnterEvent;
         private Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs> nodeLeaveEvent;
+        private Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs> nodeSelectedEvent;
     }
 
     public class TreeViewNode : Component
@@ -558,6 +651,14 @@ namespace System.Windows
                 return parent->Level() + 1;
             }
             return 0;
+        }
+        public nothrow const Point& Location() const
+        {
+            return location;
+        }
+        public nothrow const Size& GetSize() const
+        {
+            return size;
         }
         internal nothrow void MeasureSize(Graphics& graphics, TreeView* treeView)
         {
@@ -816,6 +917,7 @@ namespace System.Windows
                 if (view != null)
                 {
                     view->SetSelectedNode(this);
+                    view->NodeSelected(this);
                 }
             }
         }

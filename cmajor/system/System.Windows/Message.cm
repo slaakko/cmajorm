@@ -9,6 +9,8 @@ namespace System.Windows
 {
     public const uint WM_DESTROY = 0x2u;
     public const uint WM_SIZE = 0x0005u;
+    public const uint WM_SETFOCUS = 0x0007u;
+    public const uint WM_KILLFOCUS = 0x0008u;
     public const uint WM_PAINT = 0x000Fu;
     public const uint WM_CLOSE = 0x0010u;
     public const uint WM_DRAWITEM = 0x002bu;
@@ -17,6 +19,7 @@ namespace System.Windows
     public const uint WM_CHAR = 0x0102u;
     public const uint WM_COMMAND = 0x0111u;
     public const uint WM_SYSCOMMAND = 0x0112u;
+    public const uint WM_TIMER = 0x0113u;
     public const uint WM_HSCROLL = 0x0114u;
     public const uint WM_VSCROLL = 0x0115u;
     public const uint WM_MOUSEMOVE = 0x0200u;
@@ -152,6 +155,14 @@ namespace System.Windows
         {
         }
         public ushort request;
+    }
+
+    public class TimerEventArgs
+    {
+        public nothrow TimerEventArgs(uint timerId_) : timerId(timerId_)
+        {
+        }
+        public uint timerId;
     }
     
     public class Message

@@ -1,0 +1,162 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public class ToolTip : Control
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, changed = 1 << 0
+        }
+        public ToolTip(const Color& backgroundColor, const Color& textColor, const Color& frameColor, const string& text_, const Point& location_, const Font& font_) :
+            base("System.Windows.ToolTip", DefaultWindowClassStyle(), HiddenChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, text_, location_, Size(0, 0), Dock.none, Anchors.none),
+            framePen(frameColor), font(font_), textBrush(textColor), format(StringAlignment.near, StringAlignment.near), textHeight(0)
+        {
+            SetChanged();
+        }
+        public ToolTip() : this(Color.FloralWhite(), Color.Black(), Color.Black(), "", Point(0, 0), Font(FontFamily("Segoe UI"), 9.0f))
+        {
+        }
+        public void SetTextColor(const Color& textColor)
+        {
+            textBrush = SolidBrush(textColor);
+            Invalidate();
+        }
+        public void SetFrameColor(const Color& frameColor)
+        {
+            framePen = Pen(frameColor);
+            Invalidate();
+        }
+        public void SetFont(const Font& font_)
+        {
+            font = font_;
+            SetChanged();
+            Invalidate();
+        }
+        public void MeasureExtent()
+        {
+            Graphics graphics = Graphics.FromWindowHandle(Handle());
+            Measure(graphics);
+        }
+        protected override void OnTextChanged()
+        {
+            base->OnTextChanged();
+            lines = SplitIntoLines(Text());
+            Invalidate();
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            if (Changed())
+            {
+                ResetChanged();
+                Measure(args.graphics);
+            }
+            Rect r(Point(), GetSize());
+            r.size.w = r.size.w - 1;
+            r.size.h = r.size.h - 1;
+            args.graphics.Clear(BackgroundColor());
+            args.graphics.DrawRectangleChecked(framePen, r);
+            PointF pt(1, 1);
+            for (const string& line : lines)
+            {
+                args.graphics.DrawStringChecked(line, font, pt, textBrush);
+                pt.y = pt.y + textHeight;
+            }
+            base->OnPaint(args);
+        }
+        private void Measure(Graphics& graphics)
+        {
+            Size size;
+            for (const string& line : lines)
+            {
+                RectF textRect = graphics.MeasureStringChecked(line, font, PointF(0, 0), format);
+                textHeight = Max(textHeight, cast<int>(textRect.size.h));
+                size.w = Max(size.w, cast<int>(textRect.size.w));
+            }
+            size.h = cast<int>(lines.Count()) * textHeight;
+            size.w = size.w + 1;
+            size.h = size.h + 1;
+            SetSize(size);
+        }
+        private nothrow inline bool Changed() const
+        {
+            return (flags & Flags.changed) != Flags.none;
+        }
+        private nothrow inline void SetChanged()
+        {
+            flags = cast<Flags>(flags | Flags.changed);
+        }
+        private nothrow inline void ResetChanged()
+        {
+            flags = cast<Flags>(flags & ~Flags.changed);
+        }
+        private Flags flags;
+        private Pen framePen;
+        private Font font;
+        private SolidBrush textBrush;
+        private StringFormat format;
+        private List<string> lines;
+        private int textHeight;
+    }
+
+    public nothrow List<string> SplitIntoLines(const string& text)
+    {
+        List<string> lines;
+        string line;
+        int state = 0;
+        for (char c : text)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    switch (c)
+                    {
+                        case '\n':
+                        {
+                            lines.Add(line);
+                            line.Clear();
+                            break;
+                        }
+                        case '\r':
+                        {
+                            state = 1;
+                            break;
+                        }
+                        default:
+                        {
+                            line.Append(c);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    switch (c)
+                    {
+                        case '\n':
+                        {
+                            lines.Add(line);
+                            line.Clear();
+                            state = 0;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        if (!line.IsEmpty())
+        {
+            lines.Add(line);
+        }
+        return lines;
+    }
+}

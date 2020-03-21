@@ -7,13 +7,8 @@ class MainWindow : Window
 {
     public MainWindow() : base("Abstract Syntax Tree Viewer")
     {
-        SetBackgroundColor(Color.FloralWhite());
         UniquePtr<MenuBar> menuBar(new MenuBar());
         UniquePtr<MenuItem> fileItem(new MenuItem("&File"));
-        UniquePtr<MenuItem> newItem(new MenuItem("&New"));
-        newItem->AddMenuItem(new MenuItem("&Item"));
-        newItem->AddMenuItem(new MenuItem("&Project"));
-        fileItem->AddMenuItem(newItem.Release());
         UniquePtr<MenuItem> openItem(new MenuItem("&Open..."));
         openItem->SetShortcut(Keys.f3);
         openItem->ClickEvent().AddHandler(OpenClick);
@@ -43,13 +38,18 @@ class MainWindow : Window
         UniquePtr<SplitContainer> horizontalSplitContainer(new SplitContainer(Orientation.horizontal, 600, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         treeView = new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
         treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
+        treeView->NodeEnterEvent().AddHandler(TreeViewNodeEnter);
+        treeView->NodeLeaveEvent().AddHandler(TreeViewNodeLeave);
         UniquePtr<Control> paddedTreeView(new PaddedControl(treeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> borderedTreeView(new BorderedControl(paddedTreeView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> scrollableTreeView(new ScrollableControl(borderedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         horizontalSplitContainer->Pane1Container()->AddChild(scrollableTreeView.Release());
-        UniquePtr<Control> treeView2(new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
-        UniquePtr<Control> borderedTreeView2(new BorderedControl(treeView2.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-        horizontalSplitContainer->Pane2Container()->AddChild(borderedTreeView2.Release());
+        sourceCodeView = new SourceCodeView(Point(0, 0), Size(0, 0), Dock.fill, Anchors.none);
+        sourceCodeView->CaretPosChangedEvent().AddHandler(CaretPosChanged);
+        UniquePtr<Control> paddedSourceCodeView(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+        UniquePtr<Control> borderedSourceCodeView(new BorderedControl(paddedSourceCodeView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+        UniquePtr<Control> scrollableSourceCodeView(new ScrollableControl(borderedSourceCodeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+        horizontalSplitContainer->Pane2Container()->AddChild(scrollableSourceCodeView.Release());
         verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainer.Release());
         AddChild(verticalSplitContainer.Release());
     }
@@ -129,6 +129,8 @@ class MainWindow : Window
                     SyntaxTreeBuilder syntaxTreeBuilder;
                     compileUnit->Accept(syntaxTreeBuilder);
                     treeView->SetRoot(syntaxTreeBuilder.GetRoot());
+                    sourceCodeView->SetTextContent(content);
+                    sourceCodeView->SetFocus();
                 }
                 else
                 {
@@ -150,7 +152,34 @@ class MainWindow : Window
             case TreeViewNode.State.expanded: node->CollapseAll(); break;
         }
     }
+    private void TreeViewNodeEnter(TreeViewNodeEventArgs& args)
+    {
+        TreeViewNode* treeViewNode = args.node;
+        if (treeViewNode->Data() != null)
+        {
+            Cm.Ast.Node* node = cast<Cm.Ast.Node*>(treeViewNode->Data());
+            SyntaxNodeAttributeExtractor attributeExtractor;
+            node->Accept(attributeExtractor);
+            treeView->ShowToolTipWindow(attributeExtractor.s, treeViewNode);
+        }
+    }
+    private void TreeViewNodeLeave(TreeViewNodeEventArgs& args)
+    {
+        TreeViewNode* node = args.node;
+        treeView->HideToolTipWindow();
+    }
+    private void CaretPosChanged()
+    {
+        int caretLine = sourceCodeView->GetCaretLine();
+        int caretColumn = sourceCodeView->GetCaretColumn();
+        LogView* logView = Application.GetLogView();
+        if (logView != null)
+        {
+            logView->WriteLine("caret: (" + ToString(caretLine) + ", " + ToString(caretColumn) + ")");
+        }
+    }
     private TreeView* treeView;
+    private SourceCodeView* sourceCodeView;
     private ustring content;
     private CmajorLexer lexer;
     private UniquePtr<Cm.Ast.CompileUnitNode> compileUnit;

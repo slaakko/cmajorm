@@ -874,4 +874,78 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
+
+    public void CreateCaret(void* windowHandle, void* bitmapHandle, int width, int height)
+    {
+        bool succeeded = WinCreateCaret(windowHandle, bitmapHandle, width, height);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void DestroyCaret()
+    {
+        bool succeeded = WinDestroyCaret();
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void ShowCaret(void* windowHandle)
+    {
+        bool succeeded = WinShowCaret(windowHandle);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void HideCaret(void* windowHandle)
+    {
+        bool succeeded = WinHideCaret(windowHandle);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public Point GetCaretPos()
+    {
+        Point caretPos;
+        bool succeeded = WinGetCaretPos(caretPos.x, caretPos.y);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return caretPos;
+    }
+
+    public void SetCaretPos(const Point& caretPos)
+    {
+        bool succeeded = WinSetCaretPos(caretPos.x, caretPos.y);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void SetTimer(void* windowHandle, uint timerId, uint elapseMs)
+    {
+        bool succeeded = WinSetTimer(windowHandle, timerId, elapseMs);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void KillTimer(void* windowHandle, uint timerId)
+    {
+        bool succeeded = WinKillTimer(windowHandle, timerId);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
 }

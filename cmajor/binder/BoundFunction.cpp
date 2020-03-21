@@ -54,4 +54,12 @@ void BoundFunction::AddLabeledStatement(BoundStatement* labeledStatement)
     labeledStatements.push_back(labeledStatement);
 }
 
+void BoundFunction::ResetCodeGenerated()
+{
+    if (functionSymbol)
+    {
+        functionSymbol->ResetCodeGenerated();
+    }
+}
+
 } } // namespace cmajor::binder

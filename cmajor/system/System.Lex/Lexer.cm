@@ -396,6 +396,43 @@ namespace System.Lex
         {
             return -1;
         }
+        public TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
+        {
+            uchar* pos = line.Chars();
+            uchar* end = line.Chars() + line.Length();
+            TokenLine tokenLine;
+            lexeme.begin = end;
+            lexeme.end = end;
+            token.match = lexeme;
+            token.id = INVALID_TOKEN;
+            token.line = lineNumber;
+            int state = startState;
+            while (pos != end)
+            {
+                uchar c = *pos;
+                if (state == 0)
+                {
+                    lexeme.begin = pos;
+                    token.id = INVALID_TOKEN;
+                    token.line = lineNumber;
+                }
+                lexeme.end = pos + 1;
+                state = NextState(state, c);
+                if (state == -1)
+                {
+                    state = 0;
+                    pos = token.match.end;
+                    tokenLine.tokens.Add(token);
+                }
+                ++pos;
+            }
+            if (token.match.begin != token.match.end)
+            {
+                tokenLine.tokens.Add(token);
+            }
+            tokenLine.endState = state;
+            return tokenLine;
+        }
         protected Lexeme lexeme;
         protected int line;
         private ustring content;

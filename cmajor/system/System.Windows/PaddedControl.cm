@@ -34,6 +34,24 @@ namespace System.Windows
             base->OnSizeChanged();
             SetChildPos();
         }
+        protected override void OnChildContentChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentChanged(args);
+            }
+        }
+        protected override void OnChildContentLocationChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentLocationChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentLocationChanged(args);
+            }
+        }
         protected override void OnChildContentSizeChanged(ControlEventArgs& args)
         {
             base->OnChildContentSizeChanged(args);

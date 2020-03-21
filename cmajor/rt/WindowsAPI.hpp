@@ -76,6 +76,8 @@ extern "C" RT_API void WinGraphicsDeleteFont(void* font);
 extern "C" RT_API int WinGraphicsFontGetLastStatus(void* font);
 extern "C" RT_API float WinGraphicsGetFontHeight(void* font, const void* graphics);
 extern "C" RT_API void* WinGraphicsCreateDefaultStringFormat();
+extern "C" RT_API const void* WinGraphicsGetGenericDefaultStringFormat();
+extern "C" RT_API const void* WinGraphicsGetGenericTypographicStringFormat();
 extern "C" RT_API void* WinGraphicsCreateStringFormat(int formatFlags, uint16_t languageId);
 extern "C" RT_API void* WinGraphicsCloneStringFormat(void* stringFormat);
 extern "C" RT_API void WinGraphicsDeleteStringFormat(void* stringFormat);
@@ -94,6 +96,8 @@ extern "C" RT_API int WinGraphicsMeasureStringFormatRect(void* graphics, const c
     float& outX, float& outY, float& outW, float& outH, int* codePointsFitted, int* linesFilled);
 extern "C" RT_API int WinGraphicsMeasureStringFormatPoint(void* graphics, const char* str, void* font, float x, float y, void* format,
     float& outX, float& outY, float& outW, float& outH);
+extern "C" RT_API int WinGraphicsGetTextRenderingHint(void* graphics);
+extern "C" RT_API int WinGraphicsSetTextRenderingHint(void* graphics, int textRenderingHint);
 extern "C" RT_API int WinGraphicsClear(void* graphics, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue);
 extern "C" RT_API int WinGraphicsDrawRectangle(void* graphics, void* pen, int x, int y, int w, int h);
 extern "C" RT_API int WinGraphicsDrawRectangleF(void* graphics, void* pen, float x, float y, float w, float h);
@@ -188,5 +192,17 @@ extern "C" RT_API bool WinScrollWindow(void* windowHandle, int xAmount, int yAmo
 extern "C" RT_API bool WinGetScrollInfo(void* windowHandle, int nBar, uint32_t& nPage, int32_t& nPos, int32_t& nMin, int32_t& nMax, int32_t& nTrackPos);
 extern "C" RT_API int WinSetScrollInfo(void* windowHandle, int nBar, uint32_t fMask, bool redraw, uint32_t nPage, int32_t nPos, int32_t nMin, int32_t nMax);
 extern "C" RT_API bool WinShowScrollBar(void* windowHandle, int nBar, bool show);
+extern "C" RT_API bool WinCreateCaret(void* windowHandle, void* bitmapHandle, int width, int height);
+extern "C" RT_API bool WinDestroyCaret();
+extern "C" RT_API bool WinShowCaret(void* windowHandle);
+extern "C" RT_API bool WinHideCaret(void* windowHandle);
+extern "C" RT_API bool WinGetCaretPos(int& x, int& y);
+extern "C" RT_API bool WinSetCaretPos(int x, int y);
+extern "C" RT_API bool WinSetTimer(void* windowHandle, uint32_t timerId, uint32_t elapse);
+extern "C" RT_API bool WinKillTimer(void* windowHandle, uint32_t timerId);
+
+extern "C" RT_API bool WinRegOpenCurrentUser(void** result);
+extern "C" RT_API bool WinRegCloseKey(void* key);
+extern "C" RT_API bool WinRegGetDWordValue(void* key, const char* subKey, const char* valueName, uint32_t& value);
 
 #endif // CMAJOR_RT_WINDOWS_API_INCLUDED

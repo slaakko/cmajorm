@@ -14,3 +14,15 @@ public nothrow double Sqrt(double x)
 {
     return RtSqrt(x);
 }
+
+public nothrow int Log10(int n)
+{
+    int log10 = 1;
+    int m = n / 10;
+    while (m > 0)
+    {
+        ++log10;
+        m = m / 10;
+    }
+    return log10;
+}

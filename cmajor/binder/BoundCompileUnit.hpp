@@ -99,6 +99,7 @@ public:
     void AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs);
     void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
     int GetNextExitEntryIndex() { return nextExitEntryIndex++; }
+    void ResetCodeGenerated() override;
 private:
     Module& module;
     SymbolTable& symbolTable;

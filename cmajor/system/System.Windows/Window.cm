@@ -73,7 +73,7 @@ namespace System.Windows
                     break;
                 }
                 case WM_COMMAND: case WM_SIZE: case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK:
-                case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL:
+                case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL: case WM_TIMER: case WM_SETFOCUS: case WM_KILLFOCUS:
                 {
                     return base->ProcessMessage(message);
                 }
@@ -166,6 +166,12 @@ namespace System.Windows
             {
                 MessageBox.Show(ex.Message());
             }
+        }
+        protected override void OnSetFocus()
+        {
+        }
+        protected override void OnKillFocus()
+        {
         }
         public nothrow void SetAsMainWindow()
         {

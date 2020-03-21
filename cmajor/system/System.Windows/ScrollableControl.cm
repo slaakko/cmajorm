@@ -34,6 +34,25 @@ namespace System.Windows
             child->SetLocation(Point());
             child->SetSize(GetSize());
         }
+        protected override void OnChildContentChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentChanged(args);
+            hpos = 0;
+            vpos = 0;
+        }
+        protected override void OnChildContentLocationChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentLocationChanged(args);
+            scrolledChild = args.control;
+            Point childContentLocation = scrolledChild->ContentLocation();
+            Pair<int, int> scrollUnits = scrolledChild->GetScrollUnits();
+            int verticalScrollUnit = scrollUnits.first;
+            int horizontalScrollUnit = scrollUnits.second;
+            vpos = childContentLocation.y / verticalScrollUnit;
+            SetScrollInfo(Handle(), ScrollBar.SB_VERT, ScrollInfoMask.SIF_POS, true, 0u, vpos, 0, 0);
+            hpos = childContentLocation.x / horizontalScrollUnit;
+            SetScrollInfo(Handle(), ScrollBar.SB_HORZ, ScrollInfoMask.SIF_POS, true, 0u, hpos, 0, 0);
+        }
         protected override void OnChildContentSizeChanged(ControlEventArgs& args)
         {
             base->OnChildContentSizeChanged(args);
@@ -112,8 +131,45 @@ namespace System.Windows
             GetScrollInfo(Handle(), ScrollBar.SB_HORZ, hpage, hpos, hmin, hmax, trackPos);
             if (prevHPos != hpos)
             {
+                scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
                 ScrollWindow(scrolledChild->Handle(), horizontalScrollUnit * (prevHPos - hpos), 0, null, null);
                 scrolledChild->Update();
+            }
+        }
+        public override void ScrollLineDown()
+        {
+            int trackPos;
+            GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
+            int prevVPos = vpos;
+            if (vpos != vmax)
+            {
+                ++vpos;
+                SetScrollInfo(Handle(), ScrollBar.SB_VERT, ScrollInfoMask.SIF_POS, true, 0u, vpos, 0, 0);
+                GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
+                if (prevVPos != vpos)
+                {
+                    scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
+                    ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
+                    scrolledChild->Update();
+                }
+            }
+        }
+        public override void ScrollLineUp()
+        {
+            int trackPos;
+            GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
+            int prevVPos = vpos;
+            if (vpos != vmin)
+            {
+                --vpos;
+                SetScrollInfo(Handle(), ScrollBar.SB_VERT, ScrollInfoMask.SIF_POS, true, 0u, vpos, 0, 0);
+                GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
+                if (prevVPos != vpos)
+                {
+                    scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
+                    ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
+                    scrolledChild->Update();
+                }
             }
         }
         protected override void OnVScroll(ScrollEventArgs& args)
@@ -164,6 +220,7 @@ namespace System.Windows
             GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
             if (prevVPos != vpos)
             {
+                scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
                 ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
                 scrolledChild->Update();
             }
@@ -183,6 +240,7 @@ namespace System.Windows
                     GetScrollInfo(Handle(), ScrollBar.SB_VERT, vpage, vpos, vmin, vmax, trackPos);
                     if (prevVPos != vpos)
                     {
+                        scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
                         ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
                         scrolledChild->Update();
                     }
@@ -205,6 +263,13 @@ namespace System.Windows
             int dy = vpos * verticalScrollUnit;
             location.x = location.x + dx;
             location.y = location.y + dy;
+        }
+        protected override void TranslateContentLocation(Point& location)
+        {
+            int dx = hpos * horizontalScrollUnit;
+            int dy = vpos * verticalScrollUnit;
+            location.x = location.x - dx;
+            location.y = location.y - dy;
         }
         private Container container;
         private Control* child;

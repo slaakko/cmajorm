@@ -32,6 +32,7 @@ public:
     void MoveTemporaryDestructorCallsTo(BoundExpression& expression);
     void AddLabeledStatement(BoundStatement* labeledStatement);
     const std::vector<BoundStatement*>& LabeledStatements() const { return labeledStatements; }
+    void ResetCodeGenerated() override;
 private:
     FunctionSymbol* functionSymbol;
     std::unique_ptr<BoundCompoundStatement> body;

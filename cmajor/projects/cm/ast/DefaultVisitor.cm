@@ -1028,10 +1028,10 @@ namespace Cm.Ast
             globalVariableNode.TypeExpr()->Accept(*this);
             globalVariableNode.Id()->Accept(*this);
         }
-        public override void Visit(Attribute& attribute)
+        public override void Visit(AttributeNode& attribute)
         {
         }
-        public override void Visit(Attributes& attributes)
+        public override void Visit(AttributesNode& attributes)
         {
             long n = attributes.GetAttributes().Count();
             for (long i = 0; i < n; ++i)

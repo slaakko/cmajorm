@@ -23,7 +23,7 @@ public static class AttributeParser
                 System.Lex.WriteBeginRuleToLog(lexer, u"Attributes");
             }
         #endif
-        UniquePtr<Cm.Ast.Attributes> attributes;
+        UniquePtr<Cm.Ast.AttributesNode> attributes;
         Match match(false);
         Match* parentMatch0 = &match;
         {
@@ -42,7 +42,7 @@ public static class AttributeParser
                     }
                     if (match.hit)
                     {
-                        attributes.Reset(new Cm.Ast.Attributes());
+                        attributes.Reset(new Cm.Ast.AttributesNode());
                     }
                     *parentMatch2 = match;
                 }
@@ -194,7 +194,7 @@ public static class AttributeParser
         }
         return match;
     }
-    public static Match Attribute(CmajorLexer& lexer, Cm.Ast.Attributes* attributes)
+    public static Match Attribute(CmajorLexer& lexer, Cm.Ast.AttributesNode* attributes)
     {
         #if (DEBUG)
             Span debugSpan;

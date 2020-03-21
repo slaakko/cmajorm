@@ -19,12 +19,25 @@ namespace System.Windows
     public class delegate void ClickEventHandler();
     public class delegate void SizeChangedEventHandler();
     public class delegate void LocationChangedEventHandler();
+    public class delegate void ContentChangedEventHandler();
+    public class delegate void ChildContentChangedEventHandler(ControlEventArgs& controlEventArgs);
+    public class delegate void ContentLocationChangedEventHandler();
+    public class delegate void ChildContentLocationChangedEventHandler(ControlEventArgs& controlEventArgs);
     public class delegate void ContentSizeChangedEventHandler();
     public class delegate void ChildContentSizeChangedEventHandler(ControlEventArgs& controlEventArgs);
+    public class delegate void TextChangedEventHandler();
     public class delegate void HScrollEventHandler(ScrollEventArgs& scrollEventArgs);
     public class delegate void VScrollEventHandler(ScrollEventArgs& scrollEventArgs);
+    public class delegate void TimerEventHandler(TimerEventArgs& timerEventArgs);
+    public class delegate void SetFocusEventHandler();
+    public class delegate void KillFocusEventHandler();
 
     public inline nothrow WindowClassStyle DefaultWindowClassStyle()
+    {
+        return WindowClassStyle.CS_DEFAULT;
+    }
+
+    public inline nothrow WindowClassStyle DoubleClickWindowClassStyle()
     {
         return WindowClassStyle.CS_DBLCLKS;
     }
@@ -32,6 +45,11 @@ namespace System.Windows
     public inline nothrow WindowStyle DefaultChildWindowStyle()
     {
         return cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_VISIBLE | WindowStyle.WS_CLIPSIBLINGS);
+    }
+
+    public inline nothrow WindowStyle HiddenChildWindowStyle()
+    {
+        return cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_CLIPSIBLINGS);
     }
 
     public inline nothrow ExtendedWindowStyle DefaultExtendedWindowStyle()
@@ -43,13 +61,13 @@ namespace System.Windows
     {
         private enum Flags : sbyte
         {
-            none = 0, mouseInClient = 1 << 0, lbuttonPressed = 1 << 1, menuWantsKeys = 1 << 2, keyDownHandled = 1 << 3
+            none = 0, mouseInClient = 1 << 0, lbuttonPressed = 1 << 1, menuWantsKeys = 1 << 2, keyDownHandled = 1 << 3, focused = 1 << 4, caretCreated = 1 << 5, caretShown = 1 << 6
         }
         public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowStyle style_, ExtendedWindowStyle exStyle_, 
             const Color& backgroundColor_, const string& text_, const Point& location_, const Size& size_, Dock dock_, Anchors anchors_) : 
             windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), style(style_), exStyle(exStyle_),
-            backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), contentSize(), dock(dock_), anchors(anchors_), flags(Flags.none),
-            arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW))
+            backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), contentLocation(0, 0), contentSize(), dock(dock_), anchors(anchors_), flags(Flags.none),
+            arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), caretShowCount(0)
         {
             Application.Init();
             if ((style & WindowStyle.WS_CHILD) == 0)
@@ -228,6 +246,10 @@ namespace System.Windows
         {
             WinUpdateWindow(handle);
         }
+        public void SetFocus()
+        {
+            WinSetFocus(Handle());
+        }
         public nothrow const string& Text() const
         {
             return text;
@@ -238,7 +260,12 @@ namespace System.Windows
             {
                 text = text_;
                 SetWindowText(handle, text);
+                OnTextChanged();
             }
+        }
+        protected virtual void OnTextChanged()
+        {
+            textChangedEvent.Fire();
         }
         public const Point& Location()
         {
@@ -293,6 +320,54 @@ namespace System.Windows
         {
             sizeChangedEvent.Fire();
         }
+        public void SetContentChanged()
+        {
+            OnContentChanged();
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                ControlEventArgs args(this);
+                parentControl->OnChildContentChanged(args);
+            }
+        }
+        protected virtual void OnContentChanged()
+        {
+            contentChangedEvent.Fire();
+        }
+        protected virtual void OnChildContentChanged(ControlEventArgs& args)
+        {
+            childContentChangedEvent.Fire(args);
+        }
+        public nothrow inline const Point& ContentLocation() const
+        {
+            return contentLocation;
+        }
+        internal nothrow void SetContentLocationInternal(const Point& contentLocation_)
+        {
+            contentLocation = contentLocation_;
+        }
+        public void SetContentLocation(const Point& contentLocation_)
+        {
+            if (contentLocation != contentLocation_)
+            {
+                contentLocation = contentLocation_;
+                OnContentLocationChanged();
+                Control* parentControl = ParentControl();
+                if (parentControl != null)
+                {
+                    ControlEventArgs args(this);
+                    parentControl->OnChildContentLocationChanged(args);
+                }
+            }
+        }
+        protected virtual void OnContentLocationChanged()
+        {
+            contentLocationChangedEvent.Fire();
+        }
+        protected virtual void OnChildContentLocationChanged(ControlEventArgs& args)
+        {
+            childContentLocationChangedEvent.Fire(args);
+        }
         public nothrow inline const Size& ContentSize() const
         {
             return contentSize;
@@ -327,6 +402,10 @@ namespace System.Windows
         public nothrow Pair<int, int> GetScrollUnits() const
         {
             return MakePair(verticalScrollUnit, horizontalScrollUnit);
+        }
+        protected virtual void SetCaretLocation()
+        {
+            SetCaretPos(Point(0, 0));
         }
         public inline nothrow Dock GetDock() const
         {
@@ -515,6 +594,22 @@ namespace System.Windows
                 log->WriteLine(string(' ', level) + "Control." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Point(), GetSize()).ToString() + "]");
             }
         }
+        public virtual void ScrollLineDown()
+        {
+            Control* parent = ParentControl();
+            if (parent != null)
+            {
+                parent->ScrollLineDown();
+            }
+        }
+        public virtual void ScrollLineUp()
+        {
+            Control* parent = ParentControl();
+            if (parent != null)
+            {
+                parent->ScrollLineUp();
+            }
+        }
         protected virtual bool ProcessMessage(Message& message)
         {
             switch (message.msg)
@@ -606,7 +701,6 @@ namespace System.Windows
                     DoHScroll(request);
                     message.result = 0;
                     return true;
-                    break;
                 }
                 case WM_VSCROLL:
                 {
@@ -614,7 +708,6 @@ namespace System.Windows
                     DoVScroll(request);
                     message.result = 0;
                     return true;
-                    break;
                 }
                 case WM_MOUSEWHEEL:
                 {
@@ -626,6 +719,24 @@ namespace System.Windows
                         return true;
                     }
                     break;
+                }
+                case WM_SETFOCUS:
+                {
+                    DoSetFocus();
+                    message.result = 0;
+                    return true;
+                }
+                case WM_KILLFOCUS:
+                {
+                    DoKillFocus();
+                    message.result = 0;
+                    return true;
+                }
+                case WM_TIMER:
+                {
+                    DoTimer(message.wparam);
+                    message.result = 0;
+                    return true;
                 }
             }
             return false;
@@ -728,11 +839,29 @@ namespace System.Windows
                 string s = "DoKeyUp: " + ToString(cast<Keys>(virtualKeyCode)) + " " + ToHexString(cast<uint>(virtualKeyCode));
                 logView->WriteLine(s);
             }
+            Keys keyCode = cast<Keys>(virtualKeyCode);
+            switch (keyCode)
+            {
+                case Keys.controlKey:
+                {
+                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.controlModifier);
+                    break;
+                }
+                case Keys.shiftKey:
+                {
+                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.shiftModifier);
+                    break;
+                }
+                case Keys.menu:
+                {
+                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.altModifier);
+                    break;
+                }
+            }
             if (KeyDownHandled() || MenuWantsKeys())
             {
                 return KeyDownHandled();
             }
-            Keys keyCode = cast<Keys>(virtualKeyCode);
             Keys modifierKeys;
             switch (keyCode)
             {
@@ -754,24 +883,6 @@ namespace System.Windows
             }
             KeyEventArgs args(keyCode, modifierKeys);
             OnKeyUp(args);
-            switch (keyCode)
-            {
-                case Keys.controlKey:
-                {
-                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.controlModifier);
-                    break;
-                }
-                case Keys.shiftKey:
-                {
-                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.shiftModifier);
-                    break;
-                }
-                case Keys.menu:
-                {
-                    currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.altModifier);
-                    break;
-                }
-            }
             if (args.handled)
             {
                 return true;
@@ -851,6 +962,36 @@ namespace System.Windows
         {
             OnMouseWheel(args);
         }
+        private void DoSetFocus()
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(Text() + " got focus");
+            }
+            SetFocused();
+            OnSetFocus();
+        }
+        protected virtual void OnSetFocus()
+        {
+            setFocusEvent.Fire();
+            DoCreateAndShowCaret();
+        }
+        private void DoKillFocus()
+        {
+            LogView* log = Application.GetLogView();
+            if (log != null)
+            {
+                log->WriteLine(Text() + " lost focus");
+            }
+            ResetFocused();
+            OnKillFocus();
+        }
+        protected virtual void OnKillFocus()
+        {
+            killFocusEvent.Fire();
+            DoDestroyCaret();
+        }
         protected nothrow virtual bool IsDecoratorControl() const
         {
             return false;
@@ -871,6 +1012,14 @@ namespace System.Windows
                 parentControl->TranslateMousePos(location);
             }
         }
+        protected virtual void TranslateContentLocation(Point& location)
+        {
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->TranslateContentLocation(location);
+            }
+        }
         private void DoPaint()
         {
             void* paintStruct = null;
@@ -884,7 +1033,15 @@ namespace System.Windows
             {
                 TranslateChildGraphics(graphics);
             }
+            if (Focused())
+            {
+                --caretShowCount;
+            }
             OnPaint(args);
+            if (Focused() && CaretCreated())
+            {
+                ShowCaret();
+            }
         }
         protected virtual void OnPaint(PaintEventArgs& args)
         {
@@ -899,6 +1056,59 @@ namespace System.Windows
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+            }
+        }
+        private void DoCreateAndShowCaret()
+        {
+            if (Focused())
+            {
+                CreateCaret();
+                SetCaretCreated();
+                SetCaretLocation();
+                ShowCaret();
+            }
+        }
+        public virtual void CreateCaret()
+        {
+            System.Windows.API.CreateCaret(Handle(), null, 1, 15);
+        }
+        private void DoDestroyCaret()
+        {
+            if (CaretCreated())
+            {
+                HideCaret();
+                ResetCaretCreated();
+                DestroyCaret();
+            }
+        }
+        public virtual void DestroyCaret()
+        {
+            System.Windows.API.DestroyCaret();
+            caretShowCount = 0;
+        }
+        public void ShowCaret()
+        {
+            System.Windows.API.ShowCaret(Handle());
+            ++caretShowCount;
+        }
+        public void HideCaret()
+        {
+            System.Windows.API.HideCaret(Handle());
+            --caretShowCount;
+        }
+        public nothrow inline int CaretShowCount() const
+        {
+            return caretShowCount;
+        }
+        public Point GetCaretPos() const
+        {
+            return System.Windows.API.GetCaretPos();
+        }
+        public void SetCaretPos(const Point& caretPos)
+        {
+            if (CaretCreated())
+            {
+                System.Windows.API.SetCaretPos(caretPos);
             }
         }
         private void DoMouseMove(MouseEventArgs& args)
@@ -960,6 +1170,23 @@ namespace System.Windows
                 TranslateMousePos(args.location);
             }
             OnMouseDoubleClick(args);
+        }
+        public void SetTimer(uint timerId, uint elapseMs)
+        {
+            SetTimer(Handle(), timerId, elapseMs);
+        }
+        public void KillTimer(uint timerId)
+        {
+            KillTimer(Handle(), timerId);
+        }
+        private void DoTimer(uint timerId)
+        {
+            TimerEventArgs timerEventArgs(timerId);
+            OnTimer(timerEventArgs);
+        }
+        protected virtual void OnTimer(TimerEventArgs& args)
+        {
+            timerEvent.Fire(args);
         }
         protected virtual void SetCursor()
         {
@@ -1106,6 +1333,22 @@ namespace System.Windows
         {
             return locationChangedEvent;
         }
+        public nothrow Event<ContentChangedEventHandler>& ContentChangedEvent() const
+        {
+            return contentChangedEvent;
+        }
+        public nothrow Event<ChildContentChangedEventHandler, ControlEventArgs>& ChildContentChangedEvent() const
+        {
+            return childContentChangedEvent;
+        }
+        public nothrow Event<ContentLocationChangedEventHandler>& ContentLocationChangedEvent() const
+        {
+            return contentLocationChangedEvent;
+        }
+        public nothrow Event<ChildContentLocationChangedEventHandler, ControlEventArgs>& ChildContentLocationChangedEvent() const
+        {
+            return childContentLocationChangedEvent;
+        }
         public nothrow Event<ContentSizeChangedEventHandler>& ContentSizeChangedEvent() const
         {
             return contentSizeChangedEvent;
@@ -1113,6 +1356,10 @@ namespace System.Windows
         public nothrow Event<ChildContentSizeChangedEventHandler, ControlEventArgs>& ChildContentSizeChangedEvent() const
         {
             return childContentSizeChangedEvent;
+        }
+        public nothrow Event<TextChangedEventHandler>& TextChangedEvent() const
+        {
+            return textChangedEvent;
         }
         public nothrow Event<HScrollEventHandler, ScrollEventArgs>& HScrollEvent() const
         {
@@ -1125,6 +1372,18 @@ namespace System.Windows
         public nothrow Event<MouseWheelEventHandler, MouseWheelEventArgs>& MouseWheelEvent() const
         {
             return mouseWheelEvent;
+        }
+        public nothrow Event<TimerEventHandler, TimerEventArgs>& TimerEvent() const
+        {
+            return timerEvent;
+        }
+        public nothrow Event<SetFocusEventHandler>& SetFocusEvent() const
+        {
+            return setFocusEvent;
+        }
+        public nothrow Event<KillFocusEventHandler>& KillFocusEvent() const
+        {
+            return killFocusEvent;
         }
         private nothrow inline bool MouseInClient() const
         {
@@ -1164,7 +1423,7 @@ namespace System.Windows
         }
         private nothrow inline bool KeyDownHandled() const
         {
-            return (flags & flags.keyDownHandled) != 0;
+            return (flags & Flags.keyDownHandled) != 0;
         }
         private nothrow inline void SetKeyDownHandled()
         {
@@ -1173,6 +1432,42 @@ namespace System.Windows
         private nothrow inline void ResetKeyDownHandled()
         {
             flags = cast<Flags>(flags & ~Flags.keyDownHandled);
+        }
+        public nothrow inline bool Focused() const
+        {
+            return (flags & Flags.focused) != 0;
+        }
+        private nothrow inline void SetFocused()
+        {
+            flags = cast<Flags>(flags | Flags.focused);
+        }
+        private nothrow inline void ResetFocused()
+        {
+            flags = cast<Flags>(flags & ~Flags.focused);
+        }
+        public nothrow inline bool CaretCreated() const
+        {
+            return (flags & Flags.caretCreated) != 0;
+        }
+        private nothrow inline void SetCaretCreated()
+        {
+            flags = cast<Flags>(flags | Flags.caretCreated);
+        }
+        private nothrow inline void ResetCaretCreated()
+        {
+            flags = cast<Flags>(flags & ~Flags.caretCreated);
+        }
+        private nothrow inline bool CaretShown() const
+        {
+            return (flags & Flags.caretShown) != 0;
+        }
+        private nothrow inline void SetCaretShown()
+        {
+            flags = cast<Flags>(flags | Flags.caretShown);
+        }
+        private nothrow inline void ResetCaretShown()
+        {
+            flags = cast<Flags>(flags & ~Flags.caretShown);
         }
         private const char* windowClassName;
         private WindowClassStyle windowClassStyle;
@@ -1183,6 +1478,7 @@ namespace System.Windows
         private string text;
         private Point location;
         private Size size;
+        private Point contentLocation;
         private Size contentSize;
         private int verticalScrollUnit;
         private int horizontalScrollUnit;
@@ -1192,6 +1488,7 @@ namespace System.Windows
         private Keys currentModifierKeys;
         private List<Control*> createList;
         private Cursor arrowCursor;
+        private int caretShowCount;
         private Event<PaintEventHandler, PaintEventArgs> paintEvent;
         private Event<MouseEnterEventHandler> mouseEnterEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseMoveEvent;
@@ -1205,10 +1502,18 @@ namespace System.Windows
         private Event<ClickEventHandler> clickEvent;
         private Event<SizeChangedEventHandler> sizeChangedEvent;
         private Event<LocationChangedEventHandler> locationChangedEvent;
+        private Event<ContentChangedEventHandler> contentChangedEvent;
+        private Event<ChildContentChangedEventHandler, ControlEventArgs> childContentChangedEvent;
+        private Event<ContentLocationChangedEventHandler> contentLocationChangedEvent;
+        private Event<ChildContentLocationChangedEventHandler, ControlEventArgs> childContentLocationChangedEvent;
         private Event<ContentSizeChangedEventHandler> contentSizeChangedEvent;
         private Event<ChildContentSizeChangedEventHandler, ControlEventArgs> childContentSizeChangedEvent;
+        private Event<TextChangedEventHandler> textChangedEvent;
         private Event<HScrollEventHandler, ScrollEventArgs> hscrollEvent;
         private Event<VScrollEventHandler, ScrollEventArgs> vscrollEvent;
         private Event<MouseWheelEventHandler, MouseWheelEventArgs> mouseWheelEvent;
+        private Event<TimerEventHandler, TimerEventArgs> timerEvent;
+        private Event<SetFocusEventHandler> setFocusEvent;
+        private Event<KillFocusEventHandler> killFocusEvent;
     }
 }

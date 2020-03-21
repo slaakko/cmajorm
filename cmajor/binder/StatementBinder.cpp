@@ -422,6 +422,10 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&destructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::destructorSymbol, "destructor symbol expected");
     DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(symbol);
+    if (destructorSymbol->MangledName() == U"destructor_Edge_int_E57D66B72F5D4567500CC822E3AB34B236FB95FB")
+    {
+        int x = 0;
+    }
     if (!dontCheckDuplicateFunctionSymbols)
     {
         destructorSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();

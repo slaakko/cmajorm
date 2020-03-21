@@ -27,7 +27,7 @@ public static class InterfaceParser
         Span specifierSpan;
         Span beginBraceSpan;
         Span endBraceSpan;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
         UniquePtr<IdentifierNode> id;
         Match match(false);
@@ -82,7 +82,7 @@ public static class InterfaceParser
                                                 Match* parentMatch11 = &match;
                                                 {
                                                     Match match = AttributeParser.Attributes(lexer);
-                                                    attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                                    attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                     if (match.hit)
                                                     {
                                                         *parentMatch11 = match;
@@ -384,7 +384,7 @@ public static class InterfaceParser
         #endif
         UniquePtr<MemberFunctionNode> memFun;
         Span s;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Node> returnType;
         UniquePtr<Value<ustring>> groupId;
         Match match(false);
@@ -426,7 +426,7 @@ public static class InterfaceParser
                                 Match* parentMatch7 = &match;
                                 {
                                     Match match = AttributeParser.Attributes(lexer);
-                                    attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                    attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                     if (match.hit)
                                     {
                                         *parentMatch7 = match;

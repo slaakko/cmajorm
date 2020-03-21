@@ -13,8 +13,8 @@ parser AttributeParser
 {
     uselexer CmajorLexer;
 
-    Attributes(var UniquePtr<Cm.Ast.Attributes> attributes) : Cm.Ast.Attributes*
-        ::= LBRACKET{ attributes.Reset(new Cm.Ast.Attributes()); } 
+    Attributes(var UniquePtr<Cm.Ast.AttributesNode> attributes) : Cm.Ast.AttributesNode*
+        ::= LBRACKET{ attributes.Reset(new Cm.Ast.AttributesNode()); } 
             (Attribute(attributes.Get()):attribute % COMMA)?
             RBRACKET!
         {
@@ -22,7 +22,7 @@ parser AttributeParser
         }
         ;
         
-    Attribute(Cm.Ast.Attributes* attributes, var Span s, var ustring name, var ustring value)
+    Attribute(Cm.Ast.AttributesNode* attributes, var Span s, var ustring name, var ustring value)
         ::= 
         (   empty{ value = u"true"; }
             ID{ s = span; name = lexer.GetMatch(span); }

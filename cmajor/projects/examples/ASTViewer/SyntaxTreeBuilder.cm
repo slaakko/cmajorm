@@ -214,6 +214,11 @@ class SyntaxTreeBuilder : Visitor
     public override void Visit(NamespaceNode& namespaceNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(NamespaceNode)));
+        if (namespaceNode.Id() != null)
+        {
+            namespaceNode.Id()->Accept(*this);
+            treeViewNode->AddChild(node.Release());
+        }
         int n = namespaceNode.Members().Count();
         for (int i = 0; i < n; ++i)
         {
@@ -1751,15 +1756,15 @@ class SyntaxTreeBuilder : Visitor
         node.Reset(treeViewNode.Release());
         node->SetData(&globalVariableNode);
     }
-    public override void Visit(Attribute& attribute)
+    public override void Visit(AttributeNode& attribute)
     {
-        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(Attribute)));
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(AttributeNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&attribute);
     }
-    public override void Visit(Attributes& attributes)
+    public override void Visit(AttributesNode& attributes)
     {
-        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(Attributes)));
+        UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(AttributesNode)));
         long n = attributes.GetAttributes().Count();
         for (long i = 0; i < n; ++i)
         {

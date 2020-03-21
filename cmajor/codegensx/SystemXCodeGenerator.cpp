@@ -57,6 +57,7 @@ void SystemXCodeGenerator::GenerateCode(void* boundCompileUnit)
 
 void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
+    boundCompileUnit.ResetCodeGenerated();
     std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".i");
     NativeModule nativeModule(emitter, intermediateFilePath);
     compileUnitId = boundCompileUnit.Id();
@@ -144,6 +145,8 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->CodeGenerated()) return;
+    functionSymbol->SetCodeGenerated();
     void* functionType = functionSymbol->IrType(*emitter);
     destructorCallGenerated = false;
     lastInstructionWasRet = false;

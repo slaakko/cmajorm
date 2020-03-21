@@ -25,7 +25,7 @@ public static class FunctionParser
         UniquePtr<FunctionNode> fun;
         Span s;
         Span specifierSpan;
-        UniquePtr<Cm.Ast.Attributes> attrs;
+        UniquePtr<Cm.Ast.AttributesNode> attrs;
         UniquePtr<Value<Cm.Ast.Specifiers>> specifiers;
         UniquePtr<Node> returnType;
         UniquePtr<Value<ustring>> functionGroupId;
@@ -79,7 +79,7 @@ public static class FunctionParser
                                             Match* parentMatch10 = &match;
                                             {
                                                 Match match = AttributeParser.Attributes(lexer);
-                                                attrs.Reset(cast<Cm.Ast.Attributes*>(match.value));
+                                                attrs.Reset(cast<Cm.Ast.AttributesNode*>(match.value));
                                                 if (match.hit)
                                                 {
                                                     *parentMatch10 = match;

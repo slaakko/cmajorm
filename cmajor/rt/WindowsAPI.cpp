@@ -564,6 +564,16 @@ void* WinGraphicsCreateDefaultStringFormat()
     return new StringFormat();
 }
 
+const void* WinGraphicsGetGenericDefaultStringFormat()
+{
+    return StringFormat::GenericDefault();
+}
+
+const void* WinGraphicsGetGenericTypographicStringFormat()
+{
+    return StringFormat::GenericTypographic();
+}
+
 void* WinGraphicsCreateStringFormat(int formatFlags, uint16_t languageId)
 {
     return new StringFormat(formatFlags, languageId);
@@ -666,6 +676,16 @@ int WinGraphicsMeasureStringFormatPoint(void* graphics, const char* str, void* f
     outW = boundingBox.Width;
     outH = boundingBox.Height;
     return status;
+}
+
+int WinGraphicsGetTextRenderingHint(void* graphics)
+{
+    return static_cast<Graphics*>(graphics)->GetTextRenderingHint();
+}
+
+int WinGraphicsSetTextRenderingHint(void* graphics, int textRenderingHint)
+{
+    return static_cast<Graphics*>(graphics)->SetTextRenderingHint(static_cast<TextRenderingHint>(textRenderingHint));
 }
 
 int WinGraphicsClear(void* graphics, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue)
@@ -1229,4 +1249,77 @@ int WinGetScrollPos(void* windowHandle, int nBar)
 bool WinShowScrollBar(void* windowHandle, int nBar, bool show)
 {
     return ShowScrollBar((HWND)windowHandle, nBar, show);
+}
+
+bool WinCreateCaret(void* windowHandle, void* bitmapHandle, int width, int height)
+{
+    return CreateCaret((HWND)windowHandle, (HBITMAP)bitmapHandle, width, height);
+}
+
+bool WinDestroyCaret()
+{
+    return DestroyCaret();
+}
+
+bool WinShowCaret(void* windowHandle)
+{
+    return ShowCaret((HWND)windowHandle);
+}
+
+bool WinHideCaret(void* windowHandle)
+{
+    return HideCaret((HWND)windowHandle);
+}
+
+bool WinGetCaretPos(int& x, int& y)
+{
+    POINT pt;
+    bool retval = GetCaretPos(&pt);
+    x = pt.x;
+    y = pt.y;
+    return retval;
+}
+
+bool WinSetCaretPos(int x, int y)
+{
+    return SetCaretPos(x, y);
+}
+
+bool WinSetTimer(void* windowHandle, uint32_t timerId, uint32_t elapse)
+{
+    int retval = SetTimer((HWND)windowHandle, timerId, elapse, nullptr);
+    return retval != 0;
+}
+
+bool WinKillTimer(void* windowHandle, uint32_t timerId)
+{
+    return KillTimer((HWND)windowHandle, timerId);
+}
+
+bool WinRegOpenCurrentUser(void** result)
+{
+    LSTATUS status = RegOpenCurrentUser(KEY_READ, (PHKEY)result);
+    return status == ERROR_SUCCESS;
+}
+
+bool WinRegCloseKey(void* key)
+{
+    LSTATUS status = RegCloseKey((HKEY)key);
+    return status == ERROR_SUCCESS;
+}
+
+bool WinRegGetDWordValue(void* key, const char* subKey, const char* valueName, uint32_t& value)
+{
+    std::u16string subkeyStr = ToUtf16(subKey);
+    std::u16string valueNameStr = ToUtf16(valueName);
+    uint32_t flags = RRF_RT_REG_DWORD;
+    uint32_t type = 0u;
+    uint32_t data = 0u;
+    uint32_t dataSize = 4u;
+    LSTATUS status = RegGetValueW((HKEY)key, (LPCWSTR)subkeyStr.c_str(), (LPCWSTR)valueNameStr.c_str(), flags, (LPDWORD)&type, &data, (LPDWORD)&dataSize);
+    if (status == ERROR_SUCCESS)
+    {
+        value = data;
+    }
+    return status == ERROR_SUCCESS;
 }

@@ -11,4 +11,8 @@ BoundNode::BoundNode(Module* module_, const Span& span_, BoundNodeType boundNode
 {
 }
 
+void BoundNode::ResetCodeGenerated()
+{
+}
+
 } } // namespace cmajor::binder

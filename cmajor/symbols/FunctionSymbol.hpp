@@ -85,7 +85,8 @@ enum class FunctionSymbolFlags : uint32_t
     includeConstraint = 1 << 16,
     copy = 1 << 17,
     varArg = 1 << 18,
-    winapi = 1 << 19
+    winapi = 1 << 19,
+    codeGenerated = 1 << 20
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -96,6 +97,11 @@ inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFla
 inline FunctionSymbolFlags operator&(FunctionSymbolFlags left, FunctionSymbolFlags right)
 {
     return FunctionSymbolFlags(uint32_t(left) & uint32_t(right));
+}
+
+inline FunctionSymbolFlags operator~(FunctionSymbolFlags flag)
+{
+    return FunctionSymbolFlags(~uint32_t(flag));
 }
 
 std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags);
@@ -200,10 +206,14 @@ public:
     void SetCopy() { SetFlag(FunctionSymbolFlags::copy); }
     bool IsVarArg() const { return GetFlag(FunctionSymbolFlags::varArg); }
     void SetVarArg() { SetFlag(FunctionSymbolFlags::varArg); }
+    bool CodeGenerated() const { return GetFlag(FunctionSymbolFlags::codeGenerated); }
+    void SetCodeGenerated() { SetFlag(FunctionSymbolFlags::codeGenerated); }
+    void ResetCodeGenerated() { ResetFlag(FunctionSymbolFlags::codeGenerated); }
     virtual bool DontThrow() const { return IsNothrow() || IsBasicTypeOperation(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
     void SetFlag(FunctionSymbolFlags flag) { flags = flags | flag; }
+    void ResetFlag(FunctionSymbolFlags flag) { flags = flags & ~flag; }
     void ComputeMangledName() override;
     int Arity() const { return parameters.size(); }
     const std::vector<ParameterSymbol*>& Parameters() const { return parameters; }

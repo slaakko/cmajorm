@@ -886,4 +886,12 @@ void BoundCompileUnit::AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& funct
     functionSymbols.push_back(std::move(functionSymbol));
 }
 
+void BoundCompileUnit::ResetCodeGenerated()
+{
+    for (std::unique_ptr<BoundNode>& node : boundNodes)
+    {
+        node->ResetCodeGenerated();
+    }
+}
+
 } } // namespace cmajor::binder

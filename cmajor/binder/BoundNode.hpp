@@ -41,6 +41,7 @@ public:
     const Span& GetSpan() const { return span; }
     BoundNodeType GetBoundNodeType() const { return boundNodeType; }
     Module* GetModule() const { return module; }
+    virtual void ResetCodeGenerated();
 private:
     Module* module;
     Span span;

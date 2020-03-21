@@ -683,8 +683,8 @@ namespace System.Windows
 
     public class MenuBox : Control
     {
-        public MenuBox(MenuBar* menuBar_) : base("System.Windows.MenuBox", DefaultWindowClassStyle(), cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_CLIPSIBLINGS),
-            DefaultExtendedWindowStyle(), Color.White(), "menuBox", Point(), Size(), Dock.none, Anchors.none), menuBar(menuBar_)
+        public MenuBox(MenuBar* menuBar_) : base("System.Windows.MenuBox", DefaultWindowClassStyle(), HiddenChildWindowStyle(), DefaultExtendedWindowStyle(),
+            Color.White(), "menuBox", Point(), Size(), Dock.none, Anchors.none), menuBar(menuBar_)
         {
         }
         public override void PrintWindowTree(int level)

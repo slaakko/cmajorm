@@ -1,0 +1,972 @@
+using System;
+using System.Collections;
+using System.Windows;
+using System.Lex;
+using Cm.Ast;
+
+class SyntaxNodeAttributeExtractor : Visitor
+{
+    public SyntaxNodeAttributeExtractor() : s(), span()
+    {
+    }
+    private void AddLineAttribute()
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append("\n");
+        }
+        s.Append("line: ").Append(System.ToString(span.line));
+    }
+    private void AddSpecifiersAttribute()
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append("\n");
+        }
+        s.Append("specifiers: ").Append(SpecifierStr(specifiers));
+    }
+    private void AddGroupIdAttribute()
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append("\n");
+        }
+        s.Append("group ID: ").Append(groupId);
+    }
+    private void AddTextAttribute()
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append("\n");
+        }
+        s.Append("text: ").Append(groupId);
+    }
+    private void AddLabelAttribute()
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append("\n");
+        }
+        s.Append("label: ").Append(label);
+    }
+    private void AddTargetAttribute()
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append("\n");
+        }
+        s.Append("target: ").Append(target);
+    }
+    private void AddSymbolAttribute()
+    {
+        if (!s.IsEmpty())
+        {
+            s.Append("\n");
+        }
+        s.Append("symbol: ").Append(symbol);
+    }
+    public override void Visit(BoolNode& boolNode)
+    {
+        span = boolNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(SByteNode& sbyteNode)
+    {
+        span = sbyteNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ByteNode& byteNode)
+    {
+        span = byteNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ShortNode& shortNode)
+    {
+        span = shortNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(UShortNode& ushortNode)
+    {
+        span = ushortNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(IntNode& intNode)
+    {
+        span = intNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(UIntNode& uintNode)
+    {
+        span = uintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(LongNode& longNode)
+    {
+        span = longNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ULongNode& ulongNode)
+    {
+        span = ulongNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(FloatNode& floatNode)
+    {
+        span = floatNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DoubleNode& doubleNode)
+    {
+        span = doubleNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(CharNode& charNode)
+    {
+        span = charNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(WCharNode& wcharNode)
+    {
+        span = wcharNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(UCharNode& ucharNode)
+    {
+        span = ucharNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(VoidNode& voidNode)
+    {
+        span = voidNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(BooleanLiteralNode& booleanLiteralNode)
+    {
+        span = booleanLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(booleanLiteralNode.Value()));
+    }
+    public override void Visit(SByteLiteralNode& sbyteLiteralNode)
+    {
+        span = sbyteLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(sbyteLiteralNode.Value()));
+    }
+    public override void Visit(ByteLiteralNode& byteLiteralNode)
+    {
+        span = byteLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(byteLiteralNode.Value()));
+    }
+    public override void Visit(ShortLiteralNode& shortLiteralNode)
+    {
+        span = shortLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(shortLiteralNode.Value()));
+    }
+    public override void Visit(UShortLiteralNode& ushortLiteralNode)
+    {
+        span = ushortLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(ushortLiteralNode.Value()));
+    }
+    public override void Visit(IntLiteralNode& intLiteralNode)
+    {
+        span = intLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(intLiteralNode.Value()));
+    }
+    public override void Visit(UIntLiteralNode& uintLiteralNode)
+    {
+        span = uintLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(uintLiteralNode.Value()));
+    }
+    public override void Visit(LongLiteralNode& longLiteralNode)
+    {
+        span = longLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(longLiteralNode.Value()));
+    }
+    public override void Visit(ULongLiteralNode& ulongLiteralNode)
+    {
+        span = ulongLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(ulongLiteralNode.Value()));
+    }
+    public override void Visit(FloatLiteralNode& floatLiteralNode)
+    {
+        span = floatLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(floatLiteralNode.Value()));
+    }
+    public override void Visit(DoubleLiteralNode& doubleLiteralNode)
+    {
+        span = doubleLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(doubleLiteralNode.Value()));
+    }
+    public override void Visit(CharLiteralNode& charLiteralNode)
+    {
+        span = charLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(charLiteralNode.Value()));
+    }
+    public override void Visit(WCharLiteralNode& wcharLiteralNode)
+    {
+        span = wcharLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(wcharLiteralNode.Value()));
+    }
+    public override void Visit(UCharLiteralNode& ucharLiteralNode)
+    {
+        span = ucharLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(ucharLiteralNode.Value()));
+    }
+    public override void Visit(StringLiteralNode& stringLiteralNode)
+    {
+        span = stringLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.MakeStringLiteral(stringLiteralNode.Value()));
+    }
+    public override void Visit(WStringLiteralNode& wstringLiteralNode)
+    {
+        span = wstringLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.MakeStringLiteral(ToUtf8(wstringLiteralNode.Value())));
+    }
+    public override void Visit(UStringLiteralNode& ustringLiteralNode)
+    {
+        span = ustringLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.MakeStringLiteral(ToUtf8(ustringLiteralNode.Value())));
+    }
+    public override void Visit(NullLiteralNode& nullLiteralNode)
+    {
+        span = nullLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append("null");
+    }
+    public override void Visit(ArrayLiteralNode& arrayLiteralNode)
+    {
+        span = arrayLiteralNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(StructuredLiteralNode& structuredLiteralNode)
+    {
+        span = structuredLiteralNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(UuidLiteralNode& uuidLiteralNode)
+    {
+        span = uuidLiteralNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nvalue: ").Append(System.ToString(uuidLiteralNode.GetUuid()));
+    }
+    public override void Visit(CompileUnitNode& compileUnitNode)
+    {
+        span = compileUnitNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(NamespaceNode& namespaceNode)
+    {
+        span = namespaceNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(AliasNode& aliasNode)
+    {
+        span = aliasNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(NamespaceImportNode& namespaceImportNode)
+    {
+        span = namespaceImportNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(IdentifierNode& identifierNode)
+    {
+        span = identifierNode.GetSpan();
+        AddLineAttribute();
+        s.Append("\nid: ").Append(ToUtf8(identifierNode.Str()));
+    }
+    public override void Visit(TemplateIdNode& templateIdNode)
+    {
+        span = templateIdNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(FunctionNode& functionNode)
+    {
+        span = functionNode.GetSpan();
+        AddLineAttribute();
+        specifiers = functionNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+        groupId = ToUtf8(functionNode.GroupId());
+        AddGroupIdAttribute();
+    }
+    public override void Visit(ClassNode& classNode)
+    {
+        span = classNode.GetSpan();
+        AddLineAttribute();
+        specifiers = classNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(ThisInitializerNode& thisInitializerNode)
+    {
+        span = thisInitializerNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(BaseInitializerNode& baseInitializerNode)
+    {
+        span = baseInitializerNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(MemberInitializerNode& memberInitializerNode)
+    {
+        span = memberInitializerNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(StaticConstructorNode& staticConstructorNode)
+    {
+        span = staticConstructorNode.GetSpan();
+        AddLineAttribute();
+        specifiers = staticConstructorNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(ConstructorNode& constructorNode)
+    {
+        span = constructorNode.GetSpan();
+        AddLineAttribute();
+        specifiers = constructorNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(DestructorNode& destructorNode)
+    {
+        span = destructorNode.GetSpan();
+        AddLineAttribute();
+        specifiers = destructorNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(MemberFunctionNode& memberFunctionNode)
+    {
+        span = memberFunctionNode.GetSpan();
+        AddLineAttribute();
+        specifiers = memberFunctionNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(ConversionFunctionNode& conversionFunctionNode)
+    {
+        span = conversionFunctionNode.GetSpan();
+        AddLineAttribute();
+        specifiers = conversionFunctionNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(MemberVariableNode& memberVariableNode)
+    {
+        span = memberVariableNode.GetSpan();
+        AddLineAttribute();
+        specifiers = memberVariableNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(InterfaceNode& interfaceNode)
+    {
+        span = interfaceNode.GetSpan();
+        AddLineAttribute();
+        specifiers = interfaceNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(DelegateNode& delegateNode)
+    {
+        span = delegateNode.GetSpan();
+        AddLineAttribute();
+        specifiers = delegateNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(ClassDelegateNode& classDelegateNode)
+    {
+        span = classDelegateNode.GetSpan();
+        AddLineAttribute();
+        specifiers = classDelegateNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
+    {
+        span = parenthesizedConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode)
+    {
+        span = disjunctiveConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode)
+    {
+        span = conjunctiveConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(WhereConstraintNode& whereConstraintNode)
+    {
+        span = whereConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(PredicateConstraintNode& predicateConstraintNode)
+    {
+        span = predicateConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(IsConstraintNode& isConstraintNode)
+    {
+        span = isConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(MultiParamConstraintNode& multiParamConstraintNode)
+    {
+        span = multiParamConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(TypeNameConstraintNode& typeNameConstraintNode)
+    {
+        span = typeNameConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConstructorConstraintNode& constructorConstraintNode)
+    {
+        span = constructorConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DestructorConstraintNode& destructorConstraintNode)
+    {
+        span = destructorConstraintNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode)
+    {
+        span = memberFunctionConstraintNode.GetSpan();
+        AddLineAttribute();
+        groupId = ToUtf8(memberFunctionConstraintNode.GroupId());
+        AddGroupIdAttribute();
+    }
+    public override void Visit(FunctionConstraintNode& functionConstraintNode)
+    {
+        span = functionConstraintNode.GetSpan();
+        AddLineAttribute();
+        groupId = ToUtf8(functionConstraintNode.GroupId());
+        AddGroupIdAttribute();
+    }
+    public override void Visit(AxiomStatementNode& axiomStatementNode)
+    {
+        span = axiomStatementNode.GetSpan();
+        AddLineAttribute();
+        text = axiomStatementNode.ToString();
+        AddTextAttribute();
+    }
+    public override void Visit(AxiomNode& axiomNode)
+    {
+        span = axiomNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConceptIdNode& conceptIdNode)
+    {
+        span = conceptIdNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConceptNode& conceptNode)
+    {
+        span = conceptNode.GetSpan();
+        AddLineAttribute();
+        specifiers = conceptNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(LabelNode& labelNode)
+    {
+        span = labelNode.GetSpan();
+        AddLineAttribute();
+        label = ToUtf8(labelNode.Label());
+        AddLabelAttribute();
+    }
+    public override void Visit(LabeledStatementNode& labeledStatementNode)
+    {
+        span = labeledStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(CompoundStatementNode& compoundStatementNode)
+    {
+        span = compoundStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ReturnStatementNode& returnStatementNode)
+    {
+        span = returnStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(IfStatementNode& ifStatementNode)
+    {
+        span = ifStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(WhileStatementNode& whileStatementNode)
+    {
+        span = whileStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DoStatementNode& doStatementNode)
+    {
+        span = doStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ForStatementNode& forStatementNode)
+    {
+        span = forStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(BreakStatementNode& breakStatementNode)
+    {
+        span = breakStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ContinueStatementNode& continueStatementNode)
+    {
+        span = continueStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(GotoStatementNode& gotoStatementNode)
+    {
+        span = gotoStatementNode.GetSpan();
+        AddLineAttribute();
+        target = ToUtf8(gotoStatementNode.Target());
+        AddTargetAttribute();
+    }
+    public override void Visit(ConstructionStatementNode& constructionStatementNode)
+    {
+        span = constructionStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DeleteStatementNode& deleteStatementNode)
+    {
+        span = deleteStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DestroyStatementNode& destroyStatementNode)
+    {
+        span = destroyStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(AssignmentStatementNode& assignmentStatementNode)
+    {
+        span = assignmentStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ExpressionStatementNode& expressionStatementNode)
+    {
+        span = expressionStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(EmptyStatementNode& emptyStatementNode)
+    {
+        span = emptyStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(RangeForStatementNode& rangeForStatementNode)
+    {
+        span = rangeForStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(SwitchStatementNode& switchStatementNode)
+    {
+        span = switchStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(CaseStatementNode& caseStatementNode)
+    {
+        span = caseStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DefaultStatementNode& defaultStatementNode)
+    {
+        span = defaultStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(GotoCaseStatementNode& gotoCaseStatementNode)
+    {
+        span = gotoCaseStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
+    {
+        span = gotoDefaultStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ThrowStatementNode& throwStatementNode)
+    {
+        span = throwStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(TryStatementNode& tryStatementNode)
+    {
+        span = tryStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(CatchNode& catchNode)
+    {
+        span = catchNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(AssertStatementNode& assertStatementNode)
+    {
+        span = assertStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode)
+    {
+        span = conditionalCompilationPartNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode)
+    {
+        span = conditionalCompilationDisjunctionNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode)
+    {
+        span = conditionalCompilationConjunctionNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode)
+    {
+        span = conditionalCompilationNotNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
+    {
+        span = conditionalCompilationPrimaryNode.GetSpan();
+        AddLineAttribute();
+        symbol = ToUtf8(conditionalCompilationPrimaryNode.Symbol());
+        AddSymbolAttribute();
+    }
+    public override void Visit(ParenthesizedConditionalCompilationExpressionNode& parenthesizeCondCompExprNode)
+    {
+        span = parenthesizeCondCompExprNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
+    {
+        span = conditionalCompilationStatementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(TypedefNode& typedefNode)
+    {
+        span = typedefNode.GetSpan();
+        AddLineAttribute();
+        specifiers = typedefNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(ConstantNode& constantNode)
+    {
+        span = constantNode.GetSpan();
+        AddLineAttribute();
+        specifiers = constantNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(EnumTypeNode& enumTypeNode)
+    {
+        span = enumTypeNode.GetSpan();
+        AddLineAttribute();
+        specifiers = enumTypeNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(EnumConstantNode& enumConstantNode)
+    {
+        span = enumConstantNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ParameterNode& parameterNode)
+    {
+        span = parameterNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(TemplateParameterNode& templateParameterNode)
+    {
+        span = templateParameterNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConstNode& constNode)
+    {
+        span = constNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(LValueRefNode& lvalueRefNode)
+    {
+        span = lvalueRefNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(RValueRefNode& rvalueRefNode)
+    {
+        span = rvalueRefNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(PointerNode& pointerNode)
+    {
+        span = pointerNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ArrayNode& arrayNode)
+    {
+        span = arrayNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DotNode& dotNode)
+    {
+        span = dotNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ArrowNode& arrowNode)
+    {
+        span = arrowNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(EquivalenceNode& equivalenceNode)
+    {
+        span = equivalenceNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ImplicationNode& implicationNode)
+    {
+        span = implicationNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DisjunctionNode& disjunctionNode)
+    {
+        span = disjunctionNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConjunctionNode& conjunctionNode)
+    {
+        span = conjunctionNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(BitOrNode& bitOrNode)
+    {
+        span = bitOrNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(BitXorNode& bitXorNode)
+    {
+        span = bitXorNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(BitAndNode& bitAndNode)
+    {
+        span = bitAndNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(EqualNode& equalNode)
+    {
+        span = equalNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(NotEqualNode& notEqualNode)
+    {
+        span = notEqualNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(LessNode& lessNode)
+    {
+        span = lessNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(GreaterNode& greaterNode)
+    {
+        span = greaterNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(LessOrEqualNode& lessOrEqualNode)
+    {
+        span = lessOrEqualNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(GreaterOrEqualNode& greaterOrEqualNode)
+    {
+        span = greaterOrEqualNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ShiftLeftNode& shiftLeftNode)
+    {
+        span = shiftLeftNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ShiftRightNode& shiftRightNode)
+    {
+        span = shiftRightNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(AddNode& addNode)
+    {
+        span = addNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(SubNode& subNode)
+    {
+        span = subNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(MulNode& mulNode)
+    {
+        span = mulNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DivNode& divNode)
+    {
+        span = divNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(RemNode& remNode)
+    {
+        span = remNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(NotNode& notNode)
+    {
+        span = notNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(UnaryPlusNode& unaryPlusNode)
+    {
+        span = unaryPlusNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(UnaryMinusNode& unaryMinusNode)
+    {
+        span = unaryMinusNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(PrefixIncrementNode& prefixIncrementNode)
+    {
+        span = prefixIncrementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(PrefixDecrementNode& prefixDecrementNode)
+    {
+        span = prefixDecrementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(DerefNode& derefNode)
+    {
+        span = derefNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(AddrOfNode& addrOfNode)
+    {
+        span = addrOfNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ComplementNode& complementNode)
+    {
+        span = complementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(IsNode& isNode)
+    {
+        span = isNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(AsNode& asNode)
+    {
+        span = asNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(IndexingNode& indexingNode)
+    {
+        span = indexingNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(InvokeNode& invokeNode)
+    {
+        span = invokeNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(PostfixIncrementNode& postfixIncrementNode)
+    {
+        span = postfixIncrementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(PostfixDecrementNode& postfixDecrementNode)
+    {
+        span = postfixDecrementNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(SizeOfNode& sizeOfNode)
+    {
+        span = sizeOfNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(TypeNameNode& typeNameNode)
+    {
+        span = typeNameNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(TypeIdNode& typeIdNode)
+    {
+        span = typeIdNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(CastNode& castNode)
+    {
+        span = castNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ConstructNode& constructNode)
+    {
+        span = constructNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(NewNode& newNode)
+    {
+        span = newNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ThisNode& thisNode)
+    {
+        span = thisNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(BaseNode& baseNode)
+    {
+        span = baseNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
+    {
+        span = parenthesizedExpressionNode.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(GlobalVariableNode& globalVariableNode)
+    {
+        span = globalVariableNode.GetSpan();
+        AddLineAttribute();
+        specifiers = globalVariableNode.GetSpecifiers();
+        AddSpecifiersAttribute();
+    }
+    public override void Visit(AttributeNode& attribute)
+    {
+        span = attribute.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(AttributesNode& attributes)
+    {
+        span = attributes.GetSpan();
+        AddLineAttribute();
+    }
+    public override void Visit(CommentNode& commentNode)
+    {
+        span = commentNode.GetSpan();
+        AddLineAttribute();
+    }
+    public string s;
+    public Span span;
+    public Specifiers specifiers;
+    public string groupId;
+    public string text;
+    public string label;
+    public string target;
+    public string symbol;
+}

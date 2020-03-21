@@ -504,20 +504,34 @@ std::string Format(const std::string& s, int width, FormatWidth fw, FormatJustif
 
 std::string Format(const std::string& s, int width, FormatWidth fw, FormatJustify justify, char fillChar)
 {
+    std::string result;
+    int m = static_cast<int>(s.length());
     if (fw == FormatWidth::min)
     {
-        width = std::max(width, int(s.length()));
+        width = std::max(width, m);
     }
-    std::string result(width, fillChar);
-    int n = std::min(int(s.length()), width);
-    int offset = 0;
+    else if (fw == FormatWidth::exact)
+    {
+        m = std::min(m, width);
+    }
+    int n = std::max(0, width - m);
     if (justify == FormatJustify::right)
     {
-        offset = width - n;
+        for (int i = 0; i < n; ++i)
+        {
+            result.append(1, fillChar);
+        }
     }
-    for (int i = 0; i < n; ++i)
+    for (int i = 0; i < m; ++i)
     {
-        result[i + offset] = s[i];
+        result.append(1, s[i]);
+    }
+    if (justify == FormatJustify::left)
+    {
+        for (int i = 0; i < n; ++i)
+        {
+            result.append(1, fillChar);
+        }
     }
     return result;
 }

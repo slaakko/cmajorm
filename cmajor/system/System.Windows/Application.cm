@@ -90,6 +90,16 @@ namespace System.Windows
         {
             logView = logView_;
         }
+        public static Control* GetFocusedControl() const
+        {
+            void* focusedWindowHandle = WinGetFocus();
+            if (focusedWindowHandle == null)
+            {
+                return null;
+            }
+            Control* focusedControl = windowManager.GetWindow(focusedWindowHandle);
+            return focusedControl;
+        }
         private static WindowManager windowManager;
         private static ResourceManager resourceManager;
         private static LogView* logView;

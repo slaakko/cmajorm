@@ -44,6 +44,24 @@ namespace System.Windows
         {
             return this;
         }
+        protected override void OnChildContentLocationChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentLocationChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentLocationChanged(args);
+            }
+        }
+        protected override void OnChildContentChanged(ControlEventArgs& args)
+        {
+            base->OnChildContentChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentChanged(args);
+            }
+        }
         protected override void OnChildContentSizeChanged(ControlEventArgs& args)
         {
             base->OnChildContentSizeChanged(args);
@@ -130,6 +148,7 @@ namespace System.Windows
                 }
                 case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK:
                 case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL:
+                case WM_SETFOCUS: case WM_KILLFOCUS: case WM_TIMER:
                 {
                     return base->ProcessMessage(message);
                 }

@@ -13,7 +13,7 @@ namespace Cm.Ast
             base(NodeType.classNode, span_), specifiers(Specifiers.none), id(), templateParameters(), baseClassOrInterfaces(), members()
         {
         }
-        public nothrow ClassNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_) :
+        public nothrow ClassNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_, AttributesNode* attributes_) :
             base(NodeType.classNode, span_), specifiers(specifiers_), id(id_), templateParameters(), baseClassOrInterfaces(), members(), attributes(attributes_)
         {
         }
@@ -45,7 +45,7 @@ namespace Cm.Ast
         {
             return members;
         }
-        public nothrow Attributes* GetAttributes() const
+        public nothrow AttributesNode* GetAttributes() const
         {
             return attributes.Get();
         }
@@ -180,10 +180,10 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            Attributes* clonedAttributes = null;
+            AttributesNode* clonedAttributes = null;
             if (!attributes.IsNull())
             {
-                clonedAttributes = attributes->Clone();
+                clonedAttributes = cast<AttributesNode*>(attributes->Clone(cloneContext));
             }
             ClassNode* clone = new ClassNode(GetSpan(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
             if (!cloneContext.InstantiateClassNode())
@@ -243,7 +243,7 @@ namespace Cm.Ast
             bool hasAttributes = reader.GetBinaryReader().ReadBool();
             if (hasAttributes)
             {
-                attributes.Reset(new Attributes());
+                attributes.Reset(new AttributesNode());
                 attributes->Read(reader);
             }
             specifiers = reader.ReadSpecifiers();
@@ -275,7 +275,7 @@ namespace Cm.Ast
         private NodeList<Node> baseClassOrInterfaces;
         private UniquePtr<WhereConstraintNode> constraint;
         private NodeList<Node> members;
-        private UniquePtr<Attributes> attributes;
+        private UniquePtr<AttributesNode> attributes;
     }
     public abstract class InitializerNode : Node
     {
@@ -399,7 +399,7 @@ namespace Cm.Ast
             base(NodeType.staticConstructorNode, span_, Specifiers.none, null, u"@static_constructor", null), initializers()
         {
         }
-        public nothrow StaticConstructorNode(const System.Lex.Span& span_, Specifiers specifiers_, Attributes* attributes_) :
+        public nothrow StaticConstructorNode(const System.Lex.Span& span_, Specifiers specifiers_, AttributesNode* attributes_) :
             base(NodeType.staticConstructorNode, span_, specifiers_, null, u"@static_constructor", attributes_), initializers()
         {
         }
@@ -458,7 +458,7 @@ namespace Cm.Ast
             base(NodeType.constructorNode, span_, Specifiers.none, null, u"@constructor", null), initializers()
         {
         }
-        public nothrow ConstructorNode(const System.Lex.Span& span_, Specifiers specifiers_, Attributes* attributes_) :
+        public nothrow ConstructorNode(const System.Lex.Span& span_, Specifiers specifiers_, AttributesNode* attributes_) :
             base(NodeType.constructorNode, span_, specifiers_, null, u"@constructor", attributes_), initializers()
         {
         }
@@ -517,7 +517,7 @@ namespace Cm.Ast
             base(NodeType.destructorNode, span_)
         {
         }
-        public nothrow DestructorNode(const System.Lex.Span& span_, Specifiers specifiers_, Attributes* attributes_) :
+        public nothrow DestructorNode(const System.Lex.Span& span_, Specifiers specifiers_, AttributesNode* attributes_) :
             base(NodeType.destructorNode, span_, specifiers_, null, u"@destructor", attributes_)
         {
         }
@@ -558,7 +558,7 @@ namespace Cm.Ast
             base(NodeType.memberFunctionNode, span_)
         {
         }
-        public nothrow MemberFunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, Attributes* attributes_) :
+        public nothrow MemberFunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, AttributesNode* attributes_) :
             base(NodeType.memberFunctionNode, span_, specifiers_, returnTypeExpr_, groupId_, attributes_)
         {
         }
@@ -591,7 +591,7 @@ namespace Cm.Ast
             base(NodeType.conversionFunctionNode, span_)
         {
         }
-        public nothrow ConversionFunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, Attributes* attributes_) :
+        public nothrow ConversionFunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, AttributesNode* attributes_) :
             base(NodeType.conversionFunctionNode, span_, specifiers_, returnTypeExpr_, u"@operator_conv", attributes_)
         {
         }
@@ -624,7 +624,7 @@ namespace Cm.Ast
             base(NodeType.memberVariableNode, span_), specifiers()
         {
         }
-        public nothrow MemberVariableNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Attributes* attributes_) :
+        public nothrow MemberVariableNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, AttributesNode* attributes_) :
             base(NodeType.memberVariableNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), attributes(attributes_)
         {
             typeExpr->SetParent(this);
@@ -638,7 +638,7 @@ namespace Cm.Ast
         {
             return id.Get();
         }
-        public nothrow Attributes* GetAttributes() const
+        public nothrow AttributesNode* GetAttributes() const
         {
             return attributes.Get();
         }
@@ -656,10 +656,10 @@ namespace Cm.Ast
         }
         public override Node* Clone(CloneContext& cloneContext) const
         {
-            Attributes* clonedAttributes = null;
+            AttributesNode* clonedAttributes = null;
             if (!attributes.IsNull())
             {
-                clonedAttributes = attributes->Clone();
+                clonedAttributes = cast<AttributesNode*>(attributes->Clone(cloneContext));
             }
             MemberVariableNode* clone = new MemberVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
             clone->SetSpecifierSpan(specifierSpan);
@@ -689,7 +689,7 @@ namespace Cm.Ast
             bool hasAttributes = reader.GetBinaryReader().ReadBool();
             if (hasAttributes)
             {
-                attributes.Reset(new Attributes());
+                attributes.Reset(new AttributesNode());
                 attributes->Read(reader);
             }
             specifiers = reader.ReadSpecifiers();
@@ -703,6 +703,6 @@ namespace Cm.Ast
         private System.Lex.Span specifierSpan;
         private UniquePtr<Node> typeExpr;
         private UniquePtr<IdentifierNode> id;
-        private UniquePtr<Attributes> attributes;
+        private UniquePtr<AttributesNode> attributes;
     }
 } // namespace Cm.Ast

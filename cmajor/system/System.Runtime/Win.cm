@@ -71,6 +71,8 @@ public extern cdecl nothrow void WinGraphicsDeleteFont(void* font);
 public extern cdecl nothrow float WinGraphicsGetFontHeight(void* font, const void* graphics);
 public extern cdecl nothrow int WinGraphicsFontGetLastStatus(void* font);
 public extern cdecl nothrow void* WinGraphicsCreateDefaultStringFormat();
+public extern cdecl nothrow const void* WinGraphicsGetGenericDefaultStringFormat();
+public extern cdecl nothrow const void* WinGraphicsGetGenericTypographicStringFormat();
 public extern cdecl nothrow void* WinGraphicsCreateStringFormat(int formatFlags, ushort languageId);
 public extern cdecl nothrow void* WinGraphicsCloneStringFormat(void* stringFormat);
 public extern cdecl nothrow void WinGraphicsDeleteStringFormat(void* stringFormat);
@@ -89,6 +91,8 @@ public extern cdecl nothrow int WinGraphicsMeasureStringFormatRect(void* graphic
     float& outX, float& outY, float& outW, float& outH, int* codePointsFitted, int* linesFilled);
 public extern cdecl nothrow int WinGraphicsMeasureStringFormatPoint(void* graphics, const char* str, void* font, float x, float y, void* format,
     float& outX, float& outY, float& outW, float& outH);
+public extern cdecl nothrow int WinGraphicsGetTextRenderingHint(void* graphics);
+public extern cdecl nothrow int WinGraphicsSetTextRenderingHint(void* graphics, int textRenderingHint);
 public extern cdecl nothrow int WinGraphicsClear(void* graphics, byte alpha, byte red, byte green, byte blue);
 public extern cdecl nothrow int WinGraphicsDrawRectangle(void* graphics, void* pen, int x, int y, int w, int h);
 public extern cdecl nothrow int WinGraphicsDrawRectangleF(void* graphics, void* pen, float x, float y, float w, float h);
@@ -184,3 +188,14 @@ public extern cdecl nothrow bool WinScrollWindow(void* windowHandle, int xAmount
 public extern cdecl nothrow bool WinGetScrollInfo(void* windowHandle, int nBar, uint& nPage, int& nPos, int& nMin, int& nMax, int& nTrackPos);
 public extern cdecl nothrow int WinSetScrollInfo(void* windowHandle, int nBar, uint fMask, bool redraw, uint nPage, int nPos, int nMin, int nMax);
 public extern cdecl nothrow bool WinShowScrollBar(void* windowHandle, int nBar, bool show);
+public extern cdecl nothrow bool WinCreateCaret(void* windowHandle, void* bitmapHandle, int width, int height);
+public extern cdecl nothrow bool WinDestroyCaret();
+public extern cdecl nothrow bool WinShowCaret(void* windowHandle);
+public extern cdecl nothrow bool WinHideCaret(void* windowHandle);
+public extern cdecl nothrow bool WinGetCaretPos(int& x, int& y);
+public extern cdecl nothrow bool WinSetCaretPos(int x, int y);
+public extern cdecl nothrow bool WinSetTimer(void* windowHandle, uint timerId, uint elapseMs);
+public extern cdecl nothrow bool WinKillTimer(void* windowHandle, uint timerId);
+public extern cdecl nothrow bool WinRegOpenCurrentUser(void** result);
+public extern cdecl nothrow bool WinRegCloseKey(void* key);
+public extern cdecl nothrow bool WinRegGetDWordValue(void* key, const char* subKey, const char* valueName, uint& value);

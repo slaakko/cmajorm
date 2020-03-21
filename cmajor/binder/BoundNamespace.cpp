@@ -35,4 +35,12 @@ void BoundNamespace::AddMember(std::unique_ptr<BoundNode>&& member)
     members.push_back(std::move(member));
 }
 
+void BoundNamespace::ResetCodeGenerated()
+{
+    for (std::unique_ptr<BoundNode>& member : members)
+    {
+        member->ResetCodeGenerated();
+    }
+}
+
 } } // namespace cmajor::binder

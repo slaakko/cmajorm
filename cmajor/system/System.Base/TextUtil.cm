@@ -332,20 +332,34 @@ namespace System
 
     public nothrow string Format(const string& s, int width, FormatWidth fw, FormatJustify justify, char fillChar)
     {
+        string result;
+        int m = cast<int>(s.Length());
         if (fw == FormatWidth.min)
         {
-            width = Max(width, cast<int>(s.Length()));
+            width = Max(width, m);
         }
-        string result(fillChar, width);
-        int n = Min(cast<int>(s.Length()), width);
-        int offset = 0;
+        else if (fw == FormatWidth.exact)
+        {
+            m = Min(m, width);
+        }
+        int n = Max(0, width - m);
         if (justify == FormatJustify.right)
         {
-            offset = width - n;
+            for (int i = 0; i < n; ++i)
+            {
+                result.Append(fillChar);
+            }
         }
-        for (int i = 0; i < n; ++i)
+        for (int i = 0; i < m; ++i)
         {
-            result[i + offset] = s[i];
+            result.Append(s[i]);
+        }
+        if (justify == FormatJustify.left)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                result.Append(fillChar);
+            }
         }
         return result;
     }
@@ -365,22 +379,36 @@ namespace System
         return Format(s, width, fw, justify, ' ');
     }
 
-    public nothrow ustring Format(const ustring& s, int width, FormatWidth fw, FormatJustify justify, uchar fillChar)
+    public nothrow ustring Format(const ustring& s, int width, FormatWidth fw, FormatJustify justify, char fillChar)
     {
+        ustring result;
+        int m = cast<int>(s.Length());
         if (fw == FormatWidth.min)
         {
-            width = Max(width, cast<int>(s.Length()));
+            width = Max(width, m);
         }
-        ustring result(fillChar, width);
-        int n = Min(cast<int>(s.Length()), width);
-        int offset = 0;
+        else if (fw == FormatWidth.exact)
+        {
+            m = Min(m, width);
+        }
+        int n = Max(0, width - m);
         if (justify == FormatJustify.right)
         {
-            offset = width - n;
+            for (int i = 0; i < n; ++i)
+            {
+                result.Append(fillChar);
+            }
         }
-        for (int i = 0; i < n; ++i)
+        for (int i = 0; i < m; ++i)
         {
-            result[i + offset] = s[i];
+            result.Append(s[i]);
+        }
+        if (justify == FormatJustify.left)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                result.Append(fillChar);
+            }
         }
         return result;
     }

@@ -294,7 +294,7 @@ namespace Cm.Ast
         public override void Visit(FunctionNode& functionNode)
         {
             WriteEmptyLine();
-            Attributes* attributes = functionNode.GetAttributes();
+            AttributesNode* attributes = functionNode.GetAttributes();
             if ((attributes != null))
             {
                 attributes->Accept(*this);
@@ -352,7 +352,7 @@ namespace Cm.Ast
         public override void Visit(ClassNode& classNode)
         {
             WriteEmptyLine();
-            Attributes* attributes = classNode.GetAttributes();
+            AttributesNode* attributes = classNode.GetAttributes();
             if ((attributes != null))
             {
                 attributes->Accept(*this);
@@ -454,7 +454,7 @@ namespace Cm.Ast
         }
         public override void Visit(StaticConstructorNode& staticConstructorNode)
         {
-            Attributes* attributes = staticConstructorNode.GetAttributes();
+            AttributesNode* attributes = staticConstructorNode.GetAttributes();
             if ((attributes != null))
             {
                 attributes->Accept(*this);
@@ -501,7 +501,7 @@ namespace Cm.Ast
         }
         public override void Visit(ConstructorNode& constructorNode)
         {
-            Attributes* attributes = constructorNode.GetAttributes();
+            AttributesNode* attributes = constructorNode.GetAttributes();
             if ((attributes != null))
             {
                 attributes->Accept(*this);
@@ -558,7 +558,7 @@ namespace Cm.Ast
         }
         public override void Visit(DestructorNode& destructorNode)
         {
-            Attributes* attributes = destructorNode.GetAttributes();
+            AttributesNode* attributes = destructorNode.GetAttributes();
             if ((attributes != null))
             {
                 attributes->Accept(*this);
@@ -591,7 +591,7 @@ namespace Cm.Ast
         }
         public override void Visit(MemberFunctionNode& memberFunctionNode)
         {
-            Attributes* attributes = memberFunctionNode.GetAttributes();
+            AttributesNode* attributes = memberFunctionNode.GetAttributes();
             if ((attributes != null))
             {
                 attributes->Accept(*this);
@@ -639,7 +639,7 @@ namespace Cm.Ast
         }
         public override void Visit(ConversionFunctionNode& conversionFunctionNode)
         {
-            Attributes* attributes = conversionFunctionNode.GetAttributes();
+            AttributesNode* attributes = conversionFunctionNode.GetAttributes();
             if ((attributes != null))
             {
                 attributes->Accept(*this);
@@ -676,7 +676,7 @@ namespace Cm.Ast
         }
         public override void Visit(MemberVariableNode& memberVariableNode)
         {
-            Attributes* attributes = memberVariableNode.GetAttributes();
+            AttributesNode* attributes = memberVariableNode.GetAttributes();
             if ((attributes != null))
             {
                 attributes->Accept(*this);
@@ -695,7 +695,7 @@ namespace Cm.Ast
         public override void Visit(InterfaceNode& interfaceNode)
         {
             WriteEmptyLine();
-            Attributes* attributes = interfaceNode.GetAttributes();
+            AttributesNode* attributes = interfaceNode.GetAttributes();
             if ((attributes != null))
             {
                 attributes->Accept(*this);
@@ -1831,7 +1831,7 @@ namespace Cm.Ast
             formatter.WriteLine(";");
             emptyLine = true;
         }
-        public override void Visit(Attribute& attribute)
+        public override void Visit(AttributeNode& attribute)
         {
             formatter.Write(ToUtf8(attribute.Name()));
             if (!attribute.Value().IsEmpty())
@@ -1840,7 +1840,7 @@ namespace Cm.Ast
                 formatter.Write("\"" + StringStr(ToUtf8(attribute.Value())) + "\"");
             }
         }
-        public override void Visit(Attributes& attributes)
+        public override void Visit(AttributesNode& attributes)
         {
             formatter.Write("[");
             int n = cast<int>(attributes.GetAttributes().Count());
