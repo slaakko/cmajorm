@@ -1,0 +1,147 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+using System.Lex;
+using Cm.Lexer;
+using CmajorTokens;
+
+namespace Cm.Views
+{
+    public class CmajorSourceCodeView : SourceCodeView
+    {
+        public CmajorSourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) : base(location, size, dock, anchors), lexer(null, null, string(), 0)
+        {
+            lexer.SetCommentTokenId(COMMENT);
+            Set<int> blockCommentStates;
+            blockCommentStates.Insert(124);
+            blockCommentStates.Insert(125);
+            blockCommentStates.Insert(126);
+            blockCommentStates.Insert(127);
+            lexer.SetBlockCommentStates(blockCommentStates);
+        }
+        protected override TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
+        {
+            LogView* logView = Application.GetLogView();
+            TokenLine tokenLine = lexer.TokenizeLine(line, lineNumber, startState);
+            if (logView != null)
+            {
+                logView->WriteLine("endState=" + ToString(tokenLine.endState));
+            }
+            int tokenIndex = 0;
+            for (Token& token : tokenLine.tokens)
+            {
+                ustring s = token.match.ToString();
+                string sl = MakeStringLiteral(ToUtf8(s));
+                switch (startState)
+                {
+                    case 0:
+                    {
+                        if (token.id == CONTINUE_TOKEN)
+                        {
+                            if (s.Length() >= 2)
+                            {
+                                if (s[0] == '/' && s[1] == '/')
+                                {
+                                    token.id = COMMENT;
+                                    tokenLine.endState = 0;
+                                }
+                                else if (s[0] == '/' && s[1] == '*')
+                                {
+                                    token.id = COMMENT;
+                                }
+                            }
+                            else if (!s.IsEmpty())
+                            {
+                                if (IsWhiteSpace(s[0]))
+                                {
+                                    token.id = WS;
+                                    if (tokenIndex == tokenLine.tokens.Count() -1)
+                                    {
+                                        tokenLine.endState = 0;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        if (lexer.BlockCommentStates().CFind(startState) != lexer.BlockCommentStates().CEnd())
+                        {
+                            token.id = COMMENT;
+                        }
+                        break;
+                    }
+                }
+                if (logView != null)
+                {
+                    logView->WriteLine("lexeme=" + sl + ", token=" + ToUtf8(GetTokenName(token.id)) + ", startState=" + ToString(startState));
+                }
+                startState = 0;
+                ++tokenIndex;
+            }
+            return tokenLine;
+        }
+        protected override nothrow SourceCodeTokenKind GetTokenKind(const Token& token, int startState) const
+        {
+            switch (token.id)
+            {
+                case ASSERT: case ELIF: case ENDIF: case BOOL: case TRUE: case FALSE:
+                case SBYTE: case BYTE: case SHORT: case USHORT: case INT: case UINT:
+                case LONG: case ULONG: case FLOAT: case DOUBLE: case CHAR: case WCHAR:
+                case UCHAR: case VOID: case ENUM: case CAST: case INTERFACE: case NAMESPACE:
+                case USING: case STATIC: case EXTERN: case AS: case IS: case EXPLICIT:
+                case DELEGATE: case INLINE: case CDECL: case NOTHROW: case PUBLIC:
+                case PROTECTED: case PRIVATE: case INTERNAL: case VIRTUAL: case ABSTRACT:
+                case OVERRIDE: case SUPPRESS: case WINAPI: case OPERATOR: case CLASS:
+                case RETURN: case IF: case ELSE: case SWITCH: case CASE: case DEFAULT:
+                case WHILE: case DO: case FOR: case BREAK: case CONTINUE: case GOTO:
+                case TYPEDEF: case TYPENAME: case TYPEID: case CONST: case CONSTEXPR:
+                case NULLLIT: case THIS: case BASE: case CONSTRUCT: case DESTROY:
+                case NEW: case DELETE: case SIZEOF: case TRY: case CATCH: case THROW:
+                case CONCEPT: case WHERE: case AXIOM: case AND: case OR: 
+                {
+                    return SourceCodeTokenKind.keyword;
+                }
+                case ID:
+                {
+                    return SourceCodeTokenKind.identifier;
+                }
+                case EXCLAMATION: case UNIT_TEST: case EQUIVALENCE: case IMPLICATION:
+                case DISJUNCTION: case AMPAMP: case BITOR: case BITXOR: case AMP:
+                case EQ: case NEQ: case LEQ: case GEQ: case SHIFTLEFT: case SHIFTRIGHT:
+                case PLUS: case MINUS: case STAR: case DIV: case REM: case PLUSPLUS:
+                case MINUSMINUS: case CPL: case DOT: case ARROW: case LBRACKET:
+                case RBRACKET: case LPAREN: case RPAREN: case LANGLE: case RANGLE:
+                case LBRACE: case RBRACE: case COMMA: case ASSIGN: case COLON:
+                case SEMICOLON: case HASH: case WS:
+                {
+                    return SourceCodeTokenKind.plain;
+                }
+                case FLOATINGLIT: case INTLIT: 
+                {
+                    return SourceCodeTokenKind.number;
+                }
+                case CHARLIT:
+                {
+                    return SourceCodeTokenKind.character;
+                }
+                case STRINGLIT:
+                {
+                    return SourceCodeTokenKind.string;
+                }
+                case COMMENT:
+                {
+                    return SourceCodeTokenKind.comment;
+                }
+            }
+            return SourceCodeTokenKind.plain;
+        }
+        private CmajorLexer lexer;
+    }
+}

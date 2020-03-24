@@ -40,10 +40,11 @@ namespace System.Lex
 
     public class TokenLine
     {
-        public nothrow TokenLine() : tokens(), endState(0)
+        public nothrow TokenLine() : tokens(), startState(0), endState(0)
         {
         }
         public List<Token> tokens;
+        public int startState;
         public int endState;
     }
 

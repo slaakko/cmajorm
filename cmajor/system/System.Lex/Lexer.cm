@@ -10,12 +10,30 @@ namespace System.Lex
     public class Lexer
     {
         public Lexer(const ustring& content_, const string& fileName_, int fileIndex_) :
-            content(content_), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(null), start(content.Chars()), end(content.Chars() + content.Length()), pos(start), current(tokens.End()), log(null), countLines(true), separatorChar('\0')
+            content(content_), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(null), start(content.Chars()), end(content.Chars() + content.Length()), pos(start), current(tokens.End()), log(null), countLines(true), separatorChar('\0'),
+            commentTokenId(-1)
         {
         }
         public Lexer(const uchar* start_, const uchar* end_, const string& fileName_, int fileIndex_) :
-            content(), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(null), start(start_), end(end_), pos(start), current(tokens.End()), log(null), countLines(true), separatorChar('\0')
+            content(), fileName(fileName_), fileIndex(fileIndex_), line(1), keywordMap(null), start(start_), end(end_), pos(start), current(tokens.End()), log(null), countLines(true), separatorChar('\0'),
+            commentTokenId(-1)
         {
+        }
+        public void SetBlockCommentStates(const Set<int>& blockCommentStates_) const
+        {
+            blockCommentStates = blockCommentStates_;
+        }
+        public nothrow const Set<int>& BlockCommentStates() const
+        {
+            return blockCommentStates;
+        }
+        public nothrow void SetCommentTokenId(int commentTokenId_)
+        {
+            commentTokenId = commentTokenId_;
+        }
+        protected virtual nothrow int GetCommentTokenId() const
+        {
+            return -1;
         }
         public virtual ~Lexer()
         {
@@ -398,10 +416,11 @@ namespace System.Lex
         }
         public TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
         {
-            uchar* pos = line.Chars();
-            uchar* end = line.Chars() + line.Length();
+            pos = line.Chars();
+            end = line.Chars() + line.Length();
             TokenLine tokenLine;
-            lexeme.begin = end;
+            tokenLine.startState = startState;
+            lexeme.begin = pos;
             lexeme.end = end;
             token.match = lexeme;
             token.id = INVALID_TOKEN;
@@ -424,11 +443,37 @@ namespace System.Lex
                     pos = token.match.end;
                     tokenLine.tokens.Add(token);
                 }
-                ++pos;
+                else
+                {
+                    ++pos;
+                }
+            }
+            if (state != 0 && state != -1)
+            {
+                state = NextState(state, '\r');
+            }
+            if (state != 0 && state != -1)
+            {
+                state = NextState(state, '\n');
+            }
+            if (state != 0 && state != -1)
+            {
+                if (blockCommentStates.CFind(state) != blockCommentStates.CEnd())
+                {
+                    token.id = commentTokenId;
+                    token.match.end = end;
+                    tokenLine.tokens.Add(token);
+                    tokenLine.endState = state;
+                    return tokenLine;
+                }
             }
             if (token.match.begin != token.match.end)
             {
                 tokenLine.tokens.Add(token);
+            }
+            if (state == -1)
+            {
+                state = 0;
             }
             tokenLine.endState = state;
             return tokenLine;
@@ -449,6 +494,8 @@ namespace System.Lex
         private uchar separatorChar;
         private Stack<Span> spanStack;
         private Span currentSpan;
+        private Set<int> blockCommentStates;
+        private int commentTokenId;
     }
     public const uchar* LineStart(const uchar* start, const uchar* p)
     {

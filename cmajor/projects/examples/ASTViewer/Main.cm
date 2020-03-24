@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using System.IO;
 using System.Collections;
+using Cm.Views;
 
 class MainWindow : Window
 {
@@ -40,12 +41,14 @@ class MainWindow : Window
         treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
         treeView->NodeEnterEvent().AddHandler(TreeViewNodeEnter);
         treeView->NodeLeaveEvent().AddHandler(TreeViewNodeLeave);
+        treeView->NodeSelectedEvent().AddHandler(TreeViewNodeSelected);
         UniquePtr<Control> paddedTreeView(new PaddedControl(treeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> borderedTreeView(new BorderedControl(paddedTreeView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> scrollableTreeView(new ScrollableControl(borderedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         horizontalSplitContainer->Pane1Container()->AddChild(scrollableTreeView.Release());
-        sourceCodeView = new SourceCodeView(Point(0, 0), Size(0, 0), Dock.fill, Anchors.none);
+        sourceCodeView = new CmajorSourceCodeView(Point(0, 0), Size(0, 0), Dock.fill, Anchors.none);
         sourceCodeView->CaretPosChangedEvent().AddHandler(CaretPosChanged);
+        sourceCodeView->KeyDownEvent().AddHandler(SourceCodeViewKeyDown);
         UniquePtr<Control> paddedSourceCodeView(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> borderedSourceCodeView(new BorderedControl(paddedSourceCodeView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> scrollableSourceCodeView(new ScrollableControl(borderedSourceCodeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
@@ -126,8 +129,15 @@ class MainWindow : Window
                     lexer = CmajorLexer(content.Chars(), content.Chars() + content.Length(), filePath, 0);
                     Cm.Parser.ParsingContext ctx;
                     compileUnit = CompileUnitParser.Parse(lexer, &ctx);
-                    SyntaxTreeBuilder syntaxTreeBuilder;
+                    SyntaxTreeBuilder syntaxTreeBuilder(lexer);
                     compileUnit->Accept(syntaxTreeBuilder);
+                    indexNodeMap = syntaxTreeBuilder.GetIndexNodeMap();
+                    for (const Pair<int, TreeViewNode*>& p : indexNodeMap)
+                    {
+                        indexNodeList.Add(p);
+                    }
+                    Sort(indexNodeList.Begin(), indexNodeList.End());
+                    nodeIndexMap = syntaxTreeBuilder.GetNodeIndexMap();
                     treeView->SetRoot(syntaxTreeBuilder.GetRoot());
                     sourceCodeView->SetTextContent(content);
                     sourceCodeView->SetFocus();
@@ -168,6 +178,73 @@ class MainWindow : Window
         TreeViewNode* node = args.node;
         treeView->HideToolTipWindow();
     }
+    private void TreeViewNodeSelected(TreeViewNodeEventArgs& args)
+    {
+        TreeViewNode* node = args.node;
+        HashMap<TreeViewNode*, int>.ConstIterator it = nodeIndexMap.CFind(node);
+        if (it != nodeIndexMap.CEnd())
+        {
+            int index = it->second;
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                logView->WriteLine("index=" + ToString(index));
+            }
+            sourceCodeView->SetFocus();
+            sourceCodeView->SetCaretPosByCharIndex(index);
+        }
+    }
+    private void SourceCodeViewKeyDown(KeyEventArgs& args)
+    {
+        if (!args.handled)
+        {
+            if (args.keyData == cast<Keys>(Keys.controlModifier | Keys.u))
+            {
+                args.handled = true;
+                UpdateTreeView();
+            }
+        }
+    }
+    private void UpdateTreeView()
+    {
+        int caretLine = sourceCodeView->GetCaretLine();
+        int caretColumn = sourceCodeView->GetCaretColumn();
+        int index = sourceCodeView->GetCharIndex(caretLine, caretColumn);
+        if (index != -1)
+        {
+            Pair<int, TreeViewNode*> x(index, null);
+            List<Pair<int, TreeViewNode*>>.ConstIterator it = LowerBound(indexNodeList.CBegin(), indexNodeList.CEnd(), x);
+            if (it != indexNodeList.CBegin() && it == indexNodeList.CEnd())
+            {
+                --it;
+            }
+            int i = -1;
+            if (it != indexNodeList.CEnd())
+            {
+                int i = it->first;
+                if (i > index)
+                {
+                    if (it != indexNodeList.CBegin())
+                    {
+                        --it;
+                    }
+                }
+            }
+            if (it != indexNodeList.CEnd())
+            {
+                TreeViewNode* node = it->second;
+                treeView->Root()->CollapseAll();
+                TreeViewNode* p = node;
+                while (p != null)
+                {
+                    p->Expand();
+                    p = p->Parent();
+                }
+                node->EnsureVisible();
+                treeView->Invalidate();
+            }
+        }
+    }
     private void CaretPosChanged()
     {
         int caretLine = sourceCodeView->GetCaretLine();
@@ -179,10 +256,13 @@ class MainWindow : Window
         }
     }
     private TreeView* treeView;
-    private SourceCodeView* sourceCodeView;
+    private CmajorSourceCodeView* sourceCodeView;
     private ustring content;
     private CmajorLexer lexer;
     private UniquePtr<Cm.Ast.CompileUnitNode> compileUnit;
+    private HashMap<int, TreeViewNode*> indexNodeMap;
+    private List<Pair<int, TreeViewNode*>> indexNodeList;
+    private HashMap<TreeViewNode*, int> nodeIndexMap;
 }
 
 int main()

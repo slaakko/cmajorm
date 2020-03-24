@@ -2,16 +2,20 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>a8846c80-a92f-40ec-9044-c8688b90d5a3</ProjectGuid>
+  <ProjectGuid>b94623f8-6185-4fe7-ab0c-86331a08db94</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
-  <TargetType>program</TargetType>
+  <TargetType>winlib</TargetType>
  </PropertyGroup>
  <ItemGroup>
-  <CmCompile Include="Main.cm"/>
+  <CmCompile Include="CmajorSourceCodeView.cm"/>
  </ItemGroup>
  <ItemGroup/>
- <ItemGroup/>
+ <ItemGroup>
+  <ProjectReference Include="../ast/Cm.Ast.cmproj"/>
+  <ProjectReference Include="../lexer/Cm.Lexer.cmproj"/>
+  <ProjectReference Include="../parser/Cm.Parser.cmproj"/>
+ </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
 </Project>

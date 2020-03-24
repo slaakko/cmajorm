@@ -248,6 +248,10 @@ namespace CmajorTokens
 
     public const int HASH = 121;
 
+    public const int COMMENT = 122;
+
+    public const int WS = 123;
+
     internal class TokenMap
     {
         static TokenMap() :
@@ -272,7 +276,11 @@ namespace CmajorTokens
         }
         public ustring GetTokenName(int tokenId)
         {
-            return tokenNameList[tokenId];
+            if (tokenId >= 0)
+            {
+                return tokenNameList[tokenId];
+            }
+            return ustring();
         }
         public ustring GetTokenInfo(int tokenId)
         {
@@ -304,6 +312,7 @@ namespace CmajorTokens
             tokenIdMap[u"CLASS"] = 45;
             tokenIdMap[u"COLON"] = 119;
             tokenIdMap[u"COMMA"] = 117;
+            tokenIdMap[u"COMMENT"] = 122;
             tokenIdMap[u"CONCEPT"] = 74;
             tokenIdMap[u"CONST"] = 61;
             tokenIdMap[u"CONSTEXPR"] = 62;
@@ -401,6 +410,7 @@ namespace CmajorTokens
             tokenIdMap[u"WHERE"] = 75;
             tokenIdMap[u"WHILE"] = 52;
             tokenIdMap[u"WINAPI"] = 43;
+            tokenIdMap[u"WS"] = 123;
             tokenNameList.Add(u"END");
             tokenInfoList.Add(u"end of file");
             tokenNameList.Add(u"ASSERT");
@@ -645,6 +655,10 @@ namespace CmajorTokens
             tokenInfoList.Add(u"';'");
             tokenNameList.Add(u"HASH");
             tokenInfoList.Add(u"'#'");
+            tokenNameList.Add(u"COMMENT");
+            tokenInfoList.Add(u"comment");
+            tokenNameList.Add(u"WS");
+            tokenInfoList.Add(u"ws");
         }
         private static System.UniquePtr<TokenMap> instance;
         private System.Collections.Map<ustring, int> tokenIdMap;

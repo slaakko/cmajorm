@@ -1,178 +1,355 @@
 using System;
 using System.Collections;
 using System.Windows;
+using System.Lex;
 using Cm.Ast;
 
 class SyntaxTreeBuilder : Visitor
 {
+    public nothrow SyntaxTreeBuilder(CmajorLexer& lexer_) : lexer(lexer_)
+    {
+    }
     public TreeViewNode* GetRoot() const
     {
         return node.Release();
+    }
+    public HashMap<int, TreeViewNode*> GetIndexNodeMap()
+    {
+        return Rvalue(indexNodeMap);
+    }
+    public HashMap<TreeViewNode*, int> GetNodeIndexMap()
+    {
+        return Rvalue(nodeIndexMap);
     }
     public override void Visit(BoolNode& boolNode)
     {
         node.Reset(new TreeViewNode(typename(BoolNode)));
         node->SetData(&boolNode);
+        Span span = boolNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(SByteNode& sbyteNode)
     {
         node.Reset(new TreeViewNode(typename(SByteNode)));
         node->SetData(&sbyteNode);
+        Span span = sbyteNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ByteNode& byteNode)
     {
         node.Reset(new TreeViewNode(typename(ByteNode)));
         node->SetData(&byteNode);
+        Span span = byteNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ShortNode& shortNode)
     {
         node.Reset(new TreeViewNode(typename(ShortNode)));
         node->SetData(&shortNode);
+        Span span = shortNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UShortNode& ushortNode)
     {
         node.Reset(new TreeViewNode(typename(UShortNode)));
         node->SetData(&ushortNode);
+        Span span = ushortNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(IntNode& intNode)
     {
         node.Reset(new TreeViewNode(typename(IntNode)));
         node->SetData(&intNode);
+        Span span = intNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UIntNode& uintNode)
     {
         node.Reset(new TreeViewNode(typename(UIntNode)));
         node->SetData(&uintNode);
+        Span span = uintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(LongNode& longNode)
     {
         node.Reset(new TreeViewNode(typename(LongNode)));
         node->SetData(&longNode);
+        Span span = longNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ULongNode& ulongNode)
     {
         node.Reset(new TreeViewNode(typename(ULongNode)));
         node->SetData(&ulongNode);
+        Span span = ulongNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(FloatNode& floatNode)
     {
         node.Reset(new TreeViewNode(typename(FloatNode)));
         node->SetData(&floatNode);
+        Span span = floatNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DoubleNode& doubleNode)
     {
         node.Reset(new TreeViewNode(typename(DoubleNode)));
         node->SetData(&doubleNode);
+        Span span = doubleNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(CharNode& charNode)
     {
         node.Reset(new TreeViewNode(typename(CharNode)));
         node->SetData(&charNode);
+        Span span = charNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(WCharNode& wcharNode)
     {
         node.Reset(new TreeViewNode(typename(WCharNode)));
         node->SetData(&wcharNode);
+        Span span = wcharNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UCharNode& ucharNode)
     {
         node.Reset(new TreeViewNode(typename(UCharNode)));
         node->SetData(&ucharNode);
+        Span span = ucharNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(VoidNode& voidNode)
     {
         node.Reset(new TreeViewNode(typename(VoidNode)));
         node->SetData(&voidNode);
+        Span span = voidNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(BooleanLiteralNode& booleanLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(BooleanLiteralNode)));
         node->SetData(&booleanLiteralNode);
+        Span span = booleanLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(SByteLiteralNode& sbyteLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(SByteLiteralNode)));
         node->SetData(&sbyteLiteralNode);
+        Span span = sbyteLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ByteLiteralNode& byteLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(ByteLiteralNode)));
         node->SetData(&byteLiteralNode);
+        Span span = byteLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ShortLiteralNode& shortLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(ShortLiteralNode)));
         node->SetData(&shortLiteralNode);
+        Span span = shortLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UShortLiteralNode& ushortLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(UShortLiteralNode)));
         node->SetData(&ushortLiteralNode);
+        Span span = ushortLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(IntLiteralNode& intLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(IntLiteralNode)));
         node->SetData(&intLiteralNode);
+        Span span = intLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UIntLiteralNode& uintLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(UIntLiteralNode)));
         node->SetData(&uintLiteralNode);
+        Span span = uintLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(LongLiteralNode& longLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(LongLiteralNode)));
         node->SetData(&longLiteralNode);
+        Span span = longLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ULongLiteralNode& ulongLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(ULongLiteralNode)));
         node->SetData(&ulongLiteralNode);
+        Span span = ulongLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(FloatLiteralNode& floatLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(FloatLiteralNode)));
         node->SetData(&floatLiteralNode);
+        Span span = floatLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DoubleLiteralNode& doubleLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(DoubleLiteralNode)));
         node->SetData(&doubleLiteralNode);
+        Span span = doubleLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(CharLiteralNode& charLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(CharLiteralNode)));
         node->SetData(&charLiteralNode);
+        Span span = charLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(WCharLiteralNode& wcharLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(WCharLiteralNode)));
         node->SetData(&wcharLiteralNode);
+        Span span = wcharLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UCharLiteralNode& ucharLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(UCharLiteralNode)));
         node->SetData(&ucharLiteralNode);
+        Span span = ucharLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(StringLiteralNode& stringLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(StringLiteralNode)));
         node->SetData(&stringLiteralNode);
+        Span span = stringLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(WStringLiteralNode& wstringLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(WStringLiteralNode)));
         node->SetData(&wstringLiteralNode);
+        Span span = wstringLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UStringLiteralNode& ustringLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(UStringLiteralNode)));
         node->SetData(&ustringLiteralNode);
+        Span span = ustringLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(NullLiteralNode& nullLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(NullLiteralNode)));
         node->SetData(&nullLiteralNode);
+        Span span = nullLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ArrayLiteralNode& arrayLiteralNode)
     {
@@ -185,6 +362,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&arrayLiteralNode);
+        Span span = arrayLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(StructuredLiteralNode& structuredLiteralNode)
     {
@@ -197,11 +379,21 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&structuredLiteralNode);
+        Span span = structuredLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UuidLiteralNode& uuidLiteralNode)
     {
         node.Reset(new TreeViewNode(typename(UuidLiteralNode)));
         node->SetData(&uuidLiteralNode);
+        Span span = uuidLiteralNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(CompileUnitNode& compileUnitNode)
     {
@@ -210,6 +402,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&compileUnitNode);
+        Span span = compileUnitNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(NamespaceNode& namespaceNode)
     {
@@ -227,6 +424,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&namespaceNode);
+        Span span = namespaceNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AliasNode& aliasNode)
     {
@@ -237,6 +439,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&aliasNode);
+        Span span = aliasNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(NamespaceImportNode& namespaceImportNode)
     {
@@ -245,11 +452,21 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&namespaceImportNode);
+        Span span = namespaceImportNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(IdentifierNode& identifierNode)
     {
         node.Reset(new TreeViewNode(typename(IdentifierNode)));
         node->SetData(&identifierNode);
+        Span span = identifierNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(TemplateIdNode& templateIdNode)
     {
@@ -264,6 +481,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&templateIdNode);
+        Span span = templateIdNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(FunctionNode& functionNode)
     {
@@ -299,6 +521,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&functionNode);
+        Span span = functionNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ClassNode& classNode)
     {
@@ -335,6 +562,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&classNode);
+        Span span = classNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ThisInitializerNode& thisInitializerNode)
     {
@@ -347,6 +579,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&thisInitializerNode);
+        Span span = thisInitializerNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(BaseInitializerNode& baseInitializerNode)
     {
@@ -359,6 +596,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&baseInitializerNode);
+        Span span = baseInitializerNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(MemberInitializerNode& memberInitializerNode)
     {
@@ -373,6 +615,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&memberInitializerNode);
+        Span span = memberInitializerNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(StaticConstructorNode& staticConstructorNode)
     {
@@ -402,6 +649,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&staticConstructorNode);
+        Span span = staticConstructorNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConstructorNode& constructorNode)
     {
@@ -437,6 +689,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&constructorNode);
+        Span span = constructorNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DestructorNode& destructorNode)
     {
@@ -460,6 +717,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&destructorNode);
+        Span span = destructorNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(MemberFunctionNode& memberFunctionNode)
     {
@@ -489,6 +751,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&memberFunctionNode);
+        Span span = memberFunctionNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConversionFunctionNode& conversionFunctionNode)
     {
@@ -512,6 +779,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&conversionFunctionNode);
+        Span span = conversionFunctionNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(MemberVariableNode& memberVariableNode)
     {
@@ -527,6 +799,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&memberVariableNode);
+        Span span = memberVariableNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(InterfaceNode& interfaceNode)
     {
@@ -546,6 +823,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&interfaceNode);
+        Span span = interfaceNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DelegateNode& delegateNode)
     {
@@ -562,6 +844,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&delegateNode);
+        Span span = delegateNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ClassDelegateNode& classDelegateNode)
     {
@@ -578,6 +865,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&classDelegateNode);
+        Span span = classDelegateNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
     {
@@ -586,6 +878,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&parenthesizedConstraintNode);
+        Span span = parenthesizedConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode)
     {
@@ -596,6 +893,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&disjunctiveConstraintNode);
+        Span span = disjunctiveConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode)
     {
@@ -606,6 +908,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&conjunctiveConstraintNode);
+        Span span = conjunctiveConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(WhereConstraintNode& whereConstraintNode)
     {
@@ -614,6 +921,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&whereConstraintNode);
+        Span span = whereConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(PredicateConstraintNode& predicateConstraintNode)
     {
@@ -622,6 +934,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&predicateConstraintNode);
+        Span span = predicateConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(IsConstraintNode& isConstraintNode)
     {
@@ -632,6 +949,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&isConstraintNode);
+        Span span = isConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(MultiParamConstraintNode& multiParamConstraintNode)
     {
@@ -646,6 +968,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&multiParamConstraintNode);
+        Span span = multiParamConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(TypeNameConstraintNode& typeNameConstraintNode)
     {
@@ -654,6 +981,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&typeNameConstraintNode);
+        Span span = typeNameConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConstructorConstraintNode& constructorConstraintNode)
     {
@@ -668,6 +1000,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&constructorConstraintNode);
+        Span span = constructorConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DestructorConstraintNode& destructorConstraintNode)
     {
@@ -676,6 +1013,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&destructorConstraintNode);
+        Span span = destructorConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode)
     {
@@ -692,6 +1034,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&memberFunctionConstraintNode);
+        Span span = memberFunctionConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(FunctionConstraintNode& functionConstraintNode)
     {
@@ -706,6 +1053,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&functionConstraintNode);
+        Span span = functionConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AxiomStatementNode& axiomStatementNode)
     {
@@ -714,6 +1066,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&axiomStatementNode);
+        Span span = axiomStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AxiomNode& axiomNode)
     {
@@ -737,6 +1094,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&axiomNode);
+        Span span = axiomNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConceptIdNode& conceptIdNode)
     {
@@ -751,6 +1113,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&conceptIdNode);
+        Span span = conceptIdNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConceptNode& conceptNode)
     {
@@ -781,48 +1148,88 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&conceptNode);
+        Span span = conceptNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(SameConstraintNode& sameConstraintNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(SameConstraintNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&sameConstraintNode);
+        Span span = sameConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DerivedConstraintNode& derivedConstraintNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(DerivedConstraintNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&derivedConstraintNode);
+        Span span = derivedConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConvertibleConstraintNode& convertibleConstraintNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConvertibleConstraintNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&convertibleConstraintNode);
+        Span span = convertibleConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ExplicitlyConvertibleConstraintNode& explicitlyConvertibleConstraintNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ExplicitlyConvertibleConstraintNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&explicitlyConvertibleConstraintNode);
+        Span span = explicitlyConvertibleConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(CommonConstraintNode& commonConstraintNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(CommonConstraintNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&commonConstraintNode);
+        Span span = commonConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(NonreferenceTypeConstraintNode& nonreferenceTypeConstraintNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(NonreferenceTypeConstraintNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&nonreferenceTypeConstraintNode);
+        Span span = nonreferenceTypeConstraintNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(LabelNode& labelNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(LabelNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&labelNode);
+        Span span = labelNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(LabeledStatementNode& labeledStatementNode)
     {
@@ -833,6 +1240,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&labeledStatementNode);
+        Span span = labeledStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(CompoundStatementNode& compoundStatementNode)
     {
@@ -845,6 +1257,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&compoundStatementNode);
+        Span span = compoundStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ReturnStatementNode& returnStatementNode)
     {
@@ -856,6 +1273,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&returnStatementNode);
+        Span span = returnStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(IfStatementNode& ifStatementNode)
     {
@@ -871,6 +1293,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&ifStatementNode);
+        Span span = ifStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(WhileStatementNode& whileStatementNode)
     {
@@ -881,6 +1308,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&whileStatementNode);
+        Span span = whileStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DoStatementNode& doStatementNode)
     {
@@ -891,6 +1323,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&doStatementNode);
+        Span span = doStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ForStatementNode& forStatementNode)
     {
@@ -908,24 +1345,44 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&forStatementNode);
+        Span span = forStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(BreakStatementNode& breakStatementNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(BreakStatementNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&breakStatementNode);
+        Span span = breakStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ContinueStatementNode& continueStatementNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ContinueStatementNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&continueStatementNode);
+        Span span = continueStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(GotoStatementNode& gotoStatementNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(GotoStatementNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&gotoStatementNode);
+        Span span = gotoStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConstructionStatementNode& constructionStatementNode)
     {
@@ -942,6 +1399,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&constructionStatementNode);
+        Span span = constructionStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DeleteStatementNode& deleteStatementNode)
     {
@@ -950,6 +1412,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&deleteStatementNode);
+        Span span = deleteStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DestroyStatementNode& destroyStatementNode)
     {
@@ -958,6 +1425,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&destroyStatementNode);
+        Span span = destroyStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AssignmentStatementNode& assignmentStatementNode)
     {
@@ -968,6 +1440,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&assignmentStatementNode);
+        Span span = assignmentStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ExpressionStatementNode& expressionStatementNode)
     {
@@ -976,12 +1453,22 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&expressionStatementNode);
+        Span span = expressionStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(EmptyStatementNode& emptyStatementNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(EmptyStatementNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&emptyStatementNode);
+        Span span = emptyStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(RangeForStatementNode& rangeForStatementNode)
     {
@@ -996,6 +1483,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&rangeForStatementNode);
+        Span span = rangeForStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(SwitchStatementNode& switchStatementNode)
     {
@@ -1015,6 +1507,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&switchStatementNode);
+        Span span = switchStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(CaseStatementNode& caseStatementNode)
     {
@@ -1033,6 +1530,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&caseStatementNode);
+        Span span = caseStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DefaultStatementNode& defaultStatementNode)
     {
@@ -1045,6 +1547,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&defaultStatementNode);
+        Span span = defaultStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(GotoCaseStatementNode& gotoCaseStatementNode)
     {
@@ -1053,12 +1560,22 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&gotoCaseStatementNode);
+        Span span = gotoCaseStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(GotoDefaultStatementNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&gotoDefaultStatementNode);
+        Span span = gotoDefaultStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ThrowStatementNode& throwStatementNode)
     {
@@ -1070,6 +1587,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&throwStatementNode);
+        Span span = throwStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(TryStatementNode& tryStatementNode)
     {
@@ -1084,6 +1606,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&tryStatementNode);
+        Span span = tryStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(CatchNode& catchNode)
     {
@@ -1099,6 +1626,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&catchNode);
+        Span span = catchNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AssertStatementNode& assertStatementNode)
     {
@@ -1107,6 +1639,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&assertStatementNode);
+        Span span = assertStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode)
     {
@@ -1124,6 +1661,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&conditionalCompilationPartNode);
+        Span span = conditionalCompilationPartNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode)
     {
@@ -1134,7 +1676,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&conditionalCompilationDisjunctionNode);
-
+        Span span = conditionalCompilationDisjunctionNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode)
     {
@@ -1145,6 +1691,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&conditionalCompilationConjunctionNode);
+        Span span = conditionalCompilationConjunctionNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode)
     {
@@ -1153,12 +1704,22 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&conditionalCompilationNotNode);
+        Span span = conditionalCompilationNotNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ConditionalCompilationPrimaryNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&conditionalCompilationPrimaryNode);
+        Span span = conditionalCompilationPrimaryNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ParenthesizedConditionalCompilationExpressionNode& parenthesizeCondCompExprNode)
     {
@@ -1167,6 +1728,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&parenthesizeCondCompExprNode);
+        Span span = parenthesizeCondCompExprNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
     {
@@ -1186,6 +1752,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&conditionalCompilationStatementNode);
+        Span span = conditionalCompilationStatementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(TypedefNode& typedefNode)
     {
@@ -1196,6 +1767,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&typedefNode);
+        Span span = typedefNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConstantNode& constantNode)
     {
@@ -1208,6 +1784,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&constantNode);
+        Span span = constantNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(EnumTypeNode& enumTypeNode)
     {
@@ -1227,6 +1808,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&enumTypeNode);
+        Span span = enumTypeNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(EnumConstantNode& enumConstantNode)
     {
@@ -1243,6 +1829,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&enumConstantNode);
+        Span span = enumConstantNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ParameterNode& parameterNode)
     {
@@ -1256,6 +1847,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&parameterNode);
+        Span span = parameterNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(TemplateParameterNode& templateParameterNode)
     {
@@ -1269,6 +1865,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&templateParameterNode);
+        Span span = templateParameterNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConstNode& constNode)
     {
@@ -1277,6 +1878,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&constNode);
+        Span span = constNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(LValueRefNode& lvalueRefNode)
     {
@@ -1285,6 +1891,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&lvalueRefNode);
+        Span span = lvalueRefNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(RValueRefNode& rvalueRefNode)
     {
@@ -1293,6 +1904,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&rvalueRefNode);
+        Span span = rvalueRefNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(PointerNode& pointerNode)
     {
@@ -1301,6 +1917,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&pointerNode);
+        Span span = pointerNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ArrayNode& arrayNode)
     {
@@ -1314,6 +1935,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&arrayNode);
+        Span span = arrayNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DotNode& dotNode)
     {
@@ -1324,6 +1950,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&dotNode);
+        Span span = dotNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ArrowNode& arrowNode)
     {
@@ -1334,6 +1965,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&arrowNode);
+        Span span = arrowNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(EquivalenceNode& equivalenceNode)
     {
@@ -1344,6 +1980,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&equivalenceNode);
+        Span span = equivalenceNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ImplicationNode& implicationNode)
     {
@@ -1354,6 +1995,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&implicationNode);
+        Span span = implicationNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DisjunctionNode& disjunctionNode)
     {
@@ -1364,6 +2010,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&disjunctionNode);
+        Span span = disjunctionNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConjunctionNode& conjunctionNode)
     {
@@ -1374,6 +2025,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&conjunctionNode);
+        Span span = conjunctionNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(BitOrNode& bitOrNode)
     {
@@ -1384,6 +2040,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&bitOrNode);
+        Span span = bitOrNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(BitXorNode& bitXorNode)
     {
@@ -1394,6 +2055,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&bitXorNode);
+        Span span = bitXorNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(BitAndNode& bitAndNode)
     {
@@ -1404,6 +2070,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&bitAndNode);
+        Span span = bitAndNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(EqualNode& equalNode)
     {
@@ -1414,6 +2085,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&equalNode);
+        Span span = equalNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(NotEqualNode& notEqualNode)
     {
@@ -1424,6 +2100,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&notEqualNode);
+        Span span = notEqualNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(LessNode& lessNode)
     {
@@ -1434,6 +2115,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&lessNode);
+        Span span = lessNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(GreaterNode& greaterNode)
     {
@@ -1444,6 +2130,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&greaterNode);
+        Span span = greaterNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(LessOrEqualNode& lessOrEqualNode)
     {
@@ -1454,6 +2145,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&lessOrEqualNode);
+        Span span = lessOrEqualNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(GreaterOrEqualNode& greaterOrEqualNode)
     {
@@ -1464,6 +2160,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&greaterOrEqualNode);
+        Span span = greaterOrEqualNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ShiftLeftNode& shiftLeftNode)
     {
@@ -1474,6 +2175,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&shiftLeftNode);
+        Span span = shiftLeftNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ShiftRightNode& shiftRightNode)
     {
@@ -1484,6 +2190,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&shiftRightNode);
+        Span span = shiftRightNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AddNode& addNode)
     {
@@ -1494,6 +2205,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&addNode);
+        Span span = addNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(SubNode& subNode)
     {
@@ -1504,6 +2220,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&subNode);
+        Span span = subNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(MulNode& mulNode)
     {
@@ -1514,6 +2235,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&mulNode);
+        Span span = mulNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DivNode& divNode)
     {
@@ -1524,6 +2250,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&divNode);
+        Span span = divNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(RemNode& remNode)
     {
@@ -1534,6 +2265,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&remNode);
+        Span span = remNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(NotNode& notNode)
     {
@@ -1542,6 +2278,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&notNode);
+        Span span = notNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UnaryPlusNode& unaryPlusNode)
     {
@@ -1550,6 +2291,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&unaryPlusNode);
+        Span span = unaryPlusNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(UnaryMinusNode& unaryMinusNode)
     {
@@ -1558,6 +2304,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&unaryMinusNode);
+        Span span = unaryMinusNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(PrefixIncrementNode& prefixIncrementNode)
     {
@@ -1566,6 +2317,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&prefixIncrementNode);
+        Span span = prefixIncrementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(PrefixDecrementNode& prefixDecrementNode)
     {
@@ -1574,6 +2330,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&prefixDecrementNode);
+        Span span = prefixDecrementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(DerefNode& derefNode)
     {
@@ -1582,6 +2343,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&derefNode);
+        Span span = derefNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AddrOfNode& addrOfNode)
     {
@@ -1590,6 +2356,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&addrOfNode);
+        Span span = addrOfNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ComplementNode& complementNode)
     {
@@ -1598,6 +2369,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&complementNode);
+        Span span = complementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(IsNode& isNode)
     {
@@ -1608,6 +2384,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&isNode);
+        Span span = isNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AsNode& asNode)
     {
@@ -1618,6 +2399,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&asNode);
+        Span span = asNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(IndexingNode& indexingNode)
     {
@@ -1628,6 +2414,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&indexingNode);
+        Span span = indexingNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(InvokeNode& invokeNode)
     {
@@ -1642,6 +2433,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&invokeNode);
+        Span span = invokeNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(PostfixIncrementNode& postfixIncrementNode)
     {
@@ -1650,6 +2446,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&postfixIncrementNode);
+        Span span = postfixIncrementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(PostfixDecrementNode& postfixDecrementNode)
     {
@@ -1658,6 +2459,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&postfixDecrementNode);
+        Span span = postfixDecrementNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(SizeOfNode& sizeOfNode)
     {
@@ -1666,6 +2472,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&sizeOfNode);
+        Span span = sizeOfNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(TypeNameNode& typeNameNode)
     {
@@ -1674,6 +2485,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&typeNameNode);
+        Span span = typeNameNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(TypeIdNode& typeIdNode)
     {
@@ -1682,6 +2498,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&typeIdNode);
+        Span span = typeIdNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(CastNode& castNode)
     {
@@ -1692,6 +2513,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&castNode);
+        Span span = castNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ConstructNode& constructNode)
     {
@@ -1706,6 +2532,11 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&constructNode);
+        Span span = constructNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(NewNode& newNode)
     {
@@ -1720,18 +2551,33 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&newNode);
+        Span span = newNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ThisNode& thisNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(ThisNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&thisNode);
+        Span span = thisNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(BaseNode& baseNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(BaseNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&baseNode);
+        Span span = baseNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
     {
@@ -1740,6 +2586,11 @@ class SyntaxTreeBuilder : Visitor
         treeViewNode->AddChild(node.Release());
         node.Reset(treeViewNode.Release());
         node->SetData(&parenthesizedExpressionNode);
+        Span span = parenthesizedExpressionNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(GlobalVariableNode& globalVariableNode)
     {
@@ -1755,12 +2606,22 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&globalVariableNode);
+        Span span = globalVariableNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AttributeNode& attribute)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(AttributeNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&attribute);
+        Span span = attribute.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(AttributesNode& attributes)
     {
@@ -1773,12 +2634,25 @@ class SyntaxTreeBuilder : Visitor
         }
         node.Reset(treeViewNode.Release());
         node->SetData(&attributes);
+        Span span = attributes.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
     public override void Visit(CommentNode& commentNode)
     {
         UniquePtr<TreeViewNode> treeViewNode(new TreeViewNode(typename(CommentNode)));
         node.Reset(treeViewNode.Release());
         node->SetData(&commentNode);
+        Span span = commentNode.GetSpan();
+        lexer.ConvertExternal(span);
+        int index = span.start;
+        indexNodeMap[index] = node.Get();
+        nodeIndexMap[node.Get()] = index;
     }
+    private CmajorLexer& lexer;
     private UniquePtr<TreeViewNode> node;
+    private HashMap<int, TreeViewNode*> indexNodeMap;
+    private HashMap<TreeViewNode*, int> nodeIndexMap;
 }

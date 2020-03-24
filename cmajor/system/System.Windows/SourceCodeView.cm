@@ -69,7 +69,7 @@ namespace System.Windows
     {
         private enum Flags : sbyte
         {
-            none = 0, changed = 1 << 0
+            none = 0, changed = 1 << 0, painting = 1 << 1
         }
 
         public SourceCodeView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
@@ -115,6 +115,7 @@ namespace System.Windows
             maxLineLength = 0;
             maxLineIndex = 0;
             lines = SplitTextIntoLines(textContent);
+            lineStartIndeces = CalculateLineStartIndeces(textContent);
             tokenLines.Clear();
             int state = 0;
             int n = cast<int>(lines.Count());
@@ -153,6 +154,43 @@ namespace System.Windows
         public nothrow inline int GetCaretColumn() const
         {
             return caretColumn - (numLineNumberDigits + 1);
+        }
+        public void SetCaretPosByCharIndex(int charIndex)
+        {
+            List<int>.ConstIterator it = LowerBound(lineStartIndeces.CBegin(), lineStartIndeces.CEnd(), charIndex);
+            if (it != lineStartIndeces.CBegin() && it == lineStartIndeces.CEnd())
+            {
+                --it;
+            }
+            if (it >= lineStartIndeces.CBegin() && it != lineStartIndeces.CEnd())
+            {
+                if (*it > charIndex)
+                {
+                    --it;
+                }
+            }
+            int lineNumber = cast<int>(it - lineStartIndeces.CBegin() + 1);
+            int columnNumber = numLineNumberDigits + 2;
+            if (it >= lineStartIndeces.CBegin() && it != lineStartIndeces.CEnd())
+            {
+                int lineStartCharIndex = *it;
+                columnNumber = charIndex - lineStartCharIndex + numLineNumberDigits + 2;
+            }
+            SetCaretLineCol(lineNumber, columnNumber);
+            ScrollToCaret();
+        }
+        public int GetCharIndex(int line, int column) const
+        {
+            if (line >= 1 && line <= lineStartIndeces.Count())
+            {
+                int lineStartIndex = lineStartIndeces[line - 1];
+                int lineLength = GetLineLength(line);
+                if (column >= 1 && column <= lineLength)
+                {
+                    return lineStartIndex + column - 1;
+                }
+            }
+            return -1;
         }
         protected override void CreateCaret()
         {
@@ -491,16 +529,17 @@ namespace System.Windows
         }
         public void ScrollToCaret()
         {
+            if (lines.IsEmpty() || charHeight == 0) return;
+            LogView* log = Application.GetLogView();
             Size size = GetSize();
             int windowLines = cast<int>(size.h / charHeight);
             int windowCols = cast<int>(size.w / charWidth);
             Point currentOrigin = ContentLocation();
             int topLineNumber = cast<int>(currentOrigin.y / charHeight + 1);
             int leftColNumber = cast<int>(currentOrigin.x / charWidth + 1);
-            LogView* log = Application.GetLogView();
             if (log != null)
             {
-                log->WriteLine("currentOrigin=" + currentOrigin.ToString() + ", topLine=" + ToString(topLineNumber) + ", caretLine=" + ToString(caretLine));
+                log->WriteLine("windowLines=" + ToString(windowLines) + ", currentOrigin=" + currentOrigin.ToString() + ", topLine=" + ToString(topLineNumber) + ", caretLine=" + ToString(caretLine));
             }
             int oldTopLineNumber = topLineNumber;
             if (caretLine > topLineNumber)
@@ -548,6 +587,8 @@ namespace System.Windows
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
+            bool prevPainting = Painting();
+            SetPainting();
             try
             {
                 if (Changed())
@@ -578,12 +619,16 @@ namespace System.Windows
             {
                 MessageBox.Show(ex.Message());
             }
+            if (!prevPainting)
+            {
+                ResetPainting();
+            }
         }
         protected virtual TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
         {
             return System.Windows.DefaultTokenizeLine(line, lineNumber, startState);
         }
-        protected virtual nothrow SourceCodeTokenKind GetTokenKind(int tokenId) const
+        protected virtual nothrow SourceCodeTokenKind GetTokenKind(const Token& token, int startState) const
         {
             return SourceCodeTokenKind.plain;
         }
@@ -619,32 +664,38 @@ namespace System.Windows
             SourceCodeTextStyle* lineNumberTextStyle = GetTextStyle(SourceCodeTokenKind.lineNumber);
             graphics.DrawStringChecked(lineNumberText, *lineNumberTextStyle->font, pt, *lineNumberTextStyle->brush);
             pt.x = pt.x + charWidth * (numLineNumberDigits + 1);
-            for (const Token& token : tokenLines[lineIndex].tokens)
+            const TokenLine& tokenLine = tokenLines[lineIndex];
+            int startState = tokenLine.startState;
+            for (const Token& token : tokenLine.tokens)
             {
-                SourceCodeTokenKind tokenKind = GetTokenKind(token.id);
+                SourceCodeTokenKind tokenKind = GetTokenKind(token, startState);
                 SourceCodeTextStyle* tokenTextStyle = GetTextStyle(tokenKind);
                 ustring tokenStr = token.match.ToString();
                 string s(ToUtf8(tokenStr));
                 graphics.DrawStringChecked(s, *tokenTextStyle->font, pt, *tokenTextStyle->brush);
                 pt.x = pt.x + charWidth * tokenStr.Length();
+                startState = -1;
             }
         }
         private void Measure(Graphics& graphics)
         {
             charWidth = 0;
             charHeight = 0;
-            for (const UniquePtr<Font>& font : fonts)
+            if (!lines.IsEmpty() && maxLineLength > 0)
             {
-                TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
-                graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
-                RectF charRect = graphics.MeasureStringChecked(ToUtf8(lines[maxLineIndex]), *font, PointF(0, 0), drawFormat);
-                graphics.SetTextRenderingHintChecked(prevRenderingHint);
-                charWidth = Max(charWidth, charRect.size.w / maxLineLength);
-                charHeight = Max(charHeight, charRect.size.h);
-                LogView* log = Application.GetLogView();
-                if (log != null)
+                for (const UniquePtr<Font>& font : fonts)
                 {
-                    log->WriteLine("charWidth=" + ToString(charWidth));
+                    TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
+                    graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
+                    RectF charRect = graphics.MeasureStringChecked(ToUtf8(lines[maxLineIndex]), *font, PointF(0, 0), drawFormat);
+                    graphics.SetTextRenderingHintChecked(prevRenderingHint);
+                    charWidth = Max(charWidth, charRect.size.w / maxLineLength);
+                    charHeight = Max(charHeight, charRect.size.h);
+                    LogView* log = Application.GetLogView();
+                    if (log != null)
+                    {
+                        log->WriteLine("charWidth=" + ToString(charWidth));
+                    }
                 }
             }
             SetScrollUnits(cast<int>(charHeight), cast<int>(2 * charWidth));
@@ -761,6 +812,18 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags & ~Flags.changed);
         }
+        public inline nothrow bool Painting() const
+        {
+            return (flags &  Flags.painting) != Flags.none;
+        }
+        private inline nothrow void SetPainting()
+        {
+            flags = cast<Flags>(flags | Flags.painting);
+        }
+        private inline nothrow void ResetPainting()
+        {
+            flags = cast<Flags>(flags & ~Flags.painting);
+        }
         public nothrow Event<CaretPosChangedEventHandler>& CaretPosChangedEvent() const
         {
             return caretPosChangedEvent;
@@ -768,6 +831,7 @@ namespace System.Windows
         private Flags flags;
         private List<ustring> lines;
         private List<TokenLine> tokenLines;
+        private List<int> lineStartIndeces;
         private StringFormat drawFormat;
         private FontFamily fontFamily;
         private float fontSize;
@@ -794,7 +858,6 @@ namespace System.Windows
         private uint caretTimerPeriod;
         private Event<CaretPosChangedEventHandler> caretPosChangedEvent;
         private bool update;
-        private int numDowns;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)
@@ -857,6 +920,38 @@ namespace System.Windows
             lines.Add(TrimEnd(line));
         }
         return lines;
+    }
+
+    public List<int> CalculateLineStartIndeces(const ustring& text)
+    {
+        List<int> indeces;
+        int state = 0;
+        int n = cast<int>(text.Length());
+        for (int i = 0; i < n; ++i)
+        {
+            uchar c = text[i];
+            switch (state)
+            {
+                case 0:
+                {
+                    indeces.Add(i);
+                    if (c != '\n')
+                    {
+                        state = 1;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (c == '\n')
+                    {
+                        state = 0;
+                    }
+                    break;
+                }
+            }
+        }
+        return indeces;
     }
 
     public TokenLine DefaultTokenizeLine(const ustring& line, int lineNumber, int startState)

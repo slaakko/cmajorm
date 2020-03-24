@@ -17,16 +17,17 @@ namespace System.Windows
         {
             none = 0, changed = 1 << 0, treeViewNodeChanged = 1 << 1, treeViewNodeStateChanged = 1 << 2, toolTipWindowAdded = 1 << 3
         }
-        public TreeView(const Font& font_, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+        public TreeView(const Font& font_, const Color& backgroundColor, const Color& stateIndicatorColor_, const Color& nodeSelectedColor_, const Color& textColor_,
+            const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.TreeView", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, "treeView",
-                location, size, dock, anchors), flags(Flags.none), root(), font(font_), textBrush(Color.Black()), textHeight(0), stateIndicatorPercentage(0.5f),
-                stateIndicatorColor(Color.Red()), nodeSelectedColor(201u, 222u, 245u), nodeSelectedBrush(nodeSelectedColor),
+                location, size, dock, anchors), flags(Flags.none), root(), font(font_), textHeight(0), stateIndicatorPercentage(0.5f),
+                stateIndicatorColor(stateIndicatorColor_), nodeSelectedColor(nodeSelectedColor_), nodeSelectedBrush(nodeSelectedColor), textColor(textColor_), textBrush(textColor), 
                 format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5), selectedNode(null), trackedNode(null), toolTipWindow(new ToolTip())
         {
             SetChanged();
         }
         public TreeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            this(Font(FontFamily("Segoe UI"), 9.0f), Color.White(), location, size, dock, anchors)
+            this(Font(FontFamily("Segoe UI"), 9.0f), Color.White(), Color.Red(), Color(201u, 222u, 245u), Color.Black(), location, size, dock, anchors)
         {
         }
         public override void PrintWindowTree(int level)
@@ -35,6 +36,30 @@ namespace System.Windows
             if (log != null)
             {
                 log->WriteLine(string(' ', level) + "TreeView." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Point(), GetSize()).ToString() + "]");
+            }
+        }
+        public void EnsureNodeVisible(TreeViewNode* node)
+        {
+            Size size = GetSize();
+            Point contentLocation = ContentLocation();
+            Point nodeLocation = node->Location();
+            if (nodeLocation.y >= contentLocation.y && nodeLocation.y < contentLocation.y + size.h)
+            {
+                return;
+            }
+            if (nodeLocation.y > contentLocation.y)
+            {
+                int y = nodeLocation.y - Max(0, cast<int>(size.h - 2 * textHeight));
+                Point newOrigin(0, y);
+                SetContentLocation(newOrigin);
+                Invalidate();
+            }
+            else
+            {
+                int y = nodeLocation.y;
+                Point newOrigin(0, y);
+                SetContentLocation(newOrigin);
+                Invalidate();
             }
         }
         protected override void OnPaint(PaintEventArgs& args)
@@ -172,6 +197,31 @@ namespace System.Windows
         {
             stateIndicatorColor = stateIndicatorColor_;
             SetChanged();
+        }
+        public nothrow inline const Color& NodeSelectedColor() const
+        {
+            return nodeSelectedColor;
+        }
+        public nothrow void SetNodeSelectedColor(const Color& nodeSelectedColor_)
+        {
+            if (nodeSelectedColor != nodeSelectedColor_)
+            {
+                nodeSelectedColor = nodeSelectedColor_;
+                nodeSelectedBrush = SolidBrush(nodeSelectedColor);
+            }
+        }
+        public nothrow inline const Color& TextColor() const
+        {
+            return textColor;
+        }
+        public void SetTextColor(const Color& textColor_)
+        {
+            if (textColor != textColor_)
+            {
+                textColor = textColor_;
+                textBrush = SolidBrush(textColor);
+                SetChanged();
+            }
         }
         public nothrow inline int AnimationMs() const
         {
@@ -503,14 +553,6 @@ namespace System.Windows
                 }
             }
         }
-        public nothrow void SetNodeSelectedColor(const Color& nodeSelectedColor_)
-        {
-            if (nodeSelectedColor != nodeSelectedColor_)
-            {
-                nodeSelectedColor = nodeSelectedColor_;
-                nodeSelectedBrush = SolidBrush(nodeSelectedColor);
-            }
-        }
         internal nothrow inline TreeViewNode* TrackedNode() const
         {
             return trackedNode;
@@ -567,13 +609,14 @@ namespace System.Windows
         private Flags flags;
         private UniquePtr<TreeViewNode> root;
         private Font font;
-        private SolidBrush textBrush;
         private float textHeight;
         private float stateIndicatorPercentage;
         private float stateIndicatorHeight;
         private Color stateIndicatorColor;
         private Color nodeSelectedColor;
+        private Color textColor;
         private SolidBrush nodeSelectedBrush;
+        private SolidBrush textBrush;
         private List<Bitmap> stateIndicatorBitmaps;
         private StringFormat format;
         private long bitmapIndex;
@@ -1043,6 +1086,14 @@ namespace System.Windows
         public nothrow inline void SetData(void* data_)
         {
             data = data_;
+        }
+        public void EnsureVisible()
+        {
+            TreeView* treeView = GetTreeView();
+            if (treeView != null)
+            {
+                treeView->EnsureNodeVisible(this);
+            }
         }
         public void Draw(Graphics& graphics, TreeView* treeView)
         {
