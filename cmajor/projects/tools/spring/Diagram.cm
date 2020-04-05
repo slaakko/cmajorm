@@ -1,0 +1,507 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+using System.XPath;
+
+namespace spring
+{
+    public class Contains<T>
+    {
+        public typedef T ElementType;
+
+        public nothrow Contains(const PointF& location_) : location(location_)
+        {
+        }
+        public nothrow inline bool operator()(T* element) const
+        {
+            return element->Contains(location);
+        }
+        private PointF location;
+    }
+
+    public class Diagram 
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, changed = 1 << 0
+        }
+        public Diagram() : flags(Flags.none), layout(), elements()
+        {
+            SetChanged();
+            UniquePtr<ConcreteClassElement> concreteClassElement(new ConcreteClassElement("ConcreteClass"));
+            concreteClassElement->SetLocation(PointF(5.0f, 5.0f));
+            concreteClassElement->Operations().Add(new OperationElement("Foo"));
+            concreteClassElement->Operations().Add(new OperationElement("Bar"));
+            concreteClassElement->Operations().Add(new OperationElement("Baz"));
+            elements.Add(concreteClassElement.Release());
+            UniquePtr<AbstractClassElement> abstractClassElement(new AbstractClassElement("AbstractClass"));
+            abstractClassElement->SetLocation(PointF(50.0f, 5.0f));
+            elements.Add(abstractClassElement.Release());
+        }
+        suppress Diagram(const Diagram&);
+        suppress void operator=(const Diagram&);
+        suppress Diagram(Diagram&&);
+        suppress void operator=(Diagram&&);
+        public void Draw(Graphics& graphics)
+        {
+            if (Changed())
+            {
+                ResetChanged();
+                if (layout.IsNull())
+                {
+                    layout.Reset(new Layout(graphics));
+                }
+                for (const UniquePtr<DiagramElement>& element : elements)
+                {
+                    element->Measure(graphics, *layout);
+                }
+            }
+            for (const UniquePtr<DiagramElement>& element : elements)
+            {
+                element->Draw(graphics, *layout);
+            }
+        }
+        public nothrow const Layout& GetLayout() const
+        {
+            return *layout;
+        }
+        public nothrow Layout& GetLayout()
+        {
+            return *layout;
+        }
+        public nothrow void SetLayout(Layout* layout_)
+        {
+            layout.Reset(layout_);
+        }
+        public nothrow inline DiagramElement* GetElementByIndex(int index) const
+        {
+            return elements.Get(index);
+        }
+        public nothrow inline void SetElementByIndex(DiagramElement* element, int index)
+        {
+            elements.Set(index, element);
+        }
+        public nothrow int GetIndexOfElementAt(const PointF& location) const
+        {
+            Contains<DiagramElement> pred(location);
+            return IndexOf(elements, pred);
+        }
+        private nothrow inline bool Changed() const
+        {
+            return (flags & Flags.changed) != Flags.none;
+        }
+        private nothrow inline void SetChanged()
+        {
+            flags = cast<Flags>(flags | Flags.changed);
+        }
+        private nothrow inline void ResetChanged()
+        {
+            flags = cast<Flags>(flags & ~Flags.changed);
+        }
+        private Flags flags;
+        private UniquePtr<Layout> layout;
+        private IndexList<DiagramElement> elements;
+    }
+
+    public abstract class DiagramElement
+    {
+        public nothrow DiagramElement() : name()
+        {
+        }
+        public nothrow DiagramElement(const string& name_) : name(name_)
+        {
+        }
+        public abstract DiagramElement* Clone() const;
+        public abstract void Draw(Graphics& graphics, Layout& layout);
+        public abstract void Measure(Graphics& graphics, Layout& layout);
+        suppress DiagramElement(const DiagramElement&);
+        suppress void operator=(const DiagramElement&);
+        suppress DiagramElement(DiagramElement&&);
+        suppress void operator=(DiagramElement&&);
+        public nothrow inline const string& Name() const
+        {
+            return name;
+        }
+        public nothrow void SetName(const string& name_)
+        {
+            name = name_;
+        }
+        public nothrow inline const PointF& Location() const
+        {
+            return boundingRect.location;
+        }
+        public nothrow inline void SetLocation(const PointF& location)
+        {
+            boundingRect.location = location;
+        }
+        public nothrow inline const SizeF& GetSize() const
+        {
+            return boundingRect.size;
+        }
+        public nothrow inline void SetSize(const SizeF& size)
+        {
+            boundingRect.size = size;
+        }
+        public nothrow const RectF& BoundingRect() const
+        {
+            return boundingRect;
+        }
+        public virtual nothrow bool Contains(const PointF& location)
+        {
+            return boundingRect.Contains(location);
+        }
+        public virtual void Read(System.Dom.Element* parentElement)
+        {
+            name = ToUtf8(parentElement->GetAttribute(u"name"));
+            UniquePtr<XPathObject> result = Evaluate(u"boundingRect", parentElement);
+            if (!result.IsNull())
+            {
+                if (result->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* boundingRectElement = cast<System.Dom.Element*>(node);
+                            string x = ToUtf8(boundingRectElement->GetAttribute(u"x"));
+                            string y = ToUtf8(boundingRectElement->GetAttribute(u"y"));
+                            string w = ToUtf8(boundingRectElement->GetAttribute(u"w"));
+                            string h = ToUtf8(boundingRectElement->GetAttribute(u"h"));
+                            boundingRect = RectF(PointF(ParseFloat(x), ParseFloat(y)), SizeF(ParseFloat(w), ParseFloat(h)));
+                        }
+                    }
+                }
+            }
+        }
+        public virtual void Write(System.Dom.Element* parentElement)
+        {
+            parentElement->SetAttribute(u"name", ToUtf32(name));
+            UniquePtr<System.Dom.Element> boundingRectElement(new System.Dom.Element(u"boundingRect"));
+            boundingRectElement->SetAttribute(u"x", ToUtf32(System.ToString(boundingRect.location.x)));
+            boundingRectElement->SetAttribute(u"y", ToUtf32(System.ToString(boundingRect.location.y)));
+            boundingRectElement->SetAttribute(u"w", ToUtf32(System.ToString(boundingRect.size.w)));
+            boundingRectElement->SetAttribute(u"h", ToUtf32(System.ToString(boundingRect.size.h)));
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(boundingRectElement.Release()));
+        }
+        public virtual void SetFrom(DiagramElement* that)
+        {
+            name = that->name;
+            boundingRect = that->boundingRect;
+        }
+        private string name;
+        private RectF boundingRect;
+    }
+
+    public class FieldElement : DiagramElement
+    {
+        public nothrow FieldElement() : base()
+        {
+        }
+        public nothrow FieldElement(const string& name) : base(name)
+        {
+        }
+        suppress FieldElement(const FieldElement&);
+        suppress void operator=(const FieldElement&);
+        suppress FieldElement(FieldElement&&);
+        suppress void operator=(FieldElement&&);
+        public override DiagramElement* Clone() const
+        {
+            FieldElement* clone = new FieldElement();
+            clone->SetFrom(this);
+            return clone;
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
+
+        }
+        public override void Measure(Graphics& graphics, Layout& layout)
+        {
+
+        }
+    }
+
+    public class OperationElement : DiagramElement
+    {
+        public nothrow OperationElement() : base(), isAbstract(false)
+        {
+        }
+        public nothrow OperationElement(const string& name) : base(name), isAbstract(false)
+        {
+        }
+        public nothrow OperationElement(const string& name, bool isAbstract_) : base(name), isAbstract(isAbstract_)
+        {
+        }
+        suppress OperationElement(const OperationElement&);
+        suppress void operator=(const OperationElement&);
+        suppress OperationElement(OperationElement&&);
+        suppress void operator=(OperationElement&&);
+        public nothrow inline bool IsAbstract() const
+        {
+            return isAbstract;
+        }
+        public nothrow void SetAbstract(bool isAbstract_)
+        {
+            isAbstract = isAbstract_;
+        }
+        public override DiagramElement* Clone() const
+        {
+            OperationElement* clone = new OperationElement();
+            clone->SetFrom(this);
+            return clone;
+        }
+        public override void Read(System.Dom.Element* element)
+        {
+            base->Read(element);
+            isAbstract = ParseBool(ToUtf8(element->GetAttribute(u"abstract")));
+        }
+        public override void Write(System.Dom.Element* element)
+        {
+            base->Write(element);
+            element->SetAttribute(u"abstract", ToUtf32(System.ToString(isAbstract)));
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
+
+        }
+        public override void Measure(Graphics& graphics, Layout& layout)
+        {
+
+        }
+        public override void SetFrom(DiagramElement* that)
+        {
+            base->SetFrom(that);
+            isAbstract = cast<OperationElement*>(that)->isAbstract;
+        }
+        private bool isAbstract;
+    }
+
+    public abstract class ClassElement : DiagramElement
+    {
+        public nothrow ClassElement(const string& name) : base(name)
+        {
+            SetSize(SizeF(cast<float>(DefaultMinClassHeight() + DefaultMinClassHeight() / GoldenRatio()), DefaultMinClassHeight()));
+        }
+        suppress ClassElement(const ClassElement&);
+        suppress void operator=(const ClassElement&);
+        suppress ClassElement(ClassElement&&);
+        suppress void operator=(ClassElement&&);
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
+            DrawFrame(graphics, layout);
+            DrawCaption(graphics, layout);
+        }
+        protected abstract void DrawCaption(Graphics& graphics, Layout& layout);
+        protected abstract void DrawFrame(Graphics& graphics, Layout& layout);
+        public override void Read(System.Dom.Element* parentElement)
+        {
+            base->Read(parentElement);
+            UniquePtr<XPathObject> operationResult = Evaluate(u"operation", parentElement);
+            if (!operationResult.IsNull())
+            {
+                if (operationResult->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(operationResult.Get());
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[i];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            UniquePtr<OperationElement> operation(new OperationElement());
+                            operation->Read(element);
+                            operations.Add(operation.Release());
+                        }
+                    }
+                }
+            }
+            UniquePtr<XPathObject> fieldResult = Evaluate(u"field", parentElement);
+            if (!fieldResult.IsNull())
+            {
+                if (fieldResult->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(fieldResult.Get());
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[i];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            UniquePtr<FieldElement> field(new FieldElement());
+                            field->Read(element);
+                            fields.Add(field.Release());
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            base->Write(parentElement);
+            for (const UniquePtr<OperationElement>& operation : operations)
+            {
+                UniquePtr<System.Dom.Element> element = new System.Dom.Element(u"operation");
+                operation->Write(element.Get());
+                parentElement->AppendChild(UniquePtr<System.Dom.Node>(element.Release()));
+            }
+            for (const UniquePtr<FieldElement>& field : fields)
+            {
+                UniquePtr<System.Dom.Element> element = new System.Dom.Element(u"field");
+                field->Write(element.Get());
+                parentElement->AppendChild(UniquePtr<System.Dom.Node>(element.Release()));
+            }
+        }
+        public override void SetFrom(DiagramElement* that)
+        {
+            base->SetFrom(that);
+            operations.Clear();
+            for (UniquePtr<OperationElement>& operation : cast<ClassElement*>(that)->operations)
+            {
+                operations.Add(cast<OperationElement*>(operation->Clone()));
+            }
+            fields.Clear();
+            for (UniquePtr<FieldElement>& field : cast<ClassElement*>(that)->fields)
+            {
+                fields.Add(cast<FieldElement*>(field->Clone()));
+            }
+        }
+        public nothrow IndexList<OperationElement>& Operations() 
+        {
+            return operations;
+        }
+        public void SetOperations(IndexList<OperationElement>&& operations_)
+        {
+            operations = operations_;
+        }
+        public nothrow IndexList<FieldElement>& Fields()
+        {
+            return fields;
+        }
+        public void SetFields(IndexList<FieldElement>&& fields_)
+        {
+            fields = fields_;
+        }
+        private IndexList<OperationElement> operations;
+        private IndexList<FieldElement> fields;
+    }
+
+    public class ConcreteClassElement : ClassElement
+    {
+        public nothrow ConcreteClassElement(const string& name) : base(name), captionTextHeight(0.0f)
+        {
+        }
+        suppress ConcreteClassElement(const ConcreteClassElement&);
+        suppress void operator=(const ConcreteClassElement&);
+        suppress ConcreteClassElement(ConcreteClassElement&&);
+        suppress void operator=(ConcreteClassElement&&);
+        public override DiagramElement* Clone() const
+        {
+            ConcreteClassElement* clone = new ConcreteClassElement();
+            clone->SetFrom(this);
+            return clone;
+        }
+        protected override void DrawCaption(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            PointF location = Location();
+            PointF origin(location.x + paddingElement.left, location.y + paddingElement.top);
+            const Font& font = fontElement.GetFont();
+            const Brush& brush = layoutElement.TextBrush();
+            graphics.DrawStringChecked(Name(), font, origin, brush);
+        }
+        protected override void DrawFrame(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
+            graphics.DrawRectangleChecked(layoutElement.FramePen(), BoundingRect());
+            float y = paddingElement.Vertical() + captionTextHeight;
+            PointF location = Location();
+            PointF start(location.x, location.y + y);
+            PointF end(location.x + GetSize().w, location.y + y);
+            const Pen& framePen = layoutElement.FramePen();
+            graphics.DrawLineChecked(framePen, start, end);
+        }
+        public override void Measure(Graphics& graphics, Layout& layout)
+        {
+            const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            const Font& font = fontElement.GetFont();
+            RectF r = graphics.MeasureStringChecked(Name(), font, PointF(0, 0), layout.GetStringFormat());
+            captionTextHeight = r.size.h;
+        }
+        public override void SetFrom(DiagramElement* that)
+        {
+            base->SetFrom(that);
+        }
+        private float captionTextHeight;
+    }
+
+    public class AbstractClassElement : ClassElement
+    {
+        public nothrow AbstractClassElement(const string& name) : base(name)
+        {
+        }
+        suppress AbstractClassElement(const AbstractClassElement&);
+        suppress void operator=(const AbstractClassElement&);
+        suppress AbstractClassElement(AbstractClassElement&&);
+        suppress void operator=(AbstractClassElement&&);
+        public override DiagramElement* Clone() const
+        {
+            AbstractClassElement* clone = new AbstractClassElement();
+            clone->SetFrom(this);
+            return clone;
+        }
+        protected override void DrawCaption(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            PointF location = Location();
+            PointF origin(location.x + paddingElement.left, location.y + paddingElement.top);
+            const Font& font = fontElement.GetFont();
+            const Brush& brush = layoutElement.TextBrush();
+            graphics.DrawStringChecked(Name(), font, origin, brush);
+        }
+        protected override void DrawFrame(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
+            graphics.DrawRectangleChecked(layoutElement.FramePen(), BoundingRect());
+            float y = paddingElement.Vertical() + captionTextHeight;
+            PointF location = Location();
+            PointF start(location.x, location.y + y);
+            PointF end(location.x + GetSize().w, location.y + y);
+            const Pen& framePen = layoutElement.FramePen();
+            graphics.DrawLineChecked(framePen, start, end);
+        }
+        public override void Measure(Graphics& graphics, Layout& layout)
+        {
+            const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            const Font& font = fontElement.GetFont();
+            RectF r = graphics.MeasureStringChecked(Name(), font, PointF(0, 0), layout.GetStringFormat());
+            captionTextHeight = r.size.h;
+        }
+        public override void SetFrom(DiagramElement* that)
+        {
+            base->SetFrom(that);
+        }
+        private float captionTextHeight;
+    }
+}
+

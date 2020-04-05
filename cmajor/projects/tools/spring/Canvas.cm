@@ -1,0 +1,55 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace spring
+{
+    public class Canvas : Control
+    {
+        public Canvas(const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("spring.canvas", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            backgroundColor, "canvas", location, size, dock, anchors), diagram(new Diagram())
+        {
+        }
+        public Canvas() : this(Color.White(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none) // todo
+        {
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            Unit prevUnit = args.graphics.GetPageUnitChecked();
+            TextRenderingHint prevTextRenderingHint = args.graphics.GetTextRenderingHint();
+            args.graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
+            args.graphics.SetPageUnitChecked(Unit.millimeter);
+            args.graphics.ClearChecked(BackgroundColor());
+            diagram->Draw(args.graphics);
+            args.graphics.SetTextRenderingHintChecked(prevTextRenderingHint);
+            args.graphics.SetPageUnitChecked(prevUnit);
+        }
+        protected override void OnMouseDown(MouseEventArgs& args)
+        {
+            LogView* logView = Application.GetLogView();
+            base->OnMouseDown(args);
+            float x = ScreenMetrics.Get().HorizontalPixelsToMM(args.location.x);
+            float y = ScreenMetrics.Get().VerticalPixelsToMM(args.location.y);
+            PointF location(x, y);
+            int index = diagram->GetIndexOfElementAt(location);
+            if (index != -1)
+            {
+                DiagramElement* element = diagram->GetElementByIndex(index);
+                if (element != null)
+                {
+                    if (logView != null)
+                    {
+                        logView->WriteLine(element->Name());
+                    }
+                }
+            }
+        }
+        private UniquePtr<Diagram> diagram;
+        private PointF viewOrigin;
+    }
+}

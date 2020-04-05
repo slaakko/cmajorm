@@ -9,7 +9,160 @@ using System.Windows.API;
 
 namespace System.Windows
 {
-    public class MenuBar : Control
+    public nothrow Color DefaultMenuBackgroundColor()
+    {
+        return GetSystemColor(SystemColor.COLOR_MENU);
+    }
+
+    public nothrow Color DefaultMenuTextColor()
+    {
+        return GetSystemColor(SystemColor.COLOR_MENUTEXT);
+    }
+
+    public abstract class MenuControl : Control
+    {
+        public MenuControl(const Font& font_, const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle,
+            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base(windowClassName, windowClassStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors),
+            font(font_), textColor(DefaultMenuTextColor()), mouseOverColor(201u, 222u, 245u), menuOpenColor(Color.White()),
+            shadowColor(ShadowColor()), textBrush(textColor), backgroundBrush(BackgroundColor()), mouseOverBrush(mouseOverColor), menuOpenBrush(menuOpenColor),
+            shadowBrush(shadowColor), blackBrush(Color.Black()), blackPen(Color.Black()), darkPen(Color.DarkGray()),
+            format(StringAlignment.near, StringAlignment.near, HotKeyPrefix.show)
+        {
+        }
+        public override nothrow Padding DefaultPadding() const
+        {
+            return Padding(6, 2, 6, 2);
+        }
+        public nothrow inline const Font& GetFont() const
+        {
+            return font;
+        }
+        public nothrow inline const Color& TextColor() const
+        {
+            return textColor;
+        }
+        public nothrow inline const Color& MouseOverColor() const
+        {
+            return mouseOverColor;
+        }
+        public nothrow inline const Color& MenuOpenColor() const
+        {
+            return menuOpenColor;
+        }
+        public nothrow inline const Color& ShadowColor() const
+        {
+            return shadowColor;
+        }
+        public nothrow inline const Brush& TextBrush() const
+        {
+            return textBrush;
+        }
+        public nothrow inline const Brush& BackgroundBrush() const
+        {
+            return backgroundBrush;
+        }
+        public nothrow inline const Brush& MouseOverBrush() const
+        {
+            return mouseOverBrush;
+        }
+        public nothrow inline const Brush& MenuOpenBrush() const
+        {
+            return menuOpenBrush;
+        }
+        public nothrow inline const Brush& ShadowBrush() const
+        {
+            return shadowBrush;
+        }
+        public nothrow inline const Brush& BlackBrush() const
+        {
+            return blackBrush;
+        }
+        public nothrow inline const Pen& BlackPen() const
+        {
+            return blackPen;
+        }
+        public nothrow inline const Pen& DarkPen() const
+        {
+            return darkPen;
+        }
+        public nothrow inline const StringFormat& Format() const
+        {
+            return format;
+        }
+        internal virtual nothrow MenuItem* GetMenuItemByAccessKey(wchar accessKey)
+        {
+            return null;
+        }
+        internal virtual nothrow MenuItem* GetOpenedMenuItem() const
+        {
+            return null;
+        }
+        internal virtual nothrow MenuItem* GetSelectedMenuItem() const
+        {
+            return null;
+        }
+        internal virtual nothrow void SetSelectedMenuItem(MenuItem* selectedMenuItem_)
+        {
+        }
+        internal virtual nothrow bool IsOpen() const
+        {
+            return false;
+        }
+        public virtual nothrow void SetOpen()
+        {
+        }
+        internal virtual nothrow void SetClosed()
+        {
+        }
+        internal virtual nothrow void SetMenuInvalidated()
+        {
+        }
+        internal virtual nothrow MenuItem* GetFirstMenuItem() const
+        {
+            return null;
+        }
+        internal virtual nothrow MenuItem* GetLastMenuItem() const
+        {
+            return null;
+        }
+        internal virtual nothrow MenuItem* LatestOpenedMenuItem() const
+        {
+            return null;
+        }
+        internal virtual nothrow void SetLatestOpenedMenuItem(MenuItem* menuItem)
+        {
+        }
+        internal virtual nothrow MenuItem* GetLatestMouseDownMenuItem() const
+        {
+            return null;
+        }
+        internal virtual nothrow void SetLatestMouseDownMenuItem(MenuItem* menuItem)
+        {
+        }
+        internal virtual void InvalidateMenu()
+        {
+        }
+        internal virtual nothrow void SetMenuChanged()
+        {
+        }
+        private Font font;
+        private Color textColor;
+        private Color mouseOverColor;
+        private Color menuOpenColor;
+        private Color shadowColor;
+        private SolidBrush textBrush;
+        private SolidBrush backgroundBrush;
+        private SolidBrush mouseOverBrush;
+        private SolidBrush menuOpenBrush;
+        private SolidBrush shadowBrush;
+        private SolidBrush blackBrush;
+        private Pen blackPen;
+        private Pen darkPen;
+        private StringFormat format;
+    }
+
+    public class MenuBar : MenuControl
     {
         private enum Flags : sbyte
         {
@@ -25,13 +178,9 @@ namespace System.Windows
             return shadowColor;
         }
 
-        public MenuBar(const Font& font_) : base("System.Windows.MenuBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
-            GetSystemColor(SystemColor.COLOR_MENU), "menuBar", Point(), Size(0, initialHeight), Dock.top, Anchors.none),
-            font(font_), textColor(GetSystemColor(SystemColor.COLOR_MENUTEXT)), mouseOverColor(201u, 222u, 245u), menuOpenColor(Color.White()),
-            shadowColor(ShadowColor()), textBrush(textColor), backgroundBrush(BackgroundColor()), mouseOverBrush(mouseOverColor), menuOpenBrush(menuOpenColor),
-            shadowBrush(shadowColor), blackBrush(Color.Black()), blackPen(Color.Black()), darkPen(Color.DarkGray()),
-            format(StringAlignment.near, StringAlignment.near, HotKeyPrefix.show), flags(Flags.none), children(this),
-            latestOpenedMenuItem(null), selectedMenuItem(null), latestMouseDownMenuItem(null)
+        public MenuBar(const Font& font_) : base(font_, "System.Windows.MenuBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            DefaultMenuBackgroundColor(), "menuBar", Point(), Size(0, initialHeight), Dock.top, Anchors.none),
+            flags(Flags.none), children(this), latestOpenedMenuItem(null), selectedMenuItem(null), latestMouseDownMenuItem(null)
         {
             SetMenuChanged();
         }
@@ -42,10 +191,6 @@ namespace System.Windows
         {
             children.AddChild(menuItem);
             SetMenuChanged();
-        }
-        public override nothrow Padding DefaultPadding() const
-        {
-            return Padding(6, 2, 6, 2);
         }
         public override void PrintWindowTree(int level)
         {
@@ -79,7 +224,7 @@ namespace System.Windows
                     ResetMenuChanged();
                     CollectShortcuts();
                     Size size = GetSize();
-                    size.h = cast<int>(font.GetHeight(args.graphics));
+                    size.h = cast<int>(GetFont().GetHeight(args.graphics));
                     size.h = size.h + DefaultPadding().Vertical();
                     SetSize(size);
                     LocateMenuItems(args.graphics, size);
@@ -104,12 +249,12 @@ namespace System.Windows
                 {
                     MenuItem* menuItem = cast<MenuItem*>(child);
                     Padding menuItemPadding = menuItem->DefaultPadding();
-                    RectF r = graphics.MeasureStringChecked(menuItem->Text(), font, origin, format);
+                    RectF r = graphics.MeasureStringChecked(menuItem->Text(), GetFont(), origin, Format());
                     int w = cast<int>(r.size.w) + padding.Horizontal() + menuItemPadding.Horizontal();
                     itemRect.size.w = w;
                     menuItem->SetLocation(itemRect.location);
                     menuItem->SetSize(itemRect.size);
-                    menuItem->CalculateChildRect(graphics, font, format, Point(itemRect.location.x, itemRect.location.y + itemRect.size.h));
+                    menuItem->CalculateChildRect(graphics, GetFont(), Format(), Point(itemRect.location.x, itemRect.location.y + itemRect.size.h));
                     itemRect.location.x = itemRect.location.x + w;
                 }
                 child = child->NextSibling();
@@ -147,8 +292,8 @@ namespace System.Windows
                 {
                     MenuItem* menuItem = cast<MenuItem*>(child);
                     menuItem->Draw(
-                        args.graphics, padding, textBrush, backgroundBrush, mouseOverBrush, menuOpenBrush, shadowBrush, blackBrush, blackPen, darkPen, font, format,
-                        menuOpenColor, this, drawSubItems, origin);
+                        args.graphics, padding, TextBrush(), BackgroundBrush(), MouseOverBrush(), MenuOpenBrush(), ShadowBrush(), BlackBrush(), BlackPen(), DarkPen(), GetFont(), Format(),
+                        MenuOpenColor(), this, drawSubItems, origin);
                 }
                 child = child->NextSibling();
             }
@@ -295,7 +440,7 @@ namespace System.Windows
                 InvalidateMenu();
             }
         }
-        internal void InvalidateMenu()
+        internal override void InvalidateMenu()
         {
             Invalidate();
             Rect menuRect;
@@ -514,15 +659,15 @@ namespace System.Windows
                 child = child->NextSibling();
             }
         }
-        internal nothrow void SetLatestOpenedMenuItem(MenuItem* menuItem)
+        internal nothrow override void SetLatestOpenedMenuItem(MenuItem* menuItem)
         {
             latestOpenedMenuItem = menuItem;
         }
-        internal nothrow MenuItem* LatestOpenedMenuItem() const
+        internal nothrow override MenuItem* LatestOpenedMenuItem() const
         {
             return latestOpenedMenuItem;
         }
-        internal nothrow MenuItem* GetOpenedMenuItem() const
+        internal nothrow override MenuItem* GetOpenedMenuItem() const
         {
             Component* child = children.FirstChild();
             while (child != null)
@@ -539,7 +684,7 @@ namespace System.Windows
             }
             return null;
         }
-        internal nothrow MenuItem* GetFirstMenuItem() const
+        internal nothrow override MenuItem* GetFirstMenuItem() const
         {
             Component* child = children.FirstChild();
             while (child != null)
@@ -553,7 +698,7 @@ namespace System.Windows
             }
             return null;
         }
-        internal nothrow MenuItem* GetLastMenuItem() const
+        internal nothrow override MenuItem* GetLastMenuItem() const
         {
             Component* child = children.LastChild();
             while (child != null)
@@ -567,7 +712,7 @@ namespace System.Windows
             }
             return null;
         }
-        internal nothrow MenuItem* GetMenuItemByAccessKey(wchar accessKey)
+        internal nothrow override MenuItem* GetMenuItemByAccessKey(wchar accessKey)
         {
             Component* child = children.FirstChild();
             while (child != null)
@@ -584,19 +729,19 @@ namespace System.Windows
             }
             return null;
         }
-        internal nothrow MenuItem* GetSelectedMenuItem() const
+        internal override nothrow MenuItem* GetSelectedMenuItem() const
         {
             return selectedMenuItem;
         }
-        internal nothrow void SetSelectedMenuItem(MenuItem* selectedMenuItem_)
+        internal override nothrow void SetSelectedMenuItem(MenuItem* selectedMenuItem_)
         {
             selectedMenuItem = selectedMenuItem_;
         }
-        internal nothrow MenuItem* GetLatestMouseDownMenuItem() const
+        internal override nothrow MenuItem* GetLatestMouseDownMenuItem() const
         {
             return latestMouseDownMenuItem;
         }
-        internal nothrow void SetLatestMouseDownMenuItem(MenuItem* menuItem)
+        internal nothrow override void SetLatestMouseDownMenuItem(MenuItem* menuItem)
         {
             latestMouseDownMenuItem = menuItem;
         }
@@ -604,7 +749,7 @@ namespace System.Windows
         {
             return (flags & Flags.menuChanged) != Flags.none;
         }
-        internal nothrow inline void SetMenuChanged()
+        internal nothrow override void SetMenuChanged()
         {
             flags = cast<Flags>(flags | Flags.menuChanged);
         }
@@ -616,7 +761,7 @@ namespace System.Windows
         {
             return (flags & Flags.menuInvalidated) != Flags.none;
         }
-        internal nothrow inline void SetMenuInvalidated()
+        internal nothrow override void SetMenuInvalidated()
         {
             flags = cast<Flags>(flags | Flags.menuInvalidated);
         }
@@ -624,15 +769,15 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags & ~Flags.menuInvalidated);
         }
-        internal nothrow inline bool IsOpen() const
+        internal nothrow override bool IsOpen() const
         {
             return (flags & Flags.open) != Flags.none;
         }
-        public nothrow void SetOpen()
+        public nothrow override void SetOpen()
         {
             flags = cast<Flags>(flags | Flags.open);
         }
-        public void SetClosed()
+        public nothrow override void SetClosed()
         {
             if (IsOpen())
             {
@@ -653,25 +798,11 @@ namespace System.Windows
             Control* parentControl = ParentControl();
             if (parentControl != null && parentControl is ContainerControl*)
             {
-                menuBox = new MenuBox(this);
+                menuBox = new MenuBox(GetFont(), this, null);
                 ContainerControl* containerControl = cast<ContainerControl*>(parentControl);
                 containerControl->InsertChildAfter(menuBox, this);
             }
         }
-        private Font font;
-        private Color textColor;
-        private Color mouseOverColor;
-        private Color menuOpenColor;
-        private Color shadowColor;
-        private SolidBrush textBrush;
-        private SolidBrush backgroundBrush;
-        private SolidBrush mouseOverBrush;
-        private SolidBrush menuOpenBrush;
-        private SolidBrush shadowBrush;
-        private SolidBrush blackBrush;
-        private Pen blackPen;
-        private Pen darkPen;
-        private StringFormat format;
         private Flags flags;
         private Container children;
         private MenuItem* latestOpenedMenuItem;
@@ -681,10 +812,11 @@ namespace System.Windows
         private MenuBox* menuBox;
     }
 
-    public class MenuBox : Control
+    public class MenuBox : MenuControl
     {
-        public MenuBox(MenuBar* menuBar_) : base("System.Windows.MenuBox", DefaultWindowClassStyle(), HiddenChildWindowStyle(), DefaultExtendedWindowStyle(),
-            Color.White(), "menuBox", Point(), Size(), Dock.none, Anchors.none), menuBar(menuBar_)
+        public MenuBox(const Font& font, MenuBar* menuBar_, MenuItem* rootItem_) :
+            base(font, "System.Windows.MenuBox", DefaultWindowClassStyle(), HiddenChildWindowStyle(), DefaultExtendedWindowStyle(),
+            Color.White(), "menuBox", Point(), Size(), Dock.none, Anchors.none), menuBar(menuBar_), rootItem(rootItem_)
         {
         }
         public override void PrintWindowTree(int level)
@@ -729,7 +861,15 @@ namespace System.Windows
                 }
                 else
                 {
-                    menuBar->DrawMenuItems(args, true, loc);
+                    if (menuBar != null)
+                    {
+                        menuBar->DrawMenuItems(args, true, loc);
+                    }
+                    else if (rootItem != null)
+                    {
+                        rootItem->Draw(args.graphics, DefaultPadding(), TextBrush(), BackgroundBrush(), MouseOverBrush(), MenuOpenBrush(), ShadowBrush(), BlackBrush(), BlackPen(), DarkPen(), GetFont(), Format(),
+                            MenuOpenColor(), null, true, loc);
+                    }
                 }
             }
             catch (const Exception& ex)
@@ -784,8 +924,24 @@ namespace System.Windows
             args.location.y = args.location.y + loc.y;
             menuBar->MouseUpInternal(args);
         }
+        protected nothrow inline MenuItem* GetRootItem() const
+        {
+            return rootItem;
+        }
         private MenuBar* menuBar;
+        private MenuItem* rootItem;
         private bool paintMenu;
+    }
+
+    public class ContextMenu : MenuBox
+    {
+        public ContextMenu(const Font& font) : base(font, null, new MenuItem("root")), rootItemPtr(GetRootItem())
+        {
+        }
+        public ContextMenu() : this(Font(FontFamily("Segoe UI"), 9.0f))
+        {
+        }
+        private UniquePtr<MenuItem> rootItemPtr;
     }
 
     public abstract class MenuItemBase : Component
@@ -795,7 +951,7 @@ namespace System.Windows
         }
         public abstract void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
             const Brush& menuOpenBrush, const Brush& shadowBrush, const Brush& blackBrush, const Pen& blackPen, const Pen& darkPen, const Font& font,
-            const StringFormat& format, const Color& menuOpenColor, MenuBar* menuBar, bool drawSubItems, const Point& origin);
+            const StringFormat& format, const Color& menuOpenColor, MenuControl* menuControl, bool drawSubItems, const Point& origin);
         internal nothrow MenuItem* GetParentMenuItem() const
         {
             Container* container = GetContainer();
@@ -942,7 +1098,7 @@ namespace System.Windows
             }
             return null;
         }
-        private nothrow MenuBar* GetMenuBar() const
+        private nothrow MenuControl* GetMenuControl() const
         {
             Container* container = GetContainer();
             if (container != null)
@@ -953,18 +1109,18 @@ namespace System.Windows
                     if (parent is MenuItem*)
                     {
                         MenuItem* parentItem = cast<MenuItem*>(parent);
-                        return parentItem->GetMenuBar();
+                        return parentItem->GetMenuControl();
                     }
-                    else if (parent is MenuBar*)
+                    else if (parent is MenuControl*)
                     {
-                        MenuBar* menuBar = cast<MenuBar*>(parent);
-                        return menuBar;
+                        MenuControl* menuControl = cast<MenuControl*>(parent);
+                        return menuControl;
                     }
                 }
             }
             return null;
         }
-        internal bool HandleKey(Keys key, bool& wantsKeys, MenuItem* parentMenuItem, MenuBar* menuBar)
+        internal bool HandleKey(Keys key, bool& wantsKeys, MenuItem* parentMenuItem, MenuControl* menuControl)
         {
             if (key >= Keys.a && key <= Keys.z || key >= Keys.d0 && key <= Keys.d9)
             {
@@ -976,11 +1132,11 @@ namespace System.Windows
                 }
                 else
                 {
-                    childItem = menuBar->GetMenuItemByAccessKey(accessKey);
+                    childItem = menuControl->GetMenuItemByAccessKey(accessKey);
                 }
                 if (childItem != null)
                 {
-                    childItem->Execute(parentMenuItem, wantsKeys, menuBar);
+                    childItem->Execute(parentMenuItem, wantsKeys, menuControl);
                     return true;
                 }
                 else
@@ -995,32 +1151,32 @@ namespace System.Windows
                 {
                     case Keys.enter:
                     {
-                        Execute(parentMenuItem, wantsKeys, menuBar);
+                        Execute(parentMenuItem, wantsKeys, menuControl);
                         return true;
                     }
                     case Keys.escape:
                     {
-                        MenuItem* openedMenuItem = menuBar->GetOpenedMenuItem();
+                        MenuItem* openedMenuItem = menuControl->GetOpenedMenuItem();
                         if (openedMenuItem != null)
                         {
-                            openedMenuItem->SetState(State.closed, menuBar);
+                            openedMenuItem->SetState(State.closed, menuControl);
                         }
                         wantsKeys = false;
-                        menuBar->SetSelectedMenuItem(null);
-                        menuBar->SetClosed();
-                        menuBar->SetMenuInvalidated();
+                        menuControl->SetSelectedMenuItem(null);
+                        menuControl->SetClosed();
+                        menuControl->SetMenuInvalidated();
                         return true;
                     }
                     case Keys.home:
                     {
                         if (Level() == 0)
                         {
-                            MenuItem* firstMenuItem = menuBar->GetFirstMenuItem();
+                            MenuItem* firstMenuItem = menuControl->GetFirstMenuItem();
                             if (firstMenuItem != null)
                             {
-                                menuBar->SetSelectedMenuItem(firstMenuItem);
+                                menuControl->SetSelectedMenuItem(firstMenuItem);
                                 wantsKeys = true;
-                                menuBar->SetMenuInvalidated();
+                                menuControl->SetMenuInvalidated();
                                 return true;
                             }
                         }
@@ -1032,9 +1188,9 @@ namespace System.Windows
                                 MenuItem* firstMenuItem = parentMenuItem->GetFirstMenuItem();
                                 if (firstMenuItem != null)
                                 {
-                                    menuBar->SetSelectedMenuItem(firstMenuItem);
+                                    menuControl->SetSelectedMenuItem(firstMenuItem);
                                     wantsKeys = true;
-                                    menuBar->SetMenuInvalidated();
+                                    menuControl->SetMenuInvalidated();
                                     return true;
                                 }
                             }
@@ -1045,12 +1201,12 @@ namespace System.Windows
                     {
                         if (Level() == 0)
                         {
-                            MenuItem* lastMenuItem = menuBar->GetLastMenuItem();
+                            MenuItem* lastMenuItem = menuControl->GetLastMenuItem();
                             if (lastMenuItem != null)
                             {
-                                menuBar->SetSelectedMenuItem(lastMenuItem);
+                                menuControl->SetSelectedMenuItem(lastMenuItem);
                                 wantsKeys = true;
-                                menuBar->SetMenuInvalidated();
+                                menuControl->SetMenuInvalidated();
                                 return true;
                             }
                         }
@@ -1062,9 +1218,9 @@ namespace System.Windows
                                 MenuItem* lastMenuItem = parentMenuItem->GetLastMenuItem();
                                 if (lastMenuItem != null)
                                 {
-                                    menuBar->SetSelectedMenuItem(lastMenuItem);
+                                    menuControl->SetSelectedMenuItem(lastMenuItem);
                                     wantsKeys = true;
-                                    menuBar->SetMenuInvalidated();
+                                    menuControl->SetMenuInvalidated();
                                     return true;
                                 }
                             }
@@ -1075,13 +1231,13 @@ namespace System.Windows
                     {
                         if (Level() == 0)
                         {
-                            SetState(state.open, menuBar);
+                            SetState(state.open, menuControl);
                             MenuItem* firstChild = GetFirstMenuItem();
                             if (firstChild != null)
                             {
-                                menuBar->SetSelectedMenuItem(firstChild);
+                                menuControl->SetSelectedMenuItem(firstChild);
                                 wantsKeys = true;
-                                menuBar->SetMenuInvalidated();
+                                menuControl->SetMenuInvalidated();
                                 return true;
                             }
                         }
@@ -1090,9 +1246,9 @@ namespace System.Windows
                             MenuItem* nextMenuItem = GetNextMenuItem();
                             if (nextMenuItem != null)
                             {
-                                menuBar->SetSelectedMenuItem(nextMenuItem);
+                                menuControl->SetSelectedMenuItem(nextMenuItem);
                                 wantsKeys = true;
-                                menuBar->SetMenuInvalidated();
+                                menuControl->SetMenuInvalidated();
                                 return true;
                             }
                             else
@@ -1102,9 +1258,9 @@ namespace System.Windows
                                     MenuItem* firstMenuItem = parentMenuItem->GetFirstMenuItem();
                                     if (firstMenuItem != null)
                                     {
-                                        menuBar->SetSelectedMenuItem(firstMenuItem);
+                                        menuControl->SetSelectedMenuItem(firstMenuItem);
                                         wantsKeys = true;
-                                        menuBar->SetMenuInvalidated();
+                                        menuControl->SetMenuInvalidated();
                                         return true;
                                     }
                                 }
@@ -1116,13 +1272,13 @@ namespace System.Windows
                     {
                         if (Level() == 0)
                         {
-                            SetState(state.open, menuBar);
+                            SetState(state.open, menuControl);
                             MenuItem* lastChild = GetLastMenuItem();
                             if (lastChild != null)
                             {
-                                menuBar->SetSelectedMenuItem(lastChild);
+                                menuControl->SetSelectedMenuItem(lastChild);
                                 wantsKeys = true;
-                                menuBar->SetMenuInvalidated();
+                                menuControl->SetMenuInvalidated();
                                 return true;
                             }
                         }
@@ -1131,9 +1287,9 @@ namespace System.Windows
                             MenuItem* prevMenuItem = GetPrevMenuItem();
                             if (prevMenuItem != null)
                             {
-                                menuBar->SetSelectedMenuItem(prevMenuItem);
+                                menuControl->SetSelectedMenuItem(prevMenuItem);
                                 wantsKeys = true;
-                                menuBar->SetMenuInvalidated();
+                                menuControl->SetMenuInvalidated();
                                 return true;
                             }
                             else
@@ -1143,9 +1299,9 @@ namespace System.Windows
                                     MenuItem* lastMenuItem = parentMenuItem->GetLastMenuItem();
                                     if (lastMenuItem != null)
                                     {
-                                        menuBar->SetSelectedMenuItem(lastMenuItem);
+                                        menuControl->SetSelectedMenuItem(lastMenuItem);
                                         wantsKeys = true;
-                                        menuBar->SetMenuInvalidated();
+                                        menuControl->SetMenuInvalidated();
                                         return true;
                                     }
                                 }
@@ -1160,19 +1316,19 @@ namespace System.Windows
                             MenuItem* nextMenuItem = GetNextMenuItem();
                             if (nextMenuItem != null)
                             {
-                                menuBar->SetSelectedMenuItem(nextMenuItem);
+                                menuControl->SetSelectedMenuItem(nextMenuItem);
                                 wantsKeys = true;
-                                menuBar->SetMenuInvalidated();
+                                menuControl->SetMenuInvalidated();
                                 return true;
                             }
                             else
                             {
-                                MenuItem* firstMenuItem = menuBar->GetFirstMenuItem();
+                                MenuItem* firstMenuItem = menuControl->GetFirstMenuItem();
                                 if (firstMenuItem != null)
                                 {
-                                    menuBar->SetSelectedMenuItem(firstMenuItem);
+                                    menuControl->SetSelectedMenuItem(firstMenuItem);
                                     wantsKeys = true;
-                                    menuBar->SetMenuInvalidated();
+                                    menuControl->SetMenuInvalidated();
                                     return true;
                                 }
                             }
@@ -1182,10 +1338,10 @@ namespace System.Windows
                             MenuItem* firstChild = GetFirstMenuItem();
                             if (firstChild != null)
                             {
-                                SetState(State.open, menuBar);
-                                menuBar->SetSelectedMenuItem(firstChild);
+                                SetState(State.open, menuControl);
+                                menuControl->SetSelectedMenuItem(firstChild);
                                 wantsKeys = true;
-                                menuBar->SetMenuInvalidated();
+                                menuControl->SetMenuInvalidated();
                                 return true;
                             }
                             else
@@ -1197,30 +1353,30 @@ namespace System.Windows
                                         MenuItem* nextMenuItem = parentMenuItem->GetNextMenuItem();
                                         if (nextMenuItem != null)
                                         {
-                                            parentMenuItem->SetState(State.closed, menuBar);
-                                            nextMenuItem->SetState(State.open, menuBar);
+                                            parentMenuItem->SetState(State.closed, menuControl);
+                                            nextMenuItem->SetState(State.open, menuControl);
                                             MenuItem* firstChild = nextMenuItem->GetFirstMenuItem();
                                             if (firstChild != null)
                                             {
-                                                menuBar->SetSelectedMenuItem(firstChild);
+                                                menuControl->SetSelectedMenuItem(firstChild);
                                                 wantsKeys = true;
-                                                menuBar->SetMenuInvalidated();
+                                                menuControl->SetMenuInvalidated();
                                                 return true;
                                             }
                                         }
                                         else
                                         {
-                                            MenuItem* firstMenuItem = menuBar->GetFirstMenuItem();
+                                            MenuItem* firstMenuItem = menuControl->GetFirstMenuItem();
                                             if (firstMenuItem != null)
                                             {
-                                                parentMenuItem->SetState(State.closed, menuBar);
-                                                firstMenuItem->SetState(State.open, menuBar);
+                                                parentMenuItem->SetState(State.closed, menuControl);
+                                                firstMenuItem->SetState(State.open, menuControl);
                                                 MenuItem* firstChild = firstMenuItem->GetFirstMenuItem();
                                                 if (firstChild != null)
                                                 {
-                                                    menuBar->SetSelectedMenuItem(firstChild);
+                                                    menuControl->SetSelectedMenuItem(firstChild);
                                                     wantsKeys = true;
-                                                    menuBar->SetMenuInvalidated();
+                                                    menuControl->SetMenuInvalidated();
                                                     return true;
                                                 }
                                             }
@@ -1232,15 +1388,15 @@ namespace System.Windows
                                         MenuItem* nextMenuItem = grandParentMenuItem->GetNextMenuItem();
                                         if (nextMenuItem != null)
                                         {
-                                            parentMenuItem->SetState(State.closed, menuBar);
-                                            grandParentMenuItem->SetState(State.closed, menuBar);
-                                            nextMenuItem->SetState(State.open, menuBar);
+                                            parentMenuItem->SetState(State.closed, menuControl);
+                                            grandParentMenuItem->SetState(State.closed, menuControl);
+                                            nextMenuItem->SetState(State.open, menuControl);
                                             MenuItem* firstChild = nextMenuItem->GetFirstMenuItem();
                                             if (firstChild != null)
                                             {
-                                                menuBar->SetSelectedMenuItem(firstChild);
+                                                menuControl->SetSelectedMenuItem(firstChild);
                                                 wantsKeys = true;
-                                                menuBar->SetMenuInvalidated();
+                                                menuControl->SetMenuInvalidated();
                                                 return true;
                                             }
                                         }
@@ -1261,19 +1417,19 @@ namespace System.Windows
                             MenuItem* prevMenuItem = GetPrevMenuItem();
                             if (prevMenuItem != null)
                             {
-                                menuBar->SetSelectedMenuItem(prevMenuItem);
+                                menuControl->SetSelectedMenuItem(prevMenuItem);
                                 wantsKeys = true;
-                                menuBar->SetMenuInvalidated();
+                                menuControl->SetMenuInvalidated();
                                 return true;
                             }
                             else
                             {
-                                MenuItem* lastMenuItem = menuBar->GetLastMenuItem();
+                                MenuItem* lastMenuItem = menuControl->GetLastMenuItem();
                                 if (lastMenuItem != null)
                                 {
-                                    menuBar->SetSelectedMenuItem(lastMenuItem);
+                                    menuControl->SetSelectedMenuItem(lastMenuItem);
                                     wantsKeys = true;
-                                    menuBar->SetMenuInvalidated();
+                                    menuControl->SetMenuInvalidated();
                                     return true;
                                 }
                             }
@@ -1285,14 +1441,14 @@ namespace System.Windows
                                 MenuItem* prevMenuItem = parentMenuItem->GetPrevMenuItem();
                                 if (prevMenuItem != null)
                                 {
-                                    parentMenuItem->SetState(State.closed, menuBar);
-                                    prevMenuItem->SetState(State.open, menuBar);
+                                    parentMenuItem->SetState(State.closed, menuControl);
+                                    prevMenuItem->SetState(State.open, menuControl);
                                     MenuItem* firstChild = prevMenuItem->GetFirstMenuItem();
                                     if (firstChild != null)
                                     {
-                                        menuBar->SetSelectedMenuItem(firstChild);
+                                        menuControl->SetSelectedMenuItem(firstChild);
                                         wantsKeys = true;
-                                        menuBar->SetMenuInvalidated();
+                                        menuControl->SetMenuInvalidated();
                                         return true;
                                     }
                                 }
@@ -1301,27 +1457,27 @@ namespace System.Windows
                                     MenuItem* grandParentMenuItem = parentMenuItem->GetParentMenuItem();
                                     if (grandParentMenuItem != null)
                                     {
-                                        grandParentMenuItem->SetState(State.open, menuBar);
+                                        grandParentMenuItem->SetState(State.open, menuControl);
                                         MenuItem* firstMenuItem = grandParentMenuItem->GetFirstMenuItem();
                                         if (firstMenuItem != null)
                                         {
-                                            firstMenuItem->SetState(State.closed, menuBar);
-                                            menuBar->SetSelectedMenuItem(firstMenuItem);
+                                            firstMenuItem->SetState(State.closed, menuControl);
+                                            menuControl->SetSelectedMenuItem(firstMenuItem);
                                         }
                                     }
                                     else
                                     {
-                                        MenuItem* lastMenuItem = menuBar->GetLastMenuItem();
+                                        MenuItem* lastMenuItem = menuControl->GetLastMenuItem();
                                         if (lastMenuItem != null)
                                         {
-                                            parentMenuItem->SetState(State.closed, menuBar);
-                                            lastMenuItem->SetState(State.open, menuBar);
+                                            parentMenuItem->SetState(State.closed, menuControl);
+                                            lastMenuItem->SetState(State.open, menuControl);
                                             MenuItem* firstChild = lastMenuItem->GetFirstMenuItem();
                                             if (firstChild != null)
                                             {
-                                                menuBar->SetSelectedMenuItem(firstChild);
+                                                menuControl->SetSelectedMenuItem(firstChild);
                                                 wantsKeys = true;
-                                                menuBar->SetMenuInvalidated();
+                                                menuControl->SetMenuInvalidated();
                                                 return true;
                                             }
                                         }
@@ -1336,60 +1492,60 @@ namespace System.Windows
             wantsKeys = true;
             return false;
         }
-        private void Close(MenuBar* menuBar)
+        private void Close(MenuControl* menuControl)
         {
-            SetState(State.closed, menuBar);
+            SetState(State.closed, menuControl);
             MenuItem* parentItem = GetParentMenuItem();
             while (parentItem != null)
             {
-                parentItem->SetState(State.closed, menuBar);
+                parentItem->SetState(State.closed, menuControl);
                 parentItem = parentItem->GetParentMenuItem();
             }
-            menuBar->SetSelectedMenuItem(null);
-            menuBar->SetClosed();
-            menuBar->SetMenuInvalidated();
+            menuControl->SetSelectedMenuItem(null);
+            menuControl->SetClosed();
+            menuControl->SetMenuInvalidated();
         }
-        private void Execute(MenuItem* parentMenuItem, bool& wantsKeys, MenuBar* menuBar)
+        private void Execute(MenuItem* parentMenuItem, bool& wantsKeys, MenuControl* menuControl)
         {
             if (children.IsEmpty())
             {
-                Close(menuBar);
+                Close(menuControl);
                 wantsKeys = false;
                 DoClick();
             }
             else
             {
-                SetState(State.open, menuBar);
+                SetState(State.open, menuControl);
                 MenuItem* firstMenuItem = GetFirstMenuItem();
                 if (firstMenuItem != null)
                 {
-                    menuBar->SetSelectedMenuItem(firstMenuItem);
+                    menuControl->SetSelectedMenuItem(firstMenuItem);
                     wantsKeys = true;
-                    menuBar->SetMenuInvalidated();
+                    menuControl->SetMenuInvalidated();
                 }
             }
         }
-        internal void DoMouseDown(MouseEventArgs& args, bool& handled, MenuBar* menuBar)
+        internal void DoMouseDown(MouseEventArgs& args, bool& handled, MenuControl* menuControl)
         {
             if (Level() == 0)
             {
                 if (Contains(args.location))
                 {
                     SetMouseInClient();
-                    if (menuBar->IsOpen())
+                    if (menuControl->IsOpen())
                     {
-                        menuBar->SetClosed();
-                        menuBar->SetLatestOpenedMenuItem(null);
-                        SetState(State.closed, menuBar);
-                        DoMouseDown(args, menuBar);
+                        menuControl->SetClosed();
+                        menuControl->SetLatestOpenedMenuItem(null);
+                        SetState(State.closed, menuControl);
+                        DoMouseDown(args, menuControl);
                         handled = true;
                     }
                     else
                     {
-                        menuBar->SetOpen();
-                        SetState(State.open, menuBar);
-                        menuBar->SetLatestOpenedMenuItem(this);
-                        DoMouseDown(args, menuBar);
+                        menuControl->SetOpen();
+                        SetState(State.open, menuControl);
+                        menuControl->SetLatestOpenedMenuItem(this);
+                        DoMouseDown(args, menuControl);
                         handled = true;
                     }
                 }
@@ -1401,7 +1557,7 @@ namespace System.Windows
                         if (child is MenuItem*)
                         {
                             MenuItem* childItem = cast<MenuItem*>(child);
-                            childItem->DoMouseDown(args, handled, menuBar);
+                            childItem->DoMouseDown(args, handled, menuControl);
                             if (handled) return;
                         }
                         child = child->NextSibling();
@@ -1410,7 +1566,7 @@ namespace System.Windows
             }
             else
             {
-                if (menuBar->IsOpen())
+                if (menuControl->IsOpen())
                 {
                     MenuItem* parentMenuItem = GetParentMenuItem();
                     if (parentMenuItem != null)
@@ -1423,22 +1579,22 @@ namespace System.Windows
                                 {
                                     if (state == State.closed)
                                     {
-                                        SetState(State.open, menuBar);
-                                        menuBar->SetLatestOpenedMenuItem(this);
-                                        DoMouseDown(args, menuBar);
+                                        SetState(State.open, menuControl);
+                                        menuControl->SetLatestOpenedMenuItem(this);
+                                        DoMouseDown(args, menuControl);
                                         handled = true;
                                     }
                                     else if (state == State.open)
                                     {
-                                        SetState(State.closed, menuBar);
-                                        menuBar->SetLatestOpenedMenuItem(null);
-                                        DoMouseDown(args, menuBar);
+                                        SetState(State.closed, menuControl);
+                                        menuControl->SetLatestOpenedMenuItem(null);
+                                        DoMouseDown(args, menuControl);
                                         handled = true;
                                     }
                                 }
                                 else
                                 {
-                                    DoMouseDown(args, menuBar);
+                                    DoMouseDown(args, menuControl);
                                     if ((args.buttons & MouseButtons.lbutton) != 0)
                                     {
                                         SetLButtonPressed();
@@ -1454,7 +1610,7 @@ namespace System.Windows
                         if (child is MenuItem*)
                         {
                             MenuItem* childItem = cast<MenuItem*>(child);
-                            childItem->DoMouseDown(args, handled, menuBar);
+                            childItem->DoMouseDown(args, handled, menuControl);
                             if (handled) return;
                         }
                         child = child->NextSibling();
@@ -1462,13 +1618,13 @@ namespace System.Windows
                 }
             }
         }
-        internal void DoMouseUp(MouseEventArgs& args, bool& handled, MenuBar* menuBar)
+        internal void DoMouseUp(MouseEventArgs& args, bool& handled, MenuControl* menuControl)
         {
             if (Level() == 0)
             {
                 if (Contains(args.location))
                 {
-                    DoMouseUp(args, menuBar);
+                    DoMouseUp(args, menuControl);
                     handled = true;
                 }
                 else
@@ -1479,7 +1635,7 @@ namespace System.Windows
                         if (child is MenuItem*)
                         {
                             MenuItem* childItem = cast<MenuItem*>(child);
-                            childItem->DoMouseUp(args, handled, menuBar);
+                            childItem->DoMouseUp(args, handled, menuControl);
                             if (handled) return;
                         }
                         child = child->NextSibling();
@@ -1488,7 +1644,7 @@ namespace System.Windows
             }
             else
             {
-                if (menuBar->IsOpen())
+                if (menuControl->IsOpen())
                 {
                     MenuItem* parentMenuItem = GetParentMenuItem();
                     if (parentMenuItem != null)
@@ -1497,7 +1653,7 @@ namespace System.Windows
                         {
                             if (Contains(args.location))
                             {
-                                DoMouseUp(args, menuBar);
+                                DoMouseUp(args, menuControl);
                                 handled = true;
                                 return;
                             }
@@ -1509,7 +1665,7 @@ namespace System.Windows
                         if (child is MenuItem*)
                         {
                             MenuItem* childItem = cast<MenuItem*>(child);
-                            childItem->DoMouseUp(args, handled, menuBar);
+                            childItem->DoMouseUp(args, handled, menuControl);
                             if (handled) return;
                         }
                         child = child->NextSibling();
@@ -1517,9 +1673,9 @@ namespace System.Windows
                 }
             }
         }
-        private void DoMouseDown(MouseEventArgs& args, MenuBar* menuBar)
+        private void DoMouseDown(MouseEventArgs& args, MenuControl* menuControl)
         {
-            menuBar->SetLatestMouseDownMenuItem(this);
+            menuControl->SetLatestMouseDownMenuItem(this);
             ResetLButtonPressed();
             OnMouseDown(args);
         }
@@ -1527,10 +1683,10 @@ namespace System.Windows
         {
             mouseDownEvent.Fire(args);
         }
-        private void DoMouseUp(MouseEventArgs& args, MenuBar* menuBar)
+        private void DoMouseUp(MouseEventArgs& args, MenuControl* menuControl)
         {
             OnMouseUp(args);
-            MenuItem* latestMouseDownMenuItem = menuBar->GetLatestMouseDownMenuItem();
+            MenuItem* latestMouseDownMenuItem = menuControl->GetLatestMouseDownMenuItem();
             if ((args.buttons & MouseButtons.lbutton) != 0)
             {
                 if (LButtonPressed())
@@ -1538,20 +1694,20 @@ namespace System.Windows
                     ResetLButtonPressed();
                     if (latestMouseDownMenuItem == this && children.IsEmpty())
                     {
-                        ResetSelected(menuBar);
+                        ResetSelected(menuControl);
                         ResetMouseInClient();
-                        this->DoMouseLeave(menuBar);
-                        LeaveChildren(menuBar);
-                        Close(menuBar);
+                        this->DoMouseLeave(menuControl);
+                        LeaveChildren(menuControl);
+                        Close(menuControl);
                         DoClick();
                     }
-                    MenuItem* openedMenuItem = menuBar->GetOpenedMenuItem();
+                    MenuItem* openedMenuItem = menuControl->GetOpenedMenuItem();
                     if (openedMenuItem != null)
                     {
-                        openedMenuItem->SetState(State.closed, menuBar);
+                        openedMenuItem->SetState(State.closed, menuControl);
                     }
-                    menuBar->SetClosed();
-                    menuBar->SetMenuInvalidated();
+                    menuControl->SetClosed();
+                    menuControl->SetMenuInvalidated();
                 }
             }
         }
@@ -1559,7 +1715,7 @@ namespace System.Windows
         {
             mouseUpEvent.Fire(args);
         }
-        internal void DoMouseEnter(bool parentIsOpen, MenuBar* menuBar)
+        internal void DoMouseEnter(bool parentIsOpen, MenuControl* menuControl)
         {
             if (parentIsOpen)
             {
@@ -1569,7 +1725,7 @@ namespace System.Windows
                     if (prev is MenuItem*)
                     {
                         MenuItem* prevItem = cast<MenuItem*>(prev);
-                        prevItem->DoMouseLeave(menuBar);
+                        prevItem->DoMouseLeave(menuControl);
                     }
                     prev = prev->PrevSibling();
                 }
@@ -1579,7 +1735,7 @@ namespace System.Windows
                     if (next is MenuItem*)
                     {
                         MenuItem* nextItem = cast<MenuItem*>(next);
-                        nextItem->DoMouseLeave(menuBar);
+                        nextItem->DoMouseLeave(menuControl);
                     }
                     next = next->NextSibling();
                 }
@@ -1589,11 +1745,11 @@ namespace System.Windows
                     if (child is MenuItem*)
                     {
                         MenuItem* childMenuItem = cast<MenuItem*>(child);
-                        childMenuItem->ResetSelected(menuBar);
+                        childMenuItem->ResetSelected(menuControl);
                         if (childMenuItem->MouseInClient())
                         {
                             childMenuItem->ResetMouseInClient();
-                            childMenuItem->DoMouseLeave(menuBar);
+                            childMenuItem->DoMouseLeave(menuControl);
                         }
                     }
                     child = child->NextSibling();
@@ -1601,11 +1757,11 @@ namespace System.Windows
             }
             if (parentIsOpen)
             {
-                SetState(State.open, menuBar);
-                menuBar->SetLatestOpenedMenuItem(this);
+                SetState(State.open, menuControl);
+                menuControl->SetLatestOpenedMenuItem(this);
             }
             OnMouseEnter();
-            menuBar->SetMenuInvalidated();
+            menuControl->SetMenuInvalidated();
         }
         internal void DoMouseMove(MouseEventArgs& args)
         {
@@ -1615,7 +1771,7 @@ namespace System.Windows
         {
             mouseEnterEvent.Fire();
         }
-        private void LeaveChildren(MenuBar* menuBar)
+        private void LeaveChildren(MenuControl* menuControl)
         {
             Component* child = children.FirstChild();
             while (child != null)
@@ -1623,21 +1779,21 @@ namespace System.Windows
                 if (child is MenuItem*)
                 {
                     MenuItem* childMenuItem = cast<MenuItem*>(child);
-                    childMenuItem->ResetSelected(menuBar);
+                    childMenuItem->ResetSelected(menuControl);
                     childMenuItem->ResetMouseInClient();
-                    childMenuItem->DoMouseLeave(menuBar);
-                    childMenuItem->LeaveChildren(menuBar);
+                    childMenuItem->DoMouseLeave(menuControl);
+                    childMenuItem->LeaveChildren(menuControl);
                 }
                 child = child->NextSibling();
             }
         }
-        internal void DoMouseLeave(MenuBar* menuBar)
+        internal void DoMouseLeave(MenuControl* menuControl)
         {
             ResetLButtonPressed();
             if (state == State.open)
             {
-                SetState(State.closed, menuBar);
-                LeaveChildren(menuBar);
+                SetState(State.closed, menuControl);
+                LeaveChildren(menuControl);
                 OnMouseLeave();
             }
             else if (Level() == 0)
@@ -1649,17 +1805,17 @@ namespace System.Windows
         {
             mouseLeaveEvent.Fire();
         }
-        internal void DispatchMouseMove(MouseEventArgs& args, bool& handled, MenuBar* menuBar)
+        internal void DispatchMouseMove(MouseEventArgs& args, bool& handled, MenuControl* menuControl)
         {
             if (unionRect.Contains(args.location))
             {
                 if (Contains(args.location))
                 {
-                    SetSelected(menuBar);
+                    SetSelected(menuControl);
                 }
                 else
                 {
-                    ResetSelected(menuBar);
+                    ResetSelected(menuControl);
                     ResetMouseInClient();
                 }
                 Component* child = children.FirstChild();
@@ -1670,11 +1826,11 @@ namespace System.Windows
                         MenuItem* childMenuItem = cast<MenuItem*>(child);
                         if (childMenuItem->Contains(args.location))
                         {
-                            childMenuItem->SetSelected(menuBar);
+                            childMenuItem->SetSelected(menuControl);
                             if (!childMenuItem->MouseInClient())
                             {
                                 childMenuItem->SetMouseInClient();
-                                childMenuItem->DoMouseEnter(true, menuBar);
+                                childMenuItem->DoMouseEnter(true, menuControl);
                                 handled = true;
                             }
                             else
@@ -1684,13 +1840,13 @@ namespace System.Windows
                         }
                         else
                         {
-                            childMenuItem->ResetSelected(menuBar);
+                            childMenuItem->ResetSelected(menuControl);
                             if (childMenuItem->MouseInClient())
                             {
                                 childMenuItem->ResetMouseInClient();
-                                if (!childMenuItem->IsSameOrParentOf(menuBar->LatestOpenedMenuItem()))
+                                if (!childMenuItem->IsSameOrParentOf(menuControl->LatestOpenedMenuItem()))
                                 {
-                                    childMenuItem->DoMouseLeave(menuBar);
+                                    childMenuItem->DoMouseLeave(menuControl);
                                 }
                             }
                         }
@@ -1706,9 +1862,9 @@ namespace System.Windows
                     if (child is MenuItem*)
                     {
                         MenuItem* childMenuItem = cast<MenuItem*>(child);
-                        if (childMenuItem->IsSameOrParentOf(menuBar->LatestOpenedMenuItem()))
+                        if (childMenuItem->IsSameOrParentOf(menuControl->LatestOpenedMenuItem()))
                         {
-                            childMenuItem->DispatchMouseMove(args, handled, menuBar);
+                            childMenuItem->DispatchMouseMove(args, handled, menuControl);
                             if (handled) return;
                         }
                     }
@@ -1789,20 +1945,20 @@ namespace System.Windows
         }
         public override void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
             const Brush& menuOpenBrush, const Brush& shadowBrush, const Brush& blackBrush, const Pen& blackPen, const Pen& darkPen, const Font& font, const StringFormat& format,
-            const Color& menuOpenColor, MenuBar* menuBar, bool drawSubItems, const Point& origin)
+            const Color& menuOpenColor, MenuControl* menuControl, bool drawSubItems, const Point& origin)
         {
             switch (state)
             {
                 case State.closed:
                 {
-                    DrawClosed(graphics, parentPadding, textBrush, mouseOverBrush, backgroundBrush, menuOpenBrush, blackBrush, blackPen, font, format, menuOpenColor, menuBar,
+                    DrawClosed(graphics, parentPadding, textBrush, mouseOverBrush, backgroundBrush, menuOpenBrush, blackBrush, blackPen, font, format, menuOpenColor, menuControl,
                         drawSubItems, origin);
                     break;
                 }
                 case State.open:
                 {
                     DrawOpen(graphics, parentPadding, textBrush, backgroundBrush, mouseOverBrush, menuOpenBrush, shadowBrush, blackBrush, blackPen, darkPen, font, format,
-                        menuOpenColor, menuBar, drawSubItems, origin);
+                        menuOpenColor, menuControl, drawSubItems, origin);
                     break;
                 }
             }
@@ -1811,11 +1967,11 @@ namespace System.Windows
         {
             return text;
         }
-        public nothrow void SetText(const string& text_, MenuBar* menuBar)
+        public nothrow void SetText(const string& text_, MenuControl* menuControl)
         {
             text = text_;
             SetAccessKey();
-            menuBar->InvalidateMenu();
+            menuControl->InvalidateMenu();
         }
         public nothrow inline wchar AccessKey() const
         {
@@ -1837,10 +1993,10 @@ namespace System.Windows
         public nothrow void SetShortcut(Keys shortcut_)
         {
             shortcut = shortcut_;
-            MenuBar* menuBar = GetMenuBar();
-            if (menuBar != null)
+            MenuControl* menuControl = GetMenuControl();
+            if (menuControl != null)
             {
-                menuBar->SetMenuChanged();
+                menuControl->SetMenuChanged();
             }
         }
         private nothrow MenuItem* GetChildItemByAccessKey(wchar accessKey)
@@ -1963,12 +2119,12 @@ namespace System.Windows
         {
             return state;
         }
-        internal void SetState(State state_, MenuBar* menuBar)
+        internal void SetState(State state_, MenuControl* menuControl)
         {
             if (state != state_)
             {
                 state = state_;
-                menuBar->SetMenuInvalidated();
+                menuControl->SetMenuInvalidated();
             }
         }
         public override Size MeasureItem(Graphics& graphics, const Font& font, const StringFormat& format, int& shortcutFieldWidth, int& childIndicatorFieldWidth)
@@ -1997,7 +2153,7 @@ namespace System.Windows
         }
         private void DrawClosed(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& mouseOverBrush, const Brush& backgroundBrush,
             const Brush& menuOpenBrush, const Brush& blackBrush, const Pen& blackPen, const Font& font, const StringFormat& format, const Color& menuOpenColor,
-            MenuBar* menuBar, bool drawSubItems, const Point& origin)
+            MenuControl* menuControl, bool drawSubItems, const Point& origin)
         {
 /*
             LogView* logView = Application.GetLogView();
@@ -2013,7 +2169,7 @@ namespace System.Windows
             Rect r(loc, size);
             r.size.w = r.size.w - 1;
             r.size.h = r.size.h - 1;
-            MenuItem* selectedMenuItem = menuBar->GetSelectedMenuItem();
+            MenuItem* selectedMenuItem = menuControl->GetSelectedMenuItem();
             if (Selected() || this == selectedMenuItem)
             {
                 graphics.FillRectangleChecked(mouseOverBrush, r);
@@ -2046,7 +2202,7 @@ namespace System.Windows
         }
         private void DrawOpen(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush, const Brush& menuOpenBrush,
             const Brush& shadowBrush, const Brush& blackBrush, const Pen& blackPen, const Pen& darkPen, const Font& font, const StringFormat& format,
-            const Color& menuOpenColor, MenuBar* menuBar, bool drawSubItems, const Point& origin)
+            const Color& menuOpenColor, MenuControl* menuControl, bool drawSubItems, const Point& origin)
         {
             Point loc = Location();
             loc.x = loc.x - origin.x;
@@ -2078,7 +2234,7 @@ namespace System.Windows
             {
                 if (drawSubItems)
                 {
-                    MenuItem* selectedMenuItem = menuBar->GetSelectedMenuItem();
+                    MenuItem* selectedMenuItem = menuControl->GetSelectedMenuItem();
                     if (Selected() || this == selectedMenuItem)
                     {
                         graphics.FillRectangleChecked(mouseOverBrush, r);
@@ -2152,7 +2308,7 @@ namespace System.Windows
                         {
                             MenuItemBase* menuItem = cast<MenuItem*>(child);
                             menuItem->Draw(graphics, parentPadding, textBrush, backgroundBrush, mouseOverBrush, menuOpenBrush, shadowBrush, blackBrush, blackPen, darkPen,
-                                font, format, menuOpenColor, menuBar, drawSubItems, origin);
+                                font, format, menuOpenColor, menuControl, drawSubItems, origin);
                         }
                         child = child->NextSibling();
                     }
@@ -2217,20 +2373,20 @@ namespace System.Windows
         {
             return (flags & Flags.selected) != 0;
         }
-        internal nothrow void SetSelected(MenuBar* menuBar)
+        internal nothrow void SetSelected(MenuControl* menuControl)
         {
             if ((flags & Flags.selected) == 0)
             {
                 flags = cast<Flags>(flags | Flags.selected);
-                menuBar->SetMenuInvalidated();
+                menuControl->SetMenuInvalidated();
             }
         }
-        internal nothrow void ResetSelected(MenuBar* menuBar)
+        internal nothrow void ResetSelected(MenuControl* menuControl)
         {
             if ((flags & Flags.selected) != 0)
             {
                 flags = cast<Flags>(flags & ~Flags.selected);
-                menuBar->SetMenuInvalidated();
+                menuControl->SetMenuInvalidated();
             }
         }
         internal nothrow inline bool MouseInClient() const
@@ -2303,7 +2459,7 @@ namespace System.Windows
     {
         public override void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
             const Brush& menuOpenBrush, const Brush& shadowBrush, const Brush& blackBrush, const Pen& blackPen, const Pen& darkPen, const Font& font, const StringFormat& format,
-            const Color& menuOpenColor, MenuBar* menuBar, bool drawSubItems, const Point& origin)
+            const Color& menuOpenColor, MenuControl* menuControl, bool drawSubItems, const Point& origin)
         {
             Point loc = Location();
             loc.x = loc.x - origin.x;

@@ -10,8 +10,30 @@ namespace System.Windows
 {
     public enum ButtonStyle : long
     {
-        BS_PUSHBUTTON = 0,
-        BS_DEFPUSHBUTTON = 1
+        BS_PUSHBUTTON = 0x0,
+        BS_DEFPUSHBUTTON = 0x1,
+        BS_3STATE = 0x5,
+        BS_AUTO3STATE = 0x6,
+        BS_AUTOCHECKBOX = 0x3,
+        BS_AUTORADIOBUTTON = 0x9,
+        BS_BITMAP = 0x80,
+        BS_BOTTOM = 0x800,
+        BS_CENTER = 0x300,
+        BS_CHECKBOX = 0x2,
+        BS_GROUPBOX = 0x7,
+        BS_ICON = 0x40,
+        BS_FLAT = 0x8000,
+        BS_LEFT = 0x100,
+        BS_LEFTTEXT = 0x20,
+        BS_MULTILINE = 0x2000,
+        BS_NOTIFY = 0x4000,
+        BS_OWNERDRAW = 0x0B,
+        BS_PUSHLIKE = 0x1000,
+        BS_RADIOBUTTON = 0x4,
+        BS_RIGHT = 0x200,
+        BS_TOP = 0x400,
+        BS_TYPEMASK = 0xF,
+        BS_VCENTER = 0xC00
     }
     
     public class ButtonBase : Control
@@ -29,22 +51,98 @@ namespace System.Windows
     
     public class Button : ButtonBase
     {
-        public Button(ButtonStyle buttonStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle), DefaultExtendedWindowStyle(), 
-            GetSystemColor(SystemColor.COLOR_BTNFACE), text, location, size, dock, anchors)
+        private enum Flags : sbyte
         {
+            none = 0, defaultButton = 1 << 0
+        }
+        public Button(ButtonStyle buttonStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | buttonStyle), DefaultExtendedWindowStyle(), 
+            backgroundColor, text, location, size, dock, anchors), flags(Flags.none), dialogResult(DialogResult.none)
+        {
+            SetFlagsFromButtonStyle(buttonStyle);
         }
         public Button(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            this(ButtonStyle.BS_PUSHBUTTON, text, location, size, dock, anchors)
+            this(cast<ButtonStyle>(ButtonStyle.BS_PUSHBUTTON | ButtonStyle.BS_NOTIFY), GetSystemColor(SystemColor.COLOR_BTNFACE), text, location, size, dock, anchors)
         {
         }
         public Button(ButtonStyle buttonStyle, const string& text, const Point& location, const Size& size) :
-            this(buttonStyle, text, location, size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left))
+            this(buttonStyle, GetSystemColor(SystemColor.COLOR_BTNFACE), text, location, size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left))
         {
         }
         public Button(const string& text, const Point& location, const Size& size) : 
-            this(ButtonStyle.BS_PUSHBUTTON, text, location, size)
+            this(cast<ButtonStyle>(ButtonStyle.BS_PUSHBUTTON | ButtonStyle.BS_NOTIFY), text, location, size)
         {
+        }
+        protected override void OnCreated()
+        {
+            base->OnCreated();
+            Graphics graphics = Graphics.FromWindowHandle(Handle());
+            const FontHandle& fontHandle = GetFontHandle(graphics);
+            if (!fontHandle.IsNull())
+            {
+                SendSetFontMessage(fontHandle);
+            }
+        }
+        protected override void OnGotFocus()
+        {
+            base->OnGotFocus();
+            if (!IsDefault())
+            {
+                Window* window = GetWindow();
+                if (window != null)
+                {
+                    Button* defaultButton = window->DefaultButton();
+                    if (defaultButton != null)
+                    {
+                        defaultButton->ResetDefaultButtonStyle();
+                    }
+                }
+                SetDefaultButtonStyle();
+            }
+        }
+        protected override void OnLostFocus()
+        {
+            base->OnLostFocus();
+            if (!IsDefault())
+            {
+                ResetDefaultButtonStyle();
+                Window* window = GetWindow();
+                if (window != null)
+                {
+                    Button* defaultButton = window->DefaultButton();
+                    if (defaultButton != null)
+                    {
+                        defaultButton->SetDefaultButtonStyle();
+                    }
+                }
+            }
+        }
+        protected override void OnClick()
+        {
+            base->OnClick();
+            if (dialogResult != DialogResult.none)
+            {
+                Window* window = GetWindow();
+                if (window != null)
+                {
+                    window->SetDialogResult(dialogResult);
+                }
+            }
+        }
+        protected override void OnKeyDown(KeyEventArgs& args)
+        {
+            base->OnKeyDown(args);
+            if (!args.handled)
+            {
+                switch (args.keyData)
+                {
+                    case Keys.enter:
+                    {
+                        OnClick();
+                        break;
+                    }
+                }
+            }
         }
         public override void PrintWindowTree(int level)
         {
@@ -54,5 +152,50 @@ namespace System.Windows
                 log->WriteLine(string(' ', level) + "Button." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Point(), GetSize()).ToString() + "]");
             }
         }
+        public nothrow inline DialogResult GetDialogResult() const
+        {
+            return dialogResult;
+        }
+        public nothrow inline void SetDialogResult(DialogResult dialogResult_)
+        {
+            dialogResult = dialogResult_;
+        }
+        private nothrow void SetFlagsFromButtonStyle(ButtonStyle buttonStyle)
+        {
+            if ((buttonStyle & ButtonStyle.BS_DEFPUSHBUTTON) != 0)
+            {
+                flags = cast<Flags>(flags | Flags.defaultButton);
+            }
+        }
+        public nothrow inline bool IsDefault() const
+        {
+            return (flags & Flags.defaultButton) != Flags.none;
+        }
+        public void SetDefault()
+        {
+            flags = cast<Flags>(flags | Flags.defaultButton);
+            SetDefaultButtonStyle();
+        }
+        public void ResetDefault()
+        {
+            flags = cast<Flags>(flags & ~Flags.defaultButton);
+            ResetDefaultButtonStyle();
+        }
+        private void SetDefaultButtonStyle()
+        {
+            if (Handle() != null)
+            {
+                WinSendMessage(Handle(), BM_SETSTYLE, cast<uint>(GetWindowStyle() | ButtonStyle.BS_DEFPUSHBUTTON), cast<long>(true));
+            }
+        }
+        private void ResetDefaultButtonStyle()
+        {
+            if (Handle() != null)
+            {
+                WinSendMessage(Handle(), BM_SETSTYLE, cast<uint>(GetWindowStyle() & ~ButtonStyle.BS_DEFPUSHBUTTON), cast<long>(true));
+            }
+        }
+        private Flags flags;
+        private DialogResult dialogResult;
     }
 }

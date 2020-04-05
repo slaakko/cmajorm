@@ -13,7 +13,10 @@ namespace System.Windows
     public const uint WM_KILLFOCUS = 0x0008u;
     public const uint WM_PAINT = 0x000Fu;
     public const uint WM_CLOSE = 0x0010u;
+    public const uint WM_SHOWWINDOW =0x0018u;
     public const uint WM_DRAWITEM = 0x002bu;
+    public const uint WM_SETFONT = 0x0030u;
+    public const uint WM_GETFONT = 0x0031u;
     public const uint WM_KEYDOWN = 0x0100u;
     public const uint WM_KEYUP = 0x0101u;
     public const uint WM_CHAR = 0x0102u;
@@ -28,8 +31,33 @@ namespace System.Windows
     public const uint WM_LBUTTONDBLCLK = 0x0203u;
     public const uint WM_MOUSEWHEEL = 0x020au;
     public const uint WM_MOUSELEAVE = 0x02a3u;
-    
+
+    public const uint EM_SETSEL = 0x00b1u;
+    public const uint BM_SETSTYLE = 0x00f4u;
+    public const uint LB_GETCURSEL = 0x0188u;
+    public const uint LB_ADDSTRING = 0x0180u;
+    public const uint LB_DELETESTRING = 0x0182u;
+    public const uint LB_SETCURSEL = 0x0186u;
+    public const uint LB_INSERTSTRING = 0x0181u;
+    public const uint LB_GETTOPINDEX = 0x018eu;
+    public const uint LB_SETTOPINDEX = 0x0197u;
+    public const uint LB_GETCOUNT = 0x81bu;
+    public const uint LB_GETTEXTLEN = 0x018au;
+    public const uint LB_GETTEXT = 0x0189u;
+    public const uint BM_GETCHECK = 0x00f0u;
+    public const uint BM_SETCHECK = 0x00f1u;
+
     public const ushort BN_CLICKED = 0u;
+    public const ushort BN_SETFOCUS = 6u;
+    public const ushort BN_KILLFOCUS = 7u;
+    public const ushort EN_CHANGE = 0x0300u;
+    public const ushort EN_SETFOCUS = 0x0100u;
+    public const ushort EN_KILLFOCUS = 0x0200u;
+    public const ushort LBN_SETFOCUS = 0x4u;
+    public const ushort LBN_KILLFOCUS = 0x5u;
+    public const ushort LBN_SELCHANGE = 0x1u;
+    public const ushort BST_CHECKED = 0x1u;
+    public const ushort BST_UNCHECKED = 0x0u;
 
     public const uint ODT_MENU = 1u;
 
@@ -104,6 +132,23 @@ namespace System.Windows
         public bool handled;
     }
 
+    public class KeyEventArgs
+    {
+        public nothrow KeyEventArgs(Keys keyCode_, Keys modifiers_) :
+            keyCode(keyCode_), modifiers(modifiers_), keyData(cast<Keys>(keyCode | modifiers)),
+            alt((modifiers & Keys.altModifier) != 0), control((modifiers & Keys.controlModifier) != 0), shift((modifiers & Keys.shiftModifier) != 0), handled(false), suppressKeyPress(false)
+        {
+        }
+        public Keys keyCode;
+        public Keys modifiers;
+        public Keys keyData;
+        public bool alt;
+        public bool control;
+        public bool shift;
+        public bool handled;
+        public bool suppressKeyPress;
+    }
+
     public class TreeViewNodeMouseClickEventArgs
     {
         public nothrow TreeViewNodeMouseClickEventArgs(const Point& location_, MouseButtons buttons_, int clicks_, TreeViewNode* node_) :
@@ -122,23 +167,6 @@ namespace System.Windows
         {
         }
         public TreeViewNode* node;
-    }
-
-    public class KeyEventArgs
-    {
-        public nothrow KeyEventArgs(Keys keyCode_, Keys modifiers_) :
-            keyCode(keyCode_), modifiers(modifiers_), keyData(cast<Keys>(keyCode | modifiers)),
-            alt((modifiers & Keys.altModifier) != 0), control((modifiers & Keys.controlModifier) != 0), shift((modifiers & Keys.shiftModifier) != 0), handled(false), suppressKeyPress(false)
-        {
-        }
-        public Keys keyCode;
-        public Keys modifiers;
-        public Keys keyData;
-        public bool alt;
-        public bool control;
-        public bool shift;
-        public bool handled;
-        public bool suppressKeyPress;
     }
 
     public class ControlEventArgs
@@ -210,5 +238,6 @@ namespace System.Windows
         public uint wparam;
         public long lparam;
         public long result;
+        public void* originalWndProc;
     }
 }

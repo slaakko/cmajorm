@@ -11,8 +11,7 @@ namespace System.Windows
     public class Panel : ContainerControl
     {
         public Panel(const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("System.Windows.Panel", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), GetSystemColor(SystemColor.COLOR_MENU),
-                "panel", location, size, dock, anchors)
+            base("System.Windows.Panel", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(), "panel", location, size, dock, anchors)
         {
         }
         public override void PrintWindowTree(int level)

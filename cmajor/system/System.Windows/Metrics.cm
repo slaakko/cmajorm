@@ -4,6 +4,9 @@
 // =================================
 
 using System;
+using System.IO;
+using System.Text;
+using System.XPath;
 
 namespace System.Windows
 {
@@ -108,5 +111,371 @@ namespace System.Windows
     int GetSystemMetrics(SystemMetricsId id)
     {
         return WinGetSystemMetrics(cast<int>(id));
+    }
+
+    public const float inchMM = 25.4f;
+    public const float pointMM = 0.351450f;
+
+    public nothrow inline float InchToMM(float inches)
+    {
+        return inches * inchMM;
+    }
+
+    public nothrow inline float MMToInch(float mm)
+    {
+        return mm / inchMM;
+    }
+
+    public nothrow inline float PointToMM(float points)
+    {
+        return points * pointMM;
+    }
+
+    public nothrow inline float MMToPoint(float mm)
+    {
+        return mm / pointMM;
+    }
+
+    public nothrow inline int MMToPixels(float mm, float dpi)
+    {
+        return cast<int>(mm * dpi / inchMM);
+    }
+
+    public nothrow inline float PixelsToMM(int pixels, float dpi)
+    {
+        return pixels * inchMM / dpi;
+    }
+
+    public nothrow inline double GoldenRatio()
+    {
+        return 1 + Sqrt(5) / 2;
+    }
+
+    public string GetDefaultMetricsFilePath()
+    {
+        string metricsFilePath;
+        string cmajorRootDir = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        if (!cmajorRootDir.IsEmpty())
+        {
+            metricsFilePath = Path.Combine(Path.Combine(cmajorRootDir, "config"), "metrics.xml");
+        }
+        return metricsFilePath;
+    }
+
+    public class SizeElement
+    {
+        public SizeElement(const string& name_) : name(name_)
+        {
+        }
+        public nothrow inline const SizeF& Get() const
+        {
+            return size;
+        }
+        public nothrow void Set(const SizeF& size_)
+        {
+            size = size_;
+        }
+        public void Read(System.Dom.Element* parentElement)
+        {
+            UniquePtr<XPathObject> result = Evaluate(ToUtf32(name), parentElement);
+            if (!result.IsNull())
+            {
+                if (result->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* sizeElement = cast<System.Dom.Element*>(node);
+                            size.w = ParseFloat(ToUtf8(sizeElement->GetAttribute(u"width")));
+                            size.h = ParseFloat(ToUtf8(sizeElement->GetAttribute(u"height")));
+                        }
+                    }
+                }
+            }
+        }
+        public void Write(System.Dom.Element* parentElement)
+        {
+            ustring en = ToUtf32(name);
+            UniquePtr<System.Dom.Element> sizeElement(new System.Dom.Element(en));
+            sizeElement->SetAttribute(u"width", ToUtf32(ToString(size.w)));
+            sizeElement->SetAttribute(u"height", ToUtf32(ToString(size.h)));
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(sizeElement.Release()));
+        }
+        private string name;
+        private SizeF size;
+    }
+
+    public class Metrics
+    {
+        public nothrow Metrics() :
+            useDefaults(false), dpiX(96), dpiY(96),
+            defaultButtonSize(86, 25), defaultButtonSizeElement("button"),
+            defaultLabelSize(71, 19), defaultLabelSizeElement("label"),
+            defaultTextBoxSize(94, 14), defaultTextBoxSizeElement("textBox"),
+            defaultListBoxSize(120, 95), defaultListBoxSizeElement("listBox"),
+            defaultCheckBoxSize(80, 17), defaultCheckBoxSizeElement("checkBox"),
+            defaultControlSpacing(10, 10), defaultControlSpacingElement("controlSpacing")
+        {
+            SetElementValues();
+        }
+        public nothrow inline bool UseDefaults() const
+        {
+            return useDefaults;
+        }
+        public nothrow void SetUseDefaults(bool useDefaults_)
+        {
+            useDefaults = useDefaults_;
+        }
+        public void LoadFromFile(const string& fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                UniquePtr<System.Dom.Document> metricsDoc = System.Dom.ReadDocument(fileName);
+                Read(metricsDoc->DocumentElement());
+                LogView* logView = Application.GetLogView();
+                if (logView != null)
+                {
+                    logView->WriteLine("metrics loaded from '" + fileName + "'");
+                }
+            }
+        }
+        public void SetElementValues() // Sets element values from the corresponding pixel-valued sizes. Call this if you have changed the pixel-valued sizes and you want to save the changed metrics.
+        {
+            defaultButtonSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultButtonSize.w), VerticalPixelsToMM(defaultButtonSize.h)));
+            defaultLabelSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultLabelSize.w), VerticalPixelsToMM(defaultLabelSize.h)));
+            defaultTextBoxSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultTextBoxSize.w), VerticalPixelsToMM(defaultTextBoxSize.h)));
+            defaultListBoxSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultListBoxSize.w), VerticalPixelsToMM(defaultListBoxSize.h)));
+            defaultCheckBoxSizeElement.Set(SizeF(HorizontalPixelsToMM(defaultCheckBoxSize.w), VerticalPixelsToMM(defaultCheckBoxSize.h)));
+            defaultControlSpacingElement.Set(SizeF(HorizontalPixelsToMM(defaultControlSpacing.w), VerticalPixelsToMM(defaultControlSpacing.h)));
+        }
+        public void SaveTofile(const string& fileName, bool setElementValues)
+        {
+            if (setElementValues)
+            {
+                SetElementValues();
+            }
+            System.Dom.Document metricsDoc;
+            metricsDoc.AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Element(u"metrics")));
+            metricsDoc.DocumentElement()->AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Comment(u"metrics are in millimeters")));
+            metricsDoc.DocumentElement()->AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Text(u"\n ")));
+            Write(metricsDoc.DocumentElement());
+            StreamWriter writer = File.CreateText(fileName);
+            CodeFormatter formatter(writer);
+            formatter.SetIndentSize(1);
+            metricsDoc.Write(formatter);
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                logView->WriteLine("metrics saved to '" + fileName + "'");
+            }
+        }
+        public void Read(System.Dom.Element* parentElement)
+        {
+            defaultButtonSizeElement.Read(parentElement);
+            defaultLabelSizeElement.Read(parentElement);
+            defaultTextBoxSizeElement.Read(parentElement);
+            defaultListBoxSizeElement.Read(parentElement);
+            defaultCheckBoxSizeElement.Read(parentElement);
+            defaultControlSpacingElement.Read(parentElement);
+        }
+        public void Write(System.Dom.Element* parentElement)
+        {
+            defaultButtonSizeElement.Write(parentElement);
+            defaultLabelSizeElement.Write(parentElement);
+            defaultTextBoxSizeElement.Write(parentElement);
+            defaultListBoxSizeElement.Write(parentElement);
+            defaultCheckBoxSizeElement.Write(parentElement);
+            defaultControlSpacingElement.Write(parentElement);
+        }
+        public nothrow inline bool Calculated() const
+        {
+            return calculated;
+        }
+        public void Calculate(Graphics& graphics)
+        {
+            calculated = true;
+            dpiX = graphics.GetDpiX();
+            dpiY = graphics.GetDpiX();
+            if (useDefaults) return;
+            defaultButtonSize.w = MMToHorizontalPixels(defaultButtonSizeElement.Get().w);
+            defaultButtonSize.h = MMToVerticalPixels(defaultButtonSizeElement.Get().h);
+            defaultLabelSize.w = MMToHorizontalPixels(defaultLabelSizeElement.Get().w);
+            defaultLabelSize.h = MMToVerticalPixels(defaultLabelSizeElement.Get().h);
+            defaultTextBoxSize.w = MMToHorizontalPixels(defaultTextBoxSizeElement.Get().w);
+            defaultTextBoxSize.h = MMToVerticalPixels(defaultTextBoxSizeElement.Get().h);
+            defaultListBoxSize.w = MMToHorizontalPixels(defaultListBoxSizeElement.Get().w);
+            defaultListBoxSize.w = MMToVerticalPixels(defaultListBoxSizeElement.Get().h);
+            defaultCheckBoxSize.w = MMToHorizontalPixels(defaultCheckBoxSizeElement.Get().w);
+            defaultCheckBoxSize.h = MMToVerticalPixels(defaultCheckBoxSizeElement.Get().h);
+            defaultControlSpacing.w = MMToHorizontalPixels(defaultControlSpacingElement.Get().w);
+            defaultControlSpacing.h = MMToVerticalPixels(defaultControlSpacingElement.Get().h);
+        }
+        public void PrintToLog()
+        {
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                logView->WriteLine("DPIX=" + ToString(dpiX) + ", DPIY=" + ToString(dpiY));
+                logView->WriteLine("Button: " + defaultButtonSize.ToString() + " - (" + ToString(HorizontalPixelsToMM(defaultButtonSize.w)) + "mm, " + ToString(VerticalPixelsToMM(defaultButtonSize.h)) + "mm)");
+                logView->WriteLine("Label: " + defaultLabelSize.ToString() + " - (" + ToString(HorizontalPixelsToMM(defaultLabelSize.w)) + "mm, " + ToString(VerticalPixelsToMM(defaultLabelSize.h)) + "mm)");
+                logView->WriteLine("TextBox: " + defaultTextBoxSize.ToString() + " - (" + ToString(HorizontalPixelsToMM(defaultTextBoxSize.w)) + "mm, " + ToString(VerticalPixelsToMM(defaultTextBoxSize.h)) + "mm)");
+                logView->WriteLine("ListBox: " + defaultListBoxSize.ToString() + " - (" + ToString(HorizontalPixelsToMM(defaultListBoxSize.w)) + "mm, " + ToString(VerticalPixelsToMM(defaultListBoxSize.h)) + "mm)");
+                logView->WriteLine("CheckBox: " + defaultCheckBoxSize.ToString() + " - (" + ToString(HorizontalPixelsToMM(defaultCheckBoxSize.w)) + "mm, " + ToString(VerticalPixelsToMM(defaultCheckBoxSize.h)) + "mm)");
+                logView->WriteLine("Spacing: " + defaultControlSpacing.ToString()  + " - (" + ToString(HorizontalPixelsToMM(defaultControlSpacing.w)) + "mm, " + ToString(VerticalPixelsToMM(defaultControlSpacing.h)) + "mm)");
+            }
+        }
+        public nothrow inline float DpiX() const
+        {
+            return dpiX;
+        }
+        public nothrow inline float DpiY() const
+        {
+            return dpiY;
+        }
+        public nothrow inline int MMToHorizontalPixels(float mm) const
+        {
+            return MMToPixels(mm, dpiX);
+        }
+        public nothrow inline float HorizontalPixelsToMM(int pixels) const
+        {
+            return PixelsToMM(pixels, dpiX);
+        }
+        public nothrow inline int MMToVerticalPixels(float mm) const
+        {
+            return MMToPixels(mm, dpiY);
+        }
+        public nothrow inline float VerticalPixelsToMM(int pixels) const
+        {
+            return PixelsToMM(pixels, dpiY);
+        }
+        public nothrow inline const Size& DefaultButtonSize()  const
+        {
+            return defaultButtonSize;
+        }
+        public nothrow void SetDefaultButtonSize(const Size& defaultButtonSize_)
+        {
+            defaultButtonSize = defaultButtonSize_;
+        }
+        public nothrow inline const Size& DefaultLabelSize() const
+        {
+            return defaultLabelSize;
+        }
+        public nothrow void SetDefaultLabelSize(const Size& defaultLabelSize_)
+        {
+            defaultLabelSize = defaultLabelSize_;
+        }
+        public nothrow inline const Size& DefaultTextBoxSize() const
+        {
+            return defaultTextBoxSize;
+        }
+        public nothrow void SetDefaultTextBoxSize(const Size& defaultTextBoxSize_)
+        {
+            defaultTextBoxSize = defaultTextBoxSize_;
+        }
+        public nothrow inline const Size& DefaultListBoxSize() const
+        {
+            return defaultListBoxSize;
+        }
+        public nothrow void SetDefaultListBoxSize(const Size& defaultListBoxSize_)
+        {
+            defaultListBoxSize = defaultListBoxSize_;
+        }
+        public nothrow inline const Size& DefaultCheckBoxSize() const
+        {
+            return defaultCheckBoxSize;
+        }
+        public nothrow void SetDefaultCheckBoxSize(const Size& defaultCheckBoxSize_)
+        {
+            defaultCheckBoxSize = defaultCheckBoxSize_;
+        }
+        public nothrow inline const Size& DefaultControlSpacing() const
+        {
+            return defaultControlSpacing;
+        }
+        public nothrow void SetDefaultControlSpacing(const Size& defaultControlSpacing_)
+        {
+            defaultControlSpacing = defaultControlSpacing_;
+        }
+        public nothrow SizeElement& DefaultButtonSizeElement() 
+        {
+            return defaultButtonSizeElement;
+        }
+        public nothrow SizeElement& DefaultLabelSizeElement() 
+        {
+            return defaultLabelSizeElement;
+        }
+        public nothrow SizeElement& DefaultTextBoxSizeElement() 
+        {
+            return defaultTextBoxSizeElement;
+        }
+        public nothrow SizeElement& DefaultControlSpacingElement()
+        {
+            return defaultControlSpacingElement;
+        }
+        private bool useDefaults;
+        private bool calculated;
+        private float dpiX;
+        private float dpiY;
+        private Size defaultButtonSize;
+        private SizeElement defaultButtonSizeElement;
+        private Size defaultLabelSize;
+        private SizeElement defaultLabelSizeElement;
+        private Size defaultTextBoxSize;
+        private SizeElement defaultTextBoxSizeElement;
+        private Size defaultListBoxSize;
+        private SizeElement defaultListBoxSizeElement;
+        private Size defaultCheckBoxSize;
+        private SizeElement defaultCheckBoxSizeElement;
+        private Size defaultControlSpacing;
+        private SizeElement defaultControlSpacingElement;
+    }
+
+    public static class ScreenMetrics
+    {
+        public static ScreenMetrics() : metrics()
+        {
+        }
+        public static nothrow void SetUseDefaults(bool useDefaults)
+        {
+            metrics.SetUseDefaults(useDefaults);
+        }
+        public static void Save(bool setElementValues)
+        {
+            string metricsFilePath = GetDefaultMetricsFilePath();
+            metrics.SaveTofile(metricsFilePath, setElementValues);
+        }
+        public static void Load()
+        {
+            string metricsFilePath = GetDefaultMetricsFilePath();
+            if (File.Exists(metricsFilePath))
+            {
+                metrics.LoadFromFile(metricsFilePath);
+            }
+        }
+        public static bool Calculated()
+        {
+            return metrics.Calculated();
+        }
+        public static void Calculate(Graphics& graphics)
+        {
+            if (!metrics.UseDefaults())
+            {
+                Load();
+            }
+            metrics.Calculate(graphics);
+        }
+        public static nothrow const Metrics& Get()
+        {
+            return metrics;
+        }
+        public static void Set(const Metrics& metrics_)
+        {
+            metrics = metrics_;
+        }
+        public static Metrics metrics;
     }
 }

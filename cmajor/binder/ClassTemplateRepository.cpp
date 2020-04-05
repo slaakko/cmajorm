@@ -196,6 +196,7 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
     {
         typeBinder.CreateMemberSymbols();
     }
+    typeBinder.SetContainerScope(classTemplateSpecialization->GetContainerScope());
     globalNs->Accept(typeBinder);
     if (templateParameterBinding)
     {
@@ -355,6 +356,7 @@ bool ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
         symbolTable.EndContainer();
         TypeBinder typeBinder(boundCompileUnit);
         typeBinder.SetContainerScope(memberFunction->GetContainerScope());
+        typeBinder.SetCurrentFunctionSymbol(memberFunction);
         functionInstanceNode->Body()->Accept(typeBinder);
         StatementBinder statementBinder(boundCompileUnit);
         std::unique_ptr<BoundClass> boundClass(new BoundClass(&boundCompileUnit.GetModule(), classTemplateSpecialization));

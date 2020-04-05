@@ -1,0 +1,79 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public class LogView : TextView
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, frozen = 1 << 0
+        }
+        public LogView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base(fontFamily, fontSize, backgroundColor, location, size, dock, anchors), flags(Flags.none)
+        {
+        }
+        public LogView(const Point& location, const Size& size, Dock dock, Anchors anchors) : this(FontFamily("Consolas"), 9.0f, Color(223u, 232u, 247u), location, size, dock, anchors)
+        {
+        }
+        public LogView() : this(Point(0, 0), Size(0, 0), Dock.bottom, Anchors.none)
+        {
+        }
+        public void Clear()
+        {
+            Lines().Clear();
+            Invalidate();
+        }
+        public virtual void WriteLine(const string& line)
+        {
+            AddLine(ToUtf32(line));
+            if (!Frozen())
+            {
+                SetCaretLineCol(cast<int>(Lines().Count()), 1);
+                ScrollToCaret();
+                SetChanged();
+                Invalidate();
+            }
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            base->OnPaint(args);
+        }
+        protected override void OnMouseDown(MouseEventArgs& args)
+        {
+            SetFrozen();
+            base->OnMouseDown(args);
+        }
+        protected override void OnKeyDown(KeyEventArgs& args)
+        {
+            base->OnKeyDown(args);
+            if (CaretLine() == Lines().Count())
+            {
+                ResetFrozen();
+                Invalidate();
+            }
+            else
+            {
+                SetFrozen();
+            }
+        }
+        private nothrow inline bool Frozen() const
+        {
+            return (flags & Flags.frozen) != Flags.none;
+        }
+        private nothrow inline void SetFrozen()
+        {
+            flags = cast<Flags>(flags | Flags.frozen);
+        }
+        private nothrow inline void ResetFrozen()
+        {
+            flags = cast<Flags>(flags & ~Flags.frozen);
+        }
+        private Flags flags;
+    }
+}

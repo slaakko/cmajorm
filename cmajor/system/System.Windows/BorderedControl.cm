@@ -12,29 +12,71 @@ namespace System.Windows
         single, style3D
     }
 
+    public nothrow inline int DefaultSingleBorderWidth()
+    {
+        return 1;
+    }
+
+    public nothrow inline int Default3DBorderWidth()
+    {
+        return 2;
+    }
+
     public nothrow int GetBorderWidth(BorderStyle borderStyle)
     {
         switch (borderStyle)
         {
-            case BorderStyle.single: return 1;
-            case BorderStyle.style3D: return 2;
+            case BorderStyle.single: return DefaultSingleBorderWidth();
+            case BorderStyle.style3D: return Default3DBorderWidth();
         }
         return 0;
     }
 
     public class BorderedControl : Control
     {
-        public BorderedControl(Control* child_, BorderStyle borderStyle_, const Color& singleBorderColor_,
+        private enum Flags : sbyte
+        {
+            none = 0, childFocused = 1 << 0
+        }
+        public BorderedControl(Control* child_, BorderStyle borderStyle_, const Color& normalBorderColor_, const Color& focusedBorderColor_,
             const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.BorderedControl", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
             child_->BackgroundColor(), "borderedControl", location, size, dock, anchors),
-            container(this), borderStyle(borderStyle_), singleBorderColor(singleBorderColor_), borderWidth(GetBorderWidth(borderStyle)), child(child_)
+            container(this), borderStyle(borderStyle_), normalBorderColor(normalBorderColor_), focusedBorderColor(focusedBorderColor_), borderWidth(GetBorderWidth(borderStyle)), child(child_)
         {
             container.AddChild(child);
+            SetChildPos();
         }
         public BorderedControl(Control* child, BorderStyle borderStyle,
-            const Point& location, const Size& size, Dock dock, Anchors anchors) : this(child, borderStyle, Color.Black(), location, size, dock, anchors)
+            const Point& location, const Size& size, Dock dock, Anchors anchors) : this(child, borderStyle, Color.Black(), Color.Blue(), location, size, dock, anchors)
         {
+        }
+        public BorderedControl(Control* child, const Point& location, const Size& size, Dock dock, Anchors anchors) : this(child, BorderStyle.single, location, size, dock, anchors)
+        {
+        }
+        public BorderedControl(Control* child) : this(child, Point(), Size(), Dock.none, Anchors.none)
+        {
+        }
+        public nothrow void SetNormalBorderColor(const Color& normalBorderColor_)
+        {
+            if (normalBorderColor != normalBorderColor_)
+            {
+                normalBorderColor = normalBorderColor_;
+                Invalidate();
+            }
+        }
+        public nothrow void SetFocusedBorderColor(const Color& focusedBorderColor_)
+        {
+            if (focusedBorderColor != focusedBorderColor_)
+            {
+                focusedBorderColor = focusedBorderColor_;
+                Invalidate();
+            }
+        }
+        public nothrow void SetBorderWidth(int borderWidth_)
+        {
+            borderWidth = borderWidth_;
+            Invalidate();
         }
         protected nothrow override bool IsDecoratorControl() const
         {
@@ -47,6 +89,14 @@ namespace System.Windows
                 return cast<ContainerControl*>(child);
             }
             return base->GetContainerControl();
+        }
+        internal nothrow override Control* GetFirstEnabledTabStopControl() const
+        {
+            return child->GetFirstEnabledTabStopControl();
+        }
+        internal nothrow override Control* GetLastEnabledTabStopControl() const
+        {
+            return child->GetLastEnabledTabStopControl();
         }
         protected override void OnChildContentLocationChanged(ControlEventArgs& args)
         {
@@ -74,6 +124,28 @@ namespace System.Windows
             {
                 parentControl->OnChildContentSizeChanged(args);
             }
+        }
+        protected override void OnChildGotFocus(ControlEventArgs& args)
+        {
+            base->OnChildGotFocus(args);
+            SetChildFocused();
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentSizeChanged(args);
+            }
+            Invalidate();
+        }
+        protected override void OnChildLostFocus(ControlEventArgs& args)
+        {
+            base->OnChildLostFocus(args);
+            ResetChildFocused();
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentSizeChanged(args);
+            }
+            Invalidate();
         }
         public override void PrintWindowTree(int level)
         {
@@ -139,8 +211,16 @@ namespace System.Windows
             Rect r(Point(), GetSize());
             r.size.w = r.size.w - 1;
             r.size.h = r.size.h - 1;
-            Pen pen(singleBorderColor, 1);
-            graphics.DrawRectangleChecked(pen, r);
+            if (ChildFocused())
+            {
+                Pen pen(focusedBorderColor, 1);
+                graphics.DrawRectangleChecked(pen, r);
+            }
+            else
+            {
+                Pen pen(normalBorderColor, 1);
+                graphics.DrawRectangleChecked(pen, r);
+            }
         }
         private void Draw3DBorder(Graphics& graphics)
         {
@@ -161,10 +241,24 @@ namespace System.Windows
             graphics.DrawLineChecked(innerRightBottomEdgePen, Point(r.location.x + r.size.w, r.location.y), Point(r.location.x + r.size.w, r.location.y + r.size.h));
             graphics.DrawLineChecked(innerRightBottomEdgePen, Point(r.location.x, r.location.y + r.size.h), Point(r.location.x + r.size.w, r.location.y + r.size.h));
         }
+        private nothrow inline bool ChildFocused() const
+        {
+            return (flags & Flags.childFocused) != Flags.none;
+        }
+        private nothrow inline void SetChildFocused()
+        {
+            flags = cast<Flags>(flags | Flags.childFocused);
+        }
+        private nothrow inline void ResetChildFocused()
+        {
+            flags = cast<Flags>(flags & ~Flags.childFocused);
+        }
         private Container container;
         private BorderStyle borderStyle;
         private int borderWidth;
-        private Color singleBorderColor;
+        private Color normalBorderColor;
+        private Color focusedBorderColor;
         private Control* child;
+        private Flags flags;
     }
 }

@@ -1,0 +1,124 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace spring
+{
+    public concept ElementPredicate<T>
+    {
+        typename T.ElementType;
+
+        bool operator()(T.ElementType*);
+    }
+
+    public concept Cloneable<T>
+    {
+        T* Clone();
+    }
+
+    public class IndexList<T> where T is Cloneable
+    {
+        typedef List<UniquePtr<T>>.Iterator Iterator;
+        typedef List<UniquePtr<T>>.ConstIterator ConstIterator;
+
+        public nothrow inline Iterator Begin()
+        {
+            return elements.Begin();
+        }
+        public nothrow inline ConstIterator CBegin() const
+        {
+            return elements.CBegin();
+        }
+        public nothrow inline Iterator End()
+        {
+            return elements.End();
+        }
+        public nothrow inline ConstIterator CEnd() const
+        {
+            return elements.CEnd();
+        }
+        public nothrow inline const List<UniquePtr<T>>& Elements() const
+        {
+            return elements;
+        }
+        public IndexList<T> Clone()
+        {
+            IndexList<T> clone;
+            for (UniquePtr<T>& element : elements)
+            {
+                clone.Add(cast<T*>(element->Clone()));
+            }
+            return clone;
+        }
+        public nothrow inline T* Get(int index) const
+        {
+            return elements[index].Get();
+        }
+        public nothrow inline void Set(int index, T* element)
+        {
+            elements[index].Reset(element);
+        }
+        public nothrow inline void Add(T* element)
+        {
+            elements.Add(UniquePtr<T>(element));
+        }
+        public nothrow inline T* Remove(int index)
+        {
+            UniquePtr<T> element = elements.Remove(elements.Begin() + index);
+            return element.Release();
+        }
+        public nothrow inline void Insert(int index, T* element)
+        {
+            elements.Insert(elements.Begin() + index, UniquePtr<T>(element));
+        }
+        public void Clear()
+        {
+            elements.Clear();
+        }
+        public nothrow inline int Count() const
+        {
+            return cast<int>(elements.Count());
+        }
+        public void MoveUp(int index)
+        {
+            if (index <= 0) throw Exception("invalid index");
+            T* element = Remove(index);
+            --index;
+            Insert(index, element);
+        }
+        public void MoveDown(int index)
+        {
+            if (index >= Count()) throw Exception("invalid index");
+            T* element = Remove(index);
+            ++index;
+            if (index == Count())
+            {
+                Add(element);    
+            }
+            else
+            {
+                Insert(index, element);
+            }
+        }
+        private List<UniquePtr<T>> elements;
+    }
+
+    public nothrow int IndexOf<T, P>(const IndexList<T>& list, const P& pred) where P is ElementPredicate
+    {
+        int n = list.Count();
+        for (int i = 0; i < n; ++i)
+        {
+            T* element = list.Get(i);
+            if (pred(element))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+}

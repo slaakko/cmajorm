@@ -93,6 +93,24 @@ namespace System.Windows
                 horizontalScrollBarShown = false;
             }
         }
+        protected override void OnChildGotFocus(ControlEventArgs& args)
+        {
+            base->OnChildGotFocus(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildGotFocus(args);
+            }
+        }
+        protected override void OnChildLostFocus(ControlEventArgs& args)
+        {
+            base->OnChildLostFocus(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildLostFocus(args);
+            }
+        }
         protected override void OnHScroll(ScrollEventArgs& args)
         {
             base->OnHScroll(args);
@@ -270,6 +288,14 @@ namespace System.Windows
             int dy = vpos * verticalScrollUnit;
             location.x = location.x - dx;
             location.y = location.y - dy;
+        }
+        internal nothrow override Control* GetFirstEnabledTabStopControl() const
+        {
+            return child->GetFirstEnabledTabStopControl();
+        }
+        internal nothrow override Control* GetLastEnabledTabStopControl() const
+        {
+            return child->GetLastEnabledTabStopControl();
         }
         private Container container;
         private Control* child;

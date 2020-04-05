@@ -1,0 +1,752 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Text;
+using System.XPath;
+using System.Windows;
+
+namespace spring
+{
+    public nothrow string DefaultFontFamily()
+    {
+        return "Tahoma";
+    }
+
+    public nothrow float DefaultFontSize()
+    {
+        return 9.0f;
+    }
+
+    public nothrow float DefaultFrameWidth(Graphics& graphics)
+    {
+        return PixelsToMM(1, Max(graphics.GetDpiX(), graphics.GetDpiY()));
+    }
+
+    public nothrow float DefaultDiagramPadding()
+    {
+        return 5.0f;
+    }
+
+    public nothrow float DefaultClassPadding()
+    {
+        return 1.5f;
+    }
+
+    public nothrow float DefaultMinClassHeight()
+    {
+        return 20.0f;
+    }
+
+    public nothrow string SpringDirectory()
+    {
+        string cmajorRootDir = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        string springDirectory = Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "tools"), "spring");
+        return springDirectory;
+    }
+
+    public nothrow string DefaultLayoutDirectory()
+    {
+        return Path.Combine(SpringDirectory(), "layouts");
+    }
+
+    public nothrow string DefaultDiagramDirectory()
+    {
+        return Path.Combine(SpringDirectory(), "diagrams");
+    }
+
+    public class Layout
+    {
+         public Layout(Graphics& graphics) : abstractClassLayoutElement(new AbstractClassLayoutElement(*this, graphics)), concreteClassLayoutElement(new ConcreteClassLayoutElement(*this, graphics)),
+            abstractOperationLayoutElement(new AbstractOperationLayoutElement(*this)), concreteOperationLayoutElement(new ConcreteOperationLayoutElement(*this)),
+            fieldLayoutElement(new FieldLayoutElement(*this)),
+            classPaddingElement(new PaddingElement(DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), "classPadding")),
+            diagramPaddingElement(new PaddingElement(DefaultDiagramPadding(), DefaultDiagramPadding(), DefaultDiagramPadding(), DefaultDiagramPadding(), "diagramPadding"))
+        {
+        }
+        suppress Layout(const Layout&);
+        suppress void operator=(const Layout&);
+        suppress Layout(Layout&&);
+        suppress void operator=(Layout&&);
+        public void Clear()
+        {
+            fonts.Clear();
+            fontMap.Clear();
+            pens.Clear();
+            penMap.Clear();
+            brushes.Clear();
+            brushMap.Clear();
+        }
+        public void Load(const string& fileName)
+        {
+            Clear();
+            UniquePtr<System.Dom.Document> doc = System.Dom.ReadDocument(fileName);
+            Read(doc.Get());
+        }
+        public void Save(const string& fileName)
+        {
+            System.Dom.Document doc;
+            Write(&doc);
+            StreamWriter writer = File.CreateText(fileName);
+            CodeFormatter formatter(writer);
+            formatter.SetIndentSize(1);
+            doc.Write(formatter);
+        }
+        public nothrow inline const AbstractClassLayoutElement& GetAbstractClassLayoutElement() const
+        {
+            return *abstractClassLayoutElement;
+        }
+        public nothrow void SetAbstractClassLayoutElement(AbstractClassLayoutElement* abstractClassLayoutElement_)
+        {
+            abstractClassLayoutElement.Reset(abstractClassLayoutElement_);
+        }
+        public nothrow inline const ConcreteClassLayoutElement& GetConcreteClassLayoutElement() const
+        {
+            return *concreteClassLayoutElement;
+        }
+        public nothrow void SetConcreteClassLayoutElement(ConcreteClassLayoutElement* concreteClassLayoutElement_)
+        {
+            concreteClassLayoutElement.Reset(concreteClassLayoutElement_);
+        }
+        public nothrow inline const AbstractOperationLayoutElement& GetAbstractOperationLayoutElement() const
+        {
+            return *abstractOperationLayoutElement;
+        }
+        public nothrow void SetAbstractOperationLayoutElement(AbstractOperationLayoutElement* abstractOperationLayoutElement_)
+        {
+            abstractOperationLayoutElement.Reset(abstractOperationLayoutElement_);
+        }
+        public nothrow inline const ConcreteOperationLayoutElement& GetConcreteOperationLayoutElement() const
+        {
+            return *concreteOperationLayoutElement;
+        }
+        public nothrow void SetConcreteOperationLayoutElement(ConcreteOperationLayoutElement* concreteOperationLayoutElement_)
+        {
+            concreteOperationLayoutElement.Reset(concreteOperationLayoutElement_);
+        }
+        public nothrow inline const PaddingElement& GetClassPaddingElement() const
+        {
+            return *classPaddingElement;
+        }
+        public nothrow void SetClassPaddingElement(PaddingElement* classPaddingElement_)
+        {
+            classPaddingElement.Reset(classPaddingElement_);
+        }
+        public nothrow inline const PaddingElement& GetDiagramPaddingElement() const
+        {
+            return *diagramPaddingElement;
+        }
+        public nothrow void SetDiagramPaddingElement(PaddingElement* diagramPaddingElement_)
+        {
+            diagramPaddingElement.Reset(diagramPaddingElement_);
+        }
+        public void Read(System.Dom.ParentNode* parentNode)
+        {
+            UniquePtr<XPathObject> layoutResult = Evaluate(u"layout", parentNode);
+            if (!layoutResult.IsNull())
+            {
+                if (layoutResult->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(layoutResult.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* layoutElement = cast<System.Dom.Element*>(node);
+                            abstractClassLayoutElement->Read(layoutElement, *this);
+                            concreteClassLayoutElement->Read(layoutElement, *this);
+                            abstractOperationLayoutElement->Read(layoutElement, *this);
+                            concreteOperationLayoutElement->Read(layoutElement, *this);
+                            fieldLayoutElement->Read(layoutElement, *this);
+                            classPaddingElement->Read(layoutElement, *this);
+                            diagramPaddingElement->Read(layoutElement, *this);
+                        }
+                    }
+                }
+            }
+        }
+        public void Write(System.Dom.ParentNode* parentNode)
+        {
+            UniquePtr<System.Dom.Element> layoutElement(new System.Dom.Element(u"layout"));
+            layoutElement->AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Comment(u"metrics are in millimeters")));
+            layoutElement->AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Text(u"\n ")));
+            abstractClassLayoutElement->Write(layoutElement.Get());
+            concreteClassLayoutElement->Write(layoutElement.Get());
+            abstractOperationLayoutElement->Write(layoutElement.Get());
+            concreteOperationLayoutElement->Write(layoutElement.Get());
+            fieldLayoutElement->Write(layoutElement.Get());
+            classPaddingElement->Write(layoutElement.Get());
+            diagramPaddingElement->Write(layoutElement.Get());
+            parentNode->AppendChild(UniquePtr<System.Dom.Node>(layoutElement.Release()));
+        }
+        internal StringFormat& GetStringFormat()
+        {
+            return stringFormat;
+        }
+        internal Font* GetOrInsertFont(const string& fontFamily, float fontSize, FontStyle fontStyle)
+        {
+            FontKey key(fontFamily, fontSize, fontStyle);
+            HashMap<FontKey, Font*>.ConstIterator it = fontMap.CFind(key);
+            if (it != fontMap.CEnd())
+            {
+                return it->second;
+            }
+            UniquePtr<Font> fontPtr(new Font(FontFamily(fontFamily), fontSize, fontStyle, Unit.point));
+            Font* font = fontPtr.Get();
+            fontMap[key] = font;
+            fonts.Add(Rvalue(fontPtr));
+            return font;
+        }
+        internal Pen* GetOrInsertPen(const Color& color, float width)
+        {
+            PenKey key(color, width);
+            HashMap<PenKey, Pen*>.ConstIterator it = penMap.CFind(key);
+            if (it != penMap.CEnd())
+            {
+                return it->second;
+            }
+            UniquePtr<Pen> penPtr(new Pen(color, width));
+            Pen* pen = penPtr.Get();
+            penMap[key] = pen;
+            pens.Add(Rvalue(penPtr));
+            return pen;
+        }
+        internal Brush* GetOrInsertBrush(const Color& color)
+        {
+            HashMap<Color, Brush*>.ConstIterator it = brushMap.CFind(color);
+            if (it != brushMap.CEnd())
+            {
+                return it->second;
+            }
+            UniquePtr<Brush> brushPtr(new SolidBrush(color));
+            Brush* brush = brushPtr.Get();
+            brushMap[color] = brush;
+            brushes.Add(Rvalue(brushPtr));
+            return brush;
+        }
+        private StringFormat stringFormat;
+        private List<UniquePtr<Font>> fonts;
+        private HashMap<FontKey, Font*> fontMap;
+        private List<UniquePtr<Pen>> pens;
+        private HashMap<PenKey, Pen*> penMap;
+        private List<UniquePtr<Brush>> brushes;
+        private HashMap<Color, Brush*> brushMap;
+        private UniquePtr<AbstractClassLayoutElement> abstractClassLayoutElement;
+        private UniquePtr<ConcreteClassLayoutElement> concreteClassLayoutElement;
+        private UniquePtr<AbstractOperationLayoutElement> abstractOperationLayoutElement;
+        private UniquePtr<ConcreteOperationLayoutElement> concreteOperationLayoutElement;
+        private UniquePtr<FieldLayoutElement> fieldLayoutElement;
+        private UniquePtr<PaddingElement> classPaddingElement;
+        private UniquePtr<PaddingElement> diagramPaddingElement;
+    }
+
+    public abstract class LayoutElement
+    {
+        suppress LayoutElement(const LayoutElement&);
+        suppress void operator=(const LayoutElement&);
+        suppress LayoutElement(LayoutElement&&);
+        suppress void operator=(LayoutElement&&);
+        public abstract void Read(System.Dom.Element* parentElement, Layout& layout);
+        public abstract void Write(System.Dom.Element* parentElement);
+    }
+
+    public class PaddingElement : LayoutElement
+    {
+        public nothrow PaddingElement(const string& elementName_) : left(0), top(0), right(0), bottom(0), elementName(elementName_)
+        {
+        }
+        public nothrow PaddingElement(float left_, float top_, float right_, float bottom_, const string& elementName_) : left(left_), top(top_), right(right_), bottom(bottom_), elementName(elementName_)
+        {
+        }
+        suppress PaddingElement(const PaddingElement&);
+        suppress void operator=(const PaddingElement&);
+        suppress PaddingElement(PaddingElement&&);
+        suppress void operator=(PaddingElement&&);
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            ustring en = ToUtf32(elementName);
+            UniquePtr<XPathObject> result = Evaluate(en, parentElement);
+            if (!result.IsNull())
+            {
+                if (result->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* paddingElement = cast<System.Dom.Element*>(node);
+                            left = ParseFloat(ToUtf8(paddingElement->GetAttribute(u"left")));
+                            top = ParseFloat(ToUtf8(paddingElement->GetAttribute(u"top")));
+                            right = ParseFloat(ToUtf8(paddingElement->GetAttribute(u"right")));
+                            bottom = ParseFloat(ToUtf8(paddingElement->GetAttribute(u"bottom")));
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            ustring en = ToUtf32(elementName);
+            UniquePtr<System.Dom.Element> paddingElement(new System.Dom.Element(en));
+            paddingElement->SetAttribute(u"left", ToUtf32(System.ToString(left)));
+            paddingElement->SetAttribute(u"top", ToUtf32(System.ToString(top)));
+            paddingElement->SetAttribute(u"right", ToUtf32(System.ToString(right)));
+            paddingElement->SetAttribute(u"bottom", ToUtf32(System.ToString(bottom)));
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(paddingElement.Release()));
+        }
+        public nothrow inline float Vertical() const
+        {
+            return top + bottom;
+        }
+        public nothrow inline float Horizontal() const
+        {
+            return left + right;
+        }
+        public float left;
+        public float top;
+        public float right;
+        public float bottom;
+        private string elementName;
+    }
+
+    public class FontElement : LayoutElement
+    {
+        public FontElement(const string& family_, float size_, FontStyle style_, const string& elementName_, Layout& layout) :
+            family(family_), size(size_), style(style_), elementName(elementName_), font(layout.GetOrInsertFont(family, size, style))
+        {
+        }
+        suppress FontElement(const FontElement&);
+        suppress void operator=(const FontElement&);
+        suppress FontElement(FontElement&&);
+        suppress void operator=(FontElement&&);
+        public nothrow inline const string& Family() const
+        {
+            return family;
+        }
+        public nothrow inline float Size() const
+        {
+            return size;
+        }
+        public nothrow inline FontStyle Style() const
+        {
+            return style;
+        }
+        public nothrow inline Font& GetFont() const
+        {
+            return *font;
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            ustring en = ToUtf32(elementName);
+            UniquePtr<XPathObject> fontResult = Evaluate(en, parentElement);
+            if (!fontResult.IsNull())
+            {
+                if (fontResult->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(fontResult.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* fontElement = cast<System.Dom.Element*>(node);
+                            family = ToUtf8(fontElement->GetAttribute(u"family"));
+                            size = ParseFloat(ToUtf8(fontElement->GetAttribute(u"size")));
+                            style = ParseFontStyle(ToUtf8(fontElement->GetAttribute(u"style")));
+                            font = layout.GetOrInsertFont(family, size, style);
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            ustring en = ToUtf32(elementName);
+            UniquePtr<System.Dom.Element> fontElement(new System.Dom.Element(en));
+            fontElement->SetAttribute(u"family", ToUtf32(family));
+            fontElement->SetAttribute(u"size", ToUtf32(System.ToString(size)));
+            fontElement->SetAttribute(u"style", ToUtf32(System.Windows.ToString(style)));
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(fontElement.Release()));
+        }
+        private string family;
+        private float size;
+        private FontStyle style;
+        private string elementName;
+        private Font* font;
+    }
+
+    public class ColorElement : LayoutElement
+    {
+        public nothrow ColorElement(const Color& color_, const string& elementName_) : color(color_), elementName(elementName_)
+        {
+        }
+        suppress ColorElement(const ColorElement&);
+        suppress void operator=(const ColorElement&);
+        suppress ColorElement(ColorElement&&);
+        suppress void operator=(ColorElement&&);
+        public nothrow inline const Color& GetColor() const
+        {
+            return color;
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> colorValue = Evaluate(ToUtf32(elementName), parentElement);
+            if (!colorValue.IsNull())
+            {
+                if (colorValue->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(colorValue.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* colorElement = cast<System.Dom.Element*>(node);
+                            color = System.Windows.ParseColor(ToUtf8(colorElement->GetAttribute(u"value")));
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            ustring en = ToUtf32(elementName);
+            UniquePtr<System.Dom.Element> colorElement(new System.Dom.Element(en));
+            colorElement->SetAttribute(u"value", ToUtf32(color.ToString()));
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(colorElement.Release()));
+        }
+        private Color color;
+        private string elementName;
+    }
+
+    public abstract class CaptionLayoutElement : LayoutElement
+    {
+        public CaptionLayoutElement(FontElement* fontElement_) : fontElement(fontElement_)
+        {
+        }
+        suppress CaptionLayoutElement(const CaptionLayoutElement&);
+        suppress void operator=(const CaptionLayoutElement&);
+        suppress CaptionLayoutElement(CaptionLayoutElement&&);
+        suppress void operator=(CaptionLayoutElement&&);
+        public nothrow inline const FontElement& GetFontElement() const
+        {
+            return *fontElement;
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> caption = Evaluate(u"caption", parentElement);
+            if (!caption.IsNull())
+            {
+                if (caption->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(caption.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* captionElement = cast<System.Dom.Element*>(node);
+                            fontElement->Read(captionElement, layout);
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            UniquePtr<System.Dom.Element> captionElement(new System.Dom.Element(u"caption"));
+            fontElement->Write(captionElement.Get());
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(captionElement.Release()));
+        }
+        private UniquePtr<FontElement> fontElement;
+    }
+
+    public abstract class FieldLayoutElement : LayoutElement
+    {
+        public FieldLayoutElement(Layout& layout) : fontElement(new FontElement(DefaultFontFamily(), DefaultFontSize(), FontStyle.regular, "font", layout))
+        {
+        }
+        suppress FieldLayoutElement(const FieldLayoutElement&);
+        suppress void operator=(const FieldLayoutElement&);
+        suppress FieldLayoutElement(FieldLayoutElement&&);
+        suppress void operator=(FieldLayoutElement&&);
+        public nothrow inline const FontElement& GetFontElement() const
+        {
+            return *fontElement;
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> field = Evaluate(u"field", parentElement);
+            if (!field.IsNull())
+            {
+                if (field->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(field.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* fieldElement = cast<System.Dom.Element*>(node);
+                            fontElement->Read(fieldElement, layout);
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            UniquePtr<System.Dom.Element> fieldElement(new System.Dom.Element(u"field"));
+            fontElement->Write(fieldElement.Get());
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(fieldElement.Release()));
+        }
+        private UniquePtr<FontElement> fontElement;
+    }
+
+    public abstract class OperationLayoutElement : LayoutElement
+    {
+        public OperationLayoutElement(FontElement* fontElement_) : fontElement(fontElement_)
+        {
+        }
+        suppress OperationLayoutElement(const OperationLayoutElement&);
+        suppress void operator=(const OperationLayoutElement&);
+        suppress OperationLayoutElement(OperationLayoutElement&&);
+        suppress void operator=(OperationLayoutElement&&);
+        public nothrow inline const FontElement& GetFontElement() const
+        {
+            return *fontElement;
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            fontElement->Read(parentElement, layout);
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            fontElement->Write(parentElement);
+        }
+        private UniquePtr<FontElement> fontElement;
+    }
+
+    public class AbstractOperationLayoutElement : OperationLayoutElement
+    {
+        public AbstractOperationLayoutElement(Layout& layout) :
+            base(new FontElement(DefaultFontFamily(), DefaultFontSize(), FontStyle.italic, "font", layout))
+        {
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> abstractOperation = Evaluate(u"abstractOperation", parentElement);
+            if (!abstractOperation.IsNull())
+            {
+                if (abstractOperation->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(abstractOperation.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* abstractOperationElement = cast<System.Dom.Element*>(node);
+                            base->Read(abstractOperationElement, layout);
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            UniquePtr<System.Dom.Element> abstractOperationElement(new System.Dom.Element(u"abstractOperation"));
+            base->Write(abstractOperationElement.Get());
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(abstractOperationElement.Release()));
+        }
+    }
+
+    public class ConcreteOperationLayoutElement : OperationLayoutElement
+    {
+        public ConcreteOperationLayoutElement(Layout& layout) :
+            base(new FontElement(DefaultFontFamily(), DefaultFontSize(), FontStyle.regular, "font", layout))
+        {
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> concreteOperation = Evaluate(u"concreteOperation", parentElement);
+            if (!concreteOperation.IsNull())
+            {
+                if (concreteOperation->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(concreteOperation.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* concreteOperationElement = cast<System.Dom.Element*>(node);
+                            base->Read(concreteOperationElement, layout);
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            UniquePtr<System.Dom.Element> concreteOperationElement(new System.Dom.Element(u"concreteOperation"));
+            base->Write(concreteOperationElement.Get());
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(concreteOperationElement.Release()));
+        }
+    }
+
+    public abstract class ClassLayoutElement : LayoutElement
+    {
+        public ClassLayoutElement(CaptionLayoutElement* captionElement_, ColorElement* textColorElement_, ColorElement* frameColorElement_, float frameWidth_, Layout& layout) :
+            captionElement(captionElement_), textColorElement(textColorElement_), frameColorElement(frameColorElement_), frameWidth(frameWidth_)
+        {
+            textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
+            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth);
+        }
+        suppress ClassLayoutElement(const ClassLayoutElement&);
+        suppress void operator=(const ClassLayoutElement&);
+        suppress ClassLayoutElement(ClassLayoutElement&&);
+        suppress void operator=(ClassLayoutElement&&);
+        public nothrow inline const CaptionLayoutElement& GetCaptionElement() const
+        {
+            return *captionElement;
+        }
+        public nothrow inline const ColorElement& TextColorElement() const
+        {
+            return *textColorElement;
+        }
+        public nothrow inline const ColorElement& FrameColorElement() const
+        {
+            return *frameColorElement;
+        }
+        public nothrow inline float FrameWidth() const
+        {
+            return frameWidth;
+        }
+        public nothrow inline const Brush& TextBrush() const
+        {
+            return *textBrush;
+        }
+        public nothrow inline const Pen& FramePen() const
+        {
+            return *framePen;
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            captionElement->Read(parentElement, layout);
+            textColorElement->Read(parentElement, layout);
+            frameColorElement->Read(parentElement, layout);
+            frameWidth = ParseFloat(ToUtf8(parentElement->GetAttribute(u"frameWidth")));
+            textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
+            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth);
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            captionElement->Write(parentElement);
+            textColorElement->Write(parentElement);
+            frameColorElement->Write(parentElement);
+            parentElement->SetAttribute(u"frameWidth", ToUtf32(System.ToString(frameWidth)));
+        }
+        private UniquePtr<CaptionLayoutElement> captionElement;
+        private UniquePtr<ColorElement> textColorElement;
+        private UniquePtr<ColorElement> frameColorElement;
+        private float frameWidth;
+        private Brush* textBrush;
+        private Pen* framePen;
+    }
+
+    public class AbstractClassLayoutElement : ClassLayoutElement
+    {
+        public AbstractClassLayoutElement(Layout& layout, Graphics& graphics) :
+            base(new CaptionLayoutElement(new FontElement(DefaultFontFamily(), DefaultFontSize(), cast<FontStyle>(FontStyle.bold | FontStyle.italic), "font", layout)),
+                new ColorElement(Color.Black(), "textColor"), new ColorElement(Color.Black(), "frameColor"), DefaultFrameWidth(graphics), layout)
+        {
+        }
+        suppress AbstractClassLayoutElement(const AbstractClassLayoutElement&);
+        suppress void operator=(const AbstractClassLayoutElement&);
+        suppress AbstractClassLayoutElement(AbstractClassLayoutElement&&);
+        suppress void operator=(AbstractClassLayoutElement&&);
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> abstractClass = Evaluate(u"abstractClass", parentElement);
+            if (!abstractClass.IsNull())
+            {
+                if (abstractClass->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(abstractClass.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* abstractClassElement = cast<System.Dom.Element*>(node);
+                            base->Read(abstractClassElement, layout);
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            UniquePtr<System.Dom.Element> abstractClassElement(new System.Dom.Element(u"abstractClass"));
+            base->Write(abstractClassElement.Get());
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(abstractClassElement.Release()));
+        }
+    }
+
+    public class ConcreteClassLayoutElement : ClassLayoutElement
+    {
+        public nothrow ConcreteClassLayoutElement(Layout& layout, Graphics& graphics) :
+            base(new CaptionLayoutElement(new FontElement(DefaultFontFamily(), DefaultFontSize(), cast<FontStyle>(FontStyle.bold), "font", layout)),
+                new ColorElement(Color.Black(), "textColor"), new ColorElement(Color.Black(), "frameColor"), DefaultFrameWidth(graphics), layout)
+        {
+        }
+        suppress ConcreteClassLayoutElement(const ConcreteClassLayoutElement&);
+        suppress void operator=(const ConcreteClassLayoutElement&);
+        suppress ConcreteClassLayoutElement(ConcreteClassLayoutElement&&);
+        suppress void operator=(ConcreteClassLayoutElement&&);
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> concreteClass = Evaluate(u"concreteClass", parentElement);
+            if (!concreteClass.IsNull())
+            {
+                if (concreteClass->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(concreteClass.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* concreteClassElement = cast<System.Dom.Element*>(node);
+                            base->Read(concreteClassElement, layout);
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            UniquePtr<System.Dom.Element> concreteClassElement(new System.Dom.Element(u"concreteClass"));
+            base->Write(concreteClassElement.Get());
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(concreteClassElement.Release()));
+        }
+    }
+}

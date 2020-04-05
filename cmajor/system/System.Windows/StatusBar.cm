@@ -1,0 +1,514 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public class StatusBar : Control
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, changed = 1 << 0
+        }
+
+        private const int initialHeight = 20;
+        private const int topLineWidth = 1;
+
+        public StatusBar(const Font& font_, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("System.Windows.StatusBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            backgroundColor, "statusBar", location, size, dock, anchors), flags(Flags.none), font(font_), stringFormat(), textColor(Color.Black()), textBrush(textColor),
+            topLineColor(215u, 215u, 215u), topLinePen(topLineColor, 1.0f),
+            sunkenBorderOuterTopLeftColor(160u, 160u,160u), sunkenBorderOuterTopLeftPen(sunkenBorderOuterTopLeftColor, 1.0f),
+            sunkenBorderInnerTopLeftColor(105u, 105u, 105u), sunkenBorderInnerTopLeftPen(sunkenBorderInnerTopLeftColor, 1.0f),
+            sunkenBorderOuterRightBottomColor(Color.White()), sunkenBorderOuterRightBottomPen(sunkenBorderOuterRightBottomColor, 1.0f),
+            sunkenBorderInnerRightBottomColor(227u, 227u, 227u), sunkenBorderInnerRightBottomPen(sunkenBorderInnerRightBottomColor, 1.0f),
+            raisedBorderOuterTopLeftColor(227u, 227u, 227u), raisedBorderOuterTopLeftPen(raisedBorderOuterTopLeftColor, 1.0f),
+            raisedBorderOuterRightBottomColor(105u, 105u, 105u), raisedBorderOuterRightBottomPen(raisedBorderOuterRightBottomColor, 1.0f),
+            raisedBorderInnerTopLeftColor(Color.White()), raisedBorderInnerTopLeftPen(raisedBorderInnerTopLeftColor, 1.0f),
+            raisedBorderInnerRightBottomColor(160u, 160u,160u), raisedBorderInnerRightBottomPen(raisedBorderInnerRightBottomColor, 1.0f)
+        {
+            SetChanged();
+        }
+        public StatusBar() : this(Font(FontFamily("Segoe UI"), 9.0f), DefaultControlBackgroundColor(), Point(0, 0), Size(0, initialHeight), Dock.bottom, Anchors.none)
+        {
+        }
+        public void AddItem(StatusBarItem* statusBarItem)
+        {
+            statusBarItem->SetStatusBar(this);
+            statusBarItems.Add(UniquePtr<StatusBarItem>(statusBarItem));
+            SetChanged();
+        }
+        public nothrow inline const Color& TextColor() const
+        {
+            return textColor;
+        }
+        public void SetTextColor(const Color& textColor_)
+        {
+            if (textColor != textColor_)
+            {
+                SetChanged();
+                textColor = textColor_;
+                textBrush = SolidBrush(textColor);
+            }
+        }
+        internal nothrow inline const Brush& TextBrush() const
+        {
+            return textBrush;
+        }
+        internal nothrow inline const Font& TextFont() const
+        {
+            return font;
+        }
+        internal nothrow inline const Pen& TopLinePen() const
+        {
+            return topLinePen;
+        }
+        public nothrow inline const Color& TopLineColor() const
+        {
+            return topLineColor;
+        }
+        public void SetTopLineColor(const Color& topLineColor_)
+        {
+            if (topLineColor != topLineColor_)
+            {
+                SetChanged();
+                topLineColor = topLineColor_;
+                topLinePen = Pen(topLineColor, 1.0f);
+            }
+        }
+        public nothrow inline const Color& SunkenBorderOuterTopLeftColor() const
+        {
+            return sunkenBorderOuterTopLeftColor;
+        }
+        public void SetSunkenBorderOuterTopLeftColor(const Color& sunkenBorderOuterTopLeftColor_)
+        {
+            if (sunkenBorderOuterTopLeftColor != sunkenBorderOuterTopLeftColor_)
+            {
+                SetChanged();
+                sunkenBorderOuterTopLeftColor = sunkenBorderOuterTopLeftColor_;
+                sunkenBorderOuterTopLeftPen = Pen(sunkenBorderOuterTopLeftColor, 1.0f);
+            }
+        }
+        internal nothrow inline const Pen& SunkenBorderOuterTopLeftPen() const
+        {
+            return sunkenBorderOuterTopLeftPen;
+        }
+        public nothrow inline const Color& SunkenBorderInnerTopLeftColor() const
+        {
+            return sunkenBorderInnerTopLeftColor;
+        }
+        public void SetSunkenBorderInnerTopLeftColor(const Color& sunkenBorderInnerTopLeftColor_)
+        {
+            if (sunkenBorderInnerTopLeftColor != sunkenBorderInnerTopLeftColor_)
+            {
+                SetChanged();
+                sunkenBorderInnerTopLeftColor = sunkenBorderInnerTopLeftColor_;
+                sunkenBorderInnerTopLeftPen = Pen(sunkenBorderInnerTopLeftColor, 1.0f);
+            }
+        }
+        internal nothrow inline const Pen& SunkenBorderInnerTopLeftPen() const
+        {
+            return sunkenBorderInnerTopLeftPen;
+        }
+        public nothrow inline const Color& SunkenBorderOuterRightBottomColor() const
+        {
+            return sunkenBorderOuterRightBottomColor;
+        }
+        public void SetSunkenBorderOuterRightBottomColor(const Color& sunkenBorderOuterRightBottomColor_)
+        {
+            if (sunkenBorderOuterRightBottomColor != sunkenBorderOuterRightBottomColor_)
+            {
+                SetChanged();
+                sunkenBorderOuterRightBottomColor = sunkenBorderOuterRightBottomColor_;
+                sunkenBorderOuterRightBottomPen = Pen(sunkenBorderOuterRightBottomColor, 1.0f);
+            }
+        }
+        internal nothrow inline const Pen& SunkenBorderOuterRightBottomPen() const
+        {
+            return sunkenBorderOuterRightBottomPen;
+        }
+        public nothrow inline const Color& SunkenBorderInnerRightBottomColor() const
+        {
+            return sunkenBorderInnerRightBottomColor;
+        }
+        public void SetSunkenBorderInnerRightBottomColor(const Color& sunkenBorderInnerRightBottomColor_)
+        {
+            if (sunkenBorderInnerRightBottomColor != sunkenBorderInnerRightBottomColor_)
+            {
+                SetChanged();
+                sunkenBorderInnerRightBottomColor = sunkenBorderInnerRightBottomColor_;
+                sunkenBorderInnerRightBottomPen = Pen(sunkenBorderInnerRightBottomColor, 1.0f);
+            }
+        }
+        internal nothrow inline const Pen& SunkenBorderInnerRightBottomPen() const
+        {
+            return sunkenBorderInnerRightBottomPen;
+        }
+        public nothrow inline const Color& RaisedBorderOuterTopLeftColor() const
+        {
+            return raisedBorderOuterTopLeftColor;
+        }
+        public void SetRaisedBorderOuterTopLeftColor(const Color& raisedBorderOuterTopLeftColor_)
+        {
+            if (raisedBorderOuterTopLeftColor != raisedBorderOuterTopLeftColor_)
+            {
+                SetChanged();
+                raisedBorderOuterTopLeftColor = raisedBorderOuterTopLeftColor_;
+                raisedBorderOuterTopLeftPen = Pen(raisedBorderOuterTopLeftColor, 1.0f);
+            }
+        }
+        internal nothrow inline const Pen& RaisedBorderOuterTopLeftPen() const
+        {
+            return raisedBorderOuterTopLeftPen;
+        }
+        public nothrow inline const Color& RaisedBorderOuterRightBottomColor() const
+        {
+            return raisedBorderOuterRightBottomColor;
+        }
+        public void SetRaisedBorderRightBottomColor(const Color& raisedBorderOuterRightBottomColor_)
+        {
+            if (raisedBorderOuterRightBottomColor != raisedBorderOuterRightBottomColor_)
+            {
+                SetChanged();
+                raisedBorderOuterRightBottomColor = raisedBorderOuterRightBottomColor_;
+                raisedBorderOuterRightBottomPen = Pen(raisedBorderOuterRightBottomColor, 1.0f);
+            }
+        }
+        internal nothrow inline const Pen& RaisedBorderOuterRightBottomPen() const
+        {
+            return raisedBorderOuterRightBottomPen;
+        }
+        public nothrow inline const Color& RaisedBorderInnerTopLeftColor() const
+        {
+            return raisedBorderInnerTopLeftColor;
+        }
+        public void SetRaisedBorderInnerTopLeftColor(const Color& raisedBorderInnerTopLeftColor_)
+        {
+            if (raisedBorderInnerTopLeftColor != raisedBorderInnerTopLeftColor_)
+            {
+                SetChanged();
+                raisedBorderInnerTopLeftColor = raisedBorderInnerTopLeftColor_;
+                raisedBorderInnerTopLeftPen = Pen(raisedBorderInnerTopLeftColor, 1.0f);
+            }
+        }
+        internal nothrow inline const Pen& RaisedBorderInnerTopLeftPen() const
+        {
+            return raisedBorderInnerTopLeftPen;
+        }
+
+        public nothrow inline const Color& RaisedBorderInnerRightBottomColor() const
+        {
+            return raisedBorderInnerRightBottomColor;
+        }
+        public void SetRaisedBorderInnerRightBottomColor(const Color& raisedBorderInnerRightBottomColor_)
+        {
+            if (raisedBorderInnerRightBottomColor != raisedBorderInnerRightBottomColor_)
+            {
+                SetChanged();
+                raisedBorderInnerRightBottomColor = raisedBorderInnerRightBottomColor_;
+                raisedBorderInnerRightBottomPen = Pen(raisedBorderInnerRightBottomColor, 1.0f);
+            }
+        }
+        internal nothrow inline const Pen& RaisedBorderInnerRightBottomPen() const
+        {
+            return raisedBorderInnerRightBottomPen;
+        }
+        protected override nothrow Padding DefaultPadding() const
+        {
+            return Padding(4, 4, 4, 4);
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            if (Changed())
+            {
+                ResetChanged();
+                Measure(args.graphics);
+            }
+            args.graphics.Clear(BackgroundColor());
+            DrawTopLine(args.graphics);
+            DrawItems(args.graphics);
+            base->OnPaint(args);
+        }
+        private void DrawTopLine(Graphics& graphics)
+        {
+            Size size = GetSize();
+            Point start(0, 0);
+            Point end(size.w - 1, 0);
+            graphics.DrawLineChecked(topLinePen, start, end);
+        }
+        private void DrawItems(Graphics& graphics)
+        {
+            long n = statusBarItems.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                StatusBarItem* item = statusBarItems[i].Get();
+                item->Draw(graphics);
+            }
+        }
+        private void Measure(Graphics& graphics)
+        {
+            LogView* logView = Application.GetLogView();
+            Padding padding = DefaultPadding();
+            int statusBarItemBorderWidth = StatusBarItem.BorderWidth();
+            int statusBarItemHorizontalPadding = StatusBarItem.HorizontalPadding();
+            int textHeight = 0;
+            long n = statusBarItems.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                StatusBarItem* item = statusBarItems[i].Get();
+                string s = item->Text();
+                ustring u(ToUtf32(s));
+                string z('0', u.Length());
+                RectF rect = graphics.MeasureStringChecked(z, font, PointF(0, 0), stringFormat);
+                textHeight = Max(textHeight, cast<int>(rect.size.h));
+                item->SetTextWidth(cast<int>(rect.size.w));
+            }
+            if (textHeight != 0)
+            {
+                int height = topLineWidth + padding.Vertical() + 2 * statusBarItemBorderWidth + textHeight;
+                Size size = GetSize();
+                size.h = height;
+                SetSize(size);
+                DockWindow();
+                Point leftOrigin(padding.left, topLineWidth + padding.top);
+                long springIndex = -1;
+                for (long i = 0; i < n; ++i)
+                {
+                    StatusBarItem* item = statusBarItems[i].Get();
+                    if (item->Spring())
+                    {
+                        springIndex = i;
+                        break;
+                    }
+                    item->SetLocation(leftOrigin);
+                    item->SetSize(Size(2 * statusBarItemBorderWidth + statusBarItemHorizontalPadding + item->TextWidth(), 2 * statusBarItemBorderWidth + textHeight));
+                    leftOrigin.x = leftOrigin.x + item->GetSize().w;
+                }
+                Point rightOrigin(size.w - 1 - padding.right, topLineWidth + padding.top);
+                if (springIndex != -1)
+                {
+                    for (long i = n - 1; i > springIndex; --i)
+                    {
+                        StatusBarItem* item = statusBarItems[i].Get();
+                        if (item->Spring())
+                        {
+                            break;
+                        }
+                        item->SetSize(Size(2 * statusBarItemBorderWidth + statusBarItemHorizontalPadding + item->TextWidth(), 2 * statusBarItemBorderWidth + textHeight));
+                        rightOrigin.x = rightOrigin.x - item->GetSize().w;
+                        item->SetLocation(rightOrigin);
+                    }
+                    StatusBarItem* springItem = statusBarItems[springIndex].Get();
+                    springItem->SetLocation(leftOrigin);
+                    springItem->SetSize(Size(rightOrigin.x - leftOrigin.x + 1, 2 * statusBarItemBorderWidth + textHeight));
+                }
+            }
+        }
+        private nothrow inline bool Changed() const
+        {
+            return (flags & Flags.changed) != Flags.none;
+        }
+        internal nothrow inline void SetChanged()
+        {
+            flags = cast<Flags>(flags | Flags.changed);
+        }
+        private nothrow inline void ResetChanged()
+        {
+            flags = cast<Flags>(flags & ~Flags.changed); 
+        }
+        private Flags flags;
+        private Font font;
+        private StringFormat stringFormat;
+        private List<UniquePtr<StatusBarItem>> statusBarItems;
+        private Color textColor;
+        private SolidBrush textBrush;
+        private Color topLineColor;
+        private Pen topLinePen;
+        private Color sunkenBorderOuterTopLeftColor;
+        private Pen sunkenBorderOuterTopLeftPen;
+        private Color sunkenBorderInnerTopLeftColor;
+        private Pen sunkenBorderInnerTopLeftPen;
+        private Color sunkenBorderOuterRightBottomColor;
+        private Pen sunkenBorderOuterRightBottomPen;
+        private Color sunkenBorderInnerRightBottomColor;
+        private Pen sunkenBorderInnerRightBottomPen;
+        private Color raisedBorderOuterTopLeftColor;
+        private Pen raisedBorderOuterTopLeftPen;
+        private Color raisedBorderOuterRightBottomColor;
+        private Pen raisedBorderOuterRightBottomPen;
+        private Color raisedBorderInnerTopLeftColor;
+        private Pen raisedBorderInnerTopLeftPen;
+        private Color raisedBorderInnerRightBottomColor;
+        private Pen raisedBorderInnerRightBottomPen;
+    }
+
+    public class StatusBarItem
+    {
+        public enum BorderStyle : sbyte
+        {
+            flat, sunken, raised
+        }
+        public nothrow static int BorderWidth()
+        {
+            return 2;
+        }
+        public nothrow static int HorizontalPadding()
+        {
+            return 4;
+        }
+        public nothrow StatusBarItem(const string& text_, BorderStyle borderStyle_, bool spring_) : statusBar(null), text(text_), borderStyle(borderStyle_), spring(spring_)
+        {
+        }
+        public nothrow StatusBarItem(const string& text, BorderStyle borderStyle) : this(text, borderStyle, false)
+        {
+        }
+        public nothrow StatusBarItem(const string& text) : this(text, BorderStyle.flat)
+        {
+        }
+        public nothrow StatusBarItem() : this(string())
+        {
+        }
+        public nothrow const Point& Location() const
+        {
+            return location;
+        }
+        public nothrow void SetLocation(const Point& location_)
+        {
+            location = location_;
+        }
+        public nothrow const Size& GetSize() const
+        {
+            return size;
+        }
+        public nothrow void SetSize(const Size& size_)
+        {
+            size = size_;
+        }
+        public nothrow inline const string& Text() const
+        {
+            return text;
+        }
+        public void SetText(const string& text_)
+        {
+            if (text != text_)
+            {
+                text = text_;
+                Invalidate();
+            }
+        }
+        public nothrow inline int TextWidth() const
+        {
+            return textWidth;
+        }
+        public nothrow inline void SetTextWidth(int textWidth_)
+        {
+            textWidth = textWidth_;
+        }
+        public nothrow inline BorderStyle GetBorderStyle() const
+        {
+            return borderStyle;
+        }
+        public void SetBorderStyle(BorderStyle borderStyle_)
+        {
+            if (borderStyle != borderStyle_)
+            {
+                borderStyle = borderStyle_;
+                Invalidate();
+            }
+        }
+        public nothrow inline bool Spring() const
+        {
+            return spring;
+        }
+        public void SetSpring(bool spring_)
+        {
+            if (spring != spring_)
+            {
+                spring = spring_;
+                Invalidate();
+            }
+        }
+        public default virtual ~StatusBarItem();
+        public void Draw(Graphics& graphics)
+        {
+            DrawBorder(graphics);
+            DrawText(graphics);
+        }
+        private void DrawText(Graphics& graphics)
+        {
+            const Brush& brush = statusBar->TextBrush();
+            const Font& font = statusBar->TextFont();
+            PointF origin(location.x + 2 + HorizontalPadding() / 2, location.y + 2);
+            graphics.DrawStringChecked(text, font, origin, brush);
+        }
+        private void DrawBorder(Graphics& graphics)
+        {
+            switch (borderStyle)
+            {
+                case BorderStyle.sunken:
+                {
+                    DrawSunkenBorder(graphics);
+                    break;
+                }
+                case BorderStyle.raised:
+                {
+                    DrawRaisedBorder(graphics);
+                    break;
+                }
+            }
+        }
+        private void DrawSunkenBorder(Graphics& graphics)
+        {
+            const Pen& outerTopLeftPen = statusBar->SunkenBorderOuterTopLeftPen();
+            graphics.DrawLineChecked(outerTopLeftPen, location, Point(location.x + size.w - 2, location.y));
+            graphics.DrawLineChecked(outerTopLeftPen, location, Point(location.x, location.y + size.h - 2));
+            const Pen& outerRightBottomPen = statusBar->SunkenBorderOuterRightBottomPen();
+            graphics.DrawLineChecked(outerRightBottomPen, Point(location.x + size.w - 1, location.y), Point(location.x + size.w - 1, location.y + size.h - 1));
+            graphics.DrawLineChecked(outerRightBottomPen, Point(location.x, location.y + size.h -1), Point(location.x + size.w - 1, location.y + size.h - 1));
+            const Pen& innerTopLeftPen = statusBar->SunkenBorderInnerTopLeftPen();
+            graphics.DrawLineChecked(innerTopLeftPen, Point(location.x + 1, location.y + 1), Point(location.x + size.w - 3, location.y + 1));
+            graphics.DrawLineChecked(innerTopLeftPen, Point(location.x + 1, location.y + 1), Point(location.x + 1, location.y + size.h - 3));
+            const Pen& innerRightBottomPen = statusBar->SunkenBorderInnerRightBottomPen();
+            graphics.DrawLineChecked(innerRightBottomPen, Point(location.x + size.w - 2, location.y + 1), Point(location.x + size.w - 2, location.y + size.h - 2));
+            graphics.DrawLineChecked(innerRightBottomPen, Point(location.x + 1, location.y + size.h - 2), Point(location.x + size.w - 2, location.y + size.h - 2));
+        }
+        private void DrawRaisedBorder(Graphics& graphics)
+        {
+            const Pen& outerTopLeftPen = statusBar->RaisedBorderOuterTopLeftPen();
+            graphics.DrawLineChecked(outerTopLeftPen, location, Point(location.x + size.w - 2, location.y));
+            graphics.DrawLineChecked(outerTopLeftPen, location, Point(location.x, location.y + size.h - 2));
+            const Pen& outerRightBottomPen = statusBar->RaisedBorderOuterRightBottomPen();
+            graphics.DrawLineChecked(outerRightBottomPen, Point(location.x + size.w - 1, location.y), Point(location.x + size.w - 1, location.y + size.h - 1));
+            graphics.DrawLineChecked(outerRightBottomPen, Point(location.x, location.y + size.h -1), Point(location.x + size.w - 1, location.y + size.h - 1));
+            const Pen& innerTopLeftPen = statusBar->RaisedBorderInnerTopLeftPen();
+            graphics.DrawLineChecked(innerTopLeftPen, Point(location.x + 1, location.y + 1), Point(location.x + size.w - 3, location.y + 1));
+            graphics.DrawLineChecked(innerTopLeftPen, Point(location.x + 1, location.y + 1), Point(location.x + 1, location.y + size.h - 3));
+            const Pen& innerRightBottomPen = statusBar->RaisedBorderInnerRightBottomPen();
+            graphics.DrawLineChecked(innerRightBottomPen, Point(location.x + size.w - 2, location.y + 1), Point(location.x + size.w - 2, location.y + size.h - 2));
+            graphics.DrawLineChecked(innerRightBottomPen, Point(location.x + 1, location.y + size.h - 2), Point(location.x + size.w - 2, location.y + size.h - 2));
+        }
+        internal nothrow void SetStatusBar(StatusBar* statusBar_)
+        {
+            statusBar = statusBar_;
+        }
+        public void Invalidate()
+        {
+            if (statusBar != null)
+            {
+                statusBar->SetChanged();
+                statusBar->Invalidate();
+            }
+        }
+        private StatusBar* statusBar;
+        private Point location;
+        private Size size;
+        private int textWidth;
+        private string text;
+        private BorderStyle borderStyle;
+        private bool spring;
+    }
+}

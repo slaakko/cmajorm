@@ -1,0 +1,47 @@
+using System;
+using System.Windows;
+
+public class ShapeDialog : Window
+{
+    public ShapeDialog() : base("spring.shapeDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(), "Shapes",
+        Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(140), ScreenMetrics.Get().MMToVerticalPixels(90)), Dock.none, Anchors.none)
+    {
+        Size s = GetSize();
+        Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+        Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+        UniquePtr<GroupBox> groupBoxPtr(new GroupBox("Shape", Point(defaultControlSpacing.w, defaultControlSpacing.h),
+            Size(ScreenMetrics.Get().MMToHorizontalPixels(80), ScreenMetrics.Get().MMToVerticalPixels(50)), Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+        GroupBox* groupBox = groupBoxPtr.Get();
+        AddChild(groupBoxPtr.Release());
+        Point groupBoxLocation = groupBox->Location();
+        UniquePtr<RadioButton> circleButtonPtr(new RadioButton("Circle", Point(groupBoxLocation.x + defaultControlSpacing.w, groupBoxLocation.y + defaultControlSpacing.h), Size(), Dock.none, Anchors.none, true));
+        RadioButton* circleButton = circleButtonPtr.Get();
+        groupBox->AddChild(circleButtonPtr.Release());
+        Point circleButtonLocation = circleButton->Location();
+        Size circleButtonSize = circleButton->GetSize();
+        UniquePtr<RadioButton> squareButtonPtr(new RadioButton("Square", Point(groupBoxLocation.x + defaultControlSpacing.w, circleButtonLocation.y + circleButtonSize.h + defaultControlSpacing.h), Size(), Dock.none, Anchors.none, true));
+        RadioButton* squareButton = squareButtonPtr.Get();
+        groupBox->AddChild(squareButtonPtr.Release());
+        Point squareButtonLocation = squareButton->Location();
+        Size squareButtonSize = squareButton->GetSize();
+        UniquePtr<RadioButton> ellipseButtonPtr(new RadioButton("Ellipse", Point(groupBoxLocation.x + defaultControlSpacing.w, squareButtonLocation.y + squareButtonSize.h + defaultControlSpacing.h), Size(), Dock.none, Anchors.none, true));
+        RadioButton* ellipseButton = ellipseButtonPtr.Get();
+        groupBox->AddChild(ellipseButtonPtr.Release());
+        int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+        int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+        UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+        cancelButton = cancelButtonPtr.Get();
+        cancelButton->SetDialogResult(DialogResult.cancel);
+        x = x - defaultButtonSize.w - defaultControlSpacing.w;
+        UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+            Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+        okButton = okButtonPtr.Get();
+        okButton->SetDialogResult(DialogResult.ok);
+        AddChild(okButtonPtr.Release());
+        AddChild(cancelButtonPtr.Release());
+        SetDefaultButton(okButton);
+        SetCancelButton(cancelButton);
+    }
+    private Button* okButton;
+    private Button* cancelButton;
+}

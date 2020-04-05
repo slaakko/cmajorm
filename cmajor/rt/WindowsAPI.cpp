@@ -205,19 +205,41 @@ bool WinShellExecute(const char* filePath, int64_t& errorCode)
     return false;
 }
 
-typedef bool (*messageProcessorFunction)(void* windowHandle, uint32_t message, uint32_t wparam, int64_t lparam, int64_t& result);
+typedef bool (*messageProcessorFunction)(void* windowHandle, uint32_t message, uint32_t wparam, int64_t lparam, int64_t& result, void*& originalWndProc);
+typedef void (*keyPreviewFunction)(uint32_t keycode, bool keyDown, bool& handled);
 
 messageProcessorFunction messageProcessor = nullptr;
+keyPreviewFunction keyPreview = nullptr;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int64_t result = 0;
-    bool handled = messageProcessor(hWnd, message, wParam, lParam, result);
+    void* originalWndProc = nullptr;
+    bool handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
     if (!handled)
     {
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return result;
+}
+
+LRESULT CALLBACK CommandSubClassWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    int64_t result = 0;
+    bool handled = false;
+    void* originalWndProc = nullptr;
+    handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
+    return CallWindowProcW((WNDPROC)originalWndProc, hWnd, message, wParam, lParam);
+}
+
+void* WinSubClassCommandWndProc(void* windowHandle)
+{
+    return (WNDPROC)SetWindowLongPtrW((HWND)windowHandle, GWLP_WNDPROC, (LONG_PTR)CommandSubClassWndProc);
+}
+
+void WinRestoreOriginalWndProc(void* windowHandle, void* originalWndProc)
+{
+    SetWindowLongPtrW((HWND)windowHandle, GWLP_WNDPROC, (LONG_PTR)originalWndProc);
 }
 
 HINSTANCE applicationInstance = nullptr;
@@ -230,9 +252,10 @@ void WinSetInstance()
 ULONG_PTR gdiplusToken;
 GdiplusStartupInput gdiplusStartupInput;
 
-int WinInit(void* messageProcessorFunctionAddress)
+int WinInit(void* messageProcessorFunctionAddress, void* keyPreviewFunctionAddress)
 {
     messageProcessor = static_cast<messageProcessorFunction>(messageProcessorFunctionAddress);
+    keyPreview = static_cast<keyPreviewFunction>(keyPreviewFunctionAddress);
     Status status = GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
     return static_cast<int>(status);
 }
@@ -248,9 +271,83 @@ int WinRun()
     while (GetMessage(&msg, nullptr, 0, 0))
     {
         TranslateMessage(&msg);
-        DispatchMessage(&msg);
+        bool handled = false;
+        if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+        {
+            if (keyPreview)
+            {
+                uint32_t keyCode = msg.wParam;
+                bool keyDown = msg.message == WM_KEYDOWN;
+                keyPreview(keyCode, keyDown, handled);
+            }
+        }
+        if (!handled)
+        {
+            DispatchMessage(&msg);
+        }
     }
     return msg.wParam;
+}
+
+void* WinGetForegroundWindow()
+{
+    return GetForegroundWindow();
+}
+
+bool WinEnableWindow(void* windowHandle, bool enable)
+{
+    return EnableWindow((HWND)windowHandle, enable);
+}
+
+typedef int (*getDialogResultFunction)(void* dialogWindowPtr);
+typedef void (*dialogKeyPreviewFunction)(void* dialogWindowPtr, uint32_t keyCode, bool keyDown, bool& handled);
+
+int WinMessageLoop(void* windowHandle, void* parentWindowHandle, void* getDialogResultFunc, void* keyPreviewFunc, void* dialogWindowPtr)
+{
+    int dialogResult = 0;
+    getDialogResultFunction dialogResultFun = static_cast<getDialogResultFunction>(getDialogResultFunc);
+    dialogKeyPreviewFunction keyPreviewFun = static_cast<dialogKeyPreviewFunction>(keyPreviewFunc);
+    EnableWindow((HWND)parentWindowHandle, false);
+    ShowWindow((HWND)windowHandle, SW_SHOW);
+    BringWindowToTop((HWND)windowHandle);
+    SetActiveWindow((HWND)windowHandle);
+    bool end = false;
+    while (!end)
+    {
+        MSG msg;
+        if (GetMessage(&msg, nullptr, 0, 0))
+        {
+            TranslateMessage(&msg);
+            bool handled = false;
+            if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+            {
+                if (keyPreviewFun)
+                {
+                    uint32_t keyCode = msg.wParam;
+                    bool keyDown = msg.message == WM_KEYDOWN;
+                    keyPreviewFun(dialogWindowPtr, keyCode, keyDown, handled);
+                }
+            }
+            if (!handled)
+            {
+                DispatchMessage(&msg);
+            }
+            dialogResult = dialogResultFun(dialogWindowPtr);
+            if (dialogResult != 0)
+            {
+                end = true;
+            }
+        }
+        else
+        {
+            PostQuitMessage(msg.wParam);
+            end = true;
+        }
+    }
+    EnableWindow((HWND)parentWindowHandle, true);
+    PostMessage((HWND)windowHandle, WM_CLOSE, 0u, 0);
+    SetActiveWindow((HWND)parentWindowHandle);
+    return dialogResult;
 }
 
  uint16_t WinRegisterWindowClass(const char* windowClassName, uint32_t style, int backgroundColor)
@@ -380,9 +477,24 @@ bool WinSetWindowText(void* windowHandle, const char* text)
     return SetWindowTextW((HWND)windowHandle, (LPWSTR)str.c_str());
 }
 
+int WinGetWindowTextLength(void* windowHandle)
+{
+    return GetWindowTextLengthW((HWND)windowHandle);
+}
+
+int WinGetWindowText(void* windowHandle, char16_t* textBuffer, int maxCount)
+{
+    return GetWindowTextW((HWND)windowHandle, (LPWSTR)textBuffer, maxCount);
+}
+
 void* WinGetDC(void* windowHandle)
 {
     return GetDC((HWND)windowHandle);
+}
+
+int WinReleaseHDC(void* windowHandle, void* hdc)
+{
+    return ReleaseDC((HWND)windowHandle, (HDC)hdc);
 }
 
 bool WinTrackMouseEvent(void* windowHandle, uint32_t flags, uint32_t hoverTimeMs)
@@ -503,6 +615,11 @@ int WinGraphicsBrushGetLastStatus(void* brush)
     return static_cast<Brush*>(brush)->GetLastStatus();
 }
 
+void* WinGraphicsCreateEmptyFontFamily()
+{
+    return new FontFamily();
+}
+
 void* WinGraphicsCreateFontFamily(const char* familyName)
 {
     std::u16string name = ToUtf16(std::string(familyName));
@@ -517,6 +634,11 @@ void* WinGraphicsCloneFontFamily(void* fontFamily)
 void WinGraphicsDeleteFontFamily(void* fontFamily)
 {
     delete static_cast<FontFamily*>(fontFamily);
+}
+
+int WinGraphicsGetFontFamilyName(void* fontFamily, void*& str)
+{
+    return static_cast<FontFamily*>(fontFamily)->GetFamilyName((LPWSTR)str);
 }
 
 const void* WinGraphicsGetGenericMonospaceFontFamily()
@@ -536,12 +658,21 @@ const void* WinGraphicsGetGenericSerifFontFamily()
 
 int WinGraphicsFontFamilyGetLastStatus(void* fontFamily)
 {
-    return static_cast<FontFamily*>(fontFamily)->GetLastStatus();
+    if (fontFamily != nullptr)
+    {
+        return static_cast<FontFamily*>(fontFamily)->GetLastStatus();
+    }
+    return Status::GenericError;
 }
 
 void* WinGraphicsCreateFont(const void* fontFamily, float emSize, int style, int unit)
 {
     return new Font(static_cast<const FontFamily*>(fontFamily), emSize, style, static_cast<Gdiplus::Unit>(unit));
+}
+
+void* WinGraphicsCreateFontFromHFont(void* hdc, void* hfont)
+{
+    return new Font((HDC)hdc, (const HFONT)hfont);
 }
 
 void* WinGraphicsCloneFont(void* font)
@@ -554,9 +685,40 @@ void WinGraphicsDeleteFont(void* font)
     delete static_cast<Font*>(font);
 }
 
+int WinGraphicsGetFontFamily(void* font, void* fontFamily)
+{
+    return static_cast<Font*>(font)->GetFamily(static_cast<FontFamily*>(fontFamily));
+}
+
+float WinGraphicsGetFontSize(void* font)
+{
+    return static_cast<Font*>(font)->GetSize();
+}
+
 float WinGraphicsGetFontHeight(void* font, const void* graphics)
 {
     return static_cast<Font*>(font)->GetHeight(static_cast<const Graphics*>(graphics));
+}
+
+int WinGraphicsGetFontStyle(void* font)
+{
+    return static_cast<Font*>(font)->GetStyle();
+}
+
+int WinGraphicsFontToHFont(void* font, void* graphics, void*& hfont)
+{
+    LOGFONTW logFont;
+    int status = static_cast<Font*>(font)->GetLogFontW(static_cast<const Graphics*>(graphics), &logFont);
+    if (status != 0)
+    {
+        return status;
+    }
+    hfont = CreateFontIndirectW(&logFont);
+    if (hfont == nullptr)
+    {
+        return Status::GenericError;
+    }
+    return 0;
 }
 
 void* WinGraphicsCreateDefaultStringFormat()
@@ -612,6 +774,11 @@ int WinGraphicsStringFormatSetHotKeyPrefix(void* stringFormat, int hotKeyPrefix)
 int WinGraphicsDrawLine(void* graphics, void* pen, int startX, int startY, int endX, int endY)
 {
     return static_cast<Graphics*>(graphics)->DrawLine(static_cast<Pen*>(pen), Point(startX, startY), Point(endX, endY));
+}
+
+int WinGraphicsDrawLineF(void* graphics, void* pen, float startX, float startY, float endX, float endY)
+{
+    return static_cast<Graphics*>(graphics)->DrawLine(static_cast<Pen*>(pen), PointF(startX, startY), PointF(endX, endY));
 }
 
 int WinGraphicsDrawLines(void* graphics, void* pen, int count, void* points)
@@ -1002,6 +1169,47 @@ int WinGraphicsSetSmoothingMode(void* graphics, int smoothingMode)
     return static_cast<Graphics*>(graphics)->SetSmoothingMode(static_cast<SmoothingMode>(smoothingMode));
 }
 
+// image formats: image/bmp, image/jpeg, image/gif, image/tiff, image/png
+
+int WinGraphicsGetEncoderClsId(const char* imageFormat, void* clsid)
+{
+    std::u16string imageFormatStr = ToUtf16(imageFormat);
+    ImageCodecInfo* imageCodecInfo = nullptr;
+    uint32_t n = 0;
+    uint32_t size = 0;
+    int result = GetImageEncodersSize(&n, &size);
+    if (result != 0 || size == 0)
+    {
+        return result;
+    }
+    imageCodecInfo = (ImageCodecInfo*)(malloc(size));
+    if (!imageCodecInfo) return 3;
+    result = GetImageEncoders(n, size, imageCodecInfo);
+    if (result != 0)
+    {
+        return result;
+    }
+    for (uint32_t i = 0; i < n; ++i)
+    {
+        std::u16string mimetype = reinterpret_cast<const char16_t*>(imageCodecInfo[i].MimeType);
+        if (mimetype == imageFormatStr)
+        {
+            CLSID guid = imageCodecInfo[i].Clsid;
+            memcpy(clsid, &guid, sizeof(guid));
+            free(imageCodecInfo);
+            return 0;
+        }
+    }
+    free(imageCodecInfo);
+    return -1;
+}
+
+int WinGraphicsImageSave(void* image, const char* fileName, const void* encoderClsId)
+{
+    std::u16string fileNameStr = ToUtf16(fileName);
+    return static_cast<Image*>(image)->Save((const WCHAR*)fileNameStr.c_str(), static_cast<const CLSID*>(encoderClsId));
+}
+
 void WinGetSysColor(int index, uint8_t& red, uint8_t& green, uint8_t& blue)
 {
     uint32_t rgb = GetSysColor(index);
@@ -1176,6 +1384,16 @@ bool WinReleaseCapture()
     return ReleaseCapture();
 }
 
+int64_t WinGetClassLong(void* windowHandle, int index)
+{
+    return GetClassLongPtr((HWND)windowHandle, index);
+}
+
+int64_t WinSetClassLong(void* windowHandle, int index, int64_t value)
+{
+    return SetClassLongPtr((HWND)windowHandle, index, value);
+}
+
 int64_t WinGetWindowLong(void* windowHandle, int index)
 {
     LONG_PTR result = GetWindowLongPtrW((HWND)windowHandle, index);
@@ -1323,3 +1541,4 @@ bool WinRegGetDWordValue(void* key, const char* subKey, const char* valueName, u
     }
     return status == ERROR_SUCCESS;
 }
+

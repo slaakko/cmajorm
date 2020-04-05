@@ -141,6 +141,7 @@ void CompileResourceScriptFile(cmajor::symbols::Module& currentModule, const std
     {
         LogMessage(currentModule.LogStreamId(), "==> " + resourceFilePath);
     }
+    currentModule.AddResourceFilePathToResourceFilePaths();
 }
 
 std::vector<Resource> GetResourcesInProject(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule)
@@ -194,14 +195,19 @@ std::vector<Resource> GetResourcesInProject(sngcm::ast::Project& project, cmajor
                         }
                         currentModule.AddResourceName(resourceName);
                         std::string resourceFilePath = Path::MakeCanonical(ToUtf8(resourceFile));
+                        std::string fullResourceFilePath = resourceFilePath;
                         if (Path::IsRelative(resourceFilePath))
                         {
-                            resourceFilePath = Path::Combine(cmajorResourceDir, resourceFilePath);
+                            fullResourceFilePath = Path::Combine(cmajorResourceDir, resourceFilePath);
                         }
-                        resourceFilePath = GetFullPath(resourceFilePath);
-                        if (boost::filesystem::exists(resourceFilePath))
+                        fullResourceFilePath = GetFullPath(fullResourceFilePath);
+                        if (!boost::filesystem::exists(fullResourceFilePath))
                         {
-                            Resource resource(resourceName, GetResourceType(resourceType), resourceFilePath);
+                            fullResourceFilePath = GetFullPath(Path::Combine(project.SourceBasePath().generic_string(), resourceFilePath));
+                        }
+                        if (boost::filesystem::exists(fullResourceFilePath))
+                        {
+                            Resource resource(resourceName, GetResourceType(resourceType), fullResourceFilePath);
                             resources.push_back(std::move(resource));
                         }
                         else

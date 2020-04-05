@@ -8,6 +8,11 @@ using System.Collections;
 
 namespace System.Windows
 {
+    public nothrow inline int DefaultControlPadding()
+    {
+        return 3;
+    }
+
     public class PaddedControl : Control
     {
         public PaddedControl(Control* child_, const Padding& padding_, const Point& location, const Size& size, Dock dock, Anchors anchors) :
@@ -15,6 +20,11 @@ namespace System.Windows
             child_->BackgroundColor(), "paddedControl", location, size, dock, anchors), container(this), child(child_), padding(padding_)
         {
             container.AddChild(child);
+            SetChildPos();
+        }
+        public PaddedControl(Control* child) : this(child, Padding(DefaultControlPadding(), DefaultControlPadding(), DefaultControlPadding(), DefaultControlPadding()),
+            Point(), Size(), Dock.none, Anchors.none)
+        {
         }
         protected nothrow override bool IsDecoratorControl() const
         {
@@ -61,10 +71,36 @@ namespace System.Windows
                 parentControl->OnChildContentSizeChanged(args);
             }
         }
+        protected override void OnChildGotFocus(ControlEventArgs& args)
+        {
+            base->OnChildGotFocus(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildGotFocus(args);
+            }
+        }
+        protected override void OnChildLostFocus(ControlEventArgs& args)
+        {
+            base->OnChildLostFocus(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildLostFocus(args);
+            }
+        }
         protected override void OnPaint(PaintEventArgs& args)
         {
             args.graphics.Clear(BackgroundColor());
             base->OnPaint(args);
+        }
+        internal nothrow override Control* GetFirstEnabledTabStopControl() const
+        {
+            return child->GetFirstEnabledTabStopControl();
+        }
+        internal nothrow override Control* GetLastEnabledTabStopControl() const
+        {
+            return child->GetLastEnabledTabStopControl();
         }
         private void SetChildPos()
         {

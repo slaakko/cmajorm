@@ -8,15 +8,17 @@ using System.Windows.API;
 
 namespace System.Windows
 {
-    public delegate bool MessageProcessorFunction(void* windowHandle, uint msg, uint wparam, long lparam, long& result);
+    public delegate bool MessageProcessorFunction(void* windowHandle, uint msg, uint wparam, long lparam, long& result, void*& originalWndProc);
 
     public static class Application
     {
-        static Application() : logView(null)
+        static Application() : logView(null), activeWindow(null)
         {            
             MessageProcessorFunction messageProcessorFunction = ProcessMessage;
+            ModelessWindowKeyPreviewFunction keyPreviewFunction = ModelessWindowKeyPreview;
             void* messageProcessorFunctionAddress = cast<void*>(messageProcessorFunction);
-            int result = WinInit(messageProcessorFunctionAddress);
+            void* keyPreviewFunctionAddress = cast<void*>(keyPreviewFunction);
+            int result = WinInit(messageProcessorFunctionAddress, keyPreviewFunctionAddress);
             CheckGraphicsStatus(cast<GraphicsStatus>(result));
         }
         public static void Init()
@@ -43,6 +45,7 @@ namespace System.Windows
                     break;
                 }
             }
+            mainWindow.Show();
             mainWindow.Update();
             int exitCode = WinRun();
             return exitCode;
@@ -55,13 +58,17 @@ namespace System.Windows
         {
             Exit(0);
         }
-        private static bool ProcessMessage(void* windowHandle, uint msg, uint wparam, long lparam, long& result)
+        private static bool ProcessMessage(void* windowHandle, uint msg, uint wparam, long lparam, long& result, void*& originalWndProc)
         {
             Control* window = windowManager.GetWindow(windowHandle);
             if (window != null)
             {
                 Message message(windowHandle, msg, wparam, lparam, result);
                 bool handled = window->ProcessMessageInternal(message);
+                if (message.originalWndProc != null)
+                {
+                    originalWndProc = message.originalWndProc;
+                }
                 if (handled)
                 {
                     result = message.result;
@@ -100,8 +107,17 @@ namespace System.Windows
             Control* focusedControl = windowManager.GetWindow(focusedWindowHandle);
             return focusedControl;
         }
+        public static nothrow Window* GetActiveWindow() 
+        {
+            return activeWindow;
+        }
+        public static nothrow void SetActiveWindow(Window* activeWindow_)
+        {
+            activeWindow = activeWindow_;
+        }
         private static WindowManager windowManager;
         private static ResourceManager resourceManager;
         private static LogView* logView;
+        private static Window* activeWindow;
     }
 }

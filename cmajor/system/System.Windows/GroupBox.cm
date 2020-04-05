@@ -1,0 +1,156 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public class GroupBox : ButtonBase
+    {
+        public GroupBox(const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | ButtonStyle.BS_GROUPBOX), DefaultExtendedWindowStyle(),
+            backgroundColor, text, location, size, dock, anchors), children(this), checkedRadioButton(null)
+        {
+        }
+        public GroupBox(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : this(DefaultControlBackgroundColor(), text, location, size, dock, anchors)
+        {
+        }
+        public void AddChild(Control* child)
+        {
+            children.AddChild(child);
+            ControlEventArgs args(child);
+            OnControlAdded(args);
+        }
+        public UniquePtr<Control> RemoveChild(Control* child)
+        {
+            UniquePtr<Component> childComponent = children.RemoveChild(child);
+            ControlEventArgs args(child);
+            OnControlRemoved(args);
+            return UniquePtr<Control>(childComponent.Release() as Control*);
+        }
+        public void InsertChildAfter(Control* child, Control* after)
+        {
+            children.InsertAfter(child, after);
+            ControlEventArgs args(child);
+            OnControlAdded(args);
+        }
+        public nothrow const Container& Children() const
+        {
+            return children;
+        }
+        public nothrow inline RadioButton* CheckedRadioButton() const
+        {
+            return checkedRadioButton;
+        }
+        public void SetCheckedRadioButton(RadioButton* radioButton)
+        {
+            if (radioButton != checkedRadioButton)
+            {
+                if (checkedRadioButton != null)
+                {
+                    checkedRadioButton->SetChecked(false);
+                }
+                checkedRadioButton = radioButton;
+                if (checkedRadioButton != null)
+                {
+                    checkedRadioButton->SetChecked(true);
+                }
+            }
+        }
+        internal nothrow inline void ResetCheckedRadioButton()
+        {
+            checkedRadioButton = null;
+        }
+        protected override void OnCreated()
+        {
+            base->OnCreated();
+            Graphics graphics = Graphics.FromWindowHandle(Handle());
+            const FontHandle& fontHandle = GetFontHandle(graphics);
+            if (!fontHandle.IsNull())
+            {
+                SendSetFontMessage(fontHandle);
+            }
+            SubClassCommandWndProc();
+        }
+        protected override void OnControlAdded(ControlEventArgs& args)
+        {
+            base->OnControlAdded(args);
+            if (args.control is RadioButton*)
+            {
+                if (checkedRadioButton == null)
+                {
+                    SetCheckedRadioButton(cast<RadioButton*>(args.control));
+                }
+            }
+        }
+        protected override void OnControlRemoved(ControlEventArgs& args)
+        {
+            base->OnControlRemoved(args);
+            if (args.control is RadioButton*)
+            {
+                if (checkedRadioButton == cast<RadioButton*>(args.control))
+                {
+                    ResetCheckedRadioButton();
+                }
+            }
+        }
+        protected override void OnChildGotFocus(ControlEventArgs& args)
+        {
+            base->OnChildGotFocus(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildGotFocus(args);
+            }
+        }
+        protected override void OnChildLostFocus(ControlEventArgs& args)
+        {
+            base->OnChildLostFocus(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildLostFocus(args);
+            }
+        }
+        internal nothrow override Control* GetFirstEnabledTabStopControl() const
+        {
+            Component* child = children.FirstChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* control = cast<Control*>(child);
+                    Control* tabStopChild = control->GetFirstEnabledTabStopControl();
+                    if (tabStopChild != null)
+                    {
+                        return tabStopChild;
+                    }
+                }
+                child = child->NextSibling();
+            }
+            return null;
+        }
+        internal nothrow override Control* GetLastEnabledTabStopControl() const
+        {
+            Component* child = children.LastChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* control = cast<Control*>(child);
+                    Control* tabStopChild = control->GetLastEnabledTabStopControl();
+                    if (tabStopChild != null)
+                    {
+                        return tabStopChild;
+                    }
+                }
+                child = child->PrevSibling();
+            }
+            return null;
+        }
+        private Container children;
+        private RadioButton* checkedRadioButton;
+    }
+}

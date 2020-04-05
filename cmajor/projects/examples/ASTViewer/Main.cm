@@ -20,21 +20,23 @@ class MainWindow : Window
         exitMenuItem->ClickEvent().AddHandler(ExitClick);
         fileItem->AddMenuItem(exitMenuItem.Release());
         menuBar->AddMenuItem(fileItem.Release());
-        UniquePtr<MenuItem> windowItem(new MenuItem("&Window"));
-        windowItem->AddMenuItem(new MenuItem("&Close all"));
-        menuBar->AddMenuItem(windowItem.Release());
-        UniquePtr<MenuItem> helpItem(new MenuItem("&Help"));
-        helpItem->AddMenuItem(new MenuItem("&About"));
-        menuBar->AddMenuItem(helpItem.Release());
+        UniquePtr<MenuItem> viewItem(new MenuItem("&View"));
+        UniquePtr<MenuItem> updateItem(new MenuItem("&Update tree view"));
+        updateItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.u));
+        updateItem->ClickEvent().AddHandler(UpdateClick);
+        viewItem->AddMenuItem(updateItem.Release());
+        menuBar->AddMenuItem(viewItem.Release());
         AddChild(menuBar.Release());
-        UniquePtr<SplitContainer> verticalSplitContainer(new SplitContainer(Orientation.vertical, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+        UniquePtr<SplitContainer> verticalSplitContainer;
         UniquePtr<LogView> logView;
         if (Debug.Log())
         {
-            logView.Reset(new LogView(Size(0, 0)));
-            logView->SetDock(Dock.fill);
+            verticalSplitContainer.Reset(new SplitContainer(Orientation.vertical, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            logView.Reset(new LogView());
             Application.SetLogView(logView.Get());
-            verticalSplitContainer->Pane2Container()->AddChild(logView.Release());
+            UniquePtr<Control> borderedLogView(new BorderedControl(logView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> scrollableLogView(new ScrollableControl(borderedLogView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            verticalSplitContainer->Pane2Container()->AddChild(scrollableLogView.Release());
         }
         UniquePtr<SplitContainer> horizontalSplitContainer(new SplitContainer(Orientation.horizontal, 600, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         treeView = new TreeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
@@ -48,13 +50,19 @@ class MainWindow : Window
         horizontalSplitContainer->Pane1Container()->AddChild(scrollableTreeView.Release());
         sourceCodeView = new CmajorSourceCodeView(Point(0, 0), Size(0, 0), Dock.fill, Anchors.none);
         sourceCodeView->CaretPosChangedEvent().AddHandler(CaretPosChanged);
-        sourceCodeView->KeyDownEvent().AddHandler(SourceCodeViewKeyDown);
         UniquePtr<Control> paddedSourceCodeView(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> borderedSourceCodeView(new BorderedControl(paddedSourceCodeView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
         UniquePtr<Control> scrollableSourceCodeView(new ScrollableControl(borderedSourceCodeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         horizontalSplitContainer->Pane2Container()->AddChild(scrollableSourceCodeView.Release());
-        verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainer.Release());
-        AddChild(verticalSplitContainer.Release());
+        if (verticalSplitContainer.IsNull())
+        {
+            AddChild(horizontalSplitContainer.Release());
+        }
+        else
+        {
+            verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainer.Release());
+            AddChild(verticalSplitContainer.Release());
+        }
     }
     public override void PrintWindowTree(int level)
     {
@@ -73,14 +81,6 @@ class MainWindow : Window
             }
             child = child->NextSibling();
         }
-    }
-    protected override void OnPaint(PaintEventArgs& args)
-    {
-        base->OnPaint(args);
-    }
-    protected override bool ProcessMessage(Message& message)
-    {
-        return base->ProcessMessage(message);
     }
     protected override void OnKeyDown(KeyEventArgs& args)
     {
@@ -194,21 +194,10 @@ class MainWindow : Window
             sourceCodeView->SetCaretPosByCharIndex(index);
         }
     }
-    private void SourceCodeViewKeyDown(KeyEventArgs& args)
+    private void UpdateClick()
     {
-        if (!args.handled)
-        {
-            if (args.keyData == cast<Keys>(Keys.controlModifier | Keys.u))
-            {
-                args.handled = true;
-                UpdateTreeView();
-            }
-        }
-    }
-    private void UpdateTreeView()
-    {
-        int caretLine = sourceCodeView->GetCaretLine();
-        int caretColumn = sourceCodeView->GetCaretColumn();
+        int caretLine = sourceCodeView->CaretLine();
+        int caretColumn = sourceCodeView->CaretColumn();
         int index = sourceCodeView->GetCharIndex(caretLine, caretColumn);
         if (index != -1)
         {
@@ -240,6 +229,8 @@ class MainWindow : Window
                     p->Expand();
                     p = p->Parent();
                 }
+                treeView->Invalidate();
+                treeView->Update();
                 node->EnsureVisible();
                 treeView->Invalidate();
             }
@@ -247,8 +238,8 @@ class MainWindow : Window
     }
     private void CaretPosChanged()
     {
-        int caretLine = sourceCodeView->GetCaretLine();
-        int caretColumn = sourceCodeView->GetCaretColumn();
+        int caretLine = sourceCodeView->CaretLine();
+        int caretColumn = sourceCodeView->CaretColumn();
         LogView* logView = Application.GetLogView();
         if (logView != null)
         {
@@ -269,11 +260,13 @@ int main()
 {
     try
     {
-        Debug.SetLog();
+        //Debug.SetLog();
         //Debug.SetDocking();
         //Debug.SetWindowTree();
         //Debug.SetPaint();
+
         MainWindow mainWindow;
+        mainWindow.SetSmallIcon(Application.GetResourceManager().GetIcon("astviewer.icon"));
         if (Debug.WindowTree())
         {
             mainWindow.PrintWindowTree(0);

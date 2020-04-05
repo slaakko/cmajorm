@@ -6,11 +6,11 @@ class HelloWindow : Window
     public HelloWindow() : base("Hello"), numHellos(0), color(0u, 0x5au, 0xb4u), brush(color), fontFamily(FontFamily.GenericSansSerif()), font(fontFamily, 14.0f)
     {
         Size s = GetSize();
-        int w = 100;
-        int h = 40;
-        int x = s.w - w - 10;
-        int y = s.h - h - 10;
-        UniquePtr<Button> helloButton(new Button("Hello", Point(x, y), Size(w, h), Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+        Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+        Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+        int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+        int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+        UniquePtr<Button> helloButton(new Button("Hello", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
         helloButton->ClickEvent().AddHandler(HelloButtonClick);
         AddChild(helloButton.Release());
         PaintEvent().AddHandler(Paint);

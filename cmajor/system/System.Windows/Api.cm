@@ -342,6 +342,36 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
+
+    public int GetWindowTextLength(void* windowHandle)
+    {
+        int result = WinGetWindowTextLength(windowHandle);
+        if (result == 0)
+        {
+            ulong errorCode = WinGetLastError();
+            if (errorCode != 0u)
+            {
+                throw WindowsAPIException(errorCode);
+            }
+        }
+        return result;
+    }
+
+    public string GetWindowText(void* windowHandle)
+    {
+        int length = GetWindowTextLength(windowHandle);
+        UniquePtr<wchar> buffer(cast<wchar*>(MemAlloc(sizeof(wchar) * (length + 1))));
+        int result = WinGetWindowText(windowHandle, buffer.Get(), length + 1);
+        if (result == 0)
+        {
+            ulong errorCode = WinGetLastError();
+            if (errorCode != 0u)
+            {
+                throw WindowsAPIException(errorCode);
+            }
+        }
+        return ToUtf8(buffer.Get());
+    }
     
     public void SetParentWindow(void* childWindowHandle, void* parentWindowHandle)
     {
@@ -773,6 +803,47 @@ namespace System.Windows.API
         if (!succeeded)
         {
             throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public enum ClassLongIndex : int
+    {
+        GCL_CBCLSEXTRA = -20,
+        GCL_CBWNDEXTRA = -18,
+        GCL_HBRBACKGROUND = -10,
+        GCL_HCURSOR = -12,
+        GCL_HICON = -14,
+        GCL_HICONSM = -34,
+        GCL_HMODULE = -16,
+        GCL_MENUNAME = -8,
+        GCL_STYLE = -26,
+        GCL_WNDPROC = -24
+    }
+
+    public long GetClassLong(void* windowHandle, ClassLongIndex index)
+    {
+        long value = WinGetClassLong(windowHandle, cast<int>(index));
+        if (value == 0)
+        {
+            ulong errorCode = WinGetLastError();
+            if (errorCode != 0u)
+            {
+                throw WindowsAPIException(errorCode);
+            }
+        }
+        return value;
+    }
+
+    public void SetClassLong(void* windowHandle, ClassLongIndex index, long newValue)
+    {
+        long value = WinSetClassLong(windowHandle, cast<int>(index), newValue);
+        if (value == 0)
+        {
+            ulong errorCode = WinGetLastError();
+            if (errorCode != 0u)
+            {
+                throw WindowsAPIException(errorCode);
+            }
         }
     }
 

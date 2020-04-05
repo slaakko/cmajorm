@@ -701,6 +701,11 @@ std::string Module::ResourceFilePath() const
     return GetFullPath(boost::filesystem::path(cmmFilePath).replace_extension(".res").generic_string());
 }
 
+void Module::AddResourceFilePathToResourceFilePaths()
+{
+    resourceFilePaths.push_back(ResourceFilePath());
+}
+
 void Module::CreateSymbolTable()
 {
     symbolTable.reset(new SymbolTable(this));

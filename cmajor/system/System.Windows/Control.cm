@@ -17,6 +17,11 @@ namespace System.Windows
     public class delegate void KeyPressEventHandler(KeyPressEventArgs& keyPressEventArgs);
     public class delegate void KeyEventHandler(KeyEventArgs& keyEventArgs);
     public class delegate void ClickEventHandler();
+    public class delegate void CreatedEventHandler();
+    public class delegate void DestroyedEventHandler();
+    public class delegate void ShownEventHandler();
+    public class delegate void EnabledChangedEventHandler();
+    public class delegate void VisibleChangedEventHandler();
     public class delegate void SizeChangedEventHandler();
     public class delegate void LocationChangedEventHandler();
     public class delegate void ContentChangedEventHandler();
@@ -29,8 +34,11 @@ namespace System.Windows
     public class delegate void HScrollEventHandler(ScrollEventArgs& scrollEventArgs);
     public class delegate void VScrollEventHandler(ScrollEventArgs& scrollEventArgs);
     public class delegate void TimerEventHandler(TimerEventArgs& timerEventArgs);
-    public class delegate void SetFocusEventHandler();
-    public class delegate void KillFocusEventHandler();
+    public class delegate void GotFocusEventHandler();
+    public class delegate void LostFocusEventHandler();
+    public class delegate void ChildGotFocusEventHandler(ControlEventArgs& controlEventArgs);
+    public class delegate void ChildLostFocusEventHandler(ControlEventArgs& controlEventArgs);
+    public class delegate void ControlEventHandler(ControlEventArgs& args);
 
     public inline nothrow WindowClassStyle DefaultWindowClassStyle()
     {
@@ -52,23 +60,46 @@ namespace System.Windows
         return cast<WindowStyle>(WindowStyle.WS_CHILD | WindowStyle.WS_CLIPSIBLINGS);
     }
 
+    public inline nothrow WindowStyle DialogWindowStyle()
+    {
+        return cast<WindowStyle>(WindowStyle.WS_CAPTION | WindowStyle.WS_DLGFRAME | WindowStyle.WS_CLIPSIBLINGS);
+    }
+
     public inline nothrow ExtendedWindowStyle DefaultExtendedWindowStyle()
     {
         return ExtendedWindowStyle.WS_EX_DEFAULT;
     }
-    
+
+    public nothrow Color DefaultControlBackgroundColor()
+    {
+        return GetSystemColor(SystemColor.COLOR_MENU);
+    }
+
     public abstract class Control : Component
     {
-        private enum Flags : sbyte
+        private enum Flags : short
         {
-            none = 0, mouseInClient = 1 << 0, lbuttonPressed = 1 << 1, menuWantsKeys = 1 << 2, keyDownHandled = 1 << 3, focused = 1 << 4, caretCreated = 1 << 5, caretShown = 1 << 6
+            none = 0, mouseInClient = 1 << 0, lbuttonPressed = 1 << 1, menuWantsKeys = 1 << 2, keyDownHandled = 1 << 3, focused = 1 << 4, caretCreated = 1 << 5, caretShown = 1 << 6,
+            disabled = 1 << 7, hidden = 1 << 8, tabStop = 1 << 9, baseOnCreatedCalled = 1 << 10
         }
         public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowStyle style_, ExtendedWindowStyle exStyle_, 
             const Color& backgroundColor_, const string& text_, const Point& location_, const Size& size_, Dock dock_, Anchors anchors_) : 
             windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), style(style_), exStyle(exStyle_),
             backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), contentLocation(0, 0), contentSize(), dock(dock_), anchors(anchors_), flags(Flags.none),
-            arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), caretShowCount(0)
+            arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), caretShowCount(0), font(null), fontHandle(null), originalWndProc(null)
         {
+            if ((style & WindowStyle.WS_DISABLED) != 0)
+            {
+                SetDisabled();
+            }
+            if ((style & WindowStyle.WS_VISIBLE) == 0)
+            {
+                SetHidden();
+            }
+            if ((style & WindowStyle.WS_TABSTOP) != 0)
+            {
+                SetTabStop();
+            }
             Application.Init();
             if ((style & WindowStyle.WS_CHILD) == 0)
             {
@@ -110,10 +141,30 @@ namespace System.Windows
             }
             return parentText;
         }
+        internal nothrow void SetWindowCreateStyleFromFlags()
+        {
+            if (IsDisabled())
+            {
+                style = cast<WindowStyle>(style | WindowStyle.WS_DISABLED);
+            }
+            else
+            {
+                style = cast<WindowStyle>(style & ~WindowStyle.WS_DISABLED);
+            }
+            if (Hidden())
+            {
+                style = cast<WindowStyle>(style & ~WindowStyle.WS_VISIBLE);
+            }
+            else
+            {
+                style = cast<WindowStyle>(style | WindowStyle.WS_VISIBLE);
+            }
+        }
         internal void CreateWindowInternal()
         {
             if (handle != null) return;
             Control* parentControl = ParentControl();
+            SetWindowCreateStyleFromFlags();
             if (Application.GetWindowManager().IsSystemClassName(windowClassName))
             {
                 handle = CreateWindowByClassName(windowClassName, text.Chars(), style, exStyle, location, size, parentControl);
@@ -132,6 +183,7 @@ namespace System.Windows
                 createList.Clear();
             }
             Application.GetWindowManager().AddWindow(this);
+            OnCreated();
             WinRect clientRect = GetClientRect();
             if ((style & WindowStyle.WS_CHILD) == 0)
             {
@@ -144,11 +196,6 @@ namespace System.Windows
             if (parentControl != null && parentControl->createList.IsEmpty())
             {
                 DockWindow();
-            }
-            if ((style & WindowStyle.WS_VISIBLE) != 0)
-            {
-                Show();
-                Update();
             }
         }
         internal void AddChildVisual(Control* child)
@@ -214,6 +261,44 @@ namespace System.Windows
             SetParentWindow(handle, parentWindow->handle);
             DockWindow();
         }
+        public nothrow inline bool IsEnabled() const
+        {
+            return !IsDisabled();
+        }
+        public void Enable()
+        {
+            if (IsDisabled())
+            {
+                ResetDisabled();
+                style = cast<WindowStyle>(style & ~WindowStyle.WS_DISABLED);
+                if (handle != null)
+                {
+                    EnableWindow(true);
+                }
+                OnEnabledChanged();
+            }
+        }
+        public void Disable()
+        {
+            if (!IsDisabled())
+            {
+                SetDisabled();
+                style = cast<WindowStyle>(style | WindowStyle.WS_DISABLED);
+                if (handle != null)
+                {
+                    EnableWindow(false);
+                }
+                OnEnabledChanged();
+            }
+        }
+        protected virtual void OnEnabledChanged()
+        {
+            enabledChangedEvent.Fire();
+        }
+        internal void EnableWindow(bool enable)
+        {
+            WinEnableWindow(handle, enable);
+        }
         public void BringToFront()
         {
             BringWindowToTop(handle);
@@ -230,25 +315,87 @@ namespace System.Windows
                 return null;
             }
         }
+        public nothrow inline bool IsVisible() const
+        {
+            return !Hidden();
+        }
         public void Show()
         {
-            ShowWindow(ShowCommand.SW_SHOW);
+            if (Hidden())
+            {
+                ResetHidden();
+                style = cast<WindowStyle>(style | WindowStyle.WS_VISIBLE);
+                OnVisibleChanged();
+            }
+            if (handle != null)
+            {
+                ShowWindow(ShowCommand.SW_SHOW);
+            }
         }
         public void Hide()
         {
-            ShowWindow(ShowCommand.SW_HIDE);
+            if (handle != null)
+            {
+                ShowWindow(ShowCommand.SW_HIDE);
+            }
+            if (!Hidden())
+            {
+                SetHidden();
+                style = cast<WindowStyle>(style & ~WindowStyle.WS_VISIBLE);
+                OnVisibleChanged();
+            }
         }
         public void ShowWindow(ShowCommand showCommand)
         {
             WinShowWindow(handle, showCommand);
+            if (showCommand == ShowCommand.SW_HIDE)
+            {
+                if (!Hidden())
+                {
+                    SetHidden();
+                    style = cast<WindowStyle>(style & ~WindowStyle.WS_VISIBLE);
+                    OnVisibleChanged();
+                }
+            }
+        }
+        protected virtual void OnVisibleChanged()
+        {
+            visibleChangedEvent.Fire();
         }
         public void Update()
         {
             WinUpdateWindow(handle);
         }
+        internal nothrow virtual Control* GetFirstEnabledTabStopControl() const
+        {
+            if (IsTabStop() && IsEnabled())
+            {
+                return this;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        internal nothrow virtual Control* GetLastEnabledTabStopControl() const
+        {
+            if (IsTabStop() && IsEnabled())
+            {
+                return this;
+            }
+            else
+            {
+                return null;
+            }
+        }
         public void SetFocus()
         {
             WinSetFocus(Handle());
+            Window* window = GetWindow();
+            if (window != null)
+            {
+                window->SetFocusedControl(this);
+            }
         }
         public nothrow const string& Text() const
         {
@@ -262,6 +409,22 @@ namespace System.Windows
                 SetWindowText(handle, text);
                 OnTextChanged();
             }
+        }
+        internal void SetTextInternal(const string& text_)
+        {
+            if (text != text_)
+            {
+                text = text_;
+                OnTextChanged();
+            }
+        }
+        public int GetWindowTextLength() const
+        {
+            return GetWindowTextLength(handle);
+        }
+        public string GetWindowText()
+        {
+            return GetWindowText(handle);
         }
         protected virtual void OnTextChanged()
         {
@@ -314,6 +477,13 @@ namespace System.Windows
                 {
                     MoveWindow(handle, location, size, true);
                 }
+            }
+        }
+        public void SendSetFontMessage(const FontHandle& fontHandle)
+        {
+            if (Handle() != null)
+            {
+                WinSendMessage(Handle(), WM_SETFONT, cast<uint>(cast<ulong>(fontHandle.HFont())), 0);
             }
         }
         protected virtual void OnSizeChanged()
@@ -610,8 +780,31 @@ namespace System.Windows
                 parent->ScrollLineUp();
             }
         }
+        protected void SubClassCommandWndProc()
+        {
+            if (originalWndProc == null && handle != null)
+            {
+                originalWndProc = WinSubClassCommandWndProc(handle);
+            }
+        }
         protected virtual bool ProcessMessage(Message& message)
         {
+            if (originalWndProc != null)
+            {
+                // If this control has subclassed a standard Windows control for receiving WM_COMMAND notifications, first set address of original window procedure in the message:
+                // Currently only GroupBox does this.
+                if (message.originalWndProc == null)
+                {
+                    message.originalWndProc = originalWndProc;
+                }
+                // If this message is not a WM_COMMAND and not a WM_DESTROY message, return without processing the message.
+                // Original window procedure will be called in all cases after returning from Application.ProcessMessage.
+                if (message.msg != WM_COMMAND && message.msg != WM_DESTROY)
+                {
+                    return false;
+                }
+                // otherwise proceed to process the WM_COMMAND notification or WM_DESTROY message...
+            }
             switch (message.msg)
             {
                 case WM_PAINT:
@@ -732,14 +925,109 @@ namespace System.Windows
                     message.result = 0;
                     return true;
                 }
+                case WM_SHOWWINDOW:
+                {
+                    if (message.wparam == 1)
+                    {
+                        OnShown();
+                    }
+                    message.result = 0;
+                    return true;
+                }
                 case WM_TIMER:
                 {
                     DoTimer(message.wparam);
                     message.result = 0;
                     return true;
                 }
+                case WM_DESTROY:
+                {
+                    DoDestroy();
+                    message.result = 0;
+                    return true;
+                }
+                case WM_COMMAND:
+                {
+                    void* childWindowHandle = message.LParamHandle();
+                    ushort notificationCode = message.WParamHiWord();
+                    ushort controlId = message.WParamLoWord();
+                    Control* child = Application.GetWindowManager().GetWindow(childWindowHandle);
+                    if (child != null)
+                    {
+                        switch (notificationCode)
+                        {
+                            case BN_CLICKED:
+                            {
+                                child->OnClick();
+                                message.result = 0;
+                                return true;
+                            }
+                            case BN_SETFOCUS:
+                            {
+                                child->DoGotFocus();
+                                message.result = 0;
+                                return true;
+                            }
+                            case BN_KILLFOCUS:
+                            {
+                                child->DoLostFocus();
+                                message.result = 0;
+                                return true;
+                            }
+                            case EN_CHANGE:
+                            {
+                                child->SetTextInternal(child->GetWindowText());
+                                message.result = 0;
+                                return true;
+                            }
+                            case EN_SETFOCUS:
+                            {
+                                child->DoGotFocus();
+                                message.result = 0;
+                                return true;
+                            }
+                            case EN_KILLFOCUS:
+                            {
+                                child->DoLostFocus();
+                                message.result = 0;
+                                return true;
+                            }
+                            case LBN_SETFOCUS:
+                            {
+                                child->DoGotFocus();
+                                message.result = 0;
+                                return true;
+                            }
+                            case LBN_KILLFOCUS:
+                            {
+                                child->DoLostFocus();
+                                message.result = 0;
+                                return true;
+                            }
+                            case LBN_SELCHANGE:
+                            {
+                                if (child is ListBox*)
+                                {
+                                    ListBox* listBox = cast<ListBox*>(child);
+                                    listBox->SelectedIndexChangedInternal();
+                                }
+                                message.result = 0;
+                                return true;
+                            }
+                        }
+                    }
+                    break;
+                }
             }
             return false;
+        }
+        private void DoDestroy()
+        {
+            OnDestroyed();
+            if (originalWndProc != null)
+            {
+                WinRestoreOriginalWndProc(handle, originalWndProc);
+            }
         }
         private bool DoSysCommand(uint wparam, long lparam)
         {
@@ -822,7 +1110,7 @@ namespace System.Windows
             }
             else
             {
-                OnKeyDown(args);
+                DispatchKeyDown(args);
                 if (args.handled)
                 {
                     SetKeyDownHandled();
@@ -882,7 +1170,7 @@ namespace System.Windows
                 }
             }
             KeyEventArgs args(keyCode, modifierKeys);
-            OnKeyUp(args);
+            DispatchKeyUp(args);
             if (args.handled)
             {
                 return true;
@@ -902,7 +1190,43 @@ namespace System.Windows
                 args.handled = KeyDownHandled();
                 return;
             }
+            DispatchKeyPress(args);
+        }
+        private void DispatchKeyPress(KeyPressEventArgs& args)
+        {
             OnKeyPress(args);
+            if (!args.handled)
+            {
+                Control* parent = ParentControl();
+                if (parent != null)
+                {
+                    parent->DispatchKeyPress(args);
+                }
+            }
+        }
+        private void DispatchKeyDown(KeyEventArgs& args)
+        {
+            OnKeyDown(args);
+            if (!args.handled)
+            {
+                Control* parent = ParentControl();
+                if (parent != null)
+                {
+                    parent->DispatchKeyDown(args);
+                }
+            }
+        }
+        private void DispatchKeyUp(KeyEventArgs& args)
+        {
+            OnKeyUp(args);
+            if (!args.handled)
+            {
+                Control* parent = ParentControl();
+                if (parent != null)
+                {
+                    parent->DispatchKeyUp(args);
+                }
+            }
         }
         private bool DoMenu(wchar accessKey, Keys keyCode)
         {
@@ -964,33 +1288,51 @@ namespace System.Windows
         }
         private void DoSetFocus()
         {
-            LogView* log = Application.GetLogView();
-            if (log != null)
-            {
-                log->WriteLine(Text() + " got focus");
-            }
             SetFocused();
-            OnSetFocus();
-        }
-        protected virtual void OnSetFocus()
-        {
-            setFocusEvent.Fire();
+            DoGotFocus();
             DoCreateAndShowCaret();
+        }
+        private void DoGotFocus()
+        {
+            OnGotFocus();
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                ControlEventArgs args(this);
+                parentControl->OnChildGotFocus(args);
+            }
+        }
+        protected virtual void OnGotFocus()
+        {
+            gotFocusEvent.Fire();
+        }
+        protected virtual void OnChildGotFocus(ControlEventArgs& args)
+        {
+            childGotFocusEvent.Fire(args);
         }
         private void DoKillFocus()
         {
-            LogView* log = Application.GetLogView();
-            if (log != null)
-            {
-                log->WriteLine(Text() + " lost focus");
-            }
             ResetFocused();
-            OnKillFocus();
-        }
-        protected virtual void OnKillFocus()
-        {
-            killFocusEvent.Fire();
+            DoLostFocus();
             DoDestroyCaret();
+        }
+        private void DoLostFocus()
+        {
+            OnLostFocus();
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                ControlEventArgs args(this);
+                parentControl->OnChildLostFocus(args);
+            }
+        }
+        protected virtual void OnLostFocus()
+        {
+            lostFocusEvent.Fire();
+        }
+        protected virtual void OnChildLostFocus(ControlEventArgs& args)
+        {
+            childLostFocusEvent.Fire(args);
         }
         protected nothrow virtual bool IsDecoratorControl() const
         {
@@ -1232,6 +1574,19 @@ namespace System.Windows
         {
             clickEvent.Fire();
         }
+        protected virtual void OnCreated()
+        {
+            SetBaseOnCreatedCalled();
+            createdEvent.Fire();
+        }
+        protected virtual void OnDestroyed()
+        {
+            destroyedEvent.Fire();
+        }
+        protected virtual void OnShown()
+        {
+            shownEvent.Fire();
+        }
         protected virtual void OnHScroll(ScrollEventArgs& args)
         {
             hscrollEvent.Fire(args);
@@ -1243,6 +1598,14 @@ namespace System.Windows
         protected virtual void OnMouseWheel(MouseWheelEventArgs& args)
         {
             mouseWheelEvent.Fire(args);
+        }
+        protected virtual void OnControlAdded(ControlEventArgs& args)
+        {
+            controlAddedEvent.Fire(args);
+        }
+        public virtual void OnControlRemoved(ControlEventArgs& args)
+        {
+            controlRemovedEvent.Fire(args);
         }
         public void* GetDC()
         {
@@ -1268,6 +1631,54 @@ namespace System.Windows
         {
             backgroundColor = backgroundColor_;
             Invalidate();
+        }
+        public nothrow const Font& GetFont() const
+        {
+            if (!font.IsNull())
+            {
+                return font;
+            }
+            else
+            {
+                Control* parent = ParentControl();
+                if (parent != null)
+                {
+                    return parent->GetFont();
+                }
+                else
+                {
+                    return font;
+                }
+            }
+        }
+        public void SetFont(const Font& font_)
+        {
+            font = font_;
+        }
+        public nothrow void SetFont(Font&& font_)
+        {
+            font = Rvalue(font_);
+        }
+        public const FontHandle& GetFontHandle(Graphics& graphics) 
+        {
+            if (!fontHandle.IsNull())
+            {
+                return fontHandle;
+            }
+            if (!font.IsNull())
+            {
+                fontHandle = font.ToHFontChecked(graphics);
+                return fontHandle;
+            }
+            Control* parent = ParentControl();
+            if (parent != null)
+            {
+                return parent->GetFontHandle(graphics);
+            }
+            else
+            {
+                return fontHandle; // fontHandle.IsNull() will be true
+            }
         }
         public nothrow inline void* Handle() const
         {
@@ -1320,6 +1731,26 @@ namespace System.Windows
         public nothrow Event<KeyEventHandler, KeyEventArgs>& KeyUpEvent() const
         {
             return keyUpEvent;
+        }
+        public nothrow Event<CreatedEventHandler>& CreatedEvent() const
+        {
+            return createdEvent;
+        }
+        public nothrow Event<DestroyedEventHandler>& DestroyedEvent() const
+        {
+            return destroyedEvent;
+        }
+        public nothrow Event<ShownEventHandler>& ShownEvent() const
+        {
+            return shownEvent;
+        }
+        public nothrow Event<EnabledChangedEventHandler>& EnabledChangedEvent() const
+        {
+            return enabledChangedEvent;
+        }
+        public nothrow Event<VisibleChangedEventHandler>& VisibleChangedEvent() const
+        {
+            return visibleChangedEvent;
         }
         public nothrow Event<ClickEventHandler>& ClickEvent() const
         {
@@ -1377,13 +1808,21 @@ namespace System.Windows
         {
             return timerEvent;
         }
-        public nothrow Event<SetFocusEventHandler>& SetFocusEvent() const
+        public nothrow Event<GotFocusEventHandler>& GotFocusEvent() const
         {
-            return setFocusEvent;
+            return gotFocusEvent;
         }
-        public nothrow Event<KillFocusEventHandler>& KillFocusEvent() const
+        public nothrow Event<LostFocusEventHandler>& LostFocusEvent() const
         {
-            return killFocusEvent;
+            return lostFocusEvent;
+        }
+        public nothrow Event<ControlEventHandler, ControlEventArgs>& ControlAddedEvent() const
+        {
+            return controlAddedEvent;
+        }
+        public nothrow Event<ControlEventHandler, ControlEventArgs>& ControlRemovedEvent() const
+        {
+            return controlRemovedEvent;
         }
         private nothrow inline bool MouseInClient() const
         {
@@ -1469,6 +1908,54 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags & ~Flags.caretShown);
         }
+        public nothrow inline bool IsDisabled() const
+        {
+            return (flags & Flags.disabled) != 0;
+        }
+        private nothrow inline void SetDisabled()
+        {
+            flags = cast<Flags>(flags | Flags.disabled);
+        }
+        private nothrow inline void ResetDisabled()
+        {
+            flags = cast<Flags>(flags & ~Flags.disabled);
+        }
+        private nothrow inline bool Hidden() const
+        {
+            return (flags & Flags.hidden) != 0;
+        }
+        private nothrow inline void SetHidden()
+        {
+            flags = cast<Flags>(flags | Flags.hidden);
+        }
+        private nothrow inline void ResetHidden()
+        {
+            flags = cast<Flags>(flags & ~Flags.hidden);
+        }
+        public nothrow inline bool IsTabStop() const
+        {
+            return (flags & Flags.tabStop) != Flags.none;
+        }
+        public nothrow inline void SetTabStop()
+        {
+            flags = cast<Flags>(flags | Flags.tabStop);
+        }
+        public nothrow inline void ResetTabStop()
+        {
+            flags = cast<Flags>(flags & ~Flags.tabStop);
+        }
+        internal nothrow inline bool BaseOnCreatedCalled() const
+        {
+            return (flags & Flags.baseOnCreatedCalled) != Flags.none;
+        }
+        internal nothrow inline void SetBaseOnCreatedCalled()
+        {
+            flags = cast<Flags>(flags | Flags.baseOnCreatedCalled);
+        }
+        private nothrow inline void ResetBaseOnCreatedCalled()
+        {
+            flags = cast<Flags>(flags & ~Flags.baseOnCreatedCalled);
+        }
         private const char* windowClassName;
         private WindowClassStyle windowClassStyle;
         private Color backgroundColor;
@@ -1489,6 +1976,9 @@ namespace System.Windows
         private List<Control*> createList;
         private Cursor arrowCursor;
         private int caretShowCount;
+        private Font font;
+        private FontHandle fontHandle;
+        private void* originalWndProc;
         private Event<PaintEventHandler, PaintEventArgs> paintEvent;
         private Event<MouseEnterEventHandler> mouseEnterEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseMoveEvent;
@@ -1500,6 +1990,11 @@ namespace System.Windows
         private Event<KeyEventHandler, KeyEventArgs> keyDownEvent;
         private Event<KeyEventHandler, KeyEventArgs> keyUpEvent;
         private Event<ClickEventHandler> clickEvent;
+        private Event<CreatedEventHandler> createdEvent;
+        private Event<DestroyedEventHandler> destroyedEvent;
+        private Event<ShownEventHandler> shownEvent;
+        private Event<EnabledChangedEventHandler> enabledChangedEvent;
+        private Event<VisibleChangedEventHandler> visibleChangedEvent;
         private Event<SizeChangedEventHandler> sizeChangedEvent;
         private Event<LocationChangedEventHandler> locationChangedEvent;
         private Event<ContentChangedEventHandler> contentChangedEvent;
@@ -1513,7 +2008,11 @@ namespace System.Windows
         private Event<VScrollEventHandler, ScrollEventArgs> vscrollEvent;
         private Event<MouseWheelEventHandler, MouseWheelEventArgs> mouseWheelEvent;
         private Event<TimerEventHandler, TimerEventArgs> timerEvent;
-        private Event<SetFocusEventHandler> setFocusEvent;
-        private Event<KillFocusEventHandler> killFocusEvent;
+        private Event<GotFocusEventHandler> gotFocusEvent;
+        private Event<LostFocusEventHandler> lostFocusEvent;
+        private Event<ChildGotFocusEventHandler, ControlEventArgs> childGotFocusEvent;
+        private Event<ChildLostFocusEventHandler, ControlEventArgs> childLostFocusEvent;
+        private Event<ControlEventHandler, ControlEventArgs> controlAddedEvent;
+        private Event<ControlEventHandler, ControlEventArgs> controlRemovedEvent;
     }
 }

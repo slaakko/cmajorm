@@ -48,7 +48,7 @@ namespace System.Windows
             verticalSplitterCursor(Application.GetResourceManager().GetCursor("vertical.splitter.system.windows.cursor")), flags(), container(null)
         {
         }
-        public Splitter(Orientation orientation, const Point& location) : this(orientation, GetSystemColor(SystemColor.COLOR_MENU), location, defaultSplitterWidth)
+        public Splitter(Orientation orientation, const Point& location) : this(orientation, DefaultControlBackgroundColor(), location, defaultSplitterWidth)
         {
         }
         public nothrow void SetContainer(SplitContainer* container_)
@@ -206,7 +206,7 @@ namespace System.Windows
         public SplitContainer(Orientation orientation_, Control* pane1_, Splitter* splitter_, Control* pane2_, int splitterWidth, int splitterDistance_,
             const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.SplitContainer", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
-                GetSystemColor(SystemColor.COLOR_MENU), "splitContainer", location, size, dock, anchors),
+                DefaultControlBackgroundColor(), "splitContainer", location, size, dock, anchors),
                 orientation(orientation_), pane1(pane1_), splitter(splitter_), pane2(pane2_), splitterDistance(splitterDistance_)
         {
             pane1->SetSize(SplitSize(orientation, splitterDistance));

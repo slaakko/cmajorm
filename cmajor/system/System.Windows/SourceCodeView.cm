@@ -9,8 +9,6 @@ using System.Lex;
 
 namespace System.Windows
 {
-    public const uint defaultCaretTimerPeriod = 5000u; // 5 seconds
-
     public enum SourceCodeTokenKind : int
     {
         plain, keyword, identifier, string, character, number, comment, lineNumber
@@ -63,37 +61,18 @@ namespace System.Windows
         return code;
     }
 
-    public class delegate void CaretPosChangedEventHandler();
-
-    public class SourceCodeView : Control
+    public class SourceCodeView : TextView
     {
-        private enum Flags : sbyte
-        {
-            none = 0, changed = 1 << 0, painting = 1 << 1
-        }
-
-        public SourceCodeView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base("System.Windows.SourceCodeView", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP), DefaultExtendedWindowStyle(), backgroundColor,
-            "sourceCodeView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
-            charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(0), caretColumn(0), numLineNumberDigits(0),
-            caretTimerPeriod(defaultCaretTimerPeriod), update(false)
+        public SourceCodeView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base(fontFamily, fontSize, backgroundColor, location, size, dock, anchors), numLineNumberDigits(0)
         {
             BuildDefaultStyles();
-            uint caretTimeOut = 0u;
-            bool succeeded = ReadCaretTimeoutFromRegistry(caretTimeOut);
-            if (succeeded)
-            {
-                caretTimerPeriod = caretTimeOut;
-            }
         }
         public SourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) : this(FontFamily("Consolas"), 10.0f, Color.White(), location, size, dock, anchors)
         {
         }
-        public void SetFont(const FontFamily& fontFamily_, float fontSize_)
+        protected override void OnFontChanged()
         {
-            fontFamily = fontFamily_;
-            fontSize = fontSize_;
-            fonts.Clear();
             fontStyleFontMap.Clear();
             textStyleMap.Clear();
             tokenStyleTextStyleMap.Clear();
@@ -110,552 +89,38 @@ namespace System.Windows
             SourceCodeTokenStyle* tokenStyle = GetOrInsertTokenStyle(style.color, style.fontStyle);
             tokenKindMap[kind] = tokenStyle;
         }
-        public void SetTextContent(const ustring& textContent)
+        protected override nothrow int LineNumberFieldLength() const
         {
-            maxLineLength = 0;
-            maxLineIndex = 0;
-            lines = SplitTextIntoLines(textContent);
-            lineStartIndeces = CalculateLineStartIndeces(textContent);
+            return numLineNumberDigits + 1;
+        }
+        protected override nothrow void SetLineNumberFieldLength(int lineCount)
+        {
+            numLineNumberDigits = Log10(lineCount + 1);
+        }
+        protected override void OnLinesChanged()
+        {
+            base->OnLinesChanged();
             tokenLines.Clear();
             int state = 0;
-            int n = cast<int>(lines.Count());
+            int n = cast<int>(Lines().Count());
             numLineNumberDigits = Log10(n + 1);
             for (int i = 0; i < n; ++i)
             {
-                const ustring& line = lines[i];
-                if (line.Length() > maxLineLength)
-                {
-                    maxLineLength = cast<int>(line.Length());
-                    maxLineIndex = i;
-                }
+                const ustring& line = Lines()[i];
                 TokenLine tokenLine = TokenizeLine(line, i + 1, state);
                 state = tokenLine.endState;
                 tokenLines.Add(Rvalue(tokenLine));
-            }
-            SetContentChanged();
-            SetChanged();
-            SetCaretLineCol(1, numLineNumberDigits + 2);
-            Invalidate();
-            update = true;
-        }
-        public void SetCaretLineCol(int line, int column)
-        {
-            if (caretLine != line || caretColumn != column)
-            {
-                caretLine = line;
-                caretColumn = column;
-                SetCaretLocation();
-            }
-        }
-        public nothrow inline int GetCaretLine() const
-        {
-            return caretLine;
-        }
-        public nothrow inline int GetCaretColumn() const
-        {
-            return caretColumn - (numLineNumberDigits + 1);
-        }
-        public void SetCaretPosByCharIndex(int charIndex)
-        {
-            List<int>.ConstIterator it = LowerBound(lineStartIndeces.CBegin(), lineStartIndeces.CEnd(), charIndex);
-            if (it != lineStartIndeces.CBegin() && it == lineStartIndeces.CEnd())
-            {
-                --it;
-            }
-            if (it >= lineStartIndeces.CBegin() && it != lineStartIndeces.CEnd())
-            {
-                if (*it > charIndex)
-                {
-                    --it;
-                }
-            }
-            int lineNumber = cast<int>(it - lineStartIndeces.CBegin() + 1);
-            int columnNumber = numLineNumberDigits + 2;
-            if (it >= lineStartIndeces.CBegin() && it != lineStartIndeces.CEnd())
-            {
-                int lineStartCharIndex = *it;
-                columnNumber = charIndex - lineStartCharIndex + numLineNumberDigits + 2;
-            }
-            SetCaretLineCol(lineNumber, columnNumber);
-            ScrollToCaret();
-        }
-        public int GetCharIndex(int line, int column) const
-        {
-            if (line >= 1 && line <= lineStartIndeces.Count())
-            {
-                int lineStartIndex = lineStartIndeces[line - 1];
-                int lineLength = GetLineLength(line);
-                if (column >= 1 && column <= lineLength)
-                {
-                    return lineStartIndex + column - 1;
-                }
-            }
-            return -1;
-        }
-        protected override void CreateCaret()
-        {
-            if (charHeight != 0)
-            {
-                System.Windows.API.CreateCaret(Handle(), null, 1, cast<int>(charHeight));
-            }
-            else
-            {
-                base->CreateCaret();
-            }
-            SetTimer(1u, caretTimerPeriod);
-        }
-        protected override void OnTimer(TimerEventArgs& args)
-        {
-            if (Focused())
-            {
-                HideCaret();
-                ShowCaret();
-            }
-        }
-        protected override void OnMouseDown(MouseEventArgs& args)
-        {
-            base->OnMouseDown(args);
-            if (charHeight != 0 && charWidth != 0)
-            {
-                if (args.buttons == MouseButtons.lbutton && args.clicks == 1)
-                {
-                    Point loc = args.location;
-                    int lineNumber = cast<int>(loc.y / charHeight + 1);
-                    lineNumber = Min(lineNumber, cast<int>(lines.Count()));
-                    int columnNumber = cast<int>(loc.x / charWidth + 1);
-                    columnNumber = Max(columnNumber, numLineNumberDigits + 2);
-                    int lineLength = GetLineLength(lineNumber);
-                    columnNumber = Min(columnNumber, lineLength + numLineNumberDigits + 2);
-                    if (update)
-                    {
-                        update = false;
-                        Invalidate();
-                    }
-                    SetCaretLineCol(lineNumber, columnNumber);
-                }
-            }
-        }
-        private nothrow int GetLineLength(int lineNumber)
-        {
-            int lineLength = 0;
-            if (lineNumber >= 1 && lineNumber <= lines.Count())
-            {
-                lineLength = cast<int>(lines[lineNumber - 1].Length());
-            }
-            return lineLength;
-        }
-        private nothrow uchar GetCharAt(int line, int column) const
-        {
-            if (line < 1)
-            {
-                line = 1;
-            }
-            else if (line > lines.Count())
-            {
-                line = cast<int>(lines.Count());
-            }
-            int lineLength = GetLineLength(line);
-            if (column < 1)
-            {
-                column = 1;
-            }
-            else
-            {
-                if (lineLength > 0 && column > lineLength)
-                {
-                    column = lineLength;
-                }
-            }
-            if (line >= 1 && line <= lines.Count() && column >= 1 && column <= lineLength)
-            {
-                return lines[line - 1][column - 1];
-            }
-            return '\0';
-        }
-        private nothrow bool Prev(int& line, int& col)
-        {
-            if (col > 1)
-            {
-                --col;
-                return true;
-            }
-            else
-            {
-                if (line > 1)
-                {
-                    --line;
-                    int lineLength = GetLineLength(line);
-                    if (lineLength > 0)
-                    {
-                        col = lineLength;
-                    }
-                    else
-                    {
-                        col = 1;
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
-        private nothrow bool Next(int& line, int& col)
-        {
-            int lineLength = GetLineLength(line);
-            if (col < lineLength)
-            {
-                ++col;
-                return true;
-            }
-            else
-            {
-                if (line < lines.Count())
-                {
-                    ++line;
-                    col = 1;
-                    return true;
-                }
-            }
-            return false;
-        }
-        private nothrow void PrevWord(int& line, int& col)
-        {
-            LogView* log = Application.GetLogView();
-            if (Prev(line, col))
-            {
-                uchar c = GetCharAt(line, col);
-                while (IsWhiteSpace(c))
-                {
-                    if (col == 1 || !Prev(line, col))
-                    {
-                        return;
-                    }
-                    c = GetCharAt(line, col);
-                }
-                c = GetCharAt(line, col);
-                while (!IsWhiteSpace(c))
-                {
-                    if (col == 1 || !Prev(line, col))
-                    {
-                        return;
-                    }
-                    c = GetCharAt(line, col);
-                }
-                c = GetCharAt(line, col);
-                if (IsWhiteSpace(c))
-                {
-                    Next(line, col);
-                }
-            }
-        }
-        private nothrow void NextWord(int& line, int& col)
-        {
-            if (Next(line, col))
-            {
-                uchar c = GetCharAt(line, col);
-                while (!IsWhiteSpace(c))
-                {
-                    if (col == 1 || !Next(line, col))
-                    {
-                        return;
-                    }
-                    c = GetCharAt(line, col);
-                }
-                c = GetCharAt(line, col);
-                while (IsWhiteSpace(c))
-                {
-                    if (col == 1 || !Next(line, col))
-                    {
-                        return;
-                    }
-                    c = GetCharAt(line, col);
-                }
-            }
-        }
-        protected override void OnKeyDown(KeyEventArgs& args)
-        {
-            base->OnKeyDown(args);
-            if (!args.handled)
-            {
-                bool scrolled = false;
-                int lineNumber = caretLine;
-                int columnNumber = caretColumn;
-                switch (args.keyData)
-                {
-                    case Keys.home:
-                    {
-                        columnNumber = numLineNumberDigits + 2;
-                        args.handled = true;
-                        break;
-                    }
-                    case Keys.end:
-                    {
-                        columnNumber = GetLineLength(lineNumber) + numLineNumberDigits + 2;
-                        args.handled = true;
-                        break;
-                    }
-                    case Keys.left:
-                    {
-                        if (columnNumber > numLineNumberDigits + 2)
-                        {
-                            --columnNumber;
-                        }
-                        else if (lineNumber > 1)
-                        {
-                            --lineNumber;
-                            int lineLength = GetLineLength(lineNumber);
-                            columnNumber = lineLength + numLineNumberDigits + 2;
-                        }
-                        args.handled = true;
-                        break;
-                    }
-                    case Keys.right:
-                    {
-                        if (lineNumber <= lines.Count())
-                        {
-                            int lineLength = GetLineLength(lineNumber);
-                            if (columnNumber < lineLength + numLineNumberDigits + 2)
-                            {
-                                ++columnNumber;
-                            }
-                            else
-                            {
-                                ++lineNumber;
-                                columnNumber = numLineNumberDigits + 2;
-                            }
-                        }
-                        args.handled = true;
-                        break;
-                    }
-                    case Keys.down:
-                    {
-                        if (lineNumber < lines.Count())
-                        {
-                            ++lineNumber;
-                            int lineLength = GetLineLength(lineNumber);
-                            columnNumber = Min(columnNumber, lineLength + numLineNumberDigits + 2);
-                        }
-                        else
-                        {
-                            lineNumber = cast<int>(lines.Count()) + 1;
-                            columnNumber = numLineNumberDigits + 2;
-                        }
-                        args.handled = true;
-                        break;
-                    }
-                    case Keys.up:
-                    {
-                        if (lineNumber > 1)
-                        {
-                            --lineNumber;
-                            int lineLength = GetLineLength(lineNumber);
-                            columnNumber = Min(columnNumber, lineLength + numLineNumberDigits + 2);
-                        }
-                        args.handled = true;
-                        break;
-                    }
-                    case Keys.pageDown:
-                    {
-                        Size size = GetSize();
-                        int windowLines = cast<int>(size.h / charHeight);
-                        lineNumber = lineNumber + windowLines;
-                        lineNumber = Min(lineNumber, cast<int>(lines.Count()) + 1);
-                        args.handled = true;
-                        break;
-                    }
-                    case Keys.pageUp:
-                    {
-                        Size size = GetSize();
-                        int windowLines = cast<int>(size.h / charHeight);
-                        lineNumber = lineNumber - windowLines;
-                        lineNumber = Max(lineNumber, 1);
-                        args.handled = true;
-                        break;
-                    }
-                    case cast<Keys>(Keys.controlModifier | Keys.home):
-                    {
-                        lineNumber = 1;
-                        columnNumber = numLineNumberDigits + 2;
-                        args.handled = true;
-                        break;
-                    }
-                    case cast<Keys>(Keys.controlModifier | Keys.end):
-                    {
-                        lineNumber = cast<int>(lines.Count() + 1);
-                        columnNumber = numLineNumberDigits + 2;
-                        args.handled = true;
-                        break;
-                    }
-                    case cast<Keys>(Keys.controlModifier | Keys.left):
-                    {
-                        int line = lineNumber;
-                        int col = columnNumber - (numLineNumberDigits + 1);
-                        PrevWord(line, col);
-                        lineNumber = line;
-                        columnNumber = col + (numLineNumberDigits + 1);
-                        args.handled = true;
-                        break;
-                    }
-                    case cast<Keys>(Keys.controlModifier | Keys.right):
-                    {
-                        int line = lineNumber;
-                        int col = columnNumber - (numLineNumberDigits + 1);
-                        NextWord(line, col);
-                        lineNumber = line;
-                        columnNumber = col + (numLineNumberDigits + 1);
-                        args.handled = true;
-                        break;
-                    }
-                    case cast<Keys>(Keys.controlModifier | Keys.down):
-                    {
-                        ScrollLineDown();
-                        scrolled = true;
-                        args.handled = true;
-                        break;
-                    }
-                    case cast<Keys>(Keys.controlModifier | Keys.up):
-                    {
-                        ScrollLineUp();
-                        scrolled = true;
-                        args.handled = true;
-                        break;
-                    }
-                }
-                if (args.handled && !scrolled)
-                {
-                    SetCaretLineCol(lineNumber, columnNumber);
-                    ScrollToCaret();
-                }
-            }
-        }
-        public void ScrollToCaret()
-        {
-            if (lines.IsEmpty() || charHeight == 0) return;
-            LogView* log = Application.GetLogView();
-            Size size = GetSize();
-            int windowLines = cast<int>(size.h / charHeight);
-            int windowCols = cast<int>(size.w / charWidth);
-            Point currentOrigin = ContentLocation();
-            int topLineNumber = cast<int>(currentOrigin.y / charHeight + 1);
-            int leftColNumber = cast<int>(currentOrigin.x / charWidth + 1);
-            if (log != null)
-            {
-                log->WriteLine("windowLines=" + ToString(windowLines) + ", currentOrigin=" + currentOrigin.ToString() + ", topLine=" + ToString(topLineNumber) + ", caretLine=" + ToString(caretLine));
-            }
-            int oldTopLineNumber = topLineNumber;
-            if (caretLine > topLineNumber)
-            {
-                while (caretLine - topLineNumber + 1 >= windowLines)
-                {
-                    ++topLineNumber;
-                }
-            }
-            else if (caretLine < topLineNumber)
-            {
-                topLineNumber = caretLine;
-            }
-            else
-            {
-                topLineNumber = Max(1, caretLine - 1);
-            }
-            int oldLeftColNumber = leftColNumber;
-            if (caretColumn >= leftColNumber)
-            {
-                while (caretColumn - leftColNumber + 2 >= windowCols)
-                {
-                    ++leftColNumber;
-                }
-            }
-            else
-            {
-                if (caretColumn == numLineNumberDigits + 2)
-                {
-                    leftColNumber = 1;
-                }
-                else
-                {
-                    leftColNumber = caretColumn;
-                }
-            }
-            if (update || caretLine == 1 || topLineNumber != oldTopLineNumber || leftColNumber != oldLeftColNumber)
-            {
-                update = false;
-                Point newOrigin(cast<int>((leftColNumber - 1) * charWidth), cast<int>((topLineNumber - 1) * charHeight));
-                SetContentLocation(newOrigin);
-                SetCaretLocation();
-                Invalidate();
-            }
-        }
-        protected override void OnPaint(PaintEventArgs& args)
-        {
-            bool prevPainting = Painting();
-            SetPainting();
-            try
-            {
-                if (Changed())
-                {
-                    ResetChanged();
-                    Measure(args.graphics);
-                    if (Focused())
-                    {
-                        SetCaretLocation();
-                        ShowCaret();
-                    }
-                }
-                TextRenderingHint prevRenderingHint = args.graphics.GetTextRenderingHint();
-                args.graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
-                args.graphics.ClearChecked(BackgroundColor());
-                int n = cast<int>(tokenLines.Count());
-                numLineNumberDigits = Log10(n + 1);
-                PointF origin(0, 0);
-                for (int i = 0; i < n; ++i)
-                {
-                    DrawLine(args.graphics, i, origin);
-                    origin.y = origin.y + charHeight;
-                }
-                args.graphics.SetTextRenderingHintChecked(prevRenderingHint);
-                base->OnPaint(args);
-            }
-            catch (const Exception& ex)
-            {
-                MessageBox.Show(ex.Message());
-            }
-            if (!prevPainting)
-            {
-                ResetPainting();
             }
         }
         protected virtual TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
         {
             return System.Windows.DefaultTokenizeLine(line, lineNumber, startState);
         }
-        protected virtual nothrow SourceCodeTokenKind GetTokenKind(const Token& token, int startState) const
+        protected virtual nothrow SourceCodeTokenKind GetTokenKind(const Token& token) const
         {
             return SourceCodeTokenKind.plain;
         }
-        protected override void OnClick()
-        {
-            base->OnClick();
-            SetFocus();
-        }
-        protected override void SetCursor()
-        {
-            SetCursor(cursor);
-        }
-        protected override void SetCaretLocation()
-        {
-            Point caretPos(cast<int>((caretColumn - 1) * charWidth), cast<int>((caretLine - 1) * charHeight));
-            TranslateContentLocation(caretPos);
-            if (CaretCreated())
-            {
-                SetCaretPos(caretPos);
-                OnCaretPosChanged();
-            }
-        }
-        protected virtual void OnCaretPosChanged()
-        {
-            caretPosChangedEvent.Fire();
-        }
-        private void DrawLine(Graphics& graphics, int lineIndex, const PointF& origin)
+        protected override void DrawLine(Graphics& graphics, int lineIndex, const PointF& origin)
         {
             int lineNumber = lineIndex + 1;
             string lineNumberStr = System.ToString(lineNumber);
@@ -663,45 +128,19 @@ namespace System.Windows
             PointF pt(origin);
             SourceCodeTextStyle* lineNumberTextStyle = GetTextStyle(SourceCodeTokenKind.lineNumber);
             graphics.DrawStringChecked(lineNumberText, *lineNumberTextStyle->font, pt, *lineNumberTextStyle->brush);
-            pt.x = pt.x + charWidth * (numLineNumberDigits + 1);
+            pt.x = pt.x + CharWidth() * (numLineNumberDigits + 1);
             const TokenLine& tokenLine = tokenLines[lineIndex];
             int startState = tokenLine.startState;
             for (const Token& token : tokenLine.tokens)
             {
-                SourceCodeTokenKind tokenKind = GetTokenKind(token, startState);
+                SourceCodeTokenKind tokenKind = GetTokenKind(token);
                 SourceCodeTextStyle* tokenTextStyle = GetTextStyle(tokenKind);
                 ustring tokenStr = token.match.ToString();
                 string s(ToUtf8(tokenStr));
                 graphics.DrawStringChecked(s, *tokenTextStyle->font, pt, *tokenTextStyle->brush);
-                pt.x = pt.x + charWidth * tokenStr.Length();
+                pt.x = pt.x + CharWidth() * tokenStr.Length();
                 startState = -1;
             }
-        }
-        private void Measure(Graphics& graphics)
-        {
-            charWidth = 0;
-            charHeight = 0;
-            if (!lines.IsEmpty() && maxLineLength > 0)
-            {
-                for (const UniquePtr<Font>& font : fonts)
-                {
-                    TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
-                    graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
-                    RectF charRect = graphics.MeasureStringChecked(ToUtf8(lines[maxLineIndex]), *font, PointF(0, 0), drawFormat);
-                    graphics.SetTextRenderingHintChecked(prevRenderingHint);
-                    charWidth = Max(charWidth, charRect.size.w / maxLineLength);
-                    charHeight = Max(charHeight, charRect.size.h);
-                    LogView* log = Application.GetLogView();
-                    if (log != null)
-                    {
-                        log->WriteLine("charWidth=" + ToString(charWidth));
-                    }
-                }
-            }
-            SetScrollUnits(cast<int>(charHeight), cast<int>(2 * charWidth));
-            textWidth = cast<int>(maxLineLength * charWidth);
-            textHeight = cast<int>(lines.Count() * charHeight);
-            SetContentSize(Size(textWidth, textHeight));
         }
         private SourceCodeTextStyle* GetTextStyle(SourceCodeTokenKind tokenKind)
         {
@@ -782,8 +221,8 @@ namespace System.Windows
             {
                 return it->second;
             }
-            Font* font = new Font(fontFamily, fontSize, fontStyle, Unit.point);
-            fonts.Add(UniquePtr<Font>(font));
+            Font* font = new Font(GetFontFamily(), FontSize(), fontStyle, Unit.point);
+            Fonts().Add(UniquePtr<Font>(font));
             fontStyleFontMap[fontStyle] = font;
             return font;
         }
@@ -800,49 +239,8 @@ namespace System.Windows
             textStyleMap[style] = textStyle;
             return textStyle;
         }
-        private inline nothrow bool Changed() const
-        {
-            return (flags & Flags.changed) != Flags.none;
-        }
-        private inline nothrow void SetChanged()
-        {
-            flags = cast<Flags>(flags | Flags.changed); 
-        }
-        private inline nothrow void ResetChanged()
-        {
-            flags = cast<Flags>(flags & ~Flags.changed);
-        }
-        public inline nothrow bool Painting() const
-        {
-            return (flags &  Flags.painting) != Flags.none;
-        }
-        private inline nothrow void SetPainting()
-        {
-            flags = cast<Flags>(flags | Flags.painting);
-        }
-        private inline nothrow void ResetPainting()
-        {
-            flags = cast<Flags>(flags & ~Flags.painting);
-        }
-        public nothrow Event<CaretPosChangedEventHandler>& CaretPosChangedEvent() const
-        {
-            return caretPosChangedEvent;
-        }
-        private Flags flags;
-        private List<ustring> lines;
         private List<TokenLine> tokenLines;
-        private List<int> lineStartIndeces;
-        private StringFormat drawFormat;
-        private FontFamily fontFamily;
-        private float fontSize;
-        private float charWidth;
-        private float charHeight;
-        private int textWidth;
-        private int textHeight;
-        private int maxLineLength;
-        private int maxLineIndex;
         private int numLineNumberDigits;
-        private List<UniquePtr<Font>> fonts;
         private List<UniquePtr<Brush>> brushes;
         private List<UniquePtr<SourceCodeTextStyle>> textStyles;
         private List<UniquePtr<SourceCodeTokenStyle>> sourceCodeTokenStyles;
@@ -852,106 +250,6 @@ namespace System.Windows
         private HashMap<SourceCodeTokenStyle*, SourceCodeTextStyle*> tokenStyleTextStyleMap;
         private HashMap<SourceCodeTextStyle, SourceCodeTextStyle*> textStyleMap;
         private HashMap<SourceCodeTokenKind, SourceCodeTokenStyle*> tokenKindMap;
-        private Cursor cursor;
-        private int caretLine;
-        private int caretColumn;
-        private uint caretTimerPeriod;
-        private Event<CaretPosChangedEventHandler> caretPosChangedEvent;
-        private bool update;
-    }
-
-    public nothrow ustring TrimEnd(const ustring& line)
-    {
-        long i = line.Length();
-        while (i > 0 && IsWhiteSpace(line[i - 1]))
-        {
-            --i;
-        }
-        return line.Substring(0, i);
-    }
-
-    public List<ustring> SplitTextIntoLines(const ustring& text)
-    {
-        List<ustring> lines;
-        ustring line;
-        int state = 0;
-        for (uchar c : text)
-        {
-            switch (state)
-            {
-                case 0:
-                {
-                    switch (c)
-                    {
-                        case '\n':
-                        {
-                            lines.Add(TrimEnd(line));
-                            line.Clear();
-                            break;
-                        }
-                        case '\r':
-                        {
-                            state = 1;
-                            break;
-                        }
-                        default:
-                        {
-                            line.Append(c);
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case 1:
-                {
-                    if (c == '\n')
-                    {
-                        lines.Add(TrimEnd(line));
-                        line.Clear();
-                        state = 0;
-                        break;
-                    }
-                    break;
-                }
-            }
-        }
-        if (!line.IsEmpty())
-        {
-            lines.Add(TrimEnd(line));
-        }
-        return lines;
-    }
-
-    public List<int> CalculateLineStartIndeces(const ustring& text)
-    {
-        List<int> indeces;
-        int state = 0;
-        int n = cast<int>(text.Length());
-        for (int i = 0; i < n; ++i)
-        {
-            uchar c = text[i];
-            switch (state)
-            {
-                case 0:
-                {
-                    indeces.Add(i);
-                    if (c != '\n')
-                    {
-                        state = 1;
-                    }
-                    break;
-                }
-                case 1:
-                {
-                    if (c == '\n')
-                    {
-                        state = 0;
-                    }
-                    break;
-                }
-            }
-        }
-        return indeces;
     }
 
     public TokenLine DefaultTokenizeLine(const ustring& line, int lineNumber, int startState)
@@ -966,28 +264,5 @@ namespace System.Windows
         tokenLine.tokens.Add(token);
         tokenLine.endState = 0;
         return tokenLine;
-    }
-
-    internal bool ReadCaretTimeoutFromRegistry(uint& caretTimeout)
-    {
-        void* currentUserKey = null;
-        bool openSucceeded = WinRegOpenCurrentUser(&currentUserKey);
-        if (openSucceeded)
-        {
-            uint value = 0u;
-            bool getValueSucceeded = WinRegGetDWordValue(currentUserKey, @"Control Panel\Desktop", "CaretTimeout", value);
-            if (getValueSucceeded)
-            {
-                caretTimeout = value;
-                LogView* logView = Application.GetLogView();
-                if (logView != null)
-                {
-                    logView->WriteLine("caret timeout: " + ToString(caretTimeout));
-                }
-            }
-            WinRegCloseKey(currentUserKey);
-            return getValueSucceeded;
-        }
-        return false;
     }
 }

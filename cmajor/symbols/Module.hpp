@@ -173,6 +173,7 @@ public:
     void SetPreparing(bool preparing_) { preparing = preparing_; }
     void CollectResourceNames(std::set<std::u32string>& resourceNameSet);
     void AddResourceName(const std::u32string& resourceName);
+    void AddResourceFilePathToResourceFilePaths();
 private:
     uint8_t format;
     ModuleFlags flags;

@@ -85,6 +85,12 @@ namespace System.Windows
         public nothrow Color(byte red_, byte green_, byte blue_) : alpha(255u), red(red_), green(green_), blue(blue_)
         {
         }
+        public nothrow string ToString() const
+        {
+            string s = System.ToString(alpha);
+            s.Append('.').Append(System.ToString(red)).Append('.').Append(System.ToString(green)).Append('.').Append(System.ToString(blue));
+            return s;
+        }
         public static nothrow Color AliceBlue() 
         {
             return Color(0xF0u, 0xF8u, 0xFFu);
@@ -665,6 +671,24 @@ namespace System.Windows
         return (cast<ulong>(color.alpha) << (8u * 3u)) | (cast<ulong>(color.red) << (8u * 2u)) | (cast<ulong>(color.green) << (8u * 1u)) | cast<ulong>(color.blue);
     }
 
+    public Color ParseColor(const string& s)
+    {
+        Color color;
+        List<string> components = s.Split('.');
+        if (components.Count() == 4)
+        {
+            color.alpha = cast<byte>(ParseInt(components[0]));
+            color.red = cast<byte>(ParseInt(components[1]));
+            color.green = cast<byte>(ParseInt(components[2]));
+            color.blue = cast<byte>(ParseInt(components[3]));
+        }
+        else
+        {
+            ThrowConversionException("could not parse color from string '" + s + "'");
+        }
+        return color;
+    }
+
     public Color GetSystemColor(SystemColor color)
     {
         byte red;
@@ -864,6 +888,10 @@ namespace System.Windows
         {
             return size.w == 0 && size.h == 0;
         }
+        public nothrow inline bool Contains(const PointF& p)
+        {
+            return p.x >= location.x && p.x < location.x + size.w && p.y >= location.y && p.y < location.y + size.h;
+        }
         public nothrow inline void Inflate(float dx, float dy)
         {
             location.x = location.x - dx;
@@ -927,6 +955,29 @@ namespace System.Windows
         private void* nativePen;
     }
 
+    public class PenKey
+    {
+        public nothrow PenKey(const Color& color_, float width_) : color(color_), width(width_)
+        {
+        }
+        public nothrow string ToString() const
+        {
+            return color.ToString() + ":" + System.ToString(width);
+        }
+        public Color color;
+        public float width;
+    }
+
+    public nothrow bool operator==(const PenKey& left, const PenKey& right)
+    {
+        return left.color == right.color && left.width == right.width;
+    }
+
+    public nothrow ulong GetHashCode(const PenKey& penKey)
+    {
+        return GetHashCode(penKey.ToString());
+    }
+
     public abstract class Brush
     {
         public virtual ~Brush()
@@ -986,6 +1037,10 @@ namespace System.Windows
 
     public class FontFamily
     {
+        public FontFamily() : nativeFontFamily(WinGraphicsCreateEmptyFontFamily()), owned(true)
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsFontFamilyGetLastStatus(nativeFontFamily)));
+        }
         public FontFamily(const string& familyName) : nativeFontFamily(WinGraphicsCreateFontFamily(familyName.Chars())), owned(true)
         {
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsFontFamilyGetLastStatus(nativeFontFamily)));
@@ -1039,6 +1094,22 @@ namespace System.Windows
                 WinGraphicsDeleteFontFamily(nativeFontFamily);
             }
         }
+        public nothrow GraphicsStatus GetFamilyName(string& familyName) const
+        {
+            wchar* str = null;
+            GraphicsStatus status = cast<GraphicsStatus>(WinGraphicsGetFontFamilyName(nativeFontFamily, str));
+            if (status == GraphicsStatus.ok)
+            {
+                familyName = ToUtf8(str);
+            }
+            return status;
+        }
+        public string GetFamilyNameChecked() const
+        {
+            string familyName;
+            CheckGraphicsStatus(GetFamilyName(familyName));
+            return familyName;
+        }
         public static nothrow FontFamily GenericMonospace()
         {
             NativeHandle nativeHandle(WinGraphicsGetGenericMonospaceFontFamily());
@@ -1088,6 +1159,36 @@ namespace System.Windows
         millimeter = 6
     }
 
+    public class FontHandle
+    {
+        public nothrow FontHandle(void* hfont_) : hfont(hfont_)
+        {
+        }
+        suppress FontHandle(const FontHandle&);
+        suppress void operator=(const FontHandle&);
+        public nothrow FontHandle(FontHandle&& that) : hfont(that.hfont)
+        {
+            that.hfont = null;
+        }
+        public default nothrow void operator=(FontHandle&&);
+        public ~FontHandle()
+        {
+            if (hfont != null)
+            {
+                WinDeleteObject(hfont);
+            }
+        }
+        public nothrow inline bool IsNull() const
+        {
+            return hfont == null;
+        }
+        public nothrow inline void* HFont() const
+        {
+            return hfont;
+        }
+        private void* hfont;
+    }
+
     public class Font
     {
         public Font(const FontFamily& family, float emSize, FontStyle style, Unit unit) : nativeFont(WinGraphicsCreateFont(family.NativeFontFamily(), emSize, style, unit))
@@ -1095,6 +1196,12 @@ namespace System.Windows
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsFontGetLastStatus(nativeFont)));
         }
         public Font(const FontFamily& family, float emSize) : this(family, emSize, FontStyle.regular, Unit.point)
+        {
+        }
+        public nothrow Font(void* nativeFont_) : nativeFont(nativeFont_)
+        {
+        }
+        public nothrow Font() : this(null)
         {
         }
         public Font(const Font& that) : nativeFont(WinGraphicsCloneFont(that.nativeFont))
@@ -1124,15 +1231,156 @@ namespace System.Windows
                 WinGraphicsDeleteFont(nativeFont);
             }
         }
+        public nothrow bool IsNull() const
+        {
+            return nativeFont == null;
+        }
+        public nothrow float GetSize() const
+        {
+            return WinGraphicsGetFontSize(nativeFont);
+        }
         public nothrow float GetHeight(const Graphics& graphics) const
         {
             return WinGraphicsGetFontHeight(nativeFont, graphics.NativeGraphics());
+        }
+        public nothrow FontStyle GetStyle() const
+        {
+            return cast<FontStyle>(WinGraphicsGetFontStyle(nativeFont));
+        }
+        public nothrow GraphicsStatus GetFamily(FontFamily& fontFamily)
+        {
+            return cast<GraphicsStatus>(WinGraphicsGetFontFamily(nativeFont, fontFamily.NativeFontFamily()));
+        }
+        public FontFamily GetFamilyChecked()
+        {
+            FontFamily fontFamily;
+            CheckGraphicsStatus(GetFamily(fontFamily));
+            return fontFamily;
+        }
+        public static Font FromHFont(void* hdc, void* hfont)
+        {
+            Font font(WinGraphicsCreateFontFromHFont(hdc, hfont));
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsFontGetLastStatus(font.NativeFont())));
+            return font;
+        }
+        public nothrow GraphicsStatus ToHFont(const Graphics& graphics, FontHandle& fontHandle)
+        {
+            void* hfont = null;
+            GraphicsStatus status = cast<GraphicsStatus>(WinGraphicsFontToHFont(nativeFont, graphics.NativeGraphics(), hfont));
+            if (status == GraphicsStatus.ok)
+            {
+                fontHandle = FontHandle(hfont);
+            }
+            return status;
+        }
+        public FontHandle ToHFontChecked(const Graphics& graphics)
+        {
+            FontHandle fontHandle(null);
+            CheckGraphicsStatus(ToHFont(graphics, fontHandle));
+            return fontHandle;
         }
         public nothrow inline void* NativeFont() const
         {
             return nativeFont;
         }
         private void* nativeFont;
+    }
+
+    public nothrow string ToString(FontStyle style)
+    {
+        string s;
+        if (style == FontStyle.regular)
+        {
+            s.Append("regular");
+        }
+        else
+        {
+            if ((style & FontStyle.bold) != 0)
+            {
+                if (!s.IsEmpty())
+                {
+                    s.Append('.');
+                }
+                s.Append("bold");
+            }
+            if ((style & FontStyle.italic) != 0)
+            {
+                if (!s.IsEmpty())
+                {
+                    s.Append('.');
+                }
+                s.Append("italic");
+            }
+            if ((style & FontStyle.underline) != 0)
+            {
+                if (!s.IsEmpty())
+                {
+                    s.Append('.');
+                }
+                s.Append("underline");
+            }
+            if ((style & FontStyle.strikeOut) != 0)
+            {
+                if (!s.IsEmpty())
+                {
+                    s.Append('.');
+                }
+                s.Append("strikeOut");
+            }
+        }
+        return s;
+    }
+
+    public FontStyle ParseFontStyle(const string& fontStyleStr)
+    {
+        FontStyle fontStyle = FontStyle.regular;
+        List<string> components = fontStyleStr.Split('.');
+        for (const string& component : components)
+        {
+            if (component == "bold")
+            {
+                fontStyle = cast<FontStyle>(fontStyle | FontStyle.bold);
+            }
+            else if (component == "italic")
+            {
+                fontStyle = cast<FontStyle>(fontStyle | FontStyle.italic);
+            }
+            else if (component == "underline")
+            {
+                fontStyle = cast<FontStyle>(fontStyle | FontStyle.underline);
+            }
+            else if (component == "strikeOut")
+            {
+                fontStyle = cast<FontStyle>(fontStyle | FontStyle.strikeOut);
+            }
+        }
+        return fontStyle;
+    }
+
+    public class FontKey
+    {
+        public nothrow FontKey(const string& family_, float size_, FontStyle style_) : family(family_), size(size_), style(style_)
+        {
+        }
+        public nothrow string ToString()
+        {
+            string s = ToLower(family);
+            s.Append('.').Append(System.ToString(size)).Append('.').Append(ToString(style));
+            return s;
+        }
+        public string family;
+        public float size;
+        public FontStyle style;
+    }
+
+    public nothrow bool operator==(const FontKey& left, const FontKey& right)
+    {
+        return ToLower(left.family) == ToLower(right.family) && left.size == right.size && left.style == right.style;
+    }
+
+    public nothrow ulong GetHashCode(const FontKey& fontKey)
+    {
+        return GetHashCode(fontKey.ToString());
     }
 
     public enum StringAlignment : int
@@ -1320,6 +1568,38 @@ namespace System.Windows
         private void* nativeRegion;
     }
 
+    // image formats: image/bmp, image/jpeg, image/gif, image/tiff, image/png
+
+    public enum ImageFormat : int
+    {
+        bmp, jpeg, gif, tiff, png
+    }
+
+    public nothrow const char* GetImageFormat(ImageFormat format)
+    {
+        switch (format)
+        {
+            case ImageFormat.bmp: return "image/bmp";
+            case ImageFormat.jpeg: return "image/jpeg";
+            case ImageFormat.gif: return "image/gif";
+            case ImageFormat.tiff: return "image/tiff";
+            case ImageFormat.png: return "image/png";
+        }
+        return "";
+    }
+
+    public nothrow GraphicsStatus GetEncoderClsId(const char* imageFormat, Uuid& clsid)
+    {
+        return cast<GraphicsStatus>(WinGraphicsGetEncoderClsId(imageFormat, &clsid));
+    }
+
+    public Uuid GetEncoderClsIdChecked(const char* imageFormat)
+    {
+        Uuid clsid;
+        CheckGraphicsStatus(GetEncoderClsId(imageFormat, clsid));
+        return clsid;
+    }
+
     public class Image
     {
         public nothrow Image() : nativeImage(null)
@@ -1356,6 +1636,14 @@ namespace System.Windows
             {
                 WinGraphicsDeleteImage(nativeImage);
             }
+        }
+        public GraphicsStatus Save(const char* fileName, const Uuid& encoderClsId)
+        {
+            return cast<GraphicsStatus>(WinGraphicsImageSave(nativeImage, fileName, &encoderClsId));
+        }
+        public void SaveChecked(const char* fileName, const Uuid& encoderClsId)
+        {
+            CheckGraphicsStatus(Save(fileName, encoderClsId));
         }
         public nothrow void* NativeImage() const
         {
@@ -1704,6 +1992,14 @@ namespace System.Windows
             return cast<GraphicsStatus>(WinGraphicsDrawLine(nativeGraphics, pen.NativePen(), start.x, start.y, end.x, end.y));
         }
         public void DrawLineChecked(const Pen& pen, const Point& start, const Point& end)
+        {
+            CheckGraphicsStatus(DrawLine(pen, start, end));
+        }
+        public nothrow GraphicsStatus DrawLine(const Pen& pen, const PointF& start, const PointF& end)
+        {
+            return cast<GraphicsStatus>(WinGraphicsDrawLineF(nativeGraphics, pen.NativePen(), start.x, start.y, end.x, end.y));
+        }
+        public void DrawLineChecked(const Pen& pen, const PointF& start, const PointF& end)
         {
             CheckGraphicsStatus(DrawLine(pen, start, end));
         }
@@ -2078,3 +2374,4 @@ namespace System.Windows
         private void* nativeGraphics;
     }
 }
+

@@ -8,8 +8,6 @@ using System.Collections;
 
 namespace System.Windows
 {
-    public class delegate void ControlEventHandler(ControlEventArgs& args);
-
     public class ContainerControl : Control
     {
         public ContainerControl(const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle, 
@@ -44,6 +42,42 @@ namespace System.Windows
         {
             return this;
         }
+        internal nothrow override Control* GetFirstEnabledTabStopControl() const
+        {
+            Component* child = children.FirstChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* control = cast<Control*>(child);
+                    Control* tabStopChild = control->GetFirstEnabledTabStopControl();
+                    if (tabStopChild != null)
+                    {
+                        return tabStopChild;
+                    }
+                }
+                child = child->NextSibling();
+            }
+            return null;
+        }
+        internal nothrow override Control* GetLastEnabledTabStopControl() const
+        {
+            Component* child = children.LastChild();
+            while (child != null)
+            {
+                if (child is Control*)
+                {
+                    Control* control = cast<Control*>(child);
+                    Control* tabStopChild = control->GetLastEnabledTabStopControl();
+                    if (tabStopChild != null)
+                    {
+                        return tabStopChild;
+                    }
+                }
+                child = child->PrevSibling();
+            }
+            return null;
+        }
         protected override void OnChildContentLocationChanged(ControlEventArgs& args)
         {
             base->OnChildContentLocationChanged(args);
@@ -71,6 +105,24 @@ namespace System.Windows
                 parentControl->OnChildContentSizeChanged(args);
             }
         }
+        protected override void OnChildGotFocus(ControlEventArgs& args)
+        {
+            base->OnChildContentChanged(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentChanged(args);
+            }
+        }
+        protected override void OnChildLostFocus(ControlEventArgs& args)
+        {
+            base->OnChildLostFocus(args);
+            Control* parentControl = ParentControl();
+            if (parentControl != null)
+            {
+                parentControl->OnChildContentChanged(args);
+            }
+        }
         public override void PrintWindowTree(int level)
         {
             LogView* log = Application.GetLogView();
@@ -93,31 +145,6 @@ namespace System.Windows
         {
             switch (message.msg)
             {
-                case WM_COMMAND:
-                {
-                    void* childWindowHandle = message.LParamHandle();
-                    ushort notificationCode = message.WParamHiWord();
-                    ushort controlId = message.WParamLoWord();
-                    Control* child = Application.GetWindowManager().GetWindow(childWindowHandle);
-                    if (child != null)
-                    {
-                        switch (notificationCode)
-                        {
-                            case BN_CLICKED:
-                            {
-                                if (child is ButtonBase*)
-                                {
-                                    ButtonBase* button = cast<ButtonBase*>(child);
-                                    button->OnClickInternal();
-                                    message.result = 0;
-                                    return true;
-                                }                            
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                }
                 case WM_SIZE:
                 {
                     Size newSize = message.LParamSize();
@@ -148,7 +175,7 @@ namespace System.Windows
                 }
                 case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK:
                 case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL:
-                case WM_SETFOCUS: case WM_KILLFOCUS: case WM_TIMER:
+                case WM_SETFOCUS: case WM_KILLFOCUS: case WM_TIMER: case WM_COMMAND: case WM_SHOWWINDOW: 
                 {
                     return base->ProcessMessage(message);
                 }
@@ -236,16 +263,6 @@ namespace System.Windows
                 MessageBox.Show(ex.Message());
             }
         }
-        protected virtual void OnControlAdded(ControlEventArgs& args)
-        {
-            controlAddedEvent.Fire(args);
-        }
-        public virtual void OnControlRemoved(ControlEventArgs& args)
-        {
-            controlRemovedEvent.Fire(args);
-        }
         private Container children;
-        private Event<ControlEventHandler, ControlEventArgs> controlAddedEvent;
-        private Event<ControlEventHandler, ControlEventArgs> controlRemovedEvent;
     }
 }

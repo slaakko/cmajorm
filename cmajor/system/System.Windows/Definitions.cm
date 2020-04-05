@@ -164,6 +164,27 @@ namespace System.Windows
         normal, minimized, maximized
     }
     
+    public enum DialogResult : int
+    {
+        none = 0, ok = 1, cancel = 2, abort = 3, retry = 4, ignore = 5, yes = 6, no = 7
+    }
+
+    public nothrow string ToString(DialogResult dialogResult)
+    {
+        switch (dialogResult)
+        {
+            case DialogResult.none: return "DialogResult.none";
+            case DialogResult.ok: return "DialogResult.ok";
+            case DialogResult.cancel: return "DialogResult.cancel";
+            case DialogResult.abort: return "DialogResult.abort";
+            case DialogResult.retry: return "DialogResult.retry";
+            case DialogResult.ignore: return "DialogResult.ignore";
+            case DialogResult.yes: return "DialogResult.yes";
+            case DialogResult.no: return "DialogResult.no";
+        }
+        return string();
+    }
+
     public enum Anchors : sbyte
     {
         none = 0, top = 1 << 0, bottom = 1 << 1, left = 1 << 2, right = 1 << 3

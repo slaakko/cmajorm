@@ -25,6 +25,8 @@ FunctionNode* ConstExprFunctionRepository::GetFunctionNodeFor(FunctionSymbol* co
     if (constExprFunctionSymbol->IsProject() && !constExprFunctionSymbol->IsBound())
     {
         TypeBinder typeBinder(boundCompileUnit);
+        typeBinder.SetContainerScope(constExprFunctionSymbol->GetContainerScope());
+        typeBinder.SetCurrentFunctionSymbol(constExprFunctionSymbol);
         functionNode->Accept(typeBinder);
     }
     return functionNode;

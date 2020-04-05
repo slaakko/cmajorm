@@ -75,10 +75,14 @@ namespace System
         }
         public nothrow String(CharT c, long n) : len(n), res(0), chars(null)
         {
-            Reserve(n);
-            for (long i = 0; i < n; ++i)
+            if (n > 0)
             {
-                chars[i] = c;
+                Reserve(n);
+                for (long i = 0; i < n; ++i)
+                {
+                    chars[i] = c;
+                }
+                chars[n] = '\0';
             }
         }
         public nothrow void operator=(const String<CharT>& that)

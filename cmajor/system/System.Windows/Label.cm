@@ -1,0 +1,145 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows.API;
+
+namespace System.Windows
+{
+    public enum LabelStyle : long
+    {
+        SS_BITMAP = 0x000E,
+        SS_BLACKFRAME = 0x0007,
+        SS_BLACKRECT = 0x0004,
+        SS_CENTER = 0x0001,
+        SS_CENTERIMAGE = 0x0200,
+        SS_EDITCONTROL = 0x2000,
+        SS_ENDELLIPSIS = 0x4000,
+        SS_ENHMETAFILE = 0x000F,
+        SS_ETCHEDFRAME = 0x0012,
+        SS_ETCHEDHORZ = 0x0010,
+        SS_ETCHEDVERT = 0x0011,
+        SS_GRAYFRAME = 0x0008,
+        SS_GRAYRECT = 0x0005,
+        SS_ICON = 0x0003,
+        SS_LEFT = 0x0000,
+        SS_LEFTNOWORDWRAP = 0x000C,
+        SS_NOPREFIX = 0x0080,
+        SS_NOTIFY = 0x0100,
+        SS_OWNERDRAW = 0x000D,
+        SS_PATHELLIPSIS = 0x8000,
+        SS_REALSIZECONTROL = 0x0040,
+        SS_REALSIZEIMAGE = 0x0800,
+        SS_RIGHT = 0x0002,
+        SS_RIGHTJUST = 0x0400,
+        SS_SIMPLE = 0x000B,
+        SS_SUNKEN = 0x1000,
+        SS_TYPEMASK = 0x001F,
+        SS_WHITEFRAME = 0x0009,
+        SS_WHITERECT = 0x0006,
+        SS_WORDELLIPSIS = 0xC000
+    }
+
+    public class Label : Control
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, autoSize = 1 << 0, autoSized = 1 << 1
+        }
+
+        public Label(LabelStyle labelStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
+            base("STATIC", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | labelStyle), DefaultExtendedWindowStyle(), backgroundColor,
+            text, location, size, dock, anchors), flags(Flags.none)
+        {
+            if (autoSize)
+            {
+                SetAutoSizeFlag();
+                DoAutoSize();
+            }
+        }
+        public Label(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
+            this(LabelStyle.SS_LEFT, DefaultControlBackgroundColor(), text, location, size, dock, anchors, autoSize)
+        {
+        }
+        protected override void OnCreated()
+        {
+            base->OnCreated();
+            Graphics graphics = Graphics.FromWindowHandle(Handle());
+            const FontHandle& fontHandle = GetFontHandle(graphics);
+            if (!fontHandle.IsNull())
+            {
+                SendSetFontMessage(fontHandle);
+            }
+            if (AutoSize())
+            {
+                DoAutoSize();
+            }
+        }
+        protected override void OnTextChanged()
+        {
+            base->OnTextChanged();
+            if (AutoSize())
+            {
+                ResetAutoSized();
+                DoAutoSize();
+            }
+        }
+        public nothrow inline bool AutoSize() const
+        {
+            return (flags & Flags.autoSize) != Flags.none;
+        }
+        public void SetAutoSize(bool autoSize)
+        {
+            if (autoSize)
+            {
+                if (!AutoSize())
+                {
+                    SetAutoSizeFlag();
+                    if (!AutoSized())
+                    {
+                        DoAutoSize();
+                    }
+                }
+            }
+            else
+            {
+                ResetAutoSizeFlag();
+                ResetAutoSized();
+            }
+        }
+        private void DoAutoSize()
+        {
+            if (AutoSized()) return;
+            if (Handle() == null) return;
+            Graphics graphics = Graphics.FromWindowHandle(Handle());
+            const Font& font = GetFont();
+            StringFormat stringFormat;
+            RectF r = graphics.MeasureStringChecked(Text(), font, PointF(0, 0), stringFormat);
+            SetSize(Size(cast<int>(r.size.w), cast<int>(r.size.h)));
+            SetAutoSized();
+        }
+        private nothrow inline void SetAutoSizeFlag()
+        {
+            flags = cast<Flags>(flags | Flags.autoSize);
+        }
+        private nothrow inline void ResetAutoSizeFlag()
+        {
+            flags = cast<Flags>(flags & ~Flags.autoSize);
+        }
+        private nothrow inline bool AutoSized() const
+        {
+            return (flags & Flags.autoSized) != Flags.none;
+        }
+        private nothrow inline void SetAutoSized()
+        {
+            flags = cast<Flags>(flags | Flags.autoSized);
+        }
+        private nothrow inline void ResetAutoSized()
+        {
+            flags = cast<Flags>(flags & ~Flags.autoSized);
+        }
+        private Flags flags;
+    }
+}

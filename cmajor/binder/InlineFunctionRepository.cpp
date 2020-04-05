@@ -92,6 +92,7 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         functionSymbol->SetLinkOnceOdrLinkage();
         TypeBinder typeBinder(boundCompileUnit);
         typeBinder.SetContainerScope(functionSymbol->GetContainerScope());
+        typeBinder.SetCurrentFunctionSymbol(functionSymbol.get());
         functionInstanceNode->Accept(typeBinder);
         StatementBinder statementBinder(boundCompileUnit);
         std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit.GetModule(), functionSymbol.get()));

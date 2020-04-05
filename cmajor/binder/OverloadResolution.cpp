@@ -469,6 +469,7 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
             {
                 TypeBinder typeBinder(boundCompileUnit);
                 typeBinder.SetContainerScope(containerScope);
+                typeBinder.SetCurrentFunctionSymbol(function);
                 node->Accept(typeBinder);
             }
         }

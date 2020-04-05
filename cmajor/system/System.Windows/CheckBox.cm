@@ -1,0 +1,192 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public class delegate void CheckedChangedEventHandler();
+
+    public class CheckBox : ButtonBase
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, checked = 1 << 0, autoSize = 1 << 1, autoSized = 1 << 2
+        }
+        public CheckBox(const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
+            base("BUTTON", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | ButtonStyle.BS_CHECKBOX | ButtonStyle.BS_NOTIFY), DefaultExtendedWindowStyle(),
+            backgroundColor, text, location, size, dock, anchors), flags(Flags.none)
+        {
+            if (autoSize)
+            {
+                SetAutoSizeFlag();
+            }
+            else
+            {
+                ResetAutoSizeFlag();
+            }
+        }
+        public CheckBox(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, bool autoSize) :
+            this(DefaultControlBackgroundColor(), text, location, size, dock, anchors, autoSize)
+        {
+        }
+        public bool Checked()
+        {
+            if (Handle() != null)
+            {
+                RetrieveCheckedState();
+            }
+            return GetCheckedFlag();
+        }
+        public void SetChecked(bool checked)
+        {
+            if (checked)
+            {
+                SetCheckedFlag();
+                if (Handle() != null)
+                {
+                    WinSendMessage(Handle(), BM_SETCHECK, BST_CHECKED, 0);
+                }
+            }
+            else
+            {
+                ResetCheckedFlag();
+                if (Handle() != null)
+                {
+                    WinSendMessage(Handle(), BM_SETCHECK, BST_UNCHECKED, 0);
+                }
+            }
+        }
+        protected override void OnCreated()
+        {
+            base->OnCreated();
+            Graphics graphics = Graphics.FromWindowHandle(Handle());
+            const FontHandle& fontHandle = GetFontHandle(graphics);
+            if (!fontHandle.IsNull())
+            {
+                SendSetFontMessage(fontHandle);
+            }
+            if (GetCheckedFlag())
+            {
+                SetChecked(true);
+            }
+            else
+            {
+                SetChecked(false);
+            }
+            if (GetAutoSizeFlag())
+            {
+                DoAutoSize();
+            }
+        }
+        protected override void OnClick()
+        {
+            base->OnClick();
+            SetChecked(!GetCheckedFlag());
+        }
+        protected override void OnTextChanged()
+        {
+            base->OnTextChanged();
+            if (GetAutoSizeFlag())
+            {
+                ResetAutoSized();
+                DoAutoSize();
+            }
+        }
+        protected virtual void OnCheckedChanged()
+        {
+            checkedChangedEvent.Fire();
+        }
+        public nothrow Event<CheckedChangedEventHandler>& CheckedChangedEvent() const
+        {
+            return checkedChangedEvent;
+        }
+        private void RetrieveCheckedState()
+        {
+            long result = WinSendMessage(Handle(), BM_GETCHECK, 0u, 0);
+            if (result == BST_CHECKED)
+            {
+                SetCheckedFlag();
+            }
+            else
+            {
+                ResetCheckedFlag();
+            }
+        }
+        private void DoAutoSize()
+        {
+            if (AutoSized()) return;
+            if (Handle() == null) return;
+            Graphics graphics = Graphics.FromWindowHandle(Handle());
+            const Font& font = GetFont();
+            StringFormat stringFormat;
+            RectF r = graphics.MeasureStringChecked(Text(), font, PointF(0, 0), stringFormat);
+            Size checkSize = GetCheckSize();
+            Size borderSize = GetBorderSize();
+            r.size.w = r.size.w + checkSize.w + borderSize.w;
+            r.size.h = Max(r.size.h, checkSize.h + borderSize.h);
+            SetSize(Size(cast<int>(r.size.w), cast<int>(r.size.h)));
+            SetAutoSized();
+        }
+        private nothrow Size GetCheckSize()
+        {
+            int x = GetSystemMetrics(SystemMetricsId.SM_CXMENUCHECK);
+            int y = GetSystemMetrics(SystemMetricsId.SM_CYMENUCHECK);
+            return Size(x, y);
+        }
+        private nothrow Size GetBorderSize()
+        {
+            int x = GetSystemMetrics(SystemMetricsId.SM_CXBORDER);
+            int y = GetSystemMetrics(SystemMetricsId.SM_CYBORDER);
+            return Size(x, y);
+        }
+        private nothrow inline bool GetCheckedFlag() const
+        {
+            return (flags & Flags.checked) != Flags.none;
+        }
+        private void SetCheckedFlag()
+        {
+            if (!GetCheckedFlag())
+            {
+                flags = cast<Flags>(flags | Flags.checked);
+                OnCheckedChanged();
+            }
+        }
+        private void ResetCheckedFlag()
+        {
+            if (GetCheckedFlag())
+            {
+                flags = cast<Flags>(flags & ~Flags.checked);
+                OnCheckedChanged();
+            }
+        }
+        private nothrow inline bool GetAutoSizeFlag() const
+        {
+            return (flags & Flags.autoSize) != Flags.none;
+        }
+        private nothrow inline void SetAutoSizeFlag()
+        {
+            flags = cast<Flags>(flags | Flags.autoSize);
+        }
+        private nothrow inline void ResetAutoSizeFlag()
+        {
+            flags = cast<Flags>(flags & ~Flags.autoSize);
+        }
+        private nothrow inline bool AutoSized() const
+        {
+            return (flags & Flags.autoSized) != Flags.none;
+        }
+        private nothrow inline void SetAutoSized()
+        {
+            flags = cast<Flags>(flags | Flags.autoSized);
+        }
+        private nothrow inline void ResetAutoSized()
+        {
+            flags = cast<Flags>(flags & ~Flags.autoSized);
+        }
+        private Flags flags;
+        private Event<CheckedChangedEventHandler> checkedChangedEvent;
+    }
+}
