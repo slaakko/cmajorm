@@ -11,7 +11,7 @@ using spring;
 public class MainWindow : Window
 {
     public MainWindow() : base("Spring Software Diagram Designer"),
-        arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), classToolCursor(Application.GetResourceManager().GetCursor("class.tool.cursor"))
+        arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), classToolCursor(Application.GetResourceManager().GetCursor("class.tool.spring.cursor"))
     {
         UniquePtr<MenuBar> menuBar(new MenuBar());
         UniquePtr<MenuItem> fileItem(new MenuItem("&File"));
@@ -31,7 +31,7 @@ public class MainWindow : Window
         Tools.GetSelectTool().SetToolButton(selectToolButton);
         Tools.GetSelectTool().SetCursor(&arrowCursor);
         toolBar->AddToolButton(selectToolButton);
-        ToolButton* classToolButton = new ToolButton("class.tool.bitmap");
+        ToolButton* classToolButton = new ToolButton("class.tool.spring.bitmap");
         classToolButton->SetToolTip("Place new class");
         Tools.GetClassTool().SetToolButton(classToolButton);
         Tools.GetClassTool().SetCursor(&classToolCursor);

@@ -135,14 +135,6 @@ std::string ModuleFlagStr(ModuleFlags flags)
         }
         s.append("core");
     }
-    if ((flags & ModuleFlags::hasResourceFile) != ModuleFlags::none)
-    {
-        if (!s.empty())
-        {
-            s.append(1, ' ');
-        }
-        s.append("hasResourceFile");
-    }
     return s;
 }
 
@@ -548,14 +540,14 @@ void ImportModules(sngcm::ast::Target target, Module* rootModule, Module* module
 
 Module::Module() : 
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
-    symbolTable(nullptr), directoryPath(), libraryFilePaths(), resourceFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0), index(-1),
+    symbolTable(nullptr), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0), index(-1),
     buildStartMs(0), buildStopMs(0), preparing(false)
 {
 }
 
 Module::Module(const std::string& filePath)  :
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
-    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), resourceFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
+    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
     index(-1), buildStartMs(0), buildStopMs(0), preparing(false)
 {
     SymbolReader reader(filePath);
@@ -613,17 +605,13 @@ Module::Module(const std::string& filePath)  :
         {
             libraryFilePaths.push_back(module->LibraryFilePath());
         }
-        if (module->HasResourceFile())
-        {
-            resourceFilePaths.push_back(module->ResourceFilePath());
-        }
     }
     FinishReads(rootModule, finishReadOrder, true);
 }
 
 Module::Module(const std::u32string& name_, const std::string& filePath_, sngcm::ast::Target target) :
     format(currentModuleFormat), flags(ModuleFlags::none), name(name_), originalFilePath(filePath_), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0),
-    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), resourceFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
+    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
     index(-1), buildStartMs(0), buildStopMs(0), preparing(false)
 {
     if (SystemModuleSet::Instance().IsSystemModule(name))
@@ -634,6 +622,11 @@ Module::Module(const std::u32string& name_, const std::string& filePath_, sngcm:
     {
         SetCore();
     }
+}
+
+void Module::SetResourceFilePath(const std::string& resourceFilePath_)
+{
+    resourceFilePath = resourceFilePath_;
 }
 
 void Module::PrepareForCompilation(const std::vector<std::string>& references, sngcm::ast::Target target)
@@ -683,27 +676,8 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
         {
             libraryFilePaths.push_back(module->LibraryFilePath());
         }
-        if (module->HasResourceFile())
-        {
-            resourceFilePaths.push_back(module->ResourceFilePath());
-        }
     }
     FinishReads(rootModule, finishReadOrder, false);
-}
-
-std::string Module::ResourceFilePath() const
-{
-    std::string cmmFilePath = filePathReadFrom;
-    if (cmmFilePath.empty())
-    {
-        cmmFilePath = originalFilePath;
-    }
-    return GetFullPath(boost::filesystem::path(cmmFilePath).replace_extension(".res").generic_string());
-}
-
-void Module::AddResourceFilePathToResourceFilePaths()
-{
-    resourceFilePaths.push_back(ResourceFilePath());
 }
 
 void Module::CreateSymbolTable()
@@ -816,6 +790,7 @@ void Module::Write(SymbolWriter& writer)
         writer.GetBinaryWriter().Write(referencedModule->OriginalFilePath());
     }
     fileTable.Write(writer.GetBinaryWriter(), IsSystemModule());
+    resourceTable.Write(writer.GetBinaryWriter());
     uint32_t efn = exportedFunctions.size();
     writer.GetBinaryWriter().WriteULEB128UInt(efn);
     for (uint32_t i = 0; i < efn; ++i)
@@ -827,12 +802,6 @@ void Module::Write(SymbolWriter& writer)
     for (uint32_t i = 0; i < edn; ++i)
     {
         writer.GetBinaryWriter().Write(exportedData[i]);
-    }
-    uint32_t nresnames = resourceNames.size();
-    writer.GetBinaryWriter().WriteULEB128UInt(nresnames);
-    for (uint32_t i = 0; i < nresnames; ++i)
-    {
-        writer.GetBinaryWriter().Write(resourceNames[i]);
     }
     symbolTable->Write(writer);
 }
@@ -928,6 +897,17 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
 #endif
     }
+    resourceTable.Read(reader.GetBinaryReader());
+    int nres = resourceTable.Resources().size();
+    for (int i = 0; i < nres; ++i)
+    {
+        Resource resource = resourceTable.Resources()[i];
+        if (rootModule->globalResourceTable.Contains(resource.name))
+        {
+            throw std::runtime_error("duplicate resource name '" + ToUtf8(resource.name) + " read from file '" + reader.GetBinaryReader().FileName() + "'");
+        }
+        rootModule->globalResourceTable.AddResource(resource);
+    }
     exportedFunctions.clear();
     uint32_t efn = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < efn; ++i)
@@ -947,12 +927,6 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
     for (const std::string& data : exportedData)
     {
         rootModule->allExportedData.push_back(data);
-    }
-    uint32_t nresNames = reader.GetBinaryReader().ReadULEB128UInt();
-    for (uint32_t i = 0; i < nresNames; ++i)
-    {
-        std::u32string resourceName = reader.GetBinaryReader().ReadUtf32String();
-        resourceNames.push_back(std::move(resourceName));
     }
     CheckUpToDate();
     symbolTablePos = reader.GetBinaryReader().Pos();
@@ -994,10 +968,6 @@ void Module::Dump()
     {
         formatter.WriteLine("library file path: " + libraryFilePath);
     }
-    if (HasResourceFile())
-    {
-        formatter.WriteLine("resource file path: " + ResourceFilePath());
-    }
     int n = referenceFilePaths.size();
     if (n > 0)
     {
@@ -1010,6 +980,7 @@ void Module::Dump()
         formatter.DecIndent();
     }
     fileTable.Dump(formatter);
+    resourceTable.Dump(formatter);
     formatter.WriteLine("module dependencies:");
     formatter.IncIndent();
     formatter.WriteLine(ToUtf8(Name()));
@@ -1322,23 +1293,6 @@ void Module::StopBuild()
 int Module::GetBuildTimeMs()
 {
     return static_cast<int>(buildStopMs - buildStartMs);
-}
-
-void Module::CollectResourceNames(std::set<std::u32string>& resourceNameSet)
-{
-    for (Module* referencedModule : allRefModules)
-    {
-        referencedModule->CollectResourceNames(resourceNameSet);
-    }
-    for (const std::u32string& resourceName : resourceNames)
-    {
-        resourceNameSet.insert(resourceName);
-    }
-}
-
-void Module::AddResourceName(const std::u32string& resourceName)
-{
-    resourceNames.push_back(resourceName);
 }
 
 #ifdef _WIN32

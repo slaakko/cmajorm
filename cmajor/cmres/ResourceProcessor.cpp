@@ -5,6 +5,7 @@
 
 #include <cmajor/cmres/ResourceProcessor.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/ResourceTable.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/Parser.hpp>
@@ -22,18 +23,6 @@ namespace cmajor { namespace resources {
 using namespace soulng::util;
 using namespace soulng::unicode;
 using namespace cmajor::symbols;
-
-struct Resource
-{
-    enum class Type
-    {
-        cursor = 0, icon = 1, bitmap = 2
-    };
-    Resource(const std::u32string& name_, Type type_, const std::string& file_) : name(name_), type(type_), file(file_) {}
-    std::u32string name;
-    Type type;
-    std::string file;
-};
 
 class ResourceTypeNameRegistry
 {
@@ -102,16 +91,16 @@ const std::string& GetResourceTypeName(Resource::Type resourceType)
     return ResourceTypeNameRegistry::Instance().GetResourceTypeName(resourceType);
 }
 
-void CreateResourceScriptFile(cmajor::symbols::Module& currentModule, const std::string& resourceScriptFileName, const std::vector<Resource>& resources)
+void CreateResourceScriptFile(cmajor::symbols::Module& currentModule, const std::string& resourceScriptFileName)
 {
     std::ofstream resourceScriptFile(resourceScriptFileName);
     CodeFormatter formatter(resourceScriptFile);
-    for (const Resource& resource : resources)
+    for (const Resource& resource : currentModule.GetGlobalResourceTable().Resources())
     {
         std::string line;
         line.append(ToUtf8(resource.name)).append(1, ' ');
         line.append(GetResourceTypeName(resource.type)).append(1, ' ');
-        line.append(1, '"').append(resource.file).append(1, '"');
+        line.append(1, '"').append(resource.filePath).append(1, '"');
         formatter.WriteLine(line);
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
@@ -122,7 +111,8 @@ void CreateResourceScriptFile(cmajor::symbols::Module& currentModule, const std:
 
 void CompileResourceScriptFile(cmajor::symbols::Module& currentModule, const std::string& resourceScriptFileName)
 {
-    std::string resourceFilePath = currentModule.ResourceFilePath();
+    if (currentModule.GetGlobalResourceTable().Resources().empty()) return;
+    std::string resourceFilePath = Path::ChangeExtension(currentModule.LibraryFilePath(), ".res");
     std::string errorFilePath = Path::Combine(Path::GetDirectoryName(resourceScriptFileName), "llvm-rc.error");
     std::string commandLine;
     commandLine.append("cmfileredirector -2 ").append(QuotedPath(errorFilePath)).append(" llvm-rc /V /FO ").append(QuotedPath(resourceFilePath));
@@ -141,15 +131,12 @@ void CompileResourceScriptFile(cmajor::symbols::Module& currentModule, const std
     {
         LogMessage(currentModule.LogStreamId(), "==> " + resourceFilePath);
     }
-    currentModule.AddResourceFilePathToResourceFilePaths();
+    currentModule.SetResourceFilePath(resourceFilePath);
 }
 
-std::vector<Resource> GetResourcesInProject(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule)
+void AddResourcesInProjectToCurrentModule(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule)
 {
     std::string cmajorResourceDir = sngcm::ast::CmajorResourceDir();
-    std::vector<Resource> resources;
-    std::set<std::u32string> resourceNameSet;
-    currentModule.CollectResourceNames(resourceNameSet);
     int n = project.ResourceFilePaths().size();
     for (int i = 0; i < n; ++i)
     {
@@ -178,11 +165,15 @@ std::vector<Resource> GetResourcesInProject(sngcm::ast::Project& project, cmajor
                         {
                             throw std::runtime_error(std::to_string(i) + "'th resource element has no name attribute in resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
                         }
-                        if (resourceNameSet.find(resourceName) != resourceNameSet.cend())
+                        if (currentModule.GetResourceTable().Contains(resourceName))
                         {
-                            throw std::runtime_error(std::to_string(i) + "Resource name '" + ToUtf8(resourceName) + "' not unique. Detected when processing resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
+                            throw std::runtime_error("Resource table of module '" + ToUtf8(currentModule.Name()) + " (" + currentModule.OriginalFilePath() + ") already contains resource name '" + ToUtf8(resourceName) +
+                                ". Detected when processing resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
                         }
-                        resourceNameSet.insert(resourceName);
+                        if (currentModule.GetGlobalResourceTable().Contains(resourceName))
+                        {
+                            throw std::runtime_error(std::to_string(i) + "'th resource name '" + ToUtf8(resourceName) + "' not globally unique. Detected when processing resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
+                        }
                         std::u32string resourceType = element->GetAttribute(U"type");
                         if (resourceType.empty())
                         {
@@ -193,7 +184,6 @@ std::vector<Resource> GetResourcesInProject(sngcm::ast::Project& project, cmajor
                         {
                             throw std::runtime_error(std::to_string(i) + "'th resource element has no file attribute in resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
                         }
-                        currentModule.AddResourceName(resourceName);
                         std::string resourceFilePath = Path::MakeCanonical(ToUtf8(resourceFile));
                         std::string fullResourceFilePath = resourceFilePath;
                         if (Path::IsRelative(resourceFilePath))
@@ -208,7 +198,8 @@ std::vector<Resource> GetResourcesInProject(sngcm::ast::Project& project, cmajor
                         if (boost::filesystem::exists(fullResourceFilePath))
                         {
                             Resource resource(resourceName, GetResourceType(resourceType), fullResourceFilePath);
-                            resources.push_back(std::move(resource));
+                            currentModule.GetResourceTable().AddResource(resource);
+                            currentModule.GetGlobalResourceTable().AddResource(resource);
                         }
                         else
                         {
@@ -219,17 +210,18 @@ std::vector<Resource> GetResourcesInProject(sngcm::ast::Project& project, cmajor
             }
         }
     }
-    return resources;
 }
 
 void ProcessResourcesInProject(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule)
 {
     if (project.ResourceFilePaths().empty()) return;
-    currentModule.SetHasResourceFile();
-    std::vector<Resource> resources = GetResourcesInProject(project, currentModule);
-    std::string resourceScriptFileName = Path::ChangeExtension(project.ModuleFilePath(), ".rc");
-    CreateResourceScriptFile(currentModule, resourceScriptFileName, resources);
-    CompileResourceScriptFile(currentModule, resourceScriptFileName);
+    AddResourcesInProjectToCurrentModule(project, currentModule);
+    if (project.GetTarget() == Target::program || project.GetTarget() == Target::winapp || project.GetTarget() == Target::winguiapp)
+    {
+        std::string resourceScriptFileName = Path::ChangeExtension(project.ModuleFilePath(), ".rc");
+        CreateResourceScriptFile(currentModule, resourceScriptFileName);
+        CompileResourceScriptFile(currentModule, resourceScriptFileName);
+    }
 }
 
 void InitResources()
