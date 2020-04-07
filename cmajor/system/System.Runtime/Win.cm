@@ -127,6 +127,8 @@ public extern cdecl nothrow void* WinGraphicsCreateImage(const char* fileName, b
 public extern cdecl nothrow int WinGraphicsImageGetLastStatus(void* image);
 public extern cdecl nothrow void* WinGraphicsCloneImage(void* image);
 public extern cdecl nothrow void WinGraphicsDeleteImage(void* image);
+public extern cdecl nothrow uint WinGraphicsImageGetHeight(void* image);
+public extern cdecl nothrow uint WinGraphicsImageGetWidth(void* image);
 public extern cdecl nothrow void* WinGraphicsCreateBitmap(const char* fileName, bool useEmbeddedColorManagement);
 public extern cdecl nothrow void* WinGraphicsCreateBitmapWidthHeight(int w, int h, void* graphics);
 public extern cdecl nothrow void* WinGraphicsCreateBitmapWinBitmap(void* winBitmap, void* palette);
@@ -134,6 +136,14 @@ public extern cdecl nothrow void* WinGraphicsCreateBitmapIcon(void* icon);
 public extern cdecl nothrow void* WinGraphicsCreateBitmapResource(const char* resourceName);
 public extern cdecl nothrow uint WinGraphicsSave(void* graphics);
 public extern cdecl nothrow int WinGraphicsRestore(void* graphics, uint graphicsState);
+public extern cdecl nothrow void* WinGraphicsCreateDefaultImageAttributes();
+public extern cdecl nothrow int WinGraphicsImageAttributesGetLastStatus(void* imageAttributes);
+public extern cdecl nothrow void* WinGraphicsCloneImageAttributes(void* imageAttributes);
+public extern cdecl nothrow void WinGraphicsDeleteImageAttributes(void* imageAttributes);
+public extern cdecl nothrow int WinGraphicsImageAttributesSetColorKey(void* imageAttributes, byte colorLowAlpha, byte colorLowRed, byte colorLowGreen, byte colorLowBlue,
+    byte colorHighAlpha, byte colorHighRed, byte colorHighGreen, byte colorHighBlue, int colorAdjustType);
+public extern cdecl nothrow int WinGrapchisDrawImageWithAttributes(void* graphics, void* image, int destRectX, int destRectY, int destRectW, int destRectH, int srcX, int srcY, int srcW, int srcH,
+    int srcUnit, void* imageAttributes);
 public extern cdecl nothrow int WinGraphicsDrawImagePoint(void* graphics, void* image,  float x, float y);
 public extern cdecl nothrow int WinGraphicsDrawImageRect(void* graphics, void* image,  float x, float y, float w, float h);
 public extern cdecl nothrow int WinGraphicsGetTransform(void* graphics, void* matrix);

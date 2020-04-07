@@ -103,7 +103,7 @@ namespace spring
         }
         private void EditOperations()
         {
-            bool mayHaveAbstractOperations = classElement is AbstractClassElement*;
+            bool mayHaveAbstractOperations = classElement->IsAbstract();
             IndexList<OperationElement> clonedOperationElements = classElement->Operations().Clone();
             if (ExecuteEditOperationsDialog(clonedOperationElements, mayHaveAbstractOperations, *this))
             {

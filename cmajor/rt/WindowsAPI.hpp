@@ -131,6 +131,8 @@ extern "C" RT_API void* WinGraphicsCreateImage(const char* fileName, bool useEmb
 extern "C" RT_API int WinGraphicsImageGetLastStatus(void* image);
 extern "C" RT_API void* WinGraphicsCloneImage(void* image);
 extern "C" RT_API void WinGraphicsDeleteImage(void* image);
+extern "C" RT_API uint32_t WinGraphicsImageGetHeight(void* image);
+extern "C" RT_API uint32_t WinGraphicsImageGetWidth(void* image);
 extern "C" RT_API void* WinGraphicsCreateBitmap(const char* fileName, bool useEmbeddedColorManagement);
 extern "C" RT_API void* WinGraphicsCreateBitmapWidthHeight(int w, int h, void* graphics);
 extern "C" RT_API void* WinGraphicsCreateBitmapWinBitmap(void* winBitmap, void* palette);
@@ -138,8 +140,16 @@ extern "C" RT_API void* WinGraphicsCreateBitmapIcon(void* icon);
 extern "C" RT_API void* WinGraphicsCreateBitmapResource(const char* resourceName);
 extern "C" RT_API uint32_t WinGraphicsSave(void* graphics);
 extern "C" RT_API int WinGraphicsRestore(void* graphics, uint32_t graphicsState);
+extern "C" RT_API void* WinGraphicsCreateDefaultImageAttributes();
+extern "C" RT_API int WinGraphicsImageAttributesGetLastStatus(void* imageAttributes);
+extern "C" RT_API void* WinGraphicsCloneImageAttributes(void* imageAttributes);
+extern "C" RT_API void WinGraphicsDeleteImageAttributes(void* imageAttributes);
+extern "C" RT_API int WinGraphicsImageAttributesSetColorKey(void* imageAttributes, uint8_t colorLowAlpha, uint8_t colorLowRed, uint8_t colorLowGreen, uint8_t colorLowBlue,
+    uint8_t colorHighAlpha, uint8_t colorHighRed, uint8_t colorHighGreen, uint8_t colorHighBlue, int colorAdjustType);
 extern "C" RT_API int WinGraphicsDrawImagePoint(void* graphics, void* image, float x, float y);
 extern "C" RT_API int WinGraphicsDrawImageRect(void* graphics, void* image, float x, float y, float w, float h);
+extern "C" RT_API int WinGrapchisDrawImageWithAttributes(void* graphics, void* image, int destRectX, int destRectY, int destRectW, int destRectH, int srcX, int srcY, int srcW, int srcH,
+    int srcUnit, void* imageAttributes);
 extern "C" RT_API int WinGraphicsGetTransform(void* graphics, void* matrix);
 extern "C" RT_API int WinGraphicsSetTransform(void* graphics, void* matrix);
 extern "C" RT_API int WinGraphicsMultiplyTransform(void* graphics, void* matrix, int order);

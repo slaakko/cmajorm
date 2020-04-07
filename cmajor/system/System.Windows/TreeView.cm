@@ -20,7 +20,7 @@ namespace System.Windows
         public TreeView(const Font& font_, const Color& backgroundColor, const Color& stateIndicatorColor_, const Color& nodeSelectedColor_, const Color& textColor_,
             const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.TreeView", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, "treeView",
-                location, size, dock, anchors), flags(Flags.none), root(), font(font_), textHeight(0), stateIndicatorPercentage(0.5f),
+                location, size, dock, anchors), flags(Flags.none), root(), font(font_), textHeight(0), stateIndicatorPercentage(50.0f),
                 stateIndicatorColor(stateIndicatorColor_), nodeSelectedColor(nodeSelectedColor_), nodeSelectedBrush(nodeSelectedColor), textColor(textColor_), textBrush(textColor), 
                 format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5), selectedNode(null), trackedNode(null), toolTipWindow(new ToolTip())
         {
@@ -29,6 +29,19 @@ namespace System.Windows
         public TreeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this(Font(FontFamily("Segoe UI"), 9.0f), Color.White(), Color.Red(), Color(201u, 222u, 245u), Color.Black(), location, size, dock, anchors)
         {
+        }
+        public ~TreeView()
+        {
+            if (toolTipWindow != null && ToolTipWindowAdded())
+            {
+                ResetToolTipWindowAdded();
+                Window* window = GetWindow();
+                if (window != null)
+                {
+                    window->RemoveChild(toolTipWindow);
+                    toolTipWindow = null;
+                }
+            }
         }
         public override void PrintWindowTree(int level)
         {
@@ -420,7 +433,7 @@ namespace System.Windows
             string s = "RootNode";
             RectF textRect = graphics.MeasureStringChecked(s, font, PointF(0, 0), format);
             textHeight = textRect.size.h;
-            stateIndicatorHeight = stateIndicatorPercentage * textHeight;
+            stateIndicatorHeight = stateIndicatorPercentage * textHeight / 100.0f;
             SetScrollUnits(cast<int>(textHeight), cast<int>(textHeight));
         }
         private void MakeStateIndicatorBitmaps(Graphics& graphics)

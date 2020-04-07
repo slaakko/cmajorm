@@ -1,0 +1,68 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace spring
+{
+    public static class Tools
+    {
+        static nothrow Tools() : currentTool(&selectTool)
+        {
+        }
+        public static nothrow inline Tool* Current()
+        {
+            return currentTool;
+        }
+        public static nothrow void SetCurrent(Tool* tool)
+        {
+            currentTool = tool;
+        }
+        public static nothrow Tool& GetSelectTool()
+        {
+            return selectTool;
+        }
+        public static nothrow Tool& GetClassTool()
+        {
+            return classTool;
+        }
+        private static SelectTool selectTool;
+        private static ClassTool classTool;
+        private static Tool* currentTool;
+    }
+
+    public abstract class Tool
+    {
+        public default virtual ~Tool();
+        public nothrow void SetToolButton(ToolButton* toolButton_)
+        {
+            toolButton = toolButton_;
+            toolButton->ClickEvent().AddHandler(ToolButtonClicked);
+        }
+        public nothrow void SetCursor(Cursor* cursor_)
+        {
+            cursor = cursor_;
+        }
+        public nothrow inline Cursor* GetCursor() const
+        {
+            return cursor;
+        }
+        private nothrow void ToolButtonClicked()
+        {
+            Tools.SetCurrent(this);
+        }
+        private ToolButton* toolButton;
+        private Cursor* cursor;
+    }
+
+    public class SelectTool : Tool
+    {
+    }
+
+    public class ClassTool : Tool
+    {
+    }
+}

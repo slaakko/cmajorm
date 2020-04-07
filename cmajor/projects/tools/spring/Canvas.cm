@@ -18,6 +18,10 @@ namespace spring
         public Canvas() : this(Color.White(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none) // todo
         {
         }
+        protected override void SetCursor()
+        {
+            SetCursor(*Tools.Current()->GetCursor());
+        }
         protected override void OnPaint(PaintEventArgs& args)
         {
             Unit prevUnit = args.graphics.GetPageUnitChecked();

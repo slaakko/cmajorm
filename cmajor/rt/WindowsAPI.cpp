@@ -942,6 +942,16 @@ void WinGraphicsDeleteImage(void* image)
     delete static_cast<Image*>(image);
 }
 
+uint32_t WinGraphicsImageGetHeight(void* image)
+{
+    return static_cast<Image*>(image)->GetHeight();
+}
+
+uint32_t WinGraphicsImageGetWidth(void* image)
+{
+    return static_cast<Image*>(image)->GetWidth();
+}
+
 void* WinGraphicsCreateBitmap(const char* fileName, bool useEmbeddedColorManagement)
 {
     std::u16string fname(ToUtf16(fileName));
@@ -979,6 +989,33 @@ int WinGraphicsRestore(void* graphics, uint32_t graphicsState)
     return static_cast<Graphics*>(graphics)->Restore(graphicsState);
 }
 
+void* WinGraphicsCreateDefaultImageAttributes()
+{
+    return new ImageAttributes();
+}
+
+int WinGraphicsImageAttributesGetLastStatus(void* imageAttributes)
+{
+    return static_cast<ImageAttributes*>(imageAttributes)->GetLastStatus();
+}
+
+void* WinGraphicsCloneImageAttributes(void* imageAttributes)
+{
+    return static_cast<ImageAttributes*>(imageAttributes)->Clone();
+}
+
+void WinGraphicsDeleteImageAttributes(void* imageAttributes)
+{
+    delete static_cast<ImageAttributes*>(imageAttributes);
+}
+
+int WinGraphicsImageAttributesSetColorKey(void* imageAttributes, uint8_t colorLowAlpha, uint8_t colorLowRed, uint8_t colorLowGreen, uint8_t colorLowBlue,
+    uint8_t colorHighAlpha, uint8_t colorHighRed, uint8_t colorHighGreen, uint8_t colorHighBlue, int colorAdjustType)
+{
+    return static_cast<ImageAttributes*>(imageAttributes)->SetColorKey(Color(colorLowAlpha, colorLowRed, colorLowGreen, colorLowBlue), Color(colorHighAlpha, colorHighRed, colorHighGreen, colorHighBlue),
+        static_cast<ColorAdjustType>(colorAdjustType));
+}
+
 int WinGraphicsDrawImagePoint(void* graphics, void* image, float x, float y)
 {
     return static_cast<Graphics*>(graphics)->DrawImage(static_cast<Image*>(image), PointF(x, y));
@@ -987,6 +1024,13 @@ int WinGraphicsDrawImagePoint(void* graphics, void* image, float x, float y)
 int WinGraphicsDrawImageRect(void* graphics, void* image, float x, float y, float w, float h)
 {
     return static_cast<Graphics*>(graphics)->DrawImage(static_cast<Image*>(image), RectF(x, y, w, h));
+}
+
+int WinGrapchisDrawImageWithAttributes(void* graphics, void* image, int destRectX, int destRectY, int destRectW, int destRectH, int srcX, int srcY, int srcW, int srcH,
+    int srcUnit, void* imageAttributes)
+{
+    return static_cast<Graphics*>(graphics)->DrawImage(static_cast<Image*>(image), Rect(destRectX, destRectY, destRectW, destRectH), srcX, srcY, srcW, srcH, static_cast<Unit>(srcUnit),
+        static_cast<ImageAttributes*>(imageAttributes), nullptr, nullptr);
 }
 
 int WinGraphicsGetTransform(void* graphics, void* matrix)
@@ -1541,4 +1585,5 @@ bool WinRegGetDWordValue(void* key, const char* subKey, const char* valueName, u
     }
     return status == ERROR_SUCCESS;
 }
+
 

@@ -33,13 +33,13 @@ namespace spring
         public Diagram() : flags(Flags.none), layout(), elements()
         {
             SetChanged();
-            UniquePtr<ConcreteClassElement> concreteClassElement(new ConcreteClassElement("ConcreteClass"));
+            UniquePtr<ClassElement> concreteClassElement(new ClassElement("ConcreteClass", false));
             concreteClassElement->SetLocation(PointF(5.0f, 5.0f));
             concreteClassElement->Operations().Add(new OperationElement("Foo"));
             concreteClassElement->Operations().Add(new OperationElement("Bar"));
             concreteClassElement->Operations().Add(new OperationElement("Baz"));
             elements.Add(concreteClassElement.Release());
-            UniquePtr<AbstractClassElement> abstractClassElement(new AbstractClassElement("AbstractClass"));
+            UniquePtr<ClassElement> abstractClassElement(new ClassElement("AbstractClass", true));
             abstractClassElement->SetLocation(PointF(50.0f, 5.0f));
             elements.Add(abstractClassElement.Release());
         }
@@ -285,7 +285,7 @@ namespace spring
 
     public abstract class ClassElement : DiagramElement
     {
-        public nothrow ClassElement(const string& name) : base(name)
+        public nothrow ClassElement(const string& name, bool isAbstract_) : base(name), isAbstract(isAbstract_)
         {
             SetSize(SizeF(cast<float>(DefaultMinClassHeight() + DefaultMinClassHeight() / GoldenRatio()), DefaultMinClassHeight()));
         }
@@ -293,16 +293,122 @@ namespace spring
         suppress void operator=(const ClassElement&);
         suppress ClassElement(ClassElement&&);
         suppress void operator=(ClassElement&&);
+        public nothrow inline bool IsAbstract() const
+        {
+            return isAbstract;
+        }
+        public nothrow inline void SetAbstract(bool isAbstract_)
+        {
+            isAbstract = isAbstract_;
+        }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
             DrawFrame(graphics, layout);
             DrawCaption(graphics, layout);
         }
-        protected abstract void DrawCaption(Graphics& graphics, Layout& layout);
-        protected abstract void DrawFrame(Graphics& graphics, Layout& layout);
+        public override void Measure(Graphics& graphics, Layout& layout)
+        {
+            if (!isAbstract)
+            {
+                MeasureConcreteClass(graphics, layout);
+            }
+            else
+            {
+                MeasureAbstractClass(graphics, layout);
+            }
+        }
+        private void MeasureConcreteClass(Graphics& graphics, Layout& layout)
+        {
+            const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            const Font& font = fontElement.GetFont();
+            RectF r = graphics.MeasureStringChecked(Name(), font, PointF(0, 0), layout.GetStringFormat());
+            captionTextHeight = r.size.h;
+        }
+        private void MeasureAbstractClass(Graphics& graphics, Layout& layout)
+        {
+            const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            const Font& font = fontElement.GetFont();
+            RectF r = graphics.MeasureStringChecked(Name(), font, PointF(0, 0), layout.GetStringFormat());
+            captionTextHeight = r.size.h;
+        }
+        private void DrawFrame(Graphics& graphics, Layout& layout)
+        {
+            if (!isAbstract)
+            {
+                DrawConcreteClassFrame(graphics, layout);
+            }
+            else
+            {
+                DrawAbstractClassFrame(graphics, layout);
+            }
+        }
+        private void DrawCaption(Graphics& graphics, Layout& layout)
+        {
+            if (!isAbstract)
+            {
+                DrawConcreteClassCaption(graphics, layout);
+            }
+            else
+            {
+                DrawAbstractClassCaption(graphics, layout);
+            }
+        }
+        private void DrawConcreteClassFrame(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
+            graphics.DrawRectangleChecked(layoutElement.FramePen(), BoundingRect());
+            float y = paddingElement.Vertical() + captionTextHeight;
+            PointF location = Location();
+            PointF start(location.x, location.y + y);
+            PointF end(location.x + GetSize().w, location.y + y);
+            const Pen& framePen = layoutElement.FramePen();
+            graphics.DrawLineChecked(framePen, start, end);
+        }
+        private void DrawAbstractClassFrame(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
+            graphics.DrawRectangleChecked(layoutElement.FramePen(), BoundingRect());
+            float y = paddingElement.Vertical() + captionTextHeight;
+            PointF location = Location();
+            PointF start(location.x, location.y + y);
+            PointF end(location.x + GetSize().w, location.y + y);
+            const Pen& framePen = layoutElement.FramePen();
+            graphics.DrawLineChecked(framePen, start, end);
+        }
+        private void DrawConcreteClassCaption(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            PointF location = Location();
+            PointF origin(location.x + paddingElement.left, location.y + paddingElement.top);
+            const Font& font = fontElement.GetFont();
+            const Brush& brush = layoutElement.TextBrush();
+            graphics.DrawStringChecked(Name(), font, origin, brush);
+        }
+        private void DrawAbstractClassCaption(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            PointF location = Location();
+            PointF origin(location.x + paddingElement.left, location.y + paddingElement.top);
+            const Font& font = fontElement.GetFont();
+            const Brush& brush = layoutElement.TextBrush();
+            graphics.DrawStringChecked(Name(), font, origin, brush);
+        }
         public override void Read(System.Dom.Element* parentElement)
         {
             base->Read(parentElement);
+            isAbstract = ParseBool(ToUtf8(parentElement->GetAttribute(u"abstract")));
             UniquePtr<XPathObject> operationResult = Evaluate(u"operation", parentElement);
             if (!operationResult.IsNull())
             {
@@ -347,6 +453,7 @@ namespace spring
         public override void Write(System.Dom.Element* parentElement)
         {
             base->Write(parentElement);
+            parentElement->SetAttribute(u"abstract", ToUtf32(System.ToString(isAbstract)));
             for (const UniquePtr<OperationElement>& operation : operations)
             {
                 UniquePtr<System.Dom.Element> element = new System.Dom.Element(u"operation");
@@ -363,6 +470,7 @@ namespace spring
         public override void SetFrom(DiagramElement* that)
         {
             base->SetFrom(that);
+            isAbstract = cast<ClassElement*>(that)->isAbstract;
             operations.Clear();
             for (UniquePtr<OperationElement>& operation : cast<ClassElement*>(that)->operations)
             {
@@ -392,116 +500,7 @@ namespace spring
         }
         private IndexList<OperationElement> operations;
         private IndexList<FieldElement> fields;
-    }
-
-    public class ConcreteClassElement : ClassElement
-    {
-        public nothrow ConcreteClassElement(const string& name) : base(name), captionTextHeight(0.0f)
-        {
-        }
-        suppress ConcreteClassElement(const ConcreteClassElement&);
-        suppress void operator=(const ConcreteClassElement&);
-        suppress ConcreteClassElement(ConcreteClassElement&&);
-        suppress void operator=(ConcreteClassElement&&);
-        public override DiagramElement* Clone() const
-        {
-            ConcreteClassElement* clone = new ConcreteClassElement();
-            clone->SetFrom(this);
-            return clone;
-        }
-        protected override void DrawCaption(Graphics& graphics, Layout& layout)
-        {
-            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
-            const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
-            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
-            const FontElement& fontElement = captionLayoutElement.GetFontElement();
-            PointF location = Location();
-            PointF origin(location.x + paddingElement.left, location.y + paddingElement.top);
-            const Font& font = fontElement.GetFont();
-            const Brush& brush = layoutElement.TextBrush();
-            graphics.DrawStringChecked(Name(), font, origin, brush);
-        }
-        protected override void DrawFrame(Graphics& graphics, Layout& layout)
-        {
-            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
-            const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
-            graphics.DrawRectangleChecked(layoutElement.FramePen(), BoundingRect());
-            float y = paddingElement.Vertical() + captionTextHeight;
-            PointF location = Location();
-            PointF start(location.x, location.y + y);
-            PointF end(location.x + GetSize().w, location.y + y);
-            const Pen& framePen = layoutElement.FramePen();
-            graphics.DrawLineChecked(framePen, start, end);
-        }
-        public override void Measure(Graphics& graphics, Layout& layout)
-        {
-            const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
-            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
-            const FontElement& fontElement = captionLayoutElement.GetFontElement();
-            const Font& font = fontElement.GetFont();
-            RectF r = graphics.MeasureStringChecked(Name(), font, PointF(0, 0), layout.GetStringFormat());
-            captionTextHeight = r.size.h;
-        }
-        public override void SetFrom(DiagramElement* that)
-        {
-            base->SetFrom(that);
-        }
-        private float captionTextHeight;
-    }
-
-    public class AbstractClassElement : ClassElement
-    {
-        public nothrow AbstractClassElement(const string& name) : base(name)
-        {
-        }
-        suppress AbstractClassElement(const AbstractClassElement&);
-        suppress void operator=(const AbstractClassElement&);
-        suppress AbstractClassElement(AbstractClassElement&&);
-        suppress void operator=(AbstractClassElement&&);
-        public override DiagramElement* Clone() const
-        {
-            AbstractClassElement* clone = new AbstractClassElement();
-            clone->SetFrom(this);
-            return clone;
-        }
-        protected override void DrawCaption(Graphics& graphics, Layout& layout)
-        {
-            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
-            const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
-            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
-            const FontElement& fontElement = captionLayoutElement.GetFontElement();
-            PointF location = Location();
-            PointF origin(location.x + paddingElement.left, location.y + paddingElement.top);
-            const Font& font = fontElement.GetFont();
-            const Brush& brush = layoutElement.TextBrush();
-            graphics.DrawStringChecked(Name(), font, origin, brush);
-        }
-        protected override void DrawFrame(Graphics& graphics, Layout& layout)
-        {
-            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
-            const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
-            graphics.DrawRectangleChecked(layoutElement.FramePen(), BoundingRect());
-            float y = paddingElement.Vertical() + captionTextHeight;
-            PointF location = Location();
-            PointF start(location.x, location.y + y);
-            PointF end(location.x + GetSize().w, location.y + y);
-            const Pen& framePen = layoutElement.FramePen();
-            graphics.DrawLineChecked(framePen, start, end);
-        }
-        public override void Measure(Graphics& graphics, Layout& layout)
-        {
-            const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
-            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
-            const FontElement& fontElement = captionLayoutElement.GetFontElement();
-            const Font& font = fontElement.GetFont();
-            RectF r = graphics.MeasureStringChecked(Name(), font, PointF(0, 0), layout.GetStringFormat());
-            captionTextHeight = r.size.h;
-        }
-        public override void SetFrom(DiagramElement* that)
-        {
-            base->SetFrom(that);
-        }
+        private bool isAbstract;
         private float captionTextHeight;
     }
 }
-

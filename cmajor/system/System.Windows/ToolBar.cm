@@ -1,0 +1,683 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public class ToolBar : Control
+    {
+        private enum Flags : sbyte
+        {
+            none = 0, toolTipWindowAdded = 1 << 0
+        }
+        public enum Style
+        {
+            regular = 0, radioButtonGroup = 1
+        }
+        public ToolBar(const Color& backgroundColor, const Color& toolButtonTransparentColor_, const Point& location, const Size& size, Dock dock, Anchors anchors, int toolButtonSize_, Style style_) :
+            base("System.Windows.ToolBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, "toolBar", location, size, dock, anchors),
+            flags(Flags.none), toolButtonTransparentColor(toolButtonTransparentColor_), toolButtonSize(toolButtonSize_),
+            darkColor(Color(100u, 100u, 100u)), lightColor(Color.White()), mediumLightColor(227u, 227u, 227u), mediumDarkColor(160u, 160u, 160u),
+            mouseInToolButton(null), mouseDownToolButton(null), pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip())
+        {
+        }
+        public ToolBar(int toolButtonSize, const Color& toolButtonTransparentColor, Style style) :
+            this(DefaultControlBackgroundColor(), toolButtonTransparentColor, Point(), Size(0, toolButtonSize), Dock.top, Anchors.none, toolButtonSize, style)
+        {
+        }
+        public ToolBar(Style style) : this(38, Color(0u, 128u, 128u), style)
+        {
+        }
+        public ToolBar() : this(Style.regular)
+        {
+        }
+        public ~ToolBar()
+        {
+            if (toolTipWindow != null && ToolTipWindowAdded())
+            {
+                ResetToolTipWindowAdded();
+                Window* window = GetWindow();
+                if (window != null)
+                {
+                    window->RemoveChild(toolTipWindow);
+                    toolTipWindow = null;
+                }
+            }
+        }
+        public nothrow inline Style GetStyle() const
+        {
+            return style;
+        }
+        public nothrow inline const Color& DarkColor() const
+        {
+            return darkColor;
+        }
+        public nothrow void SetDarkColor(const Color& darkColor_)
+        {
+            darkColor = darkColor_;
+        }
+        public nothrow inline const Color& LightColor() const
+        {
+            return lightColor;
+        }
+        public nothrow void SetLightColor(const Color& lightColor_)
+        {
+            lightColor = lightColor_;
+        }
+        public nothrow inline const Color& MediumLightColor() const
+        {
+            return mediumLightColor;
+        }
+        public nothrow void SetMediumLightColor(const Color& mediumLightColor_)
+        {
+            mediumLightColor = mediumLightColor_;
+        }
+        public nothrow inline const Color& MediumDarkColor() const
+        {
+            return mediumDarkColor;
+        }
+        public nothrow void SetMediumDarkColor(const Color& mediumDarkColor_)
+        {
+            mediumDarkColor = mediumDarkColor_;
+        }
+        public void AddToolButton(ToolButton* toolButton)
+        {
+            toolButton->SetToolBar(this);
+            toolButtons.Add(UniquePtr<ToolButton>(toolButton));
+            toolButton->SetTransparentColor(toolButtonTransparentColor);
+            SetToolButtonBitmap(toolButton);
+            if (style == Style.radioButtonGroup)
+            {
+                if (pressedStateToolButton == null)
+                {
+                    SetPressedStateToolButton(toolButton);
+                }
+            }
+        }
+        public nothrow ToolButton* GetToolButton(int toolButtonIndex) const
+        {
+            return toolButtons[toolButtonIndex].Get();
+        }
+        public nothrow inline ToolButton* PressedStateToolButton() const
+        {
+            if (style == Style.radioButtonGroup)
+            {
+                return pressedStateToolButton;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public void SetPressedStateToolButton(ToolButton* newPressedStateToolButton)
+        {
+            if (style == Style.radioButtonGroup)
+            {
+                if (pressedStateToolButton != newPressedStateToolButton)
+                {
+                    if (pressedStateToolButton != null)
+                    {
+                        pressedStateToolButton->SetState(ToolButton.State.normal);
+                    }
+                    pressedStateToolButton = newPressedStateToolButton;
+                    if (pressedStateToolButton != null)
+                    {
+                        pressedStateToolButton->SetState(ToolButton.State.pressed);
+                    }
+                }
+            }
+        }
+        public nothrow void ResetPressedStateToolButton()
+        {
+            if (style == Style.radioButtonGroup)
+            {
+                pressedStateToolButton = null;
+            }
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            if (!ToolTipWindowAdded())
+            {
+                SetToolTipWindowAdded();
+                Window* window = GetWindow();
+                if (window != null)
+                {
+                    window->AddChild(toolTipWindow);
+                }
+            }
+            args.graphics.Clear(BackgroundColor());
+            Point origin;
+            long n = toolButtons.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                ToolButton* toolButton = toolButtons[i].Get();
+                toolButton->SetLocation(origin);
+                toolButton->Draw(args.graphics, origin);
+                origin.x = origin.x + toolButtonSize;
+            }
+            base->OnPaint(args);
+        }
+        protected override void OnMouseEnter()
+        {
+            base->OnMouseEnter();
+            mouseInToolButton = null;
+            mouseDownToolButton = null;
+        }
+        protected override void OnMouseLeave()
+        {
+            base->OnMouseLeave();
+            if (mouseInToolButton != null)
+            {
+                mouseInToolButton->MouseLeaveInternal();
+            }
+            mouseInToolButton = null;
+            mouseDownToolButton = null;
+        }
+        protected override void OnMouseMove(MouseEventArgs& args)
+        {
+            base->OnMouseMove(args);
+            ToolButton* toolButton = GetToolButtonAt(args.location);
+            if (toolButton != null)
+            {
+                if (mouseInToolButton != toolButton)
+                {
+                    if (mouseInToolButton != null)
+                    {
+                        mouseInToolButton->MouseLeaveInternal();
+                        mouseInToolButton = null;
+                    }
+                    mouseInToolButton = toolButton;
+                    mouseInToolButton->MouseEnterInternal();
+                }
+                toolButton->MouseMoveInternal(args);
+            }
+        }
+        protected override void OnMouseDown(MouseEventArgs& args)
+        {
+            base->OnMouseDown(args);
+            if (style == Style.regular)
+            {
+                ToolButton* toolButton = GetToolButtonAt(args.location);
+                if (toolButton != null)
+                {
+                    if (args.buttons == MouseButtons.lbutton)
+                    {
+                        mouseDownToolButton = toolButton;
+                    }
+                    toolButton->MouseDownInternal(args);
+                    if (args.buttons == MouseButtons.lbutton)
+                    {
+                        toolButton->SetState(ToolButton.State.pressed);
+                    }
+                }
+                WinSetCapture(Handle());
+            }
+            else if (style == Style.radioButtonGroup)
+            {
+                ToolButton* toolButton = GetToolButtonAt(args.location);
+                if (toolButton != null)
+                {
+                    if (args.buttons == MouseButtons.lbutton)
+                    {
+                        SetPressedStateToolButton(toolButton);
+                        toolButton->DoClick();
+                    }
+                }
+            }
+        }
+        protected override void OnMouseUp(MouseEventArgs& args)
+        {
+            base->OnMouseUp(args);
+            if (style == Style.regular)
+            {
+                ToolButton* toolButton = GetToolButtonAt(args.location);
+                if (toolButton != null)
+                {
+                    toolButton->MouseUpInternal(args);
+                    if (args.buttons == MouseButtons.lbutton)
+                    {
+                        if (toolButton == mouseDownToolButton)
+                        {
+                            toolButton->DoClick();
+                        }
+                    }
+                }
+                if (mouseDownToolButton != null)
+                {
+                    mouseDownToolButton->SetState(ToolButton.State.normal);
+                }
+                mouseDownToolButton = null;
+                WinReleaseCapture();
+            }
+        }
+        internal void ShowToolTipWindow(ToolButton* toolButton)
+        {
+            toolTipWindow->Hide();
+            Point loc = toolButton->Location();
+            Size size = toolButton->GetSize();
+            toolTipWindow->SetText(toolButton->GetToolTip());
+            toolTipWindow->MeasureExtent();
+            Point pt(loc.x + size.w + toolButton->GetPadding().left, loc.y + (size.h - toolTipWindow->GetSize().h) / 2);
+            pt = ClientToScreen(pt);
+            Window* window = GetWindow();
+            if (window != null)
+            {
+                pt = window->ScreenToClient(pt);
+                Size sz = toolTipWindow->GetSize();
+                Point wloc = window->Location();
+                Size wsz = window->GetSize();
+                if (pt.y + sz.h > wloc.y + wsz.h)
+                {
+                    pt.y = wloc.y + wsz.h - sz.h;
+                }
+                if (pt.x + sz.w > wloc.x + wsz.w)
+                {
+                    pt.x = wloc.x + wsz.w - sz.w;
+                }
+                toolTipWindow->SetLocation(pt);
+                toolTipWindow->BringToFront();
+                toolTipWindow->Show();
+                toolTipWindow->Invalidate();
+                toolTipWindow->Update();
+            }
+        }
+        internal void HideToolTipWindow()
+        {
+            toolTipWindow->Hide();
+        }
+        private void SetToolButtonBitmap(ToolButton* toolButton)
+        {
+            Bitmap* toolBitmap = GetOrCreateBitmap(toolButton->ToolBitmapName());
+            toolButton->SetToolBitmap(toolBitmap);
+        }
+        private Bitmap* GetOrCreateBitmap(const string& bitmapName)
+        {
+            HashMap<string, Bitmap*>.ConstIterator it = bitmapMap.CFind(bitmapName);
+            if (it != bitmapMap.CEnd())
+            {
+                return it->second;
+            }
+            UniquePtr<Bitmap> bitmapPtr(new Bitmap(Bitmap.FromResource(bitmapName)));
+            Bitmap* bitmap = bitmapPtr.Get();
+            bitmapMap[bitmapName] = bitmap;
+            bitmaps.Add(Rvalue(bitmapPtr));
+            return bitmap;
+        }
+        private nothrow ToolButton* GetToolButtonAt(const Point& location) const
+        {
+            Size size = GetSize();
+            if (location.y >= 0 && location.y < size.h && location.x >= 0 && location.x < size.w)
+            {
+                int buttonIndex = location.x / toolButtonSize;
+                if (buttonIndex >= 0 && buttonIndex < toolButtons.Count())
+                {
+                    return toolButtons[buttonIndex].Get();
+                }
+            }
+            return null;
+        }
+        private nothrow inline bool ToolTipWindowAdded() const
+        {
+            return (flags & Flags.toolTipWindowAdded) != Flags.none;
+        }
+        private nothrow inline void SetToolTipWindowAdded()
+        {
+            flags = cast<Flags>(flags | Flags.toolTipWindowAdded);
+        }
+        private nothrow inline void ResetToolTipWindowAdded()
+        {
+            flags = cast<Flags>(flags & ~Flags.toolTipWindowAdded);
+        }
+        private Flags flags;
+        private List<UniquePtr<ToolButton>> toolButtons;
+        private Color toolButtonTransparentColor;
+        private int toolButtonSize;
+        private List<UniquePtr<Bitmap>> bitmaps;
+        private HashMap<string, Bitmap*> bitmapMap;
+        private Color darkColor;
+        private Color lightColor;
+        private Color mediumLightColor;
+        private Color mediumDarkColor;
+        private ToolButton* mouseInToolButton;
+        private ToolButton* mouseDownToolButton;
+        private ToolButton* pressedStateToolButton;
+        private Style style;
+        private ToolTip* toolTipWindow;
+    }
+
+    public class ToolButton
+    {
+        public enum State
+        {
+            normal, pressed
+        }
+
+        public nothrow ToolButton(const string& toolBitmapName_) : state(State.normal), toolBitmapName(toolBitmapName_), toolBitmap(null), transparentColor(Color(0u, 128u, 128u))
+        {
+        }
+        public default virtual ~ToolButton();
+        internal nothrow Padding GetPadding() const
+        {
+            return DefaultPadding();
+        }
+        protected virtual nothrow Padding DefaultPadding()
+        {
+            return Padding(3, 3, 3, 3);
+        }
+        public nothrow void SetToolBar(ToolBar* toolBar_)
+        {
+            toolBar = toolBar_;
+        }
+        public void SetState(State state_)
+        {
+            if (state != state_)
+            {
+                if (state_ == State.pressed)
+                {
+                    if (toolBar->GetStyle() == ToolBar.Style.radioButtonGroup)
+                    {
+                        if (toolBar->PressedStateToolButton() != this)
+                        {
+                            toolBar->SetPressedStateToolButton(this);
+                        }
+                    }
+                }
+                else if (state_ == State.normal)
+                {
+                    if (toolBar->GetStyle() == ToolBar.Style.radioButtonGroup)
+                    {
+                        if (toolBar->PressedStateToolButton() == this)
+                        {
+                            toolBar->ResetPressedStateToolButton();
+                        }
+                    }
+                }
+                state = state_;
+                Invalidate();
+            }
+        }
+        public nothrow void SetToolTip(const string& toolTip_)
+        {
+            if (toolTip != toolTip_)
+            {
+                toolTip = toolTip_;
+                Invalidate();
+            }
+        }
+        public nothrow inline const string& GetToolTip() const
+        {
+            return toolTip;
+        }
+        public nothrow inline const Point& Location() const
+        {
+            return location;
+        }
+        public nothrow void SetLocation(const Point& location_)
+        {
+            location = location_;
+        }
+        public nothrow inline const Size& GetSize() const
+        {
+            return size;
+        }
+        public nothrow void SetTransparentColor(const Color& transparentColor_)
+        {
+            transparentColor = transparentColor_;
+        }
+        internal void MouseEnterInternal()
+        {
+            OnMouseEnter();
+            if (!toolTip.IsEmpty() && toolBar != null)
+            {
+                toolBar->ShowToolTipWindow(this);
+            }
+        }
+        protected virtual void OnMouseEnter()
+        {
+            mouseEnterEvent.Fire();
+        }
+        public nothrow Event<MouseEnterEventHandler>& MouseEnterEvent() const
+        {
+            return mouseEnterEvent;
+        }
+        internal void MouseLeaveInternal()
+        {
+            OnMouseLeave();
+            if (!toolTip.IsEmpty() && toolBar != null)
+            {
+                toolBar->HideToolTipWindow();
+            }
+        }
+        protected virtual void OnMouseLeave()
+        {
+            mouseLeaveEvent.Fire();
+        }
+        public nothrow Event<MouseLeaveEventHandler>& MouseLeaveEvent() const
+        {
+            return mouseLeaveEvent;
+        }
+        internal void MouseMoveInternal(MouseEventArgs& args)
+        {
+            OnMouseMove(args);
+        }
+        protected virtual void OnMouseMove(MouseEventArgs& args)
+        {
+            mouseMoveEvent.Fire(args);
+        }
+        public nothrow Event<MouseEventHandler, MouseEventArgs>& MouseMoveEvent() const
+        {
+            return mouseMoveEvent;
+        }
+        internal void MouseDownInternal(MouseEventArgs& args)
+        {
+            OnMouseDown(args);
+        }
+        protected virtual void OnMouseDown(MouseEventArgs& args)
+        {
+            mouseDownEvent.Fire(args);
+        }
+        public nothrow Event<MouseEventHandler, MouseEventArgs>& MouseDownEvent() const
+        {
+            return mouseDownEvent;
+        }
+        internal void MouseUpInternal(MouseEventArgs& args)
+        {
+            OnMouseUp(args);
+        }
+        protected virtual void OnMouseUp(MouseEventArgs& args)
+        {
+            mouseUpEvent.Fire(args);
+        }
+        public nothrow Event<MouseEventHandler, MouseEventArgs>& MouseUpEvent() const
+        {
+            return mouseUpEvent;
+        }
+        internal void DoClick()
+        {
+            OnClick();
+        }
+        protected virtual void OnClick()
+        {
+            clickEvent.Fire();
+        }
+        public nothrow Event<ClickEventHandler>& ClickEvent() const
+        {
+            return clickEvent;
+        }
+        public virtual void Draw(Graphics& graphics, const Point& location)
+        {
+            Rect bounds(location, size);
+            switch (state)
+            {
+                case State.normal:
+                {
+                    DrawNormal(graphics, location);
+                    break;
+                }
+                case State.pressed:
+                {
+                    DrawPressed(graphics, location);
+                    break;
+                }
+            }
+        }
+        private void DrawNormal(Graphics& graphics, const Point& location)
+        {
+            Pen darkPen(toolBar->DarkColor(), 1.0f);
+            Rect rect(location, size);
+            rect.size.w = rect.size.w - 1;
+            rect.size.h = rect.size.h - 1;
+            graphics.DrawRectangleChecked(darkPen, rect);
+            Point startRightInnerDarkLoc = location;
+            startRightInnerDarkLoc.x = startRightInnerDarkLoc.x + size.w - 2;
+            Point endRightInnerDarkLoc = location;
+            endRightInnerDarkLoc.x = endRightInnerDarkLoc.x + size.w - 2;
+            endRightInnerDarkLoc.y = endRightInnerDarkLoc.y + size.h - 1;
+            graphics.DrawLineChecked(darkPen, startRightInnerDarkLoc, endRightInnerDarkLoc);
+            Point startBottomInnerDarkLoc = location;
+            startBottomInnerDarkLoc.x = startBottomInnerDarkLoc.x + 1;
+            startBottomInnerDarkLoc.y = startBottomInnerDarkLoc.y + size.h - 2;
+            Point endBottomInnerDarkLoc = location;
+            endBottomInnerDarkLoc.x = endBottomInnerDarkLoc.x + size.w - 2;
+            endBottomInnerDarkLoc.y = endBottomInnerDarkLoc.y + size.h - 2;
+            graphics.DrawLineChecked(darkPen, startBottomInnerDarkLoc, endBottomInnerDarkLoc);
+            Pen lightPen(toolBar->LightColor(), 1.0f);
+            Point startTopOuterLightLoc = location;
+            startTopOuterLightLoc.x = startTopOuterLightLoc.x + 1;
+            startTopOuterLightLoc.y = startTopOuterLightLoc.y + 1;
+            Point endTopOuterLightLoc = location;
+            endTopOuterLightLoc.x = endTopOuterLightLoc.x + size.w - 3;
+            endTopOuterLightLoc.y = endTopOuterLightLoc.y + 1;
+            graphics.DrawLineChecked(lightPen, startTopOuterLightLoc, endTopOuterLightLoc);
+            Point startLeftOuterLightLoc = location;
+            startLeftOuterLightLoc.x = startLeftOuterLightLoc.x + 1;
+            startLeftOuterLightLoc.y = startLeftOuterLightLoc.y + 1;
+            Point endLeftOuterLightLoc = location;
+            endLeftOuterLightLoc.x = endLeftOuterLightLoc.x + 1;
+            endLeftOuterLightLoc.y = endLeftOuterLightLoc.y + size.h - 3;
+            graphics.DrawLineChecked(lightPen, startLeftOuterLightLoc, endLeftOuterLightLoc);
+            Pen mediumLightPen(toolBar->MediumLightColor(), 1.0f);
+            Point startTopInnerLightLoc = location;
+            startTopInnerLightLoc.x = startTopInnerLightLoc.x + 2;
+            startTopInnerLightLoc.y = startTopInnerLightLoc.y + 2;
+            Point endTopInnerLightLoc = location;
+            endTopInnerLightLoc.x = endTopInnerLightLoc.x + size.w - 4;
+            endTopInnerLightLoc.y = endTopInnerLightLoc.y + 2;
+            graphics.DrawLineChecked(mediumLightPen, startTopInnerLightLoc, endTopInnerLightLoc);
+            Point startLeftInnerLightLoc = location;
+            startLeftInnerLightLoc.x = startLeftInnerLightLoc.x + 2;
+            startLeftInnerLightLoc.y = startLeftInnerLightLoc.y + 2;
+            Point endLeftInnerLightLoc = location;
+            endLeftInnerLightLoc.x = endLeftInnerLightLoc.x + 2;
+            endLeftInnerLightLoc.y = endLeftInnerLightLoc.y + size.h - 4;
+            graphics.DrawLineChecked(mediumLightPen, startLeftInnerLightLoc, endLeftInnerLightLoc);
+            Pen mediumDarkPen(toolBar->MediumDarkColor(), 1.0f);
+            Point startRightInnerMediumDarkLoc = location;
+            startRightInnerMediumDarkLoc.x = startRightInnerMediumDarkLoc.x + size.w - 3;
+            startRightInnerMediumDarkLoc.y = startRightInnerMediumDarkLoc.y + 2;
+            Point endRightInnerMediumDarkLoc = location;
+            endRightInnerMediumDarkLoc.x = endRightInnerMediumDarkLoc.x + size.w - 3;
+            endRightInnerMediumDarkLoc.y = endRightInnerMediumDarkLoc.y + size.h - 3;;
+            graphics.DrawLineChecked(mediumDarkPen, startRightInnerMediumDarkLoc, endRightInnerMediumDarkLoc);
+            Point startBottomInnerMediumDarkLoc = location;
+            startBottomInnerMediumDarkLoc.x = startBottomInnerMediumDarkLoc.x + 2;
+            startBottomInnerMediumDarkLoc.y = startBottomInnerMediumDarkLoc.y + size.h - 3;
+            Point endBottomInnerMediumDarkLoc = location;
+            endBottomInnerMediumDarkLoc.x = endBottomInnerMediumDarkLoc.x + size.w - 3;
+            endBottomInnerMediumDarkLoc.y = endBottomInnerMediumDarkLoc.y + size.h - 3;
+            graphics.DrawLineChecked(mediumDarkPen, startBottomInnerMediumDarkLoc, endBottomInnerMediumDarkLoc);
+            DrawToolBitmap(graphics, location);
+        }
+        private void DrawPressed(Graphics& graphics, const Point& location)
+        {
+            Pen darkPen(toolBar->DarkColor(), 1.0f);
+            Rect rect(location, size);
+            rect.size.w = rect.size.w - 1;
+            rect.size.h = rect.size.h - 1;
+            graphics.DrawRectangleChecked(darkPen, rect);
+
+            Point startTopInnerDarkLoc = location;
+            startTopInnerDarkLoc.x = startTopInnerDarkLoc.x + 1;
+            startTopInnerDarkLoc.y = startTopInnerDarkLoc.y + 1;
+            Point endTopInnerDarkLoc = location;
+            endTopInnerDarkLoc.x = endTopInnerDarkLoc.x + size.w - 2;
+            endTopInnerDarkLoc.y = endTopInnerDarkLoc.y + 1;
+            graphics.DrawLineChecked(darkPen, startTopInnerDarkLoc, endTopInnerDarkLoc);
+
+            Point startLeftInnerDarkLoc = location;
+            startLeftInnerDarkLoc.x = startLeftInnerDarkLoc.x + 1;
+            startLeftInnerDarkLoc.y = startLeftInnerDarkLoc.y + 2;
+            Point endLeftInnerDarkLoc = location;
+            endLeftInnerDarkLoc.x = endLeftInnerDarkLoc.x + 1;
+            endLeftInnerDarkLoc.y = endLeftInnerDarkLoc.y + size.h - 2;
+            graphics.DrawLineChecked(darkPen, startLeftInnerDarkLoc, endLeftInnerDarkLoc);
+
+            Pen mediumDarkPen(toolBar->MediumDarkColor(), 1.0f);
+            Point startTopInnerMediumDarkLoc = location;
+            startTopInnerMediumDarkLoc.x = startTopInnerMediumDarkLoc.x + 2;
+            startTopInnerMediumDarkLoc.y = startTopInnerMediumDarkLoc.y + 2;
+            Point endTopInnerMediumDarkLoc = location;
+            endTopInnerMediumDarkLoc.x = endTopInnerMediumDarkLoc.x + size.w - 2;
+            endTopInnerMediumDarkLoc.y = endTopInnerMediumDarkLoc.y + 2;
+            graphics.DrawLineChecked(mediumDarkPen, startTopInnerMediumDarkLoc, endTopInnerMediumDarkLoc);
+
+            Point startLeftInnerMediumDarkLoc = location;
+            startLeftInnerMediumDarkLoc.x = startLeftInnerMediumDarkLoc.x + 2;
+            startLeftInnerMediumDarkLoc.y = startLeftInnerMediumDarkLoc.y + 2;
+            Point endLeftInnerMediumDarkLoc = location;
+            endLeftInnerMediumDarkLoc.x = endLeftInnerMediumDarkLoc.x + 2;
+            endLeftInnerMediumDarkLoc.y = endLeftInnerMediumDarkLoc.y + size.h - 2;
+            graphics.DrawLineChecked(mediumDarkPen, startLeftInnerMediumDarkLoc, endLeftInnerMediumDarkLoc);
+
+            DrawToolBitmap(graphics, Point(location.x + 1, location.y + 1));
+        }
+        private void DrawToolBitmap(Graphics& graphics, const Point& location)
+        {
+            Point bitmapLocation(location);
+            Padding padding = DefaultPadding();
+            bitmapLocation.x = bitmapLocation.x + padding.left;
+            bitmapLocation.y = bitmapLocation.y + padding.top;
+            Rect r(bitmapLocation, toolBitmapSize);
+            ImageAttributes attributes;
+            attributes.SetColorKey(transparentColor, transparentColor, ColorAdjustType.default_);
+            graphics.DrawImageChecked(*toolBitmap, r, 0, 0, toolBitmapSize.w, toolBitmapSize.h, Unit.pixel, attributes);
+        }
+        public nothrow inline const string& ToolBitmapName() const
+        {
+            return toolBitmapName;
+        }
+        internal nothrow void SetToolBitmap(Bitmap* toolBitmap_)
+        {
+            toolBitmap = toolBitmap_;
+            toolBitmapSize = Size(cast<int>(toolBitmap->GetWidth()), cast<int>(toolBitmap->GetHeight()));
+            Padding padding = DefaultPadding();
+            size = Size(padding.Horizontal() + toolBitmapSize.w, padding.Vertical() + toolBitmapSize.h);
+        }
+        private nothrow void Invalidate()
+        {
+            if (toolBar != null)
+            {
+                toolBar->Invalidate();
+            }
+        }
+        private ToolBar* toolBar;
+        private State state;
+        private string toolBitmapName;
+        private Bitmap* toolBitmap;
+        private Color transparentColor;
+        private Point location;
+        private Size toolBitmapSize;
+        private Size size;
+        private string toolTip;
+        private Event<MouseEnterEventHandler> mouseEnterEvent;
+        private Event<MouseLeaveEventHandler> mouseLeaveEvent;
+        private Event<MouseEventHandler, MouseEventArgs> mouseMoveEvent;
+        private Event<MouseEventHandler, MouseEventArgs> mouseDownEvent;
+        private Event<MouseEventHandler, MouseEventArgs> mouseUpEvent;
+        private Event<ClickEventHandler> clickEvent;
+    }
+}

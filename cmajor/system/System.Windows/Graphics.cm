@@ -1637,6 +1637,14 @@ namespace System.Windows
                 WinGraphicsDeleteImage(nativeImage);
             }
         }
+        public nothrow uint GetHeight() const
+        {
+            return WinGraphicsImageGetHeight(nativeImage);
+        }
+        public nothrow uint GetWidth() const
+        {
+            return WinGraphicsImageGetWidth(nativeImage);
+        }
         public GraphicsStatus Save(const char* fileName, const Uuid& encoderClsId)
         {
             return cast<GraphicsStatus>(WinGraphicsImageSave(nativeImage, fileName, &encoderClsId));
@@ -1946,6 +1954,67 @@ namespace System.Windows
         antiAlias = 4
     }
 
+    public enum ColorAdjustType : int
+    {
+        default_ = 0,
+        bitmap = 1,
+        brush = 2,
+        pen = 3,
+        text = 4,
+        count = 5,
+        any = 6
+    }
+
+    public class ImageAttributes
+    {
+        public ImageAttributes() : nativeImageAttributes(WinGraphicsCreateDefaultImageAttributes())
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageAttributesGetLastStatus(nativeImageAttributes)));
+        }
+        public ImageAttributes(const ImageAttributes& that) : nativeImageAttributes(WinGraphicsCloneImageAttributes(that.nativeImageAttributes))
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageAttributesGetLastStatus(nativeImageAttributes)));
+        }
+        public nothrow ImageAttributes(ImageAttributes&& that) : nativeImageAttributes(that.nativeImageAttributes)
+        {
+            that.nativeImageAttributes = null;
+        }
+        public void operator=(const ImageAttributes& that)
+        {
+            if (nativeImageAttributes != that.nativeImageAttributes)
+            {
+                if (that.nativeImageAttributes != null)
+                {
+                    WinGraphicsDeleteImageAttributes(that.nativeImageAttributes);
+                }
+                nativeImageAttributes = WinGraphicsCloneImageAttributes(that.nativeImageAttributes);
+                CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageAttributesGetLastStatus(nativeImageAttributes)));
+            }
+        }
+        public default nothrow void operator=(ImageAttributes&&);
+        public ~ImageAttributes()
+        {
+            if (nativeImageAttributes != null)
+            {
+                WinGraphicsDeleteImageAttributes(nativeImageAttributes);
+            }
+        }
+        public nothrow GraphicsStatus SetColorKey(const Color& colorLow, const Color& colorHigh, ColorAdjustType type)
+        {
+            return cast<GraphicsStatus>(WinGraphicsImageAttributesSetColorKey(nativeImageAttributes, colorLow.alpha, colorLow.red, colorLow.green, colorLow.blue,
+                colorHigh.alpha, colorHigh.red, colorHigh.green, colorHigh.blue, cast<int>(type)));
+        }
+        public void SetColorKeyChecked(const Color& colorLow, const Color& colorHigh, ColorAdjustType type)
+        {
+            CheckGraphicsStatus(cast<GraphicsStatus>(SetColorKey(colorLow, colorHigh, type)));
+        }
+        public nothrow void* NativeImageAttributes() const
+        {
+            return nativeImageAttributes;
+        }
+        private void* nativeImageAttributes;
+    }
+
     public class Graphics
     {
         public nothrow Graphics() : nativeGraphics(null)
@@ -2168,6 +2237,15 @@ namespace System.Windows
         public void DrawImageChecked(const Image& image, const RectF& rect)
         {
             CheckGraphicsStatus(DrawImage(image, rect));
+        }
+        public nothrow GraphicsStatus DrawImage(const Image& image, const Rect& destRect, int srcX, int srcY, int srcW, int srcH, Unit srcUnit, const ImageAttributes& attributes)
+        {
+            return cast<GraphicsStatus>(WinGrapchisDrawImageWithAttributes(nativeGraphics, image.NativeImage(), destRect.location.x, destRect.location.y, destRect.size.w, destRect.size.h,
+                srcX, srcY, srcW, srcH, srcUnit, attributes.NativeImageAttributes()));
+        }
+        public void DrawImageChecked(const Image& image, const Rect& destRect, int srcX, int srcY, int srcW, int srcH, Unit srcUnit, const ImageAttributes& attributes)
+        {
+            CheckGraphicsStatus(DrawImage(image, destRect, srcX, srcY, srcW, srcH, srcUnit, attributes));
         }
         public nothrow GraphicsStatus GetClip(Region& region)
         {
