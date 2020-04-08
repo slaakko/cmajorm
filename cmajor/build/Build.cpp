@@ -869,7 +869,7 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
         InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtStartProfiling"));
         invokeRtInit->AddArgument(new DivNode(Span(),
             new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 3))); // 3 64-bit integers per entry
+            new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
         invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
         invokeRtInit->AddArgument(new DivNode(Span(),
             new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
@@ -882,7 +882,7 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
         InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit"));
         invokeRtInit->AddArgument(new DivNode(Span(), 
             new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-            new LongLiteralNode(Span(), 3))); // 3 64-bit integers per entry
+            new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
         invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
         invokeRtInit->AddArgument(new DivNode(Span(),
             new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
@@ -1066,7 +1066,7 @@ void CreateMainUnitWindowGUI(std::vector<std::string>& objectFilePaths, Module& 
     InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit"));
     invokeRtInit->AddArgument(new DivNode(Span(),
         new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-        new LongLiteralNode(Span(), 3))); // 3 64-bit integers per entry
+        new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
     invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
     invokeRtInit->AddArgument(new DivNode(Span(),
         new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),

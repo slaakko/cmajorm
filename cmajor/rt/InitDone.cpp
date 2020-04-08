@@ -30,9 +30,9 @@ extern "C" RT_API void RtInit(int64_t numberOfPolymorphicClassIds, const uint64_
     cmajor::rt::Init(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
 }
 
-extern "C" RT_API uint64_t RtDynamicInitVmt(void* vmt)
+extern "C" RT_API bool DynamicInitVmtsAndCompare(void* vmt1, void* vmt2)
 {
-    return cmajor::rt::DynamicInitVmt(vmt);
+    return cmajor::rt::DynamicInitVmtsAndCompare(vmt1, vmt2);
 }
 
 extern "C" RT_API void RtDone()

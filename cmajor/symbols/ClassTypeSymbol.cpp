@@ -38,14 +38,14 @@ int32_t GetClassIdVmtIndexOffset()
 
 int32_t GetTypeIdVmtIndexOffset()
 {
-    return 1;
+    return 2;
 }
 
 int32_t GetClassNameVmtIndexOffset()
 {
     if (GetBackEnd() == BackEnd::llvm)
     {
-        return 3;
+        return 4;
     }
     else if (GetBackEnd() == BackEnd::cmsx)
     {
@@ -61,7 +61,7 @@ int32_t GetImtsVmtIndexOffset()
 {
     if (GetBackEnd() == BackEnd::llvm)
     {
-        return 4;
+        return 5;
     }
     else if (GetBackEnd() == BackEnd::cmsx)
     {
@@ -77,7 +77,7 @@ int32_t GetFunctionVmtIndexOffset()
 {
     if (GetBackEnd() == BackEnd::llvm)
     {
-        return 5;
+        return 6;
     }
     else if (GetBackEnd() == BackEnd::cmsx)
     {
@@ -1471,7 +1471,8 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         std::vector<void*> vmtArray;
         if (GetBackEnd() == BackEnd::llvm)
         {
-            vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); // 64-bit class id, initially 0, dynamically initialized
+            vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); // 128-bit class id, initially 0, dynamically initialized
+            vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); 
             uint64_t typeId1 = 0;
             uint64_t typeId2 = 0;
             UuidToInts(TypeId(), typeId1, typeId2);
@@ -1632,8 +1633,8 @@ struct ClassInfo
     ClassTypeSymbol* cls;
     ClassInfo* baseClassInfo;
     int level;
-    uint64_t key;
-    uint64_t id;
+    boost::multiprecision::uint128_t key;
+    boost::multiprecision::uint128_t id;
 };
 
 void ResolveBaseClasses(std::unordered_map<boost::uuids::uuid, ClassInfo, boost::hash<boost::uuids::uuid>>& classIdMap)
@@ -1703,11 +1704,12 @@ std::vector<ClassInfo*> GetClassesByPriority(std::unordered_map<boost::uuids::uu
 
 void AssignKeys(std::vector<ClassInfo*>& classesByPriority)
 {
-    uint64_t key = 2;
+    boost::multiprecision::uint128_t key;
+    NextPrime(key);
     for (ClassInfo* cls : classesByPriority)
     {
         cls->key = key;
-        key = NextPrime(key + 1);
+        NextPrime(key);
         if (key < cls->key)
         {
             throw std::runtime_error("error assigning class key for class " + ToUtf8(cls->cls->FullName()) + ": overflow, too many polymorphic classes");
@@ -1715,14 +1717,14 @@ void AssignKeys(std::vector<ClassInfo*>& classesByPriority)
     }
 }
 
-uint64_t ComputeClassId(ClassInfo* cls)
+boost::multiprecision::uint128_t ComputeClassId(ClassInfo* cls)
 {
-    uint64_t classId = cls->key;
+    boost::multiprecision::uint128_t classId = cls->key;
     ClassInfo* baseClass = cls->baseClassInfo;
     while (baseClass)
     {
-        uint64_t key = baseClass->key;
-        uint64_t product = classId * key;
+        boost::multiprecision::uint128_t key = baseClass->key;
+        boost::multiprecision::uint128_t product = classId * key;
         if (product / classId != key || product % key != 0)
         {
             throw std::runtime_error("error computing class key for class " + ToUtf8(cls->cls->FullName()) + ": overflow, too many polymorphic classes");
@@ -1766,7 +1768,8 @@ ConstantNode* MakePolymorphicClassArray(const std::unordered_set<ClassTypeSymbol
         UuidToInts(typeId, typeId1, typeId2);
         polymorphicClassArrayLiteral->AddValue(new ULongLiteralNode(Span(), typeId1));
         polymorphicClassArrayLiteral->AddValue(new ULongLiteralNode(Span(), typeId2));
-        polymorphicClassArrayLiteral->AddValue(new ULongLiteralNode(Span(), info->id));
+        polymorphicClassArrayLiteral->AddValue(new ULongLiteralNode(Span(), static_cast<uint64_t>(info->id >> 64)));
+        polymorphicClassArrayLiteral->AddValue(new ULongLiteralNode(Span(), static_cast<uint64_t>(info->id)));
     }
     uint64_t arrayLength = polymorphicClassArrayLiteral->Values().Count();
     ConstantNode* polymorphicClassArray = new ConstantNode(Span(), Specifiers::internal_, new ArrayNode(Span(), new ULongNode(Span()),
@@ -1821,7 +1824,8 @@ void MakeClassIdFile(const std::unordered_set<ClassTypeSymbol*>& polymorphicClas
     {
         const boost::uuids::uuid& typeId = info->cls->TypeId();
         binaryWriter.Write(typeId);
-        binaryWriter.Write(info->id);
+        binaryWriter.Write(static_cast<uint64_t>(info->id >> 64));
+        binaryWriter.Write(static_cast<uint64_t>(info->id));
 #if (CLASS_ID_FILE_DEBUG)
         std::cerr << "class" << i << std::endl;
 #endif

@@ -28,20 +28,21 @@ namespace spring
     {
         private enum Flags : sbyte
         {
-            none = 0, changed = 1 << 0
+            none = 0, changed = 1 << 0, invalidated = 1 << 1
         }
         public Diagram() : flags(Flags.none), layout(), elements()
         {
             SetChanged();
+            Invalidate();
             UniquePtr<ClassElement> concreteClassElement(new ClassElement("ConcreteClass", false));
             concreteClassElement->SetLocation(PointF(5.0f, 5.0f));
             concreteClassElement->Operations().Add(new OperationElement("Foo"));
             concreteClassElement->Operations().Add(new OperationElement("Bar"));
             concreteClassElement->Operations().Add(new OperationElement("Baz"));
-            elements.Add(concreteClassElement.Release());
+            AddElement(concreteClassElement.Release());
             UniquePtr<ClassElement> abstractClassElement(new ClassElement("AbstractClass", true));
             abstractClassElement->SetLocation(PointF(50.0f, 5.0f));
-            elements.Add(abstractClassElement.Release());
+            AddElement(abstractClassElement.Release());
         }
         suppress Diagram(const Diagram&);
         suppress void operator=(const Diagram&);
@@ -84,12 +85,56 @@ namespace spring
         }
         public nothrow inline void SetElementByIndex(DiagramElement* element, int index)
         {
+            element->SetDiagram(this);
             elements.Set(index, element);
+        }
+        public nothrow void AddElement(DiagramElement* element)
+        {
+            element->SetDiagram(this);
+            elements.Add(element);
         }
         public nothrow int GetIndexOfElementAt(const PointF& location) const
         {
             Contains<DiagramElement> pred(location);
             return IndexOf(elements, pred);
+        }
+        public nothrow void SetSelectedElement(DiagramElement* element)
+        {
+            if (!element->IsSelected())
+            {
+                ResetSelection();
+                element->Select();
+                selectedElements.Add(element);
+            }
+        }
+        public nothrow void ResetSelection()
+        {
+            if (!selectedElements.IsEmpty())
+            {
+                for (DiagramElement* selectedElement : selectedElements)
+                {
+                    selectedElement->ResetSelected();
+                }
+                selectedElements.Clear();
+                Invalidate();
+            }
+        }
+        public nothrow void RemoveElementFromSelectedElements(DiagramElement* element)
+        {
+            if (element->IsSelected())
+            {
+                selectedElements.Remove(element);
+                element->ResetSelected();
+            }
+        }
+        public nothrow void AddElementToSelectedElements(DiagramElement* element)
+        {
+            if (!element->IsSelected())
+            {
+                RemoveElementFromSelectedElements(element);
+                element->Select();
+                selectedElements.Add(element);
+            }
         }
         private nothrow inline bool Changed() const
         {
@@ -103,26 +148,55 @@ namespace spring
         {
             flags = cast<Flags>(flags & ~Flags.changed);
         }
+        public nothrow inline bool Invalidated() const
+        {
+            return (flags & Flags.invalidated) != Flags.none;
+        }
+        public nothrow inline void Invalidate()
+        {
+            flags = cast<Flags>(flags | Flags.invalidated);
+        }
+        public nothrow inline void ResetInvalidated()
+        {
+            flags = cast<Flags>(flags & ~Flags.invalidated);
+        }
         private Flags flags;
         private UniquePtr<Layout> layout;
         private IndexList<DiagramElement> elements;
+        private List<DiagramElement*> selectedElements;
     }
 
     public abstract class DiagramElement
     {
+        private enum Flags : sbyte
+        {
+            none = 0, selected = 1 << 0
+        }
         public nothrow DiagramElement() : name()
         {
         }
         public nothrow DiagramElement(const string& name_) : name(name_)
         {
         }
-        public abstract DiagramElement* Clone() const;
-        public abstract void Draw(Graphics& graphics, Layout& layout);
-        public abstract void Measure(Graphics& graphics, Layout& layout);
         suppress DiagramElement(const DiagramElement&);
         suppress void operator=(const DiagramElement&);
         suppress DiagramElement(DiagramElement&&);
         suppress void operator=(DiagramElement&&);
+        public virtual void Draw(Graphics& graphics, Layout& layout)
+        {
+            if (IsSelected())
+            {
+                DrawSelected(graphics, layout);
+            }
+        }
+        public abstract DiagramElement* Clone() const;
+        public abstract void Measure(Graphics& graphics, Layout& layout);
+        private void DrawSelected(Graphics& graphics, Layout& layout)
+        {
+            const ColorElement& selectedColorElement = layout.GetSelectedColorElement();
+            Brush& selectedBrush = selectedColorElement.GetBrush(layout);
+            graphics.FillRectangleChecked(selectedBrush, boundingRect);
+        }
         public nothrow inline const string& Name() const
         {
             return name;
@@ -196,8 +270,38 @@ namespace spring
             name = that->name;
             boundingRect = that->boundingRect;
         }
+        public nothrow inline bool IsSelected() const
+        {
+            return (flags & Flags.selected) != Flags.none;
+        }
+        public nothrow void Select()
+        {
+            if (!IsSelected())
+            {
+                flags = cast<Flags>(flags | Flags.selected);
+                diagram->Invalidate();
+            }
+        }
+        public nothrow void ResetSelected()
+        {
+            if (IsSelected())
+            {
+                flags = cast<Flags>(flags & ~Flags.selected);
+                diagram->Invalidate();
+            }
+        }
+        public nothrow void SetDiagram(Diagram* diagram_)
+        {
+            diagram = diagram_;
+        }
+        public nothrow inline Diagram* GetDiagram() const
+        {
+            return diagram;
+        }
+        private Flags flags;
         private string name;
         private RectF boundingRect;
+        private Diagram* diagram;
     }
 
     public class FieldElement : DiagramElement
@@ -303,6 +407,7 @@ namespace spring
         }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
+            base->Draw(graphics, layout);
             DrawFrame(graphics, layout);
             DrawCaption(graphics, layout);
         }

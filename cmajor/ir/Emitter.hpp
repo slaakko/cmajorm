@@ -274,7 +274,7 @@ public:
     virtual void SaveObjectPointer(void* objectPointer_) = 0;
     virtual void SetObjectPointer(void* objectPointer_) = 0;
     virtual void* GetObjectPointer() = 0;
-    virtual void* GetClassIdPtr(void* vmtPtr) = 0;
+    virtual void* GetClassIdPtr(void* vmtPtr, int32_t classIdVmtIndexOffset) = 0;
     virtual void* GetClassName(void* vmtPtr, int32_t classNameVmtIndexOffset) = 0;
     virtual void* ComputeAddress(void* ptr, void* index) = 0;
     virtual void* CreatePtrDiff(void* left, void* right) = 0;

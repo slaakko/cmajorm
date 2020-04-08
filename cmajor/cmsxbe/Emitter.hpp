@@ -243,7 +243,7 @@ public:
     void SaveObjectPointer(void* objectPointer_) override;
     void SetObjectPointer(void* objectPointer_) override;
     void* GetObjectPointer() override;
-    void* GetClassIdPtr(void* vmtPtr) override;
+    void* GetClassIdPtr(void* vmtPtr, int32_t classIdVmtIndexOffset) override;
     void* GetClassName(void* vmtPtr, int32_t classNameVmtIndexOffset) override;
     void* ComputeAddress(void* ptr, void* index) override;
     void* CreatePtrDiff(void* left, void* right) override;

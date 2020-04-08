@@ -61,7 +61,9 @@ namespace spring
 
     public class Layout
     {
-         public Layout(Graphics& graphics) : abstractClassLayoutElement(new AbstractClassLayoutElement(*this, graphics)), concreteClassLayoutElement(new ConcreteClassLayoutElement(*this, graphics)),
+         public Layout(Graphics& graphics) :
+            selectedColorElement(new ColorElement(Color(128u, 184u, 211u, 235u), "selectedColor")),
+            abstractClassLayoutElement(new AbstractClassLayoutElement(*this, graphics)), concreteClassLayoutElement(new ConcreteClassLayoutElement(*this, graphics)),
             abstractOperationLayoutElement(new AbstractOperationLayoutElement(*this)), concreteOperationLayoutElement(new ConcreteOperationLayoutElement(*this)),
             fieldLayoutElement(new FieldLayoutElement(*this)),
             classPaddingElement(new PaddingElement(DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), "classPadding")),
@@ -95,6 +97,14 @@ namespace spring
             CodeFormatter formatter(writer);
             formatter.SetIndentSize(1);
             doc.Write(formatter);
+        }
+        public nothrow inline const ColorElement& GetSelectedColorElement() const
+        {
+            return *selectedColorElement;
+        }
+        public nothrow void SetSelectedColorElement(ColorElement* selectedColorElement_)
+        {
+            selectedColorElement.Reset(selectedColorElement_);
         }
         public nothrow inline const AbstractClassLayoutElement& GetAbstractClassLayoutElement() const
         {
@@ -159,6 +169,7 @@ namespace spring
                         if (node->GetNodeType() == System.Dom.NodeType.elementNode)
                         {
                             System.Dom.Element* layoutElement = cast<System.Dom.Element*>(node);
+                            selectedColorElement->Read(layoutElement, *this);
                             abstractClassLayoutElement->Read(layoutElement, *this);
                             concreteClassLayoutElement->Read(layoutElement, *this);
                             abstractOperationLayoutElement->Read(layoutElement, *this);
@@ -176,6 +187,7 @@ namespace spring
             UniquePtr<System.Dom.Element> layoutElement(new System.Dom.Element(u"layout"));
             layoutElement->AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Comment(u"metrics are in millimeters")));
             layoutElement->AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Text(u"\n ")));
+            selectedColorElement->Write(layoutElement.Get());
             abstractClassLayoutElement->Write(layoutElement.Get());
             concreteClassLayoutElement->Write(layoutElement.Get());
             abstractOperationLayoutElement->Write(layoutElement.Get());
@@ -237,6 +249,7 @@ namespace spring
         private HashMap<PenKey, Pen*> penMap;
         private List<UniquePtr<Brush>> brushes;
         private HashMap<Color, Brush*> brushMap;
+        private UniquePtr<ColorElement> selectedColorElement;
         private UniquePtr<AbstractClassLayoutElement> abstractClassLayoutElement;
         private UniquePtr<ConcreteClassLayoutElement> concreteClassLayoutElement;
         private UniquePtr<AbstractOperationLayoutElement> abstractOperationLayoutElement;
@@ -425,6 +438,10 @@ namespace spring
             UniquePtr<System.Dom.Element> colorElement(new System.Dom.Element(en));
             colorElement->SetAttribute(u"value", ToUtf32(color.ToString()));
             parentElement->AppendChild(UniquePtr<System.Dom.Node>(colorElement.Release()));
+        }
+        public nothrow Brush& GetBrush(Layout& layout) 
+        {
+            return *layout.GetOrInsertBrush(color);
         }
         private Color color;
         private string elementName;

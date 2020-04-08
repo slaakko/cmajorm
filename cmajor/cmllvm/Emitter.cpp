@@ -931,11 +931,22 @@ void* Emitter::SizeOf(void* ptrType)
     return size;
 }
 
+/*
 void* Emitter::GetClassIdPtr(void* vmtPtr)
 {
     ArgVector indeces;
     indeces.push_back(builder.getInt32(0));
     indeces.push_back(builder.getInt32(0));
+    llvm::Value* classIdPtr = builder.CreateGEP(static_cast<llvm::Value*>(vmtPtr), indeces);
+    return classIdPtr;
+}
+*/
+
+void* Emitter::GetClassIdPtr(void* vmtPtr, int32_t classIdVmtIndexOffset)
+{
+    ArgVector indeces;
+    indeces.push_back(builder.getInt32(0));
+    indeces.push_back(builder.getInt32(classIdVmtIndexOffset));
     llvm::Value* classIdPtr = builder.CreateGEP(static_cast<llvm::Value*>(vmtPtr), indeces);
     return classIdPtr;
 }

@@ -6,6 +6,7 @@
 #ifndef SOULNG_LEXER_TOKEN_INCLUDED
 #define SOULNG_LEXER_TOKEN_INCLUDED
 #include <soulng/lexer/Lexeme.hpp>
+#include <vector>
 #include <string>
 
 namespace soulng { namespace lexer {
@@ -27,6 +28,12 @@ struct SOULNG_LEXER_API Token
 SOULNG_LEXER_API bool NoWhiteSpaceBetweenTokens(const Token& first, const Token& second);
 
 SOULNG_LEXER_API std::string GetEndTokenInfo();
+
+struct SOULNG_LEXER_API TokenLine
+{
+    std::vector<Token> tokens;
+    int endState;
+};
 
 } } // namespace soulng::lexer
 

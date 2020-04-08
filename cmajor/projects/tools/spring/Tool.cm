@@ -20,6 +20,11 @@ namespace spring
         public static nothrow void SetCurrent(Tool* tool)
         {
             currentTool = tool;
+            currentTool->GetToolButton()->SetState(ToolButton.State.pressed);
+        }
+        internal static nothrow void SetCurrentInternal(Tool* tool)
+        {
+            currentTool = tool;
         }
         public static nothrow Tool& GetSelectTool()
         {
@@ -42,6 +47,10 @@ namespace spring
             toolButton = toolButton_;
             toolButton->ClickEvent().AddHandler(ToolButtonClicked);
         }
+        public nothrow inline ToolButton* GetToolButton() const
+        {
+            return toolButton;
+        }
         public nothrow void SetCursor(Cursor* cursor_)
         {
             cursor = cursor_;
@@ -50,9 +59,54 @@ namespace spring
         {
             return cursor;
         }
+        public virtual void MouseDown(Diagram& diagram, const PointF& location, MouseButtons buttons, int elementIndex, DiagramElement* element)
+        {
+            bool shift = (buttons & MouseButtons.shift) != MouseButtons.none;
+            bool control = (buttons & MouseButtons.control) != MouseButtons.none;
+            bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
+            bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
+            if (left)
+            {
+                MouseLeftClick(diagram, location, elementIndex, element, shift, control);
+            }
+            else if (right)
+            {
+                MouseRightClick(diagram, location, elementIndex, element, shift, control);
+            }
+        }
+        public virtual void MouseLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element, bool shift, bool control)
+        {
+            if (control)
+            {
+                MouseControlLeftClick(diagram, location, elementIndex, element);
+            }
+            else if (shift)
+            {
+                MouseShiftLeftClick(diagram, location, elementIndex, element);
+            }
+            else
+            {
+                MouseNormalLeftClick(diagram, location, elementIndex, element);
+            }
+        }
+        public virtual void MouseNormalLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        {
+        }
+        public virtual void MouseControlLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        {
+        }
+        public virtual void MouseShiftLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        {
+        }
+        public virtual void MouseRightClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element, bool shift, bool control)
+        {
+        }
+        public virtual void MouseDoubleClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        {
+        }
         private nothrow void ToolButtonClicked()
         {
-            Tools.SetCurrent(this);
+            Tools.SetCurrentInternal(this);
         }
         private ToolButton* toolButton;
         private Cursor* cursor;
@@ -60,6 +114,31 @@ namespace spring
 
     public class SelectTool : Tool
     {
+        public override void MouseNormalLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        {
+            if (element != null)
+            {
+                diagram.SetSelectedElement(element);
+            }
+            else
+            {
+                diagram.ResetSelection();
+            }
+        }
+        public override void MouseControlLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        {
+            if (element != null)
+            {
+                if (element->IsSelected())
+                {
+                    diagram.RemoveElementFromSelectedElements(element);
+                }
+                else
+                {
+                    diagram.AddElementToSelectedElements(element);
+                }
+            }
+        }
     }
 
     public class ClassTool : Tool

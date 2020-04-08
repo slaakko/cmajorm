@@ -69,18 +69,20 @@ inline ClassTypeSymbolFlags operator~(ClassTypeSymbolFlags operand)
     return ClassTypeSymbolFlags(~uint8_t(operand));
 }
 
-SYMBOLS_API int32_t GetClassIdVmtIndexOffset();     // 64-bit class id
+SYMBOLS_API int32_t GetClassIdVmtIndexOffset();     // 128-bit class id, was 64-bit before
 SYMBOLS_API int32_t GetTypeIdVmtIndexOffset();      // 16-byte type id
 SYMBOLS_API int32_t GetClassNameVmtIndexOffset();   // class name pointer
 SYMBOLS_API int32_t GetImtsVmtIndexOffset();        // interface method table pointer
 SYMBOLS_API int32_t GetFunctionVmtIndexOffset();    // virtual method table
 
-/*
-const int32_t classIdVmtIndexOffset = 0;    // 64-bit class id
-const int32_t typeIdVmtIndexOffset = 1;     // 16-byte type id
-const int32_t classNameVmtIndexOffset = 3;  // class name pointer
-const int32_t imtsVmtIndexOffset = 4;       // interface method table pointer
-const int32_t functionVmtIndexOffset = 5;   // virtual method table
+/* Indeces for LLVM backend:
+
+const int32_t classIdVmtIndexOffset = 0;    // 128-bit class id, was 64-bit before
+const int32_t typeIdVmtIndexOffset = 2;     // 16-byte type id
+const int32_t classNameVmtIndexOffset = 4;  // class name pointer
+const int32_t imtsVmtIndexOffset = 5;       // interface method table pointer
+const int32_t functionVmtIndexOffset = 6;   // virtual method table
+
 */
 
 class SYMBOLS_API ClassTypeSymbol : public TypeSymbol

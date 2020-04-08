@@ -4,42 +4,42 @@
 // =================================
 
 #include <soulng/util/Prime.hpp>
+#include <boost/multiprecision/miller_rabin.hpp>
 
 namespace soulng { namespace util {
-        
-bool IsPrime(uint64_t x)
+
+bool IsPrime64(uint64_t n)
 {
-    uint64_t i = 3;
-    while (true)
+    if (n <= 1) return false;
+    if (n <= 3) return true;
+    if (n % 2 == 0 || n % 3 == 0) return false;
+    for (uint64_t i = 5; i * i <= n; i = i + 6)
     {
-        uint64_t q = x / i;
-        if (q < i)
-        {
-            return true;
-        }
-        if (x == q * i)
+        if (n % i == 0 || n % (i + 2) == 0)
         {
             return false;
         }
-        i += 2;
     }
+    return true;
 }
 
-uint64_t NextPrime(uint64_t x)
+void NextPrime(boost::multiprecision::uint128_t& x)
 {
-    if (x <= 2)
+    ++x;
+    constexpr uint64_t max64 = std::numeric_limits<uint64_t>::max();
+    while (x < max64)
     {
-        return 2;
+        uint64_t n = static_cast<uint64_t>(x);
+        if (IsPrime64(n))
+        {
+            return;
+        }
+        ++x;
     }
-    if ((x & 1) == 0)
+    while (!boost::multiprecision::miller_rabin_test(x, 25))
     {
         ++x;
     }
-    while (!IsPrime(x))
-    {
-        x += 2;
-    }
-    return x;
 }
 
 } } // namespace soulng::util

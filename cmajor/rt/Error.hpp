@@ -21,8 +21,8 @@ extern "C" RT_API void RtFailAssertion(const char* assertion, const char* functi
 extern "C" RT_API const char* RtGetError(int32_t errorId);
 extern "C" RT_API void RtDisposeError(int32_t errorId);
 extern "C" RT_API void RtThrowException(void* exception, void* exceptionTypeId);
-extern "C" RT_API void RtCaptureException(void** exception, uint64_t* exceptionClassId);
-extern "C" RT_API void RtThrowCapturedException(void* exception, uint64_t exceptionClassId);
+extern "C" RT_API void RtCaptureException(void** exception, uint64_t & exceptionClassIdHi, uint64_t & exceptionClassIdLo);
+extern "C" RT_API void RtThrowCapturedException(void* exception, uint64_t exceptionClassIdHi, uint64_t exceptionClassIdLo);
 extern "C" RT_API bool RtHandleException(void* exceptionTypeId);
 extern "C" RT_API void* RtGetException();
 extern "C" RT_API void* RtGetExceptionTypeId();

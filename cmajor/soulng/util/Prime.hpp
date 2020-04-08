@@ -6,13 +6,13 @@
 #ifndef SOULNG_UTIL_PRIME_INCLUDED
 #define SOULNG_UTIL_PRIME_INCLUDED
 #include <soulng/util/UtilApi.hpp>
-#include <stdint.h>
+#include <boost/multiprecision/cpp_int.hpp>
 
 namespace soulng { namespace util {
 
-// Returns smallest prime greater than or equal to x
+// Returns smallest prime greater than x
 
-UTIL_API uint64_t NextPrime(uint64_t x);
+UTIL_API void NextPrime(boost::multiprecision::uint128_t& x);
 
 } } // namespace soulng::util
 

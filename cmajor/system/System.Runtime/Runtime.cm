@@ -21,8 +21,8 @@ public extern cdecl nothrow void RtFailAssertion(const char* assertion, const ch
 public extern cdecl void RtThrowException(void* exception, void* exceptionTypeId);
 public extern cdecl nothrow bool RtHandleException(void* exceptionTypeId);
 public extern cdecl nothrow void* RtGetException();
-public extern cdecl nothrow void RtCaptureException(void*& exception, ulong& exceptionClassId);
-public extern cdecl nothrow void RtThrowCapturedException(void* exception, ulong exceptionClassId);
+public extern cdecl nothrow void RtCaptureException(void*& exception, ulong& exceptionClassIdHi, ulong& exceptionClassIdLo);
+public extern cdecl nothrow void RtThrowCapturedException(void* exception, ulong exceptionClassIdHi, ulong exceptionClassIdLo);
 public extern cdecl nothrow const char* RtGetError(int errorId);
 public extern cdecl nothrow void RtDisposeError(int errorId);
 public extern cdecl nothrow const char* RtGetStackTrace();

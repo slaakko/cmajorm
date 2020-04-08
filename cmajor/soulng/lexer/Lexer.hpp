@@ -50,6 +50,7 @@ public:
     ParsingLog* Log() const { return log; }
     std::u32string RestOfLine(int maxLineLength);
     void SetSeparatorChar(char32_t separatorChar_) { separatorChar = separatorChar_; }
+    TokenLine TokenizeLine(const std::u32string& line, int lineNumber, int startState);
 protected:
     Lexeme lexeme;
     int32_t line;

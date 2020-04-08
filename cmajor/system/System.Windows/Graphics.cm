@@ -2214,6 +2214,14 @@ namespace System.Windows
         {
             CheckGraphicsStatus(FillRectangle(brush, rect));
         }
+        public nothrow GraphicsStatus FillRectangle(const Brush& brush, const RectF& rect)
+        {
+            return cast<GraphicsStatus>(WinGraphicsFillRectangleF(nativeGraphics, brush.NativeBrush(), rect.location.x, rect.location.y, rect.size.w, rect.size.h));
+        }
+        public void FillRectangleChecked(const Brush& brush, const RectF& rect)
+        {
+            CheckGraphicsStatus(FillRectangle(brush, rect));
+        }
         public nothrow GraphicsStatus FillPolygon(const Brush& brush, int numPoints, const Point* points)
         {
             return cast<GraphicsStatus>(WinGraphicsFillPolygon(nativeGraphics, brush.NativeBrush(), numPoints, points));

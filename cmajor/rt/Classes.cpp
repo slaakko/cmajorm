@@ -29,11 +29,11 @@ public:
     static void Init();
     static void Done();
     static ClassIdMap& Instance() { return *instance; }
-    void SetClassId(const boost::uuids::uuid& typeId, uint64_t classId);
-    uint64_t GetClassId(const boost::uuids::uuid& typeId) const;
+    void SetClassId(const boost::uuids::uuid& typeId, const boost::multiprecision::uint128_t& classId);
+    boost::multiprecision::uint128_t GetClassId(const boost::uuids::uuid& typeId) const;
 private:
     static std::unique_ptr<ClassIdMap> instance;
-    std::unordered_map<boost::uuids::uuid, uint64_t, boost::hash<boost::uuids::uuid>> classIdMap;
+    std::unordered_map<boost::uuids::uuid, boost::multiprecision::uint128_t, boost::hash<boost::uuids::uuid>> classIdMap;
 };
 
 std::unique_ptr<ClassIdMap> ClassIdMap::instance;
@@ -48,12 +48,12 @@ void ClassIdMap::Done()
     instance.reset();
 }
 
-void ClassIdMap::SetClassId(const boost::uuids::uuid& typeId, uint64_t classId)
+void ClassIdMap::SetClassId(const boost::uuids::uuid& typeId, const boost::multiprecision::uint128_t& classId)
 {
     classIdMap[typeId] = classId;
 }
 
-uint64_t ClassIdMap::GetClassId(const boost::uuids::uuid& typeId) const
+boost::multiprecision::uint128_t ClassIdMap::GetClassId(const boost::uuids::uuid& typeId) const
 {
     auto it = classIdMap.find(typeId);
     if (it != classIdMap.cend())
@@ -70,7 +70,7 @@ uint64_t ClassIdMap::GetClassId(const boost::uuids::uuid& typeId) const
     }
 }
 
-uint64_t GetClassId(const boost::uuids::uuid& typeId)
+boost::multiprecision::uint128_t GetClassId(const boost::uuids::uuid& typeId)
 {
     return ClassIdMap::Instance().GetClassId(typeId);
 }
@@ -83,9 +83,9 @@ void InitClasses(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphi
         boost::uuids::uuid dynamicTypeId;
         for (int64_t i = 0; i < numberOfPolymorphicClassIds; ++i)
         {
-            uint64_t typeId1 = polymorphicClassIdArray[3 * i];
-            uint64_t typeId2 = polymorphicClassIdArray[3 * i + 1];
-            uint64_t classId = polymorphicClassIdArray[3 * i + 2];
+            uint64_t typeId1 = polymorphicClassIdArray[4 * i];
+            uint64_t typeId2 = polymorphicClassIdArray[4 * i + 1];
+            boost::multiprecision::uint128_t classId = boost::multiprecision::uint128_t(polymorphicClassIdArray[4 * i + 2]) << 64 | polymorphicClassIdArray[4 * i + 3];
             IntsToUuid(typeId1, typeId2, dynamicTypeId);
             ClassIdMap::Instance().SetClassId(dynamicTypeId, classId);
         }
@@ -112,20 +112,34 @@ void InitClasses(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphi
 
 std::mutex dynamicInitVmtMutex;
 
-uint64_t DynamicInitVmt(void* vmt)
+bool DynamicInitVmtsAndCompare(void* vmt1, void* vmt2)
 {
     std::lock_guard<std::mutex> lock(dynamicInitVmtMutex);
-    uint64_t* vmtHeader = reinterpret_cast<uint64_t*>(vmt);
-    if (vmtHeader[0] == 0) // zero class id expected at the start of the VMT
+    uint64_t* vmt1Header = reinterpret_cast<uint64_t*>(vmt1);
+    boost::multiprecision::uint128_t classId1(boost::multiprecision::uint128_t(vmt1Header[0]) << 64 | vmt1Header[1]);
+    if (classId1 == 0) // class id is zero at the start of the VMT if not yet initialized
     {
-        uint64_t typeId1 = vmtHeader[1];
-        uint64_t typeId2 = vmtHeader[2];
+        uint64_t typeId1 = vmt1Header[2];
+        uint64_t typeId2 = vmt1Header[3];
         boost::uuids::uuid typeId;
-        IntsToUuid(typeId1, typeId2, typeId); 
-        uint64_t classId = ClassIdMap::Instance().GetClassId(typeId);
-        vmtHeader[0] = classId;
+        IntsToUuid(typeId1, typeId2, typeId);
+        classId1 = ClassIdMap::Instance().GetClassId(typeId);
+        vmt1Header[0] = static_cast<uint64_t>(classId1 >> 64);
+        vmt1Header[1] = static_cast<uint64_t>(classId1);
     }
-    return vmtHeader[0];
+    uint64_t* vmt2Header = reinterpret_cast<uint64_t*>(vmt2);
+    boost::multiprecision::uint128_t classId2(boost::multiprecision::uint128_t(vmt2Header[0]) << 64 | vmt2Header[1]);
+    if (classId2 == 0) // class id is zero at the start of the VMT if not yet initialized
+    {
+        uint64_t typeId1 = vmt2Header[2];
+        uint64_t typeId2 = vmt2Header[3];
+        boost::uuids::uuid typeId;
+        IntsToUuid(typeId1, typeId2, typeId);
+        classId2 = ClassIdMap::Instance().GetClassId(typeId);
+        vmt2Header[0] = static_cast<uint64_t>(classId2 >> 64);
+        vmt2Header[1] = static_cast<uint64_t>(classId2);
+    }
+    return classId1 % classId2 == 0;
 }
 
 void DoneClasses()

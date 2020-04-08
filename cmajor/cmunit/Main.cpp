@@ -137,7 +137,7 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, c
     invokeStartUnitTest->AddArgument(new StringLiteralNode(Span(), unitTestFilePath));
     invokeStartUnitTest->AddArgument(new DivNode(Span(),
         new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
-        new LongLiteralNode(Span(), 3))); // 3 64-bit integers per entry
+        new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
     invokeStartUnitTest->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
     invokeStartUnitTest->AddArgument(new DivNode(Span(),
         new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),

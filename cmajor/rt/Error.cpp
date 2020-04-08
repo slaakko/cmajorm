@@ -95,12 +95,12 @@ void DisposeError(int32_t errorId)
 #ifdef _WIN32
 
 __declspec(thread) void* currentException = nullptr;
-__declspec(thread) uint64_t currentExceptionClassId = 0;
+__declspec(thread) uint64_t currentExceptionClassId[2];
 
 #else
 
 __thread void* currentException = nullptr;
-__thread uint64_t currentExceptionClassId = 0;
+__thread uint64_t currentExceptionClassId[2];
 
 #endif
 
@@ -140,31 +140,35 @@ extern "C" RT_API void RtThrowException(void* exception, void* exceptionTypeId)
 {
     cmajor::rt::currentException = exception;
     boost::uuids::uuid* exTypeId = reinterpret_cast<boost::uuids::uuid*>(exceptionTypeId);
-    uint64_t exceptionClassId = cmajor::rt::GetClassId(*exTypeId);
-    cmajor::rt::currentExceptionClassId = exceptionClassId;
+    boost::multiprecision::uint128_t exceptionClassId = cmajor::rt::GetClassId(*exTypeId);
+    cmajor::rt::currentExceptionClassId[0] = static_cast<uint64_t>(exceptionClassId >> 64);
+    cmajor::rt::currentExceptionClassId[1] = static_cast<uint64_t>(exceptionClassId);
     throw cmajor::eh::Exception();
 }
 
-extern "C" RT_API void RtCaptureException(void** exception, uint64_t* exceptionClassId)
+extern "C" RT_API void RtCaptureException(void** exception, uint64_t& exceptionClassIdHi, uint64_t& exceptionClassIdLo)
 {
     *exception = cmajor::rt::currentException;
     cmajor::rt::currentException = nullptr;
-    *exceptionClassId = cmajor::rt::currentExceptionClassId;
-    cmajor::rt::currentExceptionClassId = 0;
+    exceptionClassIdHi = static_cast<uint64_t>(cmajor::rt::currentExceptionClassId[0]);
+    exceptionClassIdLo = static_cast<uint64_t>(cmajor::rt::currentExceptionClassId[1]);
+    cmajor::rt::currentExceptionClassId[0] = 0;
+    cmajor::rt::currentExceptionClassId[1] = 0;
 }
 
-extern "C" RT_API void RtThrowCapturedException(void* exception, uint64_t exceptionClassId)
+extern "C" RT_API void RtThrowCapturedException(void* exception, uint64_t exceptionClassIdHi, uint64_t exceptionClassIdLo)
 {
     cmajor::rt::currentException = exception;
-    cmajor::rt::currentExceptionClassId = exceptionClassId;
+    cmajor::rt::currentExceptionClassId[0] = exceptionClassIdHi;
+    cmajor::rt::currentExceptionClassId[1] = exceptionClassIdLo;
     throw cmajor::eh::Exception();
 }
 
 extern "C" RT_API bool RtHandleException(void* exceptionTypeId)
 {
-    uint64_t currentExceptionClassId = cmajor::rt::currentExceptionClassId;
+    boost::multiprecision::uint128_t currentExceptionClassId = boost::multiprecision::uint128_t(cmajor::rt::currentExceptionClassId[0]) << 64 | cmajor::rt::currentExceptionClassId[1];
     boost::uuids::uuid* exTypeId = reinterpret_cast<boost::uuids::uuid*>(exceptionTypeId);
-    uint64_t exceptionClassId = cmajor::rt::GetClassId(*exTypeId);
+    boost::multiprecision::uint128_t exceptionClassId = cmajor::rt::GetClassId(*exTypeId);
     bool handle = currentExceptionClassId % exceptionClassId == 0;
     return handle;
 }

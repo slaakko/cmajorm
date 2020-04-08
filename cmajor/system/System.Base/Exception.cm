@@ -32,34 +32,41 @@ namespace System
     
     public class ExceptionPtr
     {
-        public nothrow ExceptionPtr() : exception(null), exceptionClassId(0u)
+        public nothrow ExceptionPtr() : exception(null), exceptionClassIdHi(0u), exceptionClassIdLo(0u)
         {
         }
-        public nothrow ExceptionPtr(void* exception_, ulong exceptionClassId_) : exception(exception_), exceptionClassId(exceptionClassId_)
+        public nothrow ExceptionPtr(void* exception_, ulong exceptionClassIdHi_, ulong exceptionClassIdLo_) :
+            exception(exception_), exceptionClassIdHi(exceptionClassIdHi_), exceptionClassIdLo(exceptionClassIdLo_)
         {
         }
         public inline nothrow void* Exception() const
         {
             return exception;
         }
-        public inline nothrow ulong ExceptionClassId() const
+        public inline nothrow ulong ExceptionClassIdHi() const
         {
-            return exceptionClassId;
+            return exceptionClassIdHi;
+        }
+        public inline nothrow ulong ExceptionClassIdLo() const
+        {
+            return exceptionClassIdLo;
         }
         private void* exception;
-        private ulong exceptionClassId;
+        private ulong exceptionClassIdHi;
+        private ulong exceptionClassIdLo;
     }
     
     public nothrow ExceptionPtr CaptureCurrentException()
     {
         void* exception;
-        ulong exceptionClassId;
-        RtCaptureException(exception, exceptionClassId);
-        return ExceptionPtr(exception, exceptionClassId);
+        ulong exceptionClassIdHi;
+        ulong exceptionClassIdLo;
+        RtCaptureException(exception, exceptionClassIdHi, exceptionClassIdLo);
+        return ExceptionPtr(exception, exceptionClassIdHi, exceptionClassIdLo);
     }
     
     public void ThrowCapturedException(const ExceptionPtr& capturedException)
     {
-        RtThrowCapturedException(capturedException.Exception(), capturedException.ExceptionClassId());
+        RtThrowCapturedException(capturedException.Exception(), capturedException.ExceptionClassIdHi(), capturedException.ExceptionClassIdLo());
     }
 }

@@ -1345,7 +1345,7 @@ void* Emitter::GetObjectPointer()
     return objectPointer;
 }
 
-void* Emitter::GetClassIdPtr(void* vmtPtr)
+void* Emitter::GetClassIdPtr(void* vmtPtr, int32_t classIdVmtIndexOffset)
 {
     cmsxi::Value* classIdPtr = context->CreateElemAddr(static_cast<cmsxi::Value*>(vmtPtr), context->GetLongValue(0));
     return classIdPtr;

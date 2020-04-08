@@ -24,6 +24,10 @@ namespace spring
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
+            if (diagram->Invalidated())
+            {
+                diagram->ResetInvalidated();
+            }
             Unit prevUnit = args.graphics.GetPageUnitChecked();
             TextRenderingHint prevTextRenderingHint = args.graphics.GetTextRenderingHint();
             args.graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
@@ -35,23 +39,42 @@ namespace spring
         }
         protected override void OnMouseDown(MouseEventArgs& args)
         {
-            LogView* logView = Application.GetLogView();
             base->OnMouseDown(args);
-            float x = ScreenMetrics.Get().HorizontalPixelsToMM(args.location.x);
-            float y = ScreenMetrics.Get().VerticalPixelsToMM(args.location.y);
-            PointF location(x, y);
+            PointF location = ConvertLocation(args.location);
+            MouseButtons buttons = args.buttons;
+            DiagramElement* element = null;
             int index = diagram->GetIndexOfElementAt(location);
             if (index != -1)
             {
-                DiagramElement* element = diagram->GetElementByIndex(index);
-                if (element != null)
-                {
-                    if (logView != null)
-                    {
-                        logView->WriteLine(element->Name());
-                    }
-                }
+                element = diagram->GetElementByIndex(index);
             }
+            Tools.Current()->MouseDown(*diagram, location, buttons, index, element);
+            if (diagram->Invalidated())
+            {
+                Invalidate();
+            }
+        }
+        protected override void OnMouseDoubleClick(MouseEventArgs& args)
+        {
+            base->OnMouseDoubleClick(args);
+            PointF location = ConvertLocation(args.location);
+            int index = diagram->GetIndexOfElementAt(location);
+            DiagramElement* element = null;
+            if (index != -1)
+            {
+                element = diagram->GetElementByIndex(index);
+            }
+            Tools.Current()->MouseDoubleClick(*diagram, location, index, element);
+            if (diagram->Invalidated())
+            {
+                Invalidate();
+            }
+        }
+        private nothrow PointF ConvertLocation(const Point& location)
+        {
+            float x = ScreenMetrics.Get().HorizontalPixelsToMM(location.x);
+            float y = ScreenMetrics.Get().VerticalPixelsToMM(location.y);
+            return PointF(x, y);
         }
         private UniquePtr<Diagram> diagram;
         private PointF viewOrigin;
