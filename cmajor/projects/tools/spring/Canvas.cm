@@ -8,12 +8,15 @@ using System.Windows;
 
 namespace spring
 {
+    public const int clickThresholdMs = 500;
+
     public class Canvas : Control
     {
         public Canvas(const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("spring.canvas", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
-            backgroundColor, "canvas", location, size, dock, anchors), diagram(new Diagram())
+            backgroundColor, "canvas", location, size, dock, anchors), diagram(new Diagram()), moveOperationCreated(false)
         {
+            diagram->SetCanvas(this);
         }
         public Canvas() : this(Color.White(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none) // todo
         {
@@ -24,10 +27,7 @@ namespace spring
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
-            if (diagram->Invalidated())
-            {
-                diagram->ResetInvalidated();
-            }
+            SetCursor();
             Unit prevUnit = args.graphics.GetPageUnitChecked();
             TextRenderingHint prevTextRenderingHint = args.graphics.GetTextRenderingHint();
             args.graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
@@ -37,46 +37,140 @@ namespace spring
             args.graphics.SetTextRenderingHintChecked(prevTextRenderingHint);
             args.graphics.SetPageUnitChecked(prevUnit);
         }
+        public void KeyDown(KeyEventArgs& args)
+        {
+            switch (args.keyData)
+            {
+                case Keys.delete_:
+                {
+                    DeleteSelection();
+                    break;
+                }
+                case Keys.escape:
+                {
+                    diagram->CancelOperation();
+                    break;
+                }
+            }
+        }
         protected override void OnMouseDown(MouseEventArgs& args)
         {
             base->OnMouseDown(args);
-            PointF location = ConvertLocation(args.location);
-            MouseButtons buttons = args.buttons;
+            PointF location = ToDiagramLocation(args.location);
             DiagramElement* element = null;
             int index = diagram->GetIndexOfElementAt(location);
             if (index != -1)
             {
                 element = diagram->GetElementByIndex(index);
             }
-            Tools.Current()->MouseDown(*diagram, location, buttons, index, element);
-            if (diagram->Invalidated())
+            MouseButtons buttons = args.buttons;
+            bool shift = (buttons & MouseButtons.shift) != MouseButtons.none;
+            bool control = (buttons & MouseButtons.control) != MouseButtons.none;
+            bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
+            bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
+            mouseDownArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
+            moveOperationCreated = false;
+        }
+        protected override void OnMouseMove(MouseEventArgs& args)
+        {
+            base->OnMouseMove(args);
+            PointF location = ToDiagramLocation(args.location);
+            DiagramElement* element = null;
+            int index = diagram->GetIndexOfElementAt(location);
+            if (index != -1)
             {
-                Invalidate();
+                element = diagram->GetElementByIndex(index);
+            }
+            MouseButtons buttons = args.buttons;
+            bool shift = (buttons & MouseButtons.shift) != MouseButtons.none;
+            bool control = (buttons & MouseButtons.control) != MouseButtons.none;
+            bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
+            bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
+            mouseMoveArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
+            if (left && !right && !shift && !control)
+            {
+                if (!moveOperationCreated)
+                {
+                    moveOperationCreated = true;
+                    Tools.Current()->CreateMoveOperation(mouseDownArgs);
+                }
+                Tools.Current()->ContinueMoveOperation(mouseMoveArgs);
+            }
+        }
+        protected override void OnMouseUp(MouseEventArgs& args)
+        {
+            base->OnMouseUp(args);
+            PointF location = ToDiagramLocation(args.location);
+            DiagramElement* element = null;
+            int index = diagram->GetIndexOfElementAt(location);
+            if (index != -1)
+            {
+                element = diagram->GetElementByIndex(index);
+            }
+            MouseButtons buttons = args.buttons;
+            bool shift = (buttons & MouseButtons.shift) != MouseButtons.none;
+            bool control = (buttons & MouseButtons.control) != MouseButtons.none;
+            bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
+            bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
+            mouseUpArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
+            Duration duration = mouseUpArgs.time - mouseDownArgs.time;
+            if (duration <= Duration.FromMilliseconds(clickThresholdMs))
+            {
+                if (moveOperationCreated)
+                {
+                    moveOperationCreated = false;
+                    Tools.Current()->CancelMoveOperation(mouseUpArgs);
+                }
+                Tools.Current()->MouseClick(mouseUpArgs);
+            }
+            else
+            {
+                if (moveOperationCreated)
+                {
+                    moveOperationCreated = false;
+                    Tools.Current()->CommitMoveOperation(mouseUpArgs);
+                }
             }
         }
         protected override void OnMouseDoubleClick(MouseEventArgs& args)
         {
             base->OnMouseDoubleClick(args);
-            PointF location = ConvertLocation(args.location);
+            PointF location = ToDiagramLocation(args.location);
             int index = diagram->GetIndexOfElementAt(location);
             DiagramElement* element = null;
             if (index != -1)
             {
                 element = diagram->GetElementByIndex(index);
             }
-            Tools.Current()->MouseDoubleClick(*diagram, location, index, element);
-            if (diagram->Invalidated())
-            {
-                Invalidate();
-            }
+            MouseButtons buttons = args.buttons;
+            bool shift = (buttons & MouseButtons.shift) != MouseButtons.none;
+            bool control = (buttons & MouseButtons.control) != MouseButtons.none;
+            bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
+            bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
+            MouseArgs mouseDoubleClickArgs(diagram.Get(), location, index, element, shift, control, left, right);
+            Tools.Current()->MouseDoubleClick(mouseDoubleClickArgs);
         }
-        private nothrow PointF ConvertLocation(const Point& location)
+        public nothrow PointF ToDiagramLocation(const Point& controlLocation)
         {
-            float x = ScreenMetrics.Get().HorizontalPixelsToMM(location.x);
-            float y = ScreenMetrics.Get().VerticalPixelsToMM(location.y);
+            float x = ScreenMetrics.Get().HorizontalPixelsToMM(controlLocation.x);
+            float y = ScreenMetrics.Get().VerticalPixelsToMM(controlLocation.y);
             return PointF(x, y);
+        }
+        public nothrow Point ToControlLocation(const PointF& diagramLocation)
+        {
+            int x = ScreenMetrics.Get().MMToHorizontalPixels(diagramLocation.x);
+            int y = ScreenMetrics.Get().MMToVerticalPixels(diagramLocation.y);
+            return Point(x, y);
+        }
+        private void DeleteSelection()
+        {
+            diagram->DeleteSelection();
         }
         private UniquePtr<Diagram> diagram;
         private PointF viewOrigin;
+        private MouseArgs mouseDownArgs;
+        private MouseArgs mouseMoveArgs;
+        private MouseArgs mouseUpArgs;
+        private bool moveOperationCreated;
     }
 }

@@ -847,6 +847,20 @@ namespace System.Windows
                     message.result = 0;
                     return true;
                 }
+                case WM_RBUTTONDOWN:
+                {
+                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam | MouseButtons.rbutton), 1);
+                    DoMouseDown(args);
+                    message.result = 0;
+                    return true;
+                }
+                case WM_RBUTTONUP:
+                {
+                    MouseEventArgs args(Point(message.LParamX(), message.LParamY()), cast<MouseButtons>(message.wparam | MouseButtons.rbutton), 1);
+                    DoMouseUp(args);
+                    message.result = 0;
+                    return true;
+                }
                 case WM_CHAR:
                 {
                     wchar ch = cast<wchar>(message.wparam);
@@ -1389,7 +1403,7 @@ namespace System.Windows
         {
             paintEvent.Fire(args);
         }
-        internal virtual void PaintAll(PaintEventArgs& args)
+        internal virtual void PaintAll(PaintEventArgs& args, bool skipMenuBar)
         {
             try
             {
@@ -1501,7 +1515,7 @@ namespace System.Windows
                 if (LButtonPressed())
                 {
                     ResetLButtonPressed();
-                    OnClick();
+                    this->OnClick();
                 }
             }
         }

@@ -1,0 +1,114 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace spring
+{
+    public abstract class Operation
+    {
+        public nothrow Operation(Diagram* diagram_) : diagram(diagram_), startLocation()
+        {
+        }
+        public nothrow Operation(Diagram* diagram_, const PointF& startLocation_) : diagram(diagram_), startLocation(startLocation_)
+        {
+        }
+        public default virtual ~Operation();
+        public abstract nothrow bool IsEmpty() const;
+        public abstract void AdvanceTo(const PointF& location);
+        public abstract void Cancel();
+        public abstract void Commit(const PointF& location);
+        public nothrow inline const PointF& StartLocation() const
+        {
+            return startLocation;
+        }
+        public nothrow inline Diagram* GetDiagram() const
+        {
+            return diagram;
+        }
+        private Diagram* diagram;
+        private PointF startLocation;
+    }
+
+    public class EmptyOperation : Operation
+    {
+        public nothrow override bool IsEmpty() const
+        {
+            return true;
+        }
+        public override void AdvanceTo(const PointF& location)
+        {
+        }
+        public override void Cancel()
+        {
+        }
+        public override void Commit(const PointF& location)
+        {
+        }
+    }
+
+    public class MoveContainerElementsOperation : Operation
+    {
+        public nothrow MoveContainerElementsOperation(Diagram* diagram, const PointF& startLocation) : base(diagram, startLocation)
+        {
+        }
+        public nothrow void AddContainerElementIndex(int index)
+        {
+            containerElementIndeces.Add(index);
+        }
+        public nothrow void SetContainerElementIndeces(List<int>&& containerElementIndeces_)
+        {
+            containerElementIndeces = containerElementIndeces_;
+        }
+        public override void AdvanceTo(const PointF& location)
+        {
+            int n = cast<int>(containerElementIndeces.Count());
+            #assert(n == cast<int>(originalLocations.Count()));
+            PointF startLocation = StartLocation();
+            float dx = location.x - startLocation.x;
+            float dy = location.y - startLocation.y;
+            for (int i = 0; i < n; ++i)
+            {
+                int elementIndex = containerElementIndeces[i];
+                PointF newLocation = originalLocations[i];
+                newLocation.Offset(dx, dy);
+                DiagramElement* element = GetDiagram()->GetElementByIndex(elementIndex);
+                element->SetLocation(newLocation);
+            }
+        }
+        public override void Cancel()
+        {
+            int n = cast<int>(containerElementIndeces.Count());
+            #assert(n == cast<int>(originalLocations.Count()));
+            for (int i = 0; i < n; ++i)
+            {
+                int elementIndex = containerElementIndeces[i];
+                PointF originalLocation = originalLocations[i];
+                DiagramElement* element = GetDiagram()->GetElementByIndex(elementIndex);
+                element->SetLocation(originalLocation);
+            }
+        }
+        public override void Commit(const PointF& location)
+        {
+            AdvanceTo(location);
+        }
+        public void FetchOriginalLocations()
+        {
+            for (int elementIndex : containerElementIndeces)
+            {
+                DiagramElement* element = GetDiagram()->GetElementByIndex(elementIndex);
+                originalLocations.Add(element->Location());
+            }
+        }
+        public nothrow override bool IsEmpty() const
+        {
+            return containerElementIndeces.IsEmpty();
+        }
+        private List<int> containerElementIndeces;
+        private List<PointF> originalLocations;
+    }
+}

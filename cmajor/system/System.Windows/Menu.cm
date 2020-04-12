@@ -461,6 +461,7 @@ namespace System.Windows
             {
                 if (menuBox != null)
                 {
+                    menuBox->SetPaintThisMenuBox(true);
                     menuBox->SetLocation(Point(Location().x + menuRect.location.x, Location().y + menuRect.location.y));
                     menuBox->SetSize(menuRect.size); 
                     Control* parentControl = ParentControl();
@@ -483,6 +484,7 @@ namespace System.Windows
             {
                 if (menuBox != null)
                 {
+                    menuBox->SetPaintThisMenuBox(false);
                     menuBox->Hide();
                 }
                 InvalidateParentRect(menuRect);
@@ -816,8 +818,16 @@ namespace System.Windows
     {
         public MenuBox(const Font& font, MenuBar* menuBar_, MenuItem* rootItem_) :
             base(font, "System.Windows.MenuBox", DefaultWindowClassStyle(), HiddenChildWindowStyle(), DefaultExtendedWindowStyle(),
-            Color.White(), "menuBox", Point(), Size(), Dock.none, Anchors.none), menuBar(menuBar_), rootItem(rootItem_)
+            Color.White(), "menuBox", Point(), Size(), Dock.none, Anchors.none), menuBar(menuBar_), rootItem(rootItem_), paintThisMenuBox(false)
         {
+        }
+        public nothrow void SetPaintThisMenuBox(bool paintThisMenuBox_)
+        {
+            paintThisMenuBox = paintThisMenuBox_;
+        }
+        public nothrow inline bool PaintThisMenuBox() const
+        {
+            return paintThisMenuBox;
         }
         public override void PrintWindowTree(int level)
         {
@@ -826,6 +836,10 @@ namespace System.Windows
             {
                 log->WriteLine(string(' ', level) + "MenuBox." + Text() + ".handle=" + ToHexString(cast<ulong>(Handle())) + " " + ParentText() + "[" + Rect(Point(), GetSize()).ToString() + "]");
             }
+        }
+        protected virtual Point GetBoxLocation() const
+        {
+            return Location();
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
@@ -843,20 +857,24 @@ namespace System.Windows
                 Point loc = Location();
                 if (!paintMenu)
                 {
-                    Control* parentControl = ParentControl();
-                    if (parentControl != null)
+                    if (paintThisMenuBox)
                     {
-                        Bitmap menuBoxBitmap(args.clipRect.size.w, args.clipRect.size.h, args.graphics);
-                        Graphics menuBoxGraphics = Graphics.FromImage(menuBoxBitmap);
-                        Rect menuBoxClipRect(Point(0, 0), Size(args.clipRect.size.w, args.clipRect.size.h));
-                        menuBoxGraphics.SetClipChecked(menuBoxClipRect);
-                        menuBoxGraphics.TranslateTransformChecked(-loc.x, -loc.y);
-                        PaintEventArgs paintMenuBoxArgs(menuBoxGraphics, menuBoxClipRect);
-                        bool prevPaintMenu = paintMenu;
-                        paintMenu = true;
-                        parentControl->PaintAll(paintMenuBoxArgs);
-                        paintMenu = prevPaintMenu;
-                        args.graphics.DrawImageChecked(menuBoxBitmap, PointF(0, 0));
+                        Control* parentControl = ParentControl();
+                        if (parentControl != null)
+                        {
+                            Bitmap menuBoxBitmap(args.clipRect.size.w, args.clipRect.size.h, args.graphics);
+                            Graphics menuBoxGraphics = Graphics.FromImage(menuBoxBitmap);
+                            Rect menuBoxClipRect(Point(0, 0), Size(args.clipRect.size.w, args.clipRect.size.h));
+                            menuBoxGraphics.SetClipChecked(menuBoxClipRect);
+                            menuBoxGraphics.TranslateTransformChecked(-loc.x, -loc.y);
+                            PaintEventArgs paintMenuBoxArgs(menuBoxGraphics, menuBoxClipRect);
+                            bool prevPaintMenu = paintMenu;
+                            paintMenu = true;
+                            bool skipMenuBar = this is ContextMenu*;
+                            parentControl->PaintAll(paintMenuBoxArgs, skipMenuBar);
+                            paintMenu = prevPaintMenu;
+                            args.graphics.DrawImageChecked(menuBoxBitmap, PointF(0, 0));
+                        }
                     }
                 }
                 else
@@ -868,7 +886,7 @@ namespace System.Windows
                     else if (rootItem != null)
                     {
                         rootItem->Draw(args.graphics, DefaultPadding(), TextBrush(), BackgroundBrush(), MouseOverBrush(), MenuOpenBrush(), ShadowBrush(), BlackBrush(), BlackPen(), DarkPen(), GetFont(), Format(),
-                            MenuOpenColor(), null, true, loc);
+                            MenuOpenColor(), this, true, Point());
                     }
                 }
             }
@@ -893,36 +911,79 @@ namespace System.Windows
         protected override void OnMouseEnter()
         {
             base->OnMouseEnter();
-            menuBar->MouseEnterInternal();
+            if (menuBar != null)
+            {
+                menuBar->MouseEnterInternal();
+            }
         }
         protected override void OnMouseMove(MouseEventArgs& args)
         {
             base->OnMouseMove(args);
-            Point loc = Location();
-            args.location.x = args.location.x + loc.x;
-            args.location.y = args.location.y + loc.y;
-            menuBar->MouseMoveInternal(args);
+            if (menuBar != null)
+            {
+                Point loc = Location();
+                args.location.x = args.location.x + loc.x;
+                args.location.y = args.location.y + loc.y;
+                menuBar->MouseMoveInternal(args);
+            }
+            else if (rootItem != null)
+            {
+                bool handled = false;
+                rootItem->DispatchMouseMove(args, handled, this);
+            }
         }
         protected override void OnMouseLeave()
         {
             base->OnMouseLeave();
-            menuBar->MouseLeaveInternal();
+            if (menuBar != null)
+            {
+                menuBar->MouseLeaveInternal();
+            }
+            else if (rootItem != null)
+            {
+                rootItem->LeaveChildren(this);
+            }
         }
         protected override void OnMouseDown(MouseEventArgs& args)
         {
             base->OnMouseDown(args);
-            Point loc = Location();
-            args.location.x = args.location.x + loc.x;
-            args.location.y = args.location.y + loc.y;
-            menuBar->MouseDownInternal(args);
+            if (menuBar != null)
+            {
+                Point loc = Location();
+                args.location.x = args.location.x + loc.x;
+                args.location.y = args.location.y + loc.y;
+                menuBar->MouseDownInternal(args);
+            }
+            else if (rootItem != null)
+            {
+                SetLatestMouseDownMenuItem(null);
+                bool handled = false;
+                rootItem->DoMouseDown(args, handled, this);
+                if (handled)
+                {
+                    Invalidate();
+                }
+            }
         }
         protected override void OnMouseUp(MouseEventArgs& args)
         {
             base->OnMouseUp(args);
-            Point loc = Location();
-            args.location.x = args.location.x + loc.x;
-            args.location.y = args.location.y + loc.y;
-            menuBar->MouseUpInternal(args);
+            if (menuBar != null)
+            {
+                Point loc = Location();
+                args.location.x = args.location.x + loc.x;
+                args.location.y = args.location.y + loc.y;
+                menuBar->MouseUpInternal(args);
+            }
+            else if (rootItem != null)
+            {
+                bool handled = false;
+                rootItem->DoMouseUp(args, handled, this);
+                if (handled)
+                {
+                    Invalidate();
+                }
+            }
         }
         protected nothrow inline MenuItem* GetRootItem() const
         {
@@ -930,18 +991,128 @@ namespace System.Windows
         }
         private MenuBar* menuBar;
         private MenuItem* rootItem;
+        private bool paintThisMenuBox;
         private bool paintMenu;
+    }
+
+    public abstract class ClickAction
+    {
+        public nothrow ClickAction()
+        {
+            clickEventHandler = Click;
+        }
+        public default virtual ~ClickAction();
+        public nothrow void AddHandlerTo(MenuItem& menuItem)
+        {
+            menuItem.ClickEvent().AddHandler(clickEventHandler);
+        }
+        private void Click()
+        {
+            Execute();
+        }
+        protected abstract void Execute();
+        private ClickEventHandler clickEventHandler;
+    }
+
+    public class ClickActions
+    {
+        public nothrow void Add(ClickAction* action)
+        {
+            clickActions.Add(UniquePtr<ClickAction>(action));
+        }
+        private List<UniquePtr<ClickAction>> clickActions;
     }
 
     public class ContextMenu : MenuBox
     {
-        public ContextMenu(const Font& font) : base(font, null, new MenuItem("root")), rootItemPtr(GetRootItem())
+        public ContextMenu(const Font& font) : base(font, null, new MenuItem("root")), rootItemPtr(GetRootItem()), latestOpenedMenuItem(null), selectedMenuItem(null), latestMouseDownMenuItem(null)
         {
         }
         public ContextMenu() : this(Font(FontFamily("Segoe UI"), 9.0f))
         {
         }
+        public void AddMenuItem(MenuItemBase* menuItem)
+        {
+            rootItemPtr->AddMenuItem(menuItem);
+        }
+        public void AddMenuItemAction(MenuItem* menuItem, ClickAction* action)
+        {
+            rootItemPtr->AddMenuItem(menuItem);
+            action->AddHandlerTo(*menuItem);
+            clickActions.Add(action);
+        }
+        public void CalculateSize()
+        {
+            rootItemPtr->SetState(MenuItem.State.open, this);
+            Graphics graphics = Graphics.FromWindowHandle(Handle());
+            rootItemPtr->CalculateChildRect(graphics, GetFont(), Format(), Point(0, 0));
+            Rect menuRect; 
+            rootItemPtr->GetOpenRect(menuRect);
+            SetSize(menuRect.size);
+        }
+        public nothrow bool HasMenuItems()
+        {
+            return !rootItemPtr->Children().IsEmpty();
+        }
+        protected override Point GetBoxLocation() const
+        {
+            return Point(0, 0);
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            SetPaintThisMenuBox(true);
+            base->OnPaint(args);
+        }
+        protected override void OnVisibleChanged()
+        {
+            base->OnVisibleChanged();
+            if (!IsVisible())
+            {
+                rootItemPtr->SetState(MenuItem.State.closed, this);
+                SetPaintThisMenuBox(false);
+            }
+        }
+        internal override nothrow void SetMenuInvalidated()
+        {
+            Invalidate();
+        }
+        internal override nothrow bool IsOpen() const
+        {
+            return rootItemPtr->GetState() == MenuItem.State.open;
+        }
+        internal override nothrow MenuItem* GetSelectedMenuItem() const
+        {
+            return selectedMenuItem;
+        }
+        internal override nothrow void SetSelectedMenuItem(MenuItem* selectedMenuItem_)
+        {
+            selectedMenuItem = selectedMenuItem_;
+        }
+        internal override nothrow MenuItem* LatestOpenedMenuItem() const
+        {
+            return latestOpenedMenuItem;
+        }
+        internal override nothrow void SetLatestOpenedMenuItem(MenuItem* menuItem)
+        {
+            latestOpenedMenuItem = menuItem;
+        }
+        internal override nothrow MenuItem* GetLatestMouseDownMenuItem() const
+        {
+            return latestMouseDownMenuItem;
+        }
+        internal nothrow override void SetLatestMouseDownMenuItem(MenuItem* menuItem)
+        {
+            latestMouseDownMenuItem = menuItem;
+        }
+        internal nothrow override MenuItem* GetOpenedMenuItem() const
+        {
+            return rootItemPtr.Get();
+        }
         private UniquePtr<MenuItem> rootItemPtr;
+        private MenuItem* latestOpenedMenuItem;
+        private MenuItem* selectedMenuItem;
+        private MenuItem* latestMouseDownMenuItem;
+        private ClickActions clickActions;
     }
 
     public abstract class MenuItemBase : Component
@@ -1701,13 +1872,16 @@ namespace System.Windows
                         Close(menuControl);
                         DoClick();
                     }
-                    MenuItem* openedMenuItem = menuControl->GetOpenedMenuItem();
-                    if (openedMenuItem != null)
+                    if (menuControl is MenuBar*)
                     {
-                        openedMenuItem->SetState(State.closed, menuControl);
+                        MenuItem* openedMenuItem = menuControl->GetOpenedMenuItem();
+                        if (openedMenuItem != null)
+                        {
+                            openedMenuItem->SetState(State.closed, menuControl);
+                        }
+                        menuControl->SetClosed();
+                        menuControl->SetMenuInvalidated();
                     }
-                    menuControl->SetClosed();
-                    menuControl->SetMenuInvalidated();
                 }
             }
         }
@@ -1771,7 +1945,7 @@ namespace System.Windows
         {
             mouseEnterEvent.Fire();
         }
-        private void LeaveChildren(MenuControl* menuControl)
+        internal void LeaveChildren(MenuControl* menuControl)
         {
             Component* child = children.FirstChild();
             while (child != null)

@@ -1,0 +1,316 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace spring
+{
+    public abstract class Selection
+    {
+        public nothrow Selection(Diagram& diagram_) : diagram(diagram_)
+        {
+        }
+        public default virtual ~Selection();
+        public abstract nothrow bool IsEmpty() const;
+        public abstract nothrow int Count() const;
+        public abstract nothrow bool Contains(const System.Windows.PointF& location) const;
+        public abstract nothrow int GetContainerElementCount() const;
+        public abstract nothrow List<int> GetContainerElementIndeces() const;
+        public abstract nothrow void Clear();
+        public abstract nothrow void Delete();
+        public abstract nothrow int GetFirstIndex() const;
+        public abstract nothrow void Add(int index);
+        public abstract nothrow void Remove(int index);
+        public abstract nothrow void AddActions(System.Windows.ContextMenu* contextMenu);
+        public nothrow inline Diagram& GetDiagram() const
+        {
+            return diagram;
+        }
+        private Diagram& diagram;
+    }
+
+    public class EmptySelection : Selection
+    {
+        public nothrow EmptySelection(Diagram& diagram) : base(diagram)
+        {
+        }
+        public override nothrow bool IsEmpty() const
+        {
+            return true;
+        }
+        public override nothrow int Count() const
+        {
+            return 0;
+        }
+        public override nothrow bool Contains(const System.Windows.PointF& location) const
+        {
+            return false;
+        }
+        public override nothrow int GetContainerElementCount() const
+        {
+            return 0;
+        }
+        public override nothrow List<int> GetContainerElementIndeces() const
+        {
+            return List<int>();
+        }
+        public override nothrow void Clear()
+        {
+        }
+        public override nothrow void Delete()
+        {
+        }
+        public override nothrow int GetFirstIndex() const
+        {
+            return -1;
+        }
+        public override nothrow void Add(int elementIndex)
+        {
+        }
+        public override nothrow void Remove(int elementIndex)
+        {
+        }
+        public override nothrow void AddActions(System.Windows.ContextMenu* contextMenu)
+        {
+        }
+    }
+
+    public class ElementSelection : Selection
+    {
+        public nothrow ElementSelection(Diagram& diagram) : base(diagram)
+        {
+        }
+        public nothrow ElementSelection(Diagram& diagram, int index) : base(diagram)
+        {
+            indeces.Add(index);
+            diagram.GetElementByIndex(index)->Select();
+        }
+        public nothrow ElementSelection(Diagram& diagram, List<int>&& indeces_) : base(diagram), indeces(indeces_)
+        {
+        }
+        public override nothrow bool IsEmpty() const
+        {
+            return indeces.IsEmpty();
+        }
+        public override nothrow int Count() const
+        {
+            return cast<int>(indeces.Count());
+        }
+        public override nothrow bool Contains(const System.Windows.PointF& location) const
+        {
+            int n = cast<int>(indeces.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                int index = indeces[i];
+                DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                if (element->Contains(location))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public override nothrow int GetContainerElementCount() const
+        {
+            int count = 0;
+            int n = cast<int>(indeces.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                int index = indeces[i];
+                DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                if (element is ContainerElement*)
+                {
+                    ++count;
+                }
+            }
+            return count;
+        }
+        public override nothrow List<int> GetContainerElementIndeces() const
+        {
+            List<int> containerElementIndeces;
+            int n = cast<int>(indeces.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                int index = indeces[i];
+                DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                if (element is ContainerElement*)
+                {
+                    containerElementIndeces.Add(index);
+                }
+            }
+            return containerElementIndeces;
+        }
+        public override nothrow void Clear()
+        {
+            int n = cast<int>(indeces.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                int index = indeces[i];
+                GetDiagram().GetElementByIndex(index)->ResetSelected();
+            }
+            indeces.Clear();
+        }
+        public override nothrow void Delete()
+        {
+            SortByIndex();
+            int n = cast<int>(indeces.Count());
+            for (int i = n - 1; i >= 0; --i)
+            {
+                int index = indeces[i];
+                UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+            }
+            indeces.Clear();
+        }
+        public override nothrow int GetFirstIndex() const
+        {
+            return indeces.Front();
+        }
+        public override nothrow void Add(int index)
+        {
+            int n = cast<int>(indeces.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                if (indeces[i] == index) return;
+            }
+            indeces.Add(index);
+            GetDiagram().GetElementByIndex(index)->Select();
+        }
+        public override nothrow void Remove(int index)
+        {
+            indeces.Remove(index);
+            GetDiagram().GetElementByIndex(index)->ResetSelected();
+        }
+        public override nothrow void AddActions(System.Windows.ContextMenu* contextMenu)
+        {
+            System.Windows.MenuItem* deleteMenuItem = new System.Windows.MenuItem("Delete");
+            contextMenu->AddMenuItemAction(deleteMenuItem, new DeleteSelectionAction(GetDiagram()));
+            if (GetContainerElementCount() > 1)
+            {
+                System.Windows.MenuItem* alignTopMenuItem = new System.Windows.MenuItem("Align top");
+                contextMenu->AddMenuItemAction(alignTopMenuItem, new AlignTopAction(GetDiagram()));
+                System.Windows.MenuItem* alignBottomMenuItem = new System.Windows.MenuItem("Align bottom");
+                contextMenu->AddMenuItemAction(alignBottomMenuItem, new AlignBottomAction(GetDiagram()));
+                System.Windows.MenuItem* alignVerticalCenterMenuItem = new System.Windows.MenuItem("Align vertical center");
+                contextMenu->AddMenuItemAction(alignVerticalCenterMenuItem, new AlignVerticalCenterAction(GetDiagram()));
+                System.Windows.MenuItem* alignLeftSideMenuItem = new System.Windows.MenuItem("Align left side");
+                contextMenu->AddMenuItemAction(alignLeftSideMenuItem, new AlignLeftSideAction(GetDiagram()));
+                System.Windows.MenuItem* alignRightSideMenuItem = new System.Windows.MenuItem("Align right side");
+                contextMenu->AddMenuItemAction(alignRightSideMenuItem, new AlignRightSideAction(GetDiagram()));
+                System.Windows.MenuItem* alignHorizontalCenterMenuItem = new System.Windows.MenuItem("Align horizontal center");
+                contextMenu->AddMenuItemAction(alignHorizontalCenterMenuItem, new AlignHorizontalCenterAction(GetDiagram()));
+            }
+        }
+        public nothrow void SortByIndex()
+        {
+            Sort(indeces);
+        }
+        public nothrow void SortHorizontally()
+        {
+            Sort(indeces, HorizontallyLess(&GetDiagram()));
+        }
+        public nothrow void SortVertically()
+        {
+            Sort(indeces, VerticallyLess(&GetDiagram()));
+        }
+        public nothrow void AlignTop()
+        {
+            if (!indeces.IsEmpty())
+            {
+                DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
+                float top = firstElement->Location().y;
+                int n = cast<int>(indeces.Count());
+                for (int i = 1; i < n; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    element->SetLocation(System.Windows.PointF(element->Location().x, top));
+                }
+            }
+        }
+        public nothrow void AlignBottom()
+        {
+            if (!indeces.IsEmpty())
+            {
+                DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
+                float bottom = firstElement->Location().y + firstElement->GetSize().h;
+                int n = cast<int>(indeces.Count());
+                for (int i = 1; i < n; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    float elementBottom = element->Location().y + element->GetSize().h;
+                    float dy = elementBottom - bottom;
+                    float top = element->Location().y - dy;
+                    element->SetLocation(System.Windows.PointF(element->Location().x, top));
+                }
+            }
+        }
+        public nothrow void AlignVerticalCenter()
+        {
+            if (!indeces.IsEmpty())
+            {
+                DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
+                float center = firstElement->Location().y + firstElement->GetSize().h / 2.0f;
+                int n = cast<int>(indeces.Count());
+                for (int i = 1; i < n; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    float elementCenter = element->Location().y + element->GetSize().h / 2;
+                    float dy = elementCenter - center;
+                    float top = element->Location().y - dy;
+                    element->SetLocation(System.Windows.PointF(element->Location().x, top));
+                }
+            }
+        }
+        public nothrow void AlignLeftSide()
+        {
+            if (!indeces.IsEmpty())
+            {
+                DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
+                float leftSide = firstElement->Location().x;
+                int n = cast<int>(indeces.Count());
+                for (int i = 1; i < n; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    element->SetLocation(System.Windows.PointF(leftSide, element->Location().y));
+                }
+            }
+        }
+        public nothrow void AlignRightSide()
+        {
+            if (!indeces.IsEmpty())
+            {
+                DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
+                float rightSide = firstElement->Location().x + firstElement->GetSize().w;
+                int n = cast<int>(indeces.Count());
+                for (int i = 1; i < n; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    float elementRightSide = element->Location().x + element->GetSize().w;
+                    float dx = elementRightSide - rightSide;
+                    float leftSide = element->Location().x - dx;
+                    element->SetLocation(System.Windows.PointF(leftSide, element->Location().y));
+                }
+            }
+        }
+        public nothrow void AlignHorizontalCenter()
+        {
+            if (!indeces.IsEmpty())
+            {
+                DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
+                float center = firstElement->Location().x + firstElement->GetSize().w / 2.0f;
+                int n = cast<int>(indeces.Count());
+                for (int i = 1; i < n; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    float elementCenter = element->Location().x + element->GetSize().w / 2.0f;
+                    float dx = elementCenter - center;
+                    float leftSide = element->Location().x - dx;
+                    element->SetLocation(System.Windows.PointF(leftSide, element->Location().y));
+                }
+            }
+        }
+        private List<int> indeces;
+    }
+}

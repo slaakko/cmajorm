@@ -13,30 +13,63 @@ namespace spring
         static nothrow Tools() : currentTool(&selectTool)
         {
         }
+        public static nothrow void SetDiagram(Diagram* diagram_)
+        {
+            diagram = diagram_;
+        }
+        public static nothrow Diagram* GetDiagram()
+        {
+            return diagram;
+        }
         public static nothrow inline Tool* Current()
         {
             return currentTool;
         }
         public static nothrow void SetCurrent(Tool* tool)
         {
-            currentTool = tool;
-            currentTool->GetToolButton()->SetState(ToolButton.State.pressed);
+            if (tool != currentTool)
+            {
+                currentTool = tool;
+                currentTool->GetToolButton()->SetState(ToolButton.State.pressed);
+                currentTool->Initialize(*diagram);
+            }
         }
         internal static nothrow void SetCurrentInternal(Tool* tool)
         {
             currentTool = tool;
         }
-        public static nothrow Tool& GetSelectTool()
+        public static nothrow Tool* GetSelectTool()
         {
-            return selectTool;
+            return &selectTool;
         }
-        public static nothrow Tool& GetClassTool()
+        public static nothrow Tool* GetClassTool()
         {
-            return classTool;
+            return &classTool;
         }
         private static SelectTool selectTool;
         private static ClassTool classTool;
         private static Tool* currentTool;
+        private static Diagram* diagram;
+    }
+
+    public class MouseArgs
+    {
+        public nothrow MouseArgs()
+        {
+        }
+        public nothrow MouseArgs(Diagram* diagram_, const PointF& location_, int elementIndex_, DiagramElement* element_, bool shift_, bool control_, bool left_, bool right_) :
+            time(Now()), diagram(diagram_), location(location_), elementIndex(elementIndex_), element(element_), shift(shift_), control(control_), left(left_), right(right_)
+        {
+        }
+        public TimePoint time;
+        public Diagram* diagram;
+        public PointF location;
+        public int elementIndex;
+        public DiagramElement* element;
+        public bool shift;
+        public bool control;
+        public bool left;
+        public bool right;
     }
 
     public abstract class Tool
@@ -59,49 +92,89 @@ namespace spring
         {
             return cursor;
         }
-        public virtual void MouseDown(Diagram& diagram, const PointF& location, MouseButtons buttons, int elementIndex, DiagramElement* element)
+        public virtual void Initialize(Diagram& diagram)
         {
-            bool shift = (buttons & MouseButtons.shift) != MouseButtons.none;
-            bool control = (buttons & MouseButtons.control) != MouseButtons.none;
-            bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
-            bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
-            if (left)
+        }
+        public virtual void BeforeLeftClick(MouseArgs& args)
+        {
+        }
+        public virtual void AfterLeftClick(MouseArgs& args)
+        {
+        }
+        public virtual void BeforeRightClick(MouseArgs& args)
+        {
+        }
+        public virtual void AfterRightClick(MouseArgs& args)
+        {
+        }
+        public virtual void MouseClick(MouseArgs& args)
+        {
+            if (args.left)
             {
-                MouseLeftClick(diagram, location, elementIndex, element, shift, control);
+                BeforeLeftClick(args);
+                if (args.shift)
+                {
+                    MouseShiftLeftClick(args);
+                }
+                else if (args.control)
+                {
+                    MouseControlLeftClick(args);
+                }
+                else
+                {
+                    MouseNormalLeftClick(args);
+                }
+                AfterLeftClick(args);
             }
-            else if (right)
+            else if (args.right)
             {
-                MouseRightClick(diagram, location, elementIndex, element, shift, control);
+                BeforeRightClick(args);
+                if (args.shift)
+                {
+                    MouseShiftRightClick(args);
+                }
+                else if (args.control)
+                {
+                    MouseControlRightClick(args);
+                }
+                else
+                {
+                    MouseNormalRightClick(args);
+                }
+                AfterRightClick(args);
             }
         }
-        public virtual void MouseLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element, bool shift, bool control)
-        {
-            if (control)
-            {
-                MouseControlLeftClick(diagram, location, elementIndex, element);
-            }
-            else if (shift)
-            {
-                MouseShiftLeftClick(diagram, location, elementIndex, element);
-            }
-            else
-            {
-                MouseNormalLeftClick(diagram, location, elementIndex, element);
-            }
-        }
-        public virtual void MouseNormalLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        public virtual void MouseShiftLeftClick(MouseArgs& args)
         {
         }
-        public virtual void MouseControlLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        public virtual void MouseControlLeftClick(MouseArgs& args)
         {
         }
-        public virtual void MouseShiftLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        public virtual void MouseNormalLeftClick(MouseArgs& args)
         {
         }
-        public virtual void MouseRightClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element, bool shift, bool control)
+        public virtual void MouseShiftRightClick(MouseArgs& args)
         {
         }
-        public virtual void MouseDoubleClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        public virtual void MouseControlRightClick(MouseArgs& args)
+        {
+        }
+        public virtual void MouseNormalRightClick(MouseArgs& args)
+        {
+        }
+        public virtual void MouseDoubleClick(MouseArgs& args)
+        {
+        }
+        public virtual void CreateMoveOperation(MouseArgs& args)
+        {
+        }
+        public virtual void ContinueMoveOperation(MouseArgs& args)
+        {
+        }
+        public virtual void CancelMoveOperation(MouseArgs& args)
+        {
+        }
+        public virtual void CommitMoveOperation(MouseArgs& args)
         {
         }
         private nothrow void ToolButtonClicked()
@@ -114,34 +187,176 @@ namespace spring
 
     public class SelectTool : Tool
     {
-        public override void MouseNormalLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        public override void Initialize(Diagram& diagram)
         {
-            if (element != null)
+            diagram.ResetSelection();
+        }
+        public override void BeforeLeftClick(MouseArgs& args)
+        {
+            args.diagram->DisposeContextMenu();
+        }
+        public override void MouseNormalLeftClick(MouseArgs& args)
+        {
+            if (args.element != null)
             {
-                diagram.SetSelectedElement(element);
+                args.diagram->SetSelection(new ElementSelection(*args.diagram, args.elementIndex));
             }
             else
             {
-                diagram.ResetSelection();
+                args.diagram->ResetSelection();
             }
         }
-        public override void MouseControlLeftClick(Diagram& diagram, const PointF& location, int elementIndex, DiagramElement* element)
+        public override void MouseControlLeftClick(MouseArgs& args)
         {
-            if (element != null)
+            if (args.element != null)
             {
-                if (element->IsSelected())
+                if (args.element->IsSelected())
                 {
-                    diagram.RemoveElementFromSelectedElements(element);
+                    args.diagram->GetSelection().Remove(args.elementIndex);
                 }
                 else
                 {
-                    diagram.AddElementToSelectedElements(element);
+                    args.diagram->GetSelection().Add(args.elementIndex);
                 }
             }
+        }
+        public override void MouseNormalRightClick(MouseArgs& args)
+        {
+            UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+            if (args.diagram->GetSelection().Count() <= 1)
+            {
+                if (args.diagram->GetSelection().Count() == 1)
+                {
+                    args.elementIndex = args.diagram->GetSelection().GetFirstIndex();
+                    if (args.elementIndex != -1)
+                    {
+                        args.element = args.diagram->GetElementByIndex(args.elementIndex);
+                    }
+                    else
+                    {
+                        args.element = null;
+                    }
+                }
+                if (args.element != null)
+                {
+                    if (args.element->Contains(args.location))
+                    {
+                        args.element->AddActions(*args.diagram, args.elementIndex, contextMenu.Get());
+                    }
+                    else
+                    {
+                        args.diagram->DisposeContextMenu();
+                    }
+                }
+                else
+                {
+                    args.diagram->DisposeContextMenu();
+                }
+            }
+            else
+            {
+                if (args.diagram->GetSelection().Contains(args.location))
+                {
+                    args.diagram->GetSelection().AddActions(contextMenu.Get());
+                }
+                else
+                {
+                    args.diagram->DisposeContextMenu();
+                }
+            }
+            if (contextMenu->HasMenuItems())
+            {
+                Point loc = args.diagram->GetCanvas()->ToControlLocation(args.location);
+                Point screenLoc = args.diagram->GetCanvas()->ClientToScreen(loc);
+                Window* window = args.diagram->GetCanvas()->GetWindow();
+                window->ShowContextMenu(contextMenu.Release(), screenLoc);
+            }
+            else
+            {
+                args.diagram->DisposeContextMenu();
+            }
+        }
+        public override void MouseDoubleClick(MouseArgs& args)
+        {
+            args.diagram->GetSelection().Clear();
+            if (args.element != null)
+            {
+                ClassElementPropertiesAction action(*args.diagram, args.elementIndex);
+                action.Execute();
+            }
+        }
+        public override void CreateMoveOperation(MouseArgs& args)
+        {
+            UniquePtr<MoveContainerElementsOperation> moveOperation(new MoveContainerElementsOperation(args.diagram, args.location));
+            if (args.diagram->GetSelection().Count() <= 1)
+            {
+                if (args.diagram->GetSelection().Count() == 1)
+                {
+                    args.elementIndex = args.diagram->GetSelection().GetFirstIndex();
+                    if (args.elementIndex != -1)
+                    {
+                        args.element = args.diagram->GetElementByIndex(args.elementIndex);
+                    }
+                    else
+                    {
+                        args.element = null;
+                    }
+                }
+                if (args.element != null)
+                {
+                    if (args.element is ContainerElement*)
+                    {
+                        if (args.element->Contains(args.location))
+                        {
+                            moveOperation->AddContainerElementIndex(args.elementIndex);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (args.diagram->GetSelection().GetContainerElementCount() > 0)
+                {
+                    if (args.diagram->GetSelection().Contains(args.location))
+                    {
+                        moveOperation->SetContainerElementIndeces(args.diagram->GetSelection().GetContainerElementIndeces());
+                    }
+                }
+            }
+            moveOperation->FetchOriginalLocations();
+            if (!moveOperation->IsEmpty())
+            {
+                args.diagram->SetOperation(moveOperation.Release());
+            }
+        }
+        public override void ContinueMoveOperation(MouseArgs& args)
+        {
+            args.diagram->AdvanceOperation(args.location);
+        }
+        public override void CancelMoveOperation(MouseArgs& args)
+        {
+            args.diagram->CancelOperation();
+        }
+        public override void CommitMoveOperation(MouseArgs& args)
+        {
+            args.diagram->CommitOperation(args.location);
         }
     }
 
     public class ClassTool : Tool
     {
+        public override void Initialize(Diagram& diagram)
+        {
+            diagram.ResetSelection();
+        }
+        public override void MouseNormalLeftClick(MouseArgs& args)
+        {
+            UniquePtr<ClassElement> classElement(new ClassElement("Class", false));
+            classElement->SetLocation(args.location);
+            args.diagram->AddElement(classElement.Release());
+            args.diagram->SetChanged();
+            args.diagram->Invalidate();
+            Tools.SetCurrent(Tools.GetSelectTool());
+        }
     }
 }

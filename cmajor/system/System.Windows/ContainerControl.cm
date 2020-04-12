@@ -173,7 +173,7 @@ namespace System.Windows
                     message.result = 0;
                     return true;
                 }
-                case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK:
+                case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK: case WM_RBUTTONDOWN: case WM_RBUTTONUP:
                 case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL:
                 case WM_SETFOCUS: case WM_KILLFOCUS: case WM_TIMER: case WM_COMMAND: case WM_SHOWWINDOW: 
                 {
@@ -224,11 +224,11 @@ namespace System.Windows
                 container->DockChildren();
             }
         }
-        internal override void PaintAll(PaintEventArgs& args)
+        internal override void PaintAll(PaintEventArgs& args, bool skipMenuBar)
         {
             try
             {
-                base->PaintAll(args);
+                base->PaintAll(args, skipMenuBar);
                 Control* topControl = TopControl();
                 Component* child = children.FirstChild();
                 while (child != null)
@@ -238,12 +238,31 @@ namespace System.Windows
                         Control* childControl = cast<Control*>(child);
                         if (childControl != topControl)
                         {
-                            GraphicsState state = args.graphics.SaveChecked();
-                            Point loc = childControl->Location();
-                            args.graphics.SetClipChecked(Rect(childControl->Location(), childControl->GetSize()));
-                            args.graphics.TranslateTransformChecked(loc.x, loc.y);
-                            childControl->PaintAll(args);
-                            args.graphics.RestoreChecked(state);
+                            bool skip = false;
+                            if (skipMenuBar)
+                            {
+                                if (childControl is MenuBar*)
+                                {
+                                    skip = true;
+                                }
+                                else if (childControl is MenuBox*)
+                                {
+                                    MenuBox* menuBox = cast<MenuBox*>(childControl);
+                                    if (!menuBox->PaintThisMenuBox())
+                                    {
+                                        skip = true;
+                                    }
+                                }
+                            }
+                            if (!skip)
+                            {
+                                GraphicsState state = args.graphics.SaveChecked();
+                                Point loc = childControl->Location();
+                                args.graphics.SetClipChecked(Rect(childControl->Location(), childControl->GetSize()));
+                                args.graphics.TranslateTransformChecked(loc.x, loc.y);
+                                childControl->PaintAll(args, skipMenuBar);
+                                args.graphics.RestoreChecked(state);
+                            }
                         }
                     }
                     child = child->NextSibling();
@@ -254,7 +273,7 @@ namespace System.Windows
                     Point loc = topControl->Location();
                     args.graphics.SetClipChecked(Rect(topControl->Location(), topControl->GetSize()));
                     args.graphics.TranslateTransformChecked(loc.x, loc.y);
-                    topControl->PaintAll(args);
+                    topControl->PaintAll(args, skipMenuBar);
                     args.graphics.RestoreChecked(state);
                 }
             }

@@ -28,13 +28,13 @@ public class MainWindow : Window
         UniquePtr<ToolBar> toolBar(new ToolBar(ToolBar.Style.radioButtonGroup));
         ToolButton* selectToolButton = new ToolButton("arrow.system.windows.bitmap");
         selectToolButton->SetToolTip("Select");
-        Tools.GetSelectTool().SetToolButton(selectToolButton);
-        Tools.GetSelectTool().SetCursor(&arrowCursor);
+        Tools.GetSelectTool()->SetToolButton(selectToolButton);
+        Tools.GetSelectTool()->SetCursor(&arrowCursor);
         toolBar->AddToolButton(selectToolButton);
         ToolButton* classToolButton = new ToolButton("class.tool.spring.bitmap");
         classToolButton->SetToolTip("Place new class");
-        Tools.GetClassTool().SetToolButton(classToolButton);
-        Tools.GetClassTool().SetCursor(&classToolCursor);
+        Tools.GetClassTool()->SetToolButton(classToolButton);
+        Tools.GetClassTool()->SetCursor(&classToolCursor);
         toolBar->AddToolButton(classToolButton);
         AddChild(toolBar.Release());
         UniquePtr<SplitContainer> verticalSplitContainer(new SplitContainer(Orientation.vertical, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
@@ -94,6 +94,10 @@ public class MainWindow : Window
             logView->WriteLine("dialog result=" + ToString(result));
         }
     }
+    protected override void OnKeyDown(KeyEventArgs& args)
+    {
+        canvas->KeyDown(args);
+    }
     private void CanvasMouseEnter()
     {
         xCoordStatusBarItem->SetText(string(' ', 6));
@@ -122,6 +126,7 @@ int main()
 {
     try
     {
+       Debug.SetPaint();
        MainWindow mainWindow;
        ScreenMetrics.Save(false);
        Graphics graphics = Graphics.FromWindowHandle(mainWindow.Handle());

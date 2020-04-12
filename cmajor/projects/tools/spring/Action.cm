@@ -1,0 +1,190 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace spring
+{
+    public class ExecuteGuard
+    {
+        public nothrow ExecuteGuard(Diagram& diagram_) : diagram(diagram_)
+        {
+        }
+        public ~ExecuteGuard()
+        {
+            diagram.DisposeContextMenu();
+        }
+        private Diagram& diagram;
+    }
+
+    public abstract class DiagramAction : ClickAction
+    {
+        public nothrow DiagramAction(Diagram& diagram_) : base(), diagram(diagram_)
+        {
+        }
+        public override void Execute()
+        {
+            ExecuteGuard guard(diagram);
+            Execute(diagram);
+        }
+        protected abstract void Execute(Diagram& diagram);
+        private Diagram& diagram;
+    }
+
+    public abstract class DiagramElementAction : ClickAction
+    {
+        public nothrow DiagramElementAction(Diagram& diagram_, int elementIndex_) : base(), diagram(diagram_), elementIndex(elementIndex_)
+        {
+        }
+        public override void Execute()
+        {
+            ExecuteGuard guard(diagram);
+            Execute(diagram, elementIndex);
+        }
+        protected abstract void Execute(Diagram& diagram, int elementIndex);
+        private Diagram& diagram;
+        private int elementIndex;
+    }
+
+    public class DeleteSelectionAction : DiagramAction
+    {
+        public nothrow DeleteSelectionAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            diagram.GetSelection().Delete();
+            diagram.SetChanged();
+            diagram.Invalidate();
+        }
+    }
+
+    public class AlignTopAction : DiagramAction
+    {
+        public nothrow AlignTopAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            Selection& selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            containerElementSelection.SortHorizontally();
+            containerElementSelection.AlignTop();
+        }
+    }
+
+    public class AlignBottomAction : DiagramAction
+    {
+        public nothrow AlignBottomAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            Selection& selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            containerElementSelection.SortHorizontally();
+            containerElementSelection.AlignBottom();
+        }
+    }
+
+    public class AlignVerticalCenterAction : DiagramAction
+    {
+        public nothrow AlignVerticalCenterAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            Selection& selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            containerElementSelection.SortHorizontally();
+            containerElementSelection.AlignVerticalCenter();
+        }
+    }
+
+    public class AlignLeftSideAction : DiagramAction
+    {
+        public nothrow AlignLeftSideAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            Selection& selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            containerElementSelection.SortVertically();
+            containerElementSelection.AlignLeftSide();
+        }
+    }
+
+    public class AlignRightSideAction : DiagramAction
+    {
+        public nothrow AlignRightSideAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            Selection& selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            containerElementSelection.SortVertically();
+            containerElementSelection.AlignRightSide();
+        }
+    }
+
+    public class AlignHorizontalCenterAction : DiagramAction
+    {
+        public nothrow AlignHorizontalCenterAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            Selection& selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            containerElementSelection.SortVertically();
+            containerElementSelection.AlignHorizontalCenter();
+        }
+    }
+
+    public class DeleteDiagramElementAction : DiagramElementAction
+    {
+        public nothrow DeleteDiagramElementAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
+        {
+        }
+        protected override void Execute(Diagram& diagram, int elementIndex)
+        {
+            diagram.RemoveElementByIndex(elementIndex);
+        }
+    }
+
+    public class ClassElementPropertiesAction : DiagramElementAction
+    {
+        public nothrow ClassElementPropertiesAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
+        {
+        }
+        protected override void Execute(Diagram& diagram, int elementIndex)
+        {
+            DiagramElement* element = diagram.GetElementByIndex(elementIndex);
+            if (element is ClassElement*)
+            {
+                ClassElement* classElement = cast<ClassElement*>(element);
+                UniquePtr<ClassElement> clone = cast<ClassElement*>(classElement->Clone());
+                UniquePtr<ClassPropertiesDialog> classPropertiesDialog = new ClassPropertiesDialog(clone.Get());
+                Canvas* canvas = diagram.GetCanvas();
+                Window* window = canvas->GetWindow();
+                if (window != null)
+                {
+                    diagram.HideContextMenu();
+                    DialogResult result = classPropertiesDialog->ShowDialog(*window);
+                    if (result == DialogResult.ok)
+                    {
+                        diagram.SetElementByIndex(clone.Release(), elementIndex);
+                        diagram.SetChanged();
+                        diagram.Invalidate();
+                    }
+                }
+            }
+        }
+    }
+}

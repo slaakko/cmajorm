@@ -24,30 +24,89 @@ namespace spring
         private PointF location;
     }
 
+    public class HorizontallyLess : Rel<int>
+    {
+        public nothrow HorizontallyLess() : diagram(null)
+        {
+        }
+        public nothrow HorizontallyLess(Diagram* diagram_) : diagram(diagram_)
+        {
+        }
+        public nothrow bool operator()(int leftIndex, int rightIndex) const
+        {
+            DiagramElement* left = diagram->GetElementByIndex(leftIndex);
+            DiagramElement* right = diagram->GetElementByIndex(rightIndex);
+            if (left->Location().x < right->Location().x)
+            {
+                return true;
+            }
+            if (left->Location().x > right->Location().x)
+            {
+                return false;
+            }
+            return left->Location().y < right->Location().y;
+        }
+        private Diagram* diagram;
+    }
+
+    public class VerticallyLess : Rel<int>
+    {
+        public nothrow VerticallyLess () : diagram(null)
+        {
+        }
+        public nothrow VerticallyLess(Diagram* diagram_) : diagram(diagram_)
+        {
+        }
+        public nothrow bool operator()(int leftIndex, int rightIndex) const
+        {
+            DiagramElement* left = diagram->GetElementByIndex(leftIndex);
+            DiagramElement* right = diagram->GetElementByIndex(rightIndex);
+            if (left->Location().y < right->Location().y)
+            {
+                return true;
+            }
+            if (left->Location().y > right->Location().y)
+            {
+                return false;
+            }
+            return left->Location().x < right->Location().x;
+        }
+        private Diagram* diagram;
+    }
+
     public class Diagram 
     {
         private enum Flags : sbyte
         {
             none = 0, changed = 1 << 0, invalidated = 1 << 1
         }
-        public Diagram() : flags(Flags.none), layout(), elements()
+        public Diagram() : flags(Flags.none), layout(), elements(), selection(new EmptySelection(*this)), operation(new EmptyOperation())
         {
+            Tools.SetDiagram(this);
             SetChanged();
             Invalidate();
             UniquePtr<ClassElement> concreteClassElement(new ClassElement("ConcreteClass", false));
             concreteClassElement->SetLocation(PointF(5.0f, 5.0f));
-            concreteClassElement->Operations().Add(new OperationElement("Foo"));
-            concreteClassElement->Operations().Add(new OperationElement("Bar"));
-            concreteClassElement->Operations().Add(new OperationElement("Baz"));
+            concreteClassElement->Operations().Add(new OperationElement("ConcreteOperation()"));
+            concreteClassElement->Operations().Add(new OperationElement("AnotherConcreteOperation()"));
+            concreteClassElement->Operations().Add(new OperationElement("ThirdConcreteOperation()"));
             AddElement(concreteClassElement.Release());
             UniquePtr<ClassElement> abstractClassElement(new ClassElement("AbstractClass", true));
-            abstractClassElement->SetLocation(PointF(50.0f, 5.0f));
+            abstractClassElement->SetLocation(PointF(80.0f, 5.0f));
             AddElement(abstractClassElement.Release());
         }
         suppress Diagram(const Diagram&);
         suppress void operator=(const Diagram&);
         suppress Diagram(Diagram&&);
         suppress void operator=(Diagram&&);
+        public nothrow void SetCanvas(Canvas* canvas_)
+        {
+            canvas = canvas_;
+        }
+        public nothrow Canvas* GetCanvas() const
+        {
+            return canvas;
+        }
         public void Draw(Graphics& graphics)
         {
             if (Changed())
@@ -61,6 +120,10 @@ namespace spring
                 {
                     element->Measure(graphics, *layout);
                 }
+            }
+            if (Invalidated())
+            {
+                ResetInvalidated();
             }
             for (const UniquePtr<DiagramElement>& element : elements)
             {
@@ -79,68 +142,106 @@ namespace spring
         {
             layout.Reset(layout_);
         }
+        public nothrow void DeleteSelection()
+        {
+            if (!selection->IsEmpty())
+            {
+                selection->Delete();
+            }
+        }
         public nothrow inline DiagramElement* GetElementByIndex(int index) const
         {
             return elements.Get(index);
         }
         public nothrow inline void SetElementByIndex(DiagramElement* element, int index)
         {
-            element->SetDiagram(this);
+            if (element != null)
+            {
+                element->SetDiagram(this);
+            }
             elements.Set(index, element);
         }
         public nothrow void AddElement(DiagramElement* element)
         {
             element->SetDiagram(this);
             elements.Add(element);
+            SetChanged();
+            Invalidate();
+        }
+        public nothrow UniquePtr<DiagramElement> RemoveElementByIndex(int index)
+        {
+            UniquePtr<DiagramElement> element = elements.Remove(index);
+            SetChanged();
+            Invalidate();
+            return element;
         }
         public nothrow int GetIndexOfElementAt(const PointF& location) const
         {
             Contains<DiagramElement> pred(location);
             return IndexOf(elements, pred);
         }
-        public nothrow void SetSelectedElement(DiagramElement* element)
+        public nothrow Selection& GetSelection()
         {
-            if (!element->IsSelected())
-            {
-                ResetSelection();
-                element->Select();
-                selectedElements.Add(element);
-            }
+            return *selection;
+        }
+        public nothrow void SetSelection(Selection* selection_)
+        {
+            selection->Clear();
+            selection.Reset(selection_);
         }
         public nothrow void ResetSelection()
         {
-            if (!selectedElements.IsEmpty())
-            {
-                for (DiagramElement* selectedElement : selectedElements)
-                {
-                    selectedElement->ResetSelected();
-                }
-                selectedElements.Clear();
-                Invalidate();
-            }
+            selection->Clear();
+            DisposeContextMenu();
+            selection.Reset(new EmptySelection(*this));
         }
-        public nothrow void RemoveElementFromSelectedElements(DiagramElement* element)
+        public nothrow inline Operation* GetOperation() const
         {
-            if (element->IsSelected())
-            {
-                selectedElements.Remove(element);
-                element->ResetSelected();
-            }
+            return operation.Get();
         }
-        public nothrow void AddElementToSelectedElements(DiagramElement* element)
+        public nothrow void SetOperation(Operation* operation_)
         {
-            if (!element->IsSelected())
-            {
-                RemoveElementFromSelectedElements(element);
-                element->Select();
-                selectedElements.Add(element);
-            }
+            operation.Reset(operation_);
+        }
+        public void AdvanceOperation(const PointF& location)
+        {
+            operation->AdvanceTo(location);
+            SetChanged();
+            Invalidate();
+        }
+        public void CancelOperation()
+        {
+            operation->Cancel();
+            ResetOperation();
+            SetChanged();
+            Invalidate();
+        }
+        public void CommitOperation(const PointF& location)
+        {
+            operation->Commit(location);
+            ResetOperation();
+            SetChanged();
+            Invalidate();
+        }
+        public nothrow void ResetOperation()
+        {
+            operation.Reset(new EmptyOperation());
+        }
+        public void DisposeContextMenu()
+        {
+            Window* window = canvas->GetWindow();
+            window->RemoveContextMenu();
+        }
+        public void HideContextMenu()
+        {
+            Window* window = canvas->GetWindow();
+            window->HideContextMenu();
         }
         private nothrow inline bool Changed() const
         {
             return (flags & Flags.changed) != Flags.none;
         }
-        private nothrow inline void SetChanged()
+        public nothrow inline void SetChanged()
         {
             flags = cast<Flags>(flags | Flags.changed);
         }
@@ -152,18 +253,27 @@ namespace spring
         {
             return (flags & Flags.invalidated) != Flags.none;
         }
-        public nothrow inline void Invalidate()
+        public nothrow void Invalidate()
         {
-            flags = cast<Flags>(flags | Flags.invalidated);
+            if (!Invalidated())
+            {
+                flags = cast<Flags>(flags | Flags.invalidated);
+                if (canvas != null)
+                {
+                    canvas->Invalidate();
+                }
+            }
         }
         public nothrow inline void ResetInvalidated()
         {
             flags = cast<Flags>(flags & ~Flags.invalidated);
         }
         private Flags flags;
+        private Canvas* canvas;
         private UniquePtr<Layout> layout;
         private IndexList<DiagramElement> elements;
-        private List<DiagramElement*> selectedElements;
+        private UniquePtr<Selection> selection;
+        private UniquePtr<Operation> operation;
     }
 
     public abstract class DiagramElement
@@ -191,6 +301,11 @@ namespace spring
         }
         public abstract DiagramElement* Clone() const;
         public abstract void Measure(Graphics& graphics, Layout& layout);
+        public virtual nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
+        {
+            MenuItem* deleteMenuItem = new MenuItem("Delete");
+            contextMenu->AddMenuItemAction(deleteMenuItem, new DeleteDiagramElementAction(diagram, elementIndex));
+        }
         private void DrawSelected(Graphics& graphics, Layout& layout)
         {
             const ColorElement& selectedColorElement = layout.GetSelectedColorElement();
@@ -373,11 +488,53 @@ namespace spring
         }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
-
+            if (isAbstract)
+            {
+                DrawAbstractOperation(graphics, layout);
+            }
+            else
+            {
+                DrawConcreteOperation(graphics, layout);
+            }
+        }
+        private void DrawAbstractOperation(Graphics& graphics, Layout& layout)
+        {
+            const AbstractOperationLayoutElement& layoutElement = layout.GetAbstractOperationLayoutElement();
+            const FontElement& fontElement = layoutElement.GetFontElement();
+            const ColorElement& textColorElement = layoutElement.TextColorElement();
+            graphics.DrawStringChecked(Name(), fontElement.GetFont(), Location(), textColorElement.GetBrush(layout));
+        }
+        private void DrawConcreteOperation(Graphics& graphics, Layout& layout)
+        {
+            const ConcreteOperationLayoutElement& layoutElement = layout.GetConcreteOperationLayoutElement();
+            const FontElement& fontElement = layoutElement.GetFontElement();
+            const ColorElement& textColorElement = layoutElement.TextColorElement();
+            graphics.DrawStringChecked(Name(), fontElement.GetFont(), Location(), textColorElement.GetBrush(layout));
         }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
-
+            if (isAbstract)
+            {
+                MeasureAbstractOperation(graphics, layout);
+            }
+            else
+            {
+                MeasureConcreteOperation(graphics, layout);
+            }
+        }
+        private void MeasureAbstractOperation(Graphics& graphics, Layout& layout)
+        {
+            const AbstractOperationLayoutElement& layoutElement = layout.GetAbstractOperationLayoutElement();
+            const FontElement& fontElement = layoutElement.GetFontElement();
+            RectF r = graphics.MeasureStringChecked(Name(), fontElement.GetFont(), PointF(0, 0), layout.GetStringFormat());
+            SetSize(r.size);
+        }
+        private void MeasureConcreteOperation(Graphics& graphics, Layout& layout)
+        {
+            const ConcreteOperationLayoutElement& layoutElement = layout.GetConcreteOperationLayoutElement();
+            const FontElement& fontElement = layoutElement.GetFontElement();
+            RectF r = graphics.MeasureStringChecked(Name(), fontElement.GetFont(), PointF(0, 0), layout.GetStringFormat());
+            SetSize(r.size);
         }
         public override void SetFrom(DiagramElement* that)
         {
@@ -387,8 +544,21 @@ namespace spring
         private bool isAbstract;
     }
 
-    public abstract class ClassElement : DiagramElement
+    public abstract class ContainerElement : DiagramElement
     {
+        public nothrow ContainerElement() : base()
+        {
+        }
+        public nothrow ContainerElement(const string& name) : base(name)
+        {
+        }
+    }
+
+    public class ClassElement : ContainerElement
+    {
+        public nothrow ClassElement() : base()
+        {
+        }
         public nothrow ClassElement(const string& name, bool isAbstract_) : base(name), isAbstract(isAbstract_)
         {
             SetSize(SizeF(cast<float>(DefaultMinClassHeight() + DefaultMinClassHeight() / GoldenRatio()), DefaultMinClassHeight()));
@@ -405,11 +575,24 @@ namespace spring
         {
             isAbstract = isAbstract_;
         }
+        public override DiagramElement* Clone() const
+        {
+            UniquePtr<ClassElement> clone = new ClassElement();
+            clone->SetFrom(this);
+            return clone.Release();
+        }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
             base->Draw(graphics, layout);
             DrawFrame(graphics, layout);
             DrawCaption(graphics, layout);
+            DrawOperations(graphics, layout);
+        }
+        public override nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
+        {
+            base->AddActions(diagram, elementIndex, contextMenu);
+            MenuItem* propertiesMenuItem = new MenuItem("Properties...");
+            contextMenu->AddMenuItemAction(propertiesMenuItem, new ClassElementPropertiesAction(diagram, elementIndex));
         }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
@@ -424,21 +607,109 @@ namespace spring
         }
         private void MeasureConcreteClass(Graphics& graphics, Layout& layout)
         {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
             const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
             const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
             const FontElement& fontElement = captionLayoutElement.GetFontElement();
             const Font& font = fontElement.GetFont();
             RectF r = graphics.MeasureStringChecked(Name(), font, PointF(0, 0), layout.GetStringFormat());
             captionTextHeight = r.size.h;
+            captionRect = RectF();
+            captionRect.location = Location();
+            captionRect.size.h = paddingElement.Vertical() + r.size.h;
+            captionRect.size.w = paddingElement.Horizontal() + r.size.w;
+            MeasureOperations(graphics, layout);
+            MeasureFields(graphics, layout);
+            SetSize();
         }
         private void MeasureAbstractClass(Graphics& graphics, Layout& layout)
         {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
             const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
             const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
             const FontElement& fontElement = captionLayoutElement.GetFontElement();
             const Font& font = fontElement.GetFont();
             RectF r = graphics.MeasureStringChecked(Name(), font, PointF(0, 0), layout.GetStringFormat());
             captionTextHeight = r.size.h;
+            captionRect = RectF();
+            captionRect.location = Location();
+            captionRect.size.h = paddingElement.Vertical() + r.size.h;
+            captionRect.size.w = paddingElement.Horizontal() + r.size.w;
+            MeasureOperations(graphics, layout);
+            MeasureFields(graphics, layout);
+            SetSize();
+        }
+        private void SetSize()
+        {
+            SizeF size = GetSize();
+            size.w = Max(size.w, captionRect.size.w);
+            float h = captionRect.size.h;
+            if (!operations.IsEmpty())
+            {
+                size.w = Max(size.w, operationRect.size.w);
+                h = h + operationRect.size.h;
+            }
+            if (!fields.IsEmpty())
+            {
+                size.w = Max(size.w, fieldRect.size.w);
+                h = h + fieldRect.size.h;
+            }
+            size.h = Max(size.h, h);
+            SetSize(size);
+        }
+        private void MeasureOperations(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            PointF location = Location();
+            operationRect = RectF();
+            operationRect.location.x = location.x;
+            operationRect.location.y = location.y + captionRect.size.h;
+            operationRect.size.w = captionRect.size.w;
+            operationRect.size.h = paddingElement.top;
+            PointF origin;
+            origin.x = operationRect.location.x + paddingElement.left;
+            origin.y = operationRect.location.y + paddingElement.top;
+            int n = operations.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                OperationElement* operation = operations.Get(i);
+                operation->Measure(graphics, layout);
+                SizeF operationSize = operation->GetSize();
+                float w = operationSize.w + paddingElement.Horizontal();
+                float h = operationSize.h;
+                operation->SetLocation(origin);
+                operationRect.size.w = Max(operationRect.size.w, w);
+                origin.y = origin.y + h;
+                operationRect.size.h = operationRect.size.h + h;
+            }
+            operationRect.size.h = operationRect.size.h + paddingElement.bottom;
+        }
+        private void MeasureFields(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            fieldRect = RectF();
+            PointF location = Location();
+            fieldRect.location.x = location.x;
+            fieldRect.location.y = operationRect.location.y + operationRect.size.h;
+            fieldRect.size.w = operationRect.size.w;
+            fieldRect.size.h = paddingElement.top;
+            PointF origin;
+            origin.x = fieldRect.location.x + paddingElement.left;
+            origin.y = fieldRect.location.y + paddingElement.top;
+            int n = fields.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                FieldElement* field = fields.Get(i);
+                field->Measure(graphics, layout);
+                SizeF fieldSize = field->GetSize();
+                float w = fieldSize.w + paddingElement.Horizontal();
+                float h = fieldSize.h;
+                field->SetLocation(origin);
+                fieldRect.size.w = Max(fieldRect.size.w, w);
+                origin.y = origin.y + h;
+                fieldRect.size.h = fieldRect.size.h + h;
+            }
+            fieldRect.size.h = fieldRect.size.h + paddingElement.bottom;
         }
         private void DrawFrame(Graphics& graphics, Layout& layout)
         {
@@ -509,6 +780,15 @@ namespace spring
             const Font& font = fontElement.GetFont();
             const Brush& brush = layoutElement.TextBrush();
             graphics.DrawStringChecked(Name(), font, origin, brush);
+        }
+        private void DrawOperations(Graphics& graphics, Layout& layout)
+        {
+            int n = operations.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                OperationElement* operation = operations.Get(i);
+                operation->Draw(graphics, layout);
+            }
         }
         public override void Read(System.Dom.Element* parentElement)
         {
@@ -607,5 +887,8 @@ namespace spring
         private IndexList<FieldElement> fields;
         private bool isAbstract;
         private float captionTextHeight;
+        private RectF captionRect;
+        private RectF operationRect;
+        private RectF fieldRect;
     }
 }

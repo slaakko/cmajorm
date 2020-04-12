@@ -57,7 +57,7 @@ namespace System.Windows
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
             const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_) : 
             base(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors), flags(Flags.none), state(WindowState.normal),
-            menuBar(null), defaultButton(null), cancelButton(null), focusedControl(null), dialogResult(DialogResult.none), keyPreviewMethod(), currentKeyPreviewModifierKeys(Keys.none),
+            menuBar(null), contextMenu(null), defaultButton(null), cancelButton(null), focusedControl(null), dialogResult(DialogResult.none), keyPreviewMethod(), currentKeyPreviewModifierKeys(Keys.none),
             fontFamilyName(fontFamilyName_), fontSize(fontSize_), fontStyle(fontStyle_)
         {
             SetKeyPreviewMethod(DefaultKeyPreview);
@@ -164,7 +164,7 @@ namespace System.Windows
                     }
                     break;
                 }
-                case WM_COMMAND: case WM_SIZE: case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK:
+                case WM_COMMAND: case WM_SIZE: case WM_PAINT: case WM_MOUSEMOVE: case WM_MOUSELEAVE: case WM_LBUTTONDOWN: case WM_LBUTTONUP: case WM_LBUTTONDBLCLK: case WM_RBUTTONDOWN: case WM_RBUTTONUP:
                 case WM_CHAR: case WM_KEYDOWN: case WM_KEYUP: case WM_SYSCOMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL: case WM_TIMER: case WM_SETFOCUS: case WM_KILLFOCUS:
                 case WM_SHOWWINDOW:
                 {
@@ -497,6 +497,45 @@ namespace System.Windows
         {
             return menuBar;
         }
+        public nothrow ContextMenu* GetContextMenu() const
+        {
+            return contextMenu;
+        }
+        public nothrow void SetContextMenu(ContextMenu* contextMenu_)
+        {
+            RemoveContextMenu();
+            contextMenu = contextMenu_;
+            AddChild(contextMenu);
+        }
+        public nothrow void RemoveContextMenu()
+        {
+            if (contextMenu != null)
+            {
+                HideContextMenu();
+                RemoveChild(contextMenu);
+                contextMenu = null;
+            }
+        }
+        public nothrow void ShowContextMenu(ContextMenu* contextMenu_, const Point& ptInScreenCoords)
+        {
+            SetContextMenu(contextMenu_);
+            Point loc = ScreenToClient(ptInScreenCoords);
+            contextMenu->SetLocation(loc);
+            contextMenu->CalculateSize();
+            contextMenu->BringToFront();
+            contextMenu->Show();
+            contextMenu->Invalidate();
+            contextMenu->Update();
+        }
+        public nothrow void HideContextMenu()
+        {
+            if (contextMenu != null)
+            {
+                contextMenu->Hide();
+                Invalidate();
+                Update();
+            }
+        }
         public nothrow Event<WindowClosingEventHandler, bool>& WindowClosingEvent()
         {
             return windowClosingEvent;
@@ -729,6 +768,7 @@ namespace System.Windows
         private Flags flags;
         private WindowState state;
         private MenuBar* menuBar;
+        private ContextMenu* contextMenu;
         private Button* defaultButton;
         private Button* cancelButton;
         private Control* focusedControl;

@@ -12,9 +12,19 @@ using System.Windows;
 
 namespace spring
 {
-    public nothrow string DefaultFontFamily()
+    public nothrow string DefaultCaptionFontFamily()
     {
-        return "Tahoma";
+        return "Arial";
+    }
+
+    public nothrow string DefaultOperationFontFamily()
+    {
+        return "Arial";
+    }
+
+    public nothrow string DefaultFieldFontFamily()
+    {
+        return "Arial";
     }
 
     public nothrow float DefaultFontSize()
@@ -59,10 +69,15 @@ namespace spring
         return Path.Combine(SpringDirectory(), "diagrams");
     }
 
+    public nothrow Color DefaultSelectionColor()
+    {
+        return Color(64u, 184u, 211u, 235u);
+    }
+
     public class Layout
     {
          public Layout(Graphics& graphics) :
-            selectedColorElement(new ColorElement(Color(128u, 184u, 211u, 235u), "selectedColor")),
+            selectedColorElement(new ColorElement(DefaultSelectionColor(), "selectedColor")),
             abstractClassLayoutElement(new AbstractClassLayoutElement(*this, graphics)), concreteClassLayoutElement(new ConcreteClassLayoutElement(*this, graphics)),
             abstractOperationLayoutElement(new AbstractOperationLayoutElement(*this)), concreteOperationLayoutElement(new ConcreteOperationLayoutElement(*this)),
             fieldLayoutElement(new FieldLayoutElement(*this)),
@@ -492,7 +507,7 @@ namespace spring
 
     public abstract class FieldLayoutElement : LayoutElement
     {
-        public FieldLayoutElement(Layout& layout) : fontElement(new FontElement(DefaultFontFamily(), DefaultFontSize(), FontStyle.regular, "font", layout))
+        public FieldLayoutElement(Layout& layout) : fontElement(new FontElement(DefaultFieldFontFamily(), DefaultFontSize(), FontStyle.regular, "font", layout))
         {
         }
         suppress FieldLayoutElement(const FieldLayoutElement&);
@@ -535,32 +550,40 @@ namespace spring
 
     public abstract class OperationLayoutElement : LayoutElement
     {
-        public OperationLayoutElement(FontElement* fontElement_) : fontElement(fontElement_)
+        public OperationLayoutElement(ColorElement* textColorElement_, FontElement* fontElement_) : textColorElement(textColorElement_), fontElement(fontElement_)
         {
         }
         suppress OperationLayoutElement(const OperationLayoutElement&);
         suppress void operator=(const OperationLayoutElement&);
         suppress OperationLayoutElement(OperationLayoutElement&&);
         suppress void operator=(OperationLayoutElement&&);
+        public nothrow inline const ColorElement& TextColorElement() const
+        {
+            return *textColorElement;
+        }
         public nothrow inline const FontElement& GetFontElement() const
         {
             return *fontElement;
         }
         public override void Read(System.Dom.Element* parentElement, Layout& layout)
         {
+            textColorElement->Read(parentElement, layout);
             fontElement->Read(parentElement, layout);
         }
         public override void Write(System.Dom.Element* parentElement)
         {
+            textColorElement->Write(parentElement);
             fontElement->Write(parentElement);
         }
+        private UniquePtr<ColorElement> textColorElement;
         private UniquePtr<FontElement> fontElement;
     }
 
     public class AbstractOperationLayoutElement : OperationLayoutElement
     {
         public AbstractOperationLayoutElement(Layout& layout) :
-            base(new FontElement(DefaultFontFamily(), DefaultFontSize(), FontStyle.italic, "font", layout))
+            base(new ColorElement(Color.Black(), "textColor"),
+                new FontElement(DefaultOperationFontFamily(), DefaultFontSize(), FontStyle.italic, "font", layout))
         {
         }
         public override void Read(System.Dom.Element* parentElement, Layout& layout)
@@ -595,7 +618,8 @@ namespace spring
     public class ConcreteOperationLayoutElement : OperationLayoutElement
     {
         public ConcreteOperationLayoutElement(Layout& layout) :
-            base(new FontElement(DefaultFontFamily(), DefaultFontSize(), FontStyle.regular, "font", layout))
+            base(new ColorElement(Color.Black(), "textColor"),
+                new FontElement(DefaultOperationFontFamily(), DefaultFontSize(), FontStyle.regular, "font", layout))
         {
         }
         public override void Read(System.Dom.Element* parentElement, Layout& layout)
@@ -690,7 +714,7 @@ namespace spring
     public class AbstractClassLayoutElement : ClassLayoutElement
     {
         public AbstractClassLayoutElement(Layout& layout, Graphics& graphics) :
-            base(new CaptionLayoutElement(new FontElement(DefaultFontFamily(), DefaultFontSize(), cast<FontStyle>(FontStyle.bold | FontStyle.italic), "font", layout)),
+            base(new CaptionLayoutElement(new FontElement(DefaultCaptionFontFamily(), DefaultFontSize(), cast<FontStyle>(FontStyle.bold | FontStyle.italic), "font", layout)),
                 new ColorElement(Color.Black(), "textColor"), new ColorElement(Color.Black(), "frameColor"), DefaultFrameWidth(graphics), layout)
         {
         }
@@ -730,7 +754,7 @@ namespace spring
     public class ConcreteClassLayoutElement : ClassLayoutElement
     {
         public nothrow ConcreteClassLayoutElement(Layout& layout, Graphics& graphics) :
-            base(new CaptionLayoutElement(new FontElement(DefaultFontFamily(), DefaultFontSize(), cast<FontStyle>(FontStyle.bold), "font", layout)),
+            base(new CaptionLayoutElement(new FontElement(DefaultCaptionFontFamily(), DefaultFontSize(), cast<FontStyle>(FontStyle.bold), "font", layout)),
                 new ColorElement(Color.Black(), "textColor"), new ColorElement(Color.Black(), "frameColor"), DefaultFrameWidth(graphics), layout)
         {
         }

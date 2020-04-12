@@ -716,6 +716,11 @@ namespace System.Windows
         {
             return "(" + ToString(x) + ", " + ToString(y) + ")";
         }
+        public nothrow inline void Offset(int dx, int dy)
+        {
+            x = x + dx;
+            y = y + dy;
+        }
         public int x; 
         public int y;
     }
@@ -763,6 +768,11 @@ namespace System.Windows
         public nothrow string ToString() const
         {
             return "(" + ToString(x) + ", " + ToString(y) + ")";
+        }
+        public nothrow inline void Offset(float dx, float dy)
+        {
+            x = x + dx;
+            y = y + dy;
         }
         public float x;
         public float y;
@@ -832,8 +842,7 @@ namespace System.Windows
         }
         public nothrow inline void Offset(int dx, int dy)
         {
-            location.x = location.x + dx;
-            location.y = location.y + dy;
+            location.Offset(dx, dy);
         }
         public static nothrow Rect Union(const Rect& a, const Rect& b)
         {
@@ -898,6 +907,10 @@ namespace System.Windows
             location.y = location.y - dy;
             size.w = size.w + 2 * dx;
             size.h = size.h + 2 * dy;
+        }
+        public nothrow inline void Offset(float dx, float dy)
+        {
+            location.Offset(dx, dy);
         }
         public static nothrow RectF Union(const RectF& a, const RectF& b)
         {
