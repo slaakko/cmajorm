@@ -53,8 +53,12 @@ namespace spring
 
     public class MoveContainerElementsOperation : Operation
     {
-        public nothrow MoveContainerElementsOperation(Diagram* diagram, const PointF& startLocation) : base(diagram, startLocation)
+        public nothrow MoveContainerElementsOperation(Diagram* diagram, const PointF& startLocation) : base(diagram, startLocation), resetSelection(false)
         {
+        }
+        public void ResetSelection()
+        {
+            resetSelection = true;
         }
         public nothrow void AddContainerElementIndex(int index)
         {
@@ -95,6 +99,10 @@ namespace spring
         public override void Commit(const PointF& location)
         {
             AdvanceTo(location);
+            if (resetSelection)
+            {
+                GetDiagram()->ResetSelection();
+            }
         }
         public void FetchOriginalLocations()
         {
@@ -110,5 +118,6 @@ namespace spring
         }
         private List<int> containerElementIndeces;
         private List<PointF> originalLocations;
+        private bool resetSelection;
     }
 }

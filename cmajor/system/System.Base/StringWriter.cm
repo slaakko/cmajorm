@@ -7,19 +7,22 @@ using System;
 
 namespace System.IO
 {
-    public class StreamWriter : TextWriter
+    public class StringWriter : TextWriter
     {
-        public StreamWriter(const SharedPtr<ByteStream>& stream_) : stream(stream_)
+        public nothrow StringWriter() : str()
         {
         }
-        public void Write(const char* x, long length)
+        public nothrow string GetString() 
         {
-            void* buf = x;
-            stream->Write(cast<byte*>(buf), length);
+            return Rvalue(str);
+        }
+        public nothrow const string& Str() const
+        {
+            return str;
         }
         public override void Write(const string& x)
         {
-            Write(x.Chars(), x.Length());
+            str.Append(x);
         }
         public override void Write(const wstring& x)
         {
@@ -95,7 +98,7 @@ namespace System.IO
         }
         public override void WriteLine()
         {
-            Write("\n", 1);
+            str.Append('\n');
         }
         public override void WriteLine(const string& x)
         {
@@ -177,10 +180,6 @@ namespace System.IO
             Write(dateTime);
             WriteLine();
         }
-        public nothrow const SharedPtr<ByteStream>& ContainedStream()
-        {
-            return stream;
-        }
-        private SharedPtr<ByteStream> stream;
+        private string str;
     }
 }

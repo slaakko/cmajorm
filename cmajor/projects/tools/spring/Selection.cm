@@ -4,7 +4,9 @@
 // =================================
 
 using System;
+using System.IO;
 using System.Collections;
+using System.Text;
 
 namespace spring
 {
@@ -21,6 +23,7 @@ namespace spring
         public abstract nothrow List<int> GetContainerElementIndeces() const;
         public abstract nothrow void Clear();
         public abstract nothrow void Delete();
+        public abstract nothrow ustring Copy();
         public abstract nothrow int GetFirstIndex() const;
         public abstract nothrow void Add(int index);
         public abstract nothrow void Remove(int index);
@@ -63,6 +66,10 @@ namespace spring
         public override nothrow void Delete()
         {
         }
+        public override nothrow ustring Copy()
+        {
+            return ustring();
+        }
         public override nothrow int GetFirstIndex() const
         {
             return -1;
@@ -87,6 +94,8 @@ namespace spring
         {
             indeces.Add(index);
             diagram.GetElementByIndex(index)->Select();
+            diagram.EnableCopy();
+            diagram.EnableCut();
         }
         public nothrow ElementSelection(Diagram& diagram, List<int>&& indeces_) : base(diagram), indeces(indeces_)
         {
@@ -164,6 +173,44 @@ namespace spring
             }
             indeces.Clear();
         }
+        public override nothrow ustring Copy()
+        {
+            List<UniquePtr<DiagramElement>> clonedElements;
+            System.Windows.RectF boundingRect;
+            int n = cast<int>(indeces.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                int index = indeces[i];
+                DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                if (boundingRect.IsEmpty())
+                {
+                    boundingRect = element->BoundingRect();
+                }
+                else
+                {
+                    boundingRect = System.Windows.RectF.Union(boundingRect, element->BoundingRect());
+                }
+                clonedElements.Add(UniquePtr<DiagramElement>(element->Clone()));
+            }
+            for (UniquePtr<DiagramElement>& clonedElement : clonedElements)
+            {
+                System.Windows.PointF location = clonedElement->Location();
+                location.Offset(-boundingRect.location.x, -boundingRect.location.y);
+                clonedElement->SetLocation(location);
+            }
+            System.Dom.Document elementDoc;
+            elementDoc.AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Element(u"spring.diagram.elements")));
+            for (const UniquePtr<DiagramElement>& clonedElement : clonedElements)
+            {
+                UniquePtr<System.Dom.Element> domElement = clonedElement->CreateDomElement();
+                clonedElement->Write(domElement.Get());
+                elementDoc.DocumentElement()->AppendChild(UniquePtr<System.Dom.Node>(domElement.Release()));
+            }
+            StringWriter writer;
+            CodeFormatter formatter(writer);
+            elementDoc.Write(formatter);
+            return ToUtf32(writer.GetString());
+        }
         public override nothrow int GetFirstIndex() const
         {
             return indeces.Front();
@@ -177,17 +224,26 @@ namespace spring
             }
             indeces.Add(index);
             GetDiagram().GetElementByIndex(index)->Select();
+            if (!indeces.IsEmpty())
+            {
+                GetDiagram().EnableCopy();
+                GetDiagram().EnableCut();
+            }
         }
         public override nothrow void Remove(int index)
         {
             indeces.Remove(index);
             GetDiagram().GetElementByIndex(index)->ResetSelected();
+            if (indeces.IsEmpty())
+            {
+                GetDiagram().DisableCopy();
+                GetDiagram().DisableCut();
+            }
         }
         public override nothrow void AddActions(System.Windows.ContextMenu* contextMenu)
         {
-            System.Windows.MenuItem* deleteMenuItem = new System.Windows.MenuItem("Delete");
-            contextMenu->AddMenuItemAction(deleteMenuItem, new DeleteSelectionAction(GetDiagram()));
-            if (GetContainerElementCount() > 1)
+            int containerElementCount = GetContainerElementCount();
+            if (containerElementCount > 1)
             {
                 System.Windows.MenuItem* alignTopMenuItem = new System.Windows.MenuItem("Align top");
                 contextMenu->AddMenuItemAction(alignTopMenuItem, new AlignTopAction(GetDiagram()));
@@ -201,7 +257,16 @@ namespace spring
                 contextMenu->AddMenuItemAction(alignRightSideMenuItem, new AlignRightSideAction(GetDiagram()));
                 System.Windows.MenuItem* alignHorizontalCenterMenuItem = new System.Windows.MenuItem("Align horizontal center");
                 contextMenu->AddMenuItemAction(alignHorizontalCenterMenuItem, new AlignHorizontalCenterAction(GetDiagram()));
+                if (containerElementCount > 2)
+                {
+                    System.Windows.MenuItem* spaceEvenlyVerticallyMenuItem = new System.Windows.MenuItem("Space evenly vertically");
+                    contextMenu->AddMenuItemAction(spaceEvenlyVerticallyMenuItem, new SpaceEvenlyVerticallyAction(GetDiagram()));
+                    System.Windows.MenuItem* spaceEvenlyHorizontallyMenuItem = new System.Windows.MenuItem("Space evenly horizontally");
+                    contextMenu->AddMenuItemAction(spaceEvenlyHorizontallyMenuItem, new SpaceEvenlyHorizontallyAction(GetDiagram()));
+                }
             }
+            System.Windows.MenuItem* deleteMenuItem = new System.Windows.MenuItem("Delete");
+            contextMenu->AddMenuItemAction(deleteMenuItem, new DeleteSelectionAction(GetDiagram()));
         }
         public nothrow void SortByIndex()
         {
@@ -311,6 +376,59 @@ namespace spring
                 }
             }
         }
+        public nothrow void SpaceEvenlyVertically()
+        {
+            if (indeces.Count() > 2)
+            {
+                DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
+                DiagramElement* lastElement = GetDiagram().GetElementByIndex(indeces.Back());
+                float firstElementBottom = firstElement->Location().y + firstElement->GetSize().h;
+                float lastElementTop = lastElement->Location().y;
+                int n = cast<int>(indeces.Count());
+                float space = lastElementTop - firstElementBottom;
+                for (int i = 1; i < n - 1; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    space = space - element->GetSize().h;
+                }
+                space = space / (n - 1);
+                float prevElementBottom = firstElementBottom;
+                for (int i = 1; i < n - 1; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    float top = prevElementBottom + space;
+                    element->SetLocation(System.Windows.PointF(element->Location().x, top));
+                    prevElementBottom = top + element->GetSize().h;
+                }
+            }
+        }
+        public nothrow void SpaceEvenlyHorizontally()
+        {
+            if (indeces.Count() > 2)
+            {
+                DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
+                DiagramElement* lastElement = GetDiagram().GetElementByIndex(indeces.Back());
+                float firstElementRightSide = firstElement->Location().x + firstElement->GetSize().w;
+                float lastElementLeftSide = lastElement->Location().x;
+                int n = cast<int>(indeces.Count());
+                float space = lastElementLeftSide - firstElementRightSide;
+                for (int i = 1; i < n - 1; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    space = space - element->GetSize().w;
+                }
+                space = space / (n - 1);
+                float prevElementRightSide = firstElementRightSide;
+                for (int i = 1; i < n - 1; ++i)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
+                    float left = prevElementRightSide + space;
+                    element->SetLocation(System.Windows.PointF(left, element->Location().y));
+                    prevElementRightSide = left + element->GetSize().w;
+                }
+            }
+        }
         private List<int> indeces;
     }
 }
+

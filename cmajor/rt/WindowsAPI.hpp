@@ -196,6 +196,7 @@ extern "C" RT_API void* WinGetTopWindow(void* windowHandle);
 extern "C" RT_API bool WinBringWindowToTop(void* windowHandle);
 extern "C" RT_API bool WinSetWindowPos(void* windowHandle, void* insertAfterWindowHandle, int x, int y, int cx, int cy, uint32_t flags);
 extern "C" RT_API bool WinGetOpenFileName(void* windowHandle, const char16_t* filter, const char16_t* initialDirectory, char16_t* fileNameBuffer, uint32_t fileNameBufferSize, uint32_t flags, const char16_t* defaultExtension);
+extern "C" RT_API bool WinGetSaveFileName(void* windowHandle, const char16_t* filter, const char16_t* initialDirectory, char16_t* fileNameBuffer, uint32_t fileNameBufferSize, uint32_t flags, const char16_t* defaultExtension);
 extern "C" RT_API uint32_t WinCommDlgExtendedError();
 extern "C" RT_API void* WinLoadImage(const char* name, uint32_t type, int32_t cx, int32_t cy);
 extern "C" RT_API void* WinLoadStandardCursor(int cursorId);
@@ -233,5 +234,19 @@ extern "C" RT_API bool WinKillTimer(void* windowHandle, uint32_t timerId);
 extern "C" RT_API bool WinRegOpenCurrentUser(void** result);
 extern "C" RT_API bool WinRegCloseKey(void* key);
 extern "C" RT_API bool WinRegGetDWordValue(void* key, const char* subKey, const char* valueName, uint32_t& value);
+extern "C" RT_API uint32_t WinRegisterClipboardFormat(const char* formatName);
+extern "C" RT_API bool WinOpenClipboard(void* windowHandle);
+extern "C" RT_API bool WinCloseClipboard();
+extern "C" RT_API bool WinEmptyClipboard();
+extern "C" RT_API void* WinSetClipboardData(uint32_t format, void* mem);
+extern "C" RT_API void* WinGetClipboardData(uint32_t format);
+extern "C" RT_API bool WinIsClipboardFormatAvailable(uint32_t format);
+extern "C" RT_API bool WinAddClipboardFormatListener(void* windowHandle);
+extern "C" RT_API bool WinRemoveClipboardFormatListener(void* windowHandle);
+extern "C" RT_API void* WinGlobalAlloc(uint32_t flags, uint64_t size);
+extern "C" RT_API void* WinGlobalLock(void* memHandle);
+extern "C" RT_API bool WinGlobalUnlock(void* memHandle);
+extern "C" RT_API void* WinGlobalFree(void* memHandle);
+extern "C" RT_API uint64_t WinGlobalSize(void* memHandle);
 
 #endif // CMAJOR_RT_WINDOWS_API_INCLUDED

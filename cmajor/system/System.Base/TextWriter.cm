@@ -1,0 +1,188 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public abstract class TextWriter
+    {
+        public default virtual ~TextWriter();
+        public abstract void Write(const string& x);
+        public abstract void Write(const wstring& x);
+        public abstract void Write(const ustring& x);
+        public abstract void Write(bool x);
+        public abstract void Write(char x);
+        public abstract void Write(wchar x);
+        public abstract void Write(uchar x);
+        public abstract void Write(sbyte x);
+        public abstract void Write(byte x);
+        public abstract void Write(short x);
+        public abstract void Write(ushort x);
+        public abstract void Write(int x);
+        public abstract void Write(uint x);
+        public abstract void Write(long x);
+        public abstract void Write(ulong x);
+        public abstract void Write(float x);
+        public abstract void Write(double x);
+        public abstract void Write(const Date& date);
+        public abstract void Write(const DateTime& dateTime);
+        public abstract void WriteLine();
+        public abstract void WriteLine(const string& x);
+        public abstract void WriteLine(const wstring& x);
+        public abstract void WriteLine(const ustring& x);
+        public abstract void WriteLine(bool x);
+        public abstract void WriteLine(sbyte x);
+        public abstract void WriteLine(byte x);
+        public abstract void WriteLine(short x);
+        public abstract void WriteLine(ushort x);
+        public abstract void WriteLine(int x);
+        public abstract void WriteLine(uint x);
+        public abstract void WriteLine(long x);
+        public abstract void WriteLine(ulong x);
+        public abstract void WriteLine(float x);
+        public abstract void WriteLine(double x);
+        public abstract void WriteLine(const Date& date);
+        public abstract void WriteLine(const DateTime& dateTime);
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, const char* x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, const wchar* x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, const uchar* x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, const string& x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, const wstring& x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, const ustring& x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, bool x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, sbyte x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, byte x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, short x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, ushort x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, int x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, uint x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, long x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, ulong x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, float x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, double x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+    
+    public TextWriter& operator<<(TextWriter& writer, const Date& date)
+    {
+        writer.Write(date);
+        return writer;
+    }
+    
+    public TextWriter& operator<<(TextWriter& writer, const DateTime& dateTime)
+    {
+        writer.Write(dateTime);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, char x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+    
+    public TextWriter& operator<<(TextWriter& writer, wchar x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+    
+    public TextWriter& operator<<(TextWriter& writer, uchar x)
+    {
+        writer.Write(x);
+        return writer;
+    }
+
+    public TextWriter& operator<<(TextWriter& writer, const Endl&)
+    {
+        writer.WriteLine();
+        return writer;
+    }
+}

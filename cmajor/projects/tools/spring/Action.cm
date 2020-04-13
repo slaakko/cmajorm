@@ -16,7 +16,9 @@ namespace spring
         }
         public ~ExecuteGuard()
         {
-            diagram.DisposeContextMenu();
+            diagram.HideContextMenu();
+            diagram.SetChanged();
+            diagram.Invalidate();
         }
         private Diagram& diagram;
     }
@@ -147,6 +149,34 @@ namespace spring
         }
     }
 
+    public class SpaceEvenlyVerticallyAction : DiagramAction
+    {
+        public nothrow SpaceEvenlyVerticallyAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            Selection& selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            containerElementSelection.SortVertically();
+            containerElementSelection.SpaceEvenlyVertically();
+        }
+    }
+
+    public class SpaceEvenlyHorizontallyAction : DiagramAction
+    {
+        public nothrow SpaceEvenlyHorizontallyAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            Selection& selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            containerElementSelection.SortHorizontally();
+            containerElementSelection.SpaceEvenlyHorizontally();
+        }
+    }
+
     public class DeleteDiagramElementAction : DiagramElementAction
     {
         public nothrow DeleteDiagramElementAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
@@ -179,6 +209,10 @@ namespace spring
                     DialogResult result = classPropertiesDialog->ShowDialog(*window);
                     if (result == DialogResult.ok)
                     {
+                        if (!clone->IsAbstract())
+                        {
+                            clone->ResetAbstractOperations();
+                        }
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();

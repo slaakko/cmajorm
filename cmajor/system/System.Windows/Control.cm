@@ -39,6 +39,7 @@ namespace System.Windows
     public class delegate void ChildGotFocusEventHandler(ControlEventArgs& controlEventArgs);
     public class delegate void ChildLostFocusEventHandler(ControlEventArgs& controlEventArgs);
     public class delegate void ControlEventHandler(ControlEventArgs& args);
+    public class delegate void ClipboardUpdateEventHandler();
 
     public inline nothrow WindowClassStyle DefaultWindowClassStyle()
     {
@@ -960,6 +961,12 @@ namespace System.Windows
                     message.result = 0;
                     return true;
                 }
+                case WM_CLIPBOARDUPDATE:
+                {
+                    DoClipboardUpdate();
+                    message.result = 0;
+                    return true;
+                }
                 case WM_COMMAND:
                 {
                     void* childWindowHandle = message.LParamHandle();
@@ -1042,6 +1049,14 @@ namespace System.Windows
             {
                 WinRestoreOriginalWndProc(handle, originalWndProc);
             }
+        }
+        private void DoClipboardUpdate()
+        {
+            OnClipboardUpdate();
+        }
+        protected virtual void OnClipboardUpdate()
+        {
+            clipboardUpdateEvent.Fire();
         }
         private bool DoSysCommand(uint wparam, long lparam)
         {
@@ -1838,6 +1853,10 @@ namespace System.Windows
         {
             return controlRemovedEvent;
         }
+        public nothrow Event<ClipboardUpdateEventHandler>& ClipboadUpdateEvent() const
+        {
+            return clipboardUpdateEvent;
+        }
         private nothrow inline bool MouseInClient() const
         {
             return (flags & Flags.mouseInClient) != 0;
@@ -2028,5 +2047,6 @@ namespace System.Windows
         private Event<ChildLostFocusEventHandler, ControlEventArgs> childLostFocusEvent;
         private Event<ControlEventHandler, ControlEventArgs> controlAddedEvent;
         private Event<ControlEventHandler, ControlEventArgs> controlRemovedEvent;
+        private Event<ClipboardUpdateEventHandler> clipboardUpdateEvent;
     }
 }

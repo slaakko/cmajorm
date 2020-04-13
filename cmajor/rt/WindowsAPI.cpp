@@ -1334,6 +1334,35 @@ bool WinGetOpenFileName(void* windowHandle, const char16_t* filter, const char16
     return GetOpenFileNameW(&openFileName);
 }
 
+bool WinGetSaveFileName(void* windowHandle, const char16_t* filter, const char16_t* initialDirectory, char16_t* fileNameBuffer, uint32_t fileNameBufferSize, uint32_t flags, const char16_t* defaultExtension)
+{
+    OPENFILENAMEW openFileName;
+    openFileName.lStructSize = sizeof(openFileName);
+    openFileName.hwndOwner = (HWND)windowHandle;
+    openFileName.hInstance = applicationInstance;
+    openFileName.lpstrFilter = (LPCTSTR)filter;
+    openFileName.lpstrCustomFilter = nullptr;
+    openFileName.nMaxCustFilter = 0;
+    openFileName.nFilterIndex = 0;
+    openFileName.lpstrFile = (LPTSTR)fileNameBuffer;
+    openFileName.nMaxFile = fileNameBufferSize;
+    openFileName.lpstrFileTitle = nullptr;
+    openFileName.nMaxFileTitle = 0;
+    openFileName.lpstrInitialDir = (LPCWSTR)initialDirectory;
+    openFileName.lpstrTitle = nullptr;
+    openFileName.Flags = flags;
+    openFileName.nFileOffset = 0;
+    openFileName.nFileExtension = 0;
+    openFileName.lpstrDefExt = (LPCTSTR)defaultExtension;
+    openFileName.lCustData = 0;
+    openFileName.lpfnHook = nullptr;
+    openFileName.lpTemplateName = nullptr;
+    openFileName.pvReserved = nullptr;
+    openFileName.dwReserved = 0;
+    openFileName.FlagsEx = 0;
+    return GetSaveFileNameW(&openFileName);
+}
+
 uint32_t WinCommDlgExtendedError()
 {
     return CommDlgExtendedError();
@@ -1586,4 +1615,73 @@ bool WinRegGetDWordValue(void* key, const char* subKey, const char* valueName, u
     return status == ERROR_SUCCESS;
 }
 
+uint32_t WinRegisterClipboardFormat(const char* formatName)
+{
+    std::u16string format = ToUtf16(formatName);
+    return RegisterClipboardFormatW((LPCWSTR)format.c_str());
+}
 
+bool WinOpenClipboard(void* windowHandle)
+{
+    return OpenClipboard((HWND)windowHandle);
+}
+
+bool WinCloseClipboard()
+{
+    return CloseClipboard();
+}
+
+bool WinEmptyClipboard()
+{
+    return EmptyClipboard();
+}
+
+void* WinSetClipboardData(uint32_t format, void* mem)
+{
+    return SetClipboardData(format, (HANDLE)mem);
+}
+
+void* WinGetClipboardData(uint32_t format)
+{
+    return GetClipboardData(format);
+}
+
+bool WinIsClipboardFormatAvailable(uint32_t format)
+{
+    return IsClipboardFormatAvailable(format);
+}
+
+bool WinAddClipboardFormatListener(void* windowHandle)
+{
+    return AddClipboardFormatListener((HWND)windowHandle);
+}
+
+bool WinRemoveClipboardFormatListener(void* windowHandle)
+{
+    return RemoveClipboardFormatListener((HWND)windowHandle);
+}
+
+void* WinGlobalAlloc(uint32_t flags, uint64_t size)
+{
+    return GlobalAlloc(flags, size);
+}
+
+void* WinGlobalLock(void* memHandle)
+{
+    return GlobalLock((HGLOBAL)memHandle);
+}
+
+bool WinGlobalUnlock(void* memHandle)
+{
+    return GlobalUnlock((HGLOBAL)memHandle);
+}
+
+void* WinGlobalFree(void* memHandle)
+{
+    return GlobalFree((HGLOBAL)memHandle);
+}
+
+uint64_t WinGlobalSize(void* memHandle)
+{
+    return GlobalSize((HGLOBAL)memHandle);
+}

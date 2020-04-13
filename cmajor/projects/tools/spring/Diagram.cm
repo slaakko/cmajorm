@@ -5,8 +5,10 @@
 
 using System;
 using System.Collections;
+using System.IO;
 using System.Windows;
 using System.XPath;
+using System.Text;
 
 namespace spring
 {
@@ -74,26 +76,68 @@ namespace spring
         private Diagram* diagram;
     }
 
+    public abstract class DiagramElementCreator
+    {
+        public abstract DiagramElement* Create() const;
+    }
+
+    public class ConcreteDiagramElementCreator<DiagramElementT> : DiagramElementCreator
+    {
+        public override DiagramElement* Create() const
+        {
+            return new DiagramElementT();
+        }
+    }
+
+    public class DiagramElementFactory
+    {
+        static DiagramElementFactory() : instance(new DiagramElementFactory())
+        {
+        }
+        public static DiagramElementFactory& Instance()
+        {
+            return *instance;
+        }
+        public DiagramElement* Create(const string& domElementName)
+        {
+            Map<string, DiagramElementCreator*>.ConstIterator it = registry.CFind(domElementName);
+            if (it != registry.CEnd())
+            {
+                DiagramElementCreator* creator = it->second;
+                return creator->Create();
+            }
+            else
+            {
+                throw Exception("element '" + domElementName + "' not registered to diagram element factory");
+            }
+        }
+        private DiagramElementFactory()
+        {
+            UniquePtr<DiagramElementCreator> classCreator(new ConcreteDiagramElementCreator<ClassElement>());
+            registry["class"] = classCreator.Get();
+            creators.Add(Rvalue(classCreator));
+        }
+        private void Instantiate()
+        {
+            ConcreteDiagramElementCreator<ClassElement>().Create();
+        }
+        private static UniquePtr<DiagramElementFactory> instance;
+        private List<UniquePtr<DiagramElementCreator>> creators;
+        private Map<string, DiagramElementCreator*> registry;
+    }
+
     public class Diagram 
     {
         private enum Flags : sbyte
         {
-            none = 0, changed = 1 << 0, invalidated = 1 << 1
+            none = 0, changed = 1 << 0, invalidated = 1 << 1, modified = 1 << 2
         }
         public Diagram() : flags(Flags.none), layout(), elements(), selection(new EmptySelection(*this)), operation(new EmptyOperation())
         {
             Tools.SetDiagram(this);
             SetChanged();
             Invalidate();
-            UniquePtr<ClassElement> concreteClassElement(new ClassElement("ConcreteClass", false));
-            concreteClassElement->SetLocation(PointF(5.0f, 5.0f));
-            concreteClassElement->Operations().Add(new OperationElement("ConcreteOperation()"));
-            concreteClassElement->Operations().Add(new OperationElement("AnotherConcreteOperation()"));
-            concreteClassElement->Operations().Add(new OperationElement("ThirdConcreteOperation()"));
-            AddElement(concreteClassElement.Release());
-            UniquePtr<ClassElement> abstractClassElement(new ClassElement("AbstractClass", true));
-            abstractClassElement->SetLocation(PointF(80.0f, 5.0f));
-            AddElement(abstractClassElement.Release());
+            ResetModified();
         }
         suppress Diagram(const Diagram&);
         suppress void operator=(const Diagram&);
@@ -106,6 +150,46 @@ namespace spring
         public nothrow Canvas* GetCanvas() const
         {
             return canvas;
+        }
+        public void Save(const string& filePath)
+        {
+            StreamWriter writer = File.CreateText(filePath);
+            CodeFormatter formatter(writer);
+            formatter.SetIndentSize(1);
+            System.Dom.Document diagramDocument;
+            diagramDocument.AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Element(u"diagram")));
+            for (UniquePtr<DiagramElement>& element : elements)
+            {
+                UniquePtr<System.Dom.Element> domElement = element->CreateDomElement();
+                element->Write(domElement.Get());
+                diagramDocument.DocumentElement()->AppendChild(UniquePtr<System.Dom.Node>(domElement.Release()));
+            }
+            diagramDocument.Write(formatter);
+        }
+        public void Load(const string& filePath)
+        {
+            UniquePtr<System.Dom.Document> diagramDocument = System.Dom.ReadDocument(filePath);
+            UniquePtr<XPathObject> result = Evaluate(u"/diagram/*", diagramDocument.Get());
+            if (!result.IsNull())
+            {
+                if (result.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[i];
+                        if (node is System.Dom.Element*)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            string domElementName = ToUtf8(element->Name());
+                            UniquePtr<DiagramElement> diagramElement(DiagramElementFactory.Instance().Create(domElementName));
+                            diagramElement->Read(element);
+                            AddElement(diagramElement.Release());
+                        }
+                    }
+                }
+            }
         }
         public void Draw(Graphics& graphics)
         {
@@ -188,12 +272,85 @@ namespace spring
         {
             selection->Clear();
             selection.Reset(selection_);
+            if (!selection->IsEmpty())
+            {
+                EnableCopy();
+                EnableCut();
+            }
+            else
+            {
+                DisableCopy();
+                DisableCut();
+            }
         }
         public nothrow void ResetSelection()
         {
             selection->Clear();
             DisposeContextMenu();
             selection.Reset(new EmptySelection(*this));
+            DisableCopy();
+            DisableCut();
+        }
+        public nothrow void EnableCopy()
+        {
+            Canvas* canvas = GetCanvas();
+            if (canvas != null)
+            {
+                canvas->EnableCopy();
+            }
+        }
+        public nothrow void EnableCut()
+        {
+            Canvas* canvas = GetCanvas();
+            if (canvas != null)
+            {
+                canvas->EnableCut();
+            }
+        }
+        public nothrow void DisableCopy()
+        {
+            Canvas* canvas = GetCanvas();
+            if (canvas != null)
+            {
+                canvas->DisableCopy();
+            }
+        }
+        public nothrow void DisableCut()
+        {
+            Canvas* canvas = GetCanvas();
+            if (canvas != null)
+            {
+                canvas->DisableCut();
+            }
+        }
+        public void Paste(const ustring& clipboardData)
+        {
+            UniquePtr<System.Dom.Document> diagramElementDoc = System.Dom.ParseDocument(clipboardData, "clipboard");
+            UniquePtr<XPathObject> result = Evaluate(u"/spring.diagram.elements/*", diagramElementDoc.Get());
+            if (!result.IsNull())
+            {
+                if (result.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                    UniquePtr<ElementSelection> elementSelection(new ElementSelection(*this));
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[i];
+                        if (node is System.Dom.Element*)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            string domElementName = ToUtf8(element->Name());
+                            UniquePtr<DiagramElement> diagramElement(DiagramElementFactory.Instance().Create(domElementName));
+                            diagramElement->Read(element);
+                            int index = elements.Count();
+                            AddElement(diagramElement.Release());
+                            elementSelection->Add(index);
+                        }
+                    }
+                    SetSelection(elementSelection.Release());
+                }
+            }
         }
         public nothrow inline Operation* GetOperation() const
         {
@@ -243,11 +400,48 @@ namespace spring
         }
         public nothrow inline void SetChanged()
         {
-            flags = cast<Flags>(flags | Flags.changed);
+            if (!Changed())
+            {
+                flags = cast<Flags>(flags | Flags.changed);
+                SetModified();
+            }
         }
         private nothrow inline void ResetChanged()
         {
             flags = cast<Flags>(flags & ~Flags.changed);
+        }
+        public nothrow inline bool Modified() const
+        {
+            return (flags & Flags.modified) != Flags.none;
+        }
+        public nothrow void SetModified()
+        {
+            flags = cast<Flags>(flags | Flags.modified);
+            Canvas* canvas = GetCanvas();
+            if (canvas != null)
+            {
+                StatusBarItem* modifiedStatusBarItem = canvas->GetModifiedStatusBarItem();
+                if (modifiedStatusBarItem != null)
+                {
+                    modifiedStatusBarItem->SetText("*");
+                }
+            }
+        }
+        public nothrow void ResetModified()
+        {
+            if (Modified())
+            {
+                flags = cast<Flags>(flags & ~Flags.modified);
+                Canvas* canvas = GetCanvas();
+                if (canvas != null)
+                {
+                    StatusBarItem* modifiedStatusBarItem = canvas->GetModifiedStatusBarItem();
+                    if (modifiedStatusBarItem != null)
+                    {
+                        modifiedStatusBarItem->SetText(" ");
+                    }
+                }
+            }
         }
         public nothrow inline bool Invalidated() const
         {
@@ -299,6 +493,7 @@ namespace spring
                 DrawSelected(graphics, layout);
             }
         }
+        public abstract System.Dom.Element* CreateDomElement() const;
         public abstract DiagramElement* Clone() const;
         public abstract void Measure(Graphics& graphics, Layout& layout);
         public virtual nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
@@ -431,6 +626,10 @@ namespace spring
         suppress void operator=(const FieldElement&);
         suppress FieldElement(FieldElement&&);
         suppress void operator=(FieldElement&&);
+        public override System.Dom.Element* CreateDomElement() const
+        {
+            return new System.Dom.Element(u"field");
+        }
         public override DiagramElement* Clone() const
         {
             FieldElement* clone = new FieldElement();
@@ -469,6 +668,10 @@ namespace spring
         public nothrow void SetAbstract(bool isAbstract_)
         {
             isAbstract = isAbstract_;
+        }
+        public override System.Dom.Element* CreateDomElement() const
+        {
+            return new System.Dom.Element(u"operation");
         }
         public override DiagramElement* Clone() const
         {
@@ -574,6 +777,19 @@ namespace spring
         public nothrow inline void SetAbstract(bool isAbstract_)
         {
             isAbstract = isAbstract_;
+        }
+        public nothrow void ResetAbstractOperations()
+        {
+            int n = operations.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                OperationElement* operation = operations.Get(i);
+                operation->SetAbstract(false);
+            }
+        }
+        public override System.Dom.Element* CreateDomElement() const
+        {
+            return new System.Dom.Element(u"class");
         }
         public override DiagramElement* Clone() const
         {
@@ -792,8 +1008,8 @@ namespace spring
         }
         public override void Read(System.Dom.Element* parentElement)
         {
-            base->Read(parentElement);
             isAbstract = ParseBool(ToUtf8(parentElement->GetAttribute(u"abstract")));
+            base->Read(parentElement);
             UniquePtr<XPathObject> operationResult = Evaluate(u"operation", parentElement);
             if (!operationResult.IsNull())
             {

@@ -21,6 +21,39 @@ namespace spring
         public Canvas() : this(Color.White(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none) // todo
         {
         }
+        public nothrow Diagram& GetDiagram()
+        {
+            return *diagram;
+        }
+        public nothrow void SetDiagram(Diagram* diagram_)
+        {
+            diagram.Reset(diagram_);
+            diagram->SetCanvas(this);
+            diagram->SetChanged();
+            diagram->Invalidate();
+            diagram->ResetModified();
+            Invalidate();
+        }
+        public nothrow void SetModifiedStatusBarItem(StatusBarItem* modifiedStatusBarItem_)
+        {
+            modifiedStatusBarItem = modifiedStatusBarItem_;
+        }
+        public nothrow StatusBarItem* GetModifiedStatusBarItem() const
+        {
+            return modifiedStatusBarItem;
+        }
+        public nothrow void SetCopyMenuItem(MenuItem* copyMenuItem_)
+        {
+            copyMenuItem = copyMenuItem_;
+        }
+        public nothrow void SetCutMenuItem(MenuItem* cutMenuItem_)
+        {
+            cutMenuItem = cutMenuItem_;
+        }
+        public nothrow void SetPasteMenuItem(MenuItem* pasteMenuItem_)
+        {
+            pasteMenuItem = pasteMenuItem_;
+        }
         protected override void SetCursor()
         {
             SetCursor(*Tools.Current()->GetCursor());
@@ -166,7 +199,53 @@ namespace spring
         {
             diagram->DeleteSelection();
         }
+        public nothrow void EnableCopy()
+        {
+            if (copyMenuItem != null)
+            {
+                copyMenuItem->Enable();
+            }
+        }
+        public nothrow void EnableCut()
+        {
+            if (cutMenuItem != null)
+            {
+                cutMenuItem->Enable();
+            }
+        }
+        public nothrow void EnablePaste()
+        {
+            if (pasteMenuItem != null)
+            {
+                pasteMenuItem->Enable();
+            }
+        }
+        public nothrow void DisableCopy()
+        {
+            if (copyMenuItem != null)
+            {
+                copyMenuItem->Disable();
+            }
+        }
+        public nothrow void DisableCut()
+        {
+            if (cutMenuItem != null)
+            {
+                cutMenuItem->Disable();
+            }
+        }
+        public nothrow void DisablePaste()
+        {
+            if (pasteMenuItem != null)
+            {
+                pasteMenuItem->Disable();
+            }
+        }
         private UniquePtr<Diagram> diagram;
+        private StatusBarItem* modifiedStatusBarItem;
+        private MenuItem* copyMenuItem;
+        private MenuItem* cutMenuItem;
+        private MenuItem* pasteMenuItem;
         private PointF viewOrigin;
         private MouseArgs mouseDownArgs;
         private MouseArgs mouseMoveArgs;

@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.IO;
 using System.Windows;
 using spring;
@@ -11,19 +12,55 @@ using spring;
 public class MainWindow : Window
 {
     public MainWindow() : base("Spring Software Diagram Designer"),
+        springDiagramElementsFormat("spring.diagram.elements"),
+        clipboardListener(Handle()),
         arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), classToolCursor(Application.GetResourceManager().GetCursor("class.tool.spring.cursor"))
     {
         UniquePtr<MenuBar> menuBar(new MenuBar());
-        UniquePtr<MenuItem> fileItem(new MenuItem("&File"));
+        UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
+        UniquePtr<MenuItem> openMenuItem(new MenuItem("&Open..."));
+        openMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.o));
+        openMenuItem->ClickEvent().AddHandler(OpenClick);
+        fileMenuItem->AddMenuItem(openMenuItem.Release());
+        UniquePtr<MenuItem> saveMenuItem(new MenuItem("&Save"));
+        saveMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.s));
+        saveMenuItem->ClickEvent().AddHandler(SaveClick);
+        fileMenuItem->AddMenuItem(saveMenuItem.Release());
+        UniquePtr<MenuItem> saveAsMenuItem(new MenuItem("Save &As..."));
+        saveAsMenuItem->ClickEvent().AddHandler(SaveAsClick);
+        fileMenuItem->AddMenuItem(saveAsMenuItem.Release());
+        fileMenuItem->AddMenuItem(new MenuItemSeparator());
+        /*
         UniquePtr<MenuItem> testMenuItem(new MenuItem("&Test"));
         testMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.t));
         testMenuItem->ClickEvent().AddHandler(TestClick);
-        fileItem->AddMenuItem(testMenuItem.Release());
+        fileMenuItem->AddMenuItem(testMenuItem.Release());
+        */
         UniquePtr<MenuItem> exitMenuItem(new MenuItem("E&xit"));
         exitMenuItem->SetShortcut(cast<Keys>(Keys.altModifier | Keys.f4));
         exitMenuItem->ClickEvent().AddHandler(ExitClick);
-        fileItem->AddMenuItem(exitMenuItem.Release());
-        menuBar->AddMenuItem(fileItem.Release());
+        fileMenuItem->AddMenuItem(exitMenuItem.Release());
+        menuBar->AddMenuItem(fileMenuItem.Release());
+        UniquePtr<MenuItem> editMenuItem(new MenuItem("&Edit"));
+        UniquePtr<MenuItem> cutMenuItemPtr(new MenuItem("Cu&t"));
+        cutMenuItem = cutMenuItemPtr.Get();
+        cutMenuItem->Disable();
+        cutMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.x));
+        cutMenuItem->ClickEvent().AddHandler(EditCut);
+        editMenuItem->AddMenuItem(cutMenuItemPtr.Release());
+        UniquePtr<MenuItem> copyMenuItemPtr(new MenuItem("&Copy"));
+        copyMenuItem = copyMenuItemPtr.Get();
+        copyMenuItem->Disable();
+        copyMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.c));
+        copyMenuItem->ClickEvent().AddHandler(EditCopy);
+        editMenuItem->AddMenuItem(copyMenuItemPtr.Release());
+        UniquePtr<MenuItem> pasteMenuItemPtr(new MenuItem("&Paste"));
+        pasteMenuItem = pasteMenuItemPtr.Get();
+        pasteMenuItem->Disable();
+        pasteMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.v));
+        pasteMenuItem->ClickEvent().AddHandler(EditPaste);
+        editMenuItem->AddMenuItem(pasteMenuItemPtr.Release());
+        menuBar->AddMenuItem(editMenuItem.Release());
         AddChild(menuBar.Release());
         UniquePtr<ToolBar> toolBar(new ToolBar(ToolBar.Style.radioButtonGroup));
         ToolButton* selectToolButton = new ToolButton("arrow.system.windows.bitmap");
@@ -43,6 +80,9 @@ public class MainWindow : Window
         canvas->MouseEnterEvent().AddHandler(CanvasMouseEnter);
         canvas->MouseLeaveEvent().AddHandler(CanvasMouseLeave);
         canvas->MouseMoveEvent().AddHandler(CanvasMouseMove);
+        canvas->SetCopyMenuItem(copyMenuItem);
+        canvas->SetCutMenuItem(cutMenuItem);
+        canvas->SetPasteMenuItem(pasteMenuItem);
         UniquePtr<Control> borderedCanvas(new BorderedControl(canvasPtr.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         verticalSplitContainer->Pane1Container()->AddChild(borderedCanvas.Release());
         UniquePtr<LogView> logView(new LogView());
@@ -53,6 +93,14 @@ public class MainWindow : Window
         AddChild(verticalSplitContainer.Release());
         UniquePtr<StatusBar> statusBar(new StatusBar());
         string empty;
+        UniquePtr<StatusBarItem> filePathItemPtr(new StatusBarItem(empty, StatusBarItem.BorderStyle.sunken));
+        filePathStatusBarItem = filePathItemPtr.Get();
+        statusBar->AddItem(filePathItemPtr.Release());
+        UniquePtr<StatusBarItem> modifiedStatusBarItemPtr(new StatusBarItem(empty, StatusBarItem.BorderStyle.sunken));
+        modifiedStatusBarItem = modifiedStatusBarItemPtr.Get();
+        canvas->SetModifiedStatusBarItem(modifiedStatusBarItem);
+        modifiedStatusBarItem->SetText(" ");
+        statusBar->AddItem(modifiedStatusBarItemPtr.Release());
         UniquePtr<StatusBarItem> springItem(new StatusBarItem(empty, StatusBarItem.BorderStyle.flat, true));
         statusBar->AddItem(springItem.Release());
         UniquePtr<StatusBarItem> xItem(new StatusBarItem("x:"));
@@ -69,9 +117,162 @@ public class MainWindow : Window
         AddChild(statusBar.Release());
         ScreenMetrics.Get().PrintToLog();
     }
+    protected override void OnClipboardUpdate()
+    {
+        base->OnClipboardUpdate();
+        Clipboard clipboard(Handle());
+        if (clipboard.IsClipboardFormatAvailable(springDiagramElementsFormat))
+        {
+            clipboardData = clipboard.GetStringData(springDiagramElementsFormat);
+            pasteMenuItem->Enable();
+        }
+    }
+    protected override void OnWindowClosing(bool& cancelClose)
+    {
+        if (canvas->GetDiagram().Modified())
+        {
+            MessageBoxResult result = MessageBox.Show("Current diagram is modified. Do you want to save changes?", "Diagram modified", this, MessageBoxType.MB_YESNOCANCEL);
+            if (result == MessageBoxResult.yes)
+            {
+                SaveClick();
+            }
+            else if (result == MessageBoxResult.cancel)
+            {
+                cancelClose = true;
+            }
+        }
+    }
     private void ExitClick()
     {
         Close();
+    }
+    private void OpenClick()
+    {
+        try
+        {
+            if (canvas->GetDiagram().Modified())
+            {
+                MessageBoxResult result = MessageBox.Show("Current diagram is modified. Do you want to save changes?", "Diagram modified", this, MessageBoxType.MB_YESNOCANCEL);
+                if (result == MessageBoxResult.yes)
+                {
+                    SaveClick();
+                }
+                else if (result == MessageBoxResult.cancel)
+                {
+                    return;
+                }
+            }
+            List<Pair<string, string>> descriptionFilterPairs;
+            descriptionFilterPairs.Add(Pair<string, string>("Spring diagram files (*.spring.xml)", "*.spring.xml"));
+            string initialDirectory = DefaultDiagramDirectory();
+            string filePath;
+            string currentDirectory;
+            List<string> fileNames;
+            string defaultFilePath;
+            bool selected = System.Windows.API.GetOpenFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".spring.xml",
+                OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
+            if (selected)
+            {
+                if (!fileNames.IsEmpty())
+                {
+                    filePath = Path.Combine(currentDirectory, fileNames[0]);
+                }
+                if (!filePath.IsEmpty() && File.Exists(filePath))
+                {
+                    UniquePtr<Diagram> diagram(new Diagram());
+                    diagram->Load(filePath);
+                    diagramFilePath = filePath;
+                    filePathStatusBarItem->SetText(diagramFilePath);
+                    modifiedStatusBarItem->SetText(" ");
+                    canvas->SetDiagram(diagram.Release());
+                    canvas->GetDiagram().ResetModified();
+                }
+                else
+                {
+                    throw Exception("file path is empty or does not exist");
+                }
+            }
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
+        }
+    }
+    private void SaveClick()
+    {
+        try
+        {
+            if (diagramFilePath.IsEmpty())
+            {
+                SaveAsClick();
+            }
+            else
+            {
+                canvas->GetDiagram().Save(diagramFilePath);
+                canvas->GetDiagram().ResetModified();
+            }
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
+        }
+    }
+    private void SaveAsClick()
+    {
+        try
+        {
+            List<Pair<string, string>> descriptionFilterPairs;
+            descriptionFilterPairs.Add(Pair<string, string>("Spring diagram files (*.spring.xml)", "*.spring.xml"));
+            string initialDirectory = DefaultDiagramDirectory();
+            string currentDirectory;
+            List<string> fileNames;
+            string defaultFilePath;
+            string filePath;
+            bool selected = System.Windows.API.GetSaveFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".spring.xml", 0u, currentDirectory, filePath);
+            if (selected)
+            {
+                if (File.Exists(filePath))
+                {
+                    if (MessageBox.Show("File '" + filePath + "' already exists. Do you want to replace it?", "File Exists", this, MessageBoxType.MB_YESNO) != MessageBoxResult.yes)
+                    {
+                        return;
+                    }
+                }
+                canvas->GetDiagram().Save(filePath);
+                diagramFilePath = filePath;
+                filePathStatusBarItem->SetText(diagramFilePath);
+                canvas->GetDiagram().ResetModified();
+            }
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
+        }
+    }
+    private void EditCopy()
+    {
+        Selection& selection = canvas->GetDiagram().GetSelection();
+        ustring copy = selection.Copy();
+        if (!copy.IsEmpty())
+        {
+            Clipboard clipboard(Handle());
+            clipboard.SetStringData(springDiagramElementsFormat, copy);
+        }
+    }
+    private void EditCut()
+    {
+        LogView* logView = Application.GetLogView();
+        if (logView != null)
+        {
+            logView->WriteLine("cut");
+        }
+    }
+    private void EditPaste()
+    {
+        if (!clipboardData.IsEmpty())
+        {
+            canvas->GetDiagram().Paste(clipboardData);
+        }
     }
     private void TestClick()
     {
@@ -96,7 +297,41 @@ public class MainWindow : Window
     }
     protected override void OnKeyDown(KeyEventArgs& args)
     {
-        canvas->KeyDown(args);
+        base->OnKeyDown(args);
+        switch (args.keyData)
+        {
+            case cast<Keys>(Keys.controlModifier | Keys.insert):
+            {
+                if (copyMenuItem->IsEnabled())
+                {
+                    EditCopy();
+                }
+                args.handled = true;
+                break;
+            }
+            case cast<Keys>(Keys.shiftModifier | Keys.insert):
+            {
+                if (pasteMenuItem->IsEnabled())
+                {
+                    EditPaste();
+                }
+                args.handled = true;
+                break;
+            }
+            case cast<Keys>(Keys.shiftModifier | Keys.delete_):
+            {
+                if (cutMenuItem->IsEnabled())
+                {
+                    EditCut();
+                }
+                args.handled = true;
+                break;
+            }
+        }
+        if (!args.handled)
+        {
+            canvas->KeyDown(args);
+        }
     }
     private void CanvasMouseEnter()
     {
@@ -115,11 +350,20 @@ public class MainWindow : Window
         string yCoordText = Format(ToString(PixelsToMM(args.location.y, ScreenMetrics.Get().DpiY()), 2, 2), 6, FormatJustify.right);
         yCoordStatusBarItem->SetText(yCoordText);
     }
+    private ClipboardFormat springDiagramElementsFormat;
+    private ClipboardListener clipboardListener;
     private Canvas* canvas;
+    private StatusBarItem* filePathStatusBarItem;
+    private StatusBarItem* modifiedStatusBarItem;
     private StatusBarItem* xCoordStatusBarItem;
     private StatusBarItem* yCoordStatusBarItem;
     private Cursor arrowCursor;
     private Cursor& classToolCursor;
+    private string diagramFilePath;
+    private ustring clipboardData;
+    private MenuItem* cutMenuItem;
+    private MenuItem* copyMenuItem;
+    private MenuItem* pasteMenuItem;
 }
 
 int main()

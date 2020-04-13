@@ -704,6 +704,65 @@ namespace System.Windows.API
         return false;
     }
 
+    public bool GetSaveFileName(void* windowHandle, const List<Pair<string, string>>& descriptionFilterPairs, const string& initialDirectory, const string& defaultFilePath,
+        const string& defaultExtension, uint flags, string& currentDirectory, string& filePath)
+    {
+        long filterBufferSize = 0;
+        for (const Pair<string, string>& descriptionFilterPair : descriptionFilterPairs)
+        {
+            wstring description = ToUtf16(descriptionFilterPair.first);
+            wstring filter = ToUtf16(descriptionFilterPair.second);
+            filterBufferSize = filterBufferSize + description.Length() + 1 + filter.Length() + 1;
+        }
+        filterBufferSize = filterBufferSize + 1 + 1;
+        UniquePtr<wchar> filterBuffer = cast<wchar*>(MemAlloc(sizeof(wchar) * filterBufferSize));
+        wchar* filterBufferPtr = filterBuffer.Get();
+        for (const Pair<string, string>& descriptionFilterPair : descriptionFilterPairs)
+        {
+            wstring description = ToUtf16(descriptionFilterPair.first);
+            long descLen = StrCopy(filterBufferPtr, description.Chars(), description.Length());
+            filterBufferPtr = filterBufferPtr + descLen + 1;
+            wstring filter = ToUtf16(descriptionFilterPair.second);
+            long filterLen = StrCopy(filterBufferPtr, filter.Chars(), filter.Length());
+            filterBufferPtr = filterBufferPtr + filterLen + 1;
+        }
+        *filterBufferPtr++ = '\0';
+        *filterBufferPtr++ = '\0';
+        long fileNameBufferSize = 1024;
+        UniquePtr<wchar> fileNameBuffer = cast<wchar*>(MemAlloc(sizeof(wchar) * fileNameBufferSize));
+        wstring defFilePath = ToUtf16(defaultFilePath);
+        if (defaultFilePath.IsEmpty())
+        {
+            *fileNameBuffer.Get() = '\0';
+        }
+        else
+        {
+            StrCopy(fileNameBuffer.Get(), defFilePath.Chars(), defFilePath.Length());
+        }
+        wstring initialDir = ToUtf16(initialDirectory);
+        wstring defExt = ToUtf16(defaultExtension);
+        bool success = WinGetSaveFileName(windowHandle, filterBuffer.Get(), initialDir.Chars(), fileNameBuffer.Get(), cast<uint>(fileNameBufferSize), flags, defExt.Chars());
+        if (success)
+        {
+            long firstPathLength = StrLen(fileNameBuffer.Get());
+            filePath = ToUtf8(wstring(fileNameBuffer.Get(), firstPathLength));
+            return true;
+        }
+        else
+        {
+            uint errorCode = WinCommDlgExtendedError();
+            if (errorCode == 0u)
+            {
+                return false;
+            }
+            else
+            {
+                ThrowCommonDialogError(errorCode);
+            }
+        }
+        return false;
+    }
+
     public void* LoadImage(const char* name, uint type, int cx, int cy)
     {
         void* result = WinLoadImage(name, type, cx, cy);
@@ -1018,5 +1077,155 @@ namespace System.Windows.API
         {
             throw WindowsAPIException(WinGetLastError());
         }
+    }
+
+    public uint RegisterClipboardFormat(const char* formatName)
+    {
+        uint format = WinRegisterClipboardFormat(formatName);
+        if (format == 0u)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return format;
+    }
+
+    public void OpenClipboard(void* windowHandle)
+    {
+        bool succeeded = WinOpenClipboard(windowHandle);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void CloseClipboard()
+    {
+        bool succeeded = WinCloseClipboard();
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void EmptyClipboard()
+    {
+        bool succeeded = WinEmptyClipboard();
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void* SetClipboardData(uint format, void* mem)
+    {
+        void* retval = WinSetClipboardData(format, mem);
+        if (retval == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return retval;
+    }
+
+    public void* GetClipboardData(uint format)
+    {
+        void* retval = WinGetClipboardData(format);
+        if (retval == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return retval;
+    }
+
+    public bool IsClipboardFormatAvailable(uint format)
+    {
+        bool result = WinIsClipboardFormatAvailable(format);
+        if (!result)
+        {
+            ulong error = WinGetLastError();
+            if (error != 0u)
+            {
+                throw WindowsAPIException(error);
+            }
+        }
+        return result;
+    }
+
+    public void AddClipboardFormatListener(void* windowHandle)
+    {
+        bool succeeded = WinAddClipboardFormatListener(windowHandle);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public void RemoveClipboardFormatListener(void* windowHandle)
+    {
+        bool succeeded = WinRemoveClipboardFormatListener(windowHandle);
+        if (!succeeded)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public enum GlobalAllocFlags : uint
+    {
+        GMEM_FIXED = 0x0u,
+        GHND = 0x0042u,
+        GMEM_MOVEABLE = 0x0002u,
+        GMEM_ZEROINIT = 0x0040u,
+        GPTR = 0x0040u
+    }
+
+    public void* GlobalAlloc(GlobalAllocFlags flags, ulong size)
+    {
+        void* retval = WinGlobalAlloc(cast<uint>(flags), size);
+        if (retval == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return retval;
+    }
+
+    public void* GlobalLock(void* memHandle)
+    {
+        void* retval = WinGlobalLock(memHandle);
+        if (retval == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return retval;
+    }
+
+    public void GlobalUnlock(void* memHandle)
+    {
+        bool retval = WinGlobalUnlock(memHandle);
+        if (!retval)
+        {
+            ulong error = WinGetLastError();
+            if (error != 0u)
+            {
+                throw WindowsAPIException(error);
+            }
+        }
+    }
+
+    public void GlobalFree(void* memHandle)
+    {
+        void* retval = WinGlobalFree(memHandle);
+        if (retval != null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+
+    public ulong GlobalSize(void* memHandle)
+    {
+        ulong size = WinGlobalSize(memHandle);
+        if (size == 0u)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return size;
     }
 }

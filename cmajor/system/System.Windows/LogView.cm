@@ -29,9 +29,13 @@ namespace System.Windows
             Lines().Clear();
             Invalidate();
         }
-        public virtual void WriteLine(const string& line)
+        public virtual void WriteLine(const string& text)
         {
-            AddLine(ToUtf32(line));
+            List<ustring> lines = SplitTextIntoLines(ToUtf32(text));
+            for (const ustring& line : lines)
+            {
+                AddLine(line);
+            }
             if (!Frozen())
             {
                 SetCaretLineCol(cast<int>(Lines().Count()), 1);

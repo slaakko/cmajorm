@@ -199,7 +199,14 @@ namespace spring
         {
             if (args.element != null)
             {
-                args.diagram->SetSelection(new ElementSelection(*args.diagram, args.elementIndex));
+                if (args.diagram->GetSelection().Count() == 1 && args.diagram->GetSelection().Contains(args.location))
+                {
+                    args.diagram->ResetSelection();
+                }
+                else
+                {
+                    args.diagram->SetSelection(new ElementSelection(*args.diagram, args.elementIndex));
+                }
             }
             else
             {

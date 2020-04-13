@@ -1,0 +1,130 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows.API;
+
+namespace System.Windows
+{
+    public class ClipboardFormat
+    {
+        public ClipboardFormat(const string& formatName_) : formatName(formatName_), formatNumber(0u)
+        {
+            formatNumber = RegisterClipboardFormat(formatName.Chars());
+        }
+        public nothrow inline uint Number() const
+        {
+            return formatNumber;
+        }
+        private string formatName;
+        private uint formatNumber;
+    }
+
+    public class MemoryHandle
+    {
+        public nothrow MemoryHandle() : handle(null)
+        {
+        }
+        public MemoryHandle(void* handle_) : handle(handle_), memory(GlobalLock(handle))
+        {
+        }
+        suppress MemoryHandle(const MemoryHandle&);
+        suppress void operator=(const MemoryHandle&);
+        public MemoryHandle(MemoryHandle&& that) : handle(that.handle)
+        {
+            that.handle = null;
+        }
+        public default nothrow void operator=(MemoryHandle&&);
+        public ~MemoryHandle()
+        {
+            if (handle != null)
+            {
+                GlobalUnlock(handle);
+            }
+        }
+        public static MemoryHandle AllocateMemory(ulong size)
+        {
+            return MemoryHandle(GlobalAlloc(GlobalAllocFlags.GHND, size));
+        }
+        public nothrow void* Memory() const
+        {
+            return memory;
+        }
+        public ulong Size() const
+        {
+            return GlobalSize(handle);
+        }
+        public nothrow void* Handle() const
+        {
+            return handle;
+        }
+        private void* handle;
+        private void* memory;
+    }
+
+    public class ClipboardListener
+    {
+        public ClipboardListener(void* windowHandle_) : windowHandle(windowHandle_)
+        {
+            AddClipboardFormatListener(windowHandle);
+        }
+        public ~ClipboardListener()
+        {
+            try
+            {
+                RemoveClipboardFormatListener(windowHandle);
+            }
+            catch (const Exception&)
+            {
+            }
+        }
+        private void* windowHandle;
+    }
+
+    public class Clipboard
+    {
+        public Clipboard(void* windowHandle_) : windowHandle(windowHandle_)
+        {
+            OpenClipboard(windowHandle);
+        }
+        public ~Clipboard()
+        {
+            CloseClipboard();
+        }
+        public bool IsClipboardFormatAvailable(const ClipboardFormat& clipboardFormat) const
+        {
+            return IsClipboardFormatAvailable(clipboardFormat.Number());
+        }
+        public void SetEmpty()
+        {
+            EmptyClipboard();
+        }
+        public MemoryHandle GetData(const ClipboardFormat& clipboardFormat)
+        {
+            return MemoryHandle(GetClipboardData(clipboardFormat.Number()));
+        }
+        public void SetData(const ClipboardFormat& clipboardFormat, const MemoryHandle& memoryHandle)
+        {
+            SetEmpty();
+            SetClipboardData(clipboardFormat.Number(), memoryHandle.Handle());
+        }
+        public ustring GetStringData(const ClipboardFormat& clipboardFormat)
+        {
+            MemoryHandle memoryHandle = GetData(clipboardFormat);
+            ulong size = memoryHandle.Size();
+            UniquePtr<uchar> ptr(cast<uchar*>(MemAlloc(cast<long>(size))));
+            StrCopy(ptr.Get(), cast<uchar*>(memoryHandle.Memory()));
+            ustring str(ptr.Get());
+            return str;
+        }
+        public void SetStringData(const ClipboardFormat& clipboardFormat, const ustring& str)
+        {
+            MemoryHandle memoryHandle = MemoryHandle.AllocateMemory(cast<ulong>((str.Length() + 1) * sizeof(uchar)));
+            StrCopy(cast<uchar*>(memoryHandle.Memory()), str.Chars());
+            SetData(clipboardFormat, memoryHandle);
+        }
+        private void* windowHandle;
+    }
+}

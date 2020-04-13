@@ -19,13 +19,23 @@ namespace System.Windows
         return GetSystemColor(SystemColor.COLOR_MENUTEXT);
     }
 
+    public nothrow Color DefaultDisabledMenuTextColor()
+    {
+        Color color = GetSystemColor(SystemColor.COLOR_GRAYTEXT);
+        if (color == Color.Black())
+        {
+            return Color(195u, 195u, 198u);
+        }
+        return color;
+    }
+
     public abstract class MenuControl : Control
     {
         public MenuControl(const Font& font_, const char* windowClassName, WindowClassStyle windowClassStyle, WindowStyle style, ExtendedWindowStyle exStyle,
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base(windowClassName, windowClassStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors),
-            font(font_), textColor(DefaultMenuTextColor()), mouseOverColor(201u, 222u, 245u), menuOpenColor(Color.White()),
-            shadowColor(ShadowColor()), textBrush(textColor), backgroundBrush(BackgroundColor()), mouseOverBrush(mouseOverColor), menuOpenBrush(menuOpenColor),
+            font(font_), textColor(DefaultMenuTextColor()), disabledTextColor(DefaultDisabledMenuTextColor()), mouseOverColor(201u, 222u, 245u), menuOpenColor(Color.White()),
+            shadowColor(ShadowColor()), textBrush(textColor), disabledTextBrush(disabledTextColor), backgroundBrush(BackgroundColor()), mouseOverBrush(mouseOverColor), menuOpenBrush(menuOpenColor),
             shadowBrush(shadowColor), blackBrush(Color.Black()), blackPen(Color.Black()), darkPen(Color.DarkGray()),
             format(StringAlignment.near, StringAlignment.near, HotKeyPrefix.show)
         {
@@ -42,6 +52,10 @@ namespace System.Windows
         {
             return textColor;
         }
+        public nothrow inline const Color& DisabledTextColor() const
+        {
+            return disabledTextColor;
+        }
         public nothrow inline const Color& MouseOverColor() const
         {
             return mouseOverColor;
@@ -57,6 +71,10 @@ namespace System.Windows
         public nothrow inline const Brush& TextBrush() const
         {
             return textBrush;
+        }
+        public nothrow inline const Brush& DisabledTextBrush() const
+        {
+            return disabledTextBrush;
         }
         public nothrow inline const Brush& BackgroundBrush() const
         {
@@ -148,10 +166,12 @@ namespace System.Windows
         }
         private Font font;
         private Color textColor;
+        private Color disabledTextColor;
         private Color mouseOverColor;
         private Color menuOpenColor;
         private Color shadowColor;
         private SolidBrush textBrush;
+        private SolidBrush disabledTextBrush;
         private SolidBrush backgroundBrush;
         private SolidBrush mouseOverBrush;
         private SolidBrush menuOpenBrush;
@@ -292,7 +312,7 @@ namespace System.Windows
                 {
                     MenuItem* menuItem = cast<MenuItem*>(child);
                     menuItem->Draw(
-                        args.graphics, padding, TextBrush(), BackgroundBrush(), MouseOverBrush(), MenuOpenBrush(), ShadowBrush(), BlackBrush(), BlackPen(), DarkPen(), GetFont(), Format(),
+                        args.graphics, padding, TextBrush(), DisabledTextBrush(), BackgroundBrush(), MouseOverBrush(), MenuOpenBrush(), ShadowBrush(), BlackBrush(), BlackPen(), DarkPen(), GetFont(), Format(),
                         MenuOpenColor(), this, drawSubItems, origin);
                 }
                 child = child->NextSibling();
@@ -311,8 +331,11 @@ namespace System.Windows
                 if (it != shortcuts.CEnd())
                 {
                     MenuItem* menuItem = it->second;
-                    menuItem->DoClick();
-                    args.handled = true;
+                    if (menuItem->IsEnabled())
+                    {
+                        menuItem->DoClick();
+                        args.handled = true;
+                    }
                 }
             }
         }
@@ -651,11 +674,14 @@ namespace System.Windows
                 if (child is MenuItem*)
                 {
                     MenuItem* menuItem = cast<MenuItem*>(child);
-                    menuItem->DoMouseUp(args, handled, this);
-                    if (handled)
+                    if (menuItem->IsEnabled())
                     {
-                        InvalidateMenu();
-                        return;
+                        menuItem->DoMouseUp(args, handled, this);
+                        if (handled)
+                        {
+                            InvalidateMenu();
+                            return;
+                        }
                     }
                 }
                 child = child->NextSibling();
@@ -885,8 +911,8 @@ namespace System.Windows
                     }
                     else if (rootItem != null)
                     {
-                        rootItem->Draw(args.graphics, DefaultPadding(), TextBrush(), BackgroundBrush(), MouseOverBrush(), MenuOpenBrush(), ShadowBrush(), BlackBrush(), BlackPen(), DarkPen(), GetFont(), Format(),
-                            MenuOpenColor(), this, true, Point());
+                        rootItem->Draw(args.graphics, DefaultPadding(), TextBrush(), DisabledTextBrush(), BackgroundBrush(), MouseOverBrush(), MenuOpenBrush(), ShadowBrush(), BlackBrush(), BlackPen(),
+                            DarkPen(), GetFont(), Format(), MenuOpenColor(), this, true, Point());
                     }
                 }
             }
@@ -1120,7 +1146,7 @@ namespace System.Windows
         public nothrow MenuItemBase() : location(), size()
         {
         }
-        public abstract void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
+        public abstract void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& disabledTextBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
             const Brush& menuOpenBrush, const Brush& shadowBrush, const Brush& blackBrush, const Pen& blackPen, const Pen& darkPen, const Font& font,
             const StringFormat& format, const Color& menuOpenColor, MenuControl* menuControl, bool drawSubItems, const Point& origin);
         internal nothrow MenuItem* GetParentMenuItem() const
@@ -1185,7 +1211,7 @@ namespace System.Windows
         }
         private enum Flags : sbyte
         {
-            none = 0, selected = 1 << 0, mouseInClient = 1 << 1, lbuttonPressed = 1 << 2
+            none = 0, disabled = 1 << 0, selected = 1 << 1, mouseInClient = 1 << 2, lbuttonPressed = 1 << 3
         }
         public MenuItem(const string& text_) :
             base(), text(text_), children(this), state(State.closed), childRect(), unionRect(), flags(Flags.none), accessKey('\0'), shortcut(Keys.none), shortcutFieldWidth(0)
@@ -1305,7 +1331,7 @@ namespace System.Windows
                 {
                     childItem = menuControl->GetMenuItemByAccessKey(accessKey);
                 }
-                if (childItem != null)
+                if (childItem != null && childItem->IsEnabled())
                 {
                     childItem->Execute(parentMenuItem, wantsKeys, menuControl);
                     return true;
@@ -1322,8 +1348,16 @@ namespace System.Windows
                 {
                     case Keys.enter:
                     {
-                        Execute(parentMenuItem, wantsKeys, menuControl);
-                        return true;
+                        if (IsEnabled())
+                        {
+                            Execute(parentMenuItem, wantsKeys, menuControl);
+                            return true;
+                        }
+                        else
+                        {
+                            wantsKeys = true;
+                            return false;
+                        }
                     }
                     case Keys.escape:
                     {
@@ -1680,19 +1714,25 @@ namespace System.Windows
         {
             if (children.IsEmpty())
             {
-                Close(menuControl);
-                wantsKeys = false;
-                DoClick();
+                if (IsEnabled())
+                {
+                    Close(menuControl);
+                    wantsKeys = false;
+                    DoClick();
+                }
             }
             else
             {
-                SetState(State.open, menuControl);
-                MenuItem* firstMenuItem = GetFirstMenuItem();
-                if (firstMenuItem != null)
+                if (IsEnabled())
                 {
-                    menuControl->SetSelectedMenuItem(firstMenuItem);
-                    wantsKeys = true;
-                    menuControl->SetMenuInvalidated();
+                    SetState(State.open, menuControl);
+                    MenuItem* firstMenuItem = GetFirstMenuItem();
+                    if (firstMenuItem != null)
+                    {
+                        menuControl->SetSelectedMenuItem(firstMenuItem);
+                        wantsKeys = true;
+                        menuControl->SetMenuInvalidated();
+                    }
                 }
             }
         }
@@ -1806,8 +1846,11 @@ namespace System.Windows
                         if (child is MenuItem*)
                         {
                             MenuItem* childItem = cast<MenuItem*>(child);
-                            childItem->DoMouseUp(args, handled, menuControl);
-                            if (handled) return;
+                            if (childItem->IsEnabled())
+                            {
+                                childItem->DoMouseUp(args, handled, menuControl);
+                                if (handled) return;
+                            }
                         }
                         child = child->NextSibling();
                     }
@@ -1836,8 +1879,11 @@ namespace System.Windows
                         if (child is MenuItem*)
                         {
                             MenuItem* childItem = cast<MenuItem*>(child);
-                            childItem->DoMouseUp(args, handled, menuControl);
-                            if (handled) return;
+                            if (childItem->IsEnabled())
+                            {
+                                childItem->DoMouseUp(args, handled, menuControl);
+                                if (handled) return;
+                            }
                         }
                         child = child->NextSibling();
                     }
@@ -1856,6 +1902,7 @@ namespace System.Windows
         }
         private void DoMouseUp(MouseEventArgs& args, MenuControl* menuControl)
         {
+            if (!IsEnabled()) return;
             OnMouseUp(args);
             MenuItem* latestMouseDownMenuItem = menuControl->GetLatestMouseDownMenuItem();
             if ((args.buttons & MouseButtons.lbutton) != 0)
@@ -2117,7 +2164,7 @@ namespace System.Windows
             Rect r(Location(), GetSize());
             unionRect = Rect.Union(r, childRect);
         }
-        public override void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
+        public override void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& disabledTextBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
             const Brush& menuOpenBrush, const Brush& shadowBrush, const Brush& blackBrush, const Pen& blackPen, const Pen& darkPen, const Font& font, const StringFormat& format,
             const Color& menuOpenColor, MenuControl* menuControl, bool drawSubItems, const Point& origin)
         {
@@ -2125,13 +2172,13 @@ namespace System.Windows
             {
                 case State.closed:
                 {
-                    DrawClosed(graphics, parentPadding, textBrush, mouseOverBrush, backgroundBrush, menuOpenBrush, blackBrush, blackPen, font, format, menuOpenColor, menuControl,
+                    DrawClosed(graphics, parentPadding, textBrush, disabledTextBrush, mouseOverBrush, backgroundBrush, menuOpenBrush, blackBrush, blackPen, font, format, menuOpenColor, menuControl,
                         drawSubItems, origin);
                     break;
                 }
                 case State.open:
                 {
-                    DrawOpen(graphics, parentPadding, textBrush, backgroundBrush, mouseOverBrush, menuOpenBrush, shadowBrush, blackBrush, blackPen, darkPen, font, format,
+                    DrawOpen(graphics, parentPadding, textBrush, disabledTextBrush, backgroundBrush, mouseOverBrush, menuOpenBrush, shadowBrush, blackBrush, blackPen, darkPen, font, format,
                         menuOpenColor, menuControl, drawSubItems, origin);
                     break;
                 }
@@ -2325,7 +2372,7 @@ namespace System.Windows
             SetSize(size);
             return size;
         }
-        private void DrawClosed(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& mouseOverBrush, const Brush& backgroundBrush,
+        private void DrawClosed(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& disabledTextBrush, const Brush& mouseOverBrush, const Brush& backgroundBrush,
             const Brush& menuOpenBrush, const Brush& blackBrush, const Pen& blackPen, const Font& font, const StringFormat& format, const Color& menuOpenColor,
             MenuControl* menuControl, bool drawSubItems, const Point& origin)
         {
@@ -2360,7 +2407,14 @@ namespace System.Windows
                     StringFormat textFormat(format);
                     textFormat.SetAlignment(StringAlignment.center);
                     RectF rect(PointF(loc.x, loc.y), SizeF(size.w, size.h));
-                    graphics.DrawStringChecked(text, font, rect, textFormat, textBrush);
+                    if (IsEnabled())
+                    {
+                        graphics.DrawStringChecked(text, font, rect, textFormat, textBrush);
+                    }
+                    else
+                    {
+                        graphics.DrawStringChecked(text, font, rect, textFormat, disabledTextBrush);
+                    }
                 }
             }
             else 
@@ -2368,14 +2422,22 @@ namespace System.Windows
                 if (drawSubItems)
                 {
                     Padding padding = DefaultPadding();
-                    graphics.DrawStringChecked(text, font, PointF(loc.x + padding.left, loc.y + padding.top), format, textBrush);
-                    DrawShortcut(graphics, textBrush, font, format, origin);
+                    if (IsEnabled())
+                    {
+                        graphics.DrawStringChecked(text, font, PointF(loc.x + padding.left, loc.y + padding.top), format, textBrush);
+                        DrawShortcut(graphics, textBrush, font, format, origin);
+                    }
+                    else
+                    {
+                        graphics.DrawStringChecked(text, font, PointF(loc.x + padding.left, loc.y + padding.top), format, disabledTextBrush);
+                        DrawShortcut(graphics, disabledTextBrush, font, format, origin);
+                    }
                     DrawChildIndicator(graphics, blackBrush, origin);
                 }
             }
         }
-        private void DrawOpen(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush, const Brush& menuOpenBrush,
-            const Brush& shadowBrush, const Brush& blackBrush, const Pen& blackPen, const Pen& darkPen, const Font& font, const StringFormat& format,
+        private void DrawOpen(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& disabledTextBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
+            const Brush& menuOpenBrush, const Brush& shadowBrush, const Brush& blackBrush, const Pen& blackPen, const Pen& darkPen, const Font& font, const StringFormat& format,
             const Color& menuOpenColor, MenuControl* menuControl, bool drawSubItems, const Point& origin)
         {
             Point loc = Location();
@@ -2401,7 +2463,14 @@ namespace System.Windows
                     StringFormat textFormat(format);
                     textFormat.SetAlignment(StringAlignment.center);
                     RectF rect(PointF(loc.x, loc.y), SizeF(size.w, size.h));
-                    graphics.DrawStringChecked(text, font, rect, textFormat, textBrush);
+                    if (IsEnabled())
+                    {
+                        graphics.DrawStringChecked(text, font, rect, textFormat, textBrush);
+                    }
+                    else
+                    {
+                        graphics.DrawStringChecked(text, font, rect, textFormat, disabledTextBrush);
+                    }
                 }
             }
             else 
@@ -2421,8 +2490,16 @@ namespace System.Windows
                         graphics.FillRectangleChecked(menuOpenBrush, inside);
                     }
                     Padding padding = DefaultPadding();
-                    graphics.DrawStringChecked(text, font, PointF(loc.x + padding.left, loc.y + padding.top), format, textBrush);
-                    DrawShortcut(graphics, textBrush, font, format, origin);
+                    if (IsEnabled())
+                    {
+                        graphics.DrawStringChecked(text, font, PointF(loc.x + padding.left, loc.y + padding.top), format, textBrush);
+                        DrawShortcut(graphics, textBrush, font, format, origin);
+                    }
+                    else
+                    {
+                        graphics.DrawStringChecked(text, font, PointF(loc.x + padding.left, loc.y + padding.top), format, disabledTextBrush);
+                        DrawShortcut(graphics, disabledTextBrush, font, format, origin);
+                    }
                     DrawChildIndicator(graphics, blackBrush, origin);
                 }
             }
@@ -2481,7 +2558,7 @@ namespace System.Windows
                         if (child is MenuItemBase*)
                         {
                             MenuItemBase* menuItem = cast<MenuItem*>(child);
-                            menuItem->Draw(graphics, parentPadding, textBrush, backgroundBrush, mouseOverBrush, menuOpenBrush, shadowBrush, blackBrush, blackPen, darkPen,
+                            menuItem->Draw(graphics, parentPadding, textBrush, disabledTextBrush, backgroundBrush, mouseOverBrush, menuOpenBrush, shadowBrush, blackBrush, blackPen, darkPen,
                                 font, format, menuOpenColor, menuControl, drawSubItems, origin);
                         }
                         child = child->NextSibling();
@@ -2563,6 +2640,40 @@ namespace System.Windows
                 menuControl->SetMenuInvalidated();
             }
         }
+        public nothrow inline bool IsEnabled() const
+        {
+            return cast<Flags>(flags & Flags.disabled) == Flags.none;
+        }
+        public nothrow inline bool IsDisabled() const
+        {
+            return cast<Flags>(flags & Flags.disabled) != Flags.none;
+        }
+        public nothrow void Enable()
+        {
+            if (!IsEnabled())
+            {
+                flags = cast<Flags>(flags & ~Flags.disabled);
+                MenuControl* menuControl = GetMenuControl();
+                if (menuControl != null)
+                {
+                    menuControl->SetMenuInvalidated();
+                    menuControl->SetMenuChanged();
+                }
+            }
+        }
+        public nothrow void Disable()
+        {
+            if (IsEnabled())
+            {
+                flags = cast<Flags>(flags | Flags.disabled);
+                MenuControl* menuControl = GetMenuControl();
+                if (menuControl != null)
+                {
+                    menuControl->SetMenuInvalidated();
+                    menuControl->SetMenuChanged();
+                }
+            }
+        }
         internal nothrow inline bool MouseInClient() const
         {
             return (flags & Flags.mouseInClient) != 0;
@@ -2631,7 +2742,7 @@ namespace System.Windows
 
     public class MenuItemSeparator : MenuItemBase
     {
-        public override void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
+        public override void Draw(Graphics& graphics, const Padding& parentPadding, const Brush& textBrush, const Brush& disabledTextBrush, const Brush& backgroundBrush, const Brush& mouseOverBrush,
             const Brush& menuOpenBrush, const Brush& shadowBrush, const Brush& blackBrush, const Pen& blackPen, const Pen& darkPen, const Font& font, const StringFormat& format,
             const Color& menuOpenColor, MenuControl* menuControl, bool drawSubItems, const Point& origin)
         {
