@@ -14,7 +14,9 @@ public class MainWindow : Window
     public MainWindow() : base("Spring Software Diagram Designer"),
         springDiagramElementsFormat("spring.diagram.elements"),
         clipboardListener(Handle()),
-        arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), classToolCursor(Application.GetResourceManager().GetCursor("class.tool.spring.cursor"))
+        arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)),
+        classToolCursor(Application.GetResourceManager().GetCursor("class.tool.spring.cursor")),
+        objectToolCursor(Application.GetResourceManager().GetCursor("object.tool.spring.cursor"))
     {
         UniquePtr<MenuBar> menuBar(new MenuBar());
         UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -73,6 +75,11 @@ public class MainWindow : Window
         Tools.GetClassTool()->SetToolButton(classToolButton);
         Tools.GetClassTool()->SetCursor(&classToolCursor);
         toolBar->AddToolButton(classToolButton);
+        ToolButton* objectToolButton = new ToolButton("object.tool.spring.bitmap");
+        objectToolButton->SetToolTip("Place new object");
+        Tools.GetObjectTool()->SetToolButton(objectToolButton);
+        Tools.GetObjectTool()->SetCursor(&objectToolCursor);
+        toolBar->AddToolButton(objectToolButton);
         AddChild(toolBar.Release());
         UniquePtr<SplitContainer> verticalSplitContainer(new SplitContainer(Orientation.vertical, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         UniquePtr<Canvas> canvasPtr(new Canvas());
@@ -359,6 +366,7 @@ public class MainWindow : Window
     private StatusBarItem* yCoordStatusBarItem;
     private Cursor arrowCursor;
     private Cursor& classToolCursor;
+    private Cursor& objectToolCursor;
     private string diagramFilePath;
     private ustring clipboardData;
     private MenuItem* cutMenuItem;

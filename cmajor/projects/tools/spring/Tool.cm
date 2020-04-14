@@ -46,8 +46,13 @@ namespace spring
         {
             return &classTool;
         }
+        public static nothrow Tool* GetObjectTool()
+        {
+            return &objectTool;
+        }
         private static SelectTool selectTool;
         private static ClassTool classTool;
+        private static ObjectTool objectTool;
         private static Tool* currentTool;
         private static Diagram* diagram;
     }
@@ -288,8 +293,16 @@ namespace spring
             args.diagram->GetSelection().Clear();
             if (args.element != null)
             {
-                ClassElementPropertiesAction action(*args.diagram, args.elementIndex);
-                action.Execute();
+                if (args.element is ClassElement*)
+                {
+                    ClassElementPropertiesAction action(*args.diagram, args.elementIndex);
+                    action.Execute();
+                }
+                else if (args.element is ObjectElement*)
+                {
+                    ObjectElementPropertiesAction action(*args.diagram, args.elementIndex);
+                    action.Execute();
+                }
             }
         }
         public override void CreateMoveOperation(MouseArgs& args)
@@ -361,6 +374,23 @@ namespace spring
             UniquePtr<ClassElement> classElement(new ClassElement("Class", false));
             classElement->SetLocation(args.location);
             args.diagram->AddElement(classElement.Release());
+            args.diagram->SetChanged();
+            args.diagram->Invalidate();
+            Tools.SetCurrent(Tools.GetSelectTool());
+        }
+    }
+
+    public class ObjectTool : Tool
+    {
+        public override void Initialize(Diagram& diagram)
+        {
+            diagram.ResetSelection();
+        }
+        public override void MouseNormalLeftClick(MouseArgs& args)
+        {
+            UniquePtr<ObjectElement> objectElement(new ObjectElement("anObject"));
+            objectElement->SetLocation(args.location);
+            args.diagram->AddElement(objectElement.Release());
             args.diagram->SetChanged();
             args.diagram->Invalidate();
             Tools.SetCurrent(Tools.GetSelectTool());

@@ -120,6 +120,7 @@ extern "C" RT_API int WinGraphicsDrawRectangleF(void* graphics, void* pen, float
 extern "C" RT_API int WinGraphicsFillRectangle(void* graphics, void* brush, int x, int y, int w, int h);
 extern "C" RT_API int WinGraphicsFillRectangleF(void* graphics, void* brush, float x, float y, float w, float h);
 extern "C" RT_API int WinGraphicsFillPolygon(void* graphics, void* brush, int count, void* points);
+extern "C" RT_API int WinGraphicsDrawArc(void* graphics, void* pen, float x, float y, float w, float h, float startAngle, float sweepAngle);
 extern "C" RT_API void* WinGraphicsCreateRegion();
 extern "C" RT_API void* WinGraphicsCloneRegion(void* region);
 extern "C" RT_API void WinGraphicsDeleteRegion(void* region);

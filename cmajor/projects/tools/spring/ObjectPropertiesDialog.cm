@@ -1,0 +1,106 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace spring
+{
+    public class ObjectPropertiesDialog : Window
+    {
+        public ObjectPropertiesDialog(ObjectElement* objectElement_) :
+            base("spring.objectPropertiesDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(),
+            DefaultControlBackgroundColor(), "Object Properties", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(100), ScreenMetrics.Get().MMToVerticalPixels(70)),
+            Dock.none, Anchors.none), objectElement(objectElement_)
+        {
+            int column1Width = ScreenMetrics.Get().MMToHorizontalPixels(20);
+            Size s = GetSize();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            int column2Width = ScreenMetrics.Get().MMToHorizontalPixels(30);
+            int textBoxPadding = DefaultControlPadding();
+            int borderWidth = DefaultSingleBorderWidth();
+            int line1Top = defaultControlSpacing.h + textBoxPadding + borderWidth;
+            Point classNameLabelLoc(defaultControlSpacing.w, line1Top);
+            UniquePtr<Label> objectNameLabel(new Label("Object name:", classNameLabelLoc, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            int line2Top = objectNameLabel->Location().y + objectNameLabel->GetSize().h + defaultControlSpacing.h;
+            AddChild(objectNameLabel.Release());
+            Point objectNameTextBoxLoc(defaultControlSpacing.w * 2 + column1Width, line1Top);
+            Size objectNameTextBoxSize(column2Width - 2 * (textBoxPadding + borderWidth), defaultTextBoxSize.h);
+            Rect objectNameRect(objectNameTextBoxLoc, objectNameTextBoxSize);
+            Rect paddedObjectNameRect = objectNameRect;
+            paddedObjectNameRect.Inflate(textBoxPadding, textBoxPadding);
+            UniquePtr<TextBox> objectNameTextBoxPtr(new TextBox(objectElement->Name()));
+            objectNameTextBox = objectNameTextBoxPtr.Get();
+            objectNameTextBox->SelectAll();
+            objectNameTextBox->TextChangedEvent().AddHandler(ObjectNameChanged);
+            UniquePtr<Control> paddedObjectNameTextBox(new PaddedControl(objectNameTextBoxPtr.Release()));
+            Rect borderedPaddedObjectNameTextBoxRect = paddedObjectNameRect;
+            borderedPaddedObjectNameTextBoxRect.Inflate(borderWidth, borderWidth);
+            UniquePtr<Control> borderedPaddedObjectNameTextBox(new BorderedControl(paddedObjectNameTextBox.Release(), borderedPaddedObjectNameTextBoxRect.location, borderedPaddedObjectNameTextBoxRect.size,
+                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedObjectNameTextBox.Release());
+            Point abstractCheckBoxLoc(borderedPaddedObjectNameTextBoxRect.location.x, line2Top);
+            Point fieldsLabelLoc(defaultControlSpacing.w, line2Top);
+            UniquePtr<Label> fieldsLabel(new Label("Fields:", fieldsLabelLoc, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            Size fieldsLabelSize = fieldsLabel->GetSize();
+            AddChild(fieldsLabel.Release());
+            Point editFieldsButtonLoc(defaultControlSpacing.w + column1Width + defaultControlSpacing.w - (textBoxPadding + borderWidth), line2Top - (textBoxPadding + borderWidth));
+            Size editFieldsButtonSize(ScreenMetrics.Get().MMToHorizontalPixels(8), defaultButtonSize.h);
+            UniquePtr<Button> editFieldsButtonPtr(new Button("...", editFieldsButtonLoc, editFieldsButtonSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            editFieldsButton = editFieldsButtonPtr.Get();
+            editFieldsButton->ClickEvent().AddHandler(EditFields);
+            AddChild(editFieldsButtonPtr.Release());
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            okButton = okButtonPtr.Get();
+            okButton->SetDialogResult(DialogResult.ok);
+            if (objectElement->Name().IsEmpty())
+            {
+                okButton->Disable();
+                editFieldsButton->Disable();
+            }
+            AddChild(okButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(okButton);
+            SetCancelButton(cancelButton);
+        }
+        private void ObjectNameChanged()
+        {
+            if (objectNameTextBox->Text().IsEmpty())
+            {
+                okButton->Disable();
+                editFieldsButton->Disable();
+            }
+            else
+            {
+                okButton->Enable();
+                editFieldsButton->Enable();
+                objectElement->SetName(objectNameTextBox->Text());
+            }
+        }
+        private void EditFields()
+        {
+            IndexList<FieldElement> clonedFieldElements = objectElement->Fields().Clone();
+            if (ExecuteEditFieldsDialog(clonedFieldElements, *this))
+            {
+                objectElement->SetFields(clonedFieldElements);
+            }
+        }
+        private ObjectElement* objectElement;
+        private Button* okButton;
+        private Button* cancelButton;
+        private Button* editFieldsButton;
+        private TextBox* objectNameTextBox;
+    }
+}

@@ -116,10 +116,14 @@ namespace spring
             UniquePtr<DiagramElementCreator> classCreator(new ConcreteDiagramElementCreator<ClassElement>());
             registry["class"] = classCreator.Get();
             creators.Add(Rvalue(classCreator));
+            UniquePtr<DiagramElementCreator> objectCreator(new ConcreteDiagramElementCreator<ObjectElement>());
+            registry["object"] = objectCreator.Get();
+            creators.Add(Rvalue(objectCreator));
         }
         private void Instantiate()
         {
             ConcreteDiagramElementCreator<ClassElement>().Create();
+            ConcreteDiagramElementCreator<ObjectElement>().Create();
         }
         private static UniquePtr<DiagramElementFactory> instance;
         private List<UniquePtr<DiagramElementCreator>> creators;
@@ -638,11 +642,17 @@ namespace spring
         }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
-
+            const FieldLayoutElement& layoutElement = layout.GetFieldLayoutElement();
+            const FontElement& fontElement = layoutElement.GetFontElement();
+            const ColorElement& textColorElement = layoutElement.TextColorElement();
+            graphics.DrawStringChecked(Name(), fontElement.GetFont(), Location(), textColorElement.GetBrush(layout));
         }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
-
+            const FieldLayoutElement& layoutElement = layout.GetFieldLayoutElement();
+            const FontElement& fontElement = layoutElement.GetFontElement();
+            RectF r = graphics.MeasureStringChecked(Name(), fontElement.GetFont(), PointF(0, 0), layout.GetStringFormat());
+            SetSize(r.size);
         }
     }
 
@@ -764,7 +774,6 @@ namespace spring
         }
         public nothrow ClassElement(const string& name, bool isAbstract_) : base(name), isAbstract(isAbstract_)
         {
-            SetSize(SizeF(cast<float>(DefaultMinClassHeight() + DefaultMinClassHeight() / GoldenRatio()), DefaultMinClassHeight()));
         }
         suppress ClassElement(const ClassElement&);
         suppress void operator=(const ClassElement&);
@@ -803,6 +812,7 @@ namespace spring
             DrawFrame(graphics, layout);
             DrawCaption(graphics, layout);
             DrawOperations(graphics, layout);
+            DrawFields(graphics, layout);
         }
         public override nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
         {
@@ -857,10 +867,10 @@ namespace spring
         }
         private void SetSize()
         {
-            SizeF size = GetSize();
+            SizeF size;
             size.w = Max(size.w, captionRect.size.w);
             float h = captionRect.size.h;
-            if (!operations.IsEmpty())
+            if (!operations.IsEmpty() || !fields.IsEmpty())
             {
                 size.w = Max(size.w, operationRect.size.w);
                 h = h + operationRect.size.h;
@@ -954,24 +964,42 @@ namespace spring
             const PaddingElement& paddingElement = layout.GetClassPaddingElement();
             const ConcreteClassLayoutElement& layoutElement = layout.GetConcreteClassLayoutElement();
             graphics.DrawRectangleChecked(layoutElement.FramePen(), BoundingRect());
-            float y = paddingElement.Vertical() + captionTextHeight;
+            float captionY = paddingElement.Vertical() + captionTextHeight;
             PointF location = Location();
-            PointF start(location.x, location.y + y);
-            PointF end(location.x + GetSize().w, location.y + y);
+            PointF captionLineStart(location.x, location.y + captionY);
+            PointF captionLineEnd(location.x + GetSize().w, location.y + captionY);
             const Pen& framePen = layoutElement.FramePen();
-            graphics.DrawLineChecked(framePen, start, end);
+            if (!operations.IsEmpty() || !fields.IsEmpty())
+            {
+                graphics.DrawLineChecked(framePen, captionLineStart, captionLineEnd);
+            }
+            if (!fields.IsEmpty())
+            {
+                PointF fieldLineStart(location.x, fieldRect.location.y);
+                PointF fieldLineEnd(location.x + GetSize().w, fieldRect.location.y);
+                graphics.DrawLineChecked(framePen, fieldLineStart, fieldLineEnd);
+            }
         }
         private void DrawAbstractClassFrame(Graphics& graphics, Layout& layout)
         {
             const PaddingElement& paddingElement = layout.GetClassPaddingElement();
             const AbstractClassLayoutElement& layoutElement = layout.GetAbstractClassLayoutElement();
             graphics.DrawRectangleChecked(layoutElement.FramePen(), BoundingRect());
-            float y = paddingElement.Vertical() + captionTextHeight;
+            float captionY = paddingElement.Vertical() + captionTextHeight;
             PointF location = Location();
-            PointF start(location.x, location.y + y);
-            PointF end(location.x + GetSize().w, location.y + y);
+            PointF captionLineStart(location.x, location.y + captionY);
+            PointF captionLineEnd(location.x + GetSize().w, location.y + captionY);
             const Pen& framePen = layoutElement.FramePen();
-            graphics.DrawLineChecked(framePen, start, end);
+            if (!operations.IsEmpty() || !fields.IsEmpty())
+            {
+                graphics.DrawLineChecked(framePen, captionLineStart, captionLineEnd);
+            }
+            if (!fields.IsEmpty())
+            {
+                PointF fieldLineStart(location.x, fieldRect.location.y);
+                PointF fieldLineEnd(location.x + GetSize().w, fieldRect.location.y);
+                graphics.DrawLineChecked(framePen, fieldLineStart, fieldLineEnd);
+            }
         }
         private void DrawConcreteClassCaption(Graphics& graphics, Layout& layout)
         {
@@ -1004,6 +1032,15 @@ namespace spring
             {
                 OperationElement* operation = operations.Get(i);
                 operation->Draw(graphics, layout);
+            }
+        }
+        private void DrawFields(Graphics& graphics, Layout& layout)
+        {
+            int n = fields.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                FieldElement* field = fields.Get(i);
+                field->Draw(graphics, layout);
             }
         }
         public override void Read(System.Dom.Element* parentElement)
@@ -1105,6 +1142,220 @@ namespace spring
         private float captionTextHeight;
         private RectF captionRect;
         private RectF operationRect;
+        private RectF fieldRect;
+    }
+
+    public class ObjectElement : ContainerElement
+    {
+        public nothrow ObjectElement() : base()
+        {
+        }
+        public nothrow ObjectElement(const string& name) : base(name)
+        {
+        }
+        suppress ObjectElement(const ObjectElement&);
+        suppress void operator=(const ObjectElement&);
+        suppress ObjectElement(ObjectElement&&);
+        suppress void operator=(ObjectElement&&);
+        public override System.Dom.Element* CreateDomElement() const
+        {
+            return new System.Dom.Element(u"object");
+        }
+        public override DiagramElement* Clone() const
+        {
+            UniquePtr<ObjectElement> clone = new ObjectElement();
+            clone->SetFrom(this);
+            return clone.Release();
+        }
+        public override nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
+        {
+            base->AddActions(diagram, elementIndex, contextMenu);
+            MenuItem* propertiesMenuItem = new MenuItem("Properties...");
+            contextMenu->AddMenuItemAction(propertiesMenuItem, new ObjectElementPropertiesAction(diagram, elementIndex));
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
+            base->Draw(graphics, layout);
+            DrawFrame(graphics, layout);
+            DrawCaption(graphics, layout);
+            DrawFields(graphics, layout);
+        }
+        private void DrawFrame(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetObjectPaddingElement();
+            const ObjectLayoutElement& layoutElement = layout.GetObjectLayoutElement();
+            const Pen& framePen = layoutElement.FramePen();
+            float roundingRadius = layoutElement.FrameRoundingRadius();
+            PointF loc = Location();
+            SizeF size = GetSize();
+            PointF topStart(loc.x + roundingRadius - 1.0f - DefaultFrameWidth(graphics), loc.y);
+            PointF topEnd(loc.x + size.w - roundingRadius + 1.0f + DefaultFrameWidth(graphics), loc.y);
+            graphics.DrawLineChecked(framePen, topStart, topEnd);
+            RectF topLeftRoundingRect(PointF(loc.x, loc.y), SizeF(roundingRadius, roundingRadius));
+            float topLeftRoundingStartAngle = 180.0f;
+            float topLeftRoudingSweepAngle = 90.0f;
+            graphics.DrawArcChecked(framePen, topLeftRoundingRect, topLeftRoundingStartAngle, topLeftRoudingSweepAngle);
+            PointF rightStart(loc.x + size.w, loc.y + roundingRadius - 1.0f - 2.0f * DefaultFrameWidth(graphics));
+            PointF rightEnd(loc.x + size.w, loc.y + size.h - roundingRadius + 1.0f + 2.0f * DefaultFrameWidth(graphics));
+            graphics.DrawLineChecked(framePen, rightStart, rightEnd);
+            RectF topRightRoundingRect(PointF(loc.x + size.w - roundingRadius, loc.y), SizeF(roundingRadius, roundingRadius));
+            float topRightRoundingStartAngle = 0.0f;
+            float topRightRoudingSweepAngle = -90.0f;
+            graphics.DrawArcChecked(framePen, topRightRoundingRect, topRightRoundingStartAngle, topRightRoudingSweepAngle);
+            RectF rightBottomRoundingRect(PointF(loc.x + size.w - roundingRadius, loc.y + size.h - roundingRadius), SizeF(roundingRadius, roundingRadius));
+            float rightBottomRoundingStartAngle = 0.0f;
+            float rightBottomRoudingSweepAngle = 90.0f;
+            graphics.DrawArcChecked(framePen, rightBottomRoundingRect, rightBottomRoundingStartAngle, rightBottomRoudingSweepAngle);
+            PointF bottomStart(loc.x + roundingRadius - 1.0f - 2.0f * DefaultFrameWidth(graphics), loc.y + size.h);
+            PointF bottomEnd(loc.x + size.w - roundingRadius + 1.0f + 2.0f * DefaultFrameWidth(graphics), loc.y + size.h);
+            graphics.DrawLineChecked(framePen, bottomStart, bottomEnd);
+            RectF leftBottomRoundingRect(PointF(loc.x, loc.y + size.h - roundingRadius), SizeF(roundingRadius, roundingRadius));
+            float leftBottomRoundingStartAngle = 180.0f;
+            float leftBottomRoudingSweepAngle = -90.0f;
+            graphics.DrawArcChecked(framePen, leftBottomRoundingRect, leftBottomRoundingStartAngle, leftBottomRoudingSweepAngle);
+            PointF leftStart(loc.x, loc.y + roundingRadius - 1.0f - DefaultFrameWidth(graphics));
+            PointF leftEnd(loc.x, loc.y + size.h - roundingRadius + 1.0f + DefaultFrameWidth(graphics));
+            graphics.DrawLineChecked(framePen, leftStart, leftEnd);
+            if (!fields.IsEmpty())
+            {
+                float captionY = paddingElement.Vertical() + captionTextHeight;
+                PointF location = Location();
+                PointF captionLineStart(location.x, location.y + captionY);
+                PointF captionLineEnd(location.x + GetSize().w, location.y + captionY);
+                graphics.DrawLineChecked(framePen, captionLineStart, captionLineEnd);
+            }
+        }
+        private void DrawCaption(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetObjectPaddingElement();
+            const ObjectLayoutElement& layoutElement = layout.GetObjectLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            PointF location = Location();
+            PointF origin(location.x + paddingElement.left, location.y + paddingElement.top);
+            const Font& font = fontElement.GetFont();
+            const Brush& brush = layoutElement.TextBrush();
+            graphics.DrawStringChecked(Name(), font, origin, brush);
+        }
+        public override void Measure(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetClassPaddingElement();
+            const ObjectLayoutElement& layoutElement = layout.GetObjectLayoutElement();
+            const CaptionLayoutElement& captionLayoutElement = layoutElement.GetCaptionElement();
+            const FontElement& fontElement = captionLayoutElement.GetFontElement();
+            const Font& font = fontElement.GetFont();
+            RectF r = graphics.MeasureStringChecked(Name(), font, PointF(0, 0), layout.GetStringFormat());
+            captionTextHeight = r.size.h;
+            captionRect = RectF();
+            captionRect.location = Location();
+            captionRect.size.h = paddingElement.Vertical() + r.size.h;
+            captionRect.size.w = paddingElement.Horizontal() + r.size.w;
+            MeasureFields(graphics, layout);
+            SetSize();
+        }
+        private void DrawFields(Graphics& graphics, Layout& layout)
+        {
+            int n = fields.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                FieldElement* field = fields.Get(i);
+                field->Draw(graphics, layout);
+            }
+        }
+        private void MeasureFields(Graphics& graphics, Layout& layout)
+        {
+            const PaddingElement& paddingElement = layout.GetObjectPaddingElement();
+            fieldRect = RectF();
+            PointF location = Location();
+            fieldRect.location.x = location.x;
+            fieldRect.location.y = captionRect.location.y + captionRect.size.h;
+            fieldRect.size.w = captionRect.size.w;
+            fieldRect.size.h = paddingElement.top;
+            PointF origin;
+            origin.x = fieldRect.location.x + paddingElement.left;
+            origin.y = fieldRect.location.y + paddingElement.top;
+            int n = fields.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                FieldElement* field = fields.Get(i);
+                field->Measure(graphics, layout);
+                SizeF fieldSize = field->GetSize();
+                float w = fieldSize.w + paddingElement.Horizontal();
+                float h = fieldSize.h;
+                field->SetLocation(origin);
+                fieldRect.size.w = Max(fieldRect.size.w, w);
+                origin.y = origin.y + h;
+                fieldRect.size.h = fieldRect.size.h + h;
+            }
+            fieldRect.size.h = fieldRect.size.h + paddingElement.bottom;
+        }
+        private void SetSize()
+        {
+            SizeF size;
+            size.w = Max(size.w, captionRect.size.w);
+            float h = captionRect.size.h;
+            if (!fields.IsEmpty())
+            {
+                size.w = Max(size.w, fieldRect.size.w);
+                h = h + fieldRect.size.h;
+            }
+            size.h = Max(size.h, h);
+            SetSize(size);
+        }
+        public override void Read(System.Dom.Element* parentElement)
+        {
+            base->Read(parentElement);
+            UniquePtr<XPathObject> fieldResult = Evaluate(u"field", parentElement);
+            if (!fieldResult.IsNull())
+            {
+                if (fieldResult->Type() == XPathObjectType.nodeSet)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(fieldResult.Get());
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[i];
+                        if (node->GetNodeType() == System.Dom.NodeType.elementNode)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            UniquePtr<FieldElement> field(new FieldElement());
+                            field->Read(element);
+                            fields.Add(field.Release());
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            base->Write(parentElement);
+            for (const UniquePtr<FieldElement>& field : fields)
+            {
+                UniquePtr<System.Dom.Element> element = new System.Dom.Element(u"field");
+                field->Write(element.Get());
+                parentElement->AppendChild(UniquePtr<System.Dom.Node>(element.Release()));
+            }
+        }
+        public nothrow IndexList<FieldElement>& Fields()
+        {
+            return fields;
+        }
+        public void SetFields(IndexList<FieldElement>&& fields_)
+        {
+            fields = fields_;
+        }
+        public override void SetFrom(DiagramElement* that)
+        {
+            base->SetFrom(that);
+            fields.Clear();
+            for (UniquePtr<FieldElement>& field : cast<ObjectElement*>(that)->fields)
+            {
+                fields.Add(cast<FieldElement*>(field->Clone()));
+            }
+        }
+        private IndexList<FieldElement> fields;
+        private float captionTextHeight;
+        private RectF captionRect;
         private RectF fieldRect;
     }
 }

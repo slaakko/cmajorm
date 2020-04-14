@@ -2243,6 +2243,14 @@ namespace System.Windows
         {
             CheckGraphicsStatus(FillPolygon(brush, numPoints, points));
         }
+        public nothrow GraphicsStatus DrawArc(const Pen& pen, const RectF& rect, float startAngle, float sweepAngle)
+        {
+            return cast<GraphicsStatus>(WinGraphicsDrawArc(nativeGraphics, pen.NativePen(), rect.location.x, rect.location.y, rect.size.w, rect.size.h, startAngle, sweepAngle));
+        }
+        public void DrawArcChecked(const Pen& pen, const RectF& rect, float startAngle, float sweepAngle)
+        {
+            CheckGraphicsStatus(DrawArc(pen, rect, startAngle, sweepAngle));
+        }
         public nothrow GraphicsStatus DrawImage(const Image& image, const PointF& point)
         {
             return cast<GraphicsStatus>(WinGraphicsDrawImagePoint(nativeGraphics, image.NativeImage(), point.x, point.y));

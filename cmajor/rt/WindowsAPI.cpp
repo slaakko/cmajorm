@@ -885,6 +885,11 @@ int WinGraphicsFillPolygon(void* graphics, void* brush, int count, void* points)
     return static_cast<Graphics*>(graphics)->FillPolygon(static_cast<const Brush*>(brush), static_cast<const Point*>(points), count);
 }
 
+int WinGraphicsDrawArc(void* graphics, void* pen, float x, float y, float w, float h, float startAngle, float sweepAngle)
+{
+    return static_cast<Graphics*>(graphics)->DrawArc(static_cast<const Pen*>(pen), x, y, w, h, startAngle, sweepAngle);
+}
+
 void* WinGraphicsCreateRegion()
 {
     return new Region();

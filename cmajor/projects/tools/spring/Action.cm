@@ -221,4 +221,34 @@ namespace spring
             }
         }
     }
+
+    public class ObjectElementPropertiesAction : DiagramElementAction
+    {
+        public nothrow ObjectElementPropertiesAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
+        {
+        }
+        protected override void Execute(Diagram& diagram, int elementIndex)
+        {
+            DiagramElement* element = diagram.GetElementByIndex(elementIndex);
+            if (element is ObjectElement*)
+            {
+                ObjectElement* objectElement = cast<ObjectElement*>(element);
+                UniquePtr<ObjectElement> clone = cast<ObjectElement*>(objectElement->Clone());
+                UniquePtr<ObjectPropertiesDialog> objectPropertiesDialog = new ObjectPropertiesDialog(clone.Get());
+                Canvas* canvas = diagram.GetCanvas();
+                Window* window = canvas->GetWindow();
+                if (window != null)
+                {
+                    diagram.HideContextMenu();
+                    DialogResult result = objectPropertiesDialog->ShowDialog(*window);
+                    if (result == DialogResult.ok)
+                    {
+                        diagram.SetElementByIndex(clone.Release(), elementIndex);
+                        diagram.SetChanged();
+                        diagram.Invalidate();
+                    }
+                }
+            }
+        }
+    }
 }
