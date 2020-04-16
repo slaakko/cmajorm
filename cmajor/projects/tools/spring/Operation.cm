@@ -120,4 +120,33 @@ namespace spring
         private List<PointF> originalLocations;
         private bool resetSelection;
     }
+
+    public class AddRelationshipOperation : Operation
+    {
+        public nothrow AddRelationshipOperation(Diagram* diagram, RelationshipElement* relationshipElement_) : base(diagram), relationshipElement(relationshipElement_)
+        {
+        }
+        public override nothrow bool IsEmpty() const
+        {
+            return false;
+        }
+        public override void AdvanceTo(const PointF& location)
+        {
+        }
+        public override void Cancel()
+        {
+        }
+        public override void Commit(const PointF& location)
+        {
+            relationshipElement->AddToContainers();
+            Diagram* diagram = GetDiagram();
+            diagram->AddElement(relationshipElement.Release());
+            Tools.SetCurrent(Tools.GetSelectTool());
+        }
+        public nothrow RelationshipElement& GetRelationshipElement()
+        {
+            return *relationshipElement;
+        }
+        private UniquePtr<RelationshipElement> relationshipElement;
+    }
 }

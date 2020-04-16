@@ -59,7 +59,7 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram)
         {
-            diagram.GetSelection().Delete();
+            diagram.GetSelection()->Delete();
             diagram.SetChanged();
             diagram.Invalidate();
         }
@@ -72,8 +72,8 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram)
         {
-            Selection& selection = diagram.GetSelection();
-            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            Selection* selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection->GetContainerElementIndeces());
             containerElementSelection.SortHorizontally();
             containerElementSelection.AlignTop();
         }
@@ -86,8 +86,8 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram)
         {
-            Selection& selection = diagram.GetSelection();
-            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            Selection* selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection->GetContainerElementIndeces());
             containerElementSelection.SortHorizontally();
             containerElementSelection.AlignBottom();
         }
@@ -100,8 +100,8 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram)
         {
-            Selection& selection = diagram.GetSelection();
-            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            Selection* selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection->GetContainerElementIndeces());
             containerElementSelection.SortHorizontally();
             containerElementSelection.AlignVerticalCenter();
         }
@@ -114,8 +114,8 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram)
         {
-            Selection& selection = diagram.GetSelection();
-            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            Selection* selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection->GetContainerElementIndeces());
             containerElementSelection.SortVertically();
             containerElementSelection.AlignLeftSide();
         }
@@ -128,8 +128,8 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram)
         {
-            Selection& selection = diagram.GetSelection();
-            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            Selection* selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection->GetContainerElementIndeces());
             containerElementSelection.SortVertically();
             containerElementSelection.AlignRightSide();
         }
@@ -142,8 +142,8 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram)
         {
-            Selection& selection = diagram.GetSelection();
-            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            Selection* selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection->GetContainerElementIndeces());
             containerElementSelection.SortVertically();
             containerElementSelection.AlignHorizontalCenter();
         }
@@ -156,8 +156,8 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram)
         {
-            Selection& selection = diagram.GetSelection();
-            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            Selection* selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection->GetContainerElementIndeces());
             containerElementSelection.SortVertically();
             containerElementSelection.SpaceEvenlyVertically();
         }
@@ -170,8 +170,8 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram)
         {
-            Selection& selection = diagram.GetSelection();
-            ElementSelection containerElementSelection = ElementSelection(diagram, selection.GetContainerElementIndeces());
+            Selection* selection = diagram.GetSelection();
+            ElementSelection containerElementSelection = ElementSelection(diagram, selection->GetContainerElementIndeces());
             containerElementSelection.SortHorizontally();
             containerElementSelection.SpaceEvenlyHorizontally();
         }

@@ -64,11 +64,14 @@ namespace spring
             Unit prevUnit = args.graphics.GetPageUnitChecked();
             TextRenderingHint prevTextRenderingHint = args.graphics.GetTextRenderingHint();
             args.graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
+            SmoothingMode prevSmoothingMode = args.graphics.GetSmoothingModeChecked();
+            args.graphics.SetSmoothingModeChecked(SmoothingMode.highQuality);
             args.graphics.SetPageUnitChecked(Unit.millimeter);
             args.graphics.ClearChecked(BackgroundColor());
             diagram->Draw(args.graphics);
             args.graphics.SetTextRenderingHintChecked(prevTextRenderingHint);
             args.graphics.SetPageUnitChecked(prevUnit);
+            args.graphics.SetSmoothingModeChecked(prevSmoothingMode);
         }
         public void KeyDown(KeyEventArgs& args)
         {
@@ -103,6 +106,10 @@ namespace spring
             bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
             mouseDownArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
             moveOperationCreated = false;
+            if (Tools.Current() is SimpleClickTool*)
+            {
+                Tools.Current()->MouseClick(mouseDownArgs);
+            }
         }
         protected override void OnMouseMove(MouseEventArgs& args)
         {
@@ -120,14 +127,17 @@ namespace spring
             bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
             bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
             mouseMoveArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
-            if (left && !right && !shift && !control)
+            if (Tools.Current()->CanMove())
             {
-                if (!moveOperationCreated)
+                if (left && !right && !shift && !control)
                 {
-                    moveOperationCreated = true;
-                    Tools.Current()->CreateMoveOperation(mouseDownArgs);
+                    if (!moveOperationCreated)
+                    {
+                        moveOperationCreated = true;
+                        Tools.Current()->CreateMoveOperation(mouseDownArgs);
+                    }
+                    Tools.Current()->ContinueMoveOperation(mouseMoveArgs);
                 }
-                Tools.Current()->ContinueMoveOperation(mouseMoveArgs);
             }
         }
         protected override void OnMouseUp(MouseEventArgs& args)
@@ -146,22 +156,25 @@ namespace spring
             bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
             bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
             mouseUpArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
-            Duration duration = mouseUpArgs.time - mouseDownArgs.time;
-            if (duration <= Duration.FromMilliseconds(clickThresholdMs))
+            if (Tools.Current()->CanMove())
             {
-                if (moveOperationCreated)
+                Duration duration = mouseUpArgs.time - mouseDownArgs.time;
+                if (duration <= Duration.FromMilliseconds(clickThresholdMs))
                 {
-                    moveOperationCreated = false;
-                    Tools.Current()->CancelMoveOperation(mouseUpArgs);
+                    if (moveOperationCreated)
+                    {
+                        moveOperationCreated = false;
+                        Tools.Current()->CancelMoveOperation(mouseUpArgs);
+                    }
+                    Tools.Current()->MouseClick(mouseUpArgs);
                 }
-                Tools.Current()->MouseClick(mouseUpArgs);
-            }
-            else
-            {
-                if (moveOperationCreated)
+                else
                 {
-                    moveOperationCreated = false;
-                    Tools.Current()->CommitMoveOperation(mouseUpArgs);
+                    if (moveOperationCreated)
+                    {
+                        moveOperationCreated = false;
+                        Tools.Current()->CommitMoveOperation(mouseUpArgs);
+                    }
                 }
             }
         }

@@ -37,6 +37,11 @@ namespace spring
         return PixelsToMM(1, Max(graphics.GetDpiX(), graphics.GetDpiY()));
     }
 
+    public nothrow float DefaultLineWidth(Graphics& graphics)
+    {
+        return PixelsToMM(1, Max(graphics.GetDpiX(), graphics.GetDpiY()));
+    }
+
     public nothrow float DefaultFrameRoundingRadius()
     {
         return 3.0f;
@@ -57,14 +62,19 @@ namespace spring
         return 1.5f;
     }
 
-    public nothrow float DefaultMinClassHeight()
+    public nothrow float DefaultInheritanceArrowWidth()
     {
-        return 20.0f;
+        return 5.0f;
     }
 
-    public nothrow float DefaultMinObjectHeight()
+    public nothrow float DefaultLineArrowWidth()
     {
-        return 20.0f;
+        return 2.0f;
+    }
+
+    public nothrow float DefaultCardinalitySymbolRadius()
+    {
+        return 1.0f;
     }
 
     public nothrow string SpringDirectory()
@@ -98,6 +108,7 @@ namespace spring
             objectLayoutElement(new ObjectLayoutElement(*this, graphics)),
             abstractOperationLayoutElement(new AbstractOperationLayoutElement(*this)), concreteOperationLayoutElement(new ConcreteOperationLayoutElement(*this)),
             fieldLayoutElement(new FieldLayoutElement(*this)),
+            relationshipLayoutElement(new RelationshipLayoutElement(*this, graphics)),
             classPaddingElement(new PaddingElement(DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), "classPadding")),
             objectPaddingElement(new PaddingElement(DefaultObjectPadding(), DefaultObjectPadding(), DefaultObjectPadding(), DefaultObjectPadding(), "objectPadding")),
             diagramPaddingElement(new PaddingElement(DefaultDiagramPadding(), DefaultDiagramPadding(), DefaultDiagramPadding(), DefaultDiagramPadding(), "diagramPadding"))
@@ -187,6 +198,14 @@ namespace spring
         {
             fieldLayoutElement.Reset(fieldLayoutElement_);
         }
+        public nothrow inline const RelationshipLayoutElement& GetRelationshipLayoutElement() const
+        {
+            return *relationshipLayoutElement;
+        }
+        public nothrow void SetRelationshipLayoutElement(RelationshipLayoutElement* relationshipLayoutElement_) 
+        {
+            relationshipLayoutElement.Reset(relationshipLayoutElement_);
+        }
         public nothrow inline const PaddingElement& GetClassPaddingElement() const
         {
             return *classPaddingElement;
@@ -233,6 +252,7 @@ namespace spring
                             abstractOperationLayoutElement->Read(layoutElement, *this);
                             concreteOperationLayoutElement->Read(layoutElement, *this);
                             fieldLayoutElement->Read(layoutElement, *this);
+                            relationshipLayoutElement->Read(layoutElement, *this);
                             classPaddingElement->Read(layoutElement, *this);
                             objectPaddingElement->Read(layoutElement, *this);
                             diagramPaddingElement->Read(layoutElement, *this);
@@ -253,6 +273,7 @@ namespace spring
             abstractOperationLayoutElement->Write(layoutElement.Get());
             concreteOperationLayoutElement->Write(layoutElement.Get());
             fieldLayoutElement->Write(layoutElement.Get());
+            relationshipLayoutElement->Write(layoutElement.Get());
             classPaddingElement->Write(layoutElement.Get());
             objectPaddingElement->Write(layoutElement.Get());
             diagramPaddingElement->Write(layoutElement.Get());
@@ -317,6 +338,7 @@ namespace spring
         private UniquePtr<AbstractOperationLayoutElement> abstractOperationLayoutElement;
         private UniquePtr<ConcreteOperationLayoutElement> concreteOperationLayoutElement;
         private UniquePtr<FieldLayoutElement> fieldLayoutElement;
+        private UniquePtr<RelationshipLayoutElement> relationshipLayoutElement;
         private UniquePtr<PaddingElement> classPaddingElement;
         private UniquePtr<PaddingElement> objectPaddingElement;
         private UniquePtr<PaddingElement> diagramPaddingElement;
@@ -508,6 +530,82 @@ namespace spring
         }
         private Color color;
         private string elementName;
+    }
+
+    public class RelationshipLayoutElement : LayoutElement
+    {
+        public RelationshipLayoutElement(Layout& layout, Graphics& graphics) :
+            lineWidth(DefaultLineWidth(graphics)),
+            lineColorElement(new ColorElement(Color.Black(), "lineColor")),
+            inheritanceArrowWidth(DefaultInheritanceArrowWidth()),
+            lineArrowWidth(DefaultLineArrowWidth()),
+            cardinalitySymbolRadius(DefaultCardinalitySymbolRadius())
+        {
+            linePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth);
+        }
+        suppress RelationshipLayoutElement(const RelationshipLayoutElement&);
+        suppress void operator=(const RelationshipLayoutElement&);
+        suppress RelationshipLayoutElement(RelationshipLayoutElement&&);
+        suppress void operator=(RelationshipLayoutElement&&);
+        public nothrow float LineWidth() const
+        {
+            return lineWidth;
+        }
+        public nothrow const Pen& LinePen() const
+        {
+            return *linePen;
+        }
+        public nothrow inline float InheritanceArrowWidth() const
+        {
+            return inheritanceArrowWidth;
+        }
+        public nothrow inline float LineArrowWidth() const
+        {
+            return lineArrowWidth;
+        }
+        public nothrow inline float CardinalitySymbolRadius() const
+        {
+            return cardinalitySymbolRadius;
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> relationshipResult = Evaluate(u"relationship", parentElement);
+            if (!relationshipResult.IsNull())
+            {
+                if (relationshipResult.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(relationshipResult.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node is System.Dom.Element*)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            lineColorElement->Read(element, layout);
+                            inheritanceArrowWidth = ParseFloat(ToUtf8(element->GetAttribute(u"inheritanceArrowWidth")));
+                            lineArrowWidth = ParseFloat(ToUtf8(element->GetAttribute(u"lineArrowWidth")));
+                            cardinalitySymbolRadius = ParseFloat(ToUtf8(element->GetAttribute(u"cardinalitySymbolRadius")));
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            UniquePtr<System.Dom.Element> relationshipElement(new System.Dom.Element(u"relationship"));
+            lineColorElement->Write(relationshipElement.Get());
+            relationshipElement->SetAttribute(u"inheritanceArrowWidth", ToUtf32(System.ToString(inheritanceArrowWidth)));
+            relationshipElement->SetAttribute(u"lineArrowWidth", ToUtf32(System.ToString(lineArrowWidth)));
+            relationshipElement->SetAttribute(u"cardinalitySymbolRadius", ToUtf32(System.ToString(cardinalitySymbolRadius)));
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(relationshipElement.Release()));
+        }
+        private UniquePtr<ColorElement> lineColorElement;
+        private float lineWidth;
+        private float inheritanceArrowWidth;
+        private float lineArrowWidth;
+        private float cardinalitySymbolRadius;
+        private Pen* linePen;
     }
 
     public abstract class CaptionLayoutElement : LayoutElement

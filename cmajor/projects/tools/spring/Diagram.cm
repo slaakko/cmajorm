@@ -119,11 +119,15 @@ namespace spring
             UniquePtr<DiagramElementCreator> objectCreator(new ConcreteDiagramElementCreator<ObjectElement>());
             registry["object"] = objectCreator.Get();
             creators.Add(Rvalue(objectCreator));
+            UniquePtr<DiagramElementCreator> relationshipCreator(new ConcreteDiagramElementCreator<RelationshipElement>());
+            registry["relationship"] = relationshipCreator.Get();
+            creators.Add(Rvalue(relationshipCreator));
         }
         private void Instantiate()
         {
             ConcreteDiagramElementCreator<ClassElement>().Create();
             ConcreteDiagramElementCreator<ObjectElement>().Create();
+            ConcreteDiagramElementCreator<RelationshipElement>().Create();
         }
         private static UniquePtr<DiagramElementFactory> instance;
         private List<UniquePtr<DiagramElementCreator>> creators;
@@ -172,6 +176,7 @@ namespace spring
         }
         public void Load(const string& filePath)
         {
+            List<DiagramElement*> relationshipElements;
             UniquePtr<System.Dom.Document> diagramDocument = System.Dom.ReadDocument(filePath);
             UniquePtr<XPathObject> result = Evaluate(u"/diagram/*", diagramDocument.Get());
             if (!result.IsNull())
@@ -188,11 +193,20 @@ namespace spring
                             System.Dom.Element* element = cast<System.Dom.Element*>(node);
                             string domElementName = ToUtf8(element->Name());
                             UniquePtr<DiagramElement> diagramElement(DiagramElementFactory.Instance().Create(domElementName));
+                            diagramElement->SetDiagram(this);
                             diagramElement->Read(element);
+                            if (diagramElement.Get() is RelationshipElement*)
+                            {
+                                relationshipElements.Add(diagramElement.Get());
+                            }
                             AddElement(diagramElement.Release());
                         }
                     }
                 }
+            }
+            for (DiagramElement* relationshipElement : relationshipElements)
+            {
+                relationshipElement->Resolve();
             }
         }
         public void Draw(Graphics& graphics)
@@ -213,9 +227,21 @@ namespace spring
             {
                 ResetInvalidated();
             }
+            List<DiagramElement*> relationshipElements;
             for (const UniquePtr<DiagramElement>& element : elements)
             {
-                element->Draw(graphics, *layout);
+                if (element.Get() is ContainerElement*)
+                {
+                    element->Draw(graphics, *layout);
+                }
+                else if (element.Get() is RelationshipElement*)
+                {
+                    relationshipElements.Add(element.Get());
+                }
+            }
+            for (DiagramElement* relationshipElement : relationshipElements)
+            {
+                relationshipElement->Draw(graphics, *layout);
             }
         }
         public nothrow const Layout& GetLayout() const
@@ -232,6 +258,10 @@ namespace spring
         }
         public nothrow void DeleteSelection()
         {
+            if (selection.IsNull())
+            {
+                int x = 0;
+            }
             if (!selection->IsEmpty())
             {
                 selection->Delete();
@@ -248,6 +278,18 @@ namespace spring
                 element->SetDiagram(this);
             }
             elements.Set(index, element);
+        }
+        public nothrow inline int GetIndexOfElement(DiagramElement* element)
+        {
+            int n = elements.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (elements.Get(i) == element)
+                {
+                    return i;
+                }
+            }
+            return -1;
         }
         public nothrow void AddElement(DiagramElement* element)
         {
@@ -268,14 +310,26 @@ namespace spring
             Contains<DiagramElement> pred(location);
             return IndexOf(elements, pred);
         }
-        public nothrow Selection& GetSelection()
+        public nothrow Selection* GetSelection()
         {
-            return *selection;
+            if (selection.IsNull())
+            {
+                int x = 0;
+            }
+            return selection.Get();
         }
         public nothrow void SetSelection(Selection* selection_)
         {
+            if (selection.IsNull())
+            {
+                int x = 0;
+            }
             selection->Clear();
             selection.Reset(selection_);
+            if (selection.IsNull())
+            {
+                int x = 0;
+            }
             if (!selection->IsEmpty())
             {
                 EnableCopy();
@@ -289,6 +343,10 @@ namespace spring
         }
         public nothrow void ResetSelection()
         {
+            if (selection.IsNull())
+            {
+                int x = 0;
+            }
             selection->Clear();
             DisposeContextMenu();
             selection.Reset(new EmptySelection(*this));
@@ -500,6 +558,23 @@ namespace spring
         public abstract System.Dom.Element* CreateDomElement() const;
         public abstract DiagramElement* Clone() const;
         public abstract void Measure(Graphics& graphics, Layout& layout);
+        public virtual nothrow void Resolve()
+        {
+        }
+        public virtual nothrow Endpoint GetEndpoint(const Snap& snap) const
+        {
+            return Endpoint();
+        }
+        public virtual nothrow List<Endpoint> GetEndpoints() const
+        {
+            return List<Endpoint>();
+        }
+        public virtual nothrow void AddRelationship(RelationshipElement* relationship)
+        {
+        }
+        public virtual nothrow void RemoveRelationship(RelationshipElement* relationship)
+        {
+        }
         public virtual nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
         {
             MenuItem* deleteMenuItem = new MenuItem("Delete");
@@ -616,6 +691,548 @@ namespace spring
         private string name;
         private RectF boundingRect;
         private Diagram* diagram;
+    }
+
+    public enum SnapPoint : sbyte
+    {
+        none, top, bottom, left, right, center
+    }
+
+    public nothrow string ToString(SnapPoint snapPoint)
+    {
+        switch (snapPoint)
+        {
+            case SnapPoint.none: return "none";
+            case SnapPoint.top: return "top";
+            case SnapPoint.bottom: return "bottom";
+            case SnapPoint.left: return "left";
+            case SnapPoint.right: return "right";
+            case SnapPoint.center: return "center";
+        }
+        return string();
+    }
+
+    public nothrow SnapPoint ParseSnapPoint(const string& str)
+    {
+        if (str == "none")
+        {
+            return SnapPoint.none;
+        }
+        else if (str == "top")
+        {
+            return SnapPoint.top;
+        }
+        else if (str == "bottom")
+        {
+            return SnapPoint.bottom;
+        }
+        else if (str == "left")
+        {
+            return SnapPoint.left;
+        }
+        else if (str == "right")
+        {
+            return SnapPoint.right;
+        }
+        else if (str == "center")
+        {
+            return SnapPoint.center;
+        }
+        return SnapPoint.none;
+    }
+
+    public class Snap
+    {
+        public nothrow constexpr Snap() : primaryPoint(SnapPoint.none), secondaryPoint(SnapPoint.none)
+        {
+        }
+        public nothrow constexpr Snap(SnapPoint primaryPoint_, SnapPoint secondaryPoint_) : primaryPoint(primaryPoint_), secondaryPoint(secondaryPoint_)
+        {
+        }
+        public explicit constexpr nothrow Snap(int x) : primaryPoint(cast<SnapPoint>(cast<sbyte>((x >> 8) & 0xff))), secondaryPoint(cast<SnapPoint>(cast<sbyte>(x & 0xff)))
+        {
+        }
+        public static nothrow constexpr inline int TopLeft()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.top)) << 8 | cast<int>(cast<sbyte>(SnapPoint.left));
+        }
+        public static nothrow constexpr inline int TopCenter()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.top)) << 8 | cast<int>(cast<sbyte>(SnapPoint.center));
+        }
+        public static nothrow constexpr inline int TopRight()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.top)) << 8 | cast<int>(cast<sbyte>(SnapPoint.right));
+        }
+        public static nothrow constexpr inline int LeftTop()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.left)) << 8 | cast<int>(cast<sbyte>(SnapPoint.top));
+        }
+        public static nothrow constexpr inline int LeftCenter()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.left)) << 8 | cast<int>(cast<sbyte>(SnapPoint.center));
+        }
+        public static nothrow constexpr inline int LeftBottom()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.left)) << 8 | cast<int>(cast<sbyte>(SnapPoint.bottom));
+        }
+        public static nothrow constexpr inline int BottomLeft()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.bottom)) << 8 | cast<int>(cast<sbyte>(SnapPoint.left));
+        }
+        public static nothrow constexpr inline int BottomCenter()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.bottom)) << 8 | cast<int>(cast<sbyte>(SnapPoint.center));
+        }
+        public static nothrow constexpr inline int BottomRight()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.bottom)) << 8 | cast<int>(cast<sbyte>(SnapPoint.right));
+        }
+        public static nothrow constexpr inline int RightTop()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.right)) << 8 | cast<int>(cast<sbyte>(SnapPoint.top));
+        }
+        public static nothrow constexpr inline int RightCenter()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.right)) << 8 | cast<int>(cast<sbyte>(SnapPoint.center));
+        }
+        public static nothrow constexpr inline int RightBottom()
+        {
+            return cast<int>(cast<sbyte>(SnapPoint.right)) << 8 | cast<int>(cast<sbyte>(SnapPoint.bottom));
+        }
+        public nothrow string ToString() const
+        {
+            return spring.ToString(primaryPoint) + "." + spring.ToString(secondaryPoint);
+        }
+        public nothrow constexpr inline int ToInt() const
+        {
+            return cast<int>(cast<sbyte>(primaryPoint)) << 8 | cast<int>(cast<sbyte>(secondaryPoint));
+        }
+        public nothrow PointF Calculate(const PointF& point, float w, int index, int count)
+        {
+            int s = ToInt();
+            switch (s)
+            {
+                case TopLeft():
+                case BottomLeft():
+                {
+                    return PointF(point.x + index * w * 2.0f, point.y);
+                }
+                case TopRight():
+                case BottomRight():
+                {
+                    return PointF(point.x - index * w * 2.0f, point.y);
+                }
+                case LeftTop():
+                case RightTop():
+                {
+                    return PointF(point.x, point.y + w * 2.0f);
+                }
+                case LeftBottom():
+                case RightBottom():
+                {
+                    return PointF(point.x, point.y - w * 2.0f);
+                }
+                case LeftCenter():
+                case RightCenter():
+                {
+                    if ((count & 1) == 0)
+                    {
+                        return PointF(point.x, point.y - (count / 2) * w * 2.0f + index * w * 2.0f + w);
+                    }
+                    else
+                    {
+                        return PointF(point.x, point.y - (count / 2) * w * 2.0f + index * w * 2.0f);
+                    }
+                }
+                case TopCenter():
+                case BottomCenter():
+                {
+                    if ((count & 1) == 0)
+                    {
+                        return PointF(point.x - (count / 2) * w * 2.0f + index * w * 2.0f + w, point.y);
+                    }
+                    else
+                    {
+                        return PointF(point.x - (count / 2) * w * 2.0f + index * w * 2.0f, point.y);
+                    }
+                }
+            }
+            return PointF();
+        }
+        public SnapPoint primaryPoint;
+        public SnapPoint secondaryPoint;
+    }
+
+    public nothrow Snap ParseSnap(const string& str)
+    {
+        List<string> components = str.Split(".");
+        if (components.Count() == 2)
+        {
+            Snap snap(ParseSnapPoint(components[0]), ParseSnapPoint(components[1]));
+            return snap;
+        }
+        return Snap();
+    }
+
+    public nothrow constexpr inline bool operator==(const Snap& left, const Snap& right)
+    {
+        return left.primaryPoint == right.primaryPoint && left.secondaryPoint == right.secondaryPoint;
+    }
+
+    public nothrow constexpr inline bool operator<(const Snap& left, const Snap& right)
+    {
+        if (left.primaryPoint < right.primaryPoint) return true;
+        if (left.primaryPoint > right.primaryPoint) return false;
+        return left.secondaryPoint < right.secondaryPoint;
+    }
+
+    public enum Cardinality : sbyte
+    {
+        zero, one, many
+    }
+
+    public nothrow Cardinality ParseCardinality(const string& s)
+    {
+        if (s == "zero")
+        {
+            return Cardinality.zero;
+        }
+        else if (s == "one")
+        {
+            return Cardinality.one;
+        }
+        else if (s == "many")
+        {
+            return Cardinality.many;
+        }
+        return Cardinality.zero;
+    }
+
+    public nothrow string ToString(Cardinality cardinality)
+    {
+        switch (cardinality)
+        {
+            case Cardinality.zero: return "zero";
+            case Cardinality.one: return "one";
+            case Cardinality.many: return "many";
+        }
+        return string();
+    }
+
+    public class EndpointNearer : Rel<Endpoint*>
+    {
+        public nothrow EndpointNearer(const PointF& location_) : location(location_)
+        {
+        }
+        public nothrow bool operator()(Endpoint* left, Endpoint* right) const
+        {
+            return System.Windows.Distance(left->point, location) < System.Windows.Distance(right->point, location);
+        }
+        private PointF location;
+    }
+
+    public class Endpoint
+    {
+        public nothrow Endpoint() : element(null), snap(), point(0, 0), name()
+        {
+        }
+        public nothrow Endpoint(DiagramElement* element_, const Snap& snap_, const PointF& point_) : element(element_), snap(snap_), point(point_), name()
+        {
+        }
+        public nothrow string ToString() const
+        {
+            if (element != null)
+            {
+                return "endpoint." + element->Name() + "." + snap.ToString() + "." + point.ToString() + "." + name;
+            }
+            return "endpoint.null";
+        }
+        public void Write(System.Dom.Element* parentElement)
+        {
+            if (element != null)
+            {
+                Diagram* diagram = element->GetDiagram();
+                if (element != null)
+                {
+                    int index = diagram->GetIndexOfElement(element);
+                    parentElement->SetAttribute(u"index", ToUtf32(ToString(index)));
+                }
+                else
+                {
+                    parentElement->SetAttribute(u"index", u"-1");
+                }
+                parentElement->SetAttribute(u"snap", ToUtf32(snap.ToString()));
+                parentElement->SetAttribute(u"x", ToUtf32(ToString(point.x)));
+                parentElement->SetAttribute(u"y", ToUtf32(ToString(point.y)));
+                parentElement->SetAttribute(u"name", ToUtf32(name));
+            }
+        }
+        public void Read(System.Dom.Element* parentElement)
+        {
+            index = ParseInt(ToUtf8(parentElement->GetAttribute(u"index")));
+            snap = ParseSnap(ToUtf8(parentElement->GetAttribute(u"snap")));
+            point.x = ParseFloat(ToUtf8(parentElement->GetAttribute(u"x")));
+            point.y = ParseFloat(ToUtf8(parentElement->GetAttribute(u"y")));
+            name = ToUtf8(parentElement->GetAttribute(u"name"));
+        }
+        public void Resolve(Diagram* diagram)
+        {
+            if (index != -1)
+            {
+                element = diagram->GetElementByIndex(index);
+            }
+        }
+        public DiagramElement* element;
+        public Snap snap;
+        public PointF point;
+        public string name;
+        private int index;
+    }
+
+    public class RelationshipElement : DiagramElement
+    {
+        public enum Kind
+        {
+            none, inheritance, aggregation, createInstance, note, reference
+        }
+        public nothrow RelationshipElement() : base(), kind(Kind.none), source(), target(), intermediatePoints(), cardinality(Cardinality.one)
+        {
+        }
+        public nothrow RelationshipElement(Kind kind_) : base(), kind(kind_), source(), target(), intermediatePoints(), cardinality(Cardinality.one)
+        {
+        }
+        public nothrow RelationshipElement(Kind kind_, const string& name, const Endpoint& source_, const Endpoint& target_) :
+            base(name), kind(kind_), source(source_), target(target_), intermediatePoints(), cardinality(Cardinality.one)
+        {
+        }
+        suppress RelationshipElement(const RelationshipElement&);
+        suppress void operator=(const RelationshipElement&);
+        suppress RelationshipElement(RelationshipElement&&);
+        suppress void operator=(RelationshipElement&&);
+        public override System.Dom.Element* CreateDomElement() const
+        {
+            return new System.Dom.Element(u"relationship");
+        }
+        public override DiagramElement* Clone() const
+        {
+            RelationshipElement* clone = new RelationshipElement();
+            clone->SetFrom(this);
+            return clone;
+        }
+        public nothrow Kind ParseRelationshipKind(const string& str)
+        {
+            if (str == "none")
+            {
+                return Kind.none;
+            }
+            else if (str == "inheritance")
+            {
+                return Kind.inheritance;
+            }
+            else if (str == "aggregation")
+            {
+                return Kind.aggregation;
+            }
+            else if (str == "createInstance")
+            {
+                return Kind.createInstance;
+            }
+            else if (str == "note")
+            {
+                return Kind.note;
+            }
+            else if (str == "reference")
+            {
+                return Kind.reference;
+            }
+            return Kind.none;
+        }
+        public override void Read(System.Dom.Element* element)
+        {
+            base->Read(element);
+            kind = ParseRelationshipKind(ToUtf8(element->GetAttribute(u"kind")));
+            UniquePtr<XPathObject> sourceResult = Evaluate(u"source", element);
+            if (!sourceResult.IsNull())
+            {
+                if (sourceResult.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(sourceResult.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node is System.Dom.Element*)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            source.Read(element);
+                        }
+                    }
+                }
+            }
+            UniquePtr<XPathObject> targetResult = Evaluate(u"target", element);
+            if (!targetResult.IsNull())
+            {
+                if (targetResult.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(targetResult.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node is System.Dom.Element*)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            target.Read(element);
+                        }
+                    }
+                }
+            }
+            UniquePtr<XPathObject> intermediatePointsResult = Evaluate(u"intermediatePoint", element);
+            if (!intermediatePointsResult.IsNull())
+            {
+                if (intermediatePointsResult.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(intermediatePointsResult.Get());
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[i];
+                        if (node is System.Dom.Element*)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            PointF intermediatePoint;
+                            intermediatePoint.x = ParseFloat(ToUtf8(element->GetAttribute(u"x")));
+                            intermediatePoint.y = ParseFloat(ToUtf8(element->GetAttribute(u"y")));
+                            intermediatePoints.Add(intermediatePoint);
+                        }
+                    }
+                }
+            }
+            cardinality = ParseCardinality(ToUtf8(element->GetAttribute(u"cardinality")));
+        }
+        public override void Write(System.Dom.Element* element)
+        {
+            base->Write(element);
+            switch (kind)
+            {
+                case Kind.none: element->SetAttribute(u"kind", u"none"); break;
+                case Kind.inheritance: element->SetAttribute(u"kind", u"inheritance"); break;
+                case Kind.aggregation: element->SetAttribute(u"kind", u"aggregation"); break;
+                case Kind.createInstance: element->SetAttribute(u"kind", u"createInstance"); break;
+                case Kind.note: element->SetAttribute(u"kind", u"note"); break;
+                case Kind.reference: element->SetAttribute(u"kind", u"reference"); break;
+            }
+            System.Dom.Element* sourceElement = new System.Dom.Element(u"source");
+            source.Write(sourceElement);
+            element->AppendChild(UniquePtr<System.Dom.Node>(sourceElement));
+            System.Dom.Element* targetElement = new System.Dom.Element(u"target");
+            target.Write(targetElement);
+            element->AppendChild(UniquePtr<System.Dom.Node>(targetElement));
+            int n = cast<int>(intermediatePoints.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                System.Dom.Element* intermediatePointElement = new System.Dom.Element(u"intermediatePoint");
+                intermediatePointElement->SetAttribute(u"x", ToUtf32(ToString(intermediatePoints[i].x)));
+                intermediatePointElement->SetAttribute(u"y", ToUtf32(ToString(intermediatePoints[i].y)));
+            }
+            element->SetAttribute(u"cardinality", ToUtf32(ToString(cardinality)));
+        }
+        public nothrow override void Resolve()
+        {
+            source.Resolve(GetDiagram());
+            if (source.element != null)
+            {
+                source.element->AddRelationship(this);
+            }
+            target.Resolve(GetDiagram());
+            if (target.element != null)
+            {
+                target.element->AddRelationship(this);
+            }
+        }
+        public override void Measure(Graphics& graphics, Layout& layout)
+        {
+            // todo
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
+            switch (kind)
+            {
+                case Kind.inheritance:
+                {
+                    DrawInheritance(graphics, layout);
+                    break;
+                }
+            }
+        }
+        public nothrow void Calculate(const Snap& snap, DiagramElement* element, float w, int index, int count)
+        {
+            Endpoint endpoint = element->GetEndpoint(snap);
+            if (source.element == element)
+            {
+                source.point = snap.Calculate(endpoint.point, w, index, count);
+            }
+            else if (target.element == element)
+            {
+                target.point = snap.Calculate(endpoint.point, w, index, count);
+            }
+        }
+        private void DrawInheritance(Graphics& graphics, Layout& layout)
+        {
+            const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+            const Pen& linePen = relationshipLayoutElement.LinePen();
+            float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+            float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+            PointF lastPoint;
+            if (intermediatePoints.IsEmpty())
+            {
+                lastPoint = source.point;
+            }
+            else
+            {
+                lastPoint = intermediatePoints.Back();
+            }
+            Line line(lastPoint, target.point);
+            Vector v = line.ToVector();
+            float len = v.Length();
+            float startLen = Max(0.0f, len - inheritanceArrowHeight);
+            Vector u = UnitVector(v) * startLen;
+            Line startLine(source.point, u);
+            graphics.DrawLineChecked(linePen, startLine.start, startLine.end);
+            Line arrowLine(startLine.end, target.point);
+            Line arrowRightRotatedLine = System.Windows.Rotate(arrowLine, 90.0f);
+            Vector arv = UnitVector(arrowRightRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+            Line arrowRightLine(arrowRightRotatedLine.start, arv);
+            graphics.DrawLineChecked(linePen, arrowRightLine.end, target.point);
+            Line arrowLeftRotatedLine = System.Windows.Rotate(arrowLine, -90.0f);
+            Vector alv = UnitVector(arrowLeftRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+            Line arrowLeftLine(arrowLeftRotatedLine.start, alv);
+            graphics.DrawLineChecked(linePen, arrowLeftLine.end, target.point);
+            graphics.DrawLineChecked(linePen, arrowLeftLine.end, arrowRightLine.end);
+        }
+        public override void SetFrom(DiagramElement* that)
+        {
+            base->SetFrom(that);
+            kind = cast<RelationshipElement*>(that)->kind;
+            source = cast<RelationshipElement*>(that)->source;
+            target = cast<RelationshipElement*>(that)->target;
+            intermediatePoints = cast<RelationshipElement*>(that)->intermediatePoints;
+            cardinality = cast<RelationshipElement*>(that)->cardinality;
+        }
+        public nothrow void AddToContainers()
+        {
+            if (source.element != null && target.element != null)
+            {
+                source.element->AddRelationship(this);
+                target.element->AddRelationship(this);
+            }
+        }
+        public Kind kind;
+        public Endpoint source;
+        public Endpoint target;
+        public List<PointF> intermediatePoints;
+        public Cardinality cardinality;
     }
 
     public class FieldElement : DiagramElement
@@ -765,6 +1382,72 @@ namespace spring
         public nothrow ContainerElement(const string& name) : base(name)
         {
         }
+        public override void Measure(Graphics& graphics, Layout& layout)
+        {
+            const RelationshipLayoutElement& layoutElement = GetDiagram()->GetLayout().GetRelationshipLayoutElement();
+            float w = layoutElement.LineArrowWidth();
+            MeasureRelationships(Snap(Snap.TopLeft()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.TopCenter()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.TopRight()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.BottomLeft()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.BottomCenter()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.BottomRight()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.LeftTop()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.LeftCenter()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.LeftBottom()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.RightTop()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.RightCenter()), w, graphics, layout);
+            MeasureRelationships(Snap(Snap.RightBottom()), w, graphics, layout);
+        }
+        private void MeasureRelationships(const Snap& snap, float w, Graphics& graphics, Layout& layout)
+        {
+            List<RelationshipElement*> pickedRelationships = PickRelationships(snap);
+            int n = cast<int>(pickedRelationships.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                RelationshipElement* relationship = pickedRelationships[i];
+                relationship->Calculate(snap, this, w, i, n);
+            }
+        }
+        public nothrow inline const List<RelationshipElement*>& Relationships() const
+        {
+            return relationships;
+        }
+        public nothrow List<RelationshipElement*>& Relationships()
+        {
+            return relationships;
+        }
+        public nothrow override void AddRelationship(RelationshipElement* relationship)
+        {
+            relationships.Add(relationship);
+        }
+        public nothrow override void RemoveRelationship(RelationshipElement* relationship)
+        {
+            relationships.Remove(relationship);
+        }
+        private nothrow List<RelationshipElement*> PickRelationships(const Snap& snap) const
+        {
+            List<RelationshipElement*> pickedRelationships;
+            for (RelationshipElement* relationship : relationships)
+            {
+                if (relationship->source.element == this)
+                {
+                    if (relationship->source.snap == snap)
+                    {
+                        pickedRelationships.Add(relationship);
+                    }
+                }
+                else if (relationship->target.element == this)
+                {
+                    if (relationship->target.snap == snap)
+                    {
+                        pickedRelationships.Add(relationship);
+                    }
+                }
+            }
+            return pickedRelationships;
+        }
+        private List<RelationshipElement*> relationships;
     }
 
     public class ClassElement : ContainerElement
@@ -796,6 +1479,82 @@ namespace spring
                 operation->SetAbstract(false);
             }
         }
+        public override nothrow Endpoint GetEndpoint(const Snap& snap) const
+        {
+            PointF loc = Location();
+            SizeF size = GetSize();
+            const RelationshipLayoutElement& layoutElement = GetDiagram()->GetLayout().GetRelationshipLayoutElement();
+            float w = layoutElement.LineArrowWidth();
+            switch (snap.ToInt())
+            {
+                case Snap.TopLeft():
+                {
+                    return Endpoint(this, Snap(Snap.TopLeft()), PointF(loc.x + w, loc.y));
+                }
+                case Snap.TopCenter():
+                {
+                    return Endpoint(this, Snap(Snap.TopCenter()), PointF(loc.x + size.w / 2, loc.y));
+                }
+                case Snap.TopRight():
+                {
+                    return Endpoint (this, Snap(Snap.TopRight()), PointF(loc.x + size.w - w, loc.y));
+                }
+                case Snap.RightTop():
+                {
+                    return Endpoint(this, Snap(Snap.RightTop()), PointF(loc.x + size.w, loc.y + w));
+                }
+                case Snap.RightCenter():
+                {
+                    return Endpoint(this, Snap(Snap.RightCenter()), PointF(loc.x + size.w, loc.y + size.h / 2));
+                }
+                case Snap.RightBottom():
+                {
+                    return Endpoint(this, Snap(Snap.RightBottom()), PointF(loc.x + size.w, loc.y + size.h - w));
+                }
+                case Snap.BottomRight():
+                {
+                    return Endpoint(this, Snap(Snap.BottomRight()), PointF(loc.x + size.w - w, loc.y + size.h));
+                }
+                case Snap.BottomCenter():
+                {
+                    return Endpoint(this, Snap(Snap.BottomCenter()), PointF(loc.x + size.w / 2, loc.y + size.h));
+                }
+                case Snap.BottomLeft():
+                {
+                    return Endpoint(this, Snap(Snap.BottomLeft()), PointF(loc.x + w, loc.y + size.h));
+                }
+                case Snap.LeftBottom():
+                {
+                    return Endpoint(this, Snap(Snap.LeftBottom()), PointF(loc.x, loc.y + size.h - w));
+                }
+                case Snap.LeftCenter():
+                {
+                    return Endpoint(this, Snap(Snap.LeftCenter()), PointF(loc.x, loc.y + size.h / 2));
+                }
+                case Snap.LeftTop():
+                {
+                    return Endpoint(this, Snap(Snap.LeftTop()), PointF(loc.x, loc.y + w));
+                }
+            }
+            return Endpoint();
+        }
+        public override nothrow List<Endpoint> GetEndpoints() const
+        {
+            List<Endpoint> endpoints;
+            endpoints.Add(GetEndpoint(Snap(Snap.TopLeft())));
+            endpoints.Add(GetEndpoint(Snap(Snap.TopCenter())));
+            endpoints.Add(GetEndpoint(Snap(Snap.TopRight())));
+            endpoints.Add(GetEndpoint(Snap(Snap.RightTop())));
+            endpoints.Add(GetEndpoint(Snap(Snap.RightCenter())));
+            endpoints.Add(GetEndpoint(Snap(Snap.RightBottom())));
+            endpoints.Add(GetEndpoint(Snap(Snap.BottomRight())));
+            endpoints.Add(GetEndpoint(Snap(Snap.BottomCenter())));
+            endpoints.Add(GetEndpoint(Snap(Snap.BottomLeft())));
+            endpoints.Add(GetEndpoint(Snap(Snap.LeftBottom())));
+            endpoints.Add(GetEndpoint(Snap(Snap.LeftCenter())));
+            endpoints.Add(GetEndpoint(Snap(Snap.LeftTop()))); 
+            return endpoints;
+        }
         public override System.Dom.Element* CreateDomElement() const
         {
             return new System.Dom.Element(u"class");
@@ -822,6 +1581,7 @@ namespace spring
         }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
+            base->Measure(graphics, layout);
             if (!isAbstract)
             {
                 MeasureConcreteClass(graphics, layout);
@@ -1045,8 +1805,8 @@ namespace spring
         }
         public override void Read(System.Dom.Element* parentElement)
         {
-            isAbstract = ParseBool(ToUtf8(parentElement->GetAttribute(u"abstract")));
             base->Read(parentElement);
+            isAbstract = ParseBool(ToUtf8(parentElement->GetAttribute(u"abstract")));
             UniquePtr<XPathObject> operationResult = Evaluate(u"operation", parentElement);
             if (!operationResult.IsNull())
             {

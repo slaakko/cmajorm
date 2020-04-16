@@ -16,7 +16,8 @@ public class MainWindow : Window
         clipboardListener(Handle()),
         arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)),
         classToolCursor(Application.GetResourceManager().GetCursor("class.tool.spring.cursor")),
-        objectToolCursor(Application.GetResourceManager().GetCursor("object.tool.spring.cursor"))
+        objectToolCursor(Application.GetResourceManager().GetCursor("object.tool.spring.cursor")),
+        inheritanceToolCursor(Application.GetResourceManager().GetCursor("inheritance.tool.spring.cursor"))
     {
         UniquePtr<MenuBar> menuBar(new MenuBar());
         UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -71,15 +72,40 @@ public class MainWindow : Window
         Tools.GetSelectTool()->SetCursor(&arrowCursor);
         toolBar->AddToolButton(selectToolButton);
         ToolButton* classToolButton = new ToolButton("class.tool.spring.bitmap");
-        classToolButton->SetToolTip("Place new class");
+        classToolButton->SetToolTip("Add new class");
         Tools.GetClassTool()->SetToolButton(classToolButton);
         Tools.GetClassTool()->SetCursor(&classToolCursor);
         toolBar->AddToolButton(classToolButton);
         ToolButton* objectToolButton = new ToolButton("object.tool.spring.bitmap");
-        objectToolButton->SetToolTip("Place new object");
+        objectToolButton->SetToolTip("Add new object");
         Tools.GetObjectTool()->SetToolButton(objectToolButton);
         Tools.GetObjectTool()->SetCursor(&objectToolCursor);
         toolBar->AddToolButton(objectToolButton);
+        ToolButton* inheritanceToolButton = new ToolButton("inheritance.tool.spring.bitmap");
+        inheritanceToolButton->SetToolTip("Add inheritance relationship");
+        Tools.GetInheritanceTool()->SetToolButton(inheritanceToolButton);
+        Tools.GetInheritanceTool()->SetCursor(&inheritanceToolCursor);
+        toolBar->AddToolButton(inheritanceToolButton);
+        ToolButton* aggregationToolButton = new ToolButton("aggregation.tool.spring.bitmap");
+        aggregationToolButton->SetToolTip("Add aggregation relationship");
+        Tools.GetAggregationTool()->SetToolButton(aggregationToolButton);
+        Tools.GetAggregationTool()->SetCursor(&arrowCursor);
+        toolBar->AddToolButton(aggregationToolButton);
+        ToolButton* referenceToolButton = new ToolButton("reference.tool.spring.bitmap");
+        referenceToolButton->SetToolTip("Add reference relationship");
+        Tools.GetReferenceTool()->SetToolButton(referenceToolButton);
+        Tools.GetReferenceTool()->SetCursor(&arrowCursor);
+        toolBar->AddToolButton(referenceToolButton);
+        ToolButton* createInstanceToolButton = new ToolButton("create.tool.spring.bitmap");
+        createInstanceToolButton->SetToolTip("Add create instance relationship");
+        Tools.GetCreateInstanceTool()->SetToolButton(createInstanceToolButton);
+        Tools.GetCreateInstanceTool()->SetCursor(&arrowCursor);
+        toolBar->AddToolButton(createInstanceToolButton);
+        ToolButton* noteToolButton = new ToolButton("note.tool.spring.bitmap");
+        noteToolButton->SetToolTip("Add note");
+        Tools.GetNoteTool()->SetToolButton(noteToolButton);
+        Tools.GetNoteTool()->SetCursor(&arrowCursor);
+        toolBar->AddToolButton(noteToolButton);
         AddChild(toolBar.Release());
         UniquePtr<SplitContainer> verticalSplitContainer(new SplitContainer(Orientation.vertical, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         UniquePtr<Canvas> canvasPtr(new Canvas());
@@ -258,8 +284,8 @@ public class MainWindow : Window
     }
     private void EditCopy()
     {
-        Selection& selection = canvas->GetDiagram().GetSelection();
-        ustring copy = selection.Copy();
+        Selection* selection = canvas->GetDiagram().GetSelection();
+        ustring copy = selection->Copy();
         if (!copy.IsEmpty())
         {
             Clipboard clipboard(Handle());
@@ -268,10 +294,13 @@ public class MainWindow : Window
     }
     private void EditCut()
     {
-        LogView* logView = Application.GetLogView();
-        if (logView != null)
+        Selection* selection = canvas->GetDiagram().GetSelection();
+        ustring copy = selection->Copy();
+        if (!copy.IsEmpty())
         {
-            logView->WriteLine("cut");
+            Clipboard clipboard(Handle());
+            clipboard.SetStringData(springDiagramElementsFormat, copy);
+            selection->Delete();
         }
     }
     private void EditPaste()
@@ -367,6 +396,7 @@ public class MainWindow : Window
     private Cursor arrowCursor;
     private Cursor& classToolCursor;
     private Cursor& objectToolCursor;
+    private Cursor& inheritanceToolCursor;
     private string diagramFilePath;
     private ustring clipboardData;
     private MenuItem* cutMenuItem;

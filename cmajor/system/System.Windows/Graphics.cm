@@ -778,6 +778,173 @@ namespace System.Windows
         public float y;
     }
 
+    public nothrow float Distance(const PointF& start, const PointF& end)
+    {
+        float dx = Abs(start.x - end.x);
+        float dy = Abs(start.y - end.y);
+        float distance = cast<float>(Sqrt(dx * dx + dy * dy));
+        return distance;
+    }
+
+    public class Vector
+    {
+        public nothrow Vector() : x(0), y(0)
+        {
+        }
+        public nothrow Vector(float x_, float y_) : x(x_), y(y_)
+        {
+        }
+        public nothrow explicit Vector(const PointF& point) : x(point.x), y(point.y)
+        {
+        }
+        public nothrow float Length() const
+        {
+            return cast<float>(Sqrt(x * x + y * y));
+        }
+        public nothrow PointF ToPoint() const
+        {
+            return PointF(x, y);
+        }
+        public float x;
+        public float y;
+    }
+
+    public nothrow Vector operator*(const Vector& v, float a)
+    {
+        return Vector(v.x * a, v.y * a);
+    }
+
+    public nothrow Vector operator*(float a, const Vector& v)
+    {
+        return Vector(v.x * a, v.y * a);
+    }
+
+    public nothrow Vector operator+(const Vector& left, const Vector& right)
+    {
+        return Vector(left.x + right.x, left.y + right.y);
+    }
+
+    public nothrow Vector operator-(const Vector& left, const Vector& right)
+    {
+        return Vector(left.x - right.x, left.y - right.y);
+    }
+
+    public nothrow Vector UnitVector(const Vector& v)
+    {
+        float length = v.Length();
+        return v * (1 / length);
+    }
+
+    public nothrow float Dot(const Vector& u, const Vector& v)
+    {
+        return u.x * v.x + u.y * v.y;
+    }
+
+    //  MainAngle returns:
+    //      0, if angle between vector v and positive x axis is between 315 and 45 degrees clockwise
+    //      90, if angle between vector v and positive x axis is between 45 and 135 degrees clockwise 
+    //      180, if angle between vector v and positive x axis is between 135 and 225 degrees clockwise
+    //      270, if angle between vector v and positive x axis is between 225 and 315 degrees clockwise
+    //      In this coordinate system x axis points to the right and y axis points downwards.
+
+    public nothrow int MainAngle(const Vector& v) 
+    {
+        if (v.x >= 0)
+        {
+            if (v.y >= 0)
+            {
+                Vector u(1, -1);
+                if (Dot(v, u) >= 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 90;
+                }
+            }
+            else
+            {
+                Vector u(1, -1);
+                if (Dot(v, u) >= 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 270;
+                }
+            }
+        }
+        else
+        {
+            if (v.y >= 0)
+            {
+                Vector u(-1, -1);
+                if (Dot(v, u) >= 0)
+                {
+                    return 90;
+                }
+                else
+                {
+                    return 180;
+                }
+            }
+            else
+            {
+                Vector u(-1, -1);
+                if (Dot(v, u) >= 0)
+                {
+                    return 270;
+                }
+                else
+                {
+                    return 180;
+                }
+            }
+        }
+    }
+
+    public nothrow Vector Rotate(const Vector& v, double angleRad)
+    {
+        double cosTheta = Cos(angleRad);
+        double sinTheta = Sin(angleRad);
+        Vector r(cast<float>(v.x * cosTheta - v.y * sinTheta), cast<float>(v.x * sinTheta + v.y * cosTheta));
+        return r;
+    }
+
+    public class Line
+    {
+        public nothrow Line() : start(), end()
+        {
+        }
+        public nothrow Line(const PointF& start_, const PointF& end_) : start(start_), end(end_)
+        {
+        }
+        public nothrow Line(const PointF& start_, const Vector& v) : start(start_), end(Vector(Vector(start) + v).ToPoint())
+        {
+        }
+        public nothrow float Length() const
+        {
+            return Distance(start, end);
+        }
+        public nothrow Vector ToVector() const
+        {
+            return Vector(end.x - start.x, end.y - start.y);
+        }
+        public PointF start;
+        public PointF end;
+    }
+
+    public nothrow Line Rotate(const Line& line, float angleDeg)
+    {
+        double angleRad = PI() / 180.0 * angleDeg;
+        Vector v = line.ToVector();
+        Vector r = Rotate(v, angleRad);
+        Line result(line.start, r);
+        return result;
+    }
+
     public class SizeF
     {
         public nothrow SizeF() : w(0.0f), h(0.0f)

@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.Windows;
 
 namespace spring
@@ -50,9 +51,34 @@ namespace spring
         {
             return &objectTool;
         }
+        public static nothrow Tool* GetInheritanceTool()
+        {
+            return &inheritanceTool;
+        }
+        public static nothrow Tool* GetAggregationTool()
+        {
+            return &aggregationTool;
+        }
+        public static nothrow Tool* GetCreateInstanceTool()
+        {
+            return &createInstanceTool;
+        }
+        public static nothrow Tool* GetNoteTool()
+        {
+            return &noteTool;
+        }
+        public static nothrow Tool* GetReferenceTool()
+        {
+            return &referenceTool;
+        }
         private static SelectTool selectTool;
         private static ClassTool classTool;
         private static ObjectTool objectTool;
+        private static InheritanceTool inheritanceTool;
+        private static AggregationTool aggregationTool;
+        private static CreateInstanceTool createInstanceTool;
+        private static NoteTool noteTool;
+        private static ReferenceTool referenceTool;
         private static Tool* currentTool;
         private static Diagram* diagram;
     }
@@ -96,6 +122,14 @@ namespace spring
         public nothrow inline Cursor* GetCursor() const
         {
             return cursor;
+        }
+        public nothrow virtual bool CanMove() const
+        {
+            return false;
+        }
+        public nothrow virtual bool IsSimpleClickTool() const
+        {
+            return false;
         }
         public virtual void Initialize(Diagram& diagram)
         {
@@ -196,6 +230,10 @@ namespace spring
         {
             diagram.ResetSelection();
         }
+        public nothrow override bool CanMove() const
+        {
+            return true;
+        }
         public override void BeforeLeftClick(MouseArgs& args)
         {
             args.diagram->DisposeContextMenu();
@@ -204,7 +242,7 @@ namespace spring
         {
             if (args.element != null)
             {
-                if (args.diagram->GetSelection().Count() == 1 && args.diagram->GetSelection().Contains(args.location))
+                if (args.diagram->GetSelection()->Count() == 1 && args.diagram->GetSelection()->Contains(args.location))
                 {
                     args.diagram->ResetSelection();
                 }
@@ -224,22 +262,22 @@ namespace spring
             {
                 if (args.element->IsSelected())
                 {
-                    args.diagram->GetSelection().Remove(args.elementIndex);
+                    args.diagram->GetSelection()->Remove(args.elementIndex);
                 }
                 else
                 {
-                    args.diagram->GetSelection().Add(args.elementIndex);
+                    args.diagram->GetSelection()->Add(args.elementIndex);
                 }
             }
         }
         public override void MouseNormalRightClick(MouseArgs& args)
         {
             UniquePtr<ContextMenu> contextMenu(new ContextMenu());
-            if (args.diagram->GetSelection().Count() <= 1)
+            if (args.diagram->GetSelection()->Count() <= 1)
             {
-                if (args.diagram->GetSelection().Count() == 1)
+                if (args.diagram->GetSelection()->Count() == 1)
                 {
-                    args.elementIndex = args.diagram->GetSelection().GetFirstIndex();
+                    args.elementIndex = args.diagram->GetSelection()->GetFirstIndex();
                     if (args.elementIndex != -1)
                     {
                         args.element = args.diagram->GetElementByIndex(args.elementIndex);
@@ -267,9 +305,9 @@ namespace spring
             }
             else
             {
-                if (args.diagram->GetSelection().Contains(args.location))
+                if (args.diagram->GetSelection()->Contains(args.location))
                 {
-                    args.diagram->GetSelection().AddActions(contextMenu.Get());
+                    args.diagram->GetSelection()->AddActions(contextMenu.Get());
                 }
                 else
                 {
@@ -290,7 +328,7 @@ namespace spring
         }
         public override void MouseDoubleClick(MouseArgs& args)
         {
-            args.diagram->GetSelection().Clear();
+            args.diagram->GetSelection()->Clear();
             if (args.element != null)
             {
                 if (args.element is ClassElement*)
@@ -308,11 +346,11 @@ namespace spring
         public override void CreateMoveOperation(MouseArgs& args)
         {
             UniquePtr<MoveContainerElementsOperation> moveOperation(new MoveContainerElementsOperation(args.diagram, args.location));
-            if (args.diagram->GetSelection().Count() <= 1)
+            if (args.diagram->GetSelection()->Count() <= 1)
             {
-                if (args.diagram->GetSelection().Count() == 1)
+                if (args.diagram->GetSelection()->Count() == 1)
                 {
-                    args.elementIndex = args.diagram->GetSelection().GetFirstIndex();
+                    args.elementIndex = args.diagram->GetSelection()->GetFirstIndex();
                     if (args.elementIndex != -1)
                     {
                         args.element = args.diagram->GetElementByIndex(args.elementIndex);
@@ -335,11 +373,11 @@ namespace spring
             }
             else
             {
-                if (args.diagram->GetSelection().GetContainerElementCount() > 0)
+                if (args.diagram->GetSelection()->GetContainerElementCount() > 0)
                 {
-                    if (args.diagram->GetSelection().Contains(args.location))
+                    if (args.diagram->GetSelection()->Contains(args.location))
                     {
-                        moveOperation->SetContainerElementIndeces(args.diagram->GetSelection().GetContainerElementIndeces());
+                        moveOperation->SetContainerElementIndeces(args.diagram->GetSelection()->GetContainerElementIndeces());
                     }
                 }
             }
@@ -363,7 +401,15 @@ namespace spring
         }
     }
 
-    public class ClassTool : Tool
+    public abstract class SimpleClickTool : Tool
+    {
+        public nothrow override bool IsSimpleClickTool() const
+        {
+            return true;
+        }
+    }
+
+    public class ClassTool : SimpleClickTool
     {
         public override void Initialize(Diagram& diagram)
         {
@@ -380,7 +426,7 @@ namespace spring
         }
     }
 
-    public class ObjectTool : Tool
+    public class ObjectTool : SimpleClickTool
     {
         public override void Initialize(Diagram& diagram)
         {
@@ -396,4 +442,130 @@ namespace spring
             Tools.SetCurrent(Tools.GetSelectTool());
         }
     }
+
+    public abstract class RelationshipTool : SimpleClickTool
+    {
+        public override void Initialize(Diagram& diagram)
+        {
+            diagram.ResetSelection();
+        }
+        public nothrow virtual bool Accept(DiagramElement* element)
+        {
+            return false;
+        }
+        public abstract nothrow RelationshipElement.Kind GetRelationshipKind() const;
+        public override void MouseNormalLeftClick(MouseArgs& args)
+        {
+            DiagramElement* element = args.element;
+            if (element == null) return;
+            if (!Accept(element)) return;
+            List<Endpoint> endpoints = args.element->GetEndpoints();
+            List<Endpoint*> endpointPtrs;
+            for (const Endpoint& endpoint : endpoints)
+            {
+                endpointPtrs.Add(&endpoint);
+            }
+            Sort(endpointPtrs.Begin(), endpointPtrs.End(), EndpointNearer(args.location));
+            Endpoint* nearestEndpoint = endpointPtrs.Front();
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                logView->WriteLine(nearestEndpoint->ToString());
+            }
+            Operation* currentOperation = args.diagram->GetOperation();
+            if (currentOperation is EmptyOperation*)
+            {
+                RelationshipElement.Kind relationshipKind = GetRelationshipKind();
+                UniquePtr<RelationshipElement> relationshipElement(new RelationshipElement(relationshipKind));
+                relationshipElement->source = *nearestEndpoint;
+                UniquePtr<AddRelationshipOperation> operation(new AddRelationshipOperation(args.diagram, relationshipElement.Release()));
+                args.diagram->SetOperation(operation.Release());
+            }
+            else if (currentOperation is AddRelationshipOperation*)
+            {
+                AddRelationshipOperation* operation = cast<AddRelationshipOperation*>(currentOperation);
+                RelationshipElement& relationshipElement = operation->GetRelationshipElement();
+                if (relationshipElement.source.element == element)
+                {
+                    relationshipElement.source = *nearestEndpoint;
+                }
+                else if (relationshipElement.target.element == null)
+                {
+                    relationshipElement.target = *nearestEndpoint;
+                    args.diagram->CommitOperation(args.location);
+                }
+                else
+                {
+                    #assert(false);
+                }
+            }
+        }
+        public override void MouseControlLeftClick(MouseArgs& args)
+        {
+            DiagramElement* element = args.element;
+            if (element == null) return;
+            if (!Accept(element)) return;
+        }
+    }
+
+    public abstract class ClassRelationShipTool : RelationshipTool
+    {
+        public nothrow override bool Accept(DiagramElement* element)
+        {
+            if (element is ClassElement*)
+            {
+                return true;
+            }
+            return base->Accept(element);
+        }
+    }
+
+    public class InheritanceTool : ClassRelationShipTool
+    {
+        public override nothrow RelationshipElement.Kind GetRelationshipKind() const
+        {
+            return RelationshipElement.Kind.inheritance;
+        }
+    }
+
+    public class AggregationTool : ClassRelationShipTool
+    {
+        public override nothrow RelationshipElement.Kind GetRelationshipKind() const
+        {
+            return RelationshipElement.Kind.aggregation;
+        }
+    }
+
+    public class CreateInstanceTool : ClassRelationShipTool
+    {
+        public override nothrow RelationshipElement.Kind GetRelationshipKind() const
+        {
+            return RelationshipElement.Kind.createInstance;
+        }
+    }
+
+    public class NoteTool : ClassRelationShipTool
+    {
+        public override nothrow RelationshipElement.Kind GetRelationshipKind() const
+        {
+            return RelationshipElement.Kind.note;
+        }
+    }
+
+    public class ReferenceTool : RelationshipTool
+    {
+        public nothrow override bool Accept(DiagramElement* element)
+        {
+            if (element is ContainerElement*)
+            {
+                return true;
+            }
+            return base->Accept(element);
+        }
+        public override nothrow RelationshipElement.Kind GetRelationshipKind() const
+        {
+            return RelationshipElement.Kind.reference;
+        }
+    }
+
 }
