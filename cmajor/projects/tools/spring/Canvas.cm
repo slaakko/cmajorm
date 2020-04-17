@@ -28,6 +28,7 @@ namespace spring
         public nothrow void SetDiagram(Diagram* diagram_)
         {
             diagram.Reset(diagram_);
+            diagram->SetMenuItems(undoMenuItem, redoMenuItem);
             diagram->SetCanvas(this);
             diagram->SetChanged();
             diagram->Invalidate();
@@ -53,6 +54,14 @@ namespace spring
         public nothrow void SetPasteMenuItem(MenuItem* pasteMenuItem_)
         {
             pasteMenuItem = pasteMenuItem_;
+        }
+        public nothrow void SetUndoMenuItem(MenuItem* undoMenuItem_)
+        {
+            undoMenuItem = undoMenuItem_;
+        }
+        public nothrow void SetRedoMenuItem(MenuItem* redoMenuItem_)
+        {
+            redoMenuItem = redoMenuItem_;
         }
         protected override void SetCursor()
         {
@@ -106,26 +115,26 @@ namespace spring
             bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
             mouseDownArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
             moveOperationCreated = false;
-            if (Tools.Current() is SimpleClickTool*)
-            {
-                Tools.Current()->MouseClick(mouseDownArgs);
-            }
         }
         protected override void OnMouseMove(MouseEventArgs& args)
         {
             base->OnMouseMove(args);
             PointF location = ToDiagramLocation(args.location);
-            DiagramElement* element = null;
-            int index = diagram->GetIndexOfElementAt(location);
-            if (index != -1)
-            {
-                element = diagram->GetElementByIndex(index);
-            }
             MouseButtons buttons = args.buttons;
             bool shift = (buttons & MouseButtons.shift) != MouseButtons.none;
             bool control = (buttons & MouseButtons.control) != MouseButtons.none;
             bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
             bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
+            DiagramElement* element = null;
+            int index = -1;
+            if (left || right)
+            {
+                index = diagram->GetIndexOfElementAt(location);
+                if (index != -1)
+                {
+                    element = diagram->GetElementByIndex(index);
+                }
+            }
             mouseMoveArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
             if (Tools.Current()->CanMove())
             {
@@ -176,6 +185,10 @@ namespace spring
                         Tools.Current()->CommitMoveOperation(mouseUpArgs);
                     }
                 }
+            }
+            else if (Tools.Current() is SimpleClickTool*)
+            {
+                Tools.Current()->MouseClick(mouseUpArgs);
             }
         }
         protected override void OnMouseDoubleClick(MouseEventArgs& args)
@@ -259,6 +272,8 @@ namespace spring
         private MenuItem* copyMenuItem;
         private MenuItem* cutMenuItem;
         private MenuItem* pasteMenuItem;
+        private MenuItem* undoMenuItem;
+        private MenuItem* redoMenuItem;
         private PointF viewOrigin;
         private MouseArgs mouseDownArgs;
         private MouseArgs mouseMoveArgs;

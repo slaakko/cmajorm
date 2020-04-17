@@ -417,6 +417,7 @@ namespace spring
         }
         public override void MouseNormalLeftClick(MouseArgs& args)
         {
+            args.diagram->ResetSelection();
             UniquePtr<ClassElement> classElement(new ClassElement("Class", false));
             classElement->SetLocation(args.location);
             args.diagram->AddElement(classElement.Release());
@@ -434,6 +435,7 @@ namespace spring
         }
         public override void MouseNormalLeftClick(MouseArgs& args)
         {
+            args.diagram->ResetSelection();
             UniquePtr<ObjectElement> objectElement(new ObjectElement("anObject"));
             objectElement->SetLocation(args.location);
             args.diagram->AddElement(objectElement.Release());
@@ -456,6 +458,7 @@ namespace spring
         public abstract nothrow RelationshipElement.Kind GetRelationshipKind() const;
         public override void MouseNormalLeftClick(MouseArgs& args)
         {
+            args.diagram->ResetSelection();
             DiagramElement* element = args.element;
             if (element == null) return;
             if (!Accept(element)) return;
@@ -493,6 +496,7 @@ namespace spring
                 {
                     relationshipElement.target = *nearestEndpoint;
                     args.diagram->CommitOperation(args.location);
+                    Tools.SetCurrent(Tools.GetSelectTool());
                 }
                 else
                 {

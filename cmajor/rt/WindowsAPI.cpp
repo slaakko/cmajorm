@@ -595,6 +595,107 @@ int WinGraphicsPenGetLastStatus(void* pen)
     return static_cast<Pen*>(pen)->GetLastStatus();
 }
 
+int WinGraphicsPenGetAlignment(void* pen)
+{
+    return static_cast<Pen*>(pen)->GetAlignment();
+}
+
+int WinGraphicsPenSetAlignment(void* pen, int alignment)
+{
+    return static_cast<Pen*>(pen)->SetAlignment(static_cast<PenAlignment>(alignment));
+}
+
+void* WinGraphicsPenGetBrush(void* pen)
+{
+    return static_cast<Pen*>(pen)->GetBrush();
+}
+
+int WinGraphicsPenSetBrush(void* pen, void* brush)
+{
+    return static_cast<Pen*>(pen)->SetBrush(static_cast<const Brush*>(brush));
+}
+
+int WinGraphicsPenGetColor(void* pen, uint8_t& alpha, uint8_t& red, uint8_t& green, uint8_t& blue)
+{
+    Color color;
+    int result = static_cast<Pen*>(pen)->GetColor(&color);
+    if (result != 0)
+    {
+        return result;
+    }
+    alpha = color.GetAlpha();
+    red = color.GetRed();
+    green = color.GetGreen();
+    blue = color.GetBlue();
+    return result;
+}
+
+int WinGraphicsPenSetColor(void* pen, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue)
+{
+    Color color(alpha, red, green, blue);
+    return static_cast<Pen*>(pen)->SetColor(color);
+}
+
+int WinGraphicsPenGetStartCap(void* pen)
+{
+    return static_cast<Pen*>(pen)->GetStartCap();
+}
+
+int WinGraphicsPenSetStartCap(void* pen, int startCap)
+{
+    return static_cast<Pen*>(pen)->SetStartCap(static_cast<LineCap>(startCap));
+}
+
+int WinGraphicsPenGetEndCap(void* pen)
+{
+    return static_cast<Pen*>(pen)->GetEndCap();
+}
+
+int WinGraphicsPenSetEndCap(void* pen, int endCap)
+{
+    return static_cast<Pen*>(pen)->SetEndCap(static_cast<LineCap>(endCap));
+}
+
+int WinGraphicsPenGetDashCap(void* pen)
+{
+    return static_cast<Pen*>(pen)->GetDashCap();
+}
+
+int WinGraphicsPenSetDashCap(void* pen, int dashCap)
+{
+    return static_cast<Pen*>(pen)->SetDashCap(static_cast<DashCap>(dashCap));
+}
+
+float WinGraphicsPenGetDashOffset(void* pen)
+{
+    return static_cast<Pen*>(pen)->GetDashOffset();
+}
+
+int WinGraphicsPenSetDashOffset(void* pen, float dashOffset)
+{
+    return static_cast<Pen*>(pen)->SetDashOffset(dashOffset);
+}
+
+int WinGraphicsPenGetDashStyle(void* pen)
+{
+    return static_cast<Pen*>(pen)->GetDashStyle();
+}
+
+int WinGraphicsPenSetDashStyle(void* pen, int dashStyle)
+{
+    return static_cast<Pen*>(pen)->SetDashStyle(static_cast<DashStyle>(dashStyle));
+}
+
+int WinGraphicsPenGetLineJoin(void* pen)
+{
+    return static_cast<Pen*>(pen)->GetLineJoin();
+}
+
+int WinGraphicsPenSetLineJoin(void* pen, int lineJoin)
+{
+    return static_cast<Pen*>(pen)->SetLineJoin(static_cast<LineJoin>(lineJoin));
+}
+
 void* WinGraphicsCreateSolidBrush(uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue)
 {
     return new SolidBrush(Color(alpha, red, green, blue));
@@ -883,6 +984,11 @@ int WinGraphicsFillRectangleF(void* graphics, void* brush, float x, float y, flo
 int WinGraphicsFillPolygon(void* graphics, void* brush, int count, void* points)
 {
     return static_cast<Graphics*>(graphics)->FillPolygon(static_cast<const Brush*>(brush), static_cast<const Point*>(points), count);
+}
+
+int WinGraphicsFillPolygonF(void* graphics, void* brush, int count, void* points)
+{
+    return static_cast<Graphics*>(graphics)->FillPolygon(static_cast<const Brush*>(brush), static_cast<const PointF*>(points), count);
 }
 
 int WinGraphicsDrawArc(void* graphics, void* pen, float x, float y, float w, float h, float startAngle, float sweepAngle)

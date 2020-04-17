@@ -835,9 +835,23 @@ namespace System.Windows
         return v * (1 / length);
     }
 
+    // Dot product of vectors u and v:
+
     public nothrow float Dot(const Vector& u, const Vector& v)
     {
         return u.x * v.x + u.y * v.y;
+    }
+
+    public nothrow float ProjectionFactor(const Vector& a, const Vector& b)
+    {
+        return Dot(a, b * (1 / b.Length()));
+    }
+
+    // Projection of vector a onto b:
+
+    public nothrow Vector Projection(const Vector& a, const Vector& b)
+    {
+        return UnitVector(b) * ProjectionFactor(a, b);
     }
 
     //  MainAngle returns:
@@ -1091,8 +1105,52 @@ namespace System.Windows
         public SizeF size;
     }
 
+    public enum LineCap : int
+    {
+        flat = 0,
+        square = 1,
+        round = 2,
+        triangle = 3,
+        noAnchor = 0x10,
+        squareAnchor = 0x11,
+        roundAnchopr = 0x12,
+        diamondAnchor = 0x13,
+        arrowAnchor = 0x14,
+        custom = 0xff,
+        anchorMask = 0xf0
+    }
+
+    public enum LineJoin : int
+    {
+        miter = 0,
+        bevel = 1,
+        round = 2,
+        miterClipped = 3
+    }
+
+    public enum DashCap : int
+    {
+        flat = 0,
+        round = 2,
+        triangle = 3
+    }
+
+    public enum DashStyle : int
+    {
+        solid = 0,
+        dash = 1,
+        dot = 2,
+        dashDot = 3,
+        dashDotDot = 4,
+        custom = 5
+    }
+
     public class Pen
     {
+        public enum Alignment : int
+        {
+            center = 0, inset = 1
+        }
         public Pen(const Color& color, float width) : nativePen(WinGraphicsCreatePen(color.alpha, color.red, color.green, color.blue, width))
         {
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsPenGetLastStatus(nativePen)));
@@ -1128,6 +1186,118 @@ namespace System.Windows
                 WinGraphicsDeletePen(nativePen);
             }
         }
+        public nothrow Alignment GetAlignment() const
+        {
+            return cast<Alignment>(WinGraphicsPenGetAlignment(nativePen));
+        }
+        public nothrow GraphicsStatus SetAlignment(Alignment alignment)
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenSetAlignment(nativePen, cast<int>(alignment)));
+        }
+        public void SetAlignmentChecked(Alignment alignment)
+        {
+            CheckGraphicsStatus(SetAlignment(alignment));
+        }
+        public nothrow Brush GetBrush() const
+        {
+            Brush brush;
+            brush.SetNativeBrush(WinGraphicsPenGetBrush(nativePen));
+            return brush;
+        }
+        public nothrow GraphicsStatus SetBrush(const Brush& brush)
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenSetBrush(nativePen, brush.NativeBrush()));
+        }
+        public void SetBrushChecked(const Brush& brush)
+        {
+            CheckGraphicsStatus(SetBrush(brush));
+        }
+        public nothrow GraphicsStatus GetColor(Color& color) const
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenGetColor(nativePen, color.alpha, color.red, color.green, color.blue));
+        }
+        public Color GetColorChecked() const
+        {
+            Color color;
+            CheckGraphicsStatus(GetColor(color));
+            return color;
+        }
+        public nothrow GraphicsStatus SetColor(const Color& color)
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenSetColor(nativePen, color.alpha, color.red, color.green, color.blue));
+        }
+        public LineCap GetStartCap() const
+        {
+            return cast<LineCap>(WinGraphicsPenGetStartCap(nativePen));
+        }
+        public nothrow GraphicsStatus SetStartCap(LineCap startCap)
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenSetStartCap(nativePen, cast<int>(startCap)));
+        }
+        public void SetStartCapChecked(LineCap startCap)
+        {
+            CheckGraphicsStatus(SetStartCap(startCap));
+        }
+        public LineCap GetEndCap() const
+        {
+            return cast<LineCap>(WinGraphicsPenGetEndCap(nativePen));
+        }
+        public nothrow GraphicsStatus SetEndCap(LineCap endCap)
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenSetEndCap(nativePen, cast<int>(endCap)));
+        }
+        public void SetEndCapChecked(LineCap endCap)
+        {
+            CheckGraphicsStatus(SetEndCap(endCap));
+        }
+        public DashCap GetDashCap() const
+        {
+            return cast<DashCap>(WinGraphicsPenGetDashCap(nativePen));
+        }
+        public nothrow GraphicsStatus SetDashCap(DashCap dashCap)
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenSetDashCap(nativePen, cast<int>(dashCap)));
+        }
+        public void SetDashCapChecked(DashCap dashCap)
+        {
+            CheckGraphicsStatus(SetDashCap(dashCap));
+        }
+        public nothrow float GetDashOffset() const
+        {
+            return WinGraphicsPenGetDashOffset(nativePen);
+        }
+        public nothrow GraphicsStatus SetDashOffset(float dashOffset)
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenSetDashOffset(nativePen, dashOffset));
+        }
+        public void SetDashOffsetChecked(float dashOffset)
+        {
+            CheckGraphicsStatus(SetDashOffset(dashOffset));
+        }
+        public nothrow DashStyle GetDashStyle() const
+        {
+            return cast<DashStyle>(WinGraphicsPenGetDashStyle(nativePen));
+        }
+        public nothrow GraphicsStatus SetDashStyle(DashStyle dashStyle)
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenSetDashStyle(nativePen, cast<int>(dashStyle)));
+        }
+        public void SetDashStyleChecked(DashStyle dashStyle)
+        {
+            CheckGraphicsStatus(SetDashStyle(dashStyle));
+        }
+        public LineJoin GetLineJoin() const
+        {
+            return cast<LineJoin>(WinGraphicsPenGetLineJoin(nativePen));
+        }
+        public nothrow GraphicsStatus SetLineJoin(LineJoin lineJoin)
+        {
+            return cast<GraphicsStatus>(WinGraphicsPenSetLineJoin(nativePen, cast<int>(lineJoin)));
+        }
+        public void SetLineJoinChecked(LineJoin lineJoin)
+        {
+            CheckGraphicsStatus(SetLineJoin(lineJoin));
+        }
         public nothrow inline void* NativePen() const
         {
             return nativePen;
@@ -1160,10 +1330,21 @@ namespace System.Windows
 
     public abstract class Brush
     {
+        public nothrow Brush() : nativeBrush(null)
+        {
+        }
+        public nothrow void SetNativeBrush(const void* nativeBrush_)
+        {
+            nativeBrush = nativeBrush_;
+        }
         public virtual ~Brush()
         {
         }
-        public abstract nothrow const void* NativeBrush() const;
+        public virtual nothrow const void* NativeBrush() const
+        {
+            return nativeBrush;
+        }
+        private const void* nativeBrush;
     }
 
     public class SolidBrush : Brush
@@ -1171,13 +1352,16 @@ namespace System.Windows
         public SolidBrush(const Color& color) : nativeSolidBrush(WinGraphicsCreateSolidBrush(color.alpha, color.red, color.green, color.blue))
         {
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsBrushGetLastStatus(nativeSolidBrush)));
+            SetNativeBrush(nativeSolidBrush);
         }
         public SolidBrush(const SolidBrush& that) : nativeSolidBrush(WinGraphicsCloneSolidBrush(that.nativeSolidBrush))
         {
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsBrushGetLastStatus(nativeSolidBrush)));
+            SetNativeBrush(nativeSolidBrush);
         }
         public nothrow SolidBrush(SolidBrush&& that) : nativeSolidBrush(that.nativeSolidBrush)
         {
+            that.SetNativeBrush(null);
             that.nativeSolidBrush = null;
         }
         public void operator=(const SolidBrush& that)
@@ -1190,9 +1374,18 @@ namespace System.Windows
                 }
                 nativeSolidBrush = WinGraphicsCloneSolidBrush(that.nativeSolidBrush);
                 CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsBrushGetLastStatus(nativeSolidBrush)));
+                SetNativeBrush(nativeSolidBrush);
             }
         }
-        public default nothrow void operator=(SolidBrush&& that);
+        public nothrow void operator=(SolidBrush&& that)
+        {
+            const void* thatNativeBrush = that.NativeBrush();
+            const void* nativeBrush = NativeBrush();
+            Swap(thatNativeBrush, nativeBrush);
+            that.SetNativeBrush(thatNativeBrush);
+            SetNativeBrush(nativeBrush);
+            Swap(nativeSolidBrush, that.nativeSolidBrush);
+        }
         public ~SolidBrush()
         {
             if (nativeSolidBrush != null)
@@ -2407,6 +2600,14 @@ namespace System.Windows
             return cast<GraphicsStatus>(WinGraphicsFillPolygon(nativeGraphics, brush.NativeBrush(), numPoints, points));
         }
         public void FillPolygonChecked(const Brush& brush, int numPoints, const Point* points)
+        {
+            CheckGraphicsStatus(FillPolygon(brush, numPoints, points));
+        }
+        public nothrow GraphicsStatus FillPolygon(const Brush& brush, int numPoints, const PointF* points)
+        {
+            return cast<GraphicsStatus>(WinGraphicsFillPolygonF(nativeGraphics, brush.NativeBrush(), numPoints, points));
+        }
+        public void FillPolygonChecked(const Brush& brush, int numPoints, const PointF* points)
         {
             CheckGraphicsStatus(FillPolygon(brush, numPoints, points));
         }

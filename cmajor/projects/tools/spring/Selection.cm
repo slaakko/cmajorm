@@ -164,14 +164,39 @@ namespace spring
         }
         public override nothrow void Delete()
         {
+            List<RelationshipElement*> relationships;
             SortByIndex();
             int n = cast<int>(indeces.Count());
             for (int i = n - 1; i >= 0; --i)
             {
                 int index = indeces[i];
                 UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+                if (element.Get() is ContainerElement*)
+                {
+                    ContainerElement* containerElement = cast<ContainerElement*>(element.Get());
+                    for (RelationshipElement* relationship : containerElement->Relationships())
+                    {
+                        relationships.Add(relationship);
+                    }
+                }
             }
             indeces.Clear();
+            List<int> relationshipIndeces;
+            for (RelationshipElement* relationship : relationships)
+            {
+                int index = GetDiagram().GetIndexOfElement(relationship);
+                if (index != -1)
+                {
+                    relationshipIndeces.Add(index);
+                }
+            }
+            Sort(relationshipIndeces);
+            int m = cast<int>(relationshipIndeces.Count());
+            for (int i = m - 1; i >= 0; --i)
+            {
+                int index = relationshipIndeces[i];
+                UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+            }
         }
         public override nothrow ustring Copy()
         {

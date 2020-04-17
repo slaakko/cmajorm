@@ -67,7 +67,22 @@ namespace spring
         return 5.0f;
     }
 
+    public nothrow float DefaultAggregateSymbolWidth()
+    {
+        return 3.0f;
+    }
+
+    public nothrow float DefaultAggregateSymbolHeight()
+    {
+        return 2.0f;
+    }
+
     public nothrow float DefaultLineArrowWidth()
+    {
+        return 3.0f;
+    }
+
+    public nothrow float DefaultLineArrowHeight()
     {
         return 2.0f;
     }
@@ -75,6 +90,11 @@ namespace spring
     public nothrow float DefaultCardinalitySymbolRadius()
     {
         return 1.0f;
+    }
+
+    public nothrow float DefaultSelectedLineWidth()
+    {
+        return 4.0f;
     }
 
     public nothrow string SpringDirectory()
@@ -430,13 +450,25 @@ namespace spring
         {
             return family;
         }
+        public nothrow void SetFamily(const string& family_)
+        {
+            family = family_;
+        }
         public nothrow inline float Size() const
         {
             return size;
         }
+        public nothrow void SetSize(float size_)
+        {
+            size = size_;
+        }
         public nothrow inline FontStyle Style() const
         {
             return style;
+        }
+        public nothrow void SetStyle(FontStyle style_)
+        {
+            style = style_;
         }
         public nothrow inline Font& GetFont() const
         {
@@ -496,6 +528,10 @@ namespace spring
         {
             return color;
         }
+        public nothrow void SetColor(const Color& color_)
+        {
+            color = color_;
+        }
         public override void Read(System.Dom.Element* parentElement, Layout& layout)
         {
             UniquePtr<XPathObject> colorValue = Evaluate(ToUtf32(elementName), parentElement);
@@ -524,9 +560,9 @@ namespace spring
             colorElement->SetAttribute(u"value", ToUtf32(color.ToString()));
             parentElement->AppendChild(UniquePtr<System.Dom.Node>(colorElement.Release()));
         }
-        public nothrow Brush& GetBrush(Layout& layout) 
+        public nothrow const Brush* GetBrush(Layout& layout) 
         {
-            return *layout.GetOrInsertBrush(color);
+            return layout.GetOrInsertBrush(color);
         }
         private Color color;
         private string elementName;
@@ -537,11 +573,24 @@ namespace spring
         public RelationshipLayoutElement(Layout& layout, Graphics& graphics) :
             lineWidth(DefaultLineWidth(graphics)),
             lineColorElement(new ColorElement(Color.Black(), "lineColor")),
+            arrowColorElement(new ColorElement(Color.Black(), "arrowColor")),
             inheritanceArrowWidth(DefaultInheritanceArrowWidth()),
+            aggregateSymbolWidth(DefaultAggregateSymbolWidth()),
+            aggregateSymbolHeight(DefaultAggregateSymbolHeight()),
             lineArrowWidth(DefaultLineArrowWidth()),
-            cardinalitySymbolRadius(DefaultCardinalitySymbolRadius())
+            lineArrowHeight(DefaultLineArrowHeight()),
+            cardinalitySymbolRadius(DefaultCardinalitySymbolRadius()),
+            selectedLineWidth(DefaultSelectedLineWidth())
         {
             linePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth);
+            arrowBrush = layout.GetOrInsertBrush(arrowColorElement->GetColor());
+            const ColorElement& selectedColorElement = layout.GetSelectedColorElement();
+            const Brush* selectedBrush = selectedColorElement.GetBrush(layout);
+            selectedLinePen = layout.GetOrInsertPen(selectedColorElement.GetColor(), selectedLineWidth);
+            selectedLinePen->SetBrush(*selectedBrush);
+            selectedLinePen->SetStartCapChecked(LineCap.round);
+            selectedLinePen->SetEndCapChecked(LineCap.round);
+            selectedLinePen->SetLineJoinChecked(LineJoin.round);
         }
         suppress RelationshipLayoutElement(const RelationshipLayoutElement&);
         suppress void operator=(const RelationshipLayoutElement&);
@@ -551,21 +600,73 @@ namespace spring
         {
             return lineWidth;
         }
+        public nothrow void SetLineWidth(float lineWidth_)
+        {
+            lineWidth = lineWidth_;
+        }
         public nothrow const Pen& LinePen() const
         {
             return *linePen;
+        }
+        public nothrow const Pen& SelectedLinePen() const
+        {
+            return *selectedLinePen;
+        }
+        public nothrow const Brush& ArrowBrush() const
+        {
+            return *arrowBrush;
         }
         public nothrow inline float InheritanceArrowWidth() const
         {
             return inheritanceArrowWidth;
         }
+        public nothrow void SetInheritanceArrowWidth(float inheritanceArrowWidth_)
+        {
+            inheritanceArrowWidth = inheritanceArrowWidth_;
+        }
+        public nothrow inline float AggregateSymbolWidth() const
+        {
+            return aggregateSymbolWidth;
+        }
+        public nothrow void SetAggregateSymbolWidth(float aggregateSymbolWidth_)
+        {
+            aggregateSymbolWidth = aggregateSymbolWidth_;
+        }
+        public nothrow inline float AggregateSymbolHeight() const
+        {
+            return aggregateSymbolHeight;
+        }
+        public nothrow void SetAggregateSymbolHeight(float aggregateSymbolHeight_)
+        {
+            aggregateSymbolHeight = aggregateSymbolHeight_;
+        }
         public nothrow inline float LineArrowWidth() const
         {
             return lineArrowWidth;
         }
+        public nothrow inline float LineArrowHeight() const
+        {
+            return lineArrowHeight;
+        }
+        public nothrow void SetLineArrowWidth(float lineArrowWidth_)
+        {
+            lineArrowWidth = lineArrowWidth_;
+        }
         public nothrow inline float CardinalitySymbolRadius() const
         {
             return cardinalitySymbolRadius;
+        }
+        public nothrow void SetCardinalitySymbolRadius(float cardinalitySymbolRadius_)
+        {
+            cardinalitySymbolRadius = cardinalitySymbolRadius_;
+        }
+        public nothrow inline float SelectedLineWidth() const
+        {
+            return selectedLineWidth;
+        }
+        public nothrow void SetSelectedLineWidth(float selectedLineWidth_)
+        {
+            selectedLineWidth = selectedLineWidth_;
         }
         public override void Read(System.Dom.Element* parentElement, Layout& layout)
         {
@@ -583,9 +684,14 @@ namespace spring
                         {
                             System.Dom.Element* element = cast<System.Dom.Element*>(node);
                             lineColorElement->Read(element, layout);
+                            arrowColorElement->Read(element, layout);
                             inheritanceArrowWidth = ParseFloat(ToUtf8(element->GetAttribute(u"inheritanceArrowWidth")));
+                            aggregateSymbolWidth = ParseFloat(ToUtf8(element->GetAttribute(u"aggregateSymbolWidth")));
+                            aggregateSymbolHeight = ParseFloat(ToUtf8(element->GetAttribute(u"aggregateSymbolHeight")));
                             lineArrowWidth = ParseFloat(ToUtf8(element->GetAttribute(u"lineArrowWidth")));
+                            lineArrowHeight = ParseFloat(ToUtf8(element->GetAttribute(u"lineArrowHeight")));
                             cardinalitySymbolRadius = ParseFloat(ToUtf8(element->GetAttribute(u"cardinalitySymbolRadius")));
+                            selectedLineWidth = ParseFloat(ToUtf8(element->GetAttribute(u"selectedLineWidth")));
                         }
                     }
                 }
@@ -595,17 +701,29 @@ namespace spring
         {
             UniquePtr<System.Dom.Element> relationshipElement(new System.Dom.Element(u"relationship"));
             lineColorElement->Write(relationshipElement.Get());
+            arrowColorElement->Write(relationshipElement.Get());
             relationshipElement->SetAttribute(u"inheritanceArrowWidth", ToUtf32(System.ToString(inheritanceArrowWidth)));
+            relationshipElement->SetAttribute(u"aggregateSymbolWidth", ToUtf32(System.ToString(aggregateSymbolWidth)));
+            relationshipElement->SetAttribute(u"aggregateSymbolHeight", ToUtf32(System.ToString(aggregateSymbolHeight)));
             relationshipElement->SetAttribute(u"lineArrowWidth", ToUtf32(System.ToString(lineArrowWidth)));
+            relationshipElement->SetAttribute(u"lineArrowHeight", ToUtf32(System.ToString(lineArrowHeight)));
             relationshipElement->SetAttribute(u"cardinalitySymbolRadius", ToUtf32(System.ToString(cardinalitySymbolRadius)));
+            relationshipElement->SetAttribute(u"selectedLineWidth", ToUtf32(System.ToString(selectedLineWidth)));
             parentElement->AppendChild(UniquePtr<System.Dom.Node>(relationshipElement.Release()));
         }
         private UniquePtr<ColorElement> lineColorElement;
+        private UniquePtr<ColorElement> arrowColorElement;
         private float lineWidth;
         private float inheritanceArrowWidth;
+        private float aggregateSymbolWidth;
+        private float aggregateSymbolHeight;
         private float lineArrowWidth;
+        private float lineArrowHeight;
         private float cardinalitySymbolRadius;
+        private float selectedLineWidth;
         private Pen* linePen;
+        private Brush* arrowBrush;
+        private Pen* selectedLinePen;
     }
 
     public abstract class CaptionLayoutElement : LayoutElement

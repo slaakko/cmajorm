@@ -17,10 +17,15 @@ public class MainWindow : Window
         arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)),
         classToolCursor(Application.GetResourceManager().GetCursor("class.tool.spring.cursor")),
         objectToolCursor(Application.GetResourceManager().GetCursor("object.tool.spring.cursor")),
-        inheritanceToolCursor(Application.GetResourceManager().GetCursor("inheritance.tool.spring.cursor"))
+        inheritanceToolCursor(Application.GetResourceManager().GetCursor("inheritance.tool.spring.cursor")),
+        aggregationToolCursor(Application.GetResourceManager().GetCursor("aggregation.tool.spring.cursor"))
     {
         UniquePtr<MenuBar> menuBar(new MenuBar());
         UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
+        UniquePtr<MenuItem> newMenuItem(new MenuItem("&New"));
+        newMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.n));
+        newMenuItem->ClickEvent().AddHandler(NewClick);
+        fileMenuItem->AddMenuItem(newMenuItem.Release());
         UniquePtr<MenuItem> openMenuItem(new MenuItem("&Open..."));
         openMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.o));
         openMenuItem->ClickEvent().AddHandler(OpenClick);
@@ -63,6 +68,18 @@ public class MainWindow : Window
         pasteMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.v));
         pasteMenuItem->ClickEvent().AddHandler(EditPaste);
         editMenuItem->AddMenuItem(pasteMenuItemPtr.Release());
+        UniquePtr<MenuItem> undoMenuItemPtr(new MenuItem("&Undo"));
+        undoMenuItem = undoMenuItemPtr.Get();
+        undoMenuItem->Disable();
+        undoMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.z));
+        undoMenuItem->ClickEvent().AddHandler(EditUndo);
+        editMenuItem->AddMenuItem(undoMenuItemPtr.Release());
+        UniquePtr<MenuItem> redoMenuItemPtr(new MenuItem("&Redo"));
+        redoMenuItem = redoMenuItemPtr.Get();
+        redoMenuItem->Disable();
+        redoMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.y));
+        redoMenuItem->ClickEvent().AddHandler(EditRedo);
+        editMenuItem->AddMenuItem(redoMenuItemPtr.Release());
         menuBar->AddMenuItem(editMenuItem.Release());
         AddChild(menuBar.Release());
         UniquePtr<ToolBar> toolBar(new ToolBar(ToolBar.Style.radioButtonGroup));
@@ -89,7 +106,7 @@ public class MainWindow : Window
         ToolButton* aggregationToolButton = new ToolButton("aggregation.tool.spring.bitmap");
         aggregationToolButton->SetToolTip("Add aggregation relationship");
         Tools.GetAggregationTool()->SetToolButton(aggregationToolButton);
-        Tools.GetAggregationTool()->SetCursor(&arrowCursor);
+        Tools.GetAggregationTool()->SetCursor(&aggregationToolCursor);
         toolBar->AddToolButton(aggregationToolButton);
         ToolButton* referenceToolButton = new ToolButton("reference.tool.spring.bitmap");
         referenceToolButton->SetToolTip("Add reference relationship");
@@ -116,6 +133,9 @@ public class MainWindow : Window
         canvas->SetCopyMenuItem(copyMenuItem);
         canvas->SetCutMenuItem(cutMenuItem);
         canvas->SetPasteMenuItem(pasteMenuItem);
+        canvas->SetUndoMenuItem(undoMenuItem);
+        canvas->SetRedoMenuItem(redoMenuItem);
+        canvas->GetDiagram().SetMenuItems(undoMenuItem, redoMenuItem);
         UniquePtr<Control> borderedCanvas(new BorderedControl(canvasPtr.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         verticalSplitContainer->Pane1Container()->AddChild(borderedCanvas.Release());
         UniquePtr<LogView> logView(new LogView());
@@ -231,6 +251,26 @@ public class MainWindow : Window
             MessageBox.Show(ex.Message());
         }
     }
+    private void NewClick()
+    {
+        if (canvas->GetDiagram().Modified())
+        {
+            MessageBoxResult result = MessageBox.Show("Current diagram is modified. Do you want to save changes?", "Diagram modified", this, MessageBoxType.MB_YESNOCANCEL);
+            if (result == MessageBoxResult.yes)
+            {
+                SaveClick();
+            }
+            else if (result == MessageBoxResult.cancel)
+            {
+                return;
+            }
+        }
+        UniquePtr<Diagram> diagram(new Diagram());
+        diagramFilePath.Clear();
+        filePathStatusBarItem->SetText(diagramFilePath);
+        modifiedStatusBarItem->SetText(" ");
+        canvas->SetDiagram(diagram.Release());
+    }
     private void SaveClick()
     {
         try
@@ -309,6 +349,14 @@ public class MainWindow : Window
         {
             canvas->GetDiagram().Paste(clipboardData);
         }
+    }
+    private void EditUndo()
+    {
+        canvas->GetDiagram().Undo();
+    }
+    private void EditRedo()
+    {
+        canvas->GetDiagram().Redo();
     }
     private void TestClick()
     {
@@ -397,11 +445,14 @@ public class MainWindow : Window
     private Cursor& classToolCursor;
     private Cursor& objectToolCursor;
     private Cursor& inheritanceToolCursor;
+    private Cursor& aggregationToolCursor;
     private string diagramFilePath;
     private ustring clipboardData;
     private MenuItem* cutMenuItem;
     private MenuItem* copyMenuItem;
     private MenuItem* pasteMenuItem;
+    private MenuItem* undoMenuItem;
+    private MenuItem* redoMenuItem;
 }
 
 int main()
@@ -410,6 +461,7 @@ int main()
     {
        Debug.SetPaint();
        MainWindow mainWindow;
+       mainWindow.SetSmallIcon(Application.GetResourceManager().GetIcon("spring.icon"));
        ScreenMetrics.Save(false);
        Graphics graphics = Graphics.FromWindowHandle(mainWindow.Handle());
        Layout defaultLayout(graphics);

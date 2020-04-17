@@ -1,0 +1,96 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace spring
+{
+    public class CommandList
+    {
+        public nothrow CommandList() : currentIndex(0), commands()
+        {
+        }
+        public nothrow void SetMenuItems(MenuItem* undoMenuItem_, MenuItem* redoMenuItem_)
+        {
+            undoMenuItem = undoMenuItem_;
+            redoMenuItem = redoMenuItem_;
+            UpdateMenuItems();
+        }
+        public nothrow void AddCommand(Command* command)
+        {
+            if (currentIndex >= commands.Count())
+            {
+                commands.Add(UniquePtr<Command>(command));
+                currentIndex = cast<int>(commands.Count());
+            }
+            else
+            {
+                commands[currentIndex].Reset(command);
+                ++currentIndex;
+            }
+            UpdateMenuItems();
+        }
+        public nothrow bool CanUndo() const
+        {
+            return currentIndex > 0;
+        }
+        public nothrow void Undo()
+        {
+            if (CanUndo())
+            {
+                --currentIndex;
+                Command* command = commands[currentIndex].Get();
+                command->Undo();
+            }
+            UpdateMenuItems();
+        }
+        public nothrow bool CanRedo() const
+        {
+            return currentIndex < commands.Count();
+        }
+        public nothrow void Redo()
+        {
+            if (CanRedo())
+            {
+                Command* command = commands[currentIndex].Get();
+                command->Redo();
+                ++currentIndex;
+            }
+            UpdateMenuItems();
+        }
+        private void UpdateMenuItems()
+        {
+            if (CanUndo())
+            {
+                undoMenuItem->Enable();
+            }
+            else
+            {
+                undoMenuItem->Disable();
+            }
+            if (CanRedo())
+            {
+                redoMenuItem->Enable();
+            }
+            else
+            {
+                redoMenuItem->Disable();
+            }
+        }
+        private int currentIndex;
+        private List<UniquePtr<Command>> commands;
+        private MenuItem* undoMenuItem;
+        private MenuItem* redoMenuItem;
+    }
+
+    public abstract class Command
+    {
+        public default virtual ~Command();
+        public abstract nothrow void Undo();
+        public abstract nothrow void Redo();
+    }
+}

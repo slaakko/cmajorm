@@ -159,6 +159,10 @@ namespace spring
         {
             return canvas;
         }
+        public void SetMenuItems(MenuItem* undoMenuItem, MenuItem* redoMenuItem)
+        {
+            commandList.SetMenuItems(undoMenuItem, redoMenuItem);
+        }
         public void Save(const string& filePath)
         {
             StreamWriter writer = File.CreateText(filePath);
@@ -267,6 +271,18 @@ namespace spring
                 selection->Delete();
             }
         }
+        public nothrow void Undo()
+        {
+            commandList.Undo();
+            SetChanged();
+            Invalidate();
+        }
+        public nothrow void Redo()
+        {
+            commandList.Redo();
+            SetChanged();
+            Invalidate();
+        }
         public nothrow inline DiagramElement* GetElementByIndex(int index) const
         {
             return elements.Get(index);
@@ -279,7 +295,7 @@ namespace spring
             }
             elements.Set(index, element);
         }
-        public nothrow inline int GetIndexOfElement(DiagramElement* element)
+        public nothrow int GetIndexOfElement(DiagramElement* element)
         {
             int n = elements.Count();
             for (int i = 0; i < n; ++i)
@@ -432,6 +448,7 @@ namespace spring
         {
             operation->Cancel();
             ResetOperation();
+            Tools.SetCurrent(Tools.GetSelectTool());
             SetChanged();
             Invalidate();
         }
@@ -530,6 +547,7 @@ namespace spring
         private IndexList<DiagramElement> elements;
         private UniquePtr<Selection> selection;
         private UniquePtr<Operation> operation;
+        private CommandList commandList;
     }
 
     public abstract class DiagramElement
@@ -580,11 +598,11 @@ namespace spring
             MenuItem* deleteMenuItem = new MenuItem("Delete");
             contextMenu->AddMenuItemAction(deleteMenuItem, new DeleteDiagramElementAction(diagram, elementIndex));
         }
-        private void DrawSelected(Graphics& graphics, Layout& layout)
+        public virtual void DrawSelected(Graphics& graphics, Layout& layout)
         {
             const ColorElement& selectedColorElement = layout.GetSelectedColorElement();
-            Brush& selectedBrush = selectedColorElement.GetBrush(layout);
-            graphics.FillRectangleChecked(selectedBrush, boundingRect);
+            const Brush* selectedBrush = selectedColorElement.GetBrush(layout);
+            graphics.FillRectangleChecked(*selectedBrush, boundingRect);
         }
         public nothrow inline const string& Name() const
         {
@@ -816,33 +834,33 @@ namespace spring
                 case TopLeft():
                 case BottomLeft():
                 {
-                    return PointF(point.x + index * w * 2.0f, point.y);
+                    return PointF(point.x + index * w, point.y);
                 }
                 case TopRight():
                 case BottomRight():
                 {
-                    return PointF(point.x - index * w * 2.0f, point.y);
+                    return PointF(point.x - index * w, point.y);
                 }
                 case LeftTop():
                 case RightTop():
                 {
-                    return PointF(point.x, point.y + w * 2.0f);
+                    return PointF(point.x, point.y + index * w);
                 }
                 case LeftBottom():
                 case RightBottom():
                 {
-                    return PointF(point.x, point.y - w * 2.0f);
+                    return PointF(point.x, point.y - index * w);
                 }
                 case LeftCenter():
                 case RightCenter():
                 {
                     if ((count & 1) == 0)
                     {
-                        return PointF(point.x, point.y - (count / 2) * w * 2.0f + index * w * 2.0f + w);
+                        return PointF(point.x, point.y - (count / 2) * w + index * w + w / 2);
                     }
                     else
                     {
-                        return PointF(point.x, point.y - (count / 2) * w * 2.0f + index * w * 2.0f);
+                        return PointF(point.x, point.y - (count / 2) * w + index * w);
                     }
                 }
                 case TopCenter():
@@ -850,11 +868,11 @@ namespace spring
                 {
                     if ((count & 1) == 0)
                     {
-                        return PointF(point.x - (count / 2) * w * 2.0f + index * w * 2.0f + w, point.y);
+                        return PointF(point.x - (count / 2) * w + index * w + w / 2, point.y);
                     }
                     else
                     {
-                        return PointF(point.x - (count / 2) * w * 2.0f + index * w * 2.0f, point.y);
+                        return PointF(point.x - (count / 2) * w + index * w, point.y);
                     }
                 }
             }
@@ -1006,10 +1024,61 @@ namespace spring
             base(name), kind(kind_), source(source_), target(target_), intermediatePoints(), cardinality(Cardinality.one)
         {
         }
+        public ~RelationshipElement()
+        {
+            if (source.element != null)
+            {
+                source.element->RemoveRelationship(this);
+            }
+            if (target.element != null)
+            {
+                target.element->RemoveRelationship(this);
+            }
+        }
         suppress RelationshipElement(const RelationshipElement&);
         suppress void operator=(const RelationshipElement&);
         suppress RelationshipElement(RelationshipElement&&);
         suppress void operator=(RelationshipElement&&);
+        public override nothrow bool Contains(const PointF& location)
+        {
+            Diagram* diagram = GetDiagram();
+            const Layout& layout = diagram->GetLayout();
+            const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+            float selectedLineWidth = relationshipLayoutElement.SelectedLineWidth();
+            PointF from = source.point;
+            for (PointF to : intermediatePoints)
+            {
+                if (Contains(from, to, location, selectedLineWidth))
+                {
+                    return true;
+                }
+                from = to;
+            }
+            PointF to = target.point;
+            if (Contains(from, to, location, selectedLineWidth))
+            {
+                return true;
+            }
+            return false;
+        }
+        public nothrow bool Contains(const PointF& from, const PointF& to, const PointF& loc, float selectedLineWidth)
+        {
+            Line line(from, to);
+            Line lineToLoc(from, loc);
+            Vector a(line.ToVector());
+            Vector b(lineToLoc.ToVector());
+            float f = ProjectionFactor(b, a);
+            if (f >= 0 && f <= a.Length())
+            {
+                Vector c = Projection(b, a);
+                Vector d = b - c;
+                if (d.Length() <= selectedLineWidth / 2)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public override System.Dom.Element* CreateDomElement() const
         {
             return new System.Dom.Element(u"relationship");
@@ -1153,10 +1222,10 @@ namespace spring
         }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
-            // todo
         }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
+            base->Draw(graphics, layout);
             switch (kind)
             {
                 case Kind.inheritance:
@@ -1164,7 +1233,24 @@ namespace spring
                     DrawInheritance(graphics, layout);
                     break;
                 }
+                case Kind.aggregation:
+                {
+                    DrawAggregation(graphics, layout);
+                    break;
+                }
             }
+        }
+        protected override void DrawSelected(Graphics& graphics, Layout& layout)
+        {
+            const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+            const Pen& selectedLinePen = relationshipLayoutElement.SelectedLinePen();
+            PointF prev = source.point;
+            for (PointF next : intermediatePoints)
+            {
+                graphics.DrawLineChecked(selectedLinePen, prev, next);
+                prev = next;
+            }
+            graphics.DrawLineChecked(selectedLinePen, prev, target.point);
         }
         public nothrow void Calculate(const Snap& snap, DiagramElement* element, float w, int index, int count)
         {
@@ -1191,6 +1277,12 @@ namespace spring
             }
             else
             {
+                PointF prevPoint = source.point;
+                for (const PointF& intermediatePoint : intermediatePoints)
+                {
+                    graphics.DrawLineChecked(linePen, prevPoint, intermediatePoint);
+                    prevPoint = intermediatePoint;
+                }
                 lastPoint = intermediatePoints.Back();
             }
             Line line(lastPoint, target.point);
@@ -1211,6 +1303,61 @@ namespace spring
             graphics.DrawLineChecked(linePen, arrowLeftLine.end, target.point);
             graphics.DrawLineChecked(linePen, arrowLeftLine.end, arrowRightLine.end);
         }
+        private void DrawAggregation(Graphics& graphics, Layout& layout)
+        {
+            const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+            const Pen& linePen = relationshipLayoutElement.LinePen();
+            const Brush& arrowBrush = relationshipLayoutElement.ArrowBrush();
+            float aggregateSymbolWidth = relationshipLayoutElement.AggregateSymbolWidth();
+            float aggregateSymbolHeight = relationshipLayoutElement.AggregateSymbolHeight();
+            float lineArrowWidth = relationshipLayoutElement.LineArrowWidth();
+            float lineArrowHeight = relationshipLayoutElement.LineArrowHeight();
+            PointF start = source.point;
+            PointF end;
+            if (intermediatePoints.IsEmpty())
+            {
+                end = target.point;
+            }
+            else
+            {
+                end = intermediatePoints.Front();
+            }
+            Line aggregateLine(start, end);
+            Vector v(aggregateLine.ToVector());
+            Vector u(UnitVector(v) * aggregateSymbolWidth);
+            Line aggregateSymbolLine(start, u);
+            Vector h(u * 0.5f);
+            Line halfAggregateSymbolLine(start, h);
+            Vector l(UnitVector(System.Windows.Rotate(halfAggregateSymbolLine, 90.0f).ToVector()) * (aggregateSymbolHeight / 2));
+            Vector r(UnitVector(System.Windows.Rotate(halfAggregateSymbolLine, -90.0f).ToVector()) * (aggregateSymbolHeight / 2));
+            Line leftAggregateSymbolLine(halfAggregateSymbolLine.end, l);
+            Line rightAggregateSymbolLine(halfAggregateSymbolLine.end, r);
+            graphics.DrawLineChecked(linePen, aggregateSymbolLine.start, leftAggregateSymbolLine.end);
+            graphics.DrawLineChecked(linePen, leftAggregateSymbolLine.end, aggregateSymbolLine.end);
+            graphics.DrawLineChecked(linePen, aggregateSymbolLine.start, rightAggregateSymbolLine.end);
+            graphics.DrawLineChecked(linePen, rightAggregateSymbolLine.end, aggregateSymbolLine.end);
+            PointF prevPoint = aggregateSymbolLine.end;
+            for (const PointF& intermediatePoint : intermediatePoints)
+            {
+                graphics.DrawLineChecked(linePen, prevPoint, intermediatePoint);
+                prevPoint = intermediatePoint;
+            }
+            Line arrowLine(target.point, prevPoint);
+            Vector av(arrowLine.ToVector());
+            Vector uv(UnitVector(av) * cast<float>(Sqrt(3) / 2 * lineArrowWidth));
+            Line arrowStartLine(target.point, uv);
+            Line arrowEndLine(arrowStartLine.end, target.point);
+            Vector la(UnitVector(System.Windows.Rotate(arrowEndLine, 90.0f).ToVector()) * (lineArrowHeight / 2));
+            Vector ra(UnitVector(System.Windows.Rotate(arrowEndLine, -90.0f).ToVector()) * (lineArrowHeight / 2));
+            Line leftArrowLine(arrowEndLine.start, la);
+            Line rightArrowLine(arrowEndLine.start, ra);
+            List<PointF> points;
+            points.Add(target.point);
+            points.Add(leftArrowLine.end);
+            points.Add(rightArrowLine.end);
+            graphics.FillPolygonChecked(arrowBrush, cast<int>(points.Count()), points.CBegin().Ptr());
+            graphics.DrawLineChecked(linePen, arrowEndLine.start, arrowLine.end);
+        }
         public override void SetFrom(DiagramElement* that)
         {
             base->SetFrom(that);
@@ -1226,6 +1373,17 @@ namespace spring
             {
                 source.element->AddRelationship(this);
                 target.element->AddRelationship(this);
+            }
+        }
+        public nothrow void RemoveContainer(ContainerElement* element)
+        {
+            if (source.element == element)
+            {
+                source.element = null;
+            }
+            if (target.element == element)
+            {
+                target.element = null;
             }
         }
         public Kind kind;
@@ -1262,7 +1420,7 @@ namespace spring
             const FieldLayoutElement& layoutElement = layout.GetFieldLayoutElement();
             const FontElement& fontElement = layoutElement.GetFontElement();
             const ColorElement& textColorElement = layoutElement.TextColorElement();
-            graphics.DrawStringChecked(Name(), fontElement.GetFont(), Location(), textColorElement.GetBrush(layout));
+            graphics.DrawStringChecked(Name(), fontElement.GetFont(), Location(), *textColorElement.GetBrush(layout));
         }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
@@ -1332,14 +1490,14 @@ namespace spring
             const AbstractOperationLayoutElement& layoutElement = layout.GetAbstractOperationLayoutElement();
             const FontElement& fontElement = layoutElement.GetFontElement();
             const ColorElement& textColorElement = layoutElement.TextColorElement();
-            graphics.DrawStringChecked(Name(), fontElement.GetFont(), Location(), textColorElement.GetBrush(layout));
+            graphics.DrawStringChecked(Name(), fontElement.GetFont(), Location(), *textColorElement.GetBrush(layout));
         }
         private void DrawConcreteOperation(Graphics& graphics, Layout& layout)
         {
             const ConcreteOperationLayoutElement& layoutElement = layout.GetConcreteOperationLayoutElement();
             const FontElement& fontElement = layoutElement.GetFontElement();
             const ColorElement& textColorElement = layoutElement.TextColorElement();
-            graphics.DrawStringChecked(Name(), fontElement.GetFont(), Location(), textColorElement.GetBrush(layout));
+            graphics.DrawStringChecked(Name(), fontElement.GetFont(), Location(), *textColorElement.GetBrush(layout));
         }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
@@ -1381,6 +1539,25 @@ namespace spring
         }
         public nothrow ContainerElement(const string& name) : base(name)
         {
+        }
+        public ~ContainerElement()
+        {
+            for (RelationshipElement* relationship : relationships)
+            {
+                relationship->RemoveContainer(this);
+            }
+        }
+        public nothrow List<RelationshipElement*> GetSelfRelationships() const
+        {
+            List<RelationshipElement*> selfRelationships;
+            for (RelationshipElement* relationship : relationships)
+            {
+                if (relationship->source.element == this && relationship->target.element == this)
+                {
+                    selfRelationships.Add(relationship);
+                }
+            }
+            return selfRelationships;
         }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
