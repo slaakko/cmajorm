@@ -174,7 +174,8 @@ namespace spring
                 if (element.Get() is ContainerElement*)
                 {
                     ContainerElement* containerElement = cast<ContainerElement*>(element.Get());
-                    for (RelationshipElement* relationship : containerElement->Relationships())
+                    List<RelationshipElement*> containerElementRelationships = containerElement->GetAllRelationships();
+                    for (RelationshipElement* relationship : containerElementRelationships)
                     {
                         relationships.Add(relationship);
                     }
@@ -224,7 +225,8 @@ namespace spring
             }
             for (ContainerElement* containerElement : containerElements)
             {
-                for (RelationshipElement* relationship : containerElement->Relationships())
+                List<RelationshipElement*> containerRelationships = containerElement->GetAllRelationships();
+                for (RelationshipElement* relationship : containerRelationships)
                 {
                     bool sourceInClosure = false;
                     if (relationship->source.element != null)
@@ -243,6 +245,10 @@ namespace spring
                         {
                             targetInClosure = true;
                         }
+                    }
+                    else if (relationship->kind == RelationshipElement.kind.reference && relationship->cardinality == Cardinality.zero)
+                    {
+                        targetInClosure = true;
                     }
                     if (sourceInClosure && targetInClosure)
                     {

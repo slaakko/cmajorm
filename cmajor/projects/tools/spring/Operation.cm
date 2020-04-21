@@ -25,6 +25,15 @@ namespace spring
         {
             return points;
         }
+        public nothrow void SetTargetPoint(const PointF& targetPoint_)
+        {
+            hasTargetPoint = true;
+            targetPoint = targetPoint_;
+        }
+        public nothrow inline const PointF& TargetPoint() const
+        {
+            return targetPoint;
+        }
         public nothrow void Offset(float dx, float dy)
         {
             location.Offset(dx, dy);
@@ -32,9 +41,15 @@ namespace spring
             {
                 point.Offset(dx, dy);
             }
+            if (hasTargetPoint)
+            {
+                targetPoint.Offset(dx, dy);
+            }
         }
         private PointF location;
         private List<PointF> points;
+        private bool hasTargetPoint;
+        private PointF targetPoint;
     }
 
     public abstract class Operation

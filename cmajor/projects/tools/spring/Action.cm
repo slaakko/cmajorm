@@ -188,6 +188,22 @@ namespace spring
         }
     }
 
+    public class StraightenRelationshipElementAction : DiagramElementAction
+    {
+        public nothrow StraightenRelationshipElementAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
+        {
+        }
+        protected override void Execute(Diagram& diagram, int elementIndex)
+        {
+            DiagramElement* diagramElement = diagram.GetElementByIndex(elementIndex);
+            if (diagramElement is RelationshipElement*)
+            {
+                RelationshipElement* relationship = cast<RelationshipElement*>(diagramElement);
+                relationship->Straighten();
+            }
+        }
+    }
+
     public class ClassElementPropertiesAction : DiagramElementAction
     {
         public nothrow ClassElementPropertiesAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)

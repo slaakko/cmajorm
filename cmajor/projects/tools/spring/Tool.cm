@@ -384,13 +384,39 @@ namespace spring
                         {
                             moveOperation->AddElementIndex(args.elementIndex);
                             ContainerElement* containerElement = cast<ContainerElement*>(args.element);
-                            List<RelationshipElement*> selfRelationships = containerElement->GetSelfRelationships();
-                            for (RelationshipElement* selfRelationship : selfRelationships)
+                            if (containerElement != null)
                             {
-                                int index = args.diagram->GetIndexOfElement(selfRelationship);
-                                if (index != -1)
+                                List<RelationshipElement*> relationships = containerElement->GetAllRelationships();
+                                for (RelationshipElement* relationship : relationships)
                                 {
-                                    moveOperation->AddElementIndex(index);
+                                    DiagramElement* sourceElement = relationship->source.element;
+                                    ContainerElement* sourceContainerElement = null;
+                                    if (sourceElement != null)
+                                    {
+                                        sourceContainerElement = sourceElement->GetContainerElement();
+                                    }
+                                    DiagramElement* targetElement = relationship->target.element;
+                                    ContainerElement* targetContainerElement = null;
+                                    if (targetElement != null)
+                                    {
+                                        targetContainerElement = targetElement->GetContainerElement();
+                                    }
+                                    if (sourceContainerElement == containerElement && targetContainerElement == containerElement)
+                                    {
+                                        int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
+                                        if (relationshipIndex != -1)
+                                        {
+                                            moveOperation->AddElementIndex(relationshipIndex);
+                                        }
+                                    }
+                                    else if (targetElement == null && relationship->kind == RelationshipElement.kind.reference && relationship->cardinality == Cardinality.zero)
+                                    {
+                                        int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
+                                        if (relationshipIndex != -1)
+                                        {
+                                            moveOperation->AddElementIndex(relationshipIndex);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -411,7 +437,8 @@ namespace spring
                             if (element is ContainerElement*)
                             {
                                 ContainerElement* containerElement = cast<ContainerElement*>(element);
-                                for (const RelationshipElement* relationship : containerElement->Relationships())
+                                List<RelationshipElement*> containerElementRelationships = containerElement->GetAllRelationships();
+                                for (RelationshipElement* relationship : containerElementRelationships)
                                 {
                                     bool sourceInSelection = false;
                                     DiagramElement* sourceElement = relationship->source.element;
@@ -440,6 +467,10 @@ namespace spring
                                                 targetInSelection = true;
                                             }
                                         }
+                                    }
+                                    else if (relationship->kind == RelationshipElement.Kind.reference && relationship->cardinality == Cardinality.zero)
+                                    {
+                                        targetInSelection = true;
                                     }
                                     if (sourceInSelection && targetInSelection)
                                     {

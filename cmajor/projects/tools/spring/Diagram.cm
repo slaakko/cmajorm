@@ -1090,16 +1090,73 @@ namespace spring
         {
             SetLocation(compoundLocation.Location());
             intermediatePoints = compoundLocation.Points();
+            if (kind == Kind.reference && cardinality == Cardinality.zero)
+            {
+                target.point = compoundLocation.TargetPoint();
+            }
         }
         public override nothrow CompoundLocation GetCompoundLocation() const
         {
-            return CompoundLocation(Location(), intermediatePoints);
+            CompoundLocation compoundLocation(Location(), intermediatePoints);
+            if (kind == Kind.reference && cardinality == Cardinality.zero)
+            {
+                compoundLocation.SetTargetPoint(target.point);
+            }
+            return compoundLocation;
         }
         public override nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
         {
             base->AddActions(diagram, elementIndex, contextMenu);
+            MenuItem* straightenMenuItem = new MenuItem("Straighten");
+            contextMenu->AddMenuItemAction(straightenMenuItem, new StraightenRelationshipElementAction(diagram, elementIndex));
             MenuItem* propertiesMenuItem = new MenuItem("Properties...");
             contextMenu->AddMenuItemAction(propertiesMenuItem, new RelationshipElementPropertiesAction(diagram, elementIndex));
+        }
+        public nothrow void Straighten()
+        {
+            PointF prev = source.point;
+            for (PointF& next : intermediatePoints)
+            {
+                Line line(prev, next);
+                Vector v(line.ToVector());
+                switch (MainDirection(v))
+                {
+                    case 0:
+                    case 180:
+                    {
+                        next.y = prev.y;
+                        break;
+                    }
+                    case 90:
+                    case 270:
+                    {
+                        next.x = prev.x;
+                        break;
+                    }
+                }
+                prev = next;
+            }
+            if (!intermediatePoints.IsEmpty())
+            {
+                PointF& last = intermediatePoints.Back();
+                Line line(last, target.point);
+                Vector v(line.ToVector());
+                switch (MainDirection(v))
+                {
+                    case 0:
+                    case 180:
+                    {
+                        last.y = target.point.y;
+                        break;
+                    }
+                    case 90:
+                    case 270:
+                    {
+                        last.x = target.point.x;
+                        break;
+                    }
+                }
+            }
         }
         public override nothrow bool Contains(const PointF& location)
         {
@@ -2210,6 +2267,7 @@ namespace spring
                 }
             }
         }
+        public abstract nothrow List<RelationshipElement*> GetAllRelationships() const;
         public override nothrow ContainerElement* GetContainerElement() const
         {
             return this;
@@ -2294,18 +2352,6 @@ namespace spring
             endpoints.Add(GetEndpoint(Snap(Snap.LeftTop()))); 
             return endpoints;
         }
-        public nothrow List<RelationshipElement*> GetSelfRelationships() const
-        {
-            List<RelationshipElement*> selfRelationships;
-            for (RelationshipElement* relationship : relationships)
-            {
-                if (relationship->source.element == this && relationship->target.element == this)
-                {
-                    selfRelationships.Add(relationship);
-                }
-            }
-            return selfRelationships;
-        }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
             const RelationshipLayoutElement& layoutElement = GetDiagram()->GetLayout().GetRelationshipLayoutElement();
@@ -2334,10 +2380,6 @@ namespace spring
             }
         }
         public nothrow inline const List<RelationshipElement*>& Relationships() const
-        {
-            return relationships;
-        }
-        public nothrow List<RelationshipElement*>& Relationships()
         {
             return relationships;
         }
@@ -2415,6 +2457,31 @@ namespace spring
             UniquePtr<ClassElement> clone = new ClassElement();
             clone->SetFrom(this);
             return clone.Release();
+        }
+        public override nothrow List<RelationshipElement*> GetAllRelationships() const
+        {
+            List<RelationshipElement*> relationships = Relationships();
+            int no = operations.Count();
+            for (int i = 0; i < no; ++i)
+            {
+                OperationElement* operation = operations.Get(i);
+                RelationshipElement* relationship = operation->Relationship();
+                if (relationship != null)
+                {
+                    relationships.Add(relationship);
+                }
+            }
+            int nf = fields.Count();
+            for (int i = 0; i < nf; ++i)
+            {
+                FieldElement* field = fields.Get(i);
+                RelationshipElement* relationship = field->Relationship();
+                if (relationship != null)
+                {
+                    relationships.Add(relationship);
+                }
+            }
+            return relationships;
         }
         public override nothrow List<Endpoint> GetEndpoints(EndpointType endpointType, Tool* tool) const
         {
@@ -2862,6 +2929,21 @@ namespace spring
             clone->SetFrom(this);
             return clone.Release();
         }
+        public nothrow override List<RelationshipElement*> GetAllRelationships() const
+        {
+            List<RelationshipElement*> relationships = Relationships();
+            int nf = fields.Count();
+            for (int i = 0; i < nf; ++i)
+            {
+                FieldElement* field = fields.Get(i);
+                RelationshipElement* relationship = field->Relationship();
+                if (relationship != null)
+                {
+                    relationships.Add(relationship);
+                }
+            }
+            return relationships;
+        }
         public override nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
         {
             base->AddActions(diagram, elementIndex, contextMenu);
@@ -3123,6 +3205,10 @@ namespace spring
             UniquePtr<NoteElement> clone = new NoteElement();
             clone->SetFrom(this);
             return clone.Release();
+        }
+        public nothrow override List<RelationshipElement*> GetAllRelationships() const
+        {
+            return Relationships();
         }
         public override nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
         {
