@@ -198,31 +198,85 @@ namespace spring
                 UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
             }
         }
-        public override nothrow ustring Copy()
+        public List<UniquePtr<DiagramElement>> Clone() const
         {
             List<UniquePtr<DiagramElement>> clonedElements;
+            List<ContainerElement*> containerElements;
+            List<RelationshipElement*> relationshipElements;
             System.Windows.RectF boundingRect;
             int n = cast<int>(indeces.Count());
             for (int i = 0; i < n; ++i)
             {
                 int index = indeces[i];
                 DiagramElement* element = GetDiagram().GetElementByIndex(index);
-                if (boundingRect.IsEmpty())
+                if (element is ContainerElement*)
                 {
-                    boundingRect = element->BoundingRect();
+                    if (boundingRect.IsEmpty())
+                    {
+                        boundingRect = element->BoundingRect();
+                    }
+                    else
+                    {
+                        boundingRect = System.Windows.RectF.Union(boundingRect, element->BoundingRect());
+                    }
+                    containerElements.Add(cast<ContainerElement*>(element));
                 }
-                else
+            }
+            for (ContainerElement* containerElement : containerElements)
+            {
+                for (RelationshipElement* relationship : containerElement->Relationships())
                 {
-                    boundingRect = System.Windows.RectF.Union(boundingRect, element->BoundingRect());
+                    bool sourceInClosure = false;
+                    if (relationship->source.element != null)
+                    {
+                        ContainerElement* sourceContainerElement = relationship->source.element->GetContainerElement();
+                        if (Find(containerElements.CBegin(), containerElements.CEnd(), sourceContainerElement) != containerElements.CEnd())
+                        {
+                            sourceInClosure = true;
+                        }
+                    }
+                    bool targetInClosure = false;
+                    if (relationship->target.element != null)
+                    {
+                        ContainerElement* targetContainerElement = relationship->target.element->GetContainerElement();
+                        if (Find(containerElements.CBegin(), containerElements.CEnd(), targetContainerElement) != containerElements.CEnd())
+                        {
+                            targetInClosure = true;
+                        }
+                    }
+                    if (sourceInClosure && targetInClosure)
+                    {
+                        if (boundingRect.IsEmpty())
+                        {
+                            boundingRect = relationship->BoundingRect();
+                        }
+                        else
+                        {
+                            boundingRect = System.Windows.RectF.Union(boundingRect, relationship->BoundingRect());
+                        }
+                        relationshipElements.Add(relationship);
+                    }
                 }
-                clonedElements.Add(UniquePtr<DiagramElement>(element->Clone()));
+            }
+            for (ContainerElement* containerElement : containerElements)
+            {
+                clonedElements.Add(UniquePtr<DiagramElement>(containerElement->Clone()));
+            }
+            for (RelationshipElement* relationshipElement : relationshipElements)
+            {
+                clonedElements.Add(UniquePtr<DiagramElement>(relationshipElement->Clone()));
             }
             for (UniquePtr<DiagramElement>& clonedElement : clonedElements)
             {
-                System.Windows.PointF location = clonedElement->Location();
+                CompoundLocation location = clonedElement->GetCompoundLocation();
                 location.Offset(-boundingRect.location.x, -boundingRect.location.y);
-                clonedElement->SetLocation(location);
+                clonedElement->SetCompoundLocation(location);
             }
+            return clonedElements;
+        }
+        public override nothrow ustring Copy()
+        {
+            List<UniquePtr<DiagramElement>> clonedElements = Clone();
             System.Dom.Document elementDoc;
             elementDoc.AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Element(u"spring.diagram.elements")));
             for (const UniquePtr<DiagramElement>& clonedElement : clonedElements)

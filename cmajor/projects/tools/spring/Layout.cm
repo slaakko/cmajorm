@@ -137,6 +137,16 @@ namespace spring
         return 4.0f;
     }
 
+    public nothrow float DefaultNullReferenceSymbolWidth()
+    {
+        return 3.0f;
+    }
+
+    public nothrow float DefaultNullReferenceSymbolHeight()
+    {
+        return 1.0f;
+    }
+
     public nothrow string SpringDirectory()
     {
         string cmajorRootDir = RtGetEnvironmentVariable("CMAJOR_ROOT");
@@ -660,6 +670,8 @@ namespace spring
             lineArrowHeight(DefaultLineArrowHeight()),
             cardinalitySymbolRadius(DefaultCardinalitySymbolRadius()),
             relationshipSymbolRadius(DefaultRelationshipSymbolRadius()),
+            nullReferenceSymbolWidth(DefaultNullReferenceSymbolWidth()),
+            nullReferenceSymbolHeight(DefaultNullReferenceSymbolHeight()),
             selectedLineWidth(DefaultSelectedLineWidth()),
             fontElement(new FontElement(DefaultRelationshipFontFamily(), DefaultRelationshipFontSize(), FontStyle.regular, "font", layout))
         {
@@ -768,6 +780,22 @@ namespace spring
         {
             relationshipSymbolRadius = relationshipSymbolRadius_;
         }
+        public nothrow inline float NullReferenceSymbolWidth() const
+        {
+            return nullReferenceSymbolWidth;
+        }
+        public nothrow void SetNullReferenceSymbolWidht(float nullReferenceSymbolWidth_)
+        {
+            nullReferenceSymbolWidth = nullReferenceSymbolWidth_;
+        }
+        public nothrow inline float NullReferenceSymbolHeight() const
+        {
+            return nullReferenceSymbolHeight;
+        }
+        public nothrow void SetNullReferenceSymbolHeight(float nullReferenceSymbolHeight_)
+        {
+            nullReferenceSymbolHeight = nullReferenceSymbolHeight_;
+        }
         public nothrow inline float SelectedLineWidth() const
         {
             return selectedLineWidth;
@@ -801,6 +829,8 @@ namespace spring
                             lineArrowHeight = ParseFloat(ToUtf8(element->GetAttribute(u"lineArrowHeight")));
                             cardinalitySymbolRadius = ParseFloat(ToUtf8(element->GetAttribute(u"cardinalitySymbolRadius")));
                             relationshipSymbolRadius = ParseFloat(ToUtf8(element->GetAttribute(u"relationshipSymbolRadius")));
+                            nullReferenceSymbolWidth = ParseFloat(ToUtf8(element->GetAttribute(u"nullReferenceSymbolWidth")));
+                            nullReferenceSymbolHeight = ParseFloat(ToUtf8(element->GetAttribute(u"nullReferenceSymbolHeight")));
                             selectedLineWidth = ParseFloat(ToUtf8(element->GetAttribute(u"selectedLineWidth")));
                             linePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.solid);
                             dashLinePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.dash);
@@ -832,6 +862,8 @@ namespace spring
             relationshipElement->SetAttribute(u"lineArrowHeight", ToUtf32(System.ToString(lineArrowHeight)));
             relationshipElement->SetAttribute(u"cardinalitySymbolRadius", ToUtf32(System.ToString(cardinalitySymbolRadius)));
             relationshipElement->SetAttribute(u"relationshipSymbolRadius", ToUtf32(System.ToString(relationshipSymbolRadius)));
+            relationshipElement->SetAttribute(u"nullReferenceSymbolWidth", ToUtf32(System.ToString(nullReferenceSymbolWidth)));
+            relationshipElement->SetAttribute(u"nullReferenceSymbolHeight", ToUtf32(System.ToString(nullReferenceSymbolHeight)));
             relationshipElement->SetAttribute(u"selectedLineWidth", ToUtf32(System.ToString(selectedLineWidth)));
             parentElement->AppendChild(UniquePtr<System.Dom.Node>(relationshipElement.Release()));
         }
@@ -847,6 +879,8 @@ namespace spring
         private float lineArrowHeight;
         private float cardinalitySymbolRadius;
         private float relationshipSymbolRadius;
+        private float nullReferenceSymbolWidth;
+        private float nullReferenceSymbolHeight;
         private float selectedLineWidth;
         private Pen* linePen;
         private Pen* dashLinePen;

@@ -382,7 +382,17 @@ namespace spring
                     {
                         if (args.element->Contains(args.location))
                         {
-                            moveOperation->AddContainerElementIndex(args.elementIndex);
+                            moveOperation->AddElementIndex(args.elementIndex);
+                            ContainerElement* containerElement = cast<ContainerElement*>(args.element);
+                            List<RelationshipElement*> selfRelationships = containerElement->GetSelfRelationships();
+                            for (RelationshipElement* selfRelationship : selfRelationships)
+                            {
+                                int index = args.diagram->GetIndexOfElement(selfRelationship);
+                                if (index != -1)
+                                {
+                                    moveOperation->AddElementIndex(index);
+                                }
+                            }
                         }
                     }
                 }
@@ -393,7 +403,63 @@ namespace spring
                 {
                     if (args.diagram->GetSelection()->Contains(args.location))
                     {
-                        moveOperation->SetContainerElementIndeces(args.diagram->GetSelection()->GetContainerElementIndeces());
+                        List<int> elementIndeces = args.diagram->GetSelection()->GetContainerElementIndeces();
+                        List<int> relationshipIndeces;
+                        for (int index : elementIndeces)
+                        {
+                            DiagramElement* element = args.diagram->GetElementByIndex(index);
+                            if (element is ContainerElement*)
+                            {
+                                ContainerElement* containerElement = cast<ContainerElement*>(element);
+                                for (const RelationshipElement* relationship : containerElement->Relationships())
+                                {
+                                    bool sourceInSelection = false;
+                                    DiagramElement* sourceElement = relationship->source.element;
+                                    if (sourceElement != null)
+                                    {
+                                        ContainerElement* sourceContainerElement = sourceElement->GetContainerElement();
+                                        int sourceContainerElementIndex = args.diagram->GetIndexOfElement(sourceContainerElement);
+                                        if (sourceContainerElementIndex != -1)
+                                        {
+                                            if (Find(elementIndeces.CBegin(), elementIndeces.CEnd(), sourceContainerElementIndex) != elementIndeces.CEnd())
+                                            {
+                                                sourceInSelection = true;
+                                            }
+                                        }
+                                    }
+                                    bool targetInSelection = false;
+                                    DiagramElement* targetElement = relationship->target.element;
+                                    if (targetElement != null)
+                                    {
+                                        ContainerElement* targetContainerElement = targetElement->GetContainerElement();
+                                        int targetContainerElementIndex = args.diagram->GetIndexOfElement(targetContainerElement);
+                                        if (targetContainerElementIndex != -1)
+                                        {
+                                            if (Find(elementIndeces.CBegin(), elementIndeces.CEnd(), targetContainerElementIndex) != elementIndeces.CEnd())
+                                            {
+                                                targetInSelection = true;
+                                            }
+                                        }
+                                    }
+                                    if (sourceInSelection && targetInSelection)
+                                    {
+                                        int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
+                                        if (relationshipIndex != -1)
+                                        {
+                                            if (Find(relationshipIndeces.CBegin(), relationshipIndeces.CEnd(), relationshipIndex) == relationshipIndeces.CEnd())
+                                            {
+                                                relationshipIndeces.Add(relationshipIndex);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for (int relationshipIndex : relationshipIndeces)
+                        {
+                            elementIndeces.Add(relationshipIndex);
+                        }
+                        moveOperation->SetElementIndeces(Rvalue(elementIndeces));
                     }
                 }
             }
@@ -405,7 +471,7 @@ namespace spring
         }
         public override void ContinueMoveOperation(MouseArgs& args)
         {
-            args.diagram->AdvanceOperation(args.location);
+            args.diagram->AdvanceOperation(args);
         }
         public override void CancelMoveOperation(MouseArgs& args)
         {
@@ -413,7 +479,7 @@ namespace spring
         }
         public override void CommitMoveOperation(MouseArgs& args)
         {
-            args.diagram->CommitOperation(args.location);
+            args.diagram->CommitOperation(args);
         }
     }
 
@@ -503,7 +569,17 @@ namespace spring
         {
             args.diagram->ResetSelection();
             DiagramElement* element = args.element;
-            if (element == null) return;
+            if (element == null)
+            {
+                Operation* currentOperation = args.diagram->GetOperation();
+                if (currentOperation is AddRelationshipOperation*)
+                {
+                    AddRelationshipOperation* operation = cast<AddRelationshipOperation*>(currentOperation);
+                    RelationshipElement& relationshipElement = operation->GetRelationshipElement();
+                    relationshipElement.intermediatePoints.Add(args.location);
+                    return;
+                }
+            }
             DiagramElement* sourceElement = null;
             EndpointType endpointType = EndpointType.source;
             Operation* currentOperation = args.diagram->GetOperation();
@@ -552,15 +628,38 @@ namespace spring
                 {
                     AddRelationshipOperation* operation = cast<AddRelationshipOperation*>(currentOperation);
                     RelationshipElement& relationshipElement = operation->GetRelationshipElement();
-                    if (relationshipElement.source.element == element)
+                    if (relationshipElement.source.element == element && relationshipElement.intermediatePoints.IsEmpty())
                     {
                         relationshipElement.source = *nearestEndpoint;
                     }
                     else if (relationshipElement.target.element == null)
                     {
+                        if (args.control)
+                        {
+                            PointF lastPoint = relationshipElement.LastPoint();
+                            PointF nextPoint = nearestEndpoint->point;
+                            Line line(lastPoint, nextPoint);
+                            Vector v(line.ToVector());
+                            switch (MainDirection(v))
+                            {
+                                case 0:
+                                case 180:
+                                {
+                                    lastPoint.y = nextPoint.y;
+                                    break;
+                                }
+                                case 90:
+                                case 270:
+                                {
+                                    lastPoint.x = nextPoint.x;
+                                    break;
+                                }
+                            }
+                            relationshipElement.SetLastPoint(lastPoint);
+                        }
                         relationshipElement.target = *nearestEndpoint;
                         nearestEndpoint->element->AddRelationship(&relationshipElement);
-                        args.diagram->CommitOperation(args.location);
+                        args.diagram->CommitOperation(args);
                         Tools.SetCurrent(Tools.GetSelectTool());
                     }
                     else
@@ -572,11 +671,74 @@ namespace spring
         }
         public override void MouseControlLeftClick(MouseArgs& args)
         {
+            args.diagram->ResetSelection();
             DiagramElement* element = args.element;
-            if (element == null) return;
-            DiagramElement* sourceElement = null;
-            EndpointType endpointType = EndpointType.source;
-            if (!Accept(element, sourceElement, endpointType)) return;
+            Operation* currentOperation = args.diagram->GetOperation();
+            if (currentOperation is AddRelationshipOperation*)
+            {
+                AddRelationshipOperation* operation = cast<AddRelationshipOperation*>(currentOperation);
+                RelationshipElement& relationshipElement = operation->GetRelationshipElement();
+                PointF lastPoint = relationshipElement.LastPoint();
+                PointF nextPoint = args.location;
+                Line line(lastPoint, nextPoint);
+                Vector v(line.ToVector());
+                switch (MainDirection(v))
+                {
+                    case 0:
+                    case 180:
+                    {
+                        nextPoint.y = lastPoint.y;
+                        break;
+                    }
+                    case 90:
+                    case 270:
+                    {
+                        nextPoint.x = lastPoint.x;
+                        break;
+                    }
+                }
+                args.location = nextPoint;
+                MouseNormalLeftClick(args);
+            }
+        }
+        public override void MouseShiftLeftClick(MouseArgs& args)
+        {
+            args.diagram->ResetSelection();
+            Operation* currentOperation = args.diagram->GetOperation();
+            if (currentOperation is AddRelationshipOperation*)
+            {
+                AddRelationshipOperation* operation = cast<AddRelationshipOperation*>(currentOperation);
+                RelationshipElement& relationshipElement = operation->GetRelationshipElement();
+                if (relationshipElement.target.element == null)
+                {
+                    PointF finalPoint = args.location;
+                    if (args.control)
+                    {
+                        PointF lastPoint = relationshipElement.LastPoint();
+                        Line line(lastPoint, finalPoint);
+                        Vector v(line.ToVector());
+                        switch (MainDirection(v))
+                        {
+                            case 0:
+                            case 180:
+                            {
+                                finalPoint.y = lastPoint.y;
+                                break;
+                            }
+                            case 90:
+                            case 270:
+                            {
+                                finalPoint.x = lastPoint.x;
+                                break;
+                            }
+                        }
+                    }
+                    relationshipElement.target = Endpoint(null, Snap(), finalPoint);
+                    relationshipElement.source.element->AddRelationship(&relationshipElement);
+                    args.diagram->CommitOperation(args);
+                    Tools.SetCurrent(Tools.GetSelectTool());
+                }
+            }
         }
     }
 
@@ -662,7 +824,7 @@ namespace spring
                         return true;
                     }
                 }
-                else if (sourceElement is ObjectElement*)
+                else if (sourceElement is FieldElement*)
                 {
                     if (element is ObjectElement*)
                     {

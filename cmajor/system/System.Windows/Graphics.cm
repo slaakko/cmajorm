@@ -879,14 +879,14 @@ namespace System.Windows
             }
             else
             {
-                Vector u(1, -1);
+                Vector u(-1, -1);
                 if (Dot(v, u) >= 0)
                 {
-                    return 0;
+                    return 270;
                 }
                 else
                 {
-                    return 270;
+                    return 0;
                 }
             }
         }
@@ -894,7 +894,7 @@ namespace System.Windows
         {
             if (v.y >= 0)
             {
-                Vector u(-1, -1);
+                Vector u(1, 1);
                 if (Dot(v, u) >= 0)
                 {
                     return 90;
@@ -906,14 +906,14 @@ namespace System.Windows
             }
             else
             {
-                Vector u(-1, -1);
+                Vector u(-1, 1);
                 if (Dot(v, u) >= 0)
                 {
-                    return 270;
+                    return 180;
                 }
                 else
                 {
-                    return 180;
+                    return 270;
                 }
             }
         }

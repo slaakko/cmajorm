@@ -99,22 +99,7 @@ namespace spring
                 Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
             AddChild(borderedPaddedSourceTextBox.Release());
 
-            Point centerTextLabelLoc(defaultControlSpacing.w, sourceTextLabelLoc.y + sourceTextLabelSize.h + defaultControlSpacing.h);
-            UniquePtr<Label> centerTextLabelPtr(new Label("Center text:", centerTextLabelLoc, Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
-            Label* centerTextLabel = centerTextLabelPtr.Get();
-            AddChild(centerTextLabelPtr.Release());
-            Size centerTextLabelSize = centerTextLabel->GetSize();
-
-            UniquePtr<TextBox> centerTextBoxPtr(new TextBox(relationshipElement->Name()));
-            centerTextBox = centerTextBoxPtr.Get();
-            centerTextBox->TextChangedEvent().AddHandler(CenterTextBoxTextChanged);
-            UniquePtr<PaddedControl> paddedCenterTextBox(new PaddedControl(centerTextBoxPtr.Release()));
-            UniquePtr<BorderedControl> borderedPaddedCenterTextBox(new BorderedControl(paddedCenterTextBox.Release(), Point(column1Width, centerTextLabelLoc.y), Size(column2Width,
-                defaultTextBoxSize.h + DefaultSingleBorderWidth() + 2 * DefaultControlPadding()),
-                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
-            AddChild(borderedPaddedCenterTextBox.Release());
-
-            Point targetTextLabelLoc(defaultControlSpacing.w, centerTextLabelLoc.y + centerTextLabelSize.h + defaultControlSpacing.h);
+            Point targetTextLabelLoc(defaultControlSpacing.w, sourceTextLabelLoc.y + sourceTextLabelSize.h + defaultControlSpacing.h);
             UniquePtr<Label> targetTextLabelPtr(new Label("Target text:", targetTextLabelLoc, Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
             Label* targetTextLabel = targetTextLabelPtr.Get();
             AddChild(targetTextLabelPtr.Release());
@@ -280,10 +265,6 @@ namespace spring
         {
             relationshipElement->source.text = sourceTextBox->Text();
         }
-        private void CenterTextBoxTextChanged()
-        {
-            relationshipElement->SetName(centerTextBox->Text());
-        }
         private void TargetTextBoxTextChanged()
         {
             relationshipElement->target.text = targetTextBox->Text();
@@ -302,7 +283,6 @@ namespace spring
         private RadioButton* oneRadioButton;
         private RadioButton* manyRadioButton;
         private TextBox* sourceTextBox;
-        private TextBox* centerTextBox;
         private TextBox* targetTextBox;
     }
 }

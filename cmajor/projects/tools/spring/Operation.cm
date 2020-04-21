@@ -9,6 +9,34 @@ using System.Windows;
 
 namespace spring
 {
+    public class CompoundLocation
+    {
+        public nothrow CompoundLocation(const PointF& location_) : location(location_)
+        {
+        }
+        public nothrow CompoundLocation(const PointF& location_, const List<PointF>& points_) : location(location_), points(points_)
+        {
+        }
+        public nothrow inline const PointF& Location() const
+        {
+            return location;
+        }
+        public nothrow inline const List<PointF>& Points() const
+        {
+            return points;
+        }
+        public nothrow void Offset(float dx, float dy)
+        {
+            location.Offset(dx, dy);
+            for (PointF& point : points)
+            {
+                point.Offset(dx, dy);
+            }
+        }
+        private PointF location;
+        private List<PointF> points;
+    }
+
     public abstract class Operation
     {
         public nothrow Operation(Diagram* diagram_) : diagram(diagram_), startLocation()
@@ -19,9 +47,9 @@ namespace spring
         }
         public default virtual ~Operation();
         public abstract nothrow bool IsEmpty() const;
-        public abstract void AdvanceTo(const PointF& location);
+        public abstract void AdvanceTo(MouseArgs& args);
         public abstract void Cancel();
-        public abstract void Commit(const PointF& location);
+        public abstract void Commit(MouseArgs& args);
         public abstract void Draw(Graphics& graphics, Layout& layout);
         public nothrow inline const PointF& StartLocation() const
         {
@@ -41,13 +69,13 @@ namespace spring
         {
             return true;
         }
-        public override void AdvanceTo(const PointF& location)
+        public override void AdvanceTo(MouseArgs& args)
         {
         }
         public override void Cancel()
         {
         }
-        public override void Commit(const PointF& location)
+        public override void Commit(MouseArgs& args)
         {
         }
         public override void Draw(Graphics& graphics, Layout& layout)
@@ -64,28 +92,49 @@ namespace spring
         {
             resetSelection = true;
         }
-        public nothrow void AddContainerElementIndex(int index)
+        public nothrow void AddElementIndex(int index)
         {
-            containerElementIndeces.Add(index);
+            elementIndeces.Add(index);
         }
-        public nothrow void SetContainerElementIndeces(List<int>&& containerElementIndeces_)
+        public nothrow void SetElementIndeces(List<int>&& elementIndeces_)
         {
-            containerElementIndeces = containerElementIndeces_;
+            elementIndeces = elementIndeces_;
         }
-        public override void AdvanceTo(const PointF& location)
+        public override void AdvanceTo(MouseArgs& args)
         {
-            int n = cast<int>(containerElementIndeces.Count());
+            int n = cast<int>(elementIndeces.Count());
             #assert(n == cast<int>(originalLocations.Count()));
             PointF startLocation = StartLocation();
-            float dx = location.x - startLocation.x;
-            float dy = location.y - startLocation.y;
+            PointF nextLocation = args.location;
+            if (args.control)
+            {
+                Line line(startLocation, nextLocation);
+                Vector v(line.ToVector());
+                switch (MainDirection(v))
+                {
+                    case 0:
+                    case 180:
+                    {
+                        nextLocation.y = startLocation.y;
+                        break;
+                    }
+                    case 90:
+                    case 270:
+                    {
+                        nextLocation.x = startLocation.x;
+                        break;
+                    }
+                }
+            }
+            float dx = nextLocation.x - startLocation.x;
+            float dy = nextLocation.y - startLocation.y;
             for (int i = 0; i < n; ++i)
             {
-                int elementIndex = containerElementIndeces[i];
-                PointF newLocation = originalLocations[i];
+                int elementIndex = elementIndeces[i];
+                CompoundLocation newLocation = originalLocations[i];
                 newLocation.Offset(dx, dy);
                 DiagramElement* element = GetDiagram()->GetElementByIndex(elementIndex);
-                element->SetLocation(newLocation);
+                element->SetCompoundLocation(newLocation);
             }
         }
         public override void Draw(Graphics& graphics, Layout& layout)
@@ -93,19 +142,19 @@ namespace spring
         }
         public override void Cancel()
         {
-            int n = cast<int>(containerElementIndeces.Count());
+            int n = cast<int>(elementIndeces.Count());
             #assert(n == cast<int>(originalLocations.Count()));
             for (int i = 0; i < n; ++i)
             {
-                int elementIndex = containerElementIndeces[i];
-                PointF originalLocation = originalLocations[i];
+                int elementIndex = elementIndeces[i];
+                const CompoundLocation& originalLocation = originalLocations[i];
                 DiagramElement* element = GetDiagram()->GetElementByIndex(elementIndex);
-                element->SetLocation(originalLocation);
+                element->SetCompoundLocation(originalLocation);
             }
         }
-        public override void Commit(const PointF& location)
+        public override void Commit(MouseArgs& args)
         {
-            AdvanceTo(location);
+            AdvanceTo(args);
             if (resetSelection)
             {
                 GetDiagram()->ResetSelection();
@@ -113,18 +162,18 @@ namespace spring
         }
         public void FetchOriginalLocations()
         {
-            for (int elementIndex : containerElementIndeces)
+            for (int elementIndex : elementIndeces)
             {
                 DiagramElement* element = GetDiagram()->GetElementByIndex(elementIndex);
-                originalLocations.Add(element->Location());
+                originalLocations.Add(element->GetCompoundLocation());
             }
         }
         public nothrow override bool IsEmpty() const
         {
-            return containerElementIndeces.IsEmpty();
+            return elementIndeces.IsEmpty();
         }
-        private List<int> containerElementIndeces;
-        private List<PointF> originalLocations;
+        private List<int> elementIndeces;
+        private List<CompoundLocation> originalLocations;
         private bool resetSelection;
     }
 
@@ -137,9 +186,31 @@ namespace spring
         {
             return false;
         }
-        public override void AdvanceTo(const PointF& location)
+        public override void AdvanceTo(MouseArgs& args)
         {
-            relationshipElement->target.point = location;
+            PointF lastPoint = relationshipElement->LastPoint();
+            PointF targetPoint = args.location;
+            if (args.control)
+            {
+                Line line(lastPoint, targetPoint);
+                Vector v(line.ToVector());
+                switch (MainDirection(v))
+                {
+                    case 0:
+                    case 180:
+                    {
+                        targetPoint.y = lastPoint.y;
+                        break;
+                    }
+                    case 90:
+                    case 270:
+                    {
+                        targetPoint.x = lastPoint.x;
+                        break;
+                    }
+                }
+            }
+            relationshipElement->target.point = targetPoint;
         }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
@@ -149,7 +220,7 @@ namespace spring
         {
             relationshipElement->RemoveFromElements();
         }
-        public override void Commit(const PointF& location)
+        public override void Commit(MouseArgs& args)
         {
             relationshipElement->AddToElements();
             Diagram* diagram = GetDiagram();
