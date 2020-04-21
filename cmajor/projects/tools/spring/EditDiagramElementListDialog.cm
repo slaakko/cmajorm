@@ -136,7 +136,8 @@ namespace spring
 
     public class AbstractOperationElementListDialog : EditDiagramElementListDialog
     {
-        public AbstractOperationElementListDialog(const EditDiagramElementListDialogParams& dialogParams, IndexList<OperationElement>& operationList_) : base(dialogParams), operationList(&operationList_)
+        public AbstractOperationElementListDialog(const EditDiagramElementListDialogParams& dialogParams, IndexList<OperationElement>& operationList_, ContainerElement* containerElement_) :
+            base(dialogParams), operationList(&operationList_), containerElement(containerElement_)
         {
             Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
             Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
@@ -268,7 +269,9 @@ namespace spring
         {
             string operationName = operationNameTextBox->Text();
             bool isAbstract = abstractCheckBox->Checked();
-            operationList->Add(new OperationElement(operationName, isAbstract));
+            OperationElement* operationElement = new OperationElement(operationName, isAbstract);
+            operationElement->SetContainerElement(containerElement);
+            operationList->Add(operationElement);
             string listBoxItemString = operationName;
             if (isAbstract)
             {
@@ -370,6 +373,7 @@ namespace spring
             }
         }
         private IndexList<OperationElement>* operationList;
+        private ContainerElement* containerElement;
         private TextBox* operationNameTextBox;
         private CheckBox* abstractCheckBox;
         private int selectedIndex;
@@ -378,8 +382,8 @@ namespace spring
 
     public class ConcreteOperationElementListDialog : EditDiagramElementListDialog
     {
-        public ConcreteOperationElementListDialog(const EditDiagramElementListDialogParams& dialogParams, IndexList<OperationElement>& operationList_) :
-            base(dialogParams), operationList(&operationList_), selectedIndex(-1)
+        public ConcreteOperationElementListDialog(const EditDiagramElementListDialogParams& dialogParams, IndexList<OperationElement>& operationList_, ContainerElement* containerElement_) :
+            base(dialogParams), operationList(&operationList_), containerElement(containerElement_), selectedIndex(-1)
         {
             Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
             Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
@@ -496,7 +500,9 @@ namespace spring
         private void AddOperation()
         {
             string operationName = operationNameTextBox->Text();
-            operationList->Add(new OperationElement(operationName));
+            OperationElement* operationElement = new OperationElement(operationName);
+            operationElement->SetContainerElement(containerElement);
+            operationList->Add(operationElement);
             GetListBox()->AddItem(operationName);
             operationNameTextBox->Clear();
             selectedIndex = -1;
@@ -571,6 +577,7 @@ namespace spring
             }
         }
         private IndexList<OperationElement>* operationList;
+        private ContainerElement* containerElement;
         private TextBox* operationNameTextBox;
         private int selectedIndex;
         private OperationElement* selectedOperation;
@@ -578,7 +585,8 @@ namespace spring
 
     public class FieldElementListDialog : EditDiagramElementListDialog
     {
-        public FieldElementListDialog(const EditDiagramElementListDialogParams& dialogParams, IndexList<FieldElement>& fieldList_) : base(dialogParams), fieldList(&fieldList_)
+        public FieldElementListDialog(const EditDiagramElementListDialogParams& dialogParams, IndexList<FieldElement>& fieldList_, ContainerElement* containerElement_) :
+            base(dialogParams), fieldList(&fieldList_), containerElement(containerElement_)
         {
             Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
             Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
@@ -695,7 +703,9 @@ namespace spring
         private void AddField()
         {
             string fieldName = fieldNameTextBox->Text();
-            fieldList->Add(new FieldElement(fieldName));
+            FieldElement* fieldElement = new FieldElement(fieldName);
+            fieldElement->SetContainerElement(containerElement);
+            fieldList->Add(fieldElement);
             GetListBox()->AddItem(fieldName);
             fieldNameTextBox->Clear();
             selectedIndex = -1;
@@ -770,12 +780,13 @@ namespace spring
             }
         }
         private IndexList<FieldElement>* fieldList;
+        private ContainerElement* containerElement;
         private TextBox* fieldNameTextBox;
         private int selectedIndex;
         private FieldElement* selectedField;
     }
 
-    public bool ExecuteEditOperationsDialog(IndexList<OperationElement>& operationList, bool mayHaveAbstractOperations, Window& parentWindow)
+    public bool ExecuteEditOperationsDialog(IndexList<OperationElement>& operationList, ContainerElement* containerElement, bool mayHaveAbstractOperations, Window& parentWindow)
     {
         EditDiagramElementListDialogParams dialogParams;
         dialogParams.dialogCaption = "Operations";
@@ -786,14 +797,14 @@ namespace spring
             dialogParams.dialogSize = Size(ScreenMetrics.Get().MMToHorizontalPixels(140), ScreenMetrics.Get().MMToVerticalPixels(90));
             dialogParams.groupBoxSize = Size(ScreenMetrics.Get().MMToHorizontalPixels(70), ScreenMetrics.Get().MMToVerticalPixels(20));
             dialogParams.listBoxSize = Size(ScreenMetrics.Get().MMToHorizontalPixels(70), ScreenMetrics.Get().MMToVerticalPixels(36));
-            dialog.Reset(new AbstractOperationElementListDialog(dialogParams, operationList));
+            dialog.Reset(new AbstractOperationElementListDialog(dialogParams, operationList, containerElement));
         }
         else
         {
             dialogParams.dialogSize = Size(ScreenMetrics.Get().MMToHorizontalPixels(140), ScreenMetrics.Get().MMToVerticalPixels(90));
             dialogParams.groupBoxSize = Size(ScreenMetrics.Get().MMToHorizontalPixels(70), ScreenMetrics.Get().MMToVerticalPixels(13));
             dialogParams.listBoxSize = Size(ScreenMetrics.Get().MMToHorizontalPixels(70), ScreenMetrics.Get().MMToVerticalPixels(48));
-            dialog.Reset(new ConcreteOperationElementListDialog(dialogParams, operationList));
+            dialog.Reset(new ConcreteOperationElementListDialog(dialogParams, operationList, containerElement));
         }
         if (dialog->ShowDialog(parentWindow) == DialogResult.ok)
         {
@@ -802,7 +813,7 @@ namespace spring
         return false;
     }
 
-    public bool ExecuteEditFieldsDialog(IndexList<FieldElement>& fieldList, Window& parentWindow)
+    public bool ExecuteEditFieldsDialog(IndexList<FieldElement>& fieldList, ContainerElement* containerElement, Window& parentWindow)
     {
         EditDiagramElementListDialogParams dialogParams;
         dialogParams.dialogSize = Size(ScreenMetrics.Get().MMToHorizontalPixels(140), ScreenMetrics.Get().MMToVerticalPixels(90));
@@ -810,7 +821,7 @@ namespace spring
         dialogParams.groupBoxCaption = "Field";
         dialogParams.groupBoxSize = Size(ScreenMetrics.Get().MMToHorizontalPixels(70), ScreenMetrics.Get().MMToVerticalPixels(13));
         dialogParams.listBoxSize = Size(ScreenMetrics.Get().MMToHorizontalPixels(70), ScreenMetrics.Get().MMToVerticalPixels(48));
-        UniquePtr<EditDiagramElementListDialog> dialog(new FieldElementListDialog(dialogParams, fieldList));
+        UniquePtr<EditDiagramElementListDialog> dialog(new FieldElementListDialog(dialogParams, fieldList, containerElement));
         if (dialog->ShowDialog(parentWindow) == DialogResult.ok)
         {
             return true;

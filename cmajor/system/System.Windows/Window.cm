@@ -271,6 +271,17 @@ namespace System.Windows
                         {
                             if (focusedControl != null)
                             {
+                                if (focusedControl is TextBox*)
+                                {
+                                    TextBox* textBox = cast<TextBox*>(focusedControl);
+                                    if (textBox->IsMultiline())
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            if (focusedControl != null)
+                            {
                                 if (focusedControl is Button*)
                                 {
                                     Button* button = cast<Button*>(focusedControl);

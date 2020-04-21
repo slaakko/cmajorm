@@ -854,14 +854,14 @@ namespace System.Windows
         return UnitVector(b) * ProjectionFactor(a, b);
     }
 
-    //  MainAngle returns:
+    //  MainDirection returns:
     //      0, if angle between vector v and positive x axis is between 315 and 45 degrees clockwise
     //      90, if angle between vector v and positive x axis is between 45 and 135 degrees clockwise 
     //      180, if angle between vector v and positive x axis is between 135 and 225 degrees clockwise
     //      270, if angle between vector v and positive x axis is between 225 and 315 degrees clockwise
     //      In this coordinate system x axis points to the right and y axis points downwards.
 
-    public nothrow int MainAngle(const Vector& v) 
+    public nothrow int MainDirection(const Vector& v) 
     {
         if (v.x >= 0)
         {
@@ -1145,6 +1145,20 @@ namespace System.Windows
         custom = 5
     }
 
+    public nothrow string ToString(DashStyle dashStyle)
+    {
+        switch (dashStyle)
+        {
+            case DashStyle.solid: return "solid";
+            case DashStyle.dash: return "dash";
+            case DashStyle.dot: return "dot";
+            case DashStyle.dashDot: return "dashDot";
+            case DashStyle.dashDotDot: return "dashDotDot";
+            case DashStyle.custom: return "custom";
+        }
+        return string();
+    }
+
     public class Pen
     {
         public enum Alignment : int
@@ -1307,20 +1321,21 @@ namespace System.Windows
 
     public class PenKey
     {
-        public nothrow PenKey(const Color& color_, float width_) : color(color_), width(width_)
+        public nothrow PenKey(const Color& color_, float width_, DashStyle dashStyle_) : color(color_), width(width_), dashStyle(dashStyle_)
         {
         }
         public nothrow string ToString() const
         {
-            return color.ToString() + ":" + System.ToString(width);
+            return color.ToString() + ":" + System.ToString(width) + ":" + ToString(dashStyle);
         }
         public Color color;
         public float width;
+        public DashStyle dashStyle;
     }
 
     public nothrow bool operator==(const PenKey& left, const PenKey& right)
     {
-        return left.color == right.color && left.width == right.width;
+        return left.color == right.color && left.width == right.width && left.dashStyle == right.dashStyle;
     }
 
     public nothrow ulong GetHashCode(const PenKey& penKey)
@@ -2453,6 +2468,14 @@ namespace System.Windows
         {
             CheckGraphicsStatus(DrawLines(pen, numPoints, points));
         }
+        public nothrow GraphicsStatus DrawLines(const Pen& pen, int numPoints, const PointF* points)
+        {
+            return cast<GraphicsStatus>(WinGraphicsDrawLinesF(nativeGraphics, pen.NativePen(), numPoints, points));
+        }
+        public void DrawLinesChecked(const Pen& pen, int numPoints, const PointF* points)
+        {
+            CheckGraphicsStatus(DrawLines(pen, numPoints, points));
+        }
         public nothrow GraphicsStatus DrawString(const string& str, const Font& font, const PointF& origin, const Brush& brush)
         {
             return cast<GraphicsStatus>(WinGraphicsDrawString(nativeGraphics, str.Chars(), font.NativeFont(), origin.x, origin.y, brush.NativeBrush()));
@@ -2619,6 +2642,22 @@ namespace System.Windows
         {
             CheckGraphicsStatus(DrawArc(pen, rect, startAngle, sweepAngle));
         }
+        public nothrow GraphicsStatus DrawEllipse(const Pen& pen, const RectF& rect)
+        {
+            return cast<GraphicsStatus>(WinGraphicsDrawEllipse(nativeGraphics, pen.NativePen(), rect.location.x, rect.location.y, rect.size.w, rect.size.h));
+        }
+        public void DrawEllipseChecked(const Pen& pen, const RectF& rect)
+        {
+            CheckGraphicsStatus(DrawEllipse(pen, rect));
+        }
+        public nothrow GraphicsStatus FillEllipse(const Brush& brush, const RectF& rect)
+        {
+            return cast<GraphicsStatus>(WinGraphicsFillEllipse(nativeGraphics, brush.NativeBrush(), rect.location.x, rect.location.y, rect.size.w, rect.size.h));
+        }
+        public void FillEllipseChecked(const Brush& brush, const RectF& rect)
+        {
+            CheckGraphicsStatus(FillEllipse(brush, rect));
+        }
         public nothrow GraphicsStatus DrawImage(const Image& image, const PointF& point)
         {
             return cast<GraphicsStatus>(WinGraphicsDrawImagePoint(nativeGraphics, image.NativeImage(), point.x, point.y));
@@ -2637,12 +2676,21 @@ namespace System.Windows
         }
         public nothrow GraphicsStatus DrawImage(const Image& image, const Rect& destRect, int srcX, int srcY, int srcW, int srcH, Unit srcUnit, const ImageAttributes& attributes)
         {
-            return cast<GraphicsStatus>(WinGrapchisDrawImageWithAttributes(nativeGraphics, image.NativeImage(), destRect.location.x, destRect.location.y, destRect.size.w, destRect.size.h,
+            return cast<GraphicsStatus>(WinGraphicsDrawImageWithAttributes(nativeGraphics, image.NativeImage(), destRect.location.x, destRect.location.y, destRect.size.w, destRect.size.h,
                 srcX, srcY, srcW, srcH, srcUnit, attributes.NativeImageAttributes()));
         }
         public void DrawImageChecked(const Image& image, const Rect& destRect, int srcX, int srcY, int srcW, int srcH, Unit srcUnit, const ImageAttributes& attributes)
         {
             CheckGraphicsStatus(DrawImage(image, destRect, srcX, srcY, srcW, srcH, srcUnit, attributes));
+        }
+        public nothrow GraphicsStatus DrawImage(const Image& image, const RectF& destRect, const RectF& sourceRect, Unit srcUnit, const ImageAttributes& attributes)
+        {
+            return cast<GraphicsStatus>(WinGraphicsDrawImageWithAttributesF(nativeGraphics, image.NativeImage(), destRect.location.x, destRect.location.y, destRect.size.w, destRect.size.h,
+                sourceRect.location.x, sourceRect.location.y, sourceRect.size.w, sourceRect.size.h, srcUnit, attributes.NativeImageAttributes()));
+        }
+        public void DrawImageChecked(const Image& image, const RectF& destRect, const RectF& sourceRect, Unit srcUnit, const ImageAttributes& attributes)
+        {
+            CheckGraphicsStatus(DrawImage(image, destRect, sourceRect, srcUnit, attributes));
         }
         public nothrow GraphicsStatus GetClip(Region& region)
         {

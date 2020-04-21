@@ -213,6 +213,8 @@ namespace spring
                         {
                             clone->ResetAbstractOperations();
                         }
+                        clone->SetDiagram(&diagram);
+                        clone->SetRelationshipsFrom(classElement);
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();
@@ -243,6 +245,90 @@ namespace spring
                     DialogResult result = objectPropertiesDialog->ShowDialog(*window);
                     if (result == DialogResult.ok)
                     {
+                        clone->SetDiagram(&diagram);
+                        clone->SetRelationshipsFrom(objectElement);
+                        diagram.SetElementByIndex(clone.Release(), elementIndex);
+                        diagram.SetChanged();
+                        diagram.Invalidate();
+                    }
+                }
+            }
+        }
+    }
+
+    public class RelationshipElementPropertiesAction : DiagramElementAction
+    {
+        public nothrow RelationshipElementPropertiesAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
+        {
+        }
+        protected override void Execute(Diagram& diagram, int elementIndex)
+        {
+            DiagramElement* element = diagram.GetElementByIndex(elementIndex);
+            if (element is RelationshipElement*)
+            {
+                RelationshipElement* relationshipElement = cast<RelationshipElement*>(element);
+                DiagramElement* sourceElement = relationshipElement->source.element;
+                Snap sourceSnap = relationshipElement->source.snap;
+                DiagramElement* targetElement = relationshipElement->target.element;
+                Snap targetSnap = relationshipElement->target.snap;
+                UniquePtr<RelationshipElement> clone = cast<RelationshipElement*>(relationshipElement->Clone());
+                UniquePtr<RelationshipPropertiesDialog> relationshipPropertiesDialog = new RelationshipPropertiesDialog(clone.Get());
+                Canvas* canvas = diagram.GetCanvas();
+                Window* window = canvas->GetWindow();
+                if (window != null)
+                {
+                    diagram.HideContextMenu();
+                    DialogResult result = relationshipPropertiesDialog->ShowDialog(*window);
+                    if (result == DialogResult.ok)
+                    {
+                        if (relationshipElement->source.element != null)
+                        {
+                            relationshipElement->source.element->RemoveRelationship(relationshipElement);
+                            relationshipElement->source.element->AddRelationship(clone.Get());
+                            Endpoint endpoint = relationshipElement->source.element->GetEndpoint(relationshipElement->source.snap);
+                            clone->source.snap = endpoint.snap;
+                            clone->source.point = endpoint.point;
+                        }
+                        if (relationshipElement->target.element != null)
+                        {
+                            relationshipElement->target.element->RemoveRelationship(relationshipElement);
+                            relationshipElement->target.element->AddRelationship(clone.Get());
+                            Endpoint endpoint = relationshipElement->target.element->GetEndpoint(relationshipElement->target.snap);
+                            clone->target.snap = endpoint.snap;
+                            clone->target.point = endpoint.point;
+                        }
+                        diagram.SetElementByIndex(clone.Release(), elementIndex);
+                        diagram.SetChanged();
+                        diagram.Invalidate();
+                    }
+                }
+            }
+        }
+    }
+
+    public class NoteElementPropertiesAction : DiagramElementAction
+    {
+        public nothrow NoteElementPropertiesAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
+        {
+        }
+        protected override void Execute(Diagram& diagram, int elementIndex)
+        {
+            DiagramElement* element = diagram.GetElementByIndex(elementIndex);
+            if (element is NoteElement*)
+            {
+                NoteElement* noteElement = cast<NoteElement*>(element);
+                UniquePtr<NoteElement> clone = cast<NoteElement*>(noteElement->Clone());
+                UniquePtr<NotePropertiesDialog> notePropertiesDialog = new NotePropertiesDialog(clone.Get());
+                Canvas* canvas = diagram.GetCanvas();
+                Window* window = canvas->GetWindow();
+                if (window != null)
+                {
+                    diagram.HideContextMenu();
+                    DialogResult result = notePropertiesDialog->ShowDialog(*window);
+                    if (result == DialogResult.ok)
+                    {
+                        clone->SetDiagram(&diagram);
+                        clone->SetRelationshipsFrom(noteElement);
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();

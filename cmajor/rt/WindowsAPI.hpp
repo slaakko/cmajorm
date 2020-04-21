@@ -121,6 +121,7 @@ extern "C" RT_API int WinGraphicsStringFormatSetHotKeyPrefix(void* stringFormat,
 extern "C" RT_API int WinGraphicsDrawLine(void* graphics, void* pen, int startX, int startY, int endX, int endY);
 extern "C" RT_API int WinGraphicsDrawLineF(void* graphics, void* pen, float startX, float startY, float endX, float endY);
 extern "C" RT_API int WinGraphicsDrawLines(void* graphics, void* pen, int count, void* points);
+extern "C" RT_API int WinGraphicsDrawLinesF(void* graphics, void* pen, int count, void* points);
 extern "C" RT_API int WinGraphicsDrawString(void* graphics, const char* str, void* font, float x, float y, void* brush);
 extern "C" RT_API int WinGraphicsDrawStringFormatPoint(void* graphics, const char* str, void* font, float x, float y, void* format, void* brush);
 extern "C" RT_API int WinGraphicsDrawStringFormatRect(void* graphics, const char* str, void* font, float x, float y, float w, float h, void* format, void* brush);
@@ -140,6 +141,8 @@ extern "C" RT_API int WinGraphicsFillRectangleF(void* graphics, void* brush, flo
 extern "C" RT_API int WinGraphicsFillPolygon(void* graphics, void* brush, int count, void* points);
 extern "C" RT_API int WinGraphicsFillPolygonF(void* graphics, void* brush, int count, void* points);
 extern "C" RT_API int WinGraphicsDrawArc(void* graphics, void* pen, float x, float y, float w, float h, float startAngle, float sweepAngle);
+extern "C" RT_API int WinGraphicsDrawEllipse(void* graphics, void* pen, float x, float y, float w, float h);
+extern "C" RT_API int WinGraphicsFillEllipse(void* graphics, void* brush, float x, float y, float w, float h);
 extern "C" RT_API void* WinGraphicsCreateRegion();
 extern "C" RT_API void* WinGraphicsCloneRegion(void* region);
 extern "C" RT_API void WinGraphicsDeleteRegion(void* region);
@@ -168,7 +171,9 @@ extern "C" RT_API int WinGraphicsImageAttributesSetColorKey(void* imageAttribute
     uint8_t colorHighAlpha, uint8_t colorHighRed, uint8_t colorHighGreen, uint8_t colorHighBlue, int colorAdjustType);
 extern "C" RT_API int WinGraphicsDrawImagePoint(void* graphics, void* image, float x, float y);
 extern "C" RT_API int WinGraphicsDrawImageRect(void* graphics, void* image, float x, float y, float w, float h);
-extern "C" RT_API int WinGrapchisDrawImageWithAttributes(void* graphics, void* image, int destRectX, int destRectY, int destRectW, int destRectH, int srcX, int srcY, int srcW, int srcH,
+extern "C" RT_API int WinGraphicsDrawImageWithAttributes(void* graphics, void* image, int destRectX, int destRectY, int destRectW, int destRectH, int srcX, int srcY, int srcW, int srcH,
+    int srcUnit, void* imageAttributes);
+extern "C" RT_API int WinGraphicsDrawImageWithAttributesF(void* graphics, void* image, float destRectX, float destRectY, float destRectW, float destRectH, float srcX, float srcY, float srcW, float srcH,
     int srcUnit, void* imageAttributes);
 extern "C" RT_API int WinGraphicsGetTransform(void* graphics, void* matrix);
 extern "C" RT_API int WinGraphicsSetTransform(void* graphics, void* matrix);

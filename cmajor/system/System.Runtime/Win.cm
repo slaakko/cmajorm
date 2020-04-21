@@ -116,6 +116,7 @@ public extern cdecl nothrow int WinGraphicsStringFormatSetHotKeyPrefix(void* str
 public extern cdecl nothrow int WinGraphicsDrawLine(void* graphics, void* pen, int startX, int startY, int endX, int endY);
 public extern cdecl nothrow int WinGraphicsDrawLineF(void* graphics, void* pen, float startX, float startY, float endX, float endY);
 public extern cdecl nothrow int WinGraphicsDrawLines(void* graphics, void* pen, int count, void* points);
+public extern cdecl nothrow int WinGraphicsDrawLinesF(void* graphics, void* pen, int count, void* points);
 public extern cdecl nothrow int WinGraphicsDrawString(void* graphics, const char* str, void* font, float x, float y, void* brush);
 public extern cdecl nothrow int WinGraphicsDrawStringFormatPoint(void* graphics, const char* str, void* font, float x, float y, void* format, void* brush);
 public extern cdecl nothrow int WinGraphicsDrawStringFormatRect(void* graphics, const char* str, void* font, float x, float y, float w, float h, void* format, void* brush);
@@ -135,6 +136,8 @@ public extern cdecl nothrow int WinGraphicsFillRectangleF(void* graphics, void* 
 public extern cdecl nothrow int WinGraphicsFillPolygon(void* graphics, void* brush, int count, void* points);
 public extern cdecl nothrow int WinGraphicsFillPolygonF(void* graphics, void* brush, int count, void* points);
 public extern cdecl nothrow int WinGraphicsDrawArc(void* graphics, void* pen, float x, float y, float w, float h, float startAngle, float sweepAngle);
+public extern cdecl nothrow int WinGraphicsDrawEllipse(void* graphics, void* pen, float x, float y, float w, float h);
+public extern cdecl nothrow int WinGraphicsFillEllipse(void* graphics, void* brush, float x, float y, float w, float h);
 public extern cdecl nothrow void WinGetSysColor(int index, byte& red, byte& green, byte& blue);
 public extern cdecl nothrow void* WinGraphicsCreateRegion();
 public extern cdecl nothrow void* WinGraphicsCloneRegion(void* region);
@@ -162,7 +165,9 @@ public extern cdecl nothrow void* WinGraphicsCloneImageAttributes(void* imageAtt
 public extern cdecl nothrow void WinGraphicsDeleteImageAttributes(void* imageAttributes);
 public extern cdecl nothrow int WinGraphicsImageAttributesSetColorKey(void* imageAttributes, byte colorLowAlpha, byte colorLowRed, byte colorLowGreen, byte colorLowBlue,
     byte colorHighAlpha, byte colorHighRed, byte colorHighGreen, byte colorHighBlue, int colorAdjustType);
-public extern cdecl nothrow int WinGrapchisDrawImageWithAttributes(void* graphics, void* image, int destRectX, int destRectY, int destRectW, int destRectH, int srcX, int srcY, int srcW, int srcH,
+public extern cdecl nothrow int WinGraphicsDrawImageWithAttributes(void* graphics, void* image, int destRectX, int destRectY, int destRectW, int destRectH, int srcX, int srcY, int srcW, int srcH,
+    int srcUnit, void* imageAttributes);
+public extern cdecl nothrow int WinGraphicsDrawImageWithAttributesF(void* graphics, void* image, float destRectX, float destRectY, float destRectW, float destRectH, float srcX, float srcY, float srcW, float srcH,
     int srcUnit, void* imageAttributes);
 public extern cdecl nothrow int WinGraphicsDrawImagePoint(void* graphics, void* image,  float x, float y);
 public extern cdecl nothrow int WinGraphicsDrawImageRect(void* graphics, void* image,  float x, float y, float w, float h);

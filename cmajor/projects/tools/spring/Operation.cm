@@ -22,6 +22,7 @@ namespace spring
         public abstract void AdvanceTo(const PointF& location);
         public abstract void Cancel();
         public abstract void Commit(const PointF& location);
+        public abstract void Draw(Graphics& graphics, Layout& layout);
         public nothrow inline const PointF& StartLocation() const
         {
             return startLocation;
@@ -47,6 +48,9 @@ namespace spring
         {
         }
         public override void Commit(const PointF& location)
+        {
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
         {
         }
     }
@@ -83,6 +87,9 @@ namespace spring
                 DiagramElement* element = GetDiagram()->GetElementByIndex(elementIndex);
                 element->SetLocation(newLocation);
             }
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
         }
         public override void Cancel()
         {
@@ -132,13 +139,19 @@ namespace spring
         }
         public override void AdvanceTo(const PointF& location)
         {
+            relationshipElement->target.point = location;
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
+            relationshipElement->Draw(graphics, layout);
         }
         public override void Cancel()
         {
+            relationshipElement->RemoveFromElements();
         }
         public override void Commit(const PointF& location)
         {
-            relationshipElement->AddToContainers();
+            relationshipElement->AddToElements();
             Diagram* diagram = GetDiagram();
             diagram->AddElement(relationshipElement.Release());
             Tools.SetCurrent(Tools.GetSelectTool());

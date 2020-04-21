@@ -25,8 +25,8 @@ namespace spring
             int textBoxPadding = DefaultControlPadding();
             int borderWidth = DefaultSingleBorderWidth();
             int line1Top = defaultControlSpacing.h + textBoxPadding + borderWidth;
-            Point classNameLabelLoc(defaultControlSpacing.w, line1Top);
-            UniquePtr<Label> objectNameLabel(new Label("Object name:", classNameLabelLoc, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            Point objectNameLabelLoc(defaultControlSpacing.w, line1Top);
+            UniquePtr<Label> objectNameLabel(new Label("Object name:", objectNameLabelLoc, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
             int line2Top = objectNameLabel->Location().y + objectNameLabel->GetSize().h + defaultControlSpacing.h;
             AddChild(objectNameLabel.Release());
             Point objectNameTextBoxLoc(defaultControlSpacing.w * 2 + column1Width, line1Top);
@@ -92,7 +92,7 @@ namespace spring
         private void EditFields()
         {
             IndexList<FieldElement> clonedFieldElements = objectElement->Fields().Clone();
-            if (ExecuteEditFieldsDialog(clonedFieldElements, *this))
+            if (ExecuteEditFieldsDialog(clonedFieldElements, objectElement, *this))
             {
                 objectElement->SetFields(clonedFieldElements);
             }

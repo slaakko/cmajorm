@@ -33,10 +33,6 @@ namespace System.Windows
         }
         public bool Checked()
         {
-            if (Handle() != null)
-            {
-                RetrieveCheckedState();
-            }
             return GetCheckedFlag();
         }
         public void SetChecked(bool checked)
@@ -60,6 +56,7 @@ namespace System.Windows
                 {
                     WinSendMessage(Handle(), BM_SETCHECK, BST_CHECKED, 0);
                 }
+                SetFocus();
             }
             else
             {

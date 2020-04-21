@@ -887,6 +887,11 @@ int WinGraphicsDrawLines(void* graphics, void* pen, int count, void* points)
     return static_cast<Graphics*>(graphics)->DrawLines(static_cast<Pen*>(pen), static_cast<const Point*>(points), count);
 }
 
+int WinGraphicsDrawLinesF(void* graphics, void* pen, int count, void* points)
+{
+    return static_cast<Graphics*>(graphics)->DrawLines(static_cast<Pen*>(pen), static_cast<const PointF*>(points), count);
+}
+
 int WinGraphicsDrawString(void* graphics, const char* str, void* font, float x, float y, void* brush)
 {
     std::u16string s(ToUtf16(std::string(str)));
@@ -994,6 +999,16 @@ int WinGraphicsFillPolygonF(void* graphics, void* brush, int count, void* points
 int WinGraphicsDrawArc(void* graphics, void* pen, float x, float y, float w, float h, float startAngle, float sweepAngle)
 {
     return static_cast<Graphics*>(graphics)->DrawArc(static_cast<const Pen*>(pen), x, y, w, h, startAngle, sweepAngle);
+}
+
+int WinGraphicsDrawEllipse(void* graphics, void* pen, float x, float y, float w, float h)
+{
+    return static_cast<Graphics*>(graphics)->DrawEllipse(static_cast<const Pen*>(pen), x, y, w, h);
+}
+
+int WinGraphicsFillEllipse(void* graphics, void* brush, float x, float y, float w, float h)
+{
+    return static_cast<Graphics*>(graphics)->FillEllipse(static_cast<const Brush*>(brush), x, y, w, h);
 }
 
 void* WinGraphicsCreateRegion()
@@ -1137,10 +1152,17 @@ int WinGraphicsDrawImageRect(void* graphics, void* image, float x, float y, floa
     return static_cast<Graphics*>(graphics)->DrawImage(static_cast<Image*>(image), RectF(x, y, w, h));
 }
 
-int WinGrapchisDrawImageWithAttributes(void* graphics, void* image, int destRectX, int destRectY, int destRectW, int destRectH, int srcX, int srcY, int srcW, int srcH,
+int WinGraphicsDrawImageWithAttributes(void* graphics, void* image, int destRectX, int destRectY, int destRectW, int destRectH, int srcX, int srcY, int srcW, int srcH,
     int srcUnit, void* imageAttributes)
 {
     return static_cast<Graphics*>(graphics)->DrawImage(static_cast<Image*>(image), Rect(destRectX, destRectY, destRectW, destRectH), srcX, srcY, srcW, srcH, static_cast<Unit>(srcUnit),
+        static_cast<ImageAttributes*>(imageAttributes), nullptr, nullptr);
+}
+
+int WinGraphicsDrawImageWithAttributesF(void* graphics, void* image, float destRectX, float destRectY, float destRectW, float destRectH, float srcX, float srcY, float srcW, float srcH,
+    int srcUnit, void* imageAttributes)
+{
+    return static_cast<Graphics*>(graphics)->DrawImage(static_cast<Image*>(image), RectF(destRectX, destRectY, destRectW, destRectH), srcX, srcY, srcW, srcH, static_cast<Unit>(srcUnit),
         static_cast<ImageAttributes*>(imageAttributes), nullptr, nullptr);
 }
 

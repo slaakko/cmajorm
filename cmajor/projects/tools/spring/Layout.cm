@@ -27,7 +27,32 @@ namespace spring
         return "Arial";
     }
 
+    public nothrow string DefaultRelationshipFontFamily()
+    {
+        return "Arial";
+    }
+
+    public nothrow string DefaultNoteFontFamily()
+    {
+        return "Arial";
+    }
+
+    public nothrow FontStyle DefaultNoteFontStyle()
+    {
+        return FontStyle.regular;
+    }
+
     public nothrow float DefaultFontSize()
+    {
+        return 9.0f;
+    }
+
+    public nothrow float DefaultRelationshipFontSize()
+    {
+        return 8.0f;
+    }
+
+    public nothrow float DefaultNoteFontSize()
     {
         return 9.0f;
     }
@@ -62,6 +87,16 @@ namespace spring
         return 1.5f;
     }
 
+    public nothrow float DefaultNotePadding()
+    {
+        return 1.5f;
+    }
+
+    public nothrow float DefaultRelationshipSymbolPadding()
+    {
+        return 0.5f;
+    }
+
     public nothrow float DefaultInheritanceArrowWidth()
     {
         return 5.0f;
@@ -90,6 +125,11 @@ namespace spring
     public nothrow float DefaultCardinalitySymbolRadius()
     {
         return 1.0f;
+    }
+
+    public nothrow float DefaultRelationshipSymbolRadius()
+    {
+        return 0.75f;
     }
 
     public nothrow float DefaultSelectedLineWidth()
@@ -126,11 +166,15 @@ namespace spring
             abstractClassLayoutElement(new AbstractClassLayoutElement(*this, graphics)),
             concreteClassLayoutElement(new ConcreteClassLayoutElement(*this, graphics)),
             objectLayoutElement(new ObjectLayoutElement(*this, graphics)),
+            noteLayoutElement(new NoteLayoutElement(*this, graphics)),
             abstractOperationLayoutElement(new AbstractOperationLayoutElement(*this)), concreteOperationLayoutElement(new ConcreteOperationLayoutElement(*this)),
             fieldLayoutElement(new FieldLayoutElement(*this)),
             relationshipLayoutElement(new RelationshipLayoutElement(*this, graphics)),
             classPaddingElement(new PaddingElement(DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), "classPadding")),
             objectPaddingElement(new PaddingElement(DefaultObjectPadding(), DefaultObjectPadding(), DefaultObjectPadding(), DefaultObjectPadding(), "objectPadding")),
+            notePaddingElement(new PaddingElement(DefaultNotePadding(), DefaultNotePadding(), DefaultNotePadding(), DefaultNotePadding(), "notePadding")),
+            relationshipSymbolPaddingElement(
+                new PaddingElement(DefaultRelationshipSymbolPadding(), DefaultRelationshipSymbolPadding(), DefaultRelationshipSymbolPadding(), DefaultRelationshipSymbolPadding(), "relationshipSymbolPadding")),
             diagramPaddingElement(new PaddingElement(DefaultDiagramPadding(), DefaultDiagramPadding(), DefaultDiagramPadding(), DefaultDiagramPadding(), "diagramPadding"))
         {
         }
@@ -194,6 +238,14 @@ namespace spring
         {
             objectLayoutElement.Reset(objectLayoutElement_);
         }
+        public nothrow inline const NoteLayoutElement& GetNoteLayoutElement() const
+        {
+            return *noteLayoutElement;
+        }
+        public nothrow void SetNoteLayoutElement(NoteLayoutElement* noteLayoutElement_)
+        {
+            noteLayoutElement.Reset(noteLayoutElement_);
+        }
         public nothrow inline const AbstractOperationLayoutElement& GetAbstractOperationLayoutElement() const
         {
             return *abstractOperationLayoutElement;
@@ -242,6 +294,22 @@ namespace spring
         {
             objectPaddingElement.Reset(objectPaddingElement_);
         }
+        public nothrow inline const PaddingElement& GetNotePaddingElement() const
+        {
+            return *notePaddingElement;
+        }
+        public nothrow void SetNotePaddingElement(PaddingElement* notePaddingElement_)
+        {
+            notePaddingElement.Reset(notePaddingElement_);
+        }
+        public nothrow inline const PaddingElement& GetRelationshipSymbolPaddingElement() const
+        {
+            return *relationshipSymbolPaddingElement;
+        }
+        public nothrow void SetRelationshipSymbolPaddingElement(PaddingElement* relationshipSymbolPaddingElement_)
+        {
+            relationshipSymbolPaddingElement.Reset(relationshipSymbolPaddingElement_);
+        }
         public nothrow inline const PaddingElement& GetDiagramPaddingElement() const
         {
             return *diagramPaddingElement;
@@ -269,12 +337,15 @@ namespace spring
                             abstractClassLayoutElement->Read(layoutElement, *this);
                             concreteClassLayoutElement->Read(layoutElement, *this);
                             objectLayoutElement->Read(layoutElement, *this);
+                            noteLayoutElement->Read(layoutElement, *this);
                             abstractOperationLayoutElement->Read(layoutElement, *this);
                             concreteOperationLayoutElement->Read(layoutElement, *this);
                             fieldLayoutElement->Read(layoutElement, *this);
                             relationshipLayoutElement->Read(layoutElement, *this);
                             classPaddingElement->Read(layoutElement, *this);
                             objectPaddingElement->Read(layoutElement, *this);
+                            notePaddingElement->Read(layoutElement, *this);
+                            relationshipSymbolPaddingElement->Read(layoutElement, *this);
                             diagramPaddingElement->Read(layoutElement, *this);
                         }
                     }
@@ -290,12 +361,15 @@ namespace spring
             abstractClassLayoutElement->Write(layoutElement.Get());
             concreteClassLayoutElement->Write(layoutElement.Get());
             objectLayoutElement->Write(layoutElement.Get());
+            noteLayoutElement->Write(layoutElement.Get());
             abstractOperationLayoutElement->Write(layoutElement.Get());
             concreteOperationLayoutElement->Write(layoutElement.Get());
             fieldLayoutElement->Write(layoutElement.Get());
             relationshipLayoutElement->Write(layoutElement.Get());
             classPaddingElement->Write(layoutElement.Get());
             objectPaddingElement->Write(layoutElement.Get());
+            notePaddingElement->Write(layoutElement.Get());
+            relationshipSymbolPaddingElement->Write(layoutElement.Get());
             diagramPaddingElement->Write(layoutElement.Get());
             parentNode->AppendChild(UniquePtr<System.Dom.Node>(layoutElement.Release()));
         }
@@ -317,9 +391,9 @@ namespace spring
             fonts.Add(Rvalue(fontPtr));
             return font;
         }
-        internal Pen* GetOrInsertPen(const Color& color, float width)
+        internal Pen* GetOrInsertPen(const Color& color, float width, DashStyle dashStyle)
         {
-            PenKey key(color, width);
+            PenKey key(color, width, dashStyle);
             HashMap<PenKey, Pen*>.ConstIterator it = penMap.CFind(key);
             if (it != penMap.CEnd())
             {
@@ -327,6 +401,7 @@ namespace spring
             }
             UniquePtr<Pen> penPtr(new Pen(color, width));
             Pen* pen = penPtr.Get();
+            pen->SetDashStyleChecked(dashStyle);
             penMap[key] = pen;
             pens.Add(Rvalue(penPtr));
             return pen;
@@ -355,12 +430,15 @@ namespace spring
         private UniquePtr<AbstractClassLayoutElement> abstractClassLayoutElement;
         private UniquePtr<ConcreteClassLayoutElement> concreteClassLayoutElement;
         private UniquePtr<ObjectLayoutElement> objectLayoutElement;
+        private UniquePtr<NoteLayoutElement> noteLayoutElement;
         private UniquePtr<AbstractOperationLayoutElement> abstractOperationLayoutElement;
         private UniquePtr<ConcreteOperationLayoutElement> concreteOperationLayoutElement;
         private UniquePtr<FieldLayoutElement> fieldLayoutElement;
         private UniquePtr<RelationshipLayoutElement> relationshipLayoutElement;
         private UniquePtr<PaddingElement> classPaddingElement;
         private UniquePtr<PaddingElement> objectPaddingElement;
+        private UniquePtr<PaddingElement> notePaddingElement;
+        private UniquePtr<PaddingElement> relationshipSymbolPaddingElement;
         private UniquePtr<PaddingElement> diagramPaddingElement;
     }
 
@@ -574,19 +652,25 @@ namespace spring
             lineWidth(DefaultLineWidth(graphics)),
             lineColorElement(new ColorElement(Color.Black(), "lineColor")),
             arrowColorElement(new ColorElement(Color.Black(), "arrowColor")),
+            textColorElement(new ColorElement(Color.Black(), "textColor")),
             inheritanceArrowWidth(DefaultInheritanceArrowWidth()),
             aggregateSymbolWidth(DefaultAggregateSymbolWidth()),
             aggregateSymbolHeight(DefaultAggregateSymbolHeight()),
             lineArrowWidth(DefaultLineArrowWidth()),
             lineArrowHeight(DefaultLineArrowHeight()),
             cardinalitySymbolRadius(DefaultCardinalitySymbolRadius()),
-            selectedLineWidth(DefaultSelectedLineWidth())
+            relationshipSymbolRadius(DefaultRelationshipSymbolRadius()),
+            selectedLineWidth(DefaultSelectedLineWidth()),
+            fontElement(new FontElement(DefaultRelationshipFontFamily(), DefaultRelationshipFontSize(), FontStyle.regular, "font", layout))
         {
-            linePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth);
+            linePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.solid);
+            dashLinePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.dash);
+            dotLinePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.dot);
             arrowBrush = layout.GetOrInsertBrush(arrowColorElement->GetColor());
+            textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
             const ColorElement& selectedColorElement = layout.GetSelectedColorElement();
             const Brush* selectedBrush = selectedColorElement.GetBrush(layout);
-            selectedLinePen = layout.GetOrInsertPen(selectedColorElement.GetColor(), selectedLineWidth);
+            selectedLinePen = layout.GetOrInsertPen(selectedColorElement.GetColor(), selectedLineWidth, DashStyle.solid);
             selectedLinePen->SetBrush(*selectedBrush);
             selectedLinePen->SetStartCapChecked(LineCap.round);
             selectedLinePen->SetEndCapChecked(LineCap.round);
@@ -596,6 +680,10 @@ namespace spring
         suppress void operator=(const RelationshipLayoutElement&);
         suppress RelationshipLayoutElement(RelationshipLayoutElement&&);
         suppress void operator=(RelationshipLayoutElement&&);
+        public nothrow inline const FontElement& GetFontElement() const
+        {
+            return *fontElement;
+        }
         public nothrow float LineWidth() const
         {
             return lineWidth;
@@ -608,6 +696,14 @@ namespace spring
         {
             return *linePen;
         }
+        public nothrow const Pen& DashLinePen() const
+        {
+            return *dashLinePen;
+        }
+        public nothrow const Pen& DotLinePen() const
+        {
+            return *dotLinePen;
+        }
         public nothrow const Pen& SelectedLinePen() const
         {
             return *selectedLinePen;
@@ -615,6 +711,10 @@ namespace spring
         public nothrow const Brush& ArrowBrush() const
         {
             return *arrowBrush;
+        }
+        public nothrow const Brush& TextBrush() const
+        {
+            return *textBrush;
         }
         public nothrow inline float InheritanceArrowWidth() const
         {
@@ -660,6 +760,14 @@ namespace spring
         {
             cardinalitySymbolRadius = cardinalitySymbolRadius_;
         }
+        public nothrow inline float RelationshipSymbolRadius() const
+        {
+            return relationshipSymbolRadius;
+        }
+        public nothrow void SetRelationshipSymbolRadius(float relationshipSymbolRadius_)
+        {
+            relationshipSymbolRadius = relationshipSymbolRadius_;
+        }
         public nothrow inline float SelectedLineWidth() const
         {
             return selectedLineWidth;
@@ -685,13 +793,27 @@ namespace spring
                             System.Dom.Element* element = cast<System.Dom.Element*>(node);
                             lineColorElement->Read(element, layout);
                             arrowColorElement->Read(element, layout);
+                            textColorElement->Read(element, layout);
                             inheritanceArrowWidth = ParseFloat(ToUtf8(element->GetAttribute(u"inheritanceArrowWidth")));
                             aggregateSymbolWidth = ParseFloat(ToUtf8(element->GetAttribute(u"aggregateSymbolWidth")));
                             aggregateSymbolHeight = ParseFloat(ToUtf8(element->GetAttribute(u"aggregateSymbolHeight")));
                             lineArrowWidth = ParseFloat(ToUtf8(element->GetAttribute(u"lineArrowWidth")));
                             lineArrowHeight = ParseFloat(ToUtf8(element->GetAttribute(u"lineArrowHeight")));
                             cardinalitySymbolRadius = ParseFloat(ToUtf8(element->GetAttribute(u"cardinalitySymbolRadius")));
+                            relationshipSymbolRadius = ParseFloat(ToUtf8(element->GetAttribute(u"relationshipSymbolRadius")));
                             selectedLineWidth = ParseFloat(ToUtf8(element->GetAttribute(u"selectedLineWidth")));
+                            linePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.solid);
+                            dashLinePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.dash);
+                            dotLinePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.dot);
+                            arrowBrush = layout.GetOrInsertBrush(arrowColorElement->GetColor());
+                            textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
+                            const ColorElement& selectedColorElement = layout.GetSelectedColorElement();
+                            const Brush* selectedBrush = selectedColorElement.GetBrush(layout);
+                            selectedLinePen = layout.GetOrInsertPen(selectedColorElement.GetColor(), selectedLineWidth, DashStyle.solid);
+                            selectedLinePen->SetBrush(*selectedBrush);
+                            selectedLinePen->SetStartCapChecked(LineCap.round);
+                            selectedLinePen->SetEndCapChecked(LineCap.round);
+                            selectedLinePen->SetLineJoinChecked(LineJoin.round);
                         }
                     }
                 }
@@ -702,17 +824,21 @@ namespace spring
             UniquePtr<System.Dom.Element> relationshipElement(new System.Dom.Element(u"relationship"));
             lineColorElement->Write(relationshipElement.Get());
             arrowColorElement->Write(relationshipElement.Get());
+            textColorElement->Write(relationshipElement.Get());
             relationshipElement->SetAttribute(u"inheritanceArrowWidth", ToUtf32(System.ToString(inheritanceArrowWidth)));
             relationshipElement->SetAttribute(u"aggregateSymbolWidth", ToUtf32(System.ToString(aggregateSymbolWidth)));
             relationshipElement->SetAttribute(u"aggregateSymbolHeight", ToUtf32(System.ToString(aggregateSymbolHeight)));
             relationshipElement->SetAttribute(u"lineArrowWidth", ToUtf32(System.ToString(lineArrowWidth)));
             relationshipElement->SetAttribute(u"lineArrowHeight", ToUtf32(System.ToString(lineArrowHeight)));
             relationshipElement->SetAttribute(u"cardinalitySymbolRadius", ToUtf32(System.ToString(cardinalitySymbolRadius)));
+            relationshipElement->SetAttribute(u"relationshipSymbolRadius", ToUtf32(System.ToString(relationshipSymbolRadius)));
             relationshipElement->SetAttribute(u"selectedLineWidth", ToUtf32(System.ToString(selectedLineWidth)));
             parentElement->AppendChild(UniquePtr<System.Dom.Node>(relationshipElement.Release()));
         }
         private UniquePtr<ColorElement> lineColorElement;
         private UniquePtr<ColorElement> arrowColorElement;
+        private UniquePtr<ColorElement> textColorElement;
+        private UniquePtr<FontElement> fontElement;
         private float lineWidth;
         private float inheritanceArrowWidth;
         private float aggregateSymbolWidth;
@@ -720,9 +846,13 @@ namespace spring
         private float lineArrowWidth;
         private float lineArrowHeight;
         private float cardinalitySymbolRadius;
+        private float relationshipSymbolRadius;
         private float selectedLineWidth;
         private Pen* linePen;
+        private Pen* dashLinePen;
+        private Pen* dotLinePen;
         private Brush* arrowBrush;
+        private Brush* textBrush;
         private Pen* selectedLinePen;
     }
 
@@ -930,7 +1060,7 @@ namespace spring
             captionElement(captionElement_), textColorElement(textColorElement_), frameColorElement(frameColorElement_), frameWidth(frameWidth_)
         {
             textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
-            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth);
+            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth, DashStyle.solid);
         }
         suppress ClassLayoutElement(const ClassLayoutElement&);
         suppress void operator=(const ClassLayoutElement&);
@@ -967,7 +1097,7 @@ namespace spring
             frameColorElement->Read(parentElement, layout);
             frameWidth = ParseFloat(ToUtf8(parentElement->GetAttribute(u"frameWidth")));
             textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
-            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth);
+            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth, DashStyle.solid);
         }
         public override void Write(System.Dom.Element* parentElement)
         {
@@ -1074,7 +1204,7 @@ namespace spring
             frameRoundingRadius(DefaultFrameRoundingRadius())
         {
             textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
-            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth);
+            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth, DashStyle.solid);
         }
         public override void Read(System.Dom.Element* parentElement, Layout& layout)
         {
@@ -1097,7 +1227,7 @@ namespace spring
                             frameWidth = ParseFloat(ToUtf8(objectElement->GetAttribute(u"frameWidth")));
                             frameRoundingRadius = ParseFloat(ToUtf8(objectElement->GetAttribute(u"frameRoundingRadius")));
                             textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
-                            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth);
+                            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth, DashStyle.solid);
                         }
                     }
                 }
@@ -1152,6 +1282,86 @@ namespace spring
         private float frameRoundingRadius;
         private Brush* textBrush;
         private Pen* framePen;
+    }
 
+    public class NoteLayoutElement : LayoutElement
+    {
+        public NoteLayoutElement(Layout& layout, Graphics& graphics) : 
+            textColorElement(new ColorElement(Color.Black(), "textColor")),
+            frameColorElement(new ColorElement(Color.Black(), "frameColor")),
+            frameWidth(DefaultFrameWidth(graphics)),
+            fontElement(new FontElement(DefaultNoteFontFamily(), DefaultNoteFontSize(), DefaultNoteFontStyle(), "font", layout))
+        {
+            textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
+            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth, DashStyle.solid);
+        }
+        public nothrow inline const FontElement& GetFontElement() const
+        {
+            return *fontElement;
+        }
+        public nothrow inline const ColorElement& TextColorElement() const
+        {
+            return *textColorElement;
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> noteResult = Evaluate(u"note", parentElement);
+            if (!noteResult.IsNull())
+            {
+                if (noteResult.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(noteResult.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node is System.Dom.Element*)
+                        {
+                            System.Dom.Element* noteElement = cast<System.Dom.Element*>(node);
+                            textColorElement->Read(noteElement, layout);
+                            frameColorElement->Read(noteElement, layout);
+                            frameWidth = ParseFloat(ToUtf8(noteElement->GetAttribute(u"frameWidth")));
+                            textBrush = layout.GetOrInsertBrush(textColorElement->GetColor());
+                            framePen = layout.GetOrInsertPen(frameColorElement->GetColor(), frameWidth, DashStyle.solid);
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            UniquePtr<System.Dom.Element> noteElement(new System.Dom.Element(u"note"));
+            textColorElement->Write(noteElement.Get());
+            frameColorElement->Write(noteElement.Get());
+            noteElement->SetAttribute(u"frameWidth", ToUtf32(System.ToString(frameWidth)));
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(noteElement.Release()));
+        }
+        suppress NoteLayoutElement(const NoteLayoutElement&);
+        suppress void operator=(const NoteLayoutElement&);
+        suppress NoteLayoutElement(NoteLayoutElement&&);
+        suppress void operator=(NoteLayoutElement&&);
+        public nothrow inline const Brush& TextBrush() const
+        {
+            return *textBrush;
+        }
+        public nothrow inline const Pen& FramePen() const
+        {
+            return *framePen;
+        }
+        private UniquePtr<ColorElement> textColorElement;
+        private UniquePtr<ColorElement> frameColorElement;
+        private UniquePtr<FontElement> fontElement;
+        private float frameWidth;
+        private Brush* textBrush;
+        private Pen* framePen;
+    }
+
+    public nothrow float GetRelationshipSymbolFieldWidth(const Layout& layout) 
+    {
+        const PaddingElement& padding = layout.GetRelationshipSymbolPaddingElement();
+        const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+        float relationshipSymbolRadius = relationshipLayoutElement.RelationshipSymbolRadius();
+        float symbolFieldWidth = padding.Horizontal() + 2.0f * relationshipSymbolRadius;
+        return symbolFieldWidth;
     }
 }

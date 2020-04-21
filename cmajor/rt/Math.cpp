@@ -7,6 +7,7 @@
 #include <cmath>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <limits>
 
 double RtPow(double x, int32_t exponent)
 {
@@ -36,4 +37,14 @@ double RtCos(double angleRad)
 double RtSin(double angleRad)
 {
     return std::sin(angleRad);
+}
+
+double RtAtan2(double y, double x)
+{
+    return std::atan2(y, x);
+}
+
+double RtEpsilon()
+{
+    return std::numeric_limits<double>::epsilon();
 }

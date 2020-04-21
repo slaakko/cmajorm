@@ -29,13 +29,17 @@ namespace System.Windows
     {
         private enum Flags : sbyte
         {
-            none = 0, selectAll = 1 << 0
+            none = 0, selectAll = 1 << 0, multiline = 1 << 1
         }
 
         public TextBox(TextBoxStyle textBoxStyle, const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("EDIT", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP | textBoxStyle), DefaultExtendedWindowStyle(), backgroundColor,
             text, location, size, dock, anchors)
         {
+            if ((textBoxStyle & TextBoxStyle.ES_MULTILINE) != 0)
+            {
+                SetMultiline();
+            }
         }
         public TextBox(const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this(cast<TextBoxStyle>(TextBoxStyle.ES_LEFT | TextBoxStyle.ES_AUTOHSCROLL), Color.White(), text, location, size, dock, anchors)
@@ -43,6 +47,18 @@ namespace System.Windows
         }
         public TextBox(const string& text) : this(text, Point(), Size(), Dock.none, Anchors.none)
         {
+        }
+        public nothrow inline bool IsMultiline() const
+        {
+            return (flags & Flags.multiline) != Flags.none;
+        }
+        private nothrow inline void SetMultiline()
+        {
+            flags = cast<Flags>(flags | Flags.multiline);
+        }
+        private nothrow inline void ResetMultiline()
+        {
+            flags = cast<Flags>(flags & ~Flags.multiline);
         }
         public void SelectAll()
         {

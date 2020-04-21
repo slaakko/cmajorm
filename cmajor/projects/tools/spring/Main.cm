@@ -17,8 +17,13 @@ public class MainWindow : Window
         arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)),
         classToolCursor(Application.GetResourceManager().GetCursor("class.tool.spring.cursor")),
         objectToolCursor(Application.GetResourceManager().GetCursor("object.tool.spring.cursor")),
+        noteToolCursor(Application.GetResourceManager().GetCursor("note.tool.spring.cursor")),
         inheritanceToolCursor(Application.GetResourceManager().GetCursor("inheritance.tool.spring.cursor")),
-        aggregationToolCursor(Application.GetResourceManager().GetCursor("aggregation.tool.spring.cursor"))
+        aggregationToolCursor(Application.GetResourceManager().GetCursor("aggregation.tool.spring.cursor")),
+        referenceToolCursor(Application.GetResourceManager().GetCursor("reference.tool.spring.cursor")),
+        createInstanceToolCursor(Application.GetResourceManager().GetCursor("create.instance.tool.spring.cursor")),
+        attachNoteToolCursor(Application.GetResourceManager().GetCursor("attach.note.tool.spring.cursor")),
+        noteCornerBitmap(new Bitmap(Bitmap.FromResource("note.corner.spring.bitmap")))
     {
         UniquePtr<MenuBar> menuBar(new MenuBar());
         UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
@@ -98,6 +103,11 @@ public class MainWindow : Window
         Tools.GetObjectTool()->SetToolButton(objectToolButton);
         Tools.GetObjectTool()->SetCursor(&objectToolCursor);
         toolBar->AddToolButton(objectToolButton);
+        ToolButton* noteToolButton = new ToolButton("note.tool.spring.bitmap");
+        noteToolButton->SetToolTip("Add new note");
+        Tools.GetNoteTool()->SetToolButton(noteToolButton);
+        Tools.GetNoteTool()->SetCursor(&noteToolCursor);
+        toolBar->AddToolButton(noteToolButton);
         ToolButton* inheritanceToolButton = new ToolButton("inheritance.tool.spring.bitmap");
         inheritanceToolButton->SetToolTip("Add inheritance relationship");
         Tools.GetInheritanceTool()->SetToolButton(inheritanceToolButton);
@@ -111,22 +121,23 @@ public class MainWindow : Window
         ToolButton* referenceToolButton = new ToolButton("reference.tool.spring.bitmap");
         referenceToolButton->SetToolTip("Add reference relationship");
         Tools.GetReferenceTool()->SetToolButton(referenceToolButton);
-        Tools.GetReferenceTool()->SetCursor(&arrowCursor);
+        Tools.GetReferenceTool()->SetCursor(&referenceToolCursor);
         toolBar->AddToolButton(referenceToolButton);
-        ToolButton* createInstanceToolButton = new ToolButton("create.tool.spring.bitmap");
+        ToolButton* createInstanceToolButton = new ToolButton("create.instance.tool.spring.bitmap");
         createInstanceToolButton->SetToolTip("Add create instance relationship");
         Tools.GetCreateInstanceTool()->SetToolButton(createInstanceToolButton);
-        Tools.GetCreateInstanceTool()->SetCursor(&arrowCursor);
+        Tools.GetCreateInstanceTool()->SetCursor(&createInstanceToolCursor);
         toolBar->AddToolButton(createInstanceToolButton);
-        ToolButton* noteToolButton = new ToolButton("note.tool.spring.bitmap");
-        noteToolButton->SetToolTip("Add note");
-        Tools.GetNoteTool()->SetToolButton(noteToolButton);
-        Tools.GetNoteTool()->SetCursor(&arrowCursor);
-        toolBar->AddToolButton(noteToolButton);
+        ToolButton* attachNoteToolButton = new ToolButton("attach.note.tool.spring.bitmap");
+        attachNoteToolButton->SetToolTip("Attach note");
+        Tools.GetAttachNoteTool()->SetToolButton(attachNoteToolButton);
+        Tools.GetAttachNoteTool()->SetCursor(&attachNoteToolCursor);
+        toolBar->AddToolButton(attachNoteToolButton);
         AddChild(toolBar.Release());
         UniquePtr<SplitContainer> verticalSplitContainer(new SplitContainer(Orientation.vertical, 400, Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
         UniquePtr<Canvas> canvasPtr(new Canvas());
         canvas = canvasPtr.Get();
+        canvas->SetNoteCornerBitmap(noteCornerBitmap.Get());
         canvas->MouseEnterEvent().AddHandler(CanvasMouseEnter);
         canvas->MouseLeaveEvent().AddHandler(CanvasMouseLeave);
         canvas->MouseMoveEvent().AddHandler(CanvasMouseMove);
@@ -371,13 +382,6 @@ public class MainWindow : Window
         UniquePtr<ClassPropertiesDialog> classPropertiesDialog = new ClassPropertiesDialog(&classElement);
         DialogResult result = classPropertiesDialog->ShowDialog(*this);
 */
-        UniquePtr<ShapeDialog> shapeDialog = new ShapeDialog();
-        DialogResult result = shapeDialog->ShowDialog(*this);
-        LogView* logView = Application.GetLogView();
-        if (logView != null)
-        {
-            logView->WriteLine("dialog result=" + ToString(result));
-        }
     }
     protected override void OnKeyDown(KeyEventArgs& args)
     {
@@ -444,8 +448,13 @@ public class MainWindow : Window
     private Cursor arrowCursor;
     private Cursor& classToolCursor;
     private Cursor& objectToolCursor;
+    private Cursor& noteToolCursor;
     private Cursor& inheritanceToolCursor;
     private Cursor& aggregationToolCursor;
+    private Cursor& referenceToolCursor;
+    private Cursor& createInstanceToolCursor;
+    private Cursor& attachNoteToolCursor;
+    private UniquePtr<Bitmap> noteCornerBitmap;
     private string diagramFilePath;
     private ustring clipboardData;
     private MenuItem* cutMenuItem;

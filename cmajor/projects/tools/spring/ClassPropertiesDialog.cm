@@ -124,7 +124,7 @@ namespace spring
         {
             bool mayHaveAbstractOperations = classElement->IsAbstract();
             IndexList<OperationElement> clonedOperationElements = classElement->Operations().Clone();
-            if (ExecuteEditOperationsDialog(clonedOperationElements, mayHaveAbstractOperations, *this))
+            if (ExecuteEditOperationsDialog(clonedOperationElements, classElement, mayHaveAbstractOperations, *this))
             {
                 classElement->SetOperations(clonedOperationElements);
             }
@@ -132,7 +132,7 @@ namespace spring
         private void EditFields()
         {
             IndexList<FieldElement> clonedFieldElements = classElement->Fields().Clone();
-            if (ExecuteEditFieldsDialog(clonedFieldElements, *this))
+            if (ExecuteEditFieldsDialog(clonedFieldElements, classElement, *this))
             {
                 classElement->SetFields(clonedFieldElements);
             }

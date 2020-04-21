@@ -51,6 +51,10 @@ namespace spring
         {
             return &objectTool;
         }
+        public static nothrow Tool* GetNoteTool()
+        {
+            return &noteTool;
+        }
         public static nothrow Tool* GetInheritanceTool()
         {
             return &inheritanceTool;
@@ -59,26 +63,27 @@ namespace spring
         {
             return &aggregationTool;
         }
-        public static nothrow Tool* GetCreateInstanceTool()
-        {
-            return &createInstanceTool;
-        }
-        public static nothrow Tool* GetNoteTool()
-        {
-            return &noteTool;
-        }
         public static nothrow Tool* GetReferenceTool()
         {
             return &referenceTool;
         }
+        public static nothrow Tool* GetCreateInstanceTool()
+        {
+            return &createInstanceTool;
+        }
+        public static nothrow Tool* GetAttachNoteTool()
+        {
+            return &attachNoteTool;
+        }
         private static SelectTool selectTool;
         private static ClassTool classTool;
         private static ObjectTool objectTool;
+        private static NoteTool noteTool;
         private static InheritanceTool inheritanceTool;
         private static AggregationTool aggregationTool;
-        private static CreateInstanceTool createInstanceTool;
-        private static NoteTool noteTool;
         private static ReferenceTool referenceTool;
+        private static CreateInstanceTool createInstanceTool;
+        private static AttachNoteTool attachNoteTool;
         private static Tool* currentTool;
         private static Diagram* diagram;
     }
@@ -229,6 +234,7 @@ namespace spring
         public override void Initialize(Diagram& diagram)
         {
             diagram.ResetSelection();
+            diagram.ResetOperation();
         }
         public nothrow override bool CanMove() const
         {
@@ -341,6 +347,16 @@ namespace spring
                     ObjectElementPropertiesAction action(*args.diagram, args.elementIndex);
                     action.Execute();
                 }
+                else if (args.element is NoteElement*)
+                {
+                    NoteElementPropertiesAction action(*args.diagram, args.elementIndex);
+                    action.Execute();
+                }
+                else if (args.element is RelationshipElement*)
+                {
+                    RelationshipElementPropertiesAction action(*args.diagram, args.elementIndex);
+                    action.Execute();
+                }
             }
         }
         public override void CreateMoveOperation(MouseArgs& args)
@@ -414,6 +430,7 @@ namespace spring
         public override void Initialize(Diagram& diagram)
         {
             diagram.ResetSelection();
+            diagram.ResetOperation();
         }
         public override void MouseNormalLeftClick(MouseArgs& args)
         {
@@ -432,6 +449,7 @@ namespace spring
         public override void Initialize(Diagram& diagram)
         {
             diagram.ResetSelection();
+            diagram.ResetOperation();
         }
         public override void MouseNormalLeftClick(MouseArgs& args)
         {
@@ -445,13 +463,38 @@ namespace spring
         }
     }
 
+    public class NoteTool : SimpleClickTool
+    {
+        public override void Initialize(Diagram& diagram)
+        {
+            diagram.ResetSelection();
+            diagram.ResetOperation();
+        }
+        public override void MouseNormalLeftClick(MouseArgs& args)
+        {
+            args.diagram->ResetSelection();
+            UniquePtr<NoteElement> noteElement(new NoteElement());
+            noteElement->SetLocation(args.location);
+            List<string> lines;
+            lines.Add("note...");
+            noteElement->SetLines(lines);
+            noteElement->SetLocation(args.location);
+            args.diagram->AddElement(noteElement.Release());
+            args.diagram->SetChanged();
+            args.diagram->Invalidate();
+            Tools.SetCurrent(Tools.GetSelectTool());
+        }
+    }
+
+
     public abstract class RelationshipTool : SimpleClickTool
     {
         public override void Initialize(Diagram& diagram)
         {
             diagram.ResetSelection();
+            diagram.ResetOperation();
         }
-        public nothrow virtual bool Accept(DiagramElement* element)
+        public nothrow virtual bool Accept(DiagramElement* element, DiagramElement* sourceElement, EndpointType endpointType)
         {
             return false;
         }
@@ -461,46 +504,69 @@ namespace spring
             args.diagram->ResetSelection();
             DiagramElement* element = args.element;
             if (element == null) return;
-            if (!Accept(element)) return;
-            List<Endpoint> endpoints = args.element->GetEndpoints();
-            List<Endpoint*> endpointPtrs;
-            for (const Endpoint& endpoint : endpoints)
-            {
-                endpointPtrs.Add(&endpoint);
-            }
-            Sort(endpointPtrs.Begin(), endpointPtrs.End(), EndpointNearer(args.location));
-            Endpoint* nearestEndpoint = endpointPtrs.Front();
-            LogView* logView = Application.GetLogView();
-            if (logView != null)
-            {
-                logView->WriteLine(nearestEndpoint->ToString());
-            }
+            DiagramElement* sourceElement = null;
+            EndpointType endpointType = EndpointType.source;
             Operation* currentOperation = args.diagram->GetOperation();
-            if (currentOperation is EmptyOperation*)
-            {
-                RelationshipElement.Kind relationshipKind = GetRelationshipKind();
-                UniquePtr<RelationshipElement> relationshipElement(new RelationshipElement(relationshipKind));
-                relationshipElement->source = *nearestEndpoint;
-                UniquePtr<AddRelationshipOperation> operation(new AddRelationshipOperation(args.diagram, relationshipElement.Release()));
-                args.diagram->SetOperation(operation.Release());
-            }
-            else if (currentOperation is AddRelationshipOperation*)
+            if (currentOperation is AddRelationshipOperation*)
             {
                 AddRelationshipOperation* operation = cast<AddRelationshipOperation*>(currentOperation);
                 RelationshipElement& relationshipElement = operation->GetRelationshipElement();
-                if (relationshipElement.source.element == element)
+                sourceElement = relationshipElement.source.element;
+                if (relationshipElement.target.element == null)
                 {
-                    relationshipElement.source = *nearestEndpoint;
+                    endpointType = EndpointType.target;
                 }
-                else if (relationshipElement.target.element == null)
+            }
+            if (!Accept(element, sourceElement, endpointType)) return;
+            List<Endpoint> endpoints = args.element->GetEndpoints(endpointType, this);
+            if (!endpoints.IsEmpty())
+            {
+                List<Endpoint*> endpointPtrs;
+                for (const Endpoint& endpoint : endpoints)
                 {
-                    relationshipElement.target = *nearestEndpoint;
-                    args.diagram->CommitOperation(args.location);
-                    Tools.SetCurrent(Tools.GetSelectTool());
+                    endpointPtrs.Add(&endpoint);
                 }
-                else
+                Sort(endpointPtrs.Begin(), endpointPtrs.End(), EndpointNearer(args.location));
+                Endpoint* nearestEndpoint = endpointPtrs.Front();
+                LogView* logView = Application.GetLogView();
+                if (logView != null)
                 {
-                    #assert(false);
+                    logView->WriteLine(nearestEndpoint->ToString());
+                }
+                if (currentOperation is EmptyOperation*)
+                {
+                    RelationshipElement.Kind relationshipKind = GetRelationshipKind();
+                    UniquePtr<RelationshipElement> relationshipElement(new RelationshipElement(relationshipKind));
+                    if (endpointType == EndpointType.source)
+                    {
+                        if (nearestEndpoint->element != null)
+                        {
+                            nearestEndpoint->element->AddRelationship(relationshipElement.Get());
+                        }
+                    }
+                    relationshipElement->source = *nearestEndpoint;
+                    UniquePtr<AddRelationshipOperation> operation(new AddRelationshipOperation(args.diagram, relationshipElement.Release()));
+                    args.diagram->SetOperation(operation.Release());
+                }
+                else if (currentOperation is AddRelationshipOperation*)
+                {
+                    AddRelationshipOperation* operation = cast<AddRelationshipOperation*>(currentOperation);
+                    RelationshipElement& relationshipElement = operation->GetRelationshipElement();
+                    if (relationshipElement.source.element == element)
+                    {
+                        relationshipElement.source = *nearestEndpoint;
+                    }
+                    else if (relationshipElement.target.element == null)
+                    {
+                        relationshipElement.target = *nearestEndpoint;
+                        nearestEndpoint->element->AddRelationship(&relationshipElement);
+                        args.diagram->CommitOperation(args.location);
+                        Tools.SetCurrent(Tools.GetSelectTool());
+                    }
+                    else
+                    {
+                        #assert(false);
+                    }
                 }
             }
         }
@@ -508,19 +574,21 @@ namespace spring
         {
             DiagramElement* element = args.element;
             if (element == null) return;
-            if (!Accept(element)) return;
+            DiagramElement* sourceElement = null;
+            EndpointType endpointType = EndpointType.source;
+            if (!Accept(element, sourceElement, endpointType)) return;
         }
     }
 
     public abstract class ClassRelationShipTool : RelationshipTool
     {
-        public nothrow override bool Accept(DiagramElement* element)
+        public nothrow override bool Accept(DiagramElement* element, DiagramElement* sourceElement, EndpointType endpointType)
         {
             if (element is ClassElement*)
             {
                 return true;
             }
-            return base->Accept(element);
+            return base->Accept(element, sourceElement, endpointType);
         }
     }
 
@@ -548,28 +616,65 @@ namespace spring
         }
     }
 
-    public class NoteTool : ClassRelationShipTool
+    public class AttachNoteTool : ClassRelationShipTool
     {
         public override nothrow RelationshipElement.Kind GetRelationshipKind() const
         {
-            return RelationshipElement.Kind.note;
+            return RelationshipElement.Kind.attachNote;
+        }
+        public nothrow override bool Accept(DiagramElement* element, DiagramElement* sourceElement, EndpointType endpointType)
+        {
+            if (endpointType == EndpointType.target)
+            {
+                if (element is NoteElement*)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return base->Accept(element, sourceElement, endpointType);
+            }
         }
     }
 
     public class ReferenceTool : RelationshipTool
     {
-        public nothrow override bool Accept(DiagramElement* element)
+        public nothrow override bool Accept(DiagramElement* element, DiagramElement* sourceElement, EndpointType endpointType)
         {
-            if (element is ContainerElement*)
+            if (sourceElement == null)
             {
-                return true;
+                if ((element is ClassElement*) || (element is ObjectElement*))
+                {
+                    return true;
+                }
             }
-            return base->Accept(element);
+            else
+            {
+                if (sourceElement is ClassElement*)
+                {
+                    if (element is ClassElement*)
+                    {
+                        return true;
+                    }
+                }
+                else if (sourceElement is ObjectElement*)
+                {
+                    if (element is ObjectElement*)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return base->Accept(element, sourceElement, endpointType);
         }
         public override nothrow RelationshipElement.Kind GetRelationshipKind() const
         {
             return RelationshipElement.Kind.reference;
         }
     }
-
 }

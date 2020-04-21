@@ -1,0 +1,80 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace spring
+{
+    public class NotePropertiesDialog : Window
+    {
+        public NotePropertiesDialog(NoteElement* noteElement_) :
+            base("spring.notePropertiesDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(),
+            DefaultControlBackgroundColor(), "Note Properties", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(100), ScreenMetrics.Get().MMToVerticalPixels(70)),
+            Dock.none, Anchors.none), noteElement(noteElement_)
+        {
+            Size s = GetSize();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            Point textBoxLoc(defaultControlSpacing.w, defaultControlSpacing.h);
+            Size textBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(80), ScreenMetrics.Get().MMToVerticalPixels(30));
+            string noteText;
+            bool first = true;
+            for (const string& line : noteElement->Lines())
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    noteText.Append("\r\n");
+                }
+                noteText.Append(line);
+            }
+            UniquePtr<TextBox> textBoxPtr(new TextBox(cast<TextBoxStyle>(TextBoxStyle.ES_LEFT | TextBoxStyle.ES_AUTOHSCROLL | TextBoxStyle.ES_AUTOVSCROLL | TextBoxStyle.ES_MULTILINE),
+                Color.White(), noteText, textBoxLoc, textBoxSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            textBox = textBoxPtr.Get();
+            textBox->TextChangedEvent().AddHandler(NoteTextChanged);
+            textBox->SelectAll();
+            UniquePtr<PaddedControl> paddedTextBox(new PaddedControl(textBoxPtr.Release()));
+            UniquePtr<BorderedControl> borderedPaddedTextBox(new BorderedControl(paddedTextBox.Release(), BorderStyle.style3D, textBoxLoc, textBoxSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedTextBox.Release());
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            okButton = okButtonPtr.Get();
+            okButton->SetDialogResult(DialogResult.ok);
+            AddChild(okButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(okButton);
+            SetCancelButton(cancelButton);
+            textBox->SetFocus();
+        }
+        private void NoteTextChanged()
+        {
+            ustring text = ToUtf32(textBox->Text());
+            List<ustring> ulines = SplitTextIntoLines(text);
+            List<string> lines;
+            for (const ustring& line : ulines)
+            {
+                lines.Add(ToUtf8(line));
+            }
+            noteElement->SetLines(lines);
+        }
+        private NoteElement* noteElement;
+        private Button* okButton;
+        private Button* cancelButton;
+        private TextBox* textBox;
+    }
+}

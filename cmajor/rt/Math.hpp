@@ -14,5 +14,7 @@ extern "C" RT_API double RtSqrt(double x);
 extern "C" RT_API double RtPi();
 extern "C" RT_API double RtCos(double angleRad);
 extern "C" RT_API double RtSin(double angleRad);
+extern "C" RT_API double RtAtan2(double y, double x);
+extern "C" RT_API double RtEpsilon();
 
 #endif // CMAJOR_RT_MATH_INCLUDED

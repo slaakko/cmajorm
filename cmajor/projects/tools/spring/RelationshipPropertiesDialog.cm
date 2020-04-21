@@ -1,0 +1,308 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace spring
+{
+    public class RelationshipPropertiesDialog : Window
+    {
+        public RelationshipPropertiesDialog(RelationshipElement* relationshipElement_) :
+            base("spring.relationshipPropertiesDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(),
+            DefaultControlBackgroundColor(), "Relationship Properties", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(120), ScreenMetrics.Get().MMToVerticalPixels(100)),
+            Dock.none, Anchors.none), relationshipElement(relationshipElement_), ready(false)
+        {
+            int column1Width = ScreenMetrics.Get().MMToHorizontalPixels(20);
+            int column2Width = ScreenMetrics.Get().MMToHorizontalPixels(30);
+            Size s = GetSize();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            Size kindGroupBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(40), ScreenMetrics.Get().MMToVerticalPixels(25));
+            UniquePtr<GroupBox> kindGroupBoxPtr(new GroupBox("Kind", Point(defaultControlSpacing.w, defaultControlSpacing.h), kindGroupBoxSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            kindGroupBox = kindGroupBoxPtr.Get(); 
+            AddChild(kindGroupBoxPtr.Release());
+            Point kindGroupBoxLoc = kindGroupBox->Location();
+            UniquePtr<RadioButton> inheritanceRadioButtonPtr(new RadioButton("Inheritance", Point(kindGroupBoxLoc.x, kindGroupBoxLoc.y + defaultControlSpacing.h),
+                Size(0, 0), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            inheritanceRadioButton = inheritanceRadioButtonPtr.Get();
+            inheritanceRadioButton->CheckedChangedEvent().AddHandler(KindRadioButtonStateChanged);
+            kindGroupBox->AddChild(inheritanceRadioButtonPtr.Release());
+            Point inheritanceRadioButtonLoc = inheritanceRadioButton->Location();
+            Size inheritanceRadioButtonSize = inheritanceRadioButton->GetSize();
+            UniquePtr<RadioButton> aggregationRadioButtonPtr(new RadioButton("Aggregation",
+                Point(inheritanceRadioButtonLoc.x, inheritanceRadioButtonLoc.y + inheritanceRadioButtonSize.h),
+                Size(0, 0), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            aggregationRadioButton = aggregationRadioButtonPtr.Get();
+            aggregationRadioButton->CheckedChangedEvent().AddHandler(KindRadioButtonStateChanged);
+            kindGroupBox->AddChild(aggregationRadioButtonPtr.Release());
+            Point aggregationRadioButtonLoc = aggregationRadioButton->Location();
+            Size aggregationRadioButtonSize = aggregationRadioButton->GetSize();
+            UniquePtr<RadioButton> referenceRadioButtonPtr(new RadioButton("Reference",
+                Point(aggregationRadioButtonLoc.x, aggregationRadioButtonLoc.y + aggregationRadioButtonSize.h),
+                Size(0, 0), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            referenceRadioButton = referenceRadioButtonPtr.Get();
+            referenceRadioButton->CheckedChangedEvent().AddHandler(KindRadioButtonStateChanged);
+            kindGroupBox->AddChild(referenceRadioButtonPtr.Release());
+            Point referenceRadioButtonLoc = referenceRadioButton->Location();
+            Size referenceRadioButtonSize = referenceRadioButton->GetSize();
+            UniquePtr<RadioButton> createInstanceRadioButtonPtr(new RadioButton("Create instance",
+                Point(referenceRadioButtonLoc.x, referenceRadioButtonLoc.y + referenceRadioButtonSize.h),
+                Size(0, 0), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            createInstanceRadioButton = createInstanceRadioButtonPtr.Get();
+            createInstanceRadioButton->CheckedChangedEvent().AddHandler(KindRadioButtonStateChanged);
+            kindGroupBox->AddChild(createInstanceRadioButtonPtr.Release());
+            Size cardinalityGroupBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(40), ScreenMetrics.Get().MMToVerticalPixels(25));
+            UniquePtr<GroupBox> cardinalityGroupBoxPtr(new GroupBox("Cardinality", Point(defaultControlSpacing.w + kindGroupBoxLoc.x + kindGroupBoxSize.w, defaultControlSpacing.h), cardinalityGroupBoxSize,
+                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            cardinalityGroupBox = cardinalityGroupBoxPtr.Get(); 
+            AddChild(cardinalityGroupBoxPtr.Release());
+            Point cardinalityGroupBoxLoc = cardinalityGroupBox->Location();
+            UniquePtr<RadioButton> zeroRadioButtonPtr(new RadioButton("Zero", Point(defaultControlSpacing.w, cardinalityGroupBoxLoc.y + defaultControlSpacing.h),
+                Size(0, 0), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            zeroRadioButton = zeroRadioButtonPtr.Get();
+            zeroRadioButton->CheckedChangedEvent().AddHandler(CardinalityRadioButtonStateChanged);
+            cardinalityGroupBox->AddChild(zeroRadioButtonPtr.Release());
+            Point zeroRadioButtonLoc = zeroRadioButton->Location();
+            Size zeroRadioButtonSize = zeroRadioButton->GetSize();
+            UniquePtr<RadioButton> oneRadioButtonPtr(new RadioButton("One",
+                Point(zeroRadioButtonLoc.x, zeroRadioButtonLoc.y + zeroRadioButtonSize.h),
+                Size(0, 0), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            oneRadioButton = oneRadioButtonPtr.Get();
+            oneRadioButton->CheckedChangedEvent().AddHandler(CardinalityRadioButtonStateChanged);
+            cardinalityGroupBox->AddChild(oneRadioButtonPtr.Release());
+            Point oneRadioButtonLoc = oneRadioButton->Location();
+            Size oneRadioButtonSize = oneRadioButton->GetSize();
+            UniquePtr<RadioButton> manyRadioButtonPtr(new RadioButton("Many",
+                Point(oneRadioButtonLoc.x, oneRadioButtonLoc.y + oneRadioButtonSize.h),
+                Size(0, 0), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            manyRadioButton = manyRadioButtonPtr.Get();
+            manyRadioButton->CheckedChangedEvent().AddHandler(CardinalityRadioButtonStateChanged);
+            cardinalityGroupBox->AddChild(manyRadioButtonPtr.Release());
+
+            Point sourceTextLabelLoc(defaultControlSpacing.w, kindGroupBoxLoc.y + kindGroupBoxSize.h + defaultControlSpacing.h);
+            UniquePtr<Label> sourceTextLabelPtr(new Label("Source text:", sourceTextLabelLoc, Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            Label* sourceTextLabel = sourceTextLabelPtr.Get();
+            AddChild(sourceTextLabelPtr.Release());
+            Size sourceTextLabelSize = sourceTextLabel->GetSize();
+
+            UniquePtr<TextBox> sourceTextBoxPtr(new TextBox(relationshipElement->source.text));
+            sourceTextBox = sourceTextBoxPtr.Get();
+            sourceTextBox->TextChangedEvent().AddHandler(SourceTextBoxTextChanged);
+            UniquePtr<PaddedControl> paddedSourceTextBox(new PaddedControl(sourceTextBoxPtr.Release()));
+            UniquePtr<BorderedControl> borderedPaddedSourceTextBox(new BorderedControl(paddedSourceTextBox.Release(), Point(column1Width, sourceTextLabelLoc.y), Size(column2Width,
+                defaultTextBoxSize.h + DefaultSingleBorderWidth() + 2 * DefaultControlPadding()),
+                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedSourceTextBox.Release());
+
+            Point centerTextLabelLoc(defaultControlSpacing.w, sourceTextLabelLoc.y + sourceTextLabelSize.h + defaultControlSpacing.h);
+            UniquePtr<Label> centerTextLabelPtr(new Label("Center text:", centerTextLabelLoc, Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            Label* centerTextLabel = centerTextLabelPtr.Get();
+            AddChild(centerTextLabelPtr.Release());
+            Size centerTextLabelSize = centerTextLabel->GetSize();
+
+            UniquePtr<TextBox> centerTextBoxPtr(new TextBox(relationshipElement->Name()));
+            centerTextBox = centerTextBoxPtr.Get();
+            centerTextBox->TextChangedEvent().AddHandler(CenterTextBoxTextChanged);
+            UniquePtr<PaddedControl> paddedCenterTextBox(new PaddedControl(centerTextBoxPtr.Release()));
+            UniquePtr<BorderedControl> borderedPaddedCenterTextBox(new BorderedControl(paddedCenterTextBox.Release(), Point(column1Width, centerTextLabelLoc.y), Size(column2Width,
+                defaultTextBoxSize.h + DefaultSingleBorderWidth() + 2 * DefaultControlPadding()),
+                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedCenterTextBox.Release());
+
+            Point targetTextLabelLoc(defaultControlSpacing.w, centerTextLabelLoc.y + centerTextLabelSize.h + defaultControlSpacing.h);
+            UniquePtr<Label> targetTextLabelPtr(new Label("Target text:", targetTextLabelLoc, Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            Label* targetTextLabel = targetTextLabelPtr.Get();
+            AddChild(targetTextLabelPtr.Release());
+
+            UniquePtr<TextBox> targetTextBoxPtr(new TextBox(relationshipElement->target.text));
+            targetTextBox = targetTextBoxPtr.Get();
+            targetTextBox->TextChangedEvent().AddHandler(TargetTextBoxTextChanged);
+            UniquePtr<PaddedControl> paddedTargetTextBox(new PaddedControl(targetTextBoxPtr.Release()));
+            UniquePtr<BorderedControl> borderedPaddedTargetTextBox(new BorderedControl(paddedTargetTextBox.Release(), Point(column1Width, targetTextLabelLoc.y), Size(column2Width,
+                defaultTextBoxSize.h + DefaultSingleBorderWidth() + 2 * DefaultControlPadding()),
+                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedTargetTextBox.Release());
+
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            okButton = okButtonPtr.Get();
+            okButton->SetDialogResult(DialogResult.ok);
+            AddChild(okButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(okButton);
+            SetCancelButton(cancelButton);
+            SetKindRadioButton();
+            SetCardinalityRadioButton();
+            ready = true;
+            KindRadioButtonStateChanged();
+            sourceTextBox->SetFocus();
+        }
+        private void SetKindRadioButton()
+        {
+            switch (relationshipElement->kind)
+            {
+                case RelationshipElement.Kind.inheritance:
+                {
+                    kindGroupBox->SetCheckedRadioButton(inheritanceRadioButton);
+                    zeroRadioButton->Disable();
+                    break;
+                }
+                case RelationshipElement.Kind.aggregation:
+                {
+                    kindGroupBox->SetCheckedRadioButton(aggregationRadioButton);
+                    zeroRadioButton->Disable();
+                    break;
+                }
+                case RelationshipElement.Kind.reference:
+                {
+                    kindGroupBox->SetCheckedRadioButton(referenceRadioButton);
+                    break;
+                }
+                case RelationshipElement.Kind.createInstance:
+                {
+                    kindGroupBox->SetCheckedRadioButton(createInstanceRadioButton);
+                    zeroRadioButton->Disable();
+                    break;
+                }
+            }
+        }
+        private void SetCardinalityRadioButton()
+        {
+            switch (relationshipElement->cardinality)
+            {
+                case Cardinality.zero:
+                {
+                    cardinalityGroupBox->SetCheckedRadioButton(zeroRadioButton);
+                    break;
+                }
+                case Cardinality.one:
+                {
+                    cardinalityGroupBox->SetCheckedRadioButton(oneRadioButton);
+                    break;
+                }
+                case Cardinality.many:
+                {
+                    cardinalityGroupBox->SetCheckedRadioButton(manyRadioButton);
+                    break;
+                }
+            }
+        }
+        private void KindRadioButtonStateChanged()
+        {
+            if (ready)
+            {
+                RadioButton* checkedRadioButton = kindGroupBox->CheckedRadioButton();
+                if (checkedRadioButton == inheritanceRadioButton)
+                {
+                    relationshipElement->kind = RelationshipElement.Kind.inheritance;
+                }
+                else if (checkedRadioButton == aggregationRadioButton)
+                {
+                    relationshipElement->kind = RelationshipElement.Kind.aggregation;
+                }
+                else if (checkedRadioButton == referenceRadioButton)
+                {
+                    relationshipElement->kind = RelationshipElement.Kind.reference;
+                }
+                else if (checkedRadioButton == createInstanceRadioButton)
+                {
+                    relationshipElement->kind = RelationshipElement.Kind.createInstance;
+                }
+                if (checkedRadioButton == inheritanceRadioButton)
+                {
+                    if (manyRadioButton->Checked())
+                    {
+                        oneRadioButton->SetChecked(true);
+                    }
+                    else if (zeroRadioButton->Checked())
+                    {
+                        oneRadioButton->SetChecked(true);
+                    }
+                    manyRadioButton->Disable();
+                    zeroRadioButton->Disable();
+                }
+                else if (checkedRadioButton == aggregationRadioButton)
+                {
+                    if (zeroRadioButton->Checked())
+                    {
+                        oneRadioButton->SetChecked(true);
+                    }
+                    zeroRadioButton->Disable();
+                    manyRadioButton->Enable();
+                }
+                else if (checkedRadioButton == referenceRadioButton)
+                {
+                    zeroRadioButton->Enable();
+                    manyRadioButton->Enable();
+                }
+                else if (checkedRadioButton == createInstanceRadioButton)
+                {
+                    if (zeroRadioButton->Checked())
+                    {
+                        oneRadioButton->SetChecked(true);
+                    }
+                    zeroRadioButton->Disable();
+                    manyRadioButton->Enable();
+                }
+            }
+        }
+        private void CardinalityRadioButtonStateChanged()
+        {
+            if (ready)
+            {
+                RadioButton* checkedRadioButton = cardinalityGroupBox->CheckedRadioButton();
+                if (checkedRadioButton == zeroRadioButton)
+                {
+                    relationshipElement->cardinality = Cardinality.zero;
+                }
+                else if (checkedRadioButton == oneRadioButton)
+                {
+                    relationshipElement->cardinality = Cardinality.one;
+                }
+                else if (checkedRadioButton == manyRadioButton)
+                {
+                    relationshipElement->cardinality = Cardinality.many;
+                }
+            }
+        }
+        private void SourceTextBoxTextChanged()
+        {
+            relationshipElement->source.text = sourceTextBox->Text();
+        }
+        private void CenterTextBoxTextChanged()
+        {
+            relationshipElement->SetName(centerTextBox->Text());
+        }
+        private void TargetTextBoxTextChanged()
+        {
+            relationshipElement->target.text = targetTextBox->Text();
+        }
+        private bool ready;
+        private RelationshipElement* relationshipElement;
+        private Button* okButton;
+        private Button* cancelButton;
+        private GroupBox* kindGroupBox;
+        private RadioButton* inheritanceRadioButton;
+        private RadioButton* aggregationRadioButton;
+        private RadioButton* referenceRadioButton;
+        private RadioButton* createInstanceRadioButton;
+        private GroupBox* cardinalityGroupBox;
+        private RadioButton* zeroRadioButton;
+        private RadioButton* oneRadioButton;
+        private RadioButton* manyRadioButton;
+        private TextBox* sourceTextBox;
+        private TextBox* centerTextBox;
+        private TextBox* targetTextBox;
+    }
+}
