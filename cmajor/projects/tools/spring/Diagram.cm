@@ -284,6 +284,7 @@ namespace spring
                 relationshipElement->Draw(graphics, *layout);
             }
             operation->Draw(graphics, *layout);
+            selection->Draw(graphics);
         }
         public nothrow const Layout& GetLayout() const
         {
@@ -360,6 +361,55 @@ namespace spring
             Contains<DiagramElement> pred(location);
             return IndexOf(elements, pred);
         }
+        public nothrow bool HasIntersectingContrainerElements(const RectF& rect) const
+        {
+            for (const UniquePtr<DiagramElement>& element : elements)
+            {
+                if (element.Get() is ContainerElement*)
+                {
+                    ContainerElement* containerElement = cast<ContainerElement*>(element.Get());
+                    if (containerElement->IntersectsWith(rect))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public nothrow int GetNumberOfIntersectingContainerElements(const RectF& rect) const
+        {
+            int count = 0;
+            for (const UniquePtr<DiagramElement>& element : elements)
+            {
+                if (element.Get() is ContainerElement*)
+                {
+                    ContainerElement* containerElement = cast<ContainerElement*>(element.Get());
+                    if (containerElement->IntersectsWith(rect))
+                    {
+                        ++count;
+                    }
+                }
+            }
+            return count;
+        }
+        public nothrow List<int> GetIntersectingContainerElementIndeces(const RectF& rect) const
+        {
+            List<int> indeces;
+            int n = elements.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                DiagramElement* element = GetElementByIndex(i);
+                if (element is ContainerElement*)
+                {
+                    ContainerElement* containerElement = cast<ContainerElement*>(element);
+                    if (containerElement->IntersectsWith(rect))
+                    {
+                        indeces.Add(i);
+                    }
+                }
+            }
+            return indeces;
+        }
         public nothrow Selection* GetSelection()
         {
             return selection.Get();
@@ -386,6 +436,8 @@ namespace spring
             selection.Reset(new EmptySelection(*this));
             DisableCopy();
             DisableCut();
+            SetChanged();
+            Invalidate();
         }
         public nothrow void EnableCopy()
         {
@@ -591,6 +643,10 @@ namespace spring
         public virtual nothrow void Offset(float dx, float dy)
         {
             boundingRect.location.Offset(dx, dy);
+        }
+        public virtual nothrow bool IntersectsWith(const RectF& rect) const
+        {
+            return boundingRect.IntersectsWith(rect);
         }
         public virtual void Draw(Graphics& graphics, Layout& layout)
         {
@@ -1132,6 +1188,16 @@ namespace spring
                 intermediatePoint.Offset(dx, dy);
             }
             target.point.Offset(dx, dy);
+        }
+        public override nothrow bool IntersectsWith(const RectF& rect) const
+        {
+            if (rect.Contains(source.point)) return true;
+            if (rect.Contains(target.point)) return true;
+            for (const PointF& intermediatePoint : intermediatePoints)
+            {
+                if (rect.Contains(intermediatePoint)) return true;
+            }
+            return BoundingRect().IntersectsWith(rect);
         }
         public override nothrow void SetCompoundLocation(const CompoundLocation& compoundLocation)
         {

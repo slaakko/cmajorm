@@ -66,6 +66,15 @@ namespace spring
         public abstract void Cancel();
         public abstract void Commit(MouseArgs& args);
         public abstract void Draw(Graphics& graphics, Layout& layout);
+        public virtual nothrow void AddElementIndex(int index)
+        {
+        }
+        public virtual nothrow void SetElementIndeces(List<int>&& elementIndeces)
+        {
+        }
+        public virtual nothrow void FetchOriginalLocations()
+        {
+        }
         public nothrow inline const PointF& StartLocation() const
         {
             return startLocation;
@@ -102,16 +111,17 @@ namespace spring
     {
         public nothrow MoveContainerElementsOperation(Diagram* diagram, const PointF& startLocation) : base(diagram, startLocation), resetSelection(false)
         {
+            diagram->GetSelection()->SetStartLocation(startLocation);
         }
         public void ResetSelection()
         {
             resetSelection = true;
         }
-        public nothrow void AddElementIndex(int index)
+        public nothrow override void AddElementIndex(int index)
         {
             elementIndeces.Add(index);
         }
-        public nothrow void SetElementIndeces(List<int>&& elementIndeces_)
+        public nothrow override void SetElementIndeces(List<int>&& elementIndeces_)
         {
             elementIndeces = elementIndeces_;
         }
@@ -151,6 +161,7 @@ namespace spring
                 DiagramElement* element = GetDiagram()->GetElementByIndex(elementIndex);
                 element->SetCompoundLocation(newLocation);
             }
+            GetDiagram()->GetSelection()->Move(args);
         }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
@@ -175,7 +186,7 @@ namespace spring
                 GetDiagram()->ResetSelection();
             }
         }
-        public void FetchOriginalLocations()
+        public override nothrow void FetchOriginalLocations()
         {
             for (int elementIndex : elementIndeces)
             {
@@ -247,5 +258,36 @@ namespace spring
             return *relationshipElement;
         }
         private UniquePtr<RelationshipElement> relationshipElement;
+    }
+
+    public class CreateRectangleSelectionOperation : Operation
+    {
+        public CreateRectangleSelectionOperation(Diagram* diagram, const PointF& startLocation) : base(diagram, startLocation)
+        {
+            selection = new RectangleSelection(*diagram, startLocation);
+            diagram->SetSelection(selection);
+        }
+        public override nothrow bool IsEmpty() const
+        {
+            return selection->IsEmpty();
+        }
+        public override void AdvanceTo(MouseArgs& args)
+        {
+            if (args.left && !args.right)
+            {
+                 SizeF size(args.location.x - selection->GetRect().location.x, args.location.y - selection->GetRect().location.y);
+                 selection->GetRect().size = size;
+            }
+        }
+        public override void Cancel()
+        {
+        }
+        public override void Commit(MouseArgs& args)
+        {
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
+        }
+        private RectangleSelection* selection;
     }
 }

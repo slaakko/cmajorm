@@ -14,7 +14,7 @@ namespace spring
     {
         public Canvas(const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("spring.canvas", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
-            backgroundColor, "canvas", location, size, dock, anchors), diagram(new Diagram()), moveOperationCreated(false)
+            backgroundColor, "canvas", location, size, dock, anchors), diagram(new Diagram()), operationCreated(false)
         {
             diagram->SetCanvas(this);
         }
@@ -123,7 +123,7 @@ namespace spring
             bool left = (buttons & MouseButtons.lbutton) != MouseButtons.none;
             bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
             mouseDownArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
-            moveOperationCreated = false;
+            operationCreated = false;
         }
         protected override void OnMouseMove(MouseEventArgs& args)
         {
@@ -149,12 +149,12 @@ namespace spring
             {
                 if (left && !right && !shift && !control)
                 {
-                    if (!moveOperationCreated)
+                    if (!operationCreated)
                     {
-                        moveOperationCreated = true;
-                        Tools.Current()->CreateMoveOperation(mouseDownArgs);
+                        operationCreated = true;
+                        Tools.Current()->CreateOperation(mouseDownArgs);
                     }
-                    Tools.Current()->ContinueMoveOperation(mouseMoveArgs);
+                    Tools.Current()->ContinueOperation(mouseMoveArgs);
                 }
             }
             else if (Tools.Current() is RelationshipTool*)
@@ -183,19 +183,19 @@ namespace spring
                 Duration duration = mouseUpArgs.time - mouseDownArgs.time;
                 if (duration <= Duration.FromMilliseconds(clickThresholdMs))
                 {
-                    if (moveOperationCreated)
+                    if (operationCreated)
                     {
-                        moveOperationCreated = false;
-                        Tools.Current()->CancelMoveOperation(mouseUpArgs);
+                        operationCreated = false;
+                        Tools.Current()->CancelOperation(mouseUpArgs);
                     }
                     Tools.Current()->MouseClick(mouseUpArgs);
                 }
                 else
                 {
-                    if (moveOperationCreated)
+                    if (operationCreated)
                     {
-                        moveOperationCreated = false;
-                        Tools.Current()->CommitMoveOperation(mouseUpArgs);
+                        operationCreated = false;
+                        Tools.Current()->CommitOperation(mouseUpArgs);
                     }
                 }
             }
@@ -292,6 +292,6 @@ namespace spring
         private MouseArgs mouseDownArgs;
         private MouseArgs mouseMoveArgs;
         private MouseArgs mouseUpArgs;
-        private bool moveOperationCreated;
+        private bool operationCreated;
     }
 }

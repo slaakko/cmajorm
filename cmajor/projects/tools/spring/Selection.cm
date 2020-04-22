@@ -23,11 +23,31 @@ namespace spring
         public abstract nothrow List<int> GetContainerElementIndeces() const;
         public abstract nothrow void Clear();
         public abstract nothrow void Delete();
-        public abstract nothrow ustring Copy();
+        public abstract nothrow void SetStartLocation(const System.Windows.PointF& startLocation_);
+        public abstract nothrow void Move(MouseArgs& args);
         public abstract nothrow List<UniquePtr<DiagramElement>> Clone() const;
         public abstract nothrow int GetFirstIndex() const;
         public abstract nothrow void Add(int index);
         public abstract nothrow void Remove(int index);
+        public virtual nothrow void Draw(System.Windows.Graphics& graphics)
+        {
+        }
+        public nothrow ustring Copy()
+        {
+            List<UniquePtr<DiagramElement>> clonedElements = Clone();
+            System.Dom.Document elementDoc;
+            elementDoc.AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Element(u"spring.diagram.elements")));
+            for (const UniquePtr<DiagramElement>& clonedElement : clonedElements)
+            {
+                UniquePtr<System.Dom.Element> domElement = clonedElement->CreateDomElement();
+                clonedElement->Write(domElement.Get());
+                elementDoc.DocumentElement()->AppendChild(UniquePtr<System.Dom.Node>(domElement.Release()));
+            }
+            StringWriter writer;
+            CodeFormatter formatter(writer);
+            elementDoc.Write(formatter);
+            return ToUtf32(writer.GetString());
+        }
         public virtual nothrow void AddActions(System.Windows.ContextMenu* contextMenu)
         {
             System.Windows.MenuItem* saveImageMenuItem = new System.Windows.MenuItem("Save image");
@@ -82,9 +102,11 @@ namespace spring
         public override nothrow void Delete()
         {
         }
-        public override nothrow ustring Copy()
+        public override nothrow void SetStartLocation(const System.Windows.PointF& startLocation_)
         {
-            return ustring();
+        }
+        public override nothrow void Move(MouseArgs& args)
+        {
         }
         public override nothrow List<UniquePtr<DiagramElement>> Clone() const
         {
@@ -197,7 +219,10 @@ namespace spring
                     List<RelationshipElement*> containerElementRelationships = containerElement->GetAllRelationships();
                     for (RelationshipElement* relationship : containerElementRelationships)
                     {
-                        relationships.Add(relationship);
+                        if (Find(relationships.CBegin(), relationships.CEnd(), relationship) == relationships.CEnd())
+                        {
+                            relationships.Add(relationship);
+                        }
                     }
                 }
             }
@@ -208,7 +233,10 @@ namespace spring
                 int index = GetDiagram().GetIndexOfElement(relationship);
                 if (index != -1)
                 {
-                    relationshipIndeces.Add(index);
+                    if (Find(relationshipIndeces.CBegin(), relationshipIndeces.CEnd(), index) == relationshipIndeces.CEnd())
+                    {
+                        relationshipIndeces.Add(index);
+                    }
                 }
             }
             Sort(relationshipIndeces);
@@ -218,6 +246,12 @@ namespace spring
                 int index = relationshipIndeces[i];
                 UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
             }
+        }
+        public override nothrow void SetStartLocation(const System.Windows.PointF& startLocation_)
+        {
+        }
+        public override nothrow void Move(MouseArgs& args)
+        {
         }
         public override nothrow List<UniquePtr<DiagramElement>> Clone() const
         {
@@ -280,7 +314,10 @@ namespace spring
                         {
                             boundingRect = System.Windows.RectF.Union(boundingRect, relationship->BoundingRect());
                         }
-                        relationshipElements.Add(relationship);
+                        if (Find(relationshipElements.CBegin(), relationshipElements.CEnd(), relationship) == relationshipElements.CEnd())
+                        {
+                            relationshipElements.Add(relationship);
+                        }
                     }
                 }
             }
@@ -297,22 +334,6 @@ namespace spring
                 clonedElement->Offset(-boundingRect.location.x, -boundingRect.location.y);
             }
             return clonedElements;
-        }
-        public override nothrow ustring Copy()
-        {
-            List<UniquePtr<DiagramElement>> clonedElements = Clone();
-            System.Dom.Document elementDoc;
-            elementDoc.AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Element(u"spring.diagram.elements")));
-            for (const UniquePtr<DiagramElement>& clonedElement : clonedElements)
-            {
-                UniquePtr<System.Dom.Element> domElement = clonedElement->CreateDomElement();
-                clonedElement->Write(domElement.Get());
-                elementDoc.DocumentElement()->AppendChild(UniquePtr<System.Dom.Node>(domElement.Release()));
-            }
-            StringWriter writer;
-            CodeFormatter formatter(writer);
-            elementDoc.Write(formatter);
-            return ToUtf32(writer.GetString());
         }
         public override nothrow int GetFirstIndex() const
         {
@@ -533,6 +554,209 @@ namespace spring
             }
         }
         private List<int> indeces;
+    }
+
+    public class RectangleSelection : Selection
+    {
+        public nothrow RectangleSelection(Diagram& diagram, const System.Windows.PointF& startLocation_) : base(diagram), rect(startLocation_, System.Windows.SizeF()), startLocation(startLocation_)
+        {
+        }
+        public override nothrow bool IsEmpty() const
+        {
+            if (rect.IsEmpty()) return true;
+            return GetDiagram().HasIntersectingContrainerElements(rect);
+        }
+        public override nothrow int Count() const
+        {
+            return GetDiagram().GetNumberOfIntersectingContainerElements(rect);
+        }
+        public override nothrow bool Contains(const System.Windows.PointF& location) const
+        {
+            return rect.Contains(location);
+        }
+        public override nothrow int GetContainerElementCount() const
+        {
+            return GetDiagram().GetNumberOfIntersectingContainerElements(rect);
+        }
+        public override nothrow List<int> GetContainerElementIndeces() const
+        {
+            return GetDiagram().GetIntersectingContainerElementIndeces(rect);
+        }
+        public override nothrow void Clear()
+        {
+            rect = System.Windows.RectF();
+        }
+        public override nothrow void Delete()
+        {
+            List<int> containerElementIndeces = GetContainerElementIndeces();
+            Sort(containerElementIndeces);
+            List<RelationshipElement*> relationships;
+            int n = cast<int>(containerElementIndeces.Count());
+            for (int i = n - 1; i >= 0; --i)
+            {
+                int index = containerElementIndeces[i];
+                UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+                if (element.Get() is ContainerElement*)
+                {
+                    ContainerElement* containerElement = cast<ContainerElement*>(element.Get());
+                    List<RelationshipElement*> containerElementRelationships = containerElement->GetAllRelationships();
+                    for (RelationshipElement* relationship : containerElementRelationships)
+                    {
+                        if (Find(relationships.CBegin(), relationships.CEnd(), relationship) == relationships.CEnd())
+                        {
+                            relationships.Add(relationship);
+                        }
+                    }
+                }
+            }
+            List<int> relationshipIndeces;
+            for (RelationshipElement* relationship : relationships)
+            {
+                int index = GetDiagram().GetIndexOfElement(relationship);
+                if (index != -1)
+                {
+                    if (Find(relationshipIndeces.CBegin(), relationshipIndeces.CEnd(), index) == relationshipIndeces.CEnd())
+                    {
+                        relationshipIndeces.Add(index);
+                    }
+                }
+            }
+            Sort(relationshipIndeces);
+            int m = cast<int>(relationshipIndeces.Count());
+            for (int i = m - 1; i >= 0; --i)
+            {
+                int index = relationshipIndeces[i];
+                UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+            }
+        }
+        public override nothrow void SetStartLocation(const System.Windows.PointF& startLocation_)
+        {
+            startLocation = startLocation_;
+            rectStartLocation = rect.location;
+        }
+        public override nothrow void Move(MouseArgs& args)
+        {
+            float dx = args.location.x - startLocation.x;
+            float dy = args.location.y - startLocation.y;
+            rect.location.x = rectStartLocation.x + dx;
+            rect.location.y = rectStartLocation.y + dy ;
+        }
+        public override nothrow List<UniquePtr<DiagramElement>> Clone() const
+        {
+            List<UniquePtr<DiagramElement>> clonedElements;
+            List<ContainerElement*> containerElements;
+            List<RelationshipElement*> relationshipElements;
+            System.Windows.RectF boundingRect;
+            List<int> containerElementIndeces = GetContainerElementIndeces();
+            int n = cast<int>(containerElementIndeces.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                int index = containerElementIndeces[i];
+                DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                if (element is ContainerElement*)
+                {
+                    if (boundingRect.IsEmpty())
+                    {
+                        boundingRect = element->BoundingRect();
+                    }
+                    else
+                    {
+                        boundingRect = System.Windows.RectF.Union(boundingRect, element->BoundingRect());
+                    }
+                    containerElements.Add(cast<ContainerElement*>(element));
+                }
+            }
+            for (ContainerElement* containerElement : containerElements)
+            {
+                List<RelationshipElement*> containerRelationships = containerElement->GetAllRelationships();
+                for (RelationshipElement* relationship : containerRelationships)
+                {
+                    bool sourceInClosure = false;
+                    if (relationship->source.element != null)
+                    {
+                        ContainerElement* sourceContainerElement = relationship->source.element->GetContainerElement();
+                        if (Find(containerElements.CBegin(), containerElements.CEnd(), sourceContainerElement) != containerElements.CEnd())
+                        {
+                            sourceInClosure = true;
+                        }
+                    }
+                    bool targetInClosure = false;
+                    if (relationship->target.element != null)
+                    {
+                        ContainerElement* targetContainerElement = relationship->target.element->GetContainerElement();
+                        if (Find(containerElements.CBegin(), containerElements.CEnd(), targetContainerElement) != containerElements.CEnd())
+                        {
+                            targetInClosure = true;
+                        }
+                    }
+                    else if (relationship->kind == RelationshipElement.kind.reference && relationship->cardinality == Cardinality.zero)
+                    {
+                        targetInClosure = true;
+                    }
+                    if (sourceInClosure && targetInClosure)
+                    {
+                        if (boundingRect.IsEmpty())
+                        {
+                            boundingRect = relationship->BoundingRect();
+                        }
+                        else
+                        {
+                            boundingRect = System.Windows.RectF.Union(boundingRect, relationship->BoundingRect());
+                        }
+
+                        relationshipElements.Add(relationship);
+                    }
+                }
+            }
+            for (ContainerElement* containerElement : containerElements)
+            {
+                clonedElements.Add(UniquePtr<DiagramElement>(containerElement->Clone()));
+            }
+            for (RelationshipElement* relationshipElement : relationshipElements)
+            {
+                clonedElements.Add(UniquePtr<DiagramElement>(relationshipElement->Clone()));
+            }
+            for (UniquePtr<DiagramElement>& clonedElement : clonedElements)
+            {
+                clonedElement->Offset(-boundingRect.location.x, -boundingRect.location.y);
+            }
+            return clonedElements;
+        }
+        public override nothrow int GetFirstIndex() const
+        {
+            List<int> containerElementIndeces = GetContainerElementIndeces();
+            if (!containerElementIndeces.IsEmpty())
+            {
+                return containerElementIndeces.Front();
+            }
+            return -1;
+        }
+        public override nothrow void Add(int index)
+        {
+        }
+        public override nothrow void Remove(int index)
+        {
+        }
+        public override nothrow void AddActions(System.Windows.ContextMenu* contextMenu)
+        {
+            base->AddActions(contextMenu);
+            System.Windows.MenuItem* deleteMenuItem = new System.Windows.MenuItem("Delete");
+            contextMenu->AddMenuItemAction(deleteMenuItem, new DeleteSelectionAction(GetDiagram()));
+        }
+        public override nothrow void Draw(System.Windows.Graphics& graphics)
+        {
+            Layout& layout = GetDiagram().GetLayout();
+            const ColorElement& selectedColorElement = layout.GetSelectedColorElement();
+            const System.Windows.Brush* brush = selectedColorElement.GetBrush(layout);
+            graphics.FillRectangleChecked(*brush, rect);
+        }
+        public nothrow inline System.Windows.RectF& GetRect()
+        {
+            return rect;
+        }
+        private System.Windows.RectF rect;
+        private System.Windows.PointF rectStartLocation;
+        private System.Windows.PointF startLocation;
     }
 }
 

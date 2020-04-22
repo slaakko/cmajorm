@@ -209,16 +209,16 @@ namespace spring
         public virtual void MouseDoubleClick(MouseArgs& args)
         {
         }
-        public virtual void CreateMoveOperation(MouseArgs& args)
+        public virtual void CreateOperation(MouseArgs& args)
         {
         }
-        public virtual void ContinueMoveOperation(MouseArgs& args)
+        public virtual void ContinueOperation(MouseArgs& args)
         {
         }
-        public virtual void CancelMoveOperation(MouseArgs& args)
+        public virtual void CancelOperation(MouseArgs& args)
         {
         }
-        public virtual void CommitMoveOperation(MouseArgs& args)
+        public virtual void CommitOperation(MouseArgs& args)
         {
         }
         private nothrow void ToolButtonClicked()
@@ -359,9 +359,10 @@ namespace spring
                 }
             }
         }
-        public override void CreateMoveOperation(MouseArgs& args)
+        public override void CreateOperation(MouseArgs& args)
         {
-            UniquePtr<MoveContainerElementsOperation> moveOperation(new MoveContainerElementsOperation(args.diagram, args.location));
+            if (args.diagram == null) return;
+            UniquePtr<Operation> operation(new MoveContainerElementsOperation(args.diagram, args.location));
             if (args.diagram->GetSelection()->Count() <= 1)
             {
                 if (args.diagram->GetSelection()->Count() == 1)
@@ -382,7 +383,7 @@ namespace spring
                     {
                         if (args.element->Contains(args.location))
                         {
-                            moveOperation->AddElementIndex(args.elementIndex);
+                            operation->AddElementIndex(args.elementIndex);
                             ContainerElement* containerElement = cast<ContainerElement*>(args.element);
                             if (containerElement != null)
                             {
@@ -406,7 +407,7 @@ namespace spring
                                         int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
                                         if (relationshipIndex != -1)
                                         {
-                                            moveOperation->AddElementIndex(relationshipIndex);
+                                            operation->AddElementIndex(relationshipIndex);
                                         }
                                     }
                                     else if (targetElement == null && relationship->kind == RelationshipElement.kind.reference && relationship->cardinality == Cardinality.zero)
@@ -414,13 +415,19 @@ namespace spring
                                         int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
                                         if (relationshipIndex != -1)
                                         {
-                                            moveOperation->AddElementIndex(relationshipIndex);
+                                            operation->AddElementIndex(relationshipIndex);
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                }
+                else
+                {
+                    operation.Reset(new CreateRectangleSelectionOperation(args.diagram, args.location));
+                    args.diagram->SetOperation(operation.Release());
+                    return;
                 }
             }
             else
@@ -490,25 +497,25 @@ namespace spring
                         {
                             elementIndeces.Add(relationshipIndex);
                         }
-                        moveOperation->SetElementIndeces(Rvalue(elementIndeces));
+                        operation->SetElementIndeces(Rvalue(elementIndeces));
                     }
                 }
             }
-            moveOperation->FetchOriginalLocations();
-            if (!moveOperation->IsEmpty())
+            operation->FetchOriginalLocations();
+            if (!operation->IsEmpty())
             {
-                args.diagram->SetOperation(moveOperation.Release());
+                args.diagram->SetOperation(operation.Release());
             }
         }
-        public override void ContinueMoveOperation(MouseArgs& args)
+        public override void ContinueOperation(MouseArgs& args)
         {
             args.diagram->AdvanceOperation(args);
         }
-        public override void CancelMoveOperation(MouseArgs& args)
+        public override void CancelOperation(MouseArgs& args)
         {
             args.diagram->CancelOperation();
         }
-        public override void CommitMoveOperation(MouseArgs& args)
+        public override void CommitOperation(MouseArgs& args)
         {
             args.diagram->CommitOperation(args);
         }

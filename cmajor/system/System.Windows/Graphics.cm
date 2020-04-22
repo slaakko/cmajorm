@@ -1025,6 +1025,13 @@ namespace System.Windows
         {
             location.Offset(dx, dy);
         }
+        public nothrow bool IntersectsWith(const RectF& that) const
+        {
+            return location.x < that.location.x + that.size.w &&
+                location.y < that.location.y + that.size.h &&
+                location.x + size.w > that.location.x &&
+                location.y + size.h > that.location.y;
+        }
         public static nothrow Rect Union(const Rect& a, const Rect& b)
         {
             int right = Max(a.Right(), b.Right());
@@ -1092,6 +1099,13 @@ namespace System.Windows
         public nothrow inline void Offset(float dx, float dy)
         {
             location.Offset(dx, dy);
+        }
+        public nothrow bool IntersectsWith(const RectF& that) const
+        {
+            return location.x < that.location.x + that.size.w &&
+                location.y < that.location.y + that.size.h &&
+                location.x + size.w > that.location.x &&
+                location.y + size.h > that.location.y;
         }
         public static nothrow RectF Union(const RectF& a, const RectF& b)
         {
