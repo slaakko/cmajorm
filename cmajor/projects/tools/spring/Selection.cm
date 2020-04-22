@@ -24,13 +24,29 @@ namespace spring
         public abstract nothrow void Clear();
         public abstract nothrow void Delete();
         public abstract nothrow ustring Copy();
+        public abstract nothrow List<UniquePtr<DiagramElement>> Clone() const;
         public abstract nothrow int GetFirstIndex() const;
         public abstract nothrow void Add(int index);
         public abstract nothrow void Remove(int index);
-        public abstract nothrow void AddActions(System.Windows.ContextMenu* contextMenu);
+        public virtual nothrow void AddActions(System.Windows.ContextMenu* contextMenu)
+        {
+            System.Windows.MenuItem* saveImageMenuItem = new System.Windows.MenuItem("Save image");
+            contextMenu->AddMenuItemAction(saveImageMenuItem, new SaveSelectionAsImageAction(GetDiagram()));
+        }
         public nothrow inline Diagram& GetDiagram() const
         {
             return diagram;
+        }
+        public void SaveImage(const string& fileName, const PaddingElement& margins, System.Windows.ImageFormat imageFormat)
+        {
+            List<UniquePtr<DiagramElement>> clonedElements = Clone();
+            List<DiagramElement*> diagramElements;
+            for (const UniquePtr<DiagramElement>& element : clonedElements)
+            {
+                diagramElements.Add(element.Get());
+            }
+            System.Windows.Graphics graphics = graphics.FromWindowHandle(GetDiagram().GetCanvas()->Handle());
+            spring.SaveImage(fileName, margins, diagramElements, graphics, GetDiagram().GetLayout(), imageFormat);
         }
         private Diagram& diagram;
     }
@@ -69,6 +85,10 @@ namespace spring
         public override nothrow ustring Copy()
         {
             return ustring();
+        }
+        public override nothrow List<UniquePtr<DiagramElement>> Clone() const
+        {
+            return List<UniquePtr<DiagramElement>>();
         }
         public override nothrow int GetFirstIndex() const
         {
@@ -199,7 +219,7 @@ namespace spring
                 UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
             }
         }
-        public List<UniquePtr<DiagramElement>> Clone() const
+        public override nothrow List<UniquePtr<DiagramElement>> Clone() const
         {
             List<UniquePtr<DiagramElement>> clonedElements;
             List<ContainerElement*> containerElements;
@@ -274,9 +294,7 @@ namespace spring
             }
             for (UniquePtr<DiagramElement>& clonedElement : clonedElements)
             {
-                CompoundLocation location = clonedElement->GetCompoundLocation();
-                location.Offset(-boundingRect.location.x, -boundingRect.location.y);
-                clonedElement->SetCompoundLocation(location);
+                clonedElement->Offset(-boundingRect.location.x, -boundingRect.location.y);
             }
             return clonedElements;
         }
@@ -327,6 +345,7 @@ namespace spring
         }
         public override nothrow void AddActions(System.Windows.ContextMenu* contextMenu)
         {
+            base->AddActions(contextMenu);
             int containerElementCount = GetContainerElementCount();
             if (containerElementCount > 1)
             {

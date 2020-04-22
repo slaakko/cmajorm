@@ -42,6 +42,9 @@ public class MainWindow : Window
         UniquePtr<MenuItem> saveAsMenuItem(new MenuItem("Save &As..."));
         saveAsMenuItem->ClickEvent().AddHandler(SaveAsClick);
         fileMenuItem->AddMenuItem(saveAsMenuItem.Release());
+        UniquePtr<MenuItem> saveImageMenuItem(new MenuItem("Save &Image..."));
+        saveImageMenuItem->ClickEvent().AddHandler(SaveImageClick);
+        fileMenuItem->AddMenuItem(saveImageMenuItem.Release());
         fileMenuItem->AddMenuItem(new MenuItemSeparator());
         /*
         UniquePtr<MenuItem> testMenuItem(new MenuItem("&Test"));
@@ -368,6 +371,14 @@ public class MainWindow : Window
     private void EditRedo()
     {
         canvas->GetDiagram().Redo();
+    }
+    private void SaveImageClick()
+    {
+        SaveImageDialog dialog(diagramFilePath, canvas->GetDiagram().GetLayout());
+        if (dialog.ShowDialog(*this) == DialogResult.ok)
+        {
+            canvas->GetDiagram().SaveImage(dialog.fileName, dialog.margins, dialog.format);
+        }
     }
     private void TestClick()
     {

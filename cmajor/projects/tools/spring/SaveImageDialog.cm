@@ -1,0 +1,431 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Collections;
+using System.Windows;
+
+namespace spring
+{
+    public class SaveImageDialog : Window
+    {
+        public SaveImageDialog(const string& diagramFileName_, const Layout& layout_) : 
+            base("spring.saveImageDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(),
+            DefaultControlBackgroundColor(), "Save image", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(100), ScreenMetrics.Get().MMToVerticalPixels(100)), Dock.none, Anchors.none),
+            diagramFileName(diagramFileName_), layout(layout_)
+        {
+            if (!diagramFileName.IsEmpty())
+            {
+                fileName = Path.ChangeExtension(diagramFileName, ".png");
+            }
+            format = ImageFormat.png;
+            Size s = GetSize();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            margins.left = layout.GetDiagramPaddingElement().left;
+            margins.top = layout.GetDiagramPaddingElement().top;
+            margins.right = layout.GetDiagramPaddingElement().right;
+            margins.bottom = layout.GetDiagramPaddingElement().bottom;
+            int labelColumnWidth = ScreenMetrics.Get().MMToHorizontalPixels(15);
+
+            UniquePtr<GroupBox> formatGroupBoxPtr(new GroupBox("Format", Point(defaultControlSpacing.w, defaultControlSpacing.h),
+                Size(ScreenMetrics.Get().MMToHorizontalPixels(30), ScreenMetrics.Get().MMToVerticalPixels(30)), Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            formatGroupBox = formatGroupBoxPtr.Get();
+            AddChild(formatGroupBoxPtr.Release());
+            Point formatGroupBoxLoc = formatGroupBox->Location();
+            UniquePtr<RadioButton> pngRadioButtonPtr(new RadioButton("PNG", Point(formatGroupBoxLoc.x, formatGroupBoxLoc.y + defaultControlSpacing.h),
+                Size(), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            pngRadioButton = pngRadioButtonPtr.Get();
+            pngRadioButton->CheckedChangedEvent().AddHandler(FormatRadioButtonStateChanged);
+            formatGroupBox->AddChild(pngRadioButtonPtr.Release());
+            UniquePtr<RadioButton> jpgRadioButtonPtr(new RadioButton("JPEG", Point(formatGroupBoxLoc.x, pngRadioButton->Location().y + pngRadioButton->GetSize().h),
+                Size(), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            jpgRadioButton = jpgRadioButtonPtr.Get();
+            jpgRadioButton->CheckedChangedEvent().AddHandler(FormatRadioButtonStateChanged);
+            formatGroupBox->AddChild(jpgRadioButtonPtr.Release());
+            UniquePtr<RadioButton> gifRadioButtonPtr(new RadioButton("GIF", Point(formatGroupBoxLoc.x, jpgRadioButton->Location().y + jpgRadioButton->GetSize().h),
+                Size(), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            gifRadioButton = gifRadioButtonPtr.Get();
+            gifRadioButton->CheckedChangedEvent().AddHandler(FormatRadioButtonStateChanged);
+            formatGroupBox->AddChild(gifRadioButtonPtr.Release());
+            UniquePtr<RadioButton> tiffRadioButtonPtr(new RadioButton("TIFF", Point(formatGroupBoxLoc.x, gifRadioButton->Location().y + gifRadioButton->GetSize().h),
+                Size(), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            tiffRadioButton = tiffRadioButtonPtr.Get();
+            tiffRadioButton->CheckedChangedEvent().AddHandler(FormatRadioButtonStateChanged);
+            formatGroupBox->AddChild(tiffRadioButtonPtr.Release());
+            UniquePtr<RadioButton> bmpRadioButtonPtr(new RadioButton("BMP", Point(formatGroupBoxLoc.x, tiffRadioButton->Location().y + tiffRadioButton->GetSize().h),
+                Size(), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            bmpRadioButton = bmpRadioButtonPtr.Get();
+            bmpRadioButton->CheckedChangedEvent().AddHandler(FormatRadioButtonStateChanged);
+            formatGroupBox->AddChild(bmpRadioButtonPtr.Release());
+
+            UniquePtr<GroupBox> marginsGroupBoxPtr(new GroupBox("Margins", Point(formatGroupBoxLoc.x + formatGroupBox->GetSize().w + defaultControlSpacing.w, defaultControlSpacing.h),
+                Size(ScreenMetrics.Get().MMToHorizontalPixels(50), ScreenMetrics.Get().MMToVerticalPixels(40)), Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            marginsGroupBox = marginsGroupBoxPtr.Get();
+            AddChild(marginsGroupBoxPtr.Release());
+            Point leftLabelLoc = Point(defaultControlSpacing.w, marginsGroupBox->Location().y + defaultControlSpacing.h);
+            UniquePtr<Label> leftLabelPtr(new Label("Left:", Point(leftLabelLoc.x, leftLabelLoc.y + defaultControlSpacing.h / 2),
+                Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            Label* leftLabel = leftLabelPtr.Get();
+            marginsGroupBox->AddChild(leftLabelPtr.Release());
+            Point leftTextBoxLoc(leftLabelLoc.x + labelColumnWidth, leftLabelLoc.y);
+            Size textBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(20), defaultTextBoxSize.h + 2 * DefaultControlPadding() + 2 * DefaultSingleBorderWidth());
+            UniquePtr<TextBox> leftTextBoxPtr(new TextBox(ToString(margins.left)));
+            leftTextBox = leftTextBoxPtr.Get();
+            leftTextBox->TextChangedEvent().AddHandler(LeftChanged);
+            UniquePtr<PaddedControl> paddedLeftTextBoxPtr(new PaddedControl(leftTextBoxPtr.Release()));
+            UniquePtr<BorderedControl> borderedLeftTextBoxPtr(new BorderedControl(paddedLeftTextBoxPtr.Release(), leftTextBoxLoc, textBoxSize, Dock.none, cast<Anchors>(Anchors.left | Anchors.top)));
+            marginsGroupBox->AddChild(borderedLeftTextBoxPtr.Release());
+            UniquePtr<Label> leftMMLabelPtr(new Label("mm", Point(leftTextBoxLoc.x + textBoxSize.w + defaultControlSpacing.w, leftTextBoxLoc.y + textBoxSize.h - defaultLabelSize.h),
+                Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            marginsGroupBox->AddChild(leftMMLabelPtr.Release());
+
+            Point topTextBoxLoc(leftTextBoxLoc.x, leftTextBoxLoc.y + textBoxSize.h + defaultControlSpacing.h);
+            UniquePtr<Label> topLabelPtr(new Label("Top:", Point(defaultControlSpacing.w, topTextBoxLoc.y + textBoxSize.h - defaultLabelSize.h),
+                Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            Label* topLabel = topLabelPtr.Get();
+            marginsGroupBox->AddChild(topLabelPtr.Release());
+            UniquePtr<TextBox> topTextBoxPtr(new TextBox(ToString(margins.top)));
+            topTextBox = topTextBoxPtr.Get();
+            topTextBox->TextChangedEvent().AddHandler(TopChanged);
+            UniquePtr<PaddedControl> paddedTopTextBoxPtr(new PaddedControl(topTextBoxPtr.Release()));
+            UniquePtr<BorderedControl> borderedTopTextBoxPtr(new BorderedControl(paddedTopTextBoxPtr.Release(), topTextBoxLoc, textBoxSize, Dock.none, cast<Anchors>(Anchors.left | Anchors.top)));
+            marginsGroupBox->AddChild(borderedTopTextBoxPtr.Release());
+            UniquePtr<Label> topMMLabelPtr(new Label("mm", Point(topTextBoxLoc.x + textBoxSize.w + defaultControlSpacing.w, topTextBoxLoc.y + textBoxSize.h - defaultLabelSize.h),
+                Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            marginsGroupBox->AddChild(topMMLabelPtr.Release());
+
+            Point rightTextBoxLoc(topTextBoxLoc.x, topTextBoxLoc.y + textBoxSize.h + defaultControlSpacing.h);
+            UniquePtr<Label> rightLabelPtr(new Label("Right:", Point(defaultControlSpacing.w, rightTextBoxLoc.y + textBoxSize.h - defaultLabelSize.h),
+                Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            Label* rightLabel = rightLabelPtr.Get();
+            marginsGroupBox->AddChild(rightLabelPtr.Release());
+            UniquePtr<TextBox> rightTextBoxPtr(new TextBox(ToString(margins.right)));
+            rightTextBox = rightTextBoxPtr.Get();
+            rightTextBox->TextChangedEvent().AddHandler(RightChanged);
+            UniquePtr<PaddedControl> paddedRightTextBoxPtr(new PaddedControl(rightTextBoxPtr.Release()));
+            UniquePtr<BorderedControl> borderedRightTextBoxPtr(new BorderedControl(paddedRightTextBoxPtr.Release(), rightTextBoxLoc, textBoxSize, Dock.none, cast<Anchors>(Anchors.left | Anchors.top)));
+            marginsGroupBox->AddChild(borderedRightTextBoxPtr.Release());
+            UniquePtr<Label> rightMMLabelPtr(new Label("mm", Point(rightTextBoxLoc.x + textBoxSize.w + defaultControlSpacing.w, rightTextBoxLoc.y + textBoxSize.h - defaultLabelSize.h),
+                Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            marginsGroupBox->AddChild(rightMMLabelPtr.Release());
+
+            Point bottomTextBoxLoc(rightTextBoxLoc.x, rightTextBoxLoc.y + textBoxSize.h + defaultControlSpacing.h);
+            UniquePtr<Label> bottomLabelPtr(new Label("Bottom:", Point(defaultControlSpacing.w, bottomTextBoxLoc.y + textBoxSize.h - defaultLabelSize.h),
+                Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            Label* bottomLabel = bottomLabelPtr.Get();
+            marginsGroupBox->AddChild(bottomLabelPtr.Release());
+            UniquePtr<TextBox> bottomTextBoxPtr(new TextBox(ToString(margins.bottom)));
+            bottomTextBox = bottomTextBoxPtr.Get();
+            bottomTextBox->TextChangedEvent().AddHandler(BottomChanged);
+            UniquePtr<PaddedControl> paddedBottomTextBoxPtr(new PaddedControl(bottomTextBoxPtr.Release()));
+            UniquePtr<BorderedControl> borderedBottomTextBoxPtr(new BorderedControl(paddedBottomTextBoxPtr.Release(), bottomTextBoxLoc, textBoxSize, Dock.none, cast<Anchors>(Anchors.left | Anchors.top)));
+            marginsGroupBox->AddChild(borderedBottomTextBoxPtr.Release());
+            UniquePtr<Label> bottomMMLabelPtr(new Label("mm", Point(bottomTextBoxLoc.x + textBoxSize.w + defaultControlSpacing.w, bottomTextBoxLoc.y + textBoxSize.h - defaultLabelSize.h),
+                Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            marginsGroupBox->AddChild(bottomMMLabelPtr.Release());
+
+            Point fileNameLabelLoc(defaultControlSpacing.w, marginsGroupBox->Location().y + marginsGroupBox->GetSize().h + defaultControlSpacing.h + textBoxSize.h - defaultLabelSize.h);
+            UniquePtr<Label> fileNameLabelPtr(new Label("Image file name:", fileNameLabelLoc, Size(), Dock.none, cast<Anchors>(Anchors.left | Anchors.top), true));
+            Label* fileNameLabel = fileNameLabelPtr.Get();
+            AddChild(fileNameLabelPtr.Release());
+            Point fileNameTextBoxLoc(defaultControlSpacing.w, fileNameLabelLoc.y + fileNameLabel->GetSize().h + defaultControlSpacing.h);
+            UniquePtr<TextBox> fileNameTextBoxPtr(new TextBox(fileName));
+            fileNameTextBox = fileNameTextBoxPtr.Get();
+            fileNameTextBox->TextChangedEvent().AddHandler(FileNameChanged);
+            UniquePtr<PaddedControl> paddedFileNameTextBoxPtr(new PaddedControl(fileNameTextBoxPtr.Release()));
+            UniquePtr<BorderedControl> borderedFileNameTextBoxPtr(new BorderedControl(paddedFileNameTextBoxPtr.Release(), fileNameTextBoxLoc,
+                Size(ScreenMetrics.Get().MMToHorizontalPixels(80), textBoxSize.h), Dock.none, cast<Anchors>(Anchors.left | Anchors.top)));
+            AddChild(borderedFileNameTextBoxPtr.Release());
+
+            Point browseButtonLoc(fileNameTextBoxLoc.x + fileNameTextBox->GetSize().w - defaultButtonSize.w, fileNameTextBoxLoc.y + textBoxSize.h + defaultControlSpacing.h);
+            UniquePtr<Button> browseButtonPtr(new Button("Browse", browseButtonLoc, defaultButtonSize, Dock.none, cast<Anchors>(Anchors.left | Anchors.top)));
+            browseButton = browseButtonPtr.Get();
+            browseButton->ClickEvent().AddHandler(BrowseClick);
+            AddChild(browseButtonPtr.Release());
+            
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            okButton = okButtonPtr.Get();
+            okButton->SetDialogResult(DialogResult.ok);
+            AddChild(okButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            if (fileName.IsEmpty())
+            {
+                okButton->Disable();
+            }
+            else
+            {
+                fileNameTextBox->SetText(fileName);
+            }
+            SetDefaultButton(okButton);
+            SetCancelButton(cancelButton);
+            ready = true;
+            fileNameTextBox->SetFocus();
+        }
+        private void FormatRadioButtonStateChanged()
+        {
+            if (!ready) return;
+            RadioButton* checkedRadioButton = formatGroupBox->CheckedRadioButton();
+            if (checkedRadioButton == pngRadioButton)
+            {
+                format = ImageFormat.png;
+            }
+            else if (checkedRadioButton == jpgRadioButton)
+            {
+                format = ImageFormat.jpeg;
+            }
+            else if (checkedRadioButton == gifRadioButton)
+            {
+                format = ImageFormat.gif;
+            }
+            else if (checkedRadioButton == tiffRadioButton)
+            {
+                format = ImageFormat.tiff;
+            }
+            else if (checkedRadioButton == bmpRadioButton)
+            {
+                format = ImageFormat.bmp;
+            }
+            if (!fileName.IsEmpty())
+            {
+                switch (format)
+                {
+                    case ImageFormat.png:
+                    {
+                        fileName = Path.ChangeExtension(fileName, ".png");
+                        break;
+                    }
+                    case ImageFormat.jpeg:
+                    {
+                        fileName = Path.ChangeExtension(fileName, ".jpg");
+                        break;
+                    }
+                    case ImageFormat.gif:
+                    {
+                        fileName = Path.ChangeExtension(fileName, ".gif");
+                        break;
+                    }
+                    case ImageFormat.tiff:
+                    {
+                        fileName = Path.ChangeExtension(fileName, ".tiff");
+                        break;
+                    }
+                    case ImageFormat.bmp:
+                    {
+                        fileName = Path.ChangeExtension(fileName, ".bmp");
+                        break;
+                    }
+                }
+                if (fileNameTextBox != null)
+                {
+                    fileNameTextBox->SetText(fileName);
+                }
+            }
+        }
+        private void FileNameChanged()
+        {
+            bool disable = false;
+            fileName = fileNameTextBox->Text();
+            if (fileName.IsEmpty())
+            {
+                disable = true;
+            }
+            else
+            {
+                disable = false;
+            }
+            if (disable)
+            {
+                okButton->Disable();
+            }
+            else
+            {
+                okButton->Enable();
+            }
+        }
+        private void LeftChanged()
+        {
+            bool disable = false;
+            try
+            {
+                string left = leftTextBox->Text();
+                if (left.IsEmpty())
+                {
+                    disable = true;
+                }
+                else
+                {
+                    margins.left = ParseFloat(left);
+                    disable = false;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                disable = true;
+            }
+            if (disable)
+            {
+                okButton->Disable();
+            }
+            else
+            {
+                okButton->Enable();
+            }
+        }
+        private void TopChanged()
+        {
+            bool disable = false;
+            try
+            {
+                string text = topTextBox->Text();
+                if (text.IsEmpty())
+                {
+                    disable = true;
+                }
+                else
+                {
+                    margins.top = ParseFloat(text);
+                    disable = false;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                disable = true;
+            }
+            if (disable)
+            {
+                okButton->Disable();
+            }
+            else
+            {
+                okButton->Enable();
+            }
+        }
+        private void RightChanged()
+        {
+            bool disable = false;
+            try
+            {
+                string text = rightTextBox->Text();
+                if (text.IsEmpty())
+                {
+                    disable = true;
+                }
+                else
+                {
+                    margins.right = ParseFloat(text);
+                    disable = false;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                disable = true;
+            }
+            if (disable)
+            {
+                okButton->Disable();
+            }
+            else
+            {
+                okButton->Enable();
+            }
+        }
+        private void BottomChanged()
+        {
+            bool disable = false;
+            try
+            {
+                string text = bottomTextBox->Text();
+                if (text.IsEmpty())
+                {
+                    disable = true;
+                }
+                else
+                {
+                    margins.bottom = ParseFloat(text);
+                    disable = false;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                disable = true;
+            }
+            if (disable)
+            {
+                okButton->Disable();
+            }
+            else
+            {
+                okButton->Enable();
+            }
+        }
+        private void BrowseClick()
+        {
+            try
+            {
+                List<Pair<string, string>> descriptionFilterPairs;
+                descriptionFilterPairs.Add(Pair<string, string>("PNG files (*.png)", "*.png"));
+                descriptionFilterPairs.Add(Pair<string, string>("JPG files (*.jpg)", "*.jpg"));
+                descriptionFilterPairs.Add(Pair<string, string>("GIF files (*.gif)", "*.gif"));
+                descriptionFilterPairs.Add(Pair<string, string>("TIFF files (*.tiff)", "*.tiff"));
+                descriptionFilterPairs.Add(Pair<string, string>("BMP files (*.bmp)", "*.bmp"));
+
+                string initialDirectory = DefaultDiagramDirectory();
+                string currentDirectory;
+                List<string> fileNames;
+                string defaultFilePath = fileName;
+                string filePath;
+                bool selected = System.Windows.API.GetSaveFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".png", 0u, currentDirectory, filePath);
+                if (selected)
+                {
+                    if (File.Exists(filePath))
+                    {
+                        if (MessageBox.Show("File '" + filePath + "' already exists. Do you want to replace it?", "File Exists", this, MessageBoxType.MB_YESNO) != MessageBoxResult.yes)
+                        {
+                            return;
+                        }
+                    }
+                    fileName = filePath;
+                    fileNameTextBox->SetText(fileName);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        private string diagramFileName;
+        private const Layout& layout;
+        private Button* okButton;
+        private Button* cancelButton;
+        private Button* browseButton;
+        private GroupBox* formatGroupBox;
+        private GroupBox* marginsGroupBox;
+        private RadioButton* pngRadioButton;
+        private RadioButton* jpgRadioButton;
+        private RadioButton* gifRadioButton;
+        private RadioButton* tiffRadioButton;
+        private RadioButton* bmpRadioButton;
+        private TextBox* leftTextBox;
+        private TextBox* topTextBox;
+        private TextBox* rightTextBox;
+        private TextBox* bottomTextBox;
+        private TextBox* fileNameTextBox;
+        public string fileName;
+        public PaddingElement margins;
+        public ImageFormat format;
+        private bool ready;
+    }
+}

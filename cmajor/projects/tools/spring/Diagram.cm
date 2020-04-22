@@ -144,11 +144,16 @@ namespace spring
         {
             none = 0, changed = 1 << 0, invalidated = 1 << 1, modified = 1 << 2
         }
-        public Diagram() : flags(Flags.none), layout(), elements(), selection(new EmptySelection(*this)), operation(new EmptyOperation())
+        public Diagram() : flags(Flags.none), layout(null), layoutPtr(), elements(), selection(new EmptySelection(*this)), operation(new EmptyOperation())
         {
             Tools.SetDiagram(this);
             SetChanged();
             Invalidate();
+            ResetModified();
+        }
+        public Diagram(const Layout& layout_) : flags(Flags.none), layout(&layout_), layoutPtr(), elements(), selection(new EmptySelection(*this)), operation(new EmptyOperation())
+        {
+            SetChanged();
             ResetModified();
         }
         suppress Diagram(const Diagram&);
@@ -217,14 +222,41 @@ namespace spring
                 relationshipElement->Resolve();
             }
         }
+        public void SaveImage(const string& fileName, const PaddingElement& margins, ImageFormat imageFormat)
+        {
+            List<DiagramElement*> diagramElements;
+            for (const UniquePtr<DiagramElement>& element : elements)
+            {
+                diagramElements.Add(element.Get());
+            }
+            Graphics graphics = Graphics.FromWindowHandle(GetCanvas()->Handle());
+            spring.SaveImage(fileName, margins, diagramElements, graphics, GetLayout(), imageFormat);
+        }
+        public nothrow RectF CalculateBoundingRect() const
+        {
+            List<DiagramElement*> diagramElements;
+            for (const UniquePtr<DiagramElement>& element : elements)
+            {
+                diagramElements.Add(element.Get());
+            }
+            return CalculateBoundingRect(diagramElements);
+        }
+        public nothrow void Offset(float dx, float dy)
+        {
+            for (const UniquePtr<DiagramElement>& element : elements)
+            {
+                element->Offset(dx, dy);
+            }
+        }
         public void Draw(Graphics& graphics)
         {
             if (Changed())
             {
                 ResetChanged();
-                if (layout.IsNull())
+                if (layout == null)
                 {
-                    layout.Reset(new Layout(graphics));
+                    layoutPtr.Reset(new Layout(graphics));
+                    layout = layoutPtr.Get();
                 }
                 for (const UniquePtr<DiagramElement>& element : elements)
                 {
@@ -261,9 +293,10 @@ namespace spring
         {
             return *layout;
         }
-        public nothrow void SetLayout(Layout* layout_)
+        public nothrow void ResetLayout(Layout* layout_)
         {
-            layout.Reset(layout_);
+            layoutPtr.Reset(layout_);
+            layout = layoutPtr.Get();
         }
         public nothrow void DeleteSelection()
         {
@@ -531,7 +564,8 @@ namespace spring
         }
         private Flags flags;
         private Canvas* canvas;
-        private UniquePtr<Layout> layout;
+        private Layout* layout;
+        private UniquePtr<Layout> layoutPtr;
         private IndexList<DiagramElement> elements;
         private UniquePtr<Selection> selection;
         private UniquePtr<Operation> operation;
@@ -554,6 +588,10 @@ namespace spring
         suppress void operator=(const DiagramElement&);
         suppress DiagramElement(DiagramElement&&);
         suppress void operator=(DiagramElement&&);
+        public virtual nothrow void Offset(float dx, float dy)
+        {
+            boundingRect.location.Offset(dx, dy);
+        }
         public virtual void Draw(Graphics& graphics, Layout& layout)
         {
             if (IsSelected())
@@ -1063,7 +1101,7 @@ namespace spring
         public nothrow override RectF BoundingRect() const
         {
             RectF boundingRect;
-            PointF minPoint(MaxValue<float>(), MaxValue<float>());
+            PointF minPoint(99999999999.9f, 99999999999.9f);
             PointF maxPoint(-1, -1);
             minPoint.x = Min(source.point.x, minPoint.x);
             minPoint.y = Min(source.point.y, minPoint.y);
@@ -1085,6 +1123,15 @@ namespace spring
             boundingRect.size.w = maxPoint.x - minPoint.x;
             boundingRect.size.h = maxPoint.y - minPoint.y;
             return boundingRect;
+        }
+        public override nothrow void Offset(float dx, float dy)
+        {
+            source.point.Offset(dx, dy);
+            for (PointF& intermediatePoint : intermediatePoints)
+            {
+                intermediatePoint.Offset(dx, dy);
+            }
+            target.point.Offset(dx, dy);
         }
         public override nothrow void SetCompoundLocation(const CompoundLocation& compoundLocation)
         {
@@ -3331,5 +3378,46 @@ namespace spring
         }
         private List<string> lines;
         private SizeF lineSize;
+    }
+
+    public RectF CalculateBoundingRect(const List<DiagramElement*>& diagramElements)
+    {
+        RectF boundingRect;
+        for (DiagramElement* diagramElement : diagramElements)
+        {
+            if (boundingRect.IsEmpty())
+            {
+                boundingRect = diagramElement->BoundingRect();
+            }
+            else
+            {
+                boundingRect = RectF.Union(boundingRect, diagramElement->BoundingRect());
+            }
+        }
+        return boundingRect;
+    }
+
+    public void SaveImage(const string& fileName, const PaddingElement& margins, const List<DiagramElement*>& diagramElements, Graphics& graphics, Layout& layout, ImageFormat imageFormat)
+    {
+        Diagram diagram(layout);
+        for (DiagramElement* diagramElement : diagramElements)
+        {
+            diagram.AddElement(diagramElement->Clone());
+        }
+        RectF boundingRect = diagram.CalculateBoundingRect();
+        diagram.Offset(-boundingRect.location.x + margins.left, -boundingRect.location.y + margins.top);
+        boundingRect.size.w = boundingRect.size.w + margins.Horizontal();
+        boundingRect.size.h = boundingRect.size.h + margins.Vertical();
+        int width = ScreenMetrics.Get().MMToHorizontalPixels(boundingRect.size.w);
+        int height = ScreenMetrics.Get().MMToVerticalPixels(boundingRect.size.h); 
+        Bitmap bitmap(width, height, graphics);
+        Graphics bitmapGraphics = Graphics.FromImage(bitmap);
+        bitmapGraphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
+        bitmapGraphics.SetSmoothingModeChecked(SmoothingMode.highQuality);
+        bitmapGraphics.SetPageUnitChecked(Unit.millimeter);
+        bitmapGraphics.ClearChecked(Color.White());
+        diagram.SetChanged();
+        diagram.Draw(bitmapGraphics);
+        bitmap.SaveChecked(fileName.Chars(), GetEncoderClsIdChecked(GetImageFormat(imageFormat)));
     }
 }

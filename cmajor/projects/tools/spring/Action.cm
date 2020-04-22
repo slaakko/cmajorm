@@ -65,6 +65,22 @@ namespace spring
         }
     }
 
+    public class SaveSelectionAsImageAction : DiagramAction
+    {
+        public nothrow SaveSelectionAsImageAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            diagram.HideContextMenu();
+            SaveImageDialog dialog("", diagram.GetLayout());
+            if (dialog.ShowDialog(*diagram.GetCanvas()->GetWindow()) == DialogResult.ok)
+            {
+                diagram.GetSelection()->SaveImage(dialog.fileName, dialog.margins, dialog.format);
+            }
+        }
+    }
+
     public class AlignTopAction : DiagramAction
     {
         public nothrow AlignTopAction(Diagram& diagram) : base(diagram)
