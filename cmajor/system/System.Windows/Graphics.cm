@@ -1027,10 +1027,7 @@ namespace System.Windows
         }
         public nothrow bool IntersectsWith(const RectF& that) const
         {
-            return location.x < that.location.x + that.size.w &&
-                location.y < that.location.y + that.size.h &&
-                location.x + size.w > that.location.x &&
-                location.y + size.h > that.location.y;
+            return Left() < that.Right() && Top() < that.Bottom() && Right() > that.Left() && Bottom() > that.Top();
         }
         public static nothrow Rect Union(const Rect& a, const Rect& b)
         {
@@ -1102,10 +1099,7 @@ namespace System.Windows
         }
         public nothrow bool IntersectsWith(const RectF& that) const
         {
-            return location.x < that.location.x + that.size.w &&
-                location.y < that.location.y + that.size.h &&
-                location.x + size.w > that.location.x &&
-                location.y + size.h > that.location.y;
+            return Left() < that.Right() && Top() < that.Bottom() && Right() > that.Left() && Bottom() > that.Top();
         }
         public static nothrow RectF Union(const RectF& a, const RectF& b)
         {

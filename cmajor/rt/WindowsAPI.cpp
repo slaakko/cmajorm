@@ -1818,3 +1818,4 @@ uint64_t WinGlobalSize(void* memHandle)
 {
     return GlobalSize((HGLOBAL)memHandle);
 }
+

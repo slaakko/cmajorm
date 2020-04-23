@@ -14,7 +14,8 @@ namespace spring
     {
         public Canvas(const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("spring.canvas", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
-            backgroundColor, "canvas", location, size, dock, anchors), diagram(new Diagram()), operationCreated(false)
+            backgroundColor, "canvas", location, size, dock, anchors), diagram(new Diagram()), operationCreated(false),
+            buttonPressed(false)
         {
             diagram->SetCanvas(this);
         }
@@ -41,6 +42,11 @@ namespace spring
             diagram->SetChanged();
             diagram->Invalidate();
             diagram->ResetModified();
+            Invalidate();
+        }
+        public nothrow void SetViewOrigin(const PointF& viewOrigin_)
+        {
+            viewOrigin = viewOrigin_;
             Invalidate();
         }
         public nothrow void SetModifiedStatusBarItem(StatusBarItem* modifiedStatusBarItem_)
@@ -73,7 +79,36 @@ namespace spring
         }
         protected override void SetCursor()
         {
-            SetCursor(*Tools.Current()->GetCursor());
+            SetCursor(PointF());
+        }
+        void SetCursor(const PointF& location)
+        {
+            if (Tools.Current() is SelectTool*)
+            {
+                if (diagram->GetOperation() is ResizeRectangleSelectionOperation*)
+                {
+                    ResizeRectangleSelectionOperation* operation = cast<ResizeRectangleSelectionOperation*>(diagram->GetOperation());
+                    SetCursor(*operation->GetCursor());
+                    return;
+                }
+                else
+                {
+                    if (diagram->GetSelection() is RectangleSelection*)
+                    {
+                        RectangleSelection* selection = cast<RectangleSelection*>(diagram->GetSelection());
+                        SetCursor(*selection->GetCursor(location));
+                        return;
+                    }
+                }
+            }
+            if (buttonPressed)
+            {
+                SetCursor(*Tools.Current()->GetPressedCursor());
+            }
+            else
+            {
+                SetCursor(*Tools.Current()->GetCursor());
+            }
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
@@ -85,11 +120,11 @@ namespace spring
             args.graphics.SetSmoothingModeChecked(SmoothingMode.highQuality);
             args.graphics.SetPageUnitChecked(Unit.millimeter);
             args.graphics.ClearChecked(BackgroundColor());
+            args.graphics.TranslateTransformChecked(-viewOrigin.x, -viewOrigin.y);
             diagram->Draw(args.graphics);
             args.graphics.SetTextRenderingHintChecked(prevTextRenderingHint);
             args.graphics.SetPageUnitChecked(prevUnit);
             args.graphics.SetSmoothingModeChecked(prevSmoothingMode);
-
         }
         public void KeyDown(KeyEventArgs& args)
         {
@@ -124,6 +159,11 @@ namespace spring
             bool right = (buttons & MouseButtons.rbutton) != MouseButtons.none;
             mouseDownArgs = MouseArgs(diagram.Get(), location, index, element, shift, control, left, right);
             operationCreated = false;
+            if (left)
+            {
+                buttonPressed = true;
+            }
+            SetCursor(location);
         }
         protected override void OnMouseMove(MouseEventArgs& args)
         {
@@ -161,6 +201,7 @@ namespace spring
             {
                 diagram->AdvanceOperation(mouseMoveArgs);
             }
+            SetCursor(location);
         }
         protected override void OnMouseUp(MouseEventArgs& args)
         {
@@ -183,12 +224,15 @@ namespace spring
                 Duration duration = mouseUpArgs.time - mouseDownArgs.time;
                 if (duration <= Duration.FromMilliseconds(clickThresholdMs))
                 {
-                    if (operationCreated)
+                    if (Tools.Current() is SelectTool*)
                     {
-                        operationCreated = false;
-                        Tools.Current()->CancelOperation(mouseUpArgs);
+                        if (operationCreated)
+                        {
+                            operationCreated = false;
+                            Tools.Current()->CancelOperation(mouseUpArgs);
+                        }
+                        Tools.Current()->MouseClick(mouseUpArgs);
                     }
-                    Tools.Current()->MouseClick(mouseUpArgs);
                 }
                 else
                 {
@@ -203,6 +247,8 @@ namespace spring
             {
                 Tools.Current()->MouseClick(mouseUpArgs);
             }
+            buttonPressed = false;
+            SetCursor(location);
         }
         protected override void OnMouseDoubleClick(MouseEventArgs& args)
         {
@@ -226,12 +272,16 @@ namespace spring
         {
             float x = ScreenMetrics.Get().HorizontalPixelsToMM(controlLocation.x);
             float y = ScreenMetrics.Get().VerticalPixelsToMM(controlLocation.y);
-            return PointF(x, y);
+            PointF loc(x, y);
+            loc.Offset(viewOrigin.x, viewOrigin.y);
+            return loc;
         }
         public nothrow Point ToControlLocation(const PointF& diagramLocation)
         {
-            int x = ScreenMetrics.Get().MMToHorizontalPixels(diagramLocation.x);
-            int y = ScreenMetrics.Get().MMToVerticalPixels(diagramLocation.y);
+            PointF loc(diagramLocation);
+            loc.Offset(-viewOrigin.x, -viewOrigin.y);
+            int x = ScreenMetrics.Get().MMToHorizontalPixels(loc.x);
+            int y = ScreenMetrics.Get().MMToVerticalPixels(loc.y);
             return Point(x, y);
         }
         private void DeleteSelection()
@@ -280,6 +330,10 @@ namespace spring
                 pasteMenuItem->Disable();
             }
         }
+        public const PointF& ViewOrigin() const
+        {
+            return viewOrigin;
+        }
         private UniquePtr<Diagram> diagram;
         private Bitmap* noteCornerBitmap;
         private StatusBarItem* modifiedStatusBarItem;
@@ -293,5 +347,6 @@ namespace spring
         private MouseArgs mouseMoveArgs;
         private MouseArgs mouseUpArgs;
         private bool operationCreated;
+        private bool buttonPressed;
     }
 }

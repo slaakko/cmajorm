@@ -169,6 +169,11 @@ namespace spring
         return Color(64u, 96u, 156u, 210u);
     }
 
+    public nothrow float DefaultResizeHandleWidth()
+    {
+        return 1.0f;
+    }
+
     public class Layout
     {
          public Layout(Graphics& graphics) :
@@ -180,6 +185,7 @@ namespace spring
             abstractOperationLayoutElement(new AbstractOperationLayoutElement(*this)), concreteOperationLayoutElement(new ConcreteOperationLayoutElement(*this)),
             fieldLayoutElement(new FieldLayoutElement(*this)),
             relationshipLayoutElement(new RelationshipLayoutElement(*this, graphics)),
+            resizeHandleLayoutElement(new ResizeHandleLayoutElement(*this, graphics)),
             classPaddingElement(new PaddingElement(DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), DefaultClassPadding(), "classPadding")),
             objectPaddingElement(new PaddingElement(DefaultObjectPadding(), DefaultObjectPadding(), DefaultObjectPadding(), DefaultObjectPadding(), "objectPadding")),
             notePaddingElement(new PaddingElement(DefaultNotePadding(), DefaultNotePadding(), DefaultNotePadding(), DefaultNotePadding(), "notePadding")),
@@ -288,6 +294,14 @@ namespace spring
         {
             relationshipLayoutElement.Reset(relationshipLayoutElement_);
         }
+        public nothrow inline const ResizeHandleLayoutElement& GetResizeHandleLayoutElement() const
+        {
+            return *resizeHandleLayoutElement;
+        }
+        public nothrow void SetResizeHandleLayoutElement(ResizeHandleLayoutElement* resizeHandleLayoutElement_)
+        {
+            resizeHandleLayoutElement.Reset(resizeHandleLayoutElement_);
+        }
         public nothrow inline const PaddingElement& GetClassPaddingElement() const
         {
             return *classPaddingElement;
@@ -352,6 +366,7 @@ namespace spring
                             concreteOperationLayoutElement->Read(layoutElement, *this);
                             fieldLayoutElement->Read(layoutElement, *this);
                             relationshipLayoutElement->Read(layoutElement, *this);
+                            resizeHandleLayoutElement->Read(layoutElement, *this);
                             classPaddingElement->Read(layoutElement, *this);
                             objectPaddingElement->Read(layoutElement, *this);
                             notePaddingElement->Read(layoutElement, *this);
@@ -376,6 +391,7 @@ namespace spring
             concreteOperationLayoutElement->Write(layoutElement.Get());
             fieldLayoutElement->Write(layoutElement.Get());
             relationshipLayoutElement->Write(layoutElement.Get());
+            resizeHandleLayoutElement->Write(layoutElement.Get());
             classPaddingElement->Write(layoutElement.Get());
             objectPaddingElement->Write(layoutElement.Get());
             notePaddingElement->Write(layoutElement.Get());
@@ -445,6 +461,7 @@ namespace spring
         private UniquePtr<ConcreteOperationLayoutElement> concreteOperationLayoutElement;
         private UniquePtr<FieldLayoutElement> fieldLayoutElement;
         private UniquePtr<RelationshipLayoutElement> relationshipLayoutElement;
+        private UniquePtr<ResizeHandleLayoutElement> resizeHandleLayoutElement;
         private UniquePtr<PaddingElement> classPaddingElement;
         private UniquePtr<PaddingElement> objectPaddingElement;
         private UniquePtr<PaddingElement> notePaddingElement;
@@ -888,6 +905,82 @@ namespace spring
         private Brush* arrowBrush;
         private Brush* textBrush;
         private Pen* selectedLinePen;
+    }
+
+    public class ResizeHandleLayoutElement : LayoutElement
+    {
+        public ResizeHandleLayoutElement(Layout& layout, Graphics& graphics) :
+            lineWidth(DefaultLineWidth(graphics)),
+            resizeHandleWidth(DefaultResizeHandleWidth()),
+            lineColorElement(new ColorElement(Color.Black(), "lineColor")),
+            insideColorElement(new ColorElement(Color.White(), "insideColor"))
+        {
+            linePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.solid);
+            insideBrush = layout.GetOrInsertBrush(insideColorElement->GetColor());
+        }
+        public nothrow inline float LineWidth() const
+        {
+            return lineWidth;
+        }
+        public nothrow void SetLineWidth(float lineWidth_)
+        {
+            lineWidth = lineWidth_;
+        }
+        public nothrow const Pen& LinePen() const
+        {
+            return *linePen;
+        }
+        public nothrow const Brush* InsideBrush() const
+        {
+            return insideBrush;
+        }
+        public nothrow inline float ResizeHandleWidth() const
+        {
+            return resizeHandleWidth;
+        }
+        public nothrow void SetResizeHandleWidth(float resizeHandleWidth_)
+        {
+            resizeHandleWidth = resizeHandleWidth_;
+        }
+        public override void Read(System.Dom.Element* parentElement, Layout& layout)
+        {
+            UniquePtr<XPathObject> resizeHandleResult = Evaluate(u"resizeHandle", parentElement);
+            if (!resizeHandleResult.IsNull())
+            {
+                if (resizeHandleResult.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(resizeHandleResult.Get());
+                    int n = nodeSet->Length();
+                    if (n == 1)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[0];
+                        if (node is System.Dom.Element*)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            resizeHandleWidth = ParseFloat(ToUtf8(element->GetAttribute(u"resizeHandleWidth")));
+                            lineColorElement->Read(element, layout);
+                            insideColorElement->Read(element, layout);
+                            linePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.solid);
+                            insideBrush = layout.GetOrInsertBrush(insideColorElement->GetColor());
+                        }
+                    }
+                }
+            }
+        }
+        public override void Write(System.Dom.Element* parentElement)
+        {
+            UniquePtr<System.Dom.Element> resizeHandleElement(new System.Dom.Element(u"resizeHandle"));
+            resizeHandleElement->SetAttribute(u"resizeHandleWidth", ToUtf32(ToString(resizeHandleWidth)));
+            lineColorElement->Write(resizeHandleElement.Get());
+            insideColorElement->Write(resizeHandleElement.Get());
+            parentElement->AppendChild(UniquePtr<System.Dom.Node>(resizeHandleElement.Release()));
+        }
+        private float lineWidth;
+        private float resizeHandleWidth;
+        private UniquePtr<ColorElement> lineColorElement;
+        private UniquePtr<ColorElement> insideColorElement;
+        private Pen* linePen;
+        private Brush* insideBrush;
     }
 
     public abstract class CaptionLayoutElement : LayoutElement

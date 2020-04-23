@@ -15,6 +15,8 @@ public class MainWindow : Window
         springDiagramElementsFormat("spring.diagram.elements"),
         clipboardListener(Handle()),
         arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)),
+        grabOpenCursor(Application.GetResourceManager().GetCursor("grab.open.spring.cursor")),
+        grabClosedCursor(Application.GetResourceManager().GetCursor("grab.closed.spring.cursor")),
         classToolCursor(Application.GetResourceManager().GetCursor("class.tool.spring.cursor")),
         objectToolCursor(Application.GetResourceManager().GetCursor("object.tool.spring.cursor")),
         noteToolCursor(Application.GetResourceManager().GetCursor("note.tool.spring.cursor")),
@@ -46,12 +48,6 @@ public class MainWindow : Window
         saveImageMenuItem->ClickEvent().AddHandler(SaveImageClick);
         fileMenuItem->AddMenuItem(saveImageMenuItem.Release());
         fileMenuItem->AddMenuItem(new MenuItemSeparator());
-        /*
-        UniquePtr<MenuItem> testMenuItem(new MenuItem("&Test"));
-        testMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.t));
-        testMenuItem->ClickEvent().AddHandler(TestClick);
-        fileMenuItem->AddMenuItem(testMenuItem.Release());
-        */
         UniquePtr<MenuItem> exitMenuItem(new MenuItem("E&xit"));
         exitMenuItem->SetShortcut(cast<Keys>(Keys.altModifier | Keys.f4));
         exitMenuItem->ClickEvent().AddHandler(ExitClick);
@@ -96,6 +92,12 @@ public class MainWindow : Window
         Tools.GetSelectTool()->SetToolButton(selectToolButton);
         Tools.GetSelectTool()->SetCursor(&arrowCursor);
         toolBar->AddToolButton(selectToolButton);
+        ToolButton* grabToolButton = new ToolButton("grab.tool.spring.bitmap");
+        grabToolButton->SetToolTip("Grab");
+        Tools.GetGrabTool()->SetToolButton(grabToolButton);
+        Tools.GetGrabTool()->SetCursor(&grabOpenCursor);
+        Tools.GetGrabTool()->SetPressedCursor(&grabClosedCursor);
+        toolBar->AddToolButton(grabToolButton);
         ToolButton* classToolButton = new ToolButton("class.tool.spring.bitmap");
         classToolButton->SetToolTip("Add new class");
         Tools.GetClassTool()->SetToolButton(classToolButton);
@@ -170,9 +172,21 @@ public class MainWindow : Window
         statusBar->AddItem(modifiedStatusBarItemPtr.Release());
         UniquePtr<StatusBarItem> springItem(new StatusBarItem(empty, StatusBarItem.BorderStyle.flat, true));
         statusBar->AddItem(springItem.Release());
+        string spaces(' ', 6);
+        UniquePtr<StatusBarItem> viewXItem(new StatusBarItem("view X:"));
+        statusBar->AddItem(viewXItem.Release());
+        UniquePtr<StatusBarItem> viewXCoordItem(new StatusBarItem(spaces, StatusBarItem.BorderStyle.sunken));
+        viewXCoordStatusBarItem = viewXCoordItem.Get();
+        statusBar->AddItem(viewXCoordItem.Release());
+
+        UniquePtr<StatusBarItem> viewYItem(new StatusBarItem("view Y:"));
+        statusBar->AddItem(viewYItem.Release());
+        UniquePtr<StatusBarItem> viewYCoordItem(new StatusBarItem(spaces, StatusBarItem.BorderStyle.sunken));
+        viewYCoordStatusBarItem = viewYCoordItem.Get();
+        statusBar->AddItem(viewYCoordItem.Release());
+
         UniquePtr<StatusBarItem> xItem(new StatusBarItem("x:"));
         statusBar->AddItem(xItem.Release());
-        string spaces(' ', 6);
         UniquePtr<StatusBarItem> xCoordItem(new StatusBarItem(spaces, StatusBarItem.BorderStyle.sunken));
         xCoordStatusBarItem = xCoordItem.Get();
         statusBar->AddItem(xCoordItem.Release());
@@ -380,20 +394,6 @@ public class MainWindow : Window
             canvas->GetDiagram().SaveImage(dialog.fileName, dialog.margins, dialog.format);
         }
     }
-    private void TestClick()
-    {
-/*
-        AbstractClassElement classElement("AbstractClass");
-        classElement.Operations().Add(new OperationElement("Foo", true));
-        classElement.Operations().Add(new OperationElement("Bar"));
-        classElement.Operations().Add(new OperationElement("Baz"));
-        classElement.Fields().Add(new FieldElement("Field1"));
-        classElement.Fields().Add(new FieldElement("Field2"));
-        classElement.Fields().Add(new FieldElement("Field3"));
-        UniquePtr<ClassPropertiesDialog> classPropertiesDialog = new ClassPropertiesDialog(&classElement);
-        DialogResult result = classPropertiesDialog->ShowDialog(*this);
-*/
-    }
     protected override void OnKeyDown(KeyEventArgs& args)
     {
         base->OnKeyDown(args);
@@ -444,9 +444,13 @@ public class MainWindow : Window
     }
     private void CanvasMouseMove(MouseEventArgs& args)
     {
-        string xCoordText = Format(ToString(PixelsToMM(args.location.x, ScreenMetrics.Get().DpiX()), 2, 2), 6, FormatJustify.right);
+        string viewXCoordText = Format(ToString(canvas->ViewOrigin().x, 2, 2), 6, FormatJustify.right);
+        viewXCoordStatusBarItem->SetText(viewXCoordText);
+        string viewYCoordText = Format(ToString(canvas->ViewOrigin().y, 2, 2), 6, FormatJustify.right);
+        viewYCoordStatusBarItem->SetText(viewYCoordText);
+        string xCoordText = Format(ToString(canvas->ViewOrigin().x + PixelsToMM(args.location.x, ScreenMetrics.Get().DpiX()), 2, 2), 6, FormatJustify.right);
         xCoordStatusBarItem->SetText(xCoordText);
-        string yCoordText = Format(ToString(PixelsToMM(args.location.y, ScreenMetrics.Get().DpiY()), 2, 2), 6, FormatJustify.right);
+        string yCoordText = Format(ToString(canvas->ViewOrigin().y + PixelsToMM(args.location.y, ScreenMetrics.Get().DpiY()), 2, 2), 6, FormatJustify.right);
         yCoordStatusBarItem->SetText(yCoordText);
     }
     private ClipboardFormat springDiagramElementsFormat;
@@ -454,9 +458,13 @@ public class MainWindow : Window
     private Canvas* canvas;
     private StatusBarItem* filePathStatusBarItem;
     private StatusBarItem* modifiedStatusBarItem;
+    private StatusBarItem* viewXCoordStatusBarItem;
+    private StatusBarItem* viewYCoordStatusBarItem;
     private StatusBarItem* xCoordStatusBarItem;
     private StatusBarItem* yCoordStatusBarItem;
     private Cursor arrowCursor;
+    private Cursor& grabOpenCursor;
+    private Cursor& grabClosedCursor;
     private Cursor& classToolCursor;
     private Cursor& objectToolCursor;
     private Cursor& noteToolCursor;
@@ -487,21 +495,6 @@ int main()
        Layout defaultLayout(graphics);
        string defaultLayoutFileName = Path.Combine(DefaultLayoutDirectory(), "default.spring.layout.xml");
        defaultLayout.Save(defaultLayoutFileName);
-       float dpiX = graphics.GetDpiX();
-       float dpiY = graphics.GetDpiY();
-       StreamWriter writer = File.CreateText("d:\\work\\measure.txt");
-       writer << "DPIX=" << dpiX << ", DPIY=" << dpiY << endl();
-       writer << "frameWidth=" << DefaultFrameWidth(graphics) << endl();
-/*
-       int x = MMToPixels(20.0f, dpiX);
-       int y = MMToPixels(10.0f, dpiY);
-       writer << "X=" << x << ", Y=" << y << endl();
-       Bitmap bm(x, y, graphics);
-       Graphics g = Graphics.FromImage(bm);
-       g.Clear(Color.White());
-       Uuid clsid;
-       bm.SaveChecked("d:\\work\\test.png", GetEncoderClsIdChecked(GetImageFormat(ImageFormat.png)));
-*/
        int exitCode = Application.Run(mainWindow);
        return exitCode;
     }

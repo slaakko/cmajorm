@@ -275,8 +275,8 @@ namespace spring
         {
             if (args.left && !args.right)
             {
-                 SizeF size(args.location.x - selection->GetRect().location.x, args.location.y - selection->GetRect().location.y);
-                 selection->GetRect().size = size;
+                 SizeF size(args.location.x - selection->Location().x, args.location.y - selection->Location().y);
+                 selection->SetSize(size);
             }
         }
         public override void Cancel()
@@ -289,5 +289,81 @@ namespace spring
         {
         }
         private RectangleSelection* selection;
+    }
+
+    public class ResizeRectangleSelectionOperation : Operation
+    {
+        public ResizeRectangleSelectionOperation(Diagram* diagram, const PointF& startLocation, ResizeHandle* resizeHandle_) : base(diagram, startLocation), resizeHandle(resizeHandle_)
+        {
+            RectangleSelection* selection = resizeHandle->GetSelection();
+            selection->SetStartLocation(startLocation);
+        }
+        public override nothrow bool IsEmpty() const
+        {
+            return resizeHandle == null;
+        }
+        public override void AdvanceTo(MouseArgs& args)
+        {
+            if (resizeHandle == null) return;
+            PointF currentLocation = args.location;
+            PointF startLocation = StartLocation();
+            float dx = currentLocation.x - startLocation.x;
+            float dy = currentLocation.y - startLocation.y;
+            resizeHandle->Move(dx, dy);
+        }
+        public override void Cancel()
+        {
+            if (resizeHandle != null)
+            {
+                resizeHandle->GetSelection()->SetRect(resizeHandle->GetSelection()->StartRect());
+                resizeHandle = null;
+            }
+        }
+        public override void Commit(MouseArgs& args)
+        {
+            AdvanceTo(args);
+            resizeHandle = null;
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
+        }
+        public nothrow Cursor* GetCursor() const
+        {
+            return resizeHandle->GetCursor();
+        }
+        private ResizeHandle* resizeHandle;
+    }
+
+    public class GrabDiagramOperation : Operation
+    {
+        public GrabDiagramOperation(Diagram* diagram, const PointF& startLocation) : base(diagram, startLocation), startViewOrigin(diagram->GetCanvas()->ViewOrigin())
+        {
+        }
+        public override nothrow bool IsEmpty() const
+        {
+            return false;
+        }
+        public override void AdvanceTo(MouseArgs& args)
+        {
+            if (args.left && !args.right)
+            {
+                PointF startLoc = StartLocation();
+                PointF loc = args.location;
+                float dx = loc.x - startLoc.x;
+                float dy = loc.y - startLoc.y;
+                PointF viewOrigin(Max(startViewOrigin.x - dx, 0.0f), Max(startViewOrigin.y - dy, 0.0f));
+                GetDiagram()->GetCanvas()->SetViewOrigin(viewOrigin);
+            }
+        }
+        public override void Cancel()
+        {
+        }
+        public override void Commit(MouseArgs& args)
+        {
+        }
+        public override void Draw(Graphics& graphics, Layout& layout)
+        {
+        }
+        private PointF startViewOrigin;
     }
 }

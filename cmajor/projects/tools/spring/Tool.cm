@@ -43,6 +43,10 @@ namespace spring
         {
             return &selectTool;
         }
+        public static nothrow Tool* GetGrabTool()
+        {
+            return &grabTool;
+        }
         public static nothrow Tool* GetClassTool()
         {
             return &classTool;
@@ -76,6 +80,7 @@ namespace spring
             return &attachNoteTool;
         }
         private static SelectTool selectTool;
+        private static GrabTool grabTool;
         private static ClassTool classTool;
         private static ObjectTool objectTool;
         private static NoteTool noteTool;
@@ -127,6 +132,21 @@ namespace spring
         public nothrow inline Cursor* GetCursor() const
         {
             return cursor;
+        }
+        public nothrow void SetPressedCursor(Cursor* pressedCursor_)
+        {
+            pressedCursor = pressedCursor_;
+        }
+        public nothrow inline Cursor* GetPressedCursor() const
+        {
+            if (pressedCursor != null)
+            {
+                return pressedCursor;
+            }
+            else
+            {
+                return cursor;
+            }
         }
         public nothrow virtual bool CanMove() const
         {
@@ -227,6 +247,7 @@ namespace spring
         }
         private ToolButton* toolButton;
         private Cursor* cursor;
+        private Cursor* pressedCursor;
     }
 
     public class SelectTool : Tool
@@ -279,7 +300,8 @@ namespace spring
         public override void MouseNormalRightClick(MouseArgs& args)
         {
             UniquePtr<ContextMenu> contextMenu(new ContextMenu());
-            if (args.diagram->GetSelection()->Count() <= 1)
+            bool isRectangleSelection = args.diagram->GetSelection() is RectangleSelection*;
+            if (!isRectangleSelection && args.diagram->GetSelection()->Count() <= 1)
             {
                 if (args.diagram->GetSelection()->Count() == 1)
                 {
@@ -362,148 +384,193 @@ namespace spring
         public override void CreateOperation(MouseArgs& args)
         {
             if (args.diagram == null) return;
-            UniquePtr<Operation> operation(new MoveContainerElementsOperation(args.diagram, args.location));
-            if (args.diagram->GetSelection()->Count() <= 1)
+            ResizeHandle* resizeHandle = null;
+            bool leftButtonPressed = args.left && !args.right && !args.control && !args.shift;
+            if (leftButtonPressed && args.diagram->GetSelection() is RectangleSelection*)
             {
-                if (args.diagram->GetSelection()->Count() == 1)
+                RectangleSelection* selection = cast<RectangleSelection*>(args.diagram->GetSelection());
+                PointF location = args.location;
+                resizeHandle = selection->GetResizeHandle(location);
+            }
+            if (resizeHandle != null)
+            {
+                UniquePtr<Operation> operation(new ResizeRectangleSelectionOperation(args.diagram, args.location, resizeHandle));
+                args.diagram->SetOperation(operation.Release());
+            }
+            else
+            {
+                UniquePtr<Operation> operation(new MoveContainerElementsOperation(args.diagram, args.location));
+                if (args.diagram->GetSelection()->Count() <= 1)
                 {
-                    args.elementIndex = args.diagram->GetSelection()->GetFirstIndex();
-                    if (args.elementIndex != -1)
+                    if (args.diagram->GetSelection()->Count() == 1)
                     {
-                        args.element = args.diagram->GetElementByIndex(args.elementIndex);
-                    }
-                    else
-                    {
-                        args.element = null;
-                    }
-                }
-                if (args.element != null)
-                {
-                    if (args.element is ContainerElement*)
-                    {
-                        if (args.element->Contains(args.location))
+                        args.elementIndex = args.diagram->GetSelection()->GetFirstIndex();
+                        if (args.elementIndex != -1)
                         {
-                            operation->AddElementIndex(args.elementIndex);
-                            ContainerElement* containerElement = cast<ContainerElement*>(args.element);
-                            if (containerElement != null)
+                            args.element = args.diagram->GetElementByIndex(args.elementIndex);
+                        }
+                        else
+                        {
+                            args.element = null;
+                        }
+                    }
+                    if (args.element != null)
+                    {
+                        if (args.element is ContainerElement*)
+                        {
+                            if (args.element->Contains(args.location))
                             {
-                                List<RelationshipElement*> relationships = containerElement->GetAllRelationships();
-                                for (RelationshipElement* relationship : relationships)
+                                operation->AddElementIndex(args.elementIndex);
+                                ContainerElement* containerElement = cast<ContainerElement*>(args.element);
+                                if (containerElement != null)
                                 {
-                                    DiagramElement* sourceElement = relationship->source.element;
-                                    ContainerElement* sourceContainerElement = null;
-                                    if (sourceElement != null)
+                                    List<RelationshipElement*> relationships = containerElement->GetAllRelationships();
+                                    for (RelationshipElement* relationship : relationships)
                                     {
-                                        sourceContainerElement = sourceElement->GetContainerElement();
-                                    }
-                                    DiagramElement* targetElement = relationship->target.element;
-                                    ContainerElement* targetContainerElement = null;
-                                    if (targetElement != null)
-                                    {
-                                        targetContainerElement = targetElement->GetContainerElement();
-                                    }
-                                    if (sourceContainerElement == containerElement && targetContainerElement == containerElement)
-                                    {
-                                        int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
-                                        if (relationshipIndex != -1)
+                                        DiagramElement* sourceElement = relationship->source.element;
+                                        ContainerElement* sourceContainerElement = null;
+                                        if (sourceElement != null)
                                         {
-                                            operation->AddElementIndex(relationshipIndex);
+                                            sourceContainerElement = sourceElement->GetContainerElement();
                                         }
-                                    }
-                                    else if (targetElement == null && relationship->kind == RelationshipElement.kind.reference && relationship->cardinality == Cardinality.zero)
-                                    {
-                                        int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
-                                        if (relationshipIndex != -1)
+                                        DiagramElement* targetElement = relationship->target.element;
+                                        ContainerElement* targetContainerElement = null;
+                                        if (targetElement != null)
                                         {
-                                            operation->AddElementIndex(relationshipIndex);
+                                            targetContainerElement = targetElement->GetContainerElement();
+                                        }
+                                        if (sourceContainerElement == containerElement && targetContainerElement == containerElement)
+                                        {
+                                            int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
+                                            if (relationshipIndex != -1)
+                                            {
+                                                operation->AddElementIndex(relationshipIndex);
+                                            }
+                                        }
+                                        else if (targetElement == null && relationship->kind == RelationshipElement.kind.reference && relationship->cardinality == Cardinality.zero)
+                                        {
+                                            int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
+                                            if (relationshipIndex != -1)
+                                            {
+                                                operation->AddElementIndex(relationshipIndex);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                    else
+                    {
+                        operation.Reset(new CreateRectangleSelectionOperation(args.diagram, args.location));
+                        args.diagram->SetOperation(operation.Release());
+                        return;
                     }
                 }
                 else
                 {
-                    operation.Reset(new CreateRectangleSelectionOperation(args.diagram, args.location));
-                    args.diagram->SetOperation(operation.Release());
-                    return;
-                }
-            }
-            else
-            {
-                if (args.diagram->GetSelection()->GetContainerElementCount() > 0)
-                {
-                    if (args.diagram->GetSelection()->Contains(args.location))
+                    if (args.diagram->GetSelection()->GetContainerElementCount() > 0)
                     {
-                        List<int> elementIndeces = args.diagram->GetSelection()->GetContainerElementIndeces();
-                        List<int> relationshipIndeces;
-                        for (int index : elementIndeces)
+                        if (args.diagram->GetSelection()->Contains(args.location))
                         {
-                            DiagramElement* element = args.diagram->GetElementByIndex(index);
-                            if (element is ContainerElement*)
+                            List<int> elementIndeces = args.diagram->GetSelection()->GetContainerElementIndeces();
+                            List<int> relationshipIndeces;
+                            for (int index : elementIndeces)
                             {
-                                ContainerElement* containerElement = cast<ContainerElement*>(element);
-                                List<RelationshipElement*> containerElementRelationships = containerElement->GetAllRelationships();
-                                for (RelationshipElement* relationship : containerElementRelationships)
+                                DiagramElement* element = args.diagram->GetElementByIndex(index);
+                                if (element is ContainerElement*)
                                 {
-                                    bool sourceInSelection = false;
-                                    DiagramElement* sourceElement = relationship->source.element;
-                                    if (sourceElement != null)
+                                    ContainerElement* containerElement = cast<ContainerElement*>(element);
+                                    List<RelationshipElement*> containerElementRelationships = containerElement->GetAllRelationships();
+                                    for (RelationshipElement* relationship : containerElementRelationships)
                                     {
-                                        ContainerElement* sourceContainerElement = sourceElement->GetContainerElement();
-                                        int sourceContainerElementIndex = args.diagram->GetIndexOfElement(sourceContainerElement);
-                                        if (sourceContainerElementIndex != -1)
+                                        bool sourceInSelection = false;
+                                        DiagramElement* sourceElement = relationship->source.element;
+                                        if (sourceElement != null)
                                         {
-                                            if (Find(elementIndeces.CBegin(), elementIndeces.CEnd(), sourceContainerElementIndex) != elementIndeces.CEnd())
+                                            ContainerElement* sourceContainerElement = sourceElement->GetContainerElement();
+                                            int sourceContainerElementIndex = args.diagram->GetIndexOfElement(sourceContainerElement);
+                                            if (sourceContainerElementIndex != -1)
                                             {
-                                                sourceInSelection = true;
+                                                if (Find(elementIndeces.CBegin(), elementIndeces.CEnd(), sourceContainerElementIndex) != elementIndeces.CEnd())
+                                                {
+                                                    sourceInSelection = true;
+                                                }
                                             }
                                         }
-                                    }
-                                    bool targetInSelection = false;
-                                    DiagramElement* targetElement = relationship->target.element;
-                                    if (targetElement != null)
-                                    {
-                                        ContainerElement* targetContainerElement = targetElement->GetContainerElement();
-                                        int targetContainerElementIndex = args.diagram->GetIndexOfElement(targetContainerElement);
-                                        if (targetContainerElementIndex != -1)
+                                        bool targetInSelection = false;
+                                        DiagramElement* targetElement = relationship->target.element;
+                                        if (targetElement != null)
                                         {
-                                            if (Find(elementIndeces.CBegin(), elementIndeces.CEnd(), targetContainerElementIndex) != elementIndeces.CEnd())
+                                            ContainerElement* targetContainerElement = targetElement->GetContainerElement();
+                                            int targetContainerElementIndex = args.diagram->GetIndexOfElement(targetContainerElement);
+                                            if (targetContainerElementIndex != -1)
                                             {
-                                                targetInSelection = true;
+                                                if (Find(elementIndeces.CBegin(), elementIndeces.CEnd(), targetContainerElementIndex) != elementIndeces.CEnd())
+                                                {
+                                                    targetInSelection = true;
+                                                }
                                             }
                                         }
-                                    }
-                                    else if (relationship->kind == RelationshipElement.Kind.reference && relationship->cardinality == Cardinality.zero)
-                                    {
-                                        targetInSelection = true;
-                                    }
-                                    if (sourceInSelection && targetInSelection)
-                                    {
-                                        int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
-                                        if (relationshipIndex != -1)
+                                        else if (relationship->kind == RelationshipElement.Kind.reference && relationship->cardinality == Cardinality.zero)
                                         {
-                                            if (Find(relationshipIndeces.CBegin(), relationshipIndeces.CEnd(), relationshipIndex) == relationshipIndeces.CEnd())
+                                            targetInSelection = true;
+                                        }
+                                        if (sourceInSelection && targetInSelection)
+                                        {
+                                            int relationshipIndex = args.diagram->GetIndexOfElement(relationship);
+                                            if (relationshipIndex != -1)
                                             {
-                                                relationshipIndeces.Add(relationshipIndex);
+                                                if (Find(relationshipIndeces.CBegin(), relationshipIndeces.CEnd(), relationshipIndex) == relationshipIndeces.CEnd())
+                                                {
+                                                    relationshipIndeces.Add(relationshipIndex);
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
+                            for (int relationshipIndex : relationshipIndeces)
+                            {
+                                elementIndeces.Add(relationshipIndex);
+                            }
+                            operation->SetElementIndeces(Rvalue(elementIndeces));
                         }
-                        for (int relationshipIndex : relationshipIndeces)
-                        {
-                            elementIndeces.Add(relationshipIndex);
-                        }
-                        operation->SetElementIndeces(Rvalue(elementIndeces));
                     }
                 }
+                operation->FetchOriginalLocations();
+                if (!operation->IsEmpty())
+                {
+                    args.diagram->SetOperation(operation.Release());
+                }
             }
-            operation->FetchOriginalLocations();
-            if (!operation->IsEmpty())
+        }
+        public override void ContinueOperation(MouseArgs& args)
+        {
+            args.diagram->AdvanceOperation(args);
+        }
+        public override void CancelOperation(MouseArgs& args)
+        {
+            args.diagram->CancelOperation();
+        }
+        public override void CommitOperation(MouseArgs& args)
+        {
+            args.diagram->CommitOperation(args);
+        }
+    }
+
+    public class GrabTool : Tool
+    {
+        public nothrow override bool CanMove() const
+        {
+            return true;
+        }
+        public override void CreateOperation(MouseArgs& args)
+        {
+            if (args.diagram == null) return;
+            if (args.left && !args.right && !args.control && !args.shift)
             {
+                UniquePtr<Operation> operation(new GrabDiagramOperation(args.diagram, args.location));
                 args.diagram->SetOperation(operation.Release());
             }
         }

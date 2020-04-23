@@ -556,15 +556,202 @@ namespace spring
         private List<int> indeces;
     }
 
+    public class ResizeHandle
+    {
+        public nothrow ResizeHandle(RectangleSelection* selection_, const System.Windows.PointF& location_, const Snap& snap_) : selection(selection_), location(location_), startLocation(location), snap(snap_)
+        {
+            switch (snap.ToInt())
+            {
+                case Snap.TopLeft():
+                case Snap.BottomRight():
+                {
+                    cursor = System.Windows.LoadStandardCursor(System.Windows.StandardCursorId.IDC_SIZENWSE);
+                    break;
+                }
+                case Snap.TopCenter():
+                case Snap.BottomCenter():
+                {
+                    cursor = System.Windows.LoadStandardCursor(System.Windows.StandardCursorId.IDC_SIZENS);
+                    break;
+                }
+                case Snap.TopRight():
+                case Snap.BottomLeft():
+                {
+                    cursor = System.Windows.LoadStandardCursor(System.Windows.StandardCursorId.IDC_SIZENESW);
+                    break;
+                }
+                case Snap.RightCenter():
+                case Snap.LeftCenter():
+                {
+                    cursor = System.Windows.LoadStandardCursor(System.Windows.StandardCursorId.IDC_SIZEWE);
+                    break;
+                }
+            }
+        }
+        public nothrow inline RectangleSelection* GetSelection() const
+        {
+            return selection;
+        }
+        public nothrow bool Contains(const System.Windows.PointF& loc)
+        {
+            return System.Windows.Distance(location, loc) <= 2 * width;
+        }
+        public void Draw(System.Windows.Graphics& graphics, Layout& layout)
+        {
+            const ResizeHandleLayoutElement& resizeHandleLayoutElement = layout.GetResizeHandleLayoutElement();
+            width = resizeHandleLayoutElement.ResizeHandleWidth();
+            System.Windows.Vector towv = System.Windows.Vector(-1, 0) * (width / 2.0f);
+            System.Windows.Line towl(location, towv);
+            System.Windows.Vector tonv = System.Windows.Vector(0, -1) * (width / 2.0f);
+            System.Windows.Line tonl(towl.end, tonv);
+            System.Windows.PointF nw(tonl.end);
+            System.Windows.RectF rect(nw, System.Windows.SizeF(width, width));
+            const System.Windows.Brush* brush = resizeHandleLayoutElement.InsideBrush();
+            const System.Windows.Pen& pen = resizeHandleLayoutElement.LinePen();
+            graphics.FillRectangleChecked(*brush, rect);
+            graphics.DrawRectangleChecked(pen, rect);
+        }
+        public nothrow void Locate(const System.Windows.RectF& rect)
+        {
+            switch (snap.ToInt())
+            {
+                case Snap.TopLeft():
+                {
+                    location = rect.location;
+                    break;
+                }
+                case Snap.TopCenter():
+                {
+                    location = System.Windows.PointF(rect.location.x + rect.size.w / 2.0f, rect.location.y);
+                    break;
+                }
+                case Snap.TopRight():
+                {
+                    location = System.Windows.PointF(rect.location.x + rect.size.w, rect.location.y);
+                    break;
+                }
+                case Snap.RightCenter():
+                {
+                    location = System.Windows.PointF(rect.location.x + rect.size.w, rect.location.y + rect.size.h / 2.0f);
+                    break;
+                }
+                case Snap.BottomRight():
+                {
+                    location = System.Windows.PointF(rect.location.x + rect.size.w, rect.location.y + rect.size.h);
+                    break;
+                }
+                case Snap.BottomCenter():
+                {
+                    location = System.Windows.PointF(rect.location.x + rect.size.w / 2.0f, rect.location.y + rect.size.h);
+                    break;
+                }
+                case Snap.BottomLeft():
+                {
+                    location = System.Windows.PointF(rect.location.x, rect.location.y + rect.size.h);
+                    break;
+                }
+                case Snap.LeftCenter():
+                {
+                    location = System.Windows.PointF(rect.location.x, rect.location.y + rect.size.h / 2.0f);
+                    break;
+                }
+            }
+        }
+        public nothrow void Move(float dx, float dy)
+        {
+            System.Windows.RectF selectionRect = selection->StartRect();
+            switch (snap.ToInt())
+            {
+                case Snap.TopLeft():
+                {
+                    selectionRect.Offset(dx, dy);
+                    selectionRect.size.w = selectionRect.size.w - dx;
+                    selectionRect.size.h = selectionRect.size.h - dy;
+                    break;
+                }
+                case Snap.TopCenter():
+                {
+                    selectionRect.Offset(0.0f, dy);
+                    selectionRect.size.h = selectionRect.size.h - dy;
+                    break;
+                }
+                case Snap.TopRight():
+                {
+                    selectionRect.Offset(0.0f, dy);
+                    selectionRect.size.w = selectionRect.size.w + dx;
+                    selectionRect.size.h = selectionRect.size.h - dy;
+                    break;
+                }
+                case Snap.RightCenter():
+                {
+                    selectionRect.size.w = selectionRect.size.w + dx;
+                    break;
+                }
+                case Snap.BottomRight():
+                {
+                    selectionRect.size.w = selectionRect.size.w + dx;
+                    selectionRect.size.h = selectionRect.size.h + dy;
+                    break;
+                }
+                case Snap.BottomCenter():
+                {
+                    selectionRect.size.h = selectionRect.size.h + dy;
+                    break;
+                }
+                case Snap.BottomLeft():
+                {
+                    selectionRect.Offset(dx, 0.0f);
+                    selectionRect.size.w = selectionRect.size.w - dx;
+                    selectionRect.size.h = selectionRect.size.h + dy;
+                    break;
+                }
+                case Snap.LeftCenter():
+                {
+                    selectionRect.Offset(dx, 0.0f);
+                    selectionRect.size.w = selectionRect.size.w - dx;
+                    break;
+                }
+            }
+            selection->SetRect(selectionRect);
+        }
+        public nothrow System.Windows.Cursor* GetCursor() const
+        {
+            return &cursor;
+        }
+        private RectangleSelection* selection;
+        private System.Windows.PointF location;
+        private System.Windows.PointF startLocation;
+        private Snap snap;
+        private System.Windows.Cursor cursor;
+        private float width;
+    }
+
     public class RectangleSelection : Selection
     {
-        public nothrow RectangleSelection(Diagram& diagram, const System.Windows.PointF& startLocation_) : base(diagram), rect(startLocation_, System.Windows.SizeF()), startLocation(startLocation_)
+        public nothrow RectangleSelection(Diagram& diagram, const System.Windows.PointF& startLocation_) : base(diagram), rect(startLocation_, System.Windows.SizeF()), startLocation(startLocation_),
+            arrowCursor(System.Windows.LoadStandardCursor(System.Windows.StandardCursorId.IDC_ARROW))
         {
+            ResizeHandle* nw(new ResizeHandle(this, startLocation, Snap(Snap.TopLeft())));
+            resizeHandles.Add(UniquePtr<ResizeHandle>(nw));
+            ResizeHandle* n(new ResizeHandle(this, startLocation, Snap(Snap.TopCenter())));
+            resizeHandles.Add(UniquePtr<ResizeHandle>(n));
+            ResizeHandle* ne(new ResizeHandle(this, startLocation, Snap(Snap.TopRight())));
+            resizeHandles.Add(UniquePtr<ResizeHandle>(ne));
+            ResizeHandle* e(new ResizeHandle(this, startLocation, Snap(Snap.RightCenter())));
+            resizeHandles.Add(UniquePtr<ResizeHandle>(e));
+            ResizeHandle* se(new ResizeHandle(this, startLocation, Snap(Snap.BottomRight())));
+            resizeHandles.Add(UniquePtr<ResizeHandle>(se));
+            ResizeHandle* s(new ResizeHandle(this, startLocation, Snap(Snap.BottomCenter())));
+            resizeHandles.Add(UniquePtr<ResizeHandle>(s));
+            ResizeHandle* sw(new ResizeHandle(this, startLocation, Snap(Snap.BottomLeft())));
+            resizeHandles.Add(UniquePtr<ResizeHandle>(sw));
+            ResizeHandle* w(new ResizeHandle(this, startLocation, Snap(Snap.LeftCenter())));
+            resizeHandles.Add(UniquePtr<ResizeHandle>(w));
         }
         public override nothrow bool IsEmpty() const
         {
             if (rect.IsEmpty()) return true;
-            return GetDiagram().HasIntersectingContrainerElements(rect);
+            return !GetDiagram().HasIntersectingContrainerElements(rect);
         }
         public override nothrow int Count() const
         {
@@ -632,14 +819,37 @@ namespace spring
         public override nothrow void SetStartLocation(const System.Windows.PointF& startLocation_)
         {
             startLocation = startLocation_;
-            rectStartLocation = rect.location;
+            startRect = rect;
         }
         public override nothrow void Move(MouseArgs& args)
         {
             float dx = args.location.x - startLocation.x;
             float dy = args.location.y - startLocation.y;
-            rect.location.x = rectStartLocation.x + dx;
-            rect.location.y = rectStartLocation.y + dy ;
+            rect.location.x = startRect.location.x + dx;
+            rect.location.y = startRect.location.y + dy ;
+            LocateResizeHandles();
+        }
+        public nothrow inline const System.Windows.PointF& Location() const
+        {
+            return rect.location;
+        }
+        public nothrow inline const System.Windows.SizeF& GetSize() const
+        {
+            return rect.size;
+        }
+        public nothrow inline const System.Windows.RectF& StartRect() const
+        {
+            return startRect;
+        }
+        public nothrow void SetSize(const System.Windows.SizeF& size_)
+        {
+            rect.size = size_;
+            LocateResizeHandles();
+        }
+        public nothrow void SetRect(const System.Windows.RectF& rect_)
+        {
+            rect = rect_;
+            LocateResizeHandles();
         }
         public override nothrow List<UniquePtr<DiagramElement>> Clone() const
         {
@@ -703,8 +913,10 @@ namespace spring
                         {
                             boundingRect = System.Windows.RectF.Union(boundingRect, relationship->BoundingRect());
                         }
-
-                        relationshipElements.Add(relationship);
+                        if (Find(relationshipElements.CBegin(), relationshipElements.CEnd(), relationship) != relationshipElements.CEnd())
+                        {
+                            relationshipElements.Add(relationship);
+                        }
                     }
                 }
             }
@@ -749,14 +961,48 @@ namespace spring
             const ColorElement& selectedColorElement = layout.GetSelectedColorElement();
             const System.Windows.Brush* brush = selectedColorElement.GetBrush(layout);
             graphics.FillRectangleChecked(*brush, rect);
+            DrawResizeHandles(graphics, layout);
         }
-        public nothrow inline System.Windows.RectF& GetRect()
+        public System.Windows.Cursor* GetCursor(const System.Windows.PointF& location)
         {
-            return rect;
+            for (UniquePtr<ResizeHandle>& handle : resizeHandles)
+            {
+                if (handle->Contains(location))
+                {
+                    return handle->GetCursor();
+                }
+            }
+            return &arrowCursor;
+        }
+        public nothrow ResizeHandle* GetResizeHandle(const System.Windows.PointF& location) const
+        {
+            for (UniquePtr<ResizeHandle>& handle : resizeHandles)
+            {
+                if (handle->Contains(location))
+                {
+                    return handle.Get();
+                }
+            }
+            return null;
+        }
+        private void LocateResizeHandles()
+        {
+            for (UniquePtr<ResizeHandle>& handle : resizeHandles)
+            {
+                handle->Locate(rect);   
+            }
+        }
+        private void DrawResizeHandles(System.Windows.Graphics& graphics, Layout& layout)
+        {
+            for (UniquePtr<ResizeHandle>& handle : resizeHandles)
+            {
+                handle->Draw(graphics, layout);
+            }
         }
         private System.Windows.RectF rect;
-        private System.Windows.PointF rectStartLocation;
+        private System.Windows.RectF startRect;
         private System.Windows.PointF startLocation;
+        private List<UniquePtr<ResizeHandle>> resizeHandles;
+        private System.Windows.Cursor arrowCursor;
     }
 }
-
