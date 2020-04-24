@@ -270,7 +270,8 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Windows.Component", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../System.Windows/doc/class_Component_33CC3BCB117A61015FF98DB1F33C83E5961F8D40.html" },
         { name: "System.Windows.Control", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html" },
-        { name: "System.Windows.MenuBar", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: false, link: "../../System.Windows/doc/class_MenuBar_C9C6DE89C20C49C579DD7E2B480C24CA9E189CF6.html" }];
+        { name: "System.Windows.MenuControl", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: true, link: "../../System.Windows/doc/class_MenuControl_57AA6856669CDE893B4DAF44D1E48443297BE292.html" },
+        { name: "System.Windows.MenuBar", id: "diagram_node_3", level: 3, subject: true, hasDerivedNodes: false, link: "../../System.Windows/doc/class_MenuBar_C9C6DE89C20C49C579DD7E2B480C24CA9E189CF6.html" }];
     drawDiagram(diagramNodes);
 }
 

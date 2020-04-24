@@ -1,0 +1,179 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Windows/LogView.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Collections</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Windows</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html">LogView</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html">TextView</a></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">enum</span>&nbsp;<a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html">Flags</a><span class="other">&nbsp;:&nbsp;</span><span class="kw">sbyte</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">none</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">,&nbsp;</span><span class="identifier">frozen</span><span class="other">&nbsp;=&nbsp;</span><span class="number">1</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="number">0</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#constructor_LogView_47DEF78ACE259161F084E9CB35B69D33AAFEF4C2">LogView</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_FontFamily_3F56249C8B34B5FAC140ACC3315166BA2BB84593.html">FontFamily</a><span class="other">&amp;</span>&nbsp;<span class="identifier">fontFamily</span><span class="other">,&nbsp;</span><span class="kw">float</span>&nbsp;<span class="identifier">fontSize</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Color_102B8BF2A966C6BE688EE449F8242854F5D69103.html">Color</a><span class="other">&amp;</span>&nbsp;<span class="identifier">backgroundColor</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a><span class="other">&amp;</span>&nbsp;<span class="identifier">location</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a><span class="other">&amp;</span>&nbsp;<span class="identifier">size</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a>&nbsp;<span class="identifier">dock</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a>&nbsp;<span class="identifier">anchors</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">(</span><span class="identifier">fontFamily</span><span class="other">,&nbsp;</span><span class="identifier">fontSize</span><span class="other">,&nbsp;</span><span class="identifier">backgroundColor</span><span class="other">,&nbsp;</span><span class="identifier">location</span><span class="other">,&nbsp;</span><span class="identifier">size</span><span class="other">,&nbsp;</span><span class="identifier">dock</span><span class="other">,&nbsp;</span><span class="identifier">anchors</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">flags</span><span class="other">(</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html">Flags</a><span class="other">.</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html#enumeration_constant_none_5CBBE186487969B85CDDD9A0BEB9408E8D14D153">none</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#constructor_LogView_A5B979C0FBB98C3FE7E599DCE8B920970BB64F48">LogView</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html">Point</a><span class="other">&amp;</span>&nbsp;<span class="identifier">location</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html">Size</a><span class="other">&amp;</span>&nbsp;<span class="identifier">size</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a>&nbsp;<span class="identifier">dock</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a>&nbsp;<span class="identifier">anchors</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">this</span><span class="other">(</span><a href="../doc/class_FontFamily_3F56249C8B34B5FAC140ACC3315166BA2BB84593.html#constructor_FontFamily_1BB0962C8E847E687DE58A9EBEADB3907C5681D0">FontFamily</a><span class="other">(</span><span class="string">"Consolas"</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="number">9.0f</span><span class="other">,&nbsp;</span><a href="../doc/class_Color_102B8BF2A966C6BE688EE449F8242854F5D69103.html#constructor_Color_559A5D3D2F8A8F46C475A5652FB7ACCF85B4D1F7">Color</a><span class="other">(</span><span class="number">223u</span><span class="other">,&nbsp;</span><span class="number">232u</span><span class="other">,&nbsp;</span><span class="number">247u</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">location</span><span class="other">,&nbsp;</span><span class="identifier">size</span><span class="other">,&nbsp;</span><span class="identifier">dock</span><span class="other">,&nbsp;</span><span class="identifier">anchors</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#default_constructor_LogView_3126A2CE641AEA8267A13B9E145F0848D7E85B26">LogView</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">this</span><span class="other">(</span><a href="../doc/class_Point_35143E033252FDE6DCE37C651138B784E91DD333.html#constructor_Point_5F994CC52E92FE07020D18E51F9709CF4395139C">Point</a><span class="other">(</span><span class="number">0</span><span class="other">,&nbsp;</span><span class="number">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../doc/class_Size_B49441BF62A86F3B1B7DE12E42C41CE95772B742.html#constructor_Size_D7240B1410FD6DFEB1F54BC298B19BEDB309B625">Size</a><span class="other">(</span><span class="number">0</span><span class="other">,&nbsp;</span><span class="number">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html">Dock</a><span class="other">.</span><a href="../doc/enumerated_type_Dock_F3522E08789EF98D0AE1EC3CA9AD34EBDC0FA6A3.html#enumeration_constant_bottom_2C4685694C27E3C1BB1647ACB42C81988F3B8F29">bottom</a><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html">Anchors</a><span class="other">.</span><a href="../doc/enumerated_type_Anchors_34D957CCCC3A24FA4AE026335783601B0A15F2CA.html#enumeration_constant_none_45D8E37A878B7BFC39CA4D1C7C6CD54E5894DE28">none</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_Clear_LogView_18380C9D2AA16C1F4BC7832E13DA3E6DE989BE48">Clear</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_Lines_TextView_68DD5BAF62277CD7EAB843584ADDC3E2C0DF33C8">Lines</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Clear_List_T_B605D2D27445F8489FD181D1D012BF1245483B93">Clear</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_Invalidate_Control_7E985266C28AEA8EFFE8F84C09A8B49A03CAD572">Invalidate</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_WriteLine_LogView_72444D51A1164BC3A97EC7C577D6986F4407F235">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">text</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">ustring</a><span class="other">></span>&nbsp;<span class="identifier">lines</span><span class="other">&nbsp;=&nbsp;</span><a href="../doc/ns_System.Windows.html#function_SplitTextIntoLines_6D08A89B31E263948ABAFFAD1D40F7D8D36E152D">SplitTextIntoLines</a><span class="other">(</span><a href="../../System.Base/doc/ns_System.html#function_ToUtf32_0476C1B2C07579259DF76F80D2F2987EA2B8EFDD">ToUtf32</a><span class="other">(</span><span class="identifier">text</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">ustring</span><span class="other">&amp;</span>&nbsp;<span class="identifier">line</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">lines</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddLine</span><span class="other">(</span><span class="identifier">line</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_Frozen_LogView_9CAFB2C20600CC58F4004E08ADD43D987EBA5562">Frozen</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_SetCaretLineCol_TextView_EB3384063A4D1C62DEC561B583812319B425527D">SetCaretLineCol</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_Lines_TextView_68DD5BAF62277CD7EAB843584ADDC3E2C0DF33C8">Lines</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Count_List_T_CC08825E95DA25361D24D0B94402BCC8F4B0197F">Count</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="number">1</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_ScrollToCaret_TextView_418ABF6CA5BC9A69CEBB963635967F562CE3BC21">ScrollToCaret</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_SetChanged_TextView_938F4F1BFCBFD938CA691AF6B18D134E54A9B398">SetChanged</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_Invalidate_Control_7E985266C28AEA8EFFE8F84C09A8B49A03CAD572">Invalidate</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_OnPaint_LogView_E2E6C9E51F5C858DDE095958071FAC7C15A6663C">OnPaint</a><span class="other">(</span><a href="../doc/class_PaintEventArgs_63FE804F70147A1F51601ACBD09A02FF79B3A015.html">PaintEventArgs</a><span class="other">&amp;</span>&nbsp;<span class="identifier">args</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">-></span><a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_OnPaint_TextView_EFAC463D5B276501ACE432CBB46A9A74913C0AB8">OnPaint</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_OnMouseDown_LogView_FD2D6D55B6E83FDEA7D631D4F2EE6DEBA7C7F93D">OnMouseDown</a><span class="other">(</span><a href="../doc/class_MouseEventArgs_14444E11BA5CD6BB0759E82F3D34DDB60D3A1043.html">MouseEventArgs</a><span class="other">&amp;</span>&nbsp;<span class="identifier">args</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_SetFrozen_LogView_20EB71F7B8BD1916279D1E73D826CE0ED85C3069">SetFrozen</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">-></span><a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_OnMouseDown_TextView_42077A9C9A6268A21687416D7783B25C0420C8E6">OnMouseDown</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">protected</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_OnKeyDown_LogView_16E404A4702A691C0C26176C41D8AB0631D56FA6">OnKeyDown</a><span class="other">(</span><a href="../doc/class_KeyEventArgs_A767AB231E7850F4447B79B4B7A2EAEC18EA2A9A.html">KeyEventArgs</a><span class="other">&amp;</span>&nbsp;<span class="identifier">args</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">-></span><a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_OnKeyDown_TextView_422FA8F5FD25E8055593F1C6AD0E68F54B17E65F">OnKeyDown</a><span class="other">(</span><span class="identifier">args</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_CaretLine_TextView_0D3607A12C4BD62DD901D011F6E418B735C2A5B1">CaretLine</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html#member_function_Lines_TextView_68DD5BAF62277CD7EAB843584ADDC3E2C0DF33C8">Lines</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Count_List_T_CC08825E95DA25361D24D0B94402BCC8F4B0197F">Count</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_ResetFrozen_LogView_88E4A811A3693C955BC288F3D887E1516D23DDE9">ResetFrozen</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html#member_function_Invalidate_Control_7E985266C28AEA8EFFE8F84C09A8B49A03CAD572">Invalidate</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_SetFrozen_LogView_20EB71F7B8BD1916279D1E73D826CE0ED85C3069">SetFrozen</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_Frozen_LogView_9CAFB2C20600CC58F4004E08ADD43D987EBA5562">Frozen</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">(</span><a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_variable_flags_297F7CE24CBEC905809C318BE532FBB99F61AAA0">flags</a><span class="other">&nbsp;&amp;&nbsp;</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html">Flags</a><span class="other">.</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html#enumeration_constant_frozen_6F5FC3A0B46B1D490BD86AAC9A3D8FAFCE69DFEE">frozen</a><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html">Flags</a><span class="other">.</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html#enumeration_constant_none_5CBBE186487969B85CDDD9A0BEB9408E8D14D153">none</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_SetFrozen_LogView_20EB71F7B8BD1916279D1E73D826CE0ED85C3069">SetFrozen</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_variable_flags_297F7CE24CBEC905809C318BE532FBB99F61AAA0">flags</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html">Flags</a><span class="other">></span><span class="other">(</span><a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_variable_flags_297F7CE24CBEC905809C318BE532FBB99F61AAA0">flags</a><span class="other">&nbsp;|&nbsp;</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html">Flags</a><span class="other">.</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html#enumeration_constant_frozen_6F5FC3A0B46B1D490BD86AAC9A3D8FAFCE69DFEE">frozen</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_function_ResetFrozen_LogView_88E4A811A3693C955BC288F3D887E1516D23DDE9">ResetFrozen</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_variable_flags_297F7CE24CBEC905809C318BE532FBB99F61AAA0">flags</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html">Flags</a><span class="other">></span><span class="other">(</span><a href="../doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html#member_variable_flags_297F7CE24CBEC905809C318BE532FBB99F61AAA0">flags</a><span class="other">&nbsp;&amp;&nbsp;</span><span class="other">~</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html">Flags</a><span class="other">.</span><a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html#enumeration_constant_frozen_6F5FC3A0B46B1D490BD86AAC9A3D8FAFCE69DFEE">frozen</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../doc/enumerated_type_Flags_AF3532F6063E59F1A471B0C5F5DE7553B7A649A9.html">Flags</a>&nbsp;<span class="identifier">flags</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>
