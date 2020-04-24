@@ -179,10 +179,36 @@ namespace spring
             formatter.SetIndentSize(1);
             System.Dom.Document diagramDocument;
             diagramDocument.AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Element(u"diagram")));
+            HashMap<ContainerElement*, int> containerElementIndexMap;
+            List<ContainerElement*> containerElements;
+            List<RelationshipElement*> relationshipElements;
             for (UniquePtr<DiagramElement>& element : elements)
             {
-                UniquePtr<System.Dom.Element> domElement = element->CreateDomElement();
-                element->Write(domElement.Get());
+                if (element.Get() is ContainerElement*)
+                {
+                    containerElements.Add(cast<ContainerElement*>(element.Get()));
+                }
+                else if (element.Get() is RelationshipElement*)
+                {
+                    relationshipElements.Add(cast<RelationshipElement*>(element.Get()));
+                }
+            }
+            int nc = cast<int>(containerElements.Count());
+            for (int i = 0; i < nc; ++i)
+            {
+                ContainerElement* containerElement = containerElements[i];
+                containerElementIndexMap[containerElement] = i;
+                UniquePtr<System.Dom.Element> domElement = containerElement->CreateDomElement();
+                containerElement->Write(domElement.Get());
+                diagramDocument.DocumentElement()->AppendChild(UniquePtr<System.Dom.Node>(domElement.Release()));
+            }
+            int nr = cast<int>(relationshipElements.Count());
+            for (int i = 0; i < nr; ++i)
+            {
+                RelationshipElement* relationshipElement = relationshipElements[i];
+                relationshipElement->SetContainerElementIndeces(containerElementIndexMap);
+                UniquePtr<System.Dom.Element> domElement = relationshipElement->CreateDomElement();
+                relationshipElement->Write(domElement.Get());
                 diagramDocument.DocumentElement()->AppendChild(UniquePtr<System.Dom.Node>(domElement.Release()));
             }
             diagramDocument.Write(formatter);
@@ -230,7 +256,7 @@ namespace spring
                 diagramElements.Add(element.Get());
             }
             Graphics graphics = Graphics.FromWindowHandle(GetCanvas()->Handle());
-            spring.SaveImage(fileName, margins, diagramElements, graphics, GetLayout(), imageFormat);
+            spring.SaveImage(fileName, margins, canvas, diagramElements, graphics, GetLayout(), imageFormat);
         }
         public nothrow RectF CalculateBoundingRect() const
         {
@@ -343,6 +369,10 @@ namespace spring
             }
             return -1;
         }
+        public inline nothrow int NextIndex() const
+        {
+            return elements.Count();
+        }
         public nothrow void AddElement(DiagramElement* element)
         {
             element->SetDiagram(this);
@@ -356,6 +386,15 @@ namespace spring
             SetChanged();
             Invalidate();
             return element;
+        }
+        public nothrow void InsertElement(DiagramElement* element, int index)
+        {
+            element->SetDiagram(this);
+            elements.Insert(index, element);
+        }
+        public nothrow DiagramElement* ReleaseElementByIndex(int index)
+        {
+            return elements.Release(index);
         }
         public nothrow int GetIndexOfElementAt(const PointF& location) const
         {
@@ -474,6 +513,7 @@ namespace spring
         }
         public void Paste(const ustring& clipboardData)
         {
+            UniquePtr<AddElementsCommand> addElementsCommand(new AddElementsCommand(*this));
             UniquePtr<System.Dom.Document> diagramElementDoc = System.Dom.ParseDocument(clipboardData, "clipboard");
             UniquePtr<XPathObject> result = Evaluate(u"/spring.diagram.elements/*", diagramElementDoc.Get());
             if (!result.IsNull())
@@ -482,6 +522,8 @@ namespace spring
                 {
                     XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
                     UniquePtr<ElementSelection> elementSelection(new ElementSelection(*this));
+                    List<RelationshipElement*> relationshipElements;
+                    HashMap<int, int> indexMap;
                     int n = nodeSet->Length();
                     for (int i = 0; i < n; ++i)
                     {
@@ -493,11 +535,23 @@ namespace spring
                             UniquePtr<DiagramElement> diagramElement(DiagramElementFactory.Instance().Create(domElementName));
                             diagramElement->Read(element);
                             int index = elements.Count();
+                            if (diagramElement.Get() is RelationshipElement*)
+                            {
+                                relationshipElements.Add(cast<RelationshipElement*>(diagramElement.Get()));
+                            }
                             AddElement(diagramElement.Release());
+                            indexMap[i] = index;
                             elementSelection->Add(index);
+                            addElementsCommand->AddIndex(index);
                         }
                     }
+                    for (RelationshipElement* relationship : relationshipElements)
+                    {
+                        relationship->MapIndeces(indexMap);
+                        relationship->Resolve();
+                    }
                     SetSelection(elementSelection.Release());
+                    commandList.AddCommand(addElementsCommand.Release());
                 }
             }
         }
@@ -615,6 +669,10 @@ namespace spring
         {
             flags = cast<Flags>(flags & ~Flags.invalidated);
         }
+        public nothrow inline CommandList& GetCommandList()
+        {
+            return commandList;
+        }
         private Flags flags;
         private Canvas* canvas;
         private Layout* layout;
@@ -664,6 +722,9 @@ namespace spring
             return null;
         }
         public virtual nothrow void Resolve()
+        {
+        }
+        public virtual nothrow void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
         {
         }
         public virtual nothrow Endpoint GetEndpoint(const Snap& snap) const
@@ -1099,27 +1160,26 @@ namespace spring
         }
         public void Write(System.Dom.Element* parentElement)
         {
-            if (element != null)
+            if (index != -1)
             {
-                Diagram* diagram = element->GetDiagram();
-                if (element != null)
-                {
-                    int index = diagram->GetIndexOfElement(element);
-                    parentElement->SetAttribute(u"index", ToUtf32(ToString(index)));
-                }
-                else
-                {
-                    parentElement->SetAttribute(u"index", u"-1");
-                }
-                parentElement->SetAttribute(u"snap", ToUtf32(snap.ToString()));
-                parentElement->SetAttribute(u"x", ToUtf32(ToString(point.x)));
-                parentElement->SetAttribute(u"y", ToUtf32(ToString(point.y)));
-                parentElement->SetAttribute(u"text", ToUtf32(text));
+                parentElement->SetAttribute(u"index", ToUtf32(ToString(index)));
             }
+            parentElement->SetAttribute(u"snap", ToUtf32(snap.ToString()));
+            parentElement->SetAttribute(u"x", ToUtf32(ToString(point.x)));
+            parentElement->SetAttribute(u"y", ToUtf32(ToString(point.y)));
+            parentElement->SetAttribute(u"text", ToUtf32(text));
         }
         public void Read(System.Dom.Element* parentElement)
         {
-            index = ParseInt(ToUtf8(parentElement->GetAttribute(u"index")));
+            ustring indexStr = parentElement->GetAttribute(u"index");
+            if (indexStr.IsEmpty())
+            {
+                index = -1;
+            }
+            else
+            {
+                index = ParseInt(ToUtf8(indexStr));
+            }
             snap = ParseSnap(ToUtf8(parentElement->GetAttribute(u"snap")));
             point.x = ParseFloat(ToUtf8(parentElement->GetAttribute(u"x")));
             point.y = ParseFloat(ToUtf8(parentElement->GetAttribute(u"y")));
@@ -1130,6 +1190,69 @@ namespace spring
             if (index != -1)
             {
                 element = diagram->GetElementByIndex(index);
+                if (snap.primaryPoint == SnapPoint.field)
+                {
+                    if (element is ContainerElement*)
+                    {
+                        ContainerElement* containerElement = cast<ContainerElement*>(element);
+                        element = containerElement->GetField(cast<sbyte>(snap.secondaryPoint));
+                    }
+                    else
+                    {
+                        throw Exception("container element expected");
+                    }
+                }
+                else if (snap.primaryPoint == SnapPoint.operation)
+                {
+                    if (element is ContainerElement*)
+                    {
+                        ContainerElement* containerElement = cast<ContainerElement*>(element);
+                        element = containerElement->GetOperation(cast<sbyte>(snap.secondaryPoint));
+                    }
+                    else
+                    {
+                        throw Exception("container element expected");
+                    }
+                }
+            }
+            else
+            {
+                element = null;
+            }
+        }
+        public void SetIndex(const HashMap<ContainerElement*, int>& containerElementIndexMap)
+        {
+            if (element != null)
+            {
+                ContainerElement* containerElement = element->GetContainerElement();
+                HashMap<ContainerElement*, int>.ConstIterator it = containerElementIndexMap.CFind(containerElement);
+                if (it != containerElementIndexMap.CEnd())
+                {
+                    index = it->second;
+                }
+                else
+                {
+                    throw Exception("index for container element '" + containerElement->Name() + "' not found");
+                }
+            }
+            else
+            {
+                index = -1;
+            }
+        }
+        public void MapIndex(const HashMap<int, int>& indexMap)
+        {
+            if (index != -1)
+            {
+                HashMap<int, int>.ConstIterator it = indexMap.CFind(index);
+                if (it != indexMap.CEnd())
+                {
+                    index = it->second;
+                }
+                else
+                {
+                    throw Exception("index not found from index map");
+                }
             }
         }
         public DiagramElement* element;
@@ -1228,45 +1351,84 @@ namespace spring
         }
         public nothrow void Straighten()
         {
-            PointF prev = source.point;
-            for (PointF& next : intermediatePoints)
-            {
-                Line line(prev, next);
-                Vector v(line.ToVector());
-                switch (MainDirection(v))
-                {
-                    case 0:
-                    case 180:
-                    {
-                        next.y = prev.y;
-                        break;
-                    }
-                    case 90:
-                    case 270:
-                    {
-                        next.x = prev.x;
-                        break;
-                    }
-                }
-                prev = next;
-            }
             if (!intermediatePoints.IsEmpty())
             {
-                PointF& last = intermediatePoints.Back();
-                Line line(last, target.point);
+                PointF prev = source.point;
+                for (PointF& next : intermediatePoints)
+                {
+                    Line line(prev, next);
+                    Vector v(line.ToVector());
+                    switch (MainDirection(v))
+                    {
+                        case 0:
+                        case 180:
+                        {
+                            next.y = prev.y;
+                            break;
+                        }
+                        case 90:
+                        case 270:
+                        {
+                            next.x = prev.x;
+                            break;
+                        }
+                    }
+                    prev = next;
+                }
+                if (!intermediatePoints.IsEmpty())
+                {
+                    PointF& last = intermediatePoints.Back();
+                    Line line(last, target.point);
+                    Vector v(line.ToVector());
+                    switch (MainDirection(v))
+                    {
+                        case 0:
+                        case 180:
+                        {
+                            last.y = target.point.y;
+                            break;
+                        }
+                        case 90:
+                        case 270:
+                        {
+                            last.x = target.point.x;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Line line(source.point, target.point);
                 Vector v(line.ToVector());
                 switch (MainDirection(v))
                 {
                     case 0:
                     case 180:
                     {
-                        last.y = target.point.y;
+                        if (target.element != null)
+                        {
+                            float dy = source.point.y - target.point.y;
+                            target.element->Offset(0.0f, dy);
+                        }
+                        else
+                        {
+                            target.point.y = source.point.y;
+                        }
                         break;
                     }
                     case 90:
                     case 270:
                     {
-                        last.x = target.point.x;
+                        if (target.element != null)
+                        {
+                            float dx = source.point.x - target.point.x;
+                            target.element->Offset(dx, 0.0f);
+                        }
+                        else
+                        {
+                            target.point.x = source.point.x;
+                        }
                         break;
                     }
                 }
@@ -1437,6 +1599,7 @@ namespace spring
                 System.Dom.Element* intermediatePointElement = new System.Dom.Element(u"intermediatePoint");
                 intermediatePointElement->SetAttribute(u"x", ToUtf32(ToString(intermediatePoints[i].x)));
                 intermediatePointElement->SetAttribute(u"y", ToUtf32(ToString(intermediatePoints[i].y)));
+                element->AppendChild(UniquePtr<System.Dom.Node>(intermediatePointElement));
             }
             element->SetAttribute(u"cardinality", ToUtf32(ToString(cardinality)));
         }
@@ -1452,6 +1615,16 @@ namespace spring
             {
                 target.element->AddRelationship(this);
             }
+        }
+        public nothrow void SetContainerElementIndeces(const HashMap<ContainerElement*, int>& containerElementIndexMap)
+        {
+            source.SetIndex(containerElementIndexMap);
+            target.SetIndex(containerElementIndexMap);
+        }
+        public void MapIndeces(const HashMap<int, int>& indexMap)
+        {
+            source.MapIndex(indexMap);
+            target.MapIndex(indexMap);
         }
         public override void Measure(Graphics& graphics, Layout& layout)
         {
@@ -2107,6 +2280,29 @@ namespace spring
         {
             return containerElement;
         }
+        public nothrow override void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
+        {
+            base->MapRelationships(cloneMap);
+            if (relationship != null)
+            {
+                if (relationship->source.element != null)
+                {
+                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->source.element);
+                    if (it != cloneMap.CEnd())
+                    {
+                        relationship->source.element = it->second;
+                    }
+                }
+                if (relationship->target.element != null)
+                {
+                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->target.element);
+                    if (it != cloneMap.CEnd())
+                    {
+                        relationship->target.element = it->second;
+                    }
+                }
+            }
+        }
         public override nothrow void AddRelationship(RelationshipElement* relationship_)
         {
             relationship = relationship_;
@@ -2177,7 +2373,12 @@ namespace spring
         {
             base->SetFrom(that);
             containerElement = cast<FieldElement*>(that)->containerElement;
-            relationship = cast<FieldElement*>(that)->relationship;
+            relationship = null;
+            RelationshipElement* thatRelationship = cast<FieldElement*>(that)->relationship;
+            if (thatRelationship != null)
+            {
+                relationship = cast<RelationshipElement*>(thatRelationship->Clone());
+            }
         }
         public nothrow inline RelationshipElement* Relationship() const
         {
@@ -2217,6 +2418,29 @@ namespace spring
         public override nothrow ContainerElement* GetContainerElement() const
         {
             return containerElement;
+        }
+        public nothrow override void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
+        {
+            base->MapRelationships(cloneMap);
+            if (relationship != null)
+            {
+                if (relationship->source.element != null)
+                {
+                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->source.element);
+                    if (it != cloneMap.CEnd())
+                    {
+                        relationship->source.element = it->second;
+                    }
+                }
+                if (relationship->target.element != null)
+                {
+                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->target.element);
+                    if (it != cloneMap.CEnd())
+                    {
+                        relationship->target.element = it->second;
+                    }
+                }
+            }
         }
         public override nothrow void AddRelationship(RelationshipElement* relationship_)
         {
@@ -2339,7 +2563,12 @@ namespace spring
             base->SetFrom(that);
             isAbstract = cast<OperationElement*>(that)->isAbstract;
             containerElement = cast<OperationElement*>(that)->containerElement;
-            relationship = cast<OperationElement*>(that)->relationship;
+            relationship = null;
+            RelationshipElement* thatRelationship = cast<OperationElement*>(that)->relationship;
+            if (thatRelationship != null)
+            {
+                relationship = cast<RelationshipElement*>(thatRelationship->Clone());
+            }
         }
         public nothrow inline RelationshipElement* Relationship() const
         {
@@ -2365,23 +2594,47 @@ namespace spring
                 relationship->RemoveContainer(this);
             }
         }
-        public nothrow void SetRelationshipsFrom(ContainerElement* oldElement)
+        public abstract void MapChildObjects(ContainerElement* from, HashMap<DiagramElement*, DiagramElement*>& cloneMap);
+        public override nothrow void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
         {
-            for (RelationshipElement* relationship : oldElement->relationships)
+            base->MapRelationships(cloneMap);
+            for (RelationshipElement* relationship : relationships)
             {
-                if (relationship->source.element == oldElement)
+                if (relationship->source.element != null)
                 {
-                    AddRelationship(relationship);
-                    relationship->source.element = this;
+                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->source.element);
+                    if (it != cloneMap.CEnd())
+                    {
+                        relationship->source.element = it->second;
+                    }
                 }
-                if (relationship->target.element == oldElement)
+                if (relationship->target.element != null)
                 {
-                    AddRelationship(relationship);
-                    relationship->target.element = this;
+                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->target.element);
+                    if (it != cloneMap.CEnd())
+                    {
+                        relationship->target.element = it->second;
+                    }
                 }
             }
         }
         public abstract nothrow List<RelationshipElement*> GetAllRelationships() const;
+        public virtual FieldElement* GetField(int index) const
+        {
+            throw Exception("container element '" + Name() + "' has no fields");
+        }
+        public virtual OperationElement* GetOperation(int index) const
+        {
+            throw Exception("container element '" + Name() + "' has no operations");
+        }
+        public virtual int GetIndexOfFieldElement(FieldElement* fieldElement) const
+        {
+            throw Exception("container element '" + Name() + "' has no fields");
+        }
+        public virtual int GetIndexOfOperationElement(OperationElement* operationElement) const
+        {
+            throw Exception("container element '" + Name() + "' has no operations");
+        }
         public override nothrow ContainerElement* GetContainerElement() const
         {
             return this;
@@ -2530,6 +2783,15 @@ namespace spring
             }
             return pickedRelationships;
         }
+        public override void SetFrom(DiagramElement* that)
+        {
+            base->SetFrom(that);
+            relationships.Clear();
+            for (RelationshipElement* thatRelationship : cast<ContainerElement*>(that)->relationships)
+            {
+                relationships.Add(cast<RelationshipElement*>(thatRelationship->Clone()));
+            }
+        }
         private List<RelationshipElement*> relationships;
     }
 
@@ -2560,6 +2822,36 @@ namespace spring
             {
                 OperationElement* operation = operations.Get(i);
                 operation->SetAbstract(false);
+            }
+        }
+        public override void MapChildObjects(ContainerElement* from, HashMap<DiagramElement*, DiagramElement*>& cloneMap)
+        {
+            ClassElement* fromClass = cast<ClassElement*>(from);
+            int no = fromClass->operations.Count();
+            for (int i = 0; i < no; ++i)
+            {
+                cloneMap[fromClass->operations.Get(i)] = operations.Get(i);
+            }
+            int nf = fromClass->fields.Count();
+            for (int i = 0; i < nf; ++i)
+            {
+                cloneMap[fromClass->fields.Get(i)] = fields.Get(i);
+            }
+        }
+        public override nothrow void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
+        {
+            base->MapRelationships(cloneMap);
+            int no = operations.Count();
+            for (int i = 0; i < no; ++i)
+            {
+                OperationElement* operation = operations.Get(i);
+                operation->MapRelationships(cloneMap);
+            }
+            int nf = fields.Count();
+            for (int i = 0; i < nf; ++i)
+            {
+                FieldElement* field = fields.Get(i);
+                field->MapRelationships(cloneMap);
             }
         }
         public override System.Dom.Element* CreateDomElement() const
@@ -2617,6 +2909,32 @@ namespace spring
                 return endpoints;
             }
             return base->GetEndpoints(endpointType, tool);
+        }
+        public override FieldElement* GetField(int index) const
+        {
+            return fields.Get(index);
+        }
+        public override int GetIndexOfFieldElement(FieldElement* fieldElement) const
+        {
+            int n = fields.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (fields.Get(i) == fieldElement) return i;
+            }
+            throw Exception("field '" + fieldElement->Name() + "' not found from class '" + Name() + "'");
+        }
+        public override OperationElement* GetOperation(int index)
+        {
+            return operations.Get(index);
+        }
+        public override int GetIndexOfOperationElement(OperationElement* operationElement) const
+        {
+            int n = operations.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (operations.Get(i) == operationElement) return i;
+            }
+            throw Exception("operation '" + operationElement->Name() + "' not found from class '" + Name() + "'");
         }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
@@ -3058,6 +3376,38 @@ namespace spring
             }
             return relationships;
         }
+        public override void MapChildObjects(ContainerElement* from, HashMap<DiagramElement*, DiagramElement*>& cloneMap)
+        {
+            ObjectElement* fromObject = cast<ObjectElement*>(from);
+            int nf = fromObject->fields.Count();
+            for (int i = 0; i < nf; ++i)
+            {
+                cloneMap[fromObject->fields.Get(i)] = fields.Get(i);
+            }
+        }
+        public override nothrow void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
+        {
+            base->MapRelationships(cloneMap);
+            int nf = fields.Count();
+            for (int i = 0; i < nf; ++i)
+            {
+                FieldElement* field = fields.Get(i);
+                field->MapRelationships(cloneMap);
+            }
+        }
+        public override FieldElement* GetField(int index) const
+        {
+            return fields.Get(index);
+        }
+        public override int GetIndexOfFieldElement(FieldElement* fieldElement) const
+        {
+            int n = fields.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (fields.Get(i) == fieldElement) return i;
+            }
+            throw Exception("field '" + fieldElement->Name() + "' not found from class '" + Name() + "'");
+        }
         public override nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
         {
             base->AddActions(diagram, elementIndex, contextMenu);
@@ -3320,6 +3670,9 @@ namespace spring
             clone->SetFrom(this);
             return clone.Release();
         }
+        public override void MapChildObjects(ContainerElement* from, HashMap<DiagramElement*, DiagramElement*>& cloneMap)
+        {
+        }
         public nothrow override List<RelationshipElement*> GetAllRelationships() const
         {
             return Relationships();
@@ -3464,12 +3817,27 @@ namespace spring
         return boundingRect;
     }
 
-    public void SaveImage(const string& fileName, const PaddingElement& margins, const List<DiagramElement*>& diagramElements, Graphics& graphics, Layout& layout, ImageFormat imageFormat)
+    public void SaveImage(const string& fileName, const PaddingElement& margins, Canvas* canvas, const List<DiagramElement*>& diagramElements, Graphics& graphics, Layout& layout, ImageFormat imageFormat)
     {
         Diagram diagram(layout);
+        diagram.SetCanvas(canvas);
+        HashMap<DiagramElement*, DiagramElement*> cloneMap;
+        List<ContainerElement*> clones;
         for (DiagramElement* diagramElement : diagramElements)
         {
-            diagram.AddElement(diagramElement->Clone());
+            DiagramElement* clone = diagramElement->Clone();
+            if (clone is ContainerElement*)
+            {
+                ContainerElement* containerElement = cast<ContainerElement*>(clone);
+                cloneMap[diagramElement] = clone;
+                containerElement->MapChildObjects(cast<ContainerElement*>(diagramElement), cloneMap);
+                clones.Add(containerElement);
+            }
+            diagram.AddElement(clone);
+        }
+        for (ContainerElement* clone : clones)
+        {
+            clone->MapRelationships(cloneMap);
         }
         RectF boundingRect = diagram.CalculateBoundingRect();
         diagram.Offset(-boundingRect.location.x + margins.left, -boundingRect.location.y + margins.top);
@@ -3483,7 +3851,6 @@ namespace spring
         bitmapGraphics.SetSmoothingModeChecked(SmoothingMode.highQuality);
         bitmapGraphics.SetPageUnitChecked(Unit.millimeter);
         bitmapGraphics.ClearChecked(Color.White());
-        diagram.SetChanged();
         diagram.Draw(bitmapGraphics);
         bitmap.SaveChecked(fileName.Chars(), GetEncoderClsIdChecked(GetImageFormat(imageFormat)));
     }

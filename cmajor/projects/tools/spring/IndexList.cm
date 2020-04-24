@@ -76,6 +76,10 @@ namespace spring
         {
             elements.Insert(elements.Begin() + index, UniquePtr<T>(element));
         }
+        public nothrow inline T* Release(int index)
+        {
+            return elements[index].Release();
+        }
         public void Clear()
         {
             elements.Clear();

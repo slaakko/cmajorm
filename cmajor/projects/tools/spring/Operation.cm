@@ -109,7 +109,7 @@ namespace spring
 
     public class MoveContainerElementsOperation : Operation
     {
-        public nothrow MoveContainerElementsOperation(Diagram* diagram, const PointF& startLocation) : base(diagram, startLocation), resetSelection(false)
+        public nothrow MoveContainerElementsOperation(Diagram* diagram, const PointF& startLocation) : base(diagram, startLocation), resetSelection(false), moveCommand(new MoveCommand(*diagram))
         {
             diagram->GetSelection()->SetStartLocation(startLocation);
         }
@@ -185,13 +185,21 @@ namespace spring
             {
                 GetDiagram()->ResetSelection();
             }
+            for (int index : elementIndeces)
+            {
+                DiagramElement* element = GetDiagram()->GetElementByIndex(index);
+                moveCommand->AddNewLocation(element->GetCompoundLocation());
+            }
+            GetDiagram()->GetCommandList().AddCommand(moveCommand.Release());
         }
         public override nothrow void FetchOriginalLocations()
         {
             for (int elementIndex : elementIndeces)
             {
                 DiagramElement* element = GetDiagram()->GetElementByIndex(elementIndex);
-                originalLocations.Add(element->GetCompoundLocation());
+                CompoundLocation compoundLocation = element->GetCompoundLocation();
+                originalLocations.Add(compoundLocation);
+                moveCommand->AddOldLocation(elementIndex, compoundLocation);
             }
         }
         public nothrow override bool IsEmpty() const
@@ -201,6 +209,7 @@ namespace spring
         private List<int> elementIndeces;
         private List<CompoundLocation> originalLocations;
         private bool resetSelection;
+        private UniquePtr<MoveCommand> moveCommand;
     }
 
     public class AddRelationshipOperation : Operation
@@ -250,8 +259,11 @@ namespace spring
         {
             relationshipElement->AddToElements();
             Diagram* diagram = GetDiagram();
+            UniquePtr<AddElementsCommand> addElementsCommand(new AddElementsCommand(*diagram));
+            addElementsCommand->AddIndex(diagram->NextIndex());
             diagram->AddElement(relationshipElement.Release());
             Tools.SetCurrent(Tools.GetSelectTool());
+            diagram->GetCommandList().AddCommand(addElementsCommand.Release());
         }
         public nothrow RelationshipElement& GetRelationshipElement()
         {
@@ -284,6 +296,11 @@ namespace spring
         }
         public override void Commit(MouseArgs& args)
         {
+            if (!selection->IsEmpty())
+            {
+                GetDiagram()->EnableCopy();
+                GetDiagram()->EnableCut();
+            }
         }
         public override void Draw(Graphics& graphics, Layout& layout)
         {
@@ -321,8 +338,21 @@ namespace spring
         }
         public override void Commit(MouseArgs& args)
         {
-            AdvanceTo(args);
-            resizeHandle = null;
+            if (resizeHandle != null)
+            {
+                AdvanceTo(args);
+                if (!resizeHandle->GetSelection()->IsEmpty())
+                {
+                    GetDiagram()->EnableCopy();
+                    GetDiagram()->EnableCut();
+                }
+                else
+                {
+                    GetDiagram()->DisableCopy();
+                    GetDiagram()->DisableCut();
+                }
+                resizeHandle = null;
+            }
         }
         public override void Draw(Graphics& graphics, Layout& layout)
         {

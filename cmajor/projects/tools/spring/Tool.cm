@@ -608,10 +608,13 @@ namespace spring
             args.diagram->ResetSelection();
             UniquePtr<ClassElement> classElement(new ClassElement("Class", false));
             classElement->SetLocation(args.location);
+            UniquePtr<AddElementsCommand> addElementsCommand(new AddElementsCommand(*args.diagram));
+            addElementsCommand->AddIndex(args.diagram->NextIndex());
             args.diagram->AddElement(classElement.Release());
             args.diagram->SetChanged();
             args.diagram->Invalidate();
             Tools.SetCurrent(Tools.GetSelectTool());
+            args.diagram->GetCommandList().AddCommand(addElementsCommand.Release());
         }
     }
 
@@ -627,10 +630,13 @@ namespace spring
             args.diagram->ResetSelection();
             UniquePtr<ObjectElement> objectElement(new ObjectElement("anObject"));
             objectElement->SetLocation(args.location);
+            UniquePtr<AddElementsCommand> addElementsCommand(new AddElementsCommand(*args.diagram));
+            addElementsCommand->AddIndex(args.diagram->NextIndex());
             args.diagram->AddElement(objectElement.Release());
             args.diagram->SetChanged();
             args.diagram->Invalidate();
             Tools.SetCurrent(Tools.GetSelectTool());
+            args.diagram->GetCommandList().AddCommand(addElementsCommand.Release());
         }
     }
 
@@ -650,10 +656,13 @@ namespace spring
             lines.Add("note...");
             noteElement->SetLines(lines);
             noteElement->SetLocation(args.location);
+            UniquePtr<AddElementsCommand> addElementsCommand(new AddElementsCommand(*args.diagram));
+            addElementsCommand->AddIndex(args.diagram->NextIndex());
             args.diagram->AddElement(noteElement.Release());
             args.diagram->SetChanged();
             args.diagram->Invalidate();
             Tools.SetCurrent(Tools.GetSelectTool());
+            args.diagram->GetCommandList().AddCommand(addElementsCommand.Release());
         }
     }
 

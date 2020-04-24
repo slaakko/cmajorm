@@ -66,7 +66,7 @@ namespace spring
                 diagramElements.Add(element.Get());
             }
             System.Windows.Graphics graphics = graphics.FromWindowHandle(GetDiagram().GetCanvas()->Handle());
-            spring.SaveImage(fileName, margins, diagramElements, graphics, GetDiagram().GetLayout(), imageFormat);
+            spring.SaveImage(fileName, margins, GetDiagram().GetCanvas(), diagramElements, graphics, GetDiagram().GetLayout(), imageFormat);
         }
         private Diagram& diagram;
     }
@@ -206,16 +206,16 @@ namespace spring
         }
         public override nothrow void Delete()
         {
+            UniquePtr<DeleteElementsCommand> deleteElementsCommand(new DeleteElementsCommand(GetDiagram()));
             List<RelationshipElement*> relationships;
-            SortByIndex();
             int n = cast<int>(indeces.Count());
-            for (int i = n - 1; i >= 0; --i)
+            for (int i = 0; i < n; ++i)
             {
                 int index = indeces[i];
-                UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
-                if (element.Get() is ContainerElement*)
+                DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                if (element is ContainerElement*)
                 {
-                    ContainerElement* containerElement = cast<ContainerElement*>(element.Get());
+                    ContainerElement* containerElement = cast<ContainerElement*>(element);
                     List<RelationshipElement*> containerElementRelationships = containerElement->GetAllRelationships();
                     for (RelationshipElement* relationship : containerElementRelationships)
                     {
@@ -226,26 +226,27 @@ namespace spring
                     }
                 }
             }
-            indeces.Clear();
-            List<int> relationshipIndeces;
             for (RelationshipElement* relationship : relationships)
             {
                 int index = GetDiagram().GetIndexOfElement(relationship);
                 if (index != -1)
                 {
-                    if (Find(relationshipIndeces.CBegin(), relationshipIndeces.CEnd(), index) == relationshipIndeces.CEnd())
+                    if (Find(indeces.CBegin(), indeces.CEnd(), index) == indeces.CEnd())
                     {
-                        relationshipIndeces.Add(index);
+                        indeces.Add(index);
                     }
                 }
             }
-            Sort(relationshipIndeces);
-            int m = cast<int>(relationshipIndeces.Count());
+            SortByIndex();
+            int m = cast<int>(indeces.Count());
             for (int i = m - 1; i >= 0; --i)
             {
-                int index = relationshipIndeces[i];
+                int index = indeces[i];
                 UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+                deleteElementsCommand->AddDeletedElement(element.Release(), index);
             }
+            GetDiagram().GetCommandList().AddCommand(deleteElementsCommand.Release());
+            indeces.Clear();
         }
         public override nothrow void SetStartLocation(const System.Windows.PointF& startLocation_)
         {
@@ -321,13 +322,20 @@ namespace spring
                     }
                 }
             }
-            for (ContainerElement* containerElement : containerElements)
+            HashMap<ContainerElement*, int> containerElementIndexMap;
+            int nc = cast<int>(containerElements.Count());
+            for (int i = 0; i < nc; ++i)
             {
-                clonedElements.Add(UniquePtr<DiagramElement>(containerElement->Clone()));
+                ContainerElement* containerElement = containerElements[i];
+                containerElementIndexMap[containerElement] = i;
+                ContainerElement* clone = cast<ContainerElement*>(containerElement->Clone());
+                clonedElements.Add(UniquePtr<DiagramElement>(clone));
             }
             for (RelationshipElement* relationshipElement : relationshipElements)
             {
-                clonedElements.Add(UniquePtr<DiagramElement>(relationshipElement->Clone()));
+                RelationshipElement* clone = cast<RelationshipElement*>(relationshipElement->Clone());
+                clone->SetContainerElementIndeces(containerElementIndexMap);
+                clonedElements.Add(UniquePtr<DiagramElement>(clone));
             }
             for (UniquePtr<DiagramElement>& clonedElement : clonedElements)
             {
@@ -409,6 +417,12 @@ namespace spring
         {
             if (!indeces.IsEmpty())
             {
+                UniquePtr<MoveCommand> moveCommand(new MoveCommand(GetDiagram()));
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddOldLocation(index, element->GetCompoundLocation());
+                }
                 DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
                 float top = firstElement->Location().y;
                 int n = cast<int>(indeces.Count());
@@ -417,12 +431,24 @@ namespace spring
                     DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
                     element->SetLocation(System.Windows.PointF(element->Location().x, top));
                 }
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddNewLocation(element->GetCompoundLocation());
+                }
+                GetDiagram().GetCommandList().AddCommand(moveCommand.Release());
             }
         }
         public nothrow void AlignBottom()
         {
             if (!indeces.IsEmpty())
             {
+                UniquePtr<MoveCommand> moveCommand(new MoveCommand(GetDiagram()));
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddOldLocation(index, element->GetCompoundLocation());
+                }
                 DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
                 float bottom = firstElement->Location().y + firstElement->GetSize().h;
                 int n = cast<int>(indeces.Count());
@@ -434,12 +460,24 @@ namespace spring
                     float top = element->Location().y - dy;
                     element->SetLocation(System.Windows.PointF(element->Location().x, top));
                 }
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddNewLocation(element->GetCompoundLocation());
+                }
+                GetDiagram().GetCommandList().AddCommand(moveCommand.Release());
             }
         }
         public nothrow void AlignVerticalCenter()
         {
             if (!indeces.IsEmpty())
             {
+                UniquePtr<MoveCommand> moveCommand(new MoveCommand(GetDiagram()));
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddOldLocation(index, element->GetCompoundLocation());
+                }
                 DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
                 float center = firstElement->Location().y + firstElement->GetSize().h / 2.0f;
                 int n = cast<int>(indeces.Count());
@@ -451,12 +489,24 @@ namespace spring
                     float top = element->Location().y - dy;
                     element->SetLocation(System.Windows.PointF(element->Location().x, top));
                 }
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddNewLocation(element->GetCompoundLocation());
+                }
+                GetDiagram().GetCommandList().AddCommand(moveCommand.Release());
             }
         }
         public nothrow void AlignLeftSide()
         {
             if (!indeces.IsEmpty())
             {
+                UniquePtr<MoveCommand> moveCommand(new MoveCommand(GetDiagram()));
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddOldLocation(index, element->GetCompoundLocation());
+                }
                 DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
                 float leftSide = firstElement->Location().x;
                 int n = cast<int>(indeces.Count());
@@ -465,12 +515,24 @@ namespace spring
                     DiagramElement* element = GetDiagram().GetElementByIndex(indeces[i]);
                     element->SetLocation(System.Windows.PointF(leftSide, element->Location().y));
                 }
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddNewLocation(element->GetCompoundLocation());
+                }
+                GetDiagram().GetCommandList().AddCommand(moveCommand.Release());
             }
         }
         public nothrow void AlignRightSide()
         {
             if (!indeces.IsEmpty())
             {
+                UniquePtr<MoveCommand> moveCommand(new MoveCommand(GetDiagram()));
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddOldLocation(index, element->GetCompoundLocation());
+                }
                 DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
                 float rightSide = firstElement->Location().x + firstElement->GetSize().w;
                 int n = cast<int>(indeces.Count());
@@ -482,12 +544,24 @@ namespace spring
                     float leftSide = element->Location().x - dx;
                     element->SetLocation(System.Windows.PointF(leftSide, element->Location().y));
                 }
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddNewLocation(element->GetCompoundLocation());
+                }
+                GetDiagram().GetCommandList().AddCommand(moveCommand.Release());
             }
         }
         public nothrow void AlignHorizontalCenter()
         {
             if (!indeces.IsEmpty())
             {
+                UniquePtr<MoveCommand> moveCommand(new MoveCommand(GetDiagram()));
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddOldLocation(index, element->GetCompoundLocation());
+                }
                 DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
                 float center = firstElement->Location().x + firstElement->GetSize().w / 2.0f;
                 int n = cast<int>(indeces.Count());
@@ -499,12 +573,24 @@ namespace spring
                     float leftSide = element->Location().x - dx;
                     element->SetLocation(System.Windows.PointF(leftSide, element->Location().y));
                 }
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddNewLocation(element->GetCompoundLocation());
+                }
+                GetDiagram().GetCommandList().AddCommand(moveCommand.Release());
             }
         }
         public nothrow void SpaceEvenlyVertically()
         {
             if (indeces.Count() > 2)
             {
+                UniquePtr<MoveCommand> moveCommand(new MoveCommand(GetDiagram()));
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddOldLocation(index, element->GetCompoundLocation());
+                }
                 DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
                 DiagramElement* lastElement = GetDiagram().GetElementByIndex(indeces.Back());
                 float firstElementBottom = firstElement->Location().y + firstElement->GetSize().h;
@@ -525,12 +611,24 @@ namespace spring
                     element->SetLocation(System.Windows.PointF(element->Location().x, top));
                     prevElementBottom = top + element->GetSize().h;
                 }
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddNewLocation(element->GetCompoundLocation());
+                }
+                GetDiagram().GetCommandList().AddCommand(moveCommand.Release());
             }
         }
         public nothrow void SpaceEvenlyHorizontally()
         {
             if (indeces.Count() > 2)
             {
+                UniquePtr<MoveCommand> moveCommand(new MoveCommand(GetDiagram()));
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddOldLocation(index, element->GetCompoundLocation());
+                }
                 DiagramElement* firstElement = GetDiagram().GetElementByIndex(indeces.Front());
                 DiagramElement* lastElement = GetDiagram().GetElementByIndex(indeces.Back());
                 float firstElementRightSide = firstElement->Location().x + firstElement->GetSize().w;
@@ -551,6 +649,12 @@ namespace spring
                     element->SetLocation(System.Windows.PointF(left, element->Location().y));
                     prevElementRightSide = left + element->GetSize().w;
                 }
+                for (int index : indeces)
+                {
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    moveCommand->AddNewLocation(element->GetCompoundLocation());
+                }
+                GetDiagram().GetCommandList().AddCommand(moveCommand.Release());
             }
         }
         private List<int> indeces;
@@ -775,17 +879,17 @@ namespace spring
         }
         public override nothrow void Delete()
         {
-            List<int> containerElementIndeces = GetContainerElementIndeces();
-            Sort(containerElementIndeces);
+            UniquePtr<DeleteElementsCommand> deleteElementsCommand(new DeleteElementsCommand(GetDiagram()));
+            List<int> elementIndeces = GetContainerElementIndeces();
             List<RelationshipElement*> relationships;
-            int n = cast<int>(containerElementIndeces.Count());
-            for (int i = n - 1; i >= 0; --i)
+            int n = cast<int>(elementIndeces.Count());
+            for (int i = 0; i < n; ++i)
             {
-                int index = containerElementIndeces[i];
-                UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
-                if (element.Get() is ContainerElement*)
+                int index = elementIndeces[i];
+                DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                if (element is ContainerElement*)
                 {
-                    ContainerElement* containerElement = cast<ContainerElement*>(element.Get());
+                    ContainerElement* containerElement = cast<ContainerElement*>(element);
                     List<RelationshipElement*> containerElementRelationships = containerElement->GetAllRelationships();
                     for (RelationshipElement* relationship : containerElementRelationships)
                     {
@@ -796,25 +900,26 @@ namespace spring
                     }
                 }
             }
-            List<int> relationshipIndeces;
             for (RelationshipElement* relationship : relationships)
             {
                 int index = GetDiagram().GetIndexOfElement(relationship);
                 if (index != -1)
                 {
-                    if (Find(relationshipIndeces.CBegin(), relationshipIndeces.CEnd(), index) == relationshipIndeces.CEnd())
+                    if (Find(elementIndeces.CBegin(), elementIndeces.CEnd(), index) == elementIndeces.CEnd())
                     {
-                        relationshipIndeces.Add(index);
+                        elementIndeces.Add(index);
                     }
                 }
             }
-            Sort(relationshipIndeces);
-            int m = cast<int>(relationshipIndeces.Count());
+            Sort(elementIndeces);
+            int m = cast<int>(elementIndeces.Count());
             for (int i = m - 1; i >= 0; --i)
             {
-                int index = relationshipIndeces[i];
+                int index = elementIndeces[i];
                 UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+                deleteElementsCommand->AddDeletedElement(element.Release(), index);
             }
+            GetDiagram().GetCommandList().AddCommand(deleteElementsCommand.Release());
         }
         public override nothrow void SetStartLocation(const System.Windows.PointF& startLocation_)
         {
@@ -913,20 +1018,27 @@ namespace spring
                         {
                             boundingRect = System.Windows.RectF.Union(boundingRect, relationship->BoundingRect());
                         }
-                        if (Find(relationshipElements.CBegin(), relationshipElements.CEnd(), relationship) != relationshipElements.CEnd())
+                        if (Find(relationshipElements.CBegin(), relationshipElements.CEnd(), relationship) == relationshipElements.CEnd())
                         {
                             relationshipElements.Add(relationship);
                         }
                     }
                 }
             }
-            for (ContainerElement* containerElement : containerElements)
+            HashMap<ContainerElement*, int> containerElementIndexMap;
+            int nc = cast<int>(containerElements.Count());
+            for (int i = 0; i < nc; ++i)
             {
-                clonedElements.Add(UniquePtr<DiagramElement>(containerElement->Clone()));
+                ContainerElement* containerElement = containerElements[i];
+                containerElementIndexMap[containerElement] = i;
+                ContainerElement* clone = cast<ContainerElement*>(containerElement->Clone());
+                clonedElements.Add(UniquePtr<DiagramElement>(clone));
             }
             for (RelationshipElement* relationshipElement : relationshipElements)
             {
-                clonedElements.Add(UniquePtr<DiagramElement>(relationshipElement->Clone()));
+                RelationshipElement* clone = cast<RelationshipElement*>(relationshipElement->Clone());
+                clone->SetContainerElementIndeces(containerElementIndexMap);
+                clonedElements.Add(UniquePtr<DiagramElement>(clone));
             }
             for (UniquePtr<DiagramElement>& clonedElement : clonedElements)
             {

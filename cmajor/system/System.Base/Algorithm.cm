@@ -543,6 +543,20 @@ namespace System
         *last = val;
     }
 
+    public nothrow void UnguardedLinearInsert<I, T, R>(I last, T&& val, R r) where I is RandomAccessIterator and T is I.ValueType and R is Relation and R.Domain is I.ValueType
+        and I.ValueType is Movable
+    {
+        I next = last;
+        --next;
+        while (r(val, *next))
+        {
+            *last = Rvalue(*next);
+            last = next;
+            --next;
+        }
+        *last = Rvalue(val);
+    }
+
     public void LinearInsert<I, R>(I first, I last, R r) where I is RandomAccessIterator and R is Relation and R.Domain is I.ValueType
     {
         I.ValueType val = *last;
@@ -554,6 +568,20 @@ namespace System
         else
         {
             UnguardedLinearInsert(last, val, r);
+        }
+    }
+
+    public void LinearInsert<I, R>(I first, I last, R r) where I is RandomAccessIterator and R is Relation and R.Domain is I.ValueType and I.ValueType is Movable
+    {
+        I.ValueType val = Rvalue(*last);
+        if (r(val, *first))
+        {
+            MoveBackward(first, last, last + 1);
+            *first = Rvalue(val);
+        }
+        else
+        {
+            UnguardedLinearInsert(last, Rvalue(val), r);
         }
     }
 
@@ -580,7 +608,7 @@ namespace System
     {
         while (end - begin > insertionSortThreshold)
         {
-            I.ValueType pivot = Median(*begin, *(begin + (end - begin) / 2), *(end - 1), r);
+            const I.ValueType& pivot = Median(*begin, *(begin + (end - begin) / 2), *(end - 1), r);
             I cut = UnguardedPartition(begin, end, pivot, r);
             PartialQuickSort(cut, end, r);
             end = cut;

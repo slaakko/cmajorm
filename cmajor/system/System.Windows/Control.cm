@@ -1317,6 +1317,14 @@ namespace System.Windows
         }
         private void DoSetFocus()
         {
+            if (this is Window*)
+            {
+                Window* thisWindow = cast<Window*>(this);
+                if (thisWindow->IsMainWindow())
+                {
+                    return;
+                }
+            }
             SetFocused();
             DoGotFocus();
             DoCreateAndShowCaret();

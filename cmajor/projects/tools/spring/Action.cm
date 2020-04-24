@@ -201,7 +201,43 @@ namespace spring
         }
         protected override void Execute(Diagram& diagram, int elementIndex)
         {
-            diagram.RemoveElementByIndex(elementIndex);
+            UniquePtr<DeleteElementsCommand> deleteElementsCommand(new DeleteElementsCommand(diagram));
+            UniquePtr<DiagramElement> element = diagram.RemoveElementByIndex(elementIndex);
+            if (element.Get() is ContainerElement*)
+            {
+                ContainerElement* containerElement = cast<ContainerElement*>(element.Get());
+                List<RelationshipElement*> containerElementRelationships = containerElement->GetAllRelationships();
+                List<RelationshipElement*> relationships;
+                for (RelationshipElement* relationship : containerElementRelationships)
+                {
+                    if (Find(relationships.CBegin(), relationships.CEnd(), relationship) == relationships.CEnd())
+                    {
+                        relationships.Add(relationship);
+                    }
+                }
+                List<int> relationshipIndeces;
+                for (RelationshipElement* relationship : relationships)
+                {
+                    int index = diagram.GetIndexOfElement(relationship);
+                    if (index != -1)
+                    {
+                        if (Find(relationshipIndeces.CBegin(), relationshipIndeces.CEnd(), index) == relationshipIndeces.CEnd())
+                        {
+                            relationshipIndeces.Add(index);
+                        }
+                    }
+                }
+                Sort(relationshipIndeces.Begin(), relationshipIndeces.End());
+                int m = cast<int>(relationshipIndeces.Count());
+                for (int i = m - 1; i >= 0; --i)
+                {
+                    int index = relationshipIndeces[i];
+                    UniquePtr<DiagramElement> element = diagram.RemoveElementByIndex(index);
+                    deleteElementsCommand->AddDeletedElement(element.Release(), index);
+                }
+            }
+            deleteElementsCommand->AddDeletedElement(element.Release(), elementIndex);
+            diagram.GetCommandList().AddCommand(deleteElementsCommand.Release());
         }
     }
 
@@ -247,10 +283,15 @@ namespace spring
                             clone->ResetAbstractOperations();
                         }
                         clone->SetDiagram(&diagram);
-                        clone->SetRelationshipsFrom(classElement);
+                        UniquePtr<ReplaceElementCommand> replaceElementCommand(new ReplaceElementCommand(diagram, elementIndex));
+                        HashMap<DiagramElement*, DiagramElement*> cloneMap;
+                        cloneMap[classElement] = clone.Get();
+                        clone->MapChildObjects(classElement, cloneMap);
+                        clone->MapRelationships(cloneMap);
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();
+                        diagram.GetCommandList().AddCommand(replaceElementCommand.Release());
                     }
                 }
             }
@@ -279,10 +320,15 @@ namespace spring
                     if (result == DialogResult.ok)
                     {
                         clone->SetDiagram(&diagram);
-                        clone->SetRelationshipsFrom(objectElement);
+                        UniquePtr<ReplaceElementCommand> replaceElementCommand(new ReplaceElementCommand(diagram, elementIndex));
+                        HashMap<DiagramElement*, DiagramElement*> cloneMap;
+                        cloneMap[objectElement] = clone.Get();
+                        clone->MapChildObjects(objectElement, cloneMap);
+                        clone->MapRelationships(cloneMap);
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();
+                        diagram.GetCommandList().AddCommand(replaceElementCommand.Release());
                     }
                 }
             }
@@ -314,6 +360,7 @@ namespace spring
                     DialogResult result = relationshipPropertiesDialog->ShowDialog(*window);
                     if (result == DialogResult.ok)
                     {
+                        UniquePtr<ReplaceElementCommand> replaceElementCommand(new ReplaceElementCommand(diagram, elementIndex));
                         if (relationshipElement->source.element != null)
                         {
                             relationshipElement->source.element->RemoveRelationship(relationshipElement);
@@ -333,6 +380,7 @@ namespace spring
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();
+                        diagram.GetCommandList().AddCommand(replaceElementCommand.Release());
                     }
                 }
             }
@@ -361,10 +409,15 @@ namespace spring
                     if (result == DialogResult.ok)
                     {
                         clone->SetDiagram(&diagram);
-                        clone->SetRelationshipsFrom(noteElement);
+                        UniquePtr<ReplaceElementCommand> replaceElementCommand(new ReplaceElementCommand(diagram, elementIndex));
+                        HashMap<DiagramElement*, DiagramElement*> cloneMap;
+                        cloneMap[noteElement] = clone.Get();
+                        clone->MapChildObjects(noteElement, cloneMap);
+                        clone->MapRelationships(cloneMap);
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();
+                        diagram.GetCommandList().AddCommand(replaceElementCommand.Release());
                     }
                 }
             }
