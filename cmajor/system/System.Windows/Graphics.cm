@@ -778,6 +778,11 @@ namespace System.Windows
         public float y;
     }
 
+    public nothrow inline bool operator==(const PointF& left, const PointF& right)
+    {
+        return left.x == right.x && left.y == right.y;
+    }
+
     public nothrow float Distance(const PointF& start, const PointF& end)
     {
         float dx = Abs(start.x - end.x);
@@ -807,6 +812,11 @@ namespace System.Windows
         }
         public float x;
         public float y;
+    }
+
+    public nothrow inline bool operator==(const Vector& v, const Vector& u)
+    {
+        return v.x == u.x && v.y == u.y;
     }
 
     public nothrow Vector operator*(const Vector& v, float a)
@@ -948,6 +958,11 @@ namespace System.Windows
         }
         public PointF start;
         public PointF end;
+    }
+
+    public inline nothrow bool operator==(const Line& left, const Line& right) 
+    {
+        return left.start == right.start && left.end == right.end;
     }
 
     public nothrow Line Rotate(const Line& line, float angleDeg)

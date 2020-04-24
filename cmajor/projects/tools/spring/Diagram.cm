@@ -1770,6 +1770,7 @@ namespace spring
         private void DrawAggregation(Graphics& graphics, Layout& layout)
         {
             const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+            const PaddingElement& padding = layout.GetClassPaddingElement();
             const FontElement& fontElement = relationshipLayoutElement.GetFontElement();
             const Font& font = fontElement.GetFont();
             const Brush& textBrush = relationshipLayoutElement.TextBrush();
@@ -1793,7 +1794,9 @@ namespace spring
             Line aggregateLine(start, end);
             if (!source.text.IsEmpty())
             {
-                DrawSourceText(graphics, font, textBrush, aggregateLine, aggregateSymbolWidth);
+                float leadinglWidth = aggregateSymbolWidth;
+                Line textLine = GetSourceTextLine(aggregateLine, leadinglWidth, padding.left);
+                DrawSourceText(graphics, font, textBrush, textLine, leadinglWidth);
             }
             Vector v(aggregateLine.ToVector());
             Vector u(UnitVector(v) * aggregateSymbolWidth);
@@ -1926,7 +1929,9 @@ namespace spring
             Line referenceLine(first, end);
             if (!source.text.IsEmpty())
             {
-                DrawSourceText(graphics, font, textBrush, referenceLine, padding.left);
+                float leadingWidth = padding.left;
+                Line textLine = GetSourceTextLine(referenceLine, leadingWidth, leadingWidth);
+                DrawSourceText(graphics, font, textBrush, textLine, leadingWidth);
             }
             Vector v(referenceLine.ToVector());
             PointF prevPoint = referenceLine.start;
@@ -2037,7 +2042,9 @@ namespace spring
             Line instanceLine(start, end);
             if (!source.text.IsEmpty())
             {
-                DrawSourceText(graphics, font, textBrush, instanceLine, padding.left);
+                float leadingWidth = padding.left;
+                Line textLine = GetSourceTextLine(instanceLine, leadingWidth, leadingWidth);
+                DrawSourceText(graphics, font, textBrush, textLine, leadingWidth);
             }
             Vector v(instanceLine.ToVector());
             PointF prevPoint = instanceLine.start;
@@ -2158,7 +2165,56 @@ namespace spring
             }
             graphics.DrawLinesChecked(dotPen, cast<int>(points.Count()), points.CBegin().Ptr());
         }
-        private void DrawSourceText(Graphics& graphics, const Font& font, const Brush& textBrush, const Line& line, float symbolWidth)
+        private Line GetSourceTextLine(const Line& firstLine, float& leadingWidth, float padding)
+        {
+            Line textLine = firstLine;
+            if (IsHorizontalLine(firstLine.start, firstLine.end, textLine))
+            {
+                if (textLine != firstLine)
+                {
+                    leadingWidth = padding;
+                }
+                return textLine;
+            }
+            if (!intermediatePoints.IsEmpty())
+            {
+                PointF prev = firstLine.end;
+                for (int i = 1; i < intermediatePoints.Count(); ++i)
+                {
+                    PointF next = intermediatePoints[i];
+                    if (IsHorizontalLine(prev, next, textLine))
+                    {
+                        leadingWidth = padding;
+                        return textLine;
+                    }
+                    prev = next;
+                }
+                if (IsHorizontalLine(prev, target.point, textLine))
+                {
+                    leadingWidth = padding;
+                    return textLine;
+                }
+            }
+            return textLine;
+        }
+        private bool IsHorizontalLine(const PointF& prev, const PointF& next, Line& textLine)
+        {
+            Line line(prev, next);
+            Vector v = line.ToVector();
+            int direction = MainDirection(v);
+            if (direction == 0)
+            {
+                textLine = line;
+                return true;
+            }
+            else if (direction == 180)
+            {
+                textLine = Line(next, prev);
+                return true;
+            }
+            return false;
+        }
+        private void DrawSourceText(Graphics& graphics, const Font& font, const Brush& textBrush, const Line& line, float leadingWidth)
         {
             try
             {
@@ -2174,7 +2230,7 @@ namespace spring
                     float angle = cast<float>(180.0 * Atan2(dy, dx) / PI());
                     graphics.RotateTransformChecked(angle, MatrixOrder.append);
                 }
-                graphics.TranslateTransformChecked(line.start.x + symbolWidth, line.start.y, MatrixOrder.append);
+                graphics.TranslateTransformChecked(line.start.x + leadingWidth, line.start.y, MatrixOrder.append);
                 graphics.DrawStringChecked(source.text, font, PointF(0, 0), textBrush);
                 graphics.RestoreChecked(state);
             }
