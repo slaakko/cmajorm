@@ -243,6 +243,11 @@ namespace spring
             {
                 int index = indeces[i];
                 UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+                if (element.Get() is RelationshipElement*)
+                {
+                    RelationshipElement* relationship = cast<RelationshipElement*>(element.Get());
+                    relationship->RemoveFromElements();
+                }
                 deleteElementsCommand->AddDeletedElement(element.Release(), index);
             }
             GetDiagram().GetCommandList().AddCommand(deleteElementsCommand.Release());
@@ -292,6 +297,20 @@ namespace spring
                             sourceInClosure = true;
                         }
                     }
+                    bool sourcesInClosure = false;
+                    if (!relationship->sourceEndpoints.IsEmpty())
+                    {
+                        sourcesInClosure = true;
+                        for (const Endpoint& endpoint : relationship->sourceEndpoints)
+                        {
+                            ContainerElement* sourceContainerElement = endpoint.element->GetContainerElement();
+                            if (Find(containerElements.CBegin(), containerElements.CEnd(), sourceContainerElement) == containerElements.CEnd())
+                            {
+                                sourcesInClosure = false;
+                                break;
+                            }
+                        }
+                    }
                     bool targetInClosure = false;
                     if (relationship->target.element != null)
                     {
@@ -305,7 +324,7 @@ namespace spring
                     {
                         targetInClosure = true;
                     }
-                    if (sourceInClosure && targetInClosure)
+                    if ((sourceInClosure || sourcesInClosure) && targetInClosure)
                     {
                         if (boundingRect.IsEmpty())
                         {
@@ -322,6 +341,7 @@ namespace spring
                     }
                 }
             }
+            HashMap<DiagramElement*, DiagramElement*> cloneMap;
             HashMap<ContainerElement*, int> containerElementIndexMap;
             int nc = cast<int>(containerElements.Count());
             for (int i = 0; i < nc; ++i)
@@ -329,12 +349,15 @@ namespace spring
                 ContainerElement* containerElement = containerElements[i];
                 containerElementIndexMap[containerElement] = i;
                 ContainerElement* clone = cast<ContainerElement*>(containerElement->Clone());
+                cloneMap[containerElement] = clone;
                 clonedElements.Add(UniquePtr<DiagramElement>(clone));
             }
             for (RelationshipElement* relationshipElement : relationshipElements)
             {
                 RelationshipElement* clone = cast<RelationshipElement*>(relationshipElement->Clone());
                 clone->SetContainerElementIndeces(containerElementIndexMap);
+                clone->MapContainerElements(cloneMap);
+                clone->AddToElements();
                 clonedElements.Add(UniquePtr<DiagramElement>(clone));
             }
             for (UniquePtr<DiagramElement>& clonedElement : clonedElements)
@@ -396,6 +419,34 @@ namespace spring
                     contextMenu->AddMenuItemAction(spaceEvenlyVerticallyMenuItem, new SpaceEvenlyVerticallyAction(GetDiagram()));
                     System.Windows.MenuItem* spaceEvenlyHorizontallyMenuItem = new System.Windows.MenuItem("Space evenly horizontally");
                     contextMenu->AddMenuItemAction(spaceEvenlyHorizontallyMenuItem, new SpaceEvenlyHorizontallyAction(GetDiagram()));
+                }
+            }
+            else
+            {
+                bool inheritance = false;
+                int n = cast<int>(indeces.Count());
+                for (int i = 0; i < n; ++i)
+                {
+                    inheritance = false;
+                    int index = indeces[i];
+                    DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                    if (element is RelationshipElement*)
+                    {
+                        RelationshipElement* relationshipElement = cast<RelationshipElement*>(element);
+                        if (relationshipElement->kind == RelationshipElement.Kind.inheritance)
+                        {
+                            inheritance = true;
+                        }
+                    }
+                    if (!inheritance)
+                    {
+                        break;
+                    }
+                }
+                if (inheritance && n > 1)
+                {
+                    System.Windows.MenuItem* combineMenuItem = new System.Windows.MenuItem("Combine");
+                    contextMenu->AddMenuItemAction(combineMenuItem, new CombineInheritancesAction(GetDiagram()));
                 }
             }
             System.Windows.MenuItem* deleteMenuItem = new System.Windows.MenuItem("Delete");
@@ -655,6 +706,58 @@ namespace spring
                     moveCommand->AddNewLocation(element->GetCompoundLocation());
                 }
                 GetDiagram().GetCommandList().AddCommand(moveCommand.Release());
+            }
+        }
+        public void CombineInheritanceRelationships()
+        {
+            List<RelationshipElement*> inheritanceRelationships;
+            for (int index : indeces)
+            {
+                DiagramElement* element = GetDiagram().GetElementByIndex(index);
+                if (element is RelationshipElement*)
+                {
+                    RelationshipElement* relationshipElement = cast<RelationshipElement*>(element);
+                    if (relationshipElement->kind == RelationshipElement.Kind.inheritance)
+                    {
+                        inheritanceRelationships.Add(relationshipElement);
+                    }
+                }
+            }
+            List<RelationshipElement*> sourceRelationships;
+            UniquePtr<RelationshipElement> combinedInheritanceRelationship = CombineInheritanceRelationships(inheritanceRelationships, sourceRelationships);
+            if (!combinedInheritanceRelationship.IsNull())
+            {
+                List<int> inheritanceRelationshipIndeces;
+                for (RelationshipElement* sourceRelationship : sourceRelationships)
+                {
+                    int index = GetDiagram().GetIndexOfElement(sourceRelationship);
+                    if (index != -1)
+                    {
+                        inheritanceRelationshipIndeces.Add(index);
+                    }
+                }
+                UniquePtr<DeleteElementsCommand> deleteElementsCommand(new DeleteElementsCommand(GetDiagram()));
+                Sort(inheritanceRelationshipIndeces);
+                int n = cast<int>(inheritanceRelationshipIndeces.Count());
+                for (int i = n - 1; i >= 0; --i)
+                {
+                    int index = inheritanceRelationshipIndeces[i];
+                    UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+                    if (element.Get() is RelationshipElement*)
+                    {
+                        RelationshipElement* relationship = cast<RelationshipElement*>(element.Get());
+                        relationship->RemoveFromElements();
+                    }
+                    deleteElementsCommand->AddDeletedElement(element.Release(), index);
+                    indeces.Remove(index);
+                }
+                GetDiagram().GetCommandList().AddCommand(deleteElementsCommand.Release());
+                int addIndex = GetDiagram().NextIndex();
+                UniquePtr<AddElementsCommand> addElementsCommand(new AddElementsCommand(GetDiagram()));
+                addElementsCommand->AddIndex(addIndex);
+                combinedInheritanceRelationship->AddToElements();
+                GetDiagram().AddElement(combinedInheritanceRelationship.Release());
+                GetDiagram().GetCommandList().AddCommand(addElementsCommand.Release());
             }
         }
         private List<int> indeces;
@@ -917,6 +1020,11 @@ namespace spring
             {
                 int index = elementIndeces[i];
                 UniquePtr<DiagramElement> element = GetDiagram().RemoveElementByIndex(index);
+                if (element.Get() is RelationshipElement*)
+                {
+                    RelationshipElement* relationship = cast<RelationshipElement*>(element.Get());
+                    relationship->RemoveFromElements();
+                }
                 deleteElementsCommand->AddDeletedElement(element.Release(), index);
             }
             GetDiagram().GetCommandList().AddCommand(deleteElementsCommand.Release());
@@ -995,6 +1103,20 @@ namespace spring
                             sourceInClosure = true;
                         }
                     }
+                    bool sourcesInClosure = false;
+                    if (!relationship->sourceEndpoints.IsEmpty())
+                    {
+                        sourcesInClosure = true;
+                        for (const Endpoint& endpoint : relationship->sourceEndpoints)
+                        {
+                            ContainerElement* sourceContainerElement = endpoint.element->GetContainerElement();
+                            if (Find(containerElements.CBegin(), containerElements.CEnd(), sourceContainerElement) == containerElements.CEnd())
+                            {
+                                sourcesInClosure = false;
+                                break;
+                            }
+                        }
+                    }
                     bool targetInClosure = false;
                     if (relationship->target.element != null)
                     {
@@ -1008,7 +1130,7 @@ namespace spring
                     {
                         targetInClosure = true;
                     }
-                    if (sourceInClosure && targetInClosure)
+                    if ((sourceInClosure || sourcesInClosure) && targetInClosure)
                     {
                         if (boundingRect.IsEmpty())
                         {
@@ -1025,6 +1147,7 @@ namespace spring
                     }
                 }
             }
+            HashMap<DiagramElement*, DiagramElement*> cloneMap;
             HashMap<ContainerElement*, int> containerElementIndexMap;
             int nc = cast<int>(containerElements.Count());
             for (int i = 0; i < nc; ++i)
@@ -1032,12 +1155,15 @@ namespace spring
                 ContainerElement* containerElement = containerElements[i];
                 containerElementIndexMap[containerElement] = i;
                 ContainerElement* clone = cast<ContainerElement*>(containerElement->Clone());
+                cloneMap[containerElement] = clone;
                 clonedElements.Add(UniquePtr<DiagramElement>(clone));
             }
             for (RelationshipElement* relationshipElement : relationshipElements)
             {
                 RelationshipElement* clone = cast<RelationshipElement*>(relationshipElement->Clone());
                 clone->SetContainerElementIndeces(containerElementIndexMap);
+                clone->MapContainerElements(cloneMap);
+                clone->AddToElements();
                 clonedElements.Add(UniquePtr<DiagramElement>(clone));
             }
             for (UniquePtr<DiagramElement>& clonedElement : clonedElements)

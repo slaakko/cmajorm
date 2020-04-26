@@ -194,6 +194,22 @@ namespace spring
         }
     }
 
+    public class CombineInheritancesAction : DiagramAction
+    {
+        public nothrow CombineInheritancesAction(Diagram& diagram) : base(diagram)
+        {
+        }
+        protected override void Execute(Diagram& diagram)
+        {
+            Selection* selection = diagram.GetSelection();
+            if (selection is ElementSelection*)
+            {
+                ElementSelection* inheritanceElementSelection = cast<ElementSelection*>(selection);
+                inheritanceElementSelection->CombineInheritanceRelationships();
+            }
+        }
+    }
+
     public class DeleteDiagramElementAction : DiagramElementAction
     {
         public nothrow DeleteDiagramElementAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
@@ -257,6 +273,37 @@ namespace spring
         }
     }
 
+    public class SplitRelationshipElementAction : DiagramElementAction
+    {
+        public nothrow SplitRelationshipElementAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
+        {
+        }
+        protected override void Execute(Diagram& diagram, int elementIndex)
+        {
+            DiagramElement* diagramElement = diagram.GetElementByIndex(elementIndex);
+            if (diagramElement is RelationshipElement*)
+            {
+                RelationshipElement* relationship = cast<RelationshipElement*>(diagramElement);
+                if (relationship->kind == RelationshipElement.Kind.inheritance && !relationship->sourceEndpoints.IsEmpty())
+                {
+                    List<UniquePtr<RelationshipElement>> relationships = SplitCombinedInheritanceRelationship(relationship);
+                    UniquePtr<DeleteElementsCommand> deleteCommand(new DeleteElementsCommand(diagram));
+                    UniquePtr<DiagramElement> element(diagram.RemoveElementByIndex(elementIndex));
+                    deleteCommand->AddDeletedElement(element.Release(), elementIndex);
+                    diagram.GetCommandList().AddCommand(deleteCommand.Release());
+                    UniquePtr<AddElementsCommand> addElementsCommand(new AddElementsCommand(diagram));
+                    for (UniquePtr<RelationshipElement>& relationship : relationships)
+                    {
+                        int addIndex = diagram.NextIndex();
+                        addElementsCommand->AddIndex(addIndex);
+                        diagram.AddElement(relationship.Release());
+                    }
+                    diagram.GetCommandList().AddCommand(addElementsCommand.Release());
+                }
+            }
+        }
+    }
+
     public class ClassElementPropertiesAction : DiagramElementAction
     {
         public nothrow ClassElementPropertiesAction(Diagram& diagram, int elementIndex) : base(diagram, elementIndex)
@@ -287,7 +334,12 @@ namespace spring
                         HashMap<DiagramElement*, DiagramElement*> cloneMap;
                         cloneMap[classElement] = clone.Get();
                         clone->MapChildObjects(classElement, cloneMap);
-                        clone->MapRelationships(cloneMap);
+                        List<RelationshipElement*> relationships = classElement->GetAllRelationships();
+                        for (RelationshipElement* relationship : relationships)
+                        {
+                            relationship->MapContainerElements(cloneMap);
+                            relationship->AddToElements();
+                        }
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();
@@ -324,7 +376,12 @@ namespace spring
                         HashMap<DiagramElement*, DiagramElement*> cloneMap;
                         cloneMap[objectElement] = clone.Get();
                         clone->MapChildObjects(objectElement, cloneMap);
-                        clone->MapRelationships(cloneMap);
+                        List<RelationshipElement*> relationships = objectElement->GetAllRelationships();
+                        for (RelationshipElement* relationship : relationships)
+                        {
+                            relationship->MapContainerElements(cloneMap);
+                            relationship->AddToElements();
+                        }
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();
@@ -368,6 +425,17 @@ namespace spring
                             Endpoint endpoint = relationshipElement->source.element->GetEndpoint(relationshipElement->source.snap);
                             clone->source.snap = endpoint.snap;
                             clone->source.point = endpoint.point;
+                        }
+                        for (Endpoint& sourceEndpoint : relationshipElement->sourceEndpoints)
+                        {
+                            if (sourceEndpoint.element != null)
+                            {
+                                sourceEndpoint.element->RemoveRelationship(relationshipElement);
+                                sourceEndpoint.element->AddRelationship(clone.Get());
+                                Endpoint endpoint = sourceEndpoint.element->GetEndpoint(relationshipElement->source.snap);
+                                clone->source.snap = endpoint.snap;
+                                clone->source.point = endpoint.point;
+                            }
                         }
                         if (relationshipElement->target.element != null)
                         {
@@ -413,7 +481,12 @@ namespace spring
                         HashMap<DiagramElement*, DiagramElement*> cloneMap;
                         cloneMap[noteElement] = clone.Get();
                         clone->MapChildObjects(noteElement, cloneMap);
-                        clone->MapRelationships(cloneMap);
+                        List<RelationshipElement*> relationships = noteElement->GetAllRelationships();
+                        for (RelationshipElement* relationship : relationships)
+                        {
+                            relationship->MapContainerElements(cloneMap);
+                            relationship->AddToElements();
+                        }
                         diagram.SetElementByIndex(clone.Release(), elementIndex);
                         diagram.SetChanged();
                         diagram.Invalidate();

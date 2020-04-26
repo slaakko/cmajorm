@@ -74,7 +74,14 @@ namespace spring
         }
         public nothrow inline void Insert(int index, T* element)
         {
-            elements.Insert(elements.Begin() + index, UniquePtr<T>(element));
+            if (index < elements.Count())
+            {
+                elements.Insert(elements.Begin() + index, UniquePtr<T>(element));
+            }
+            else
+            {
+                elements.Add(UniquePtr<T>(element));
+            }
         }
         public nothrow inline T* Release(int index)
         {

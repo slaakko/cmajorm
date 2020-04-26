@@ -33,6 +33,7 @@ namespace spring
                 commands[currentIndex].Reset(command);
                 ++currentIndex;
             }
+            commands.Resize(currentIndex);
             UpdateMenuItems();
         }
         public nothrow bool CanUndo() const
@@ -113,6 +114,10 @@ namespace spring
         {
             element = Rvalue(element_);
         }
+        public nothrow inline DiagramElement* Get() const
+        {
+            return element.Get();
+        }
         public nothrow inline DiagramElement* Release()
         {
             return element.Release();
@@ -158,6 +163,7 @@ namespace spring
         {
             for (ElementIndexPair& deleted : deletedElements)
             {
+                deleted.Get()->ResetSelected();
                 GetDiagram().InsertElement(deleted.Release(), deleted.Index());
             }
         }
@@ -196,6 +202,7 @@ namespace spring
         {
             for (ElementIndexPair& addedElement : addedElements)
             {
+                addedElement.Get()->ResetSelected();
                 GetDiagram().InsertElement(addedElement.Release(), addedElement.Index());
             }
             addedElements.Clear();
@@ -222,8 +229,8 @@ namespace spring
                 HashMap<DiagramElement*, DiagramElement*> cloneMap;
                 cloneMap[newElement.Get()] = containerElement;
                 containerElement->MapChildObjects(cast<ContainerElement*>(newElement.Get()), cloneMap);
-                containerElement->MapRelationships(cloneMap);
             }
+            element.Get()->ResetSelected();
             GetDiagram().SetElementByIndex(element.Release(), elementIndex);
             element = Rvalue(newElement);
         }
@@ -236,8 +243,8 @@ namespace spring
                 HashMap<DiagramElement*, DiagramElement*> cloneMap;
                 cloneMap[oldElement.Get()] = containerElement;
                 containerElement->MapChildObjects(cast<ContainerElement*>(oldElement.Get()), cloneMap);
-                containerElement->MapRelationships(cloneMap);
             }
+            element.Get()->ResetSelected();
             GetDiagram().SetElementByIndex(element.Release(), elementIndex);
             element = Rvalue(oldElement);
         }

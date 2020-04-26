@@ -138,6 +138,15 @@ namespace spring
         private Map<string, DiagramElementCreator*> registry;
     }
 
+    public nothrow int MainDirection(DiagramElement* source, DiagramElement* target)
+    {
+        PointF sourceCenter = source->Center();
+        PointF targetCenter = target->Center();
+        Line line(sourceCenter, targetCenter);
+        Vector v = line.ToVector();
+        return MainDirection(v);
+    }
+
     public class Diagram 
     {
         private enum Flags : sbyte
@@ -724,9 +733,6 @@ namespace spring
         public virtual nothrow void Resolve()
         {
         }
-        public virtual nothrow void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
-        {
-        }
         public virtual nothrow Endpoint GetEndpoint(const Snap& snap) const
         {
             return Endpoint();
@@ -787,6 +793,10 @@ namespace spring
         public nothrow virtual RectF BoundingRect() const
         {
             return boundingRect;
+        }
+        public nothrow PointF Center() const
+        {
+            return PointF(boundingRect.location.x + boundingRect.size.w / 2, boundingRect.location.y + boundingRect.size.h / 2);
         }
         public virtual nothrow bool Contains(const PointF& location)
         {
@@ -1268,10 +1278,10 @@ namespace spring
         {
             none, inheritance, aggregation, reference, createInstance, attachNote
         }
-        public nothrow RelationshipElement() : base(), kind(Kind.none), source(), target(), intermediatePoints(), cardinality(Cardinality.one)
+        public nothrow RelationshipElement() : base(), kind(Kind.none), source(), target(), sourceEndpoints(), intermediatePoints(), cardinality(Cardinality.one)
         {
         }
-        public nothrow RelationshipElement(Kind kind_) : base(), kind(kind_), source(), target(), intermediatePoints(), cardinality(Cardinality.one)
+        public nothrow RelationshipElement(Kind kind_) : base(), kind(kind_), source(), target(), sourceEndpoints(), intermediatePoints(), cardinality(Cardinality.one)
         {
         }
         suppress RelationshipElement(const RelationshipElement&);
@@ -1283,8 +1293,18 @@ namespace spring
             RectF boundingRect;
             PointF minPoint(99999999999.9f, 99999999999.9f);
             PointF maxPoint(-1, -1);
-            minPoint.x = Min(source.point.x, minPoint.x);
-            minPoint.y = Min(source.point.y, minPoint.y);
+            if (source.element != null)
+            {
+                minPoint.x = Min(source.point.x, minPoint.x);
+                minPoint.y = Min(source.point.y, minPoint.y);
+            }
+            for (const Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                minPoint.x = Min(sourceEndpoint.point.x, minPoint.x);
+                minPoint.y = Min(sourceEndpoint.point.y, minPoint.y);
+                maxPoint.x = Max(sourceEndpoint.point.x, maxPoint.x);
+                maxPoint.y = Max(sourceEndpoint.point.y, maxPoint.y);
+            }
             minPoint.x = Min(target.point.x, minPoint.x);
             minPoint.y = Min(target.point.y, minPoint.y);
             maxPoint.x = Max(source.point.x, maxPoint.x);
@@ -1307,6 +1327,10 @@ namespace spring
         public override nothrow void Offset(float dx, float dy)
         {
             source.point.Offset(dx, dy);
+            for (Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                sourceEndpoint.point.Offset(dx, dy);
+            }
             for (PointF& intermediatePoint : intermediatePoints)
             {
                 intermediatePoint.Offset(dx, dy);
@@ -1316,6 +1340,10 @@ namespace spring
         public override nothrow bool IntersectsWith(const RectF& rect) const
         {
             if (rect.Contains(source.point)) return true;
+            for (const Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                if (rect.Contains(sourceEndpoint.point)) return true;
+            }
             if (rect.Contains(target.point)) return true;
             for (const PointF& intermediatePoint : intermediatePoints)
             {
@@ -1341,11 +1369,53 @@ namespace spring
             }
             return compoundLocation;
         }
+        public nothrow int MainDirection() const
+        {
+            if (sourceEndpoints.IsEmpty())
+            {
+                if (source.element != null && target.element != null)
+                {
+                    return MainDirection(source.element, target.element);
+                }
+            }
+            else if (target.element != null)
+            {
+                Map<int, int> mainDirectionMap;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        int mainDirection = MainDirection(sourceEndpoint.element, target.element);
+                        ++mainDirectionMap[mainDirection];
+                    }
+                }
+                int maxCount = -1;
+                int maxMainDirection = -1;
+                for (const Pair<int, int>& p : mainDirectionMap)
+                {
+                    if (p.second > maxCount)
+                    {
+                        maxCount = p.second;
+                        maxMainDirection = p.first;
+                    }
+                }
+                if (maxCount != -1 && maxMainDirection != -1)
+                {
+                    return maxMainDirection;
+                }
+            }
+            return 0;
+        }
         public override nothrow void AddActions(Diagram& diagram, int elementIndex, ContextMenu* contextMenu)
         {
             base->AddActions(diagram, elementIndex, contextMenu);
             MenuItem* straightenMenuItem = new MenuItem("Straighten");
             contextMenu->AddMenuItemAction(straightenMenuItem, new StraightenRelationshipElementAction(diagram, elementIndex));
+            if (kind == Kind.inheritance && !sourceEndpoints.IsEmpty())
+            {
+                MenuItem* splitMenuItem = new MenuItem("Split");
+                contextMenu->AddMenuItemAction(splitMenuItem, new SplitRelationshipElementAction(diagram, elementIndex));
+            }
             MenuItem* propertiesMenuItem = new MenuItem("Properties...");
             contextMenu->AddMenuItemAction(propertiesMenuItem, new RelationshipElementPropertiesAction(diagram, elementIndex));
         }
@@ -1440,19 +1510,34 @@ namespace spring
             const Layout& layout = diagram->GetLayout();
             const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
             float selectedLineWidth = relationshipLayoutElement.SelectedLineWidth();
-            PointF from = source.point;
-            for (PointF to : intermediatePoints)
+            if (kind == Kind.inheritance && !sourceEndpoints.IsEmpty())
             {
+                return ContainsCombinedInheritance(location, selectedLineWidth, layout);
+            }
+            else
+            {
+                PointF from = source.point;
+                for (PointF to : intermediatePoints)
+                {
+                    if (Contains(from, to, location, selectedLineWidth))
+                    {
+                        return true;
+                    }
+                    from = to;
+                }
+                PointF to = target.point;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    PointF from = sourceEndpoint.point;
+                    if (Contains(from, to, location, selectedLineWidth))
+                    {
+                        return true;
+                    }
+                }
                 if (Contains(from, to, location, selectedLineWidth))
                 {
                     return true;
                 }
-                from = to;
-            }
-            PointF to = target.point;
-            if (Contains(from, to, location, selectedLineWidth))
-            {
-                return true;
             }
             return false;
         }
@@ -1534,6 +1619,26 @@ namespace spring
                     }
                 }
             }
+            UniquePtr<XPathObject> sourceEndpointsResult = Evaluate(u"sourceEndpoint", element);
+            if (!sourceEndpointsResult.IsNull())
+            {
+                if (sourceEndpointsResult.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(sourceEndpointsResult.Get());
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        System.Dom.Node* node = (*nodeSet)[i];
+                        if (node is System.Dom.Element*)
+                        {
+                            System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                            Endpoint source;
+                            source.Read(element);
+                            sourceEndpoints.Add(source);
+                        }
+                    }
+                }
+            }
             UniquePtr<XPathObject> targetResult = Evaluate(u"target", element);
             if (!targetResult.IsNull())
             {
@@ -1590,6 +1695,15 @@ namespace spring
             System.Dom.Element* sourceElement = new System.Dom.Element(u"source");
             source.Write(sourceElement);
             element->AppendChild(UniquePtr<System.Dom.Node>(sourceElement));
+            if (!sourceEndpoints.IsEmpty())
+            {
+                for (const Endpoint& source : sourceEndpoints)
+                {
+                    System.Dom.Element* sourceEndpointElement = new System.Dom.Element(u"sourceEndpoint");
+                    source.Write(sourceEndpointElement);
+                    element->AppendChild(UniquePtr<System.Dom.Node>(sourceEndpointElement));
+                }
+            }
             System.Dom.Element* targetElement = new System.Dom.Element(u"target");
             target.Write(targetElement);
             element->AppendChild(UniquePtr<System.Dom.Node>(targetElement));
@@ -1610,6 +1724,14 @@ namespace spring
             {
                 source.element->AddRelationship(this);
             }
+            for (Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                sourceEndpoint.Resolve(GetDiagram());
+                if (sourceEndpoint.element != null)
+                {
+                    sourceEndpoint.element->AddRelationship(this);
+                }
+            }
             target.Resolve(GetDiagram());
             if (target.element != null)
             {
@@ -1619,11 +1741,19 @@ namespace spring
         public nothrow void SetContainerElementIndeces(const HashMap<ContainerElement*, int>& containerElementIndexMap)
         {
             source.SetIndex(containerElementIndexMap);
+            for (Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                sourceEndpoint.SetIndex(containerElementIndexMap);
+            }
             target.SetIndex(containerElementIndexMap);
         }
         public void MapIndeces(const HashMap<int, int>& indexMap)
         {
             source.MapIndex(indexMap);
+            for (Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                sourceEndpoint.MapIndex(indexMap);
+            }
             target.MapIndex(indexMap);
         }
         public override void Measure(Graphics& graphics, Layout& layout)
@@ -1686,13 +1816,20 @@ namespace spring
         {
             const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
             const Pen& selectedLinePen = relationshipLayoutElement.SelectedLinePen();
-            PointF prev = source.point;
-            for (PointF next : intermediatePoints)
+            if (kind == Kind.inheritance && !sourceEndpoints.IsEmpty())
             {
-                graphics.DrawLineChecked(selectedLinePen, prev, next);
-                prev = next;
+                DrawCombinedInheritanceSelected(graphics, layout, selectedLinePen);
             }
-            graphics.DrawLineChecked(selectedLinePen, prev, target.point);
+            else
+            {
+                PointF prev = source.point;
+                for (PointF next : intermediatePoints)
+                {
+                    graphics.DrawLineChecked(selectedLinePen, prev, next);
+                    prev = next;
+                }
+                graphics.DrawLineChecked(selectedLinePen, prev, target.point);
+            }
         }
         public nothrow void Calculate(const Snap& snap, DiagramElement* element, float w, int index, int count)
         {
@@ -1734,38 +1871,1047 @@ namespace spring
             const Pen& linePen = relationshipLayoutElement.LinePen();
             float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
             float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
-            PointF lastPoint;
-            if (intermediatePoints.IsEmpty())
+            if (!sourceEndpoints.IsEmpty())
             {
-                lastPoint = source.point;
+                DrawCombinedInheritance(graphics, layout);
             }
             else
             {
-                PointF prevPoint = source.point;
-                for (const PointF& intermediatePoint : intermediatePoints)
+                PointF lastPoint;
+                if (intermediatePoints.IsEmpty())
                 {
-                    graphics.DrawLineChecked(linePen, prevPoint, intermediatePoint);
-                    prevPoint = intermediatePoint;
+                    lastPoint = source.point;
                 }
-                lastPoint = intermediatePoints.Back();
+                else
+                {
+                    PointF prevPoint = source.point;
+                    for (const PointF& intermediatePoint : intermediatePoints)
+                    {
+                        graphics.DrawLineChecked(linePen, prevPoint, intermediatePoint);
+                        prevPoint = intermediatePoint;
+                    }
+                    lastPoint = intermediatePoints.Back();
+                }
+                Line line(lastPoint, target.point);
+                Vector v = line.ToVector();
+                float len = v.Length();
+                float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                Vector u = UnitVector(v) * startLen;
+                Line startLine(lastPoint, u);
+                graphics.DrawLineChecked(linePen, startLine.start, startLine.end);
+                Line arrowLine(startLine.end, target.point);
+                Line arrowRightRotatedLine = System.Windows.Rotate(arrowLine, 90.0f);
+                Vector arv = UnitVector(arrowRightRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                Line arrowRightLine(arrowRightRotatedLine.start, arv);
+                graphics.DrawLineChecked(linePen, arrowRightLine.end, target.point);
+                Line arrowLeftRotatedLine = System.Windows.Rotate(arrowLine, -90.0f);
+                Vector alv = UnitVector(arrowLeftRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                Line arrowLeftLine(arrowLeftRotatedLine.start, alv);
+                graphics.DrawLineChecked(linePen, arrowLeftLine.end, target.point);
+                graphics.DrawLineChecked(linePen, arrowLeftLine.end, arrowRightLine.end);
             }
-            Line line(lastPoint, target.point);
-            Vector v = line.ToVector();
-            float len = v.Length();
-            float startLen = Max(0.0f, len - inheritanceArrowHeight);
-            Vector u = UnitVector(v) * startLen;
-            Line startLine(source.point, u);
-            graphics.DrawLineChecked(linePen, startLine.start, startLine.end);
-            Line arrowLine(startLine.end, target.point);
-            Line arrowRightRotatedLine = System.Windows.Rotate(arrowLine, 90.0f);
-            Vector arv = UnitVector(arrowRightRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
-            Line arrowRightLine(arrowRightRotatedLine.start, arv);
-            graphics.DrawLineChecked(linePen, arrowRightLine.end, target.point);
-            Line arrowLeftRotatedLine = System.Windows.Rotate(arrowLine, -90.0f);
-            Vector alv = UnitVector(arrowLeftRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
-            Line arrowLeftLine(arrowLeftRotatedLine.start, alv);
-            graphics.DrawLineChecked(linePen, arrowLeftLine.end, target.point);
-            graphics.DrawLineChecked(linePen, arrowLeftLine.end, arrowRightLine.end);
+        }
+        private void DrawCombinedInheritance(Graphics& graphics, Layout& layout)
+        {
+            int mainDirection = MainDirection();
+            switch (mainDirection)
+            {
+                case 0:
+                {
+                    DrawCombinedInheritance0(graphics, layout);
+                    break;
+                }
+                case 90:
+                {
+                    DrawCombinedInheritance90(graphics, layout);
+                    break;
+                }
+                case 180:
+                {
+                    DrawCombinedInheritance180(graphics, layout);
+                    break;
+                }
+                case 270:
+                {
+                    DrawCombinedInheritance270(graphics, layout);
+                    break;
+                }
+            }   
+        }
+        private void DrawCombinedInheritance0(Graphics& graphics, Layout& layout)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.LeftCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    const Pen& linePen = relationshipLayoutElement.LinePen();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* rightElement = horizontalOrder.Back();
+                    Endpoint rightEndpoint = rightElement->GetEndpoint(Snap(Snap.RightCenter()));
+                    PointF rightPoint = rightEndpoint.point;
+                    float dx = (targetPoint.x - inheritanceArrowHeight) - rightPoint.x;
+                    float w = dx / 2;
+                    PointF crossPoint(targetPoint.x - inheritanceArrowHeight - w, targetPoint.y);
+                    for (ClassElement* sourceElement : verticalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.RightCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(crossPoint.x, sourcePoint.y);
+                        graphics.DrawLineChecked(linePen, sourcePoint, vpoint);
+                        graphics.DrawLineChecked(linePen, vpoint, crossPoint);
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    graphics.DrawLineChecked(linePen, startLine.start, startLine.end);
+                    Line arrowLine(startLine.end, targetPoint);
+                    Line arrowRightRotatedLine = System.Windows.Rotate(arrowLine, 90.0f);
+                    Vector arv = UnitVector(arrowRightRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                    Line arrowRightLine(arrowRightRotatedLine.start, arv);
+                    graphics.DrawLineChecked(linePen, arrowRightLine.end, targetPoint);
+                    Line arrowLeftRotatedLine = System.Windows.Rotate(arrowLine, -90.0f);
+                    Vector alv = UnitVector(arrowLeftRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                    Line arrowLeftLine(arrowLeftRotatedLine.start, alv);
+                    graphics.DrawLineChecked(linePen, arrowLeftLine.end, targetPoint);
+                    graphics.DrawLineChecked(linePen, arrowLeftLine.end, arrowRightLine.end);
+                }
+            }
+        }
+        private void DrawCombinedInheritance90(Graphics& graphics, Layout& layout)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.TopCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    const Pen& linePen = relationshipLayoutElement.LinePen();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* bottomElement = verticalOrder.Back();
+                    Endpoint bottomEndpoint = bottomElement->GetEndpoint(Snap(Snap.BottomCenter()));
+                    PointF bottomPoint = bottomEndpoint.point;
+                    float dy = (targetPoint.y - inheritanceArrowHeight) - bottomPoint.y;
+                    float h = dy / 2;
+                    PointF crossPoint(targetPoint.x, targetPoint.y - inheritanceArrowHeight - h);
+                    for (ClassElement* sourceElement : horizontalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.BottomCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(sourcePoint.x, crossPoint.y);
+                        graphics.DrawLineChecked(linePen, sourcePoint, vpoint);
+                        graphics.DrawLineChecked(linePen, vpoint, crossPoint);
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    graphics.DrawLineChecked(linePen, startLine.start, startLine.end);
+                    Line arrowLine(startLine.end, targetPoint);
+                    Line arrowRightRotatedLine = System.Windows.Rotate(arrowLine, 90.0f);
+                    Vector arv = UnitVector(arrowRightRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                    Line arrowRightLine(arrowRightRotatedLine.start, arv);
+                    graphics.DrawLineChecked(linePen, arrowRightLine.end, targetPoint);
+                    Line arrowLeftRotatedLine = System.Windows.Rotate(arrowLine, -90.0f);
+                    Vector alv = UnitVector(arrowLeftRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                    Line arrowLeftLine(arrowLeftRotatedLine.start, alv);
+                    graphics.DrawLineChecked(linePen, arrowLeftLine.end, targetPoint);
+                    graphics.DrawLineChecked(linePen, arrowLeftLine.end, arrowRightLine.end);
+                }
+            }
+        }
+        private void DrawCombinedInheritance180(Graphics& graphics, Layout& layout)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.RightCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    const Pen& linePen = relationshipLayoutElement.LinePen();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* leftElement = horizontalOrder.Front();
+                    Endpoint leftEndpoint = leftElement->GetEndpoint(Snap(Snap.LeftCenter()));
+                    PointF leftPoint = leftEndpoint.point;
+                    float dx = leftPoint.x - (targetPoint.x + inheritanceArrowHeight);
+                    float w = dx / 2;
+                    PointF crossPoint(targetPoint.x + inheritanceArrowHeight + w, targetPoint.y);
+                    for (ClassElement* sourceElement : verticalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.LeftCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(crossPoint.x, sourcePoint.y);
+                        graphics.DrawLineChecked(linePen, sourcePoint, vpoint);
+                        graphics.DrawLineChecked(linePen, vpoint, crossPoint);
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    graphics.DrawLineChecked(linePen, startLine.start, startLine.end);
+                    Line arrowLine(startLine.end, targetPoint);
+                    Line arrowRightRotatedLine = System.Windows.Rotate(arrowLine, 90.0f);
+                    Vector arv = UnitVector(arrowRightRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                    Line arrowRightLine(arrowRightRotatedLine.start, arv);
+                    graphics.DrawLineChecked(linePen, arrowRightLine.end, targetPoint);
+                    Line arrowLeftRotatedLine = System.Windows.Rotate(arrowLine, -90.0f);
+                    Vector alv = UnitVector(arrowLeftRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                    Line arrowLeftLine(arrowLeftRotatedLine.start, alv);
+                    graphics.DrawLineChecked(linePen, arrowLeftLine.end, targetPoint);
+                    graphics.DrawLineChecked(linePen, arrowLeftLine.end, arrowRightLine.end);
+                }
+            }
+        }
+        private void DrawCombinedInheritance270(Graphics& graphics, Layout& layout)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.BottomCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    const Pen& linePen = relationshipLayoutElement.LinePen();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* topElement = verticalOrder.Front();
+                    Endpoint topEndpoint = topElement->GetEndpoint(Snap(Snap.TopCenter()));
+                    PointF topPoint = topEndpoint.point;
+                    float dy = topPoint.y - (targetPoint.y + inheritanceArrowHeight);
+                    float h = dy / 2;
+                    PointF crossPoint(targetPoint.x, targetPoint.y + inheritanceArrowHeight + h);
+                    for (ClassElement* sourceElement : horizontalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.TopCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(sourcePoint.x, crossPoint.y);
+                        graphics.DrawLineChecked(linePen, sourcePoint, vpoint);
+                        graphics.DrawLineChecked(linePen, vpoint, crossPoint);
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    graphics.DrawLineChecked(linePen, startLine.start, startLine.end);
+                    Line arrowLine(startLine.end, targetPoint);
+                    Line arrowRightRotatedLine = System.Windows.Rotate(arrowLine, 90.0f);
+                    Vector arv = UnitVector(arrowRightRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                    Line arrowRightLine(arrowRightRotatedLine.start, arv);
+                    graphics.DrawLineChecked(linePen, arrowRightLine.end, targetPoint);
+                    Line arrowLeftRotatedLine = System.Windows.Rotate(arrowLine, -90.0f);
+                    Vector alv = UnitVector(arrowLeftRotatedLine.ToVector()) * (inheritanceArrowWidth / 2);
+                    Line arrowLeftLine(arrowLeftRotatedLine.start, alv);
+                    graphics.DrawLineChecked(linePen, arrowLeftLine.end, targetPoint);
+                    graphics.DrawLineChecked(linePen, arrowLeftLine.end, arrowRightLine.end);
+                }
+            }
+        }
+        private void DrawCombinedInheritanceSelected(Graphics& graphics, Layout& layout, const Pen& selectedLinePen)
+        {
+            int mainDirection = MainDirection();
+            switch (mainDirection)
+            {
+                case 0:
+                {
+                    DrawCombinedInheritance0Selected(graphics, layout, selectedLinePen);
+                    break;
+                }
+                case 90:
+                {
+                    DrawCombinedInheritance90Selected(graphics, layout, selectedLinePen);
+                    break;
+                }
+                case 180:
+                {
+                    DrawCombinedInheritance180Selected(graphics, layout, selectedLinePen);
+                    break;
+                }
+                case 270:
+                {
+                    DrawCombinedInheritance270Selected(graphics, layout, selectedLinePen);
+                    break;
+                }
+            }   
+        }
+        private void DrawCombinedInheritance0Selected(Graphics& graphics, Layout& layout, const Pen& selectedLinePen)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.LeftCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* rightElement = horizontalOrder.Back();
+                    Endpoint rightEndpoint = rightElement->GetEndpoint(Snap(Snap.RightCenter()));
+                    PointF rightPoint = rightEndpoint.point;
+                    float dx = (targetPoint.x - inheritanceArrowHeight) - rightPoint.x;
+                    float w = dx / 2;
+                    PointF crossPoint(targetPoint.x - inheritanceArrowHeight - w, targetPoint.y);
+                    for (ClassElement* sourceElement : verticalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.RightCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(crossPoint.x, sourcePoint.y);
+                        graphics.DrawLineChecked(selectedLinePen, sourcePoint, vpoint);
+                        graphics.DrawLineChecked(selectedLinePen, vpoint, crossPoint);
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    graphics.DrawLineChecked(selectedLinePen, startLine.start, startLine.end);
+                }
+            }
+        }
+        private void DrawCombinedInheritance90Selected(Graphics& graphics, Layout& layout, const Pen& selectedLinePen)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.TopCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* bottomElement = verticalOrder.Back();
+                    Endpoint bottomEndpoint = bottomElement->GetEndpoint(Snap(Snap.BottomCenter()));
+                    PointF bottomPoint = bottomEndpoint.point;
+                    float dy = (targetPoint.y - inheritanceArrowHeight) - bottomPoint.y;
+                    float h = dy / 2;
+                    PointF crossPoint(targetPoint.x, targetPoint.y - inheritanceArrowHeight - h);
+                    for (ClassElement* sourceElement : horizontalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.BottomCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(sourcePoint.x, crossPoint.y);
+                        graphics.DrawLineChecked(selectedLinePen, sourcePoint, vpoint);
+                        graphics.DrawLineChecked(selectedLinePen, vpoint, crossPoint);
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    graphics.DrawLineChecked(selectedLinePen, startLine.start, startLine.end);
+                }
+            }
+        }
+        private void DrawCombinedInheritance180Selected(Graphics& graphics, Layout& layout, const Pen& selectedLinePen)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.RightCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* leftElement = horizontalOrder.Front();
+                    Endpoint leftEndpoint = leftElement->GetEndpoint(Snap(Snap.LeftCenter()));
+                    PointF leftPoint = leftEndpoint.point;
+                    float dx = leftPoint.x - (targetPoint.x + inheritanceArrowHeight);
+                    float w = dx / 2;
+                    PointF crossPoint(targetPoint.x + inheritanceArrowHeight + w, targetPoint.y);
+                    for (ClassElement* sourceElement : verticalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.LeftCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(crossPoint.x, sourcePoint.y);
+                        graphics.DrawLineChecked(selectedLinePen, sourcePoint, vpoint);
+                        graphics.DrawLineChecked(selectedLinePen, vpoint, crossPoint);
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    graphics.DrawLineChecked(selectedLinePen, startLine.start, startLine.end);
+                }
+            }
+        }
+        private void DrawCombinedInheritance270Selected(Graphics& graphics, Layout& layout, const Pen& selectedLinePen)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.BottomCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* topElement = verticalOrder.Front();
+                    Endpoint topEndpoint = topElement->GetEndpoint(Snap(Snap.TopCenter()));
+                    PointF topPoint = topEndpoint.point;
+                    float dy = topPoint.y - (targetPoint.y + inheritanceArrowHeight);
+                    float h = dy / 2;
+                    PointF crossPoint(targetPoint.x, targetPoint.y + inheritanceArrowHeight + h);
+                    for (ClassElement* sourceElement : horizontalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.TopCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(sourcePoint.x, crossPoint.y);
+                        graphics.DrawLineChecked(selectedLinePen, sourcePoint, vpoint);
+                        graphics.DrawLineChecked(selectedLinePen, vpoint, crossPoint);
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    graphics.DrawLineChecked(selectedLinePen, startLine.start, startLine.end);
+                }
+            }
+        }
+        private bool ContainsCombinedInheritance(const PointF& location, float selectedLineWidth, const Layout& layout)
+        {
+            int mainDirection = MainDirection();
+            switch (mainDirection)
+            {
+                case 0:
+                {
+                    return ContainsCombinedInheritance0(location, selectedLineWidth, layout);
+                }
+                case 90:
+                {
+                    return ContainsCombinedInheritance90(location, selectedLineWidth, layout);
+                }
+                case 180:
+                {
+                    return ContainsCombinedInheritance180(location, selectedLineWidth, layout);
+                }
+                case 270:
+                {
+                    return ContainsCombinedInheritance270(location, selectedLineWidth, layout);
+                }
+            }
+            return false;
+        }
+        private bool ContainsCombinedInheritance0(const PointF& location, float selectedLineWidth, const Layout& layout)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.LeftCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* rightElement = horizontalOrder.Back();
+                    Endpoint rightEndpoint = rightElement->GetEndpoint(Snap(Snap.RightCenter()));
+                    PointF rightPoint = rightEndpoint.point;
+                    float dx = (targetPoint.x - inheritanceArrowHeight) - rightPoint.x;
+                    float w = dx / 2;
+                    PointF crossPoint(targetPoint.x - inheritanceArrowHeight - w, targetPoint.y);
+                    for (ClassElement* sourceElement : verticalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.RightCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(crossPoint.x, sourcePoint.y);
+                        if (Contains(sourcePoint, vpoint, location, selectedLineWidth)) return true;
+                        if (Contains(vpoint, crossPoint, location, selectedLineWidth)) return true;
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    if (Contains(startLine.start, startLine.end, location, selectedLineWidth)) return true;
+                }
+            }
+            return false;
+        }
+        private bool ContainsCombinedInheritance90(const PointF& location, float selectedLineWidth, const Layout& layout)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.TopCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* bottomElement = verticalOrder.Back();
+                    Endpoint bottomEndpoint = bottomElement->GetEndpoint(Snap(Snap.BottomCenter()));
+                    PointF bottomPoint = bottomEndpoint.point;
+                    float dy = (targetPoint.y - inheritanceArrowHeight) - bottomPoint.y;
+                    float h = dy / 2;
+                    PointF crossPoint(targetPoint.x, targetPoint.y - inheritanceArrowHeight - h);
+                    for (ClassElement* sourceElement : horizontalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.BottomCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(sourcePoint.x, crossPoint.y);
+                        if (Contains(sourcePoint, vpoint, location, selectedLineWidth)) return true;
+                        if (Contains(vpoint, crossPoint, location, selectedLineWidth)) return true;
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    if (Contains(startLine.start, startLine.end, location, selectedLineWidth)) return true;
+                }
+            }
+            return false;
+        }
+        private bool ContainsCombinedInheritance180(const PointF& location, float selectedLineWidth, const Layout& layout)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.RightCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* leftElement = horizontalOrder.Front();
+                    Endpoint leftEndpoint = leftElement->GetEndpoint(Snap(Snap.LeftCenter()));
+                    PointF leftPoint = leftEndpoint.point;
+                    float dx = leftPoint.x - (targetPoint.x + inheritanceArrowHeight);
+                    float w = dx / 2;
+                    PointF crossPoint(targetPoint.x + inheritanceArrowHeight + w, targetPoint.y);
+                    for (ClassElement* sourceElement : verticalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.LeftCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(crossPoint.x, sourcePoint.y);
+                        if (Contains(sourcePoint, vpoint, location, selectedLineWidth)) return true;
+                        if (Contains(vpoint, crossPoint, location, selectedLineWidth)) return true;
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    if (Contains(startLine.start, startLine.end, location, selectedLineWidth)) return true;
+                }
+            }
+            return false;
+        }
+        private bool ContainsCombinedInheritance270(const PointF& location, float selectedLineWidth, const Layout& layout)
+        {
+            ClassElement* targetClassElement = null;
+            if (target.element != null)
+            {
+                if (target.element is ClassElement*)
+                {
+                    targetClassElement = cast<ClassElement*>(target.element);
+                }
+            }
+            if (targetClassElement != null)
+            {
+                const Endpoint& targetEndpoint = targetClassElement->GetEndpoint(Snap(Snap.BottomCenter()));
+                PointF targetPoint = targetEndpoint.point;
+                target.point = targetPoint;
+                List<int> indeces;
+                for (const Endpoint& sourceEndpoint : sourceEndpoints)
+                {
+                    if (sourceEndpoint.element != null)
+                    {
+                        if (sourceEndpoint.element is ClassElement*)
+                        {
+                            int index = GetDiagram()->GetIndexOfElement(sourceEndpoint.element);
+                            if (index != -1)
+                            {
+                                indeces.Add(index);
+                            }
+                        }
+                    }
+                }
+                if (indeces.Count() > 1)
+                {
+                    const RelationshipLayoutElement& relationshipLayoutElement = layout.GetRelationshipLayoutElement();
+                    float inheritanceArrowWidth = relationshipLayoutElement.InheritanceArrowWidth();
+                    float inheritanceArrowHeight = cast<float>(Sqrt(3) / 2 * inheritanceArrowWidth);
+                    List<int> horizontalIndexOrder = indeces;
+                    Sort(horizontalIndexOrder.Begin(), horizontalIndexOrder.End(), HorizontallyLess(GetDiagram()));
+                    List<ClassElement*> horizontalOrder;
+                    for (int index : horizontalIndexOrder)
+                    {
+                        horizontalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    List<int> verticalIndexOrder = indeces;
+                    Sort(verticalIndexOrder.Begin(), verticalIndexOrder.End(), VerticallyLess(GetDiagram()));
+                    List<ClassElement*> verticalOrder;
+                    for (int index : verticalIndexOrder)
+                    {
+                        verticalOrder.Add(cast<ClassElement*>(GetDiagram()->GetElementByIndex(index)));
+                    }
+                    ClassElement* topElement = verticalOrder.Front();
+                    Endpoint topEndpoint = topElement->GetEndpoint(Snap(Snap.TopCenter()));
+                    PointF topPoint = topEndpoint.point;
+                    float dy = topPoint.y - (targetPoint.y + inheritanceArrowHeight);
+                    float h = dy / 2;
+                    PointF crossPoint(targetPoint.x, targetPoint.y + inheritanceArrowHeight + h);
+                    for (ClassElement* sourceElement : horizontalOrder)
+                    {
+                        Endpoint sourceEndpoint = sourceElement->GetEndpoint(Snap(Snap.TopCenter()));
+                        PointF sourcePoint = sourceEndpoint.point;
+                        PointF vpoint(sourcePoint.x, crossPoint.y);
+                        if (Contains(sourcePoint, vpoint, location, selectedLineWidth)) return true;
+                        if (Contains(vpoint, crossPoint, location, selectedLineWidth)) return true;
+                    }
+                    Line line(crossPoint, targetPoint);
+                    Vector v = line.ToVector();
+                    float len = v.Length();
+                    float startLen = Max(0.0f, len - inheritanceArrowHeight);
+                    Vector u = UnitVector(v) * startLen;
+                    Line startLine(crossPoint, u);
+                    if (Contains(startLine.start, startLine.end, location, selectedLineWidth)) return true;
+                }
+            }
+            return false;
         }
         private void DrawAggregation(Graphics& graphics, Layout& layout)
         {
@@ -2269,9 +3415,43 @@ namespace spring
             base->SetFrom(that);
             kind = cast<RelationshipElement*>(that)->kind;
             source = cast<RelationshipElement*>(that)->source;
+            for (const Endpoint& sourceEndpoint : cast<RelationshipElement*>(that)->sourceEndpoints)
+            {
+                sourceEndpoints.Add(sourceEndpoint);
+            }
             target = cast<RelationshipElement*>(that)->target;
             intermediatePoints = cast<RelationshipElement*>(that)->intermediatePoints;
             cardinality = cast<RelationshipElement*>(that)->cardinality;
+        }
+        public nothrow void MapContainerElements(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
+        {
+            if (source.element != null)
+            {
+                HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(source.element);
+                if (it != cloneMap.CEnd())
+                {
+                    source.element = it->second;
+                }
+            }
+            for (Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                if (sourceEndpoint.element != null)
+                {
+                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(sourceEndpoint.element);
+                    if (it != cloneMap.CEnd())
+                    {
+                        sourceEndpoint.element = it->second;
+                    }
+                }
+            }
+            if (target.element != null)
+            {
+                HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(target.element);
+                if (it != cloneMap.CEnd())
+                {
+                    target.element = it->second;
+                }
+            }
         }
         public nothrow void AddToElements()
         {
@@ -2280,12 +3460,27 @@ namespace spring
                 source.element->AddRelationship(this);
                 target.element->AddRelationship(this);
             }
+            for (const Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                if (sourceEndpoint.element != null && target.element != null)
+                {
+                    sourceEndpoint.element->AddRelationship(this);
+                    target.element->AddRelationship(this);
+                }
+            }
         }
         public nothrow void RemoveFromElements()
         {
             if (source.element != null)
             {
                 source.element->RemoveRelationship(this);
+            }
+            for (const Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                if (sourceEndpoint.element != null)
+                {
+                    sourceEndpoint.element->RemoveRelationship(this);
+                }
             }
             if (target.element != null)
             {
@@ -2298,6 +3493,13 @@ namespace spring
             {
                 source.element = null;
             }
+            for (Endpoint& sourceEndpoint : sourceEndpoints)
+            {
+                if (sourceEndpoint.element == element)
+                {
+                    sourceEndpoint.element = null;
+                }
+            }
             if (target.element == element)
             {
                 target.element = null;
@@ -2307,6 +3509,7 @@ namespace spring
         public Cardinality cardinality;
         public Endpoint source;
         public Endpoint target;
+        public List<Endpoint> sourceEndpoints;
         public List<PointF> intermediatePoints;
         private SizeF sourceTextSize;
         private SizeF targetTextSize;
@@ -2336,29 +3539,6 @@ namespace spring
         {
             return containerElement;
         }
-        public nothrow override void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
-        {
-            base->MapRelationships(cloneMap);
-            if (relationship != null)
-            {
-                if (relationship->source.element != null)
-                {
-                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->source.element);
-                    if (it != cloneMap.CEnd())
-                    {
-                        relationship->source.element = it->second;
-                    }
-                }
-                if (relationship->target.element != null)
-                {
-                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->target.element);
-                    if (it != cloneMap.CEnd())
-                    {
-                        relationship->target.element = it->second;
-                    }
-                }
-            }
-        }
         public override nothrow void AddRelationship(RelationshipElement* relationship_)
         {
             relationship = relationship_;
@@ -2380,6 +3560,11 @@ namespace spring
             if (relationship != null)
             {
                 relationship->source.element = this;
+                for (Endpoint& sourceEndpoint : relationship->sourceEndpoints)
+                {
+                    sourceEndpoint.element = this;
+                    sourceEndpoint.point = GetRelationshipPoint();
+                }
                 relationship->source.point = GetRelationshipPoint();
             }
         }
@@ -2429,12 +3614,6 @@ namespace spring
         {
             base->SetFrom(that);
             containerElement = cast<FieldElement*>(that)->containerElement;
-            relationship = null;
-            RelationshipElement* thatRelationship = cast<FieldElement*>(that)->relationship;
-            if (thatRelationship != null)
-            {
-                relationship = cast<RelationshipElement*>(thatRelationship->Clone());
-            }
         }
         public nothrow inline RelationshipElement* Relationship() const
         {
@@ -2475,29 +3654,6 @@ namespace spring
         {
             return containerElement;
         }
-        public nothrow override void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
-        {
-            base->MapRelationships(cloneMap);
-            if (relationship != null)
-            {
-                if (relationship->source.element != null)
-                {
-                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->source.element);
-                    if (it != cloneMap.CEnd())
-                    {
-                        relationship->source.element = it->second;
-                    }
-                }
-                if (relationship->target.element != null)
-                {
-                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->target.element);
-                    if (it != cloneMap.CEnd())
-                    {
-                        relationship->target.element = it->second;
-                    }
-                }
-            }
-        }
         public override nothrow void AddRelationship(RelationshipElement* relationship_)
         {
             relationship = relationship_;
@@ -2520,6 +3676,11 @@ namespace spring
             {
                 relationship->source.element = this;
                 relationship->source.point = GetRelationshipPoint();
+                for (Endpoint& sourceEndpoint : relationship->sourceEndpoints)
+                {
+                    sourceEndpoint.element = this;
+                    sourceEndpoint.point = GetRelationshipPoint();
+                }
             }
         }
         public PointF GetRelationshipPoint() const
@@ -2619,12 +3780,6 @@ namespace spring
             base->SetFrom(that);
             isAbstract = cast<OperationElement*>(that)->isAbstract;
             containerElement = cast<OperationElement*>(that)->containerElement;
-            relationship = null;
-            RelationshipElement* thatRelationship = cast<OperationElement*>(that)->relationship;
-            if (thatRelationship != null)
-            {
-                relationship = cast<RelationshipElement*>(thatRelationship->Clone());
-            }
         }
         public nothrow inline RelationshipElement* Relationship() const
         {
@@ -2651,29 +3806,6 @@ namespace spring
             }
         }
         public abstract void MapChildObjects(ContainerElement* from, HashMap<DiagramElement*, DiagramElement*>& cloneMap);
-        public override nothrow void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
-        {
-            base->MapRelationships(cloneMap);
-            for (RelationshipElement* relationship : relationships)
-            {
-                if (relationship->source.element != null)
-                {
-                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->source.element);
-                    if (it != cloneMap.CEnd())
-                    {
-                        relationship->source.element = it->second;
-                    }
-                }
-                if (relationship->target.element != null)
-                {
-                    HashMap<DiagramElement*, DiagramElement*>.ConstIterator it = cloneMap.CFind(relationship->target.element);
-                    if (it != cloneMap.CEnd())
-                    {
-                        relationship->target.element = it->second;
-                    }
-                }
-            }
-        }
         public abstract nothrow List<RelationshipElement*> GetAllRelationships() const;
         public virtual FieldElement* GetField(int index) const
         {
@@ -2829,6 +3961,19 @@ namespace spring
                         pickedRelationships.Add(relationship);
                     }
                 }
+                for (Endpoint& sourceEndpoint : relationship->sourceEndpoints)
+                {
+                    if (sourceEndpoint.element == this)
+                    {
+                        if (sourceEndpoint.snap == snap)
+                        {
+                            if (Find(pickedRelationships.CBegin(), pickedRelationships.CEnd(), relationship) == pickedRelationships.CEnd())
+                            {
+                                pickedRelationships.Add(relationship);
+                            }
+                        }
+                    }
+                }
                 if (relationship->target.element == this)
                 {
                     if (relationship->target.snap == snap)
@@ -2838,15 +3983,6 @@ namespace spring
                 }
             }
             return pickedRelationships;
-        }
-        public override void SetFrom(DiagramElement* that)
-        {
-            base->SetFrom(that);
-            relationships.Clear();
-            for (RelationshipElement* thatRelationship : cast<ContainerElement*>(that)->relationships)
-            {
-                relationships.Add(cast<RelationshipElement*>(thatRelationship->Clone()));
-            }
         }
         private List<RelationshipElement*> relationships;
     }
@@ -2892,22 +4028,6 @@ namespace spring
             for (int i = 0; i < nf; ++i)
             {
                 cloneMap[fromClass->fields.Get(i)] = fields.Get(i);
-            }
-        }
-        public override nothrow void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
-        {
-            base->MapRelationships(cloneMap);
-            int no = operations.Count();
-            for (int i = 0; i < no; ++i)
-            {
-                OperationElement* operation = operations.Get(i);
-                operation->MapRelationships(cloneMap);
-            }
-            int nf = fields.Count();
-            for (int i = 0; i < nf; ++i)
-            {
-                FieldElement* field = fields.Get(i);
-                field->MapRelationships(cloneMap);
             }
         }
         public override System.Dom.Element* CreateDomElement() const
@@ -3342,14 +4462,12 @@ namespace spring
         {
             base->SetFrom(that);
             isAbstract = cast<ClassElement*>(that)->isAbstract;
-            operations.Clear();
             for (UniquePtr<OperationElement>& operation : cast<ClassElement*>(that)->operations)
             {
                 OperationElement* clonedOperation = cast<OperationElement*>(operation->Clone());
                 clonedOperation->SetContainerElement(this);
                 operations.Add(clonedOperation);
             }
-            fields.Clear();
             for (UniquePtr<FieldElement>& field : cast<ClassElement*>(that)->fields)
             {
                 FieldElement* clonedField = cast<FieldElement*>(field->Clone());
@@ -3439,16 +4557,6 @@ namespace spring
             for (int i = 0; i < nf; ++i)
             {
                 cloneMap[fromObject->fields.Get(i)] = fields.Get(i);
-            }
-        }
-        public override nothrow void MapRelationships(HashMap<DiagramElement*, DiagramElement*>& cloneMap)
-        {
-            base->MapRelationships(cloneMap);
-            int nf = fields.Count();
-            for (int i = 0; i < nf; ++i)
-            {
-                FieldElement* field = fields.Get(i);
-                field->MapRelationships(cloneMap);
             }
         }
         public override FieldElement* GetField(int index) const
@@ -3688,7 +4796,6 @@ namespace spring
         public override void SetFrom(DiagramElement* that)
         {
             base->SetFrom(that);
-            fields.Clear();
             for (UniquePtr<FieldElement>& field : cast<ObjectElement*>(that)->fields)
             {
                 FieldElement* clonedField = cast<FieldElement*>(field->Clone());
@@ -3873,12 +4980,91 @@ namespace spring
         return boundingRect;
     }
 
+    UniquePtr<RelationshipElement> CombineInheritanceRelationships(const List<RelationshipElement*>& inheritanceRelationships, List<RelationshipElement*>& sourceRelationships)
+    {
+        UniquePtr<RelationshipElement> combinedRelationship;
+        Map<DiagramElement*, int> targetMap;
+        for (RelationshipElement* relationship : inheritanceRelationships)
+        {
+            if (relationship->target.element != null)
+            {
+                ++targetMap[relationship->target.element];
+            }
+        }
+        int maxCount = -1;
+        DiagramElement* maxTargetElement;
+        for (const Pair<DiagramElement*, int>& p : targetMap)
+        {
+            if (p.second > maxCount)
+            {
+                maxCount = p.second;
+                maxTargetElement = p.first;
+            }
+        }
+        if (maxTargetElement is ClassElement*)
+        {
+            Endpoint targetEndpoint;
+            List<Endpoint> sourceEndpoints;
+            ClassElement* targetClassElement = cast<ClassElement*>(maxTargetElement);
+            for (RelationshipElement* relationship : inheritanceRelationships)
+            {
+                if (relationship->target.element != null)
+                {
+                    if (relationship->target.element == targetClassElement)
+                    {
+                        if (targetEndpoint.element == null)
+                        {
+                            targetEndpoint = relationship->target;
+                        }
+                        if (relationship->source.element != null)
+                        {
+                            if (relationship->source.element is ClassElement*)
+                            {
+                                sourceEndpoints.Add(relationship->source);
+                                sourceRelationships.Add(relationship);
+                            }
+                        }
+                    }
+                }
+            }
+            if (sourceRelationships.Count() > 1)
+            {
+                combinedRelationship.Reset(new RelationshipElement());
+                combinedRelationship->kind = RelationshipElement.Kind.inheritance;
+                combinedRelationship->cardinality = Cardinality.one;
+                combinedRelationship->sourceEndpoints = sourceEndpoints;
+                combinedRelationship->target = targetEndpoint;
+            }
+        }
+        return combinedRelationship;
+    }
+
+    List<UniquePtr<RelationshipElement>> SplitCombinedInheritanceRelationship(RelationshipElement* combinedInheritanceRelationship)
+    {
+        List<UniquePtr<RelationshipElement>> relationships;
+        Endpoint target = combinedInheritanceRelationship->target;
+        for (const Endpoint& source : combinedInheritanceRelationship->sourceEndpoints)
+        {
+            UniquePtr<RelationshipElement> relationship(new RelationshipElement(RelationshipElement.Kind.inheritance));
+            relationship->source = source;
+            relationship->target = target;
+            relationships.Add(Rvalue(relationship));
+        }
+        combinedInheritanceRelationship->RemoveFromElements();
+        for (const UniquePtr<RelationshipElement>& relationship : relationships)
+        {
+            relationship->AddToElements();
+        }
+        return relationships;
+    }
+
     public void SaveImage(const string& fileName, const PaddingElement& margins, Canvas* canvas, const List<DiagramElement*>& diagramElements, Graphics& graphics, Layout& layout, ImageFormat imageFormat)
     {
         Diagram diagram(layout);
         diagram.SetCanvas(canvas);
         HashMap<DiagramElement*, DiagramElement*> cloneMap;
         List<ContainerElement*> clones;
+        List<RelationshipElement*> relationships;
         for (DiagramElement* diagramElement : diagramElements)
         {
             DiagramElement* clone = diagramElement->Clone();
@@ -3889,11 +5075,16 @@ namespace spring
                 containerElement->MapChildObjects(cast<ContainerElement*>(diagramElement), cloneMap);
                 clones.Add(containerElement);
             }
+            else if (clone is RelationshipElement*)
+            {
+                relationships.Add(cast<RelationshipElement*>(clone));
+            }
             diagram.AddElement(clone);
         }
-        for (ContainerElement* clone : clones)
+        for (RelationshipElement* relationship : relationships)
         {
-            clone->MapRelationships(cloneMap);
+            relationship->MapContainerElements(cloneMap);
+            relationship->AddToElements();
         }
         RectF boundingRect = diagram.CalculateBoundingRect();
         diagram.Offset(-boundingRect.location.x + margins.left, -boundingRect.location.y + margins.top);
