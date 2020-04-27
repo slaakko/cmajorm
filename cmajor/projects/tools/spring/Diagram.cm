@@ -1272,6 +1272,14 @@ namespace spring
         private int index;
     }
 
+    public class DecreasingOrderBySecond : Rel<Pair<int, int>>
+    {
+        public inline nothrow bool operator()(const Pair<int, int>& left, const Pair<int, int>& right) const
+        {
+            return left.second > right.second;
+        }
+    }
+
     public class RelationshipElement : DiagramElement
     {
         public enum Kind
@@ -1380,29 +1388,32 @@ namespace spring
             }
             else if (target.element != null)
             {
-                Map<int, int> mainDirectionMap;
+                LogView* log = Application.GetLogView();
+                Map<int, int> directionMap;
                 for (const Endpoint& sourceEndpoint : sourceEndpoints)
                 {
                     if (sourceEndpoint.element != null)
                     {
-                        int mainDirection = MainDirection(sourceEndpoint.element, target.element);
-                        ++mainDirectionMap[mainDirection];
+                        Line line(target.element->Center(), sourceEndpoint.element->Center());
+                        Vector v = line.ToVector();
+                        if (v.x > 0) ++directionMap[180];
+                        if (v.y > 0) ++directionMap[270];
+                        if (v.x < 0) ++directionMap[0];
+                        if (v.y < 0) ++directionMap[90];
                     }
                 }
-                int maxCount = -1;
-                int maxMainDirection = -1;
-                for (const Pair<int, int>& p : mainDirectionMap)
+                List<Pair<int, int>> directionList;
+                for (const Pair<int, int>& p : directionMap)
                 {
-                    if (p.second > maxCount)
-                    {
-                        maxCount = p.second;
-                        maxMainDirection = p.first;
-                    }
+                    directionList.Add(p);
                 }
-                if (maxCount != -1 && maxMainDirection != -1)
+                Sort(directionList.Begin(), directionList.End(), DecreasingOrderBySecond());
+                Pair<int, int> max = directionList.Front();
+                if (log != null)
                 {
-                    return maxMainDirection;
+                    log->WriteLine("MainDirection: " + ToString(max.first) + ", " + ToString(max.second));
                 }
+                return max.first;
             }
             return 0;
         }
@@ -1469,37 +1480,80 @@ namespace spring
             }
             else
             {
-                Line line(source.point, target.point);
-                Vector v(line.ToVector());
-                switch (MainDirection(v))
+                if (kind == Kind.inheritance && !sourceEndpoints.IsEmpty())
                 {
-                    case 0:
-                    case 180:
+                    if (target.element != null && sourceEndpoints.Count() >= 2)
                     {
-                        if (target.element != null)
+                        int direction = MainDirection();
+                        switch (direction)
                         {
-                            float dy = source.point.y - target.point.y;
-                            target.element->Offset(0.0f, dy);
+                            case 90:
+                            case 270:
+                            {
+                                float minX = 9999999.9f;
+                                float maxX = -1.0f;
+                                for (const Endpoint& endpoint : sourceEndpoints)
+                                {
+                                    if (endpoint.point.x < minX) minX = endpoint.point.x;
+                                    if (endpoint.point.x > maxX) maxX = endpoint.point.x;
+                                }
+                                float targetX = minX + (maxX - minX) / 2;
+                                float dx = targetX - target.element->Center().x;
+                                target.element->Offset(dx, 0.0f);
+                                break;
+                            }
+                            case 0:
+                            case 180:
+                            {
+                                float minY = 9999999.9f;
+                                float maxY = -1.0f;
+                                for (const Endpoint& endpoint : sourceEndpoints)
+                                {
+                                    if (endpoint.point.y < minY) minY = endpoint.point.y;
+                                    if (endpoint.point.y > maxY) maxY = endpoint.point.y;
+                                }
+                                float targetY = minY + (maxY - minY) / 2;
+                                float dy = targetY - target.element->Center().y;
+                                target.element->Offset(0.0f, dy);
+                                break;
+                            }
                         }
-                        else
-                        {
-                            target.point.y = source.point.y;
-                        }
-                        break;
                     }
-                    case 90:
-                    case 270:
+                }
+                else
+                {
+                    Line line(source.point, target.point);
+                    Vector v(line.ToVector());
+                    switch (MainDirection(v))
                     {
-                        if (target.element != null)
+                        case 0:
+                        case 180:
                         {
-                            float dx = source.point.x - target.point.x;
-                            target.element->Offset(dx, 0.0f);
+                            if (target.element != null)
+                            {
+                                float dy = source.point.y - target.point.y;
+                                target.element->Offset(0.0f, dy);
+                            }
+                            else
+                            {
+                                target.point.y = source.point.y;
+                            }
+                            break;
                         }
-                        else
+                        case 90:
+                        case 270:
                         {
-                            target.point.x = source.point.x;
+                            if (target.element != null)
+                            {
+                                float dx = source.point.x - target.point.x;
+                                target.element->Offset(dx, 0.0f);
+                            }
+                            else
+                            {
+                                target.point.x = source.point.x;
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }
