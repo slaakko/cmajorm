@@ -1,0 +1,139 @@
+<diagram>
+ <class abstract="true" name="ContainerControl">
+  <boundingRect h="25.719724655151367" w="33.446609497070312" x="26.987501144409179" y="68.527076721191406"/>
+  <operation abstract="false" name="AddChild()">
+   <boundingRect h="3.943944692611694" w="16.505449295043945" x="28.487501144409179" y="76.971023559570312"/>
+  </operation>
+  <operation abstract="false" name="RemoveChild()">
+   <boundingRect h="3.943944692611694" w="22.863197326660156" x="28.487501144409179" y="80.914970397949218"/>
+  </operation>
+  <operation abstract="false" name="InsertChildAfter()">
+   <boundingRect h="3.943944692611694" w="25.769996643066406" x="28.487501144409179" y="84.858917236328125"/>
+  </operation>
+  <operation abstract="false" name="Children()">
+   <boundingRect h="3.943944692611694" w="15.412493705749511" x="28.487501144409179" y="88.802864074707031"/>
+  </operation>
+ </class>
+ <class abstract="true" name="Control">
+  <boundingRect h="6.943944931030273" w="15.683978080749511" x="35.868820190429687" y="47.889572143554687"/>
+ </class>
+ <class abstract="false" name="Container">
+  <boundingRect h="17.831834793090820" w="28.363197326660156" x="89.693733215332031" y="88.246795654296875"/>
+  <operation abstract="false" name="AddChild()">
+   <boundingRect h="3.943944692611694" w="16.505449295043945" x="91.193733215332031" y="96.690742492675781"/>
+  </operation>
+  <operation abstract="false" name="RemoveChild()">
+   <boundingRect h="3.943944692611694" w="22.863197326660156" x="91.193733215332031" y="100.634689331054687"/>
+  </operation>
+ </class>
+ <class abstract="true" name="Component">
+  <boundingRect h="24.775779724121093" w="22.226211547851562" x="32.597705841064453" y="10.054164886474609"/>
+  <field name="container">
+   <boundingRect h="3.943944692611694" w="14.510222434997558" x="34.097705841064453" y="21.498109817504882"/>
+  </field>
+  <field name="nextSibling">
+   <boundingRect h="3.943944692611694" w="17.057352066040039" x="34.097705841064453" y="25.442054748535156"/>
+  </field>
+  <field name="prevSibling">
+   <boundingRect h="3.943944692611694" w="17.237186431884765" x="34.097705841064453" y="29.385999679565429"/>
+  </field>
+ </class>
+ <note name="note">
+  <boundingRect h="10.887889862060546" w="34.776348114013671" x="125.412490844726562" y="12.700000762939453"/>
+  <line value="children.AddChild()"/>
+  <line value="OnControlAdded()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="10.887889862060546" w="41.13409423828125" x="125.412490844726562" y="25.400001525878906"/>
+  <line value="children.RemoveChild()"/>
+  <line value="OnControlRemoved()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="10.887889862060546" w="36.588638305664062" x="125.412490844726562" y="38.364582061767578"/>
+  <line value="children.InsertAfter()"/>
+  <line value="OnControlAdded()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="77.934944152832031" w="78.942626953125" x="125.412490844726562" y="51.593746185302734"/>
+  <line value="Container* prevContainer = child->GetContainer()"/>
+  <line value="if (prevContainer != null)"/>
+  <line value="{"/>
+  <line value="    prevContainer->RemoveChild(child);"/>
+  <line value="}"/>
+  <line value="if (lastChild != null)"/>
+  <line value="{"/>
+  <line value="    lastChild->LinkAfter(child)"/>
+  <line value="}"/>
+  <line value="if (firstChild == null)"/>
+  <line value="{"/>
+  <line value="    firstChild = child"/>
+  <line value="}"/>
+  <line value="chld->SetContainer(this)"/>
+  <line value="lastChild = child"/>
+  <line value="if ((child is Control*) and (parent is Control*))"/>
+  <line value="{"/>
+  <line value="    parent->AddChildVisual(child);"/>
+  <line value="}"/>
+ </note>
+ <class abstract="false" name="Window">
+  <boundingRect h="6.943944931030273" w="16.592449188232421" x="35.454166412353515" y="107.685401916503906"/>
+ </class>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="-3.175003051757812" y="38.099998474121093"/>
+  <source index="0" snap="top.center" text="" x="43.710807800292968" y="68.527076721191406"/>
+  <target index="1" snap="bottom.center" text="" x="43.710807800292968" y="54.833518981933593"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="-3.175003051757812" y="38.099998474121093"/>
+  <source index="0" snap="right.bottom" text="children" x="60.434112548828125" y="91.246803283691406"/>
+  <target index="2" snap="left.top" text="" x="89.693733215332031" y="91.246795654296875"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="-1.587501406669616" y="7.937500476837158"/>
+  <source index="1" snap="top.center" text="" x="43.710807800292968" y="47.889572143554687"/>
+  <target index="3" snap="bottom.center" text="" x="43.710811614990234" y="34.829944610595703"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="-1.587501406669616" y="7.937500476837158"/>
+  <source index="2" snap="top.left" text="firstChild" x="92.693733215332031" y="88.246795654296875"/>
+  <target index="3" snap="right.bottom" text="" x="54.823917388916015" y="31.829944610595703"/>
+  <intermediatePoint x="92.693733215332031" y="31.829944610595703"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="top.right" text="lastChild" x="115.056930541992187" y="88.246795654296875"/>
+  <target index="3" snap="right.top" text="" x="54.823917388916015" y="13.054164886474609"/>
+  <intermediatePoint x="115.056930541992187" y="13.054164886474609"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="operation.0" text="" x="56.007499694824218" y="78.9429931640625"/>
+  <target index="4" snap="left.center" text="" x="125.412490844726562" y="18.143945693969726"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="operation.1" text="" x="56.007499694824218" y="82.886940002441406"/>
+  <target index="5" snap="left.center" text="" x="125.412490844726562" y="30.843946456909179"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="operation.2" text="" x="56.007499694824218" y="86.830886840820312"/>
+  <target index="6" snap="left.center" text="" x="125.412490844726562" y="43.808525085449218"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="8" snap="top.center" text="" x="43.750389099121093" y="107.685401916503906"/>
+  <target index="0" snap="bottom.center" text="" x="43.710807800292968" y="94.246803283691406"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="top.center" text="parent" x="103.875335693359375" y="88.246795654296875"/>
+  <target index="3" snap="right.center" text="" x="54.823917388916015" y="22.442054748535156"/>
+  <intermediatePoint x="103.875335693359375" y="22.442054748535156"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="operation.0" text="" x="115.806930541992187" y="98.662712097167968"/>
+  <target index="7" snap="left.center" text="" x="125.412490844726562" y="90.56121826171875"/>
+ </relationship>
+</diagram>

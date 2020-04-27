@@ -40,6 +40,50 @@
     </p>
 
     <img src="image/component.objects.png"/>
+
+    <h2>The Control class</h2>
+
+    <p>
+        The Control class represents a Windows control window. It is the direct base class of standard Windows controls such as text boxes and labels,
+        and also an indirect base class of container windows such as the panels and toplevel windows.
+        A control window has a window handle that is obtained using the CreateWindow Windows API function. 
+        If the control window is a child window, the window handle gets created when the child is added to a parent that has already a window handle,
+        or later when the parent window gets its own window handle. At this time the visual parent window-child window relationship is created.
+        When a control window receives its window handle, it calls the OnCreated() member function that by default fires the Control.CreatedEvent() event.
+        The window handle for a toplevel window is created in the Control's constructor. It also fires the Control.CreatedEvent() event, but any overridden 
+        OnCreated() member function will <em>not</em> be called, because overridden member functions will not be called from the constructor 
+        of a base class.
+    </p>
     
+    <img src="image/control.class.png"/>
+    
+    <p>
+        A control window has a window text, location, size, and a background color. It can be docked or anchored to an edge of a parent window.
+        The font of a child control window is by default null, in which case it uses the font of its parent window if that has one, 
+        or the font of its parent's parent window if it has one and so on. Each toplevel window has a font that is by default Microsoft Sans Serif.
+        The font of a control window can be explicitly set in which case it is also used as the font for its child windows if their font is not 
+        explicitly set.
+    </p>
+    
+    <h2>The ContainerControl class</h2>
+    
+    <p>
+        The ContainerControl class manages child controls and acts as a parent window to them.
+        It has a container object that keeps the child controls in a linked list. 
+    </p>
+    
+    <img src="image/container.control.spring.png"/>
+
+    <p>
+        When a child control is added to the container, the control is first removed from any previous container, and then added to the new one.
+        After that the child control is visually created if the container control itself is already visually created, or otherwise it is added to a
+        a list of children to be created visually later. The container control calls virtual OnControlAdded() and OnControlRemoved() member functions 
+        for controls added and removed respectively. The implementations of those functions in the Control class fire 
+        corresponding Control.ControlAddedEvent() and Control.ControlRemovedEvent() events.
+    </p>
+    
+    <h2>Standard Dialog Controls</h2>
+    
+    <img src="image/dialog.control.class.diagram.spring.png"/>
     
 </body>
