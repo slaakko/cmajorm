@@ -1,0 +1,172 @@
+<diagram>
+ <class abstract="false" name="MyWindow">
+  <boundingRect h="17.831834793090820" w="31.997083663940429" x="34.028938293457031" y="44.979164123535156"/>
+  <operation abstract="false" name="MyWindow()">
+   <boundingRect h="3.943944692611694" w="19.224660873413085" x="35.528938293457031" y="53.423110961914062"/>
+  </operation>
+  <operation abstract="false" name="- OKButtonClick()">
+   <boundingRect h="3.943944692611694" w="26.497083663940429" x="35.528938293457031" y="57.367053985595703"/>
+  </operation>
+ </class>
+ <class abstract="false" name="Window">
+  <boundingRect h="6.943944931030273" w="16.592449188232421" x="41.731243133544921" y="20.637500762939453"/>
+ </class>
+ <class abstract="false" name="Button">
+  <boundingRect h="13.887889862060546" w="22.910818099975585" x="87.74737548828125" y="63.707389831542968"/>
+  <operation abstract="false" name="# OnClick()">
+   <boundingRect h="3.943944692611694" w="17.410818099975585" x="89.24737548828125" y="72.151336669921875"/>
+  </operation>
+ </class>
+ <class abstract="false" name="Event&lt;ClickEventHandler>">
+  <boundingRect h="25.719724655151367" w="48.179035186767578" x="132.092941284179687" y="6.903966903686523"/>
+  <operation abstract="false" name="AddHandler()">
+   <boundingRect h="3.943944692611694" w="20.503652572631835" x="133.592941284179687" y="15.347911834716796"/>
+  </operation>
+  <operation abstract="false" name="RemoveHandler()">
+   <boundingRect h="3.943944692611694" w="26.861402511596679" x="133.592941284179687" y="19.291856765747070"/>
+  </operation>
+  <operation abstract="false" name="Fire()">
+   <boundingRect h="3.943944692611694" w="8.867156982421875" x="133.592941284179687" y="23.235801696777343"/>
+  </operation>
+  <operation abstract="false" name="Fire(args)">
+   <boundingRect h="3.943944692611694" w="15.228008270263671" x="133.592941284179687" y="27.179746627807617"/>
+  </operation>
+ </class>
+ <class abstract="true" name="Control">
+  <boundingRect h="17.831834793090820" w="24.183609008789062" x="87.110977172851562" y="10.847910881042480"/>
+  <operation abstract="false" name="ClickEvent()">
+   <boundingRect h="3.943944692611694" w="18.683609008789062" x="88.610977172851562" y="19.291854858398437"/>
+  </operation>
+  <operation abstract="false" name="# OnClick()">
+   <boundingRect h="3.943944692611694" w="17.410818099975585" x="88.610977172851562" y="23.235799789428710"/>
+  </operation>
+ </class>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="30.409172058105468" x="131.76251220703125" y="47.625"/>
+  <line value="clickEvent.Fire()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="10.887889862060546" w="30.599861145019531" x="203.464569091796875" y="22.046216964721679"/>
+  <line value="for each handler"/>
+  <line value="    handler()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="10.887889862060546" w="30.599861145019531" x="203.464569091796875" y="35.189586639404296"/>
+  <line value="for each handler"/>
+  <line value="    handler(args)"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="39.323352813720703" x="203.464569091796875" y="4.115522384643554"/>
+  <line value="handlers.Add(handler)"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="45.681102752685546" x="203.464569091796875" y="12.964580535888671"/>
+  <line value="handlers.Remove(handler)"/>
+ </note>
+ <class abstract="true" name="ButtonBase">
+  <boundingRect h="6.943944931030273" w="22.407594680786132" x="87.998985290527343" y="44.185420989990234"/>
+ </class>
+ <class abstract="false" name="User">
+  <boundingRect h="6.943944931030273" w="11.329205513000488" x="131.76251220703125" y="56.930210113525390"/>
+ </class>
+ <class abstract="false" name="ClickEventHandler">
+  <boundingRect h="6.943944931030273" w="32.954238891601562" x="204.258316040039062" y="55.033317565917968"/>
+ </class>
+ <note name="note">
+  <boundingRect h="18.775779724121093" w="82.119178771972656" x="87.577072143554687" y="82.550003051757812"/>
+  <line value="okButton = new Button();"/>
+  <line value="okButton->ClickEvent().AddHandler(OKButtonClick)"/>
+  <line value="AddChild(okButton)"/>
+  <line value="..."/>
+ </note>
+ <note name="note">
+  <boundingRect h="10.887889862060546" w="30.683574676513671" x="131.76251220703125" y="66.235397338867187"/>
+  <line value="base->OnClick()"/>
+  <line value="..."/>
+ </note>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="top.center" text="" x="50.027481079101562" y="44.979164123535156"/>
+  <target index="1" snap="bottom.center" text="" x="50.0274658203125" y="27.581445693969726"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="-1.852095961570739" y="-3.439585685729980"/>
+  <source index="4" snap="right.center" text="clickEvent" x="111.294586181640625" y="19.763828277587890"/>
+  <target index="3" snap="left.center" text="" x="132.092941284179687" y="19.763828277587890"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="operation.1" text="" x="109.044586181640625" y="25.207771301269531"/>
+  <target index="5" snap="left.bottom" text="" x="131.76251220703125" y="51.568946838378906"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="3" snap="operation.2" text="" x="162.204345703125" y="25.207773208618164"/>
+  <target index="6" snap="left.center" text="" x="203.464569091796875" y="27.490161895751953"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="3" snap="operation.3" text="" x="162.204345703125" y="29.151718139648437"/>
+  <target index="7" snap="left.center" text="" x="203.464569091796875" y="40.633529663085937"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="3" snap="operation.0" text="" x="162.204345703125" y="17.319883346557617"/>
+  <target index="8" snap="left.bottom" text="" x="203.464569091796875" y="8.059467315673828"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="3" snap="operation.1" text="" x="162.204345703125" y="21.263828277587890"/>
+  <target index="9" snap="left.center" text="" x="203.464569091796875" y="16.436553955078125"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="10" snap="top.center" text="" x="99.202781677246093" y="44.185420989990234"/>
+  <target index="4" snap="bottom.center" text="" x="99.202781677246093" y="28.679744720458984"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="top.center" text="" x="99.202781677246093" y="63.707389831542968"/>
+  <target index="10" snap="bottom.center" text="" x="99.202781677246093" y="51.129364013671875"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="11" snap="left.center" text="clicks" x="131.76251220703125" y="60.402183532714843"/>
+  <target index="2" snap="right.top" text="" x="110.658195495605468" y="66.707389831542968"/>
+ </relationship>
+ <relationship cardinality="many" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="3" snap="bottom.center" text="handlers" x="156.182464599609375" y="32.623691558837890"/>
+  <target index="12" snap="left.bottom" text="" x="204.258316040039062" y="58.977264404296875"/>
+  <intermediatePoint x="156.182464599609375" y="43.656238555908203"/>
+  <intermediatePoint x="183.885421752929687" y="43.656238555908203"/>
+ </relationship>
+ <relationship cardinality="one" kind="reference" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="right.center" text="okButton" x="66.026023864746093" y="53.89508056640625"/>
+  <target index="2" snap="left.center" text="" x="87.74737548828125" y="70.651336669921875"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="operation.0" text="" x="63.776023864746093" y="55.395084381103515"/>
+  <target index="13" snap="left.top" text="" x="87.577072143554687" y="85.550003051757812"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="right.top" text="creates" x="66.026023864746093" y="47.979164123535156"/>
+  <target index="2" snap="top.left" text="" x="90.74737548828125" y="63.707389831542968"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="operation.0" text="" x="108.408195495605468" y="74.123306274414062"/>
+  <target index="14" snap="left.bottom" text="" x="131.76251220703125" y="74.123291015625"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="3" snap="right.center" text="calls" x="180.27197265625" y="19.763828277587890"/>
+  <target index="0" snap="bottom.center" text="" x="50.027481079101562" y="62.810997009277343"/>
+  <intermediatePoint x="191.822921752929687" y="19.763824462890625"/>
+  <intermediatePoint x="191.822921752929687" y="103.98126220703125"/>
+  <intermediatePoint x="50.027481079101562" y="103.98126220703125"/>
+ </relationship>
+</diagram>

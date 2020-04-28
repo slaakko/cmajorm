@@ -1,0 +1,169 @@
+<diagram>
+ <class abstract="false" name="Application">
+  <boundingRect h="53.32733154296875" w="40.905063629150390" x="16.668735504150390" y="22.754169464111328"/>
+  <operation abstract="false" name="Init()">
+   <boundingRect h="3.943944692611694" w="7.597467422485351" x="18.168735504150390" y="31.198114395141601"/>
+  </operation>
+  <operation abstract="false" name="Run()">
+   <boundingRect h="3.943944692611694" w="9.233026504516601" x="18.168735504150390" y="35.142059326171875"/>
+  </operation>
+  <operation abstract="false" name="Exit()">
+   <boundingRect h="3.943944692611694" w="8.687322616577148" x="18.168735504150390" y="39.086002349853515"/>
+  </operation>
+  <operation abstract="false" name="- ProcessMessage()">
+   <boundingRect h="3.943944692611694" w="30.313905715942382" x="18.168735504150390" y="43.029945373535156"/>
+  </operation>
+  <operation abstract="false" name="GetWindowManager()">
+   <boundingRect h="3.943944692611694" w="33.040866851806640" x="18.168735504150390" y="46.973888397216796"/>
+  </operation>
+  <operation abstract="false" name="GetResourceManager()">
+   <boundingRect h="3.943944692611694" w="35.405063629150390" x="18.168735504150390" y="50.917831420898437"/>
+  </operation>
+  <operation abstract="false" name="GetLogView()">
+   <boundingRect h="3.943944692611694" w="21.049356460571289" x="18.168735504150390" y="54.861774444580078"/>
+  </operation>
+  <operation abstract="false" name="SetLogView()">
+   <boundingRect h="3.943944692611694" w="20.686586380004882" x="18.168735504150390" y="58.805717468261718"/>
+  </operation>
+  <operation abstract="false" name="GetFocusedControl()">
+   <boundingRect h="3.943944692611694" w="31.589796066284179" x="18.168735504150390" y="62.749660491943359"/>
+  </operation>
+  <operation abstract="false" name="GetActiveWindow()">
+   <boundingRect h="3.943944692611694" w="29.042665481567382" x="18.168735504150390" y="66.693603515625"/>
+  </operation>
+  <operation abstract="false" name="SetActiveWindow()">
+   <boundingRect h="3.943944692611694" w="28.679897308349609" x="18.168735504150390" y="70.637550354003906"/>
+  </operation>
+ </class>
+ <note name="note">
+  <boundingRect h="14.831834793090820" w="90.752754211425781" x="77.787490844726562" y="21.960418701171875"/>
+  <line value="messageProcessorFunction = ProcessMessage"/>
+  <line value="keyPreviewFunction = ModelessWindowKeyPreview"/>
+  <line value="WinInit(messageProcessorFunction, keyPreviewFunction)"/>
+ </note>
+ <note name="note">
+  <boundingRect h="18.775779724121093" w="41.771263122558593" x="78.052070617675781" y="38.364585876464843"/>
+  <line value="mainWindow.Show()"/>
+  <line value="mainWindow.Update()"/>
+  <line value="int exitCode = WinRun()"/>
+  <line value="return exitCode"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="53.494579315185546" x="77.787490844726562" y="59.002086639404296"/>
+  <line value="WinPostQuitMessage(exitCode)"/>
+ </note>
+ <class abstract="false" name="cmrt">
+  <boundingRect h="25.719724655151367" w="40.177974700927734" x="16.668735504150390" y="82.285423278808593"/>
+  <operation abstract="false" name="WinInit()">
+   <boundingRect h="3.943944692611694" w="13.229681015014648" x="18.168735504150390" y="90.7293701171875"/>
+  </operation>
+  <operation abstract="false" name="WinRun()">
+   <boundingRect h="3.943944692611694" w="14.865240097045898" x="18.168735504150390" y="94.673316955566406"/>
+  </operation>
+  <operation abstract="false" name="WinPostQuitMessage()">
+   <boundingRect h="3.943944692611694" w="34.677974700927734" x="18.168735504150390" y="98.617263793945312"/>
+  </operation>
+  <operation abstract="false" name="WinDone()">
+   <boundingRect h="3.943944692611694" w="16.683731079101562" x="18.168735504150390" y="102.561210632324218"/>
+  </operation>
+ </class>
+ <note name="note">
+  <boundingRect h="14.831834793090820" w="68.223907470703125" x="77.787490844726562" y="67.46875"/>
+  <line value="save message processor function address"/>
+  <line value="save keyPreview function address"/>
+  <line value="GdiplusStartup()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="58.215217590332031" w="99.891731262207031" x="78.052070617675781" y="84.137481689453125"/>
+  <line value="MSG msg"/>
+  <line value="while (GetMessage(msg))"/>
+  <line value="{"/>
+  <line value="    TranslateMessage(msg)"/>
+  <line value="    if (message == WM_KEYDOWN || message == WM_KEYUP)"/>
+  <line value="    {"/>
+  <line value="        keyPreview(keyCode, keyDown, handled)"/>
+  <line value="    }"/>
+  <line value="    if (!handled)"/>
+  <line value="    {"/>
+  <line value="        DispatchMessage(msg)"/>
+  <line value="    }"/>
+  <line value="}"/>
+  <line value="return msg.wParam;"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="34.956184387207031" x="78.316650390625" y="143.933349609375"/>
+  <line value="PostQuitMessage()"/>
+ </note>
+ <class abstract="false" name="program">
+  <boundingRect h="13.887889862060546" w="19.825736999511718" x="16.933334350585937" y="5.556250095367431"/>
+  <operation abstract="false" name="main()">
+   <boundingRect h="3.943944692611694" w="10.322881698608398" x="18.433334350585937" y="14.000194549560546"/>
+  </operation>
+ </class>
+ <note name="note">
+  <boundingRect h="14.831834793090820" w="50.7691650390625" x="77.787506103515625" y="5.291666030883789"/>
+  <line value="MainWindow mainWindow"/>
+  <line value="Application.Run(mainWindow)"/>
+  <line value="WinDone() (called implicitly)"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="34.777900695800781" x="78.316665649414062" y="152.929168701171875"/>
+  <line value="GdiplusShutdown()"/>
+ </note>
+ <class abstract="true" name="Control">
+  <boundingRect h="13.887889862060546" w="19.275382995605468" x="173.037506103515625" y="22.225002288818359"/>
+  <operation abstract="false" name="Control()">
+   <boundingRect h="3.943944692611694" w="13.775383949279785" x="174.537506103515625" y="30.668947219848632"/>
+  </operation>
+ </class>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="30.415374755859375" x="201.083328247070312" y="28.696973800659179"/>
+  <line value="Application.Init()"/>
+ </note>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="-8.4666748046875" y="9.525005340576171"/>
+  <source index="0" snap="operation.0" text="" x="55.323799133300781" y="33.170085906982421"/>
+  <target index="1" snap="left.center" text="" x="77.787490844726562" y="29.376335144042968"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="-8.4666748046875" y="9.525005340576171"/>
+  <source index="0" snap="operation.1" text="" x="55.323799133300781" y="37.114032745361328"/>
+  <target index="2" snap="left.center" text="" x="78.052070617675781" y="47.752475738525390"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="-8.4666748046875" y="9.525005340576171"/>
+  <source index="0" snap="operation.2" text="" x="55.323799133300781" y="41.057975769042968"/>
+  <target index="3" snap="left.bottom" text="" x="77.787490844726562" y="62.946029663085937"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="-8.4666748046875" y="9.525005340576171"/>
+  <source index="4" snap="operation.0" text="" x="54.596710205078125" y="92.701339721679687"/>
+  <target index="5" snap="left.top" text="" x="77.787490844726562" y="70.46875"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="-8.4666748046875" y="9.525005340576171"/>
+  <source index="4" snap="operation.1" text="" x="54.596710205078125" y="96.645286560058593"/>
+  <target index="6" snap="left.center" text="" x="78.052070617675781" y="113.245086669921875"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="-8.4666748046875" y="9.525005340576171"/>
+  <source index="4" snap="operation.2" text="" x="54.596710205078125" y="100.5892333984375"/>
+  <target index="7" snap="left.top" text="" x="78.316650390625" y="146.933349609375"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="8" snap="operation.0" text="" x="30.506216049194335" y="15.972167015075683"/>
+  <target index="9" snap="left.center" text="" x="77.787506103515625" y="12.707583427429199"/>
+  <intermediatePoint x="77.522911071777343" y="12.435416221618652"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="operation.3" text="" x="54.596710205078125" y="104.533180236816406"/>
+  <target index="10" snap="left.center" text="" x="78.316665649414062" y="156.401138305664062"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="11" snap="operation.0" text="" x="190.062896728515625" y="32.640918731689453"/>
+  <target index="12" snap="left.bottom" text="" x="201.083328247070312" y="32.640918731689453"/>
+ </relationship>
+</diagram>

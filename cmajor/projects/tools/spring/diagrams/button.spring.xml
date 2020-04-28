@@ -1,0 +1,76 @@
+<diagram>
+ <class abstract="false" name="Button">
+  <boundingRect h="40.551559448242187" w="32.545890808105468" x="127.378013610839843" y="11.106971740722656"/>
+  <operation abstract="false" name="IsDefault()">
+   <boundingRect h="3.943944692611694" w="16.139579772949218" x="128.878021240234375" y="19.550916671752929"/>
+  </operation>
+  <operation abstract="false" name="SetDefault()">
+   <boundingRect h="3.943944692611694" w="18.503774642944335" x="128.878021240234375" y="23.494861602783203"/>
+  </operation>
+  <operation abstract="false" name="ResetDefault()">
+   <boundingRect h="3.943944692611694" w="22.137660980224609" x="128.878021240234375" y="27.438806533813476"/>
+  </operation>
+  <operation abstract="false" name="GetDialogResult()">
+   <boundingRect h="3.943944692611694" w="27.045888900756835" x="128.878021240234375" y="31.38275146484375"/>
+  </operation>
+  <operation abstract="false" name="SetDialogResult()">
+   <boundingRect h="3.943944692611694" w="26.683118820190429" x="128.878021240234375" y="35.326694488525390"/>
+  </operation>
+  <operation abstract="false" name="# OnClick()">
+   <boundingRect h="3.943944692611694" w="17.410818099975585" x="128.878021240234375" y="39.270637512207031"/>
+  </operation>
+  <field name="dialogResult">
+   <boundingRect h="3.943944692611694" w="19.055679321289062" x="128.878021240234375" y="46.214584350585937"/>
+  </field>
+ </class>
+ <class abstract="true" name="ButtonBase">
+  <boundingRect h="6.943944931030273" w="22.407594680786132" x="86.409370422363281" y="27.910779953002929"/>
+ </class>
+ <class abstract="true" name="Control">
+  <boundingRect h="13.887889862060546" w="22.910818099975585" x="52.164344787597656" y="24.910779953002929"/>
+  <operation abstract="false" name="# OnClick()">
+   <boundingRect h="3.943944692611694" w="17.410818099975585" x="53.664344787597656" y="33.354724884033203"/>
+  </operation>
+ </class>
+ <class abstract="true" name="Component">
+  <boundingRect h="6.943944931030273" w="22.226211547851562" x="16.668748855590820" y="27.910779953002929"/>
+ </class>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="27.142707824707031" x="85.460411071777343" y="39.952075958251953"/>
+  <line value="fire clickEvent"/>
+ </note>
+ <note name="note">
+  <boundingRect h="26.663669586181640" w="68.127792358398437" x="169.597946166992187" y="24.994857788085937"/>
+  <line value="base->OnClick()"/>
+  <line value="Window* window = GetWindow()"/>
+  <line value="if (window != null)"/>
+  <line value="{"/>
+  <line value="    window->SetDialogResult(dialogResult)"/>
+  <line value="}"/>
+ </note>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="left.center" text="" x="127.378013610839843" y="31.38275146484375"/>
+  <target index="1" snap="right.center" text="" x="108.816963195800781" y="31.38275146484375"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="operation.0" text="" x="72.825164794921875" y="35.326698303222656"/>
+  <target index="4" snap="left.bottom" text="" x="85.460411071777343" y="43.896018981933593"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="1" snap="left.bottom" text="" x="86.409370422363281" y="31.854724884033203"/>
+  <target index="2" snap="right.center" text="" x="75.075164794921875" y="31.854724884033203"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="left.center" text="" x="52.164344787597656" y="31.854724884033203"/>
+  <target index="3" snap="right.bottom" text="" x="38.89495849609375" y="31.854724884033203"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="operation.5" text="" x="157.673904418945312" y="41.242610931396484"/>
+  <target index="5" snap="left.center" text="" x="169.597946166992187" y="38.326690673828125"/>
+ </relationship>
+</diagram>

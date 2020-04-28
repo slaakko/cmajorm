@@ -18,7 +18,7 @@
     </p>
     
     <img src="image/notation.png"/>
-    
+
     <h2>The Component and Container classes</h2>
     
     <p>
@@ -62,9 +62,45 @@
         The font of a child control window is by default null, in which case it uses the font of its parent window if that has one, 
         or the font of its parent's parent window if it has one and so on. Each toplevel window has a font that is by default Microsoft Sans Serif.
         The font of a control window can be explicitly set in which case it is also used as the font for its child windows if their font is not 
-        explicitly set.
+        explicitly set. 
     </p>
     
+    <p>
+        The set of protected virtual member functions that by convention begin with "On" are used for notifying derived classes and classes that have subscribed for 
+        receiving <em>events</em> that some condition or property has changed. A class derived from Control class can receive notification for some condition 
+        by overriding the notification function for that condition. By default the "On"-member function in the base class fires a corresponding event.
+        For example OnClick() function in the Control class fires the clickEvent event. Typically the first thing an overridden notification member function 
+        in a derived class does is to call the base class implementation of that notification function, so that subscribers of the corresponding
+        event will be notified.
+    </p>
+
+    <h2>The Event Dispatch Mechanism</h2>
+    
+    <p>
+        The event dispatch mechanism is based on the Event class template that is parameterized with a handler type and an event arguments type. 
+        The event arguments type is by default empty. An instance of the Event class captures event handler member functions added to it.
+        Technically the handler type is a <em>class delegate</em> type in Cmajor language terminology. A class delegate is like an object-oriented 
+        function pointer that can be bound to a specific member function of a specific object. Typically the member function belongs to the
+        same class that calls the AddHandler() function of the event, so that the object is implicitly the calling class object.
+        The event can be fired by calling the Fire() member function of the event object with either empty argument list when the handler takes
+        no arguments, or with an event argument object, when the handler type takes a parameter.
+        The Fire() function calls each bound handler member function in turn.
+    </p>
+    
+    <p>
+        The following class diagram shows a situation in which a user-defined window called MyWindow creates a Button object called okButton in its constructor,
+        adds a handler member function OKButtonClick() to the clickEvent event of the Button by calling the AddHandler() function with 
+        OKButtonClick, and adds the okButton as a child of MyWindow. When the user clicks the okButton, Windows sends a control notification message
+        to the MyWindow class that calls the OnClick() member function of the Button. The OnClick() function of the button calls the
+        OnClick() function of the Control base class that fires the event by calling the Fire() function of the clickEvent. 
+        Now that the OKButtonClick is one of the event handlers in the handler list of the clickEvent event, it gets called.
+    </p>
+    
+    <img src="image/events.png"/>
+    
+    <p>In the diagram the ClickEventHandler is shown as a class symbol although it really is a class delegate type. 
+    
+
     <h2>The ContainerControl class</h2>
     
     <p>
@@ -76,7 +112,7 @@
 
     <p>
         When a child control is added to the container, the control is first removed from any previous container, and then added to the new one.
-        After that the child control is visually created if the container control itself is already visually created, or otherwise it is added to a
+        After that, the child control is visually created if the container control itself is already visually created, or otherwise it is added to a
         a list of children to be created visually later. The container control calls virtual OnControlAdded() and OnControlRemoved() member functions 
         for controls added and removed respectively. The implementations of those functions in the Control class fire 
         corresponding Control.ControlAddedEvent() and Control.ControlRemovedEvent() events.
@@ -84,6 +120,32 @@
     
     <h2>Standard Dialog Controls</h2>
     
+    <p>
+    The library provides familiar common Windows controls that can be put into a dialog box.
+    </p>
+    
     <img src="image/dialog.control.class.diagram.spring.png"/>
+    
+    <h3>The Button Control</h3>
+    
+    <p>
+        The button control has standard "BUTTON" window class style.
+        When clicked, the overridden OnClick() member function will be called. The default implementation fires Control.ClickEvent() event and
+        sets the dialog result of a containing window. The dialog result will be returned as the value of the Window.ShowDialog() member function
+        if the containing window is shown as a dialog.
+    </p>
+    
+    <img src="image/button.png"/>
+    
+    <p>
+        If the button is created with ButtonStyle.BS_DEFPUSHBUTTON style or Button.SetDefault() member function is called, the button will 
+        act as the default button in a dialog. 
+        The OnClick() member function of the default button will be called if the user presses the ENTER key in a dialog and the input focus is
+        not in another button control.
+    </p>
+
+    <h2>Windows Application Lifecycle</h2>
+    
+    <img src="image/application.png"/>
     
 </body>
