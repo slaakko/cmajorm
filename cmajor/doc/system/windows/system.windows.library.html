@@ -116,6 +116,7 @@
         a list of children to be created visually later. The container control calls virtual OnControlAdded() and OnControlRemoved() member functions 
         for controls added and removed respectively. The implementations of those functions in the Control class fire 
         corresponding Control.ControlAddedEvent() and Control.ControlRemovedEvent() events.
+        When the size of a container control changes, it arranges the child controls that have dock or anchor attributes set.
     </p>
     
     <h2>Standard Dialog Controls</h2>
@@ -129,8 +130,8 @@
     <h3>The Button Control</h3>
     
     <p>
-        The button control has standard "BUTTON" window class style.
-        When clicked, the overridden OnClick() member function will be called. The default implementation fires Control.ClickEvent() event and
+        The Button control, as all controls derived from the ButtonBase class, have standard "BUTTON" window class style.
+        When a button is clicked, the overridden OnClick() member function will be called. The default implementation fires Control.ClickEvent() event and
         sets the dialog result of a containing window. The dialog result will be returned as the value of the Window.ShowDialog() member function
         if the containing window is shown as a dialog.
     </p>
@@ -144,8 +145,159 @@
         not in another button control.
     </p>
 
+    <h3>The CheckBox Control</h3>
+    
+    <p>
+        A check box toggles its state when clicked. When the state changes it fires the CheckedChanged() event.
+        A check box can be autosized. Then it calculates and sets its dimensions by measuring its text rectangle using its font.
+    </p>
+    
+    <img src="image/check.box.png"/>
+
+    <h3>The RadioButton Control</h3>
+    
+    <p>
+        Radio buttons are typically added to a group box. Then one of them will be checked at a time.
+        A radio button can also be autosized.
+    </p>
+    
+    <img src="image/radio.button.png"/>
+
+    <h3>The GroupBox Control</h3>
+    
+    <p>
+        Curiously enough, a group box is in Windows a kind of button.
+        A group box has a container object and acts as a parent window to the child controls added to it.
+        When a group box contains radio buttons, it keeps track which one of them is currently checked,
+        and the checked radio button can be changed from the group box.
+    </p>
+    
+    <img src="image/group.box.png"/>
+
+    <h3>The Panel Control</h3>
+    
+    <p>
+        The panel control is not a standard Windows control but it might be useful in dialog boxes for grouping and arranging child controls.
+    </p>
+    
+    <h3>The Label Control</h3>
+    
+    <p>
+        A label shows static text. It has standard "STATIC" window class style. It can be autosized.
+    </p>
+    
+    <h3>The ListBox Control</h3>
+    
+    <p>
+        The ListBox control has standard "LISTBOX" window class style.
+        Unlike its Windows Forms cousin, a Cmajor list box control shows only string items, not other kinds of objects.
+    </p>
+
+    <img src="image/list.box.png"/>
+
+    <h3>The TextBox Control</h3>
+    
+    <p>
+        A text box shows editable text. The TextBox control has standard "EDIT" window class style. It can be multiline.
+    </p>
+    
+    <img src="image/text.box.png"/>
+
+    <h2>Decorator Controls</h2>
+    
+    <p>
+        According to the GoF Design Patterns book a decorator component is one that encloses another component and can add responsibilities to it dynamically.
+        The System Windows library has three decorators: the BorderedControl class that draws a border around another control,
+        the PaddedControl that adds margins to another control and ScrollableControl that adds scrolling capabilities to another control.
+        The decorator controls take ownership of their child control and delete the child when destroyed.
+        A decorator control acts as a parent window to its child.
+    </p>
+    
+    <h3>The BorderedControl</h3>
+    
+    <p>
+        The constructor of the BorderedControl class takes a child control as a parameter. When asked to paint itself, the bordered control draws a border around the child.
+        Also when the child receives or loses the input focus, the border color changes.
+        When the location or size of the bordered control changes, the bordered control repositions its child.
+    </p>
+    
+    <img src="image/bordered.control.png"/>
+
+    <h3>The PaddedControl</h3>
+    
+    <p>
+        The padded control constructor also takes a child control as a parameter, adds padding to the child, and repositions the child when its position or size changes.
+        The default margin is 3 pixels added to the left, top, right and bottom sides of the child.
+    </p>
+
+    <h3>The ScrollableControl</h3>
+    
+    <p>
+        The ScrollableControl class adds scrolling capability to its child. 
+        The scrolling mechanism is not completely invisible to the child, but requires some child collaboration.
+    </p>
+    
+    <img src="image/scrollable.control.png"/>
+
+    <p>
+        Suppose we want to implement a scrollable control called MyControl. 
+        For MyControl to be scrollable it must set units of scrolling using the SetScrollUnits() member function and 
+        the size of its entire content using the SetContentSize() member function.
+        If MyControl shows textual content, the scroll units might be the average width and height of one character in pixels,
+        and the content size would be the size of the bounding rectangle of the entire text, for example.
+        When an instance of MyControl is given as argument to the constructor of the ScrollableControl, the ScrollableControl instance
+        is the parent window and the MyControl instance is its child window. When MyControl calls the SetContentSize function,
+        the Control.SetContentSize() function notifies the ScrollableControl parent that has overridden the
+        OnChildContentSizeChanged() member function that the content size of the child has changed.
+        The ScrollableControl obtains the scrolling units and the content size from its child, and if the content size is larger than the 
+        client size, it shows scroll bars. 
+    </p>
+
+    <p>
+        When MyControl receives WM_PAINT message from Windows, the message processing function of the Control class invokes Control.DoPaint().
+        DoPaint() constructs an instance of a Graphics class and then calls the TranslateChildGraphics() function of the parent. 
+        The TranslateChildGraphics() adjusts the transformation matrix of the Graphics object so that scrolled portion of the content will be visible. 
+        It then calls the OnPaint() member function. The MyControl.OnPaint() can draw the entire content rectangle [0...contentSize.w, 0...contentSize.h] 
+        without knowing which part of it will be visible. If MyControl wants to show some part of its content, it can call the SetContentLocation() function, 
+        that notifies the ScrollableControl parent to adjust the scrolling parameters and invalidate the client area.
+    </p>
+
+    <img src="image/scrolled.view.png"/>
+
+    <p>
+        The MyWindow constructor creates an instance of MyControl and then gives it as an argument 
+        to the constructor of the ScrollableControl class. Then it adds the constructed scrollable control as a child of itself.
+    </p>
+
     <h2>Windows Application Lifecycle</h2>
+
+    <p>
+        The main function of a Cmajor Windows GUI application consists typically of construction of a main window and then calling static Application.Run() 
+        member function with the main window as argument. Construction of a window, or any other class derived from the Control class for that matter, 
+        will implicitly call static Application.Init() function that will initialize the GDI+ library and setup message processing and key preview function addresses.
+        Because GDI+ library will not be initialized until the first window is created, construction of fonts and other classes that use the GDI+
+        library will not work before that moment unless you call Application.Init() explicitly first.
+    </p>
     
     <img src="image/application.png"/>
+
+    <p>
+        The Application.Run() function will show the main window and call the WinRun() function of the Cmajor runtime library that contains a message loop.
+        Closing the main window or calling the Application.Exit() explicitly will post a quit message that ultimately ends the message loop.
+        After that the Application.Run() will return to the main function with the exit code passed to Application.Exit() as argument.
+        The main function will implicitly call the WinDone() function of the Cmajor runtime library that shuts down the GDI+ library.
+        Finally the main function returns the exit code to the operating system and ends the execution of the program.
+    </p>
     
+    <h2>Windows Applications and Visual Studio extension</h2>
+    
+    <p>
+        The Cmajor Visual Studio extension has no project templates for Cmajor Windows applications and libraries.
+        You can however work with Cmajor Windows applications in Visual Studio, if you create a Windows GUI application 
+        project using Cmajor Development Environment or create a <em>.cmp</em> project file manually,
+        and then use the <a href="https://slaakko.github.io/cmajor/tools/projectconversion/projectconversion.html">cmp2cmproj</a>
+        project conversion tool to convert the project file to a <em>.cmproj</em> project file understood by the Visual Studio extension.
+        The <a href="https://slaakko.github.io/cmajor/langref/langref.html#projects-syntax">syntax</a> of the project file is quite simple
+        so a <em>.cmp</em> project file can also be created with any text editor.
+    </p>
 </body>

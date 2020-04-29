@@ -1138,16 +1138,7 @@ namespace System.Windows.API
 
     public bool IsClipboardFormatAvailable(uint format)
     {
-        bool result = WinIsClipboardFormatAvailable(format);
-        if (!result)
-        {
-            ulong error = WinGetLastError();
-            if (error != 0u)
-            {
-                throw WindowsAPIException(error);
-            }
-        }
-        return result;
+        return WinIsClipboardFormatAvailable(format);
     }
 
     public void AddClipboardFormatListener(void* windowHandle)

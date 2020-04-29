@@ -1,0 +1,88 @@
+<diagram>
+ <class abstract="true" name="Component">
+  <boundingRect h="6.943944931030273" w="22.226211547851562" x="18.785417556762695" y="33.232776641845703"/>
+ </class>
+ <class abstract="true" name="Control">
+  <boundingRect h="6.943944931030273" w="15.683978080749511" x="60.55340576171875" y="33.704750061035156"/>
+ </class>
+ <class abstract="false" name="BorderedControl">
+  <boundingRect h="33.607612609863281" w="43.813411712646484" x="99.218757629394531" y="20.372917175292968"/>
+  <operation abstract="false" name="SetNormalBorderColor()">
+   <boundingRect h="3.943944692611694" w="36.307331085205078" x="100.718757629394531" y="28.816862106323242"/>
+  </operation>
+  <operation abstract="false" name="SetFocusedBorderColor()">
+   <boundingRect h="3.943944692611694" w="38.313411712646484" x="100.718757629394531" y="32.760807037353515"/>
+  </operation>
+  <operation abstract="false" name="SetBorderWidth()">
+   <boundingRect h="3.943944692611694" w="26.315700531005859" x="100.718757629394531" y="36.704750061035156"/>
+  </operation>
+  <operation abstract="false" name="# OnPaint()">
+   <boundingRect h="3.943944692611694" w="17.778238296508789" x="100.718757629394531" y="40.648693084716796"/>
+  </operation>
+  <operation abstract="false" name="# OnChildGotFocus()">
+   <boundingRect h="3.943944692611694" w="31.954114913940429" x="100.718757629394531" y="44.592636108398437"/>
+  </operation>
+  <operation abstract="false" name="# OnChildLostFocus()">
+   <boundingRect h="3.943944692611694" w="32.8641357421875" x="100.718757629394531" y="48.536579132080078"/>
+  </operation>
+ </class>
+ <note name="note">
+  <boundingRect h="10.887889862060546" w="31.050994873046875" x="165.100006103515625" y="3.574642181396484"/>
+  <line value="DrawBorder()"/>
+  <line value="base->OnPaint()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="34.551559448242187" w="55.038669586181640" x="165.100006103515625" y="17.207567214965820"/>
+  <line value="base->OnChildGotFocus()"/>
+  <line value="SetChildFocused()"/>
+  <line value="Control* parent = ParentControl()"/>
+  <line value="if (parent != null)"/>
+  <line value="{"/>
+  <line value="    parent->OnChildGotFocus()"/>
+  <line value="}"/>
+  <line value="Invalidate()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="34.551559448242187" w="55.038669586181640" x="165.100006103515625" y="54.504161834716796"/>
+  <line value="base->OnChildLostFocus()"/>
+  <line value="ResetChildFocused()"/>
+  <line value="Control* parent = ParentControl()"/>
+  <line value="if (parent != null)"/>
+  <line value="{"/>
+  <line value="    parent->OnChildLostFocus()"/>
+  <line value="}"/>
+  <line value="Invalidate()"/>
+ </note>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="operation.3" text="" x="140.78216552734375" y="42.62066650390625"/>
+  <target index="3" snap="left.center" text="" x="165.100006103515625" y="9.018587112426757"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="operation.4" text="" x="140.78216552734375" y="46.564609527587890"/>
+  <target index="4" snap="left.center" text="" x="165.100006103515625" y="34.483345031738281"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="operation.5" text="" x="140.78216552734375" y="50.508552551269531"/>
+  <target index="5" snap="left.center" text="" x="165.100006103515625" y="71.779937744140625"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="left.center" text="" x="99.218757629394531" y="37.176723480224609"/>
+  <target index="1" snap="right.center" text="" x="76.237380981445312" y="37.176723480224609"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="1" snap="left.top" text="" x="60.55340576171875" y="36.704750061035156"/>
+  <target index="0" snap="right.center" text="" x="41.011627197265625" y="36.704750061035156"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="bottom.center" text="child" x="121.125465393066406" y="53.98052978515625"/>
+  <target index="1" snap="bottom.center" text="" x="68.395393371582031" y="40.648696899414062"/>
+  <intermediatePoint x="121.125465393066406" y="64.293746948242187"/>
+  <intermediatePoint x="68.395393371582031" y="64.293746948242187"/>
+ </relationship>
+</diagram>

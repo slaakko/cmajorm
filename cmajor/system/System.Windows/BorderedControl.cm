@@ -132,7 +132,7 @@ namespace System.Windows
             Control* parentControl = ParentControl();
             if (parentControl != null)
             {
-                parentControl->OnChildContentSizeChanged(args);
+                parentControl->OnChildGotFocus(args);
             }
             Invalidate();
         }
@@ -143,7 +143,7 @@ namespace System.Windows
             Control* parentControl = ParentControl();
             if (parentControl != null)
             {
-                parentControl->OnChildContentSizeChanged(args);
+                parentControl->OnChildLostFocus(args);
             }
             Invalidate();
         }
