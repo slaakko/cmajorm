@@ -1,0 +1,136 @@
+<diagram>
+ <class abstract="true" name="Control">
+  <boundingRect h="6.943944931030273" w="15.683978080749511" x="58.208324432373046" y="60.739768981933593"/>
+ </class>
+ <class abstract="true" name="Component">
+  <boundingRect h="6.943944931030273" w="22.226211547851562" x="16.404163360595703" y="60.739768981933593"/>
+ </class>
+ <class abstract="true" name="ContainerControl">
+  <boundingRect h="6.943944931030273" w="30.946607589721679" x="98.424995422363281" y="30.427078247070312"/>
+ </class>
+ <class abstract="false" name="Window">
+  <boundingRect h="6.943944931030273" w="16.592449188232421" x="158.220809936523437" y="29.897911071777343"/>
+ </class>
+ <class abstract="false" name="DialogWindow">
+  <boundingRect h="13.887889862060546" w="29.635988235473632" x="202.670822143554687" y="26.987493515014648"/>
+  <operation abstract="false" name="DialogWindow()">
+   <boundingRect h="3.943944692611694" w="24.135988235473632" x="204.170822143554687" y="35.431438446044921"/>
+  </operation>
+ </class>
+ <class abstract="false" name="BorderedControl">
+  <boundingRect h="6.943944931030273" w="30.222621917724609" x="98.424995422363281" y="45.640617370605468"/>
+ </class>
+ <class abstract="false" name="PaddedControl">
+  <boundingRect h="6.943944931030273" w="27.497207641601562" x="98.424995422363281" y="60.854160308837890"/>
+ </class>
+ <class abstract="false" name="TextBox">
+  <boundingRect h="6.943944931030273" w="16.959869384765625" x="98.424995422363281" y="76.067703247070312"/>
+ </class>
+ <class abstract="true" name="ButtonBase">
+  <boundingRect h="6.943944931030273" w="22.407594680786132" x="98.424995422363281" y="91.28125"/>
+ </class>
+ <class abstract="false" name="Button">
+  <boundingRect h="6.943944931030273" w="14.591021537780761" x="158.220809936523437" y="91.28125"/>
+ </class>
+ <note name="note">
+  <boundingRect h="73.990997314453125" w="176.730438232421875" x="243.945846557617187" y="20.656803131103515"/>
+  <line value="Size size = GetSize()"/>
+  <line value="Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize()"/>
+  <line value="Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing()"/>
+  <line value="Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize()"/>
+  <line value="Point textBoxLoc(defaultControlSpacing.w, defaultControlSpacing.h);"/>
+  <line value="Size textBoxSize = defaultTextBoxSize;"/>
+  <line value="int textBoxPadding = DefaultControlPadding();"/>
+  <line value="int borderWidth = DefaultSingleBorderWidth();"/>
+  <line value="Rect textBoxRect(textBoxLoc, textBoxSize);"/>
+  <line value="textBoxRect.Inflate(textBoxPadding + borderWidth, textBoxPadding + borderWidth);"/>
+  <line value="UniquePtr&lt;TextBox> textBoxPtr = new TextBox()"/>
+  <line value="UniquePtr&lt;Control> paddedTextBox(new PaddedControl(textBoxPtr.Release())"/>
+  <line value="UniquePtr&lt;Control> borderedTextBox(new BorderedControl(paddedTextBox, textBoxRect.location, textBoxRect.size)"/>
+  <line value="AddChild(borderedTextBox.Release())"/>
+  <line value="UniquePtr&lt;Button> cancelButtonPtr(new Button(...))"/>
+  <line value="UniquePtr&lt;Button> okButtonPtr(new Button(...))"/>
+  <line value="AddChild(okButtonPtr.Release())"/>
+  <line value="AddChild(cancelButtonPtr.Release())"/>
+ </note>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="left.top" text="" x="58.208324432373046" y="63.739768981933593"/>
+  <target index="1" snap="right.top" text="" x="38.630374908447265" y="63.739768981933593"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source snap="none.none" text="" x="0" y="0"/>
+  <sourceEndpoint index="2" snap="left.top" text="" x="98.424995422363281" y="33.427078247070312"/>
+  <sourceEndpoint index="5" snap="left.top" text="" x="98.424995422363281" y="48.640617370605468"/>
+  <sourceEndpoint index="6" snap="left.bottom" text="" x="98.424995422363281" y="64.798095703125"/>
+  <sourceEndpoint index="7" snap="left.top" text="" x="98.424995422363281" y="79.067703247070312"/>
+  <sourceEndpoint index="8" snap="left.center" text="" x="98.424995422363281" y="94.753211975097656"/>
+  <target index="0" snap="right.bottom" text="" x="73.892303466796875" y="64.211738586425781"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="3" snap="left.center" text="" x="158.220809936523437" y="33.369884490966796"/>
+  <target index="2" snap="right.top" text="" x="129.371597290039062" y="33.427078247070312"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="left.center" text="" x="202.670822143554687" y="33.931438446044921"/>
+  <target index="3" snap="right.bottom" text="" x="174.813262939453125" y="33.84185791015625"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="9" snap="left.top" text="" x="158.220809936523437" y="94.28125"/>
+  <target index="8" snap="right.top" text="" x="120.832588195800781" y="94.28125"/>
+ </relationship>
+ <relationship cardinality="many" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="top.center" text="children" x="113.898300170898437" y="30.427078247070312"/>
+  <target index="1" snap="top.center" text="" x="27.517269134521484" y="60.739768981933593"/>
+  <intermediatePoint x="113.898307800292968" y="22.224998474121093"/>
+  <intermediatePoint x="27.51727294921875" y="22.224998474121093"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="5" snap="top.center" text="child" x="113.536308288574218" y="45.640617370605468"/>
+  <target index="0" snap="top.center" text="" x="66.050315856933593" y="60.739768981933593"/>
+  <intermediatePoint x="113.536308288574218" y="40.745834350585937"/>
+  <intermediatePoint x="66.050315856933593" y="40.745834350585937"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="6" snap="top.center" text="child" x="112.173599243164062" y="60.854160308837890"/>
+  <target index="0" snap="top.right" text="" x="70.892303466796875" y="60.739768981933593"/>
+  <intermediatePoint x="112.173606872558593" y="55.0333251953125"/>
+  <intermediatePoint x="70.892295837402343" y="55.0333251953125"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="bottom.center" text="creates" x="217.488815307617187" y="40.875381469726562"/>
+  <target index="9" snap="right.bottom" text="" x="172.81182861328125" y="95.225196838378906"/>
+  <intermediatePoint x="217.488815307617187" y="95.225196838378906"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="bottom.left" text="creates" x="205.670822143554687" y="40.875381469726562"/>
+  <target index="7" snap="right.center" text="" x="115.384864807128906" y="79.5396728515625"/>
+  <intermediatePoint x="205.670822143554687" y="79.5396728515625"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="bottom.left" text="creates" x="208.670822143554687" y="40.875381469726562"/>
+  <target index="6" snap="right.center" text="" x="125.922203063964843" y="64.326133728027343"/>
+  <intermediatePoint x="208.670822143554687" y="64.326133728027343"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="bottom.left" text="creates" x="211.670822143554687" y="40.875381469726562"/>
+  <target index="5" snap="right.top" text="" x="128.647613525390625" y="48.640617370605468"/>
+  <intermediatePoint x="211.670822143554687" y="48.640617370605468"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="operation.0" text="" x="230.056808471679687" y="37.403411865234375"/>
+  <target index="10" snap="left.center" text="" x="243.945846557617187" y="57.652301788330078"/>
+ </relationship>
+</diagram>

@@ -1,0 +1,160 @@
+<diagram>
+ <class abstract="false" name="MenuBar">
+  <boundingRect h="13.887889862060546" w="26.591835021972656" x="113.241653442382812" y="56.091659545898437"/>
+  <operation abstract="false" name="AddMenuItem()">
+   <boundingRect h="3.943944692611694" w="23.591835021972656" x="114.741653442382812" y="64.535606384277343"/>
+  </operation>
+ </class>
+ <class abstract="false" name="MenuItem">
+  <boundingRect h="33.607612609863281" w="26.591835021972656" x="113.506217956542968" y="21.166656494140625"/>
+  <operation abstract="false" name="AddMenuItem()">
+   <boundingRect h="3.943944692611694" w="23.591835021972656" x="115.006217956542968" y="29.610601425170898"/>
+  </operation>
+  <operation abstract="false" name="SetText()">
+   <boundingRect h="3.943944692611694" w="14.504021644592285" x="115.006217956542968" y="33.554546356201171"/>
+  </operation>
+  <operation abstract="false" name="SetShortCut()">
+   <boundingRect h="3.943944692611694" w="21.046255111694335" x="115.006217956542968" y="37.498489379882812"/>
+  </operation>
+  <operation abstract="false" name="Enable()">
+   <boundingRect h="3.943944692611694" w="13.417266845703125" x="115.006217956542968" y="41.442432403564453"/>
+  </operation>
+  <operation abstract="false" name="Disable()">
+   <boundingRect h="3.943944692611694" w="14.141253471374511" x="115.006217956542968" y="45.386375427246093"/>
+  </operation>
+  <operation abstract="false" name="ClickEvent()">
+   <boundingRect h="3.943944692611694" w="18.683609008789062" x="115.006217956542968" y="49.330318450927734"/>
+  </operation>
+ </class>
+ <class abstract="false" name="MyWindow">
+  <boundingRect h="17.831834793090820" w="24.724660873413085" x="184.1500244140625" y="69.320831298828125"/>
+  <operation abstract="false" name="MyWindow()">
+   <boundingRect h="3.943944692611694" w="19.224660873413085" x="185.6500244140625" y="77.764778137207031"/>
+  </operation>
+  <operation abstract="false" name="- NewClick()">
+   <boundingRect h="3.943944692611694" w="18.858791351318359" x="185.6500244140625" y="81.708724975585937"/>
+  </operation>
+ </class>
+ <note name="note">
+  <boundingRect h="70.047050476074218" w="111.320487976074218" x="225.954116821289062" y="44.713222503662109"/>
+  <line value="UniquePtr&lt;MenuBar> menuBar()"/>
+  <line value='UniquePtr&lt;MenuItem> fileMenuItem(new MenuItem("&amp;File"))'/>
+  <line value='UniquePtr&lt;MenuItem> newMenuItem(new MenuItem("&amp;New"))'/>
+  <line value="newMenuItem->SetShortcut(cast&lt;Keys>(Keys.controlModifier | Keys.n))"/>
+  <line value="newMenuItem->ClickEvent().AddHandler(NewClick)"/>
+  <line value="fileMenuItem->AddMenuItem(newMenuItem.Release())"/>
+  <line value="UniquePtr&lt;MenuItemBase> separator(new MenuItemSeparator())"/>
+  <line value="fileMenuItem->AddMenuItem(separator.Release())"/>
+  <line value='UniquePtr&lt;MenuItem> exitMenuItem(new MenuItem("E&amp;xit"))'/>
+  <line value="fileMenuItem->AddMenuItem(exitMenuItem.Release())"/>
+  <line value="menuBar->AddMenuItem(fileMenuItem.Release())"/>
+  <line value='UniquePtr&lt;MenuItem> editMenuItem(new MenuItem("&amp;Edit"))'/>
+  <line value='UniquePtr&lt;MenuItem> cutMenuItem(new MenuItem("&amp;Cut"))'/>
+  <line value="cutMenuItem->Disable()"/>
+  <line value="editMenuItem->AddMenuItem(cutMenuItem.Release())"/>
+  <line value="menuBar->AddMenuItem(editMenuItem.Release())"/>
+  <line value="AddChild(menuBar.Release())"/>
+ </note>
+ <class abstract="false" name="Window">
+  <boundingRect h="6.943944931030273" w="16.592449188232421" x="149.489593505859375" y="75.23675537109375"/>
+ </class>
+ <class abstract="true" name="ContainerControl">
+  <boundingRect h="6.943944931030273" w="30.946607589721679" x="99.747917175292968" y="74.764785766601562"/>
+ </class>
+ <class abstract="true" name="Control">
+  <boundingRect h="6.943944931030273" w="15.683978080749511" x="66.67498779296875" y="73.820838928222656"/>
+ </class>
+ <class abstract="true" name="Component">
+  <boundingRect h="6.943944931030273" w="22.226211547851562" x="26.458316802978515" y="64.427078247070312"/>
+ </class>
+ <class abstract="false" name="Container">
+  <boundingRect h="20.831834793090820" w="19.320964813232421" x="68.262481689453125" y="48.774269104003906"/>
+  <field name="firstChild">
+   <boundingRect h="3.943944692611694" w="13.778484344482421" x="69.762481689453125" y="60.218215942382812"/>
+  </field>
+  <field name="lastChild">
+   <boundingRect h="3.943944692611694" w="13.600200653076171" x="69.762481689453125" y="64.162162780761718"/>
+  </field>
+ </class>
+ <class abstract="true" name="MenuItemBase">
+  <boundingRect h="6.943944931030273" w="27.137538909912109" x="66.675003051757812" y="34.026519775390625"/>
+ </class>
+ <class abstract="false" name="MenuItemSeparator">
+  <boundingRect h="6.943944931030273" w="34.588245391845703" x="113.241661071777343" y="11.641664505004882"/>
+ </class>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="60.589580535888671" y="19.049999237060546"/>
+  <source index="2" snap="operation.0" text="" x="206.624679565429687" y="79.736747741699218"/>
+  <target index="3" snap="left.center" text="" x="225.954116821289062" y="79.736747741699218"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="60.589580535888671" y="19.049999237060546"/>
+  <source index="2" snap="left.center" text="" x="184.1500244140625" y="78.236747741699218"/>
+  <target index="4" snap="right.top" text="" x="166.082046508789062" y="78.23675537109375"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="60.589580535888671" y="19.049999237060546"/>
+  <source index="4" snap="left.center" text="" x="149.489593505859375" y="78.708724975585937"/>
+  <target index="5" snap="right.bottom" text="" x="130.69451904296875" y="78.708732604980468"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="33.602081298828125" y="15.875"/>
+  <source index="5" snap="left.top" text="" x="99.747917175292968" y="77.764785766601562"/>
+  <target index="6" snap="right.bottom" text="" x="82.358963012695312" y="77.764785766601562"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source snap="none.none" text="" x="0" y="0"/>
+  <sourceEndpoint index="9" snap="left.center" text="" x="67.733329772949218" y="34.692806243896484"/>
+  <sourceEndpoint index="6" snap="left.center" text="" x="67.468772888183593" y="62.476142883300781"/>
+  <target index="7" snap="right.bottom" text="" x="48.684528350830078" y="67.8990478515625"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="-1.058349609375" y="14.816665649414062"/>
+  <source index="1" snap="left.bottom" text="children" x="113.506217956542968" y="51.774269104003906"/>
+  <target index="8" snap="right.top" text="" x="87.583450317382812" y="51.774269104003906"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="-1.058349609375" y="14.816665649414062"/>
+  <source index="8" snap="left.top" text="firstChild" x="68.262481689453125" y="51.774269104003906"/>
+  <target index="7" snap="top.left" text="" x="29.458316802978515" y="64.427078247070312"/>
+  <intermediatePoint x="29.458316802978515" y="51.774269104003906"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="-1.058349609375" y="14.816665649414062"/>
+  <source index="8" snap="left.center" text="lastChild" x="68.262481689453125" y="59.190185546875"/>
+  <target index="7" snap="top.right" text="" x="45.684528350830078" y="64.427078247070312"/>
+  <intermediatePoint x="45.684528350830078" y="59.190185546875"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="-1.058349609375" y="14.816665649414062"/>
+  <source index="0" snap="left.top" text="children" x="113.241653442382812" y="59.091659545898437"/>
+  <target index="8" snap="right.center" text="" x="87.583450317382812" y="59.190185546875"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="-1.058349609375" y="14.816665649414062"/>
+  <source index="2" snap="left.top" text="creates" x="184.1500244140625" y="72.320831298828125"/>
+  <target index="0" snap="right.center" text="" x="139.83349609375" y="63.035606384277343"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="-1.058349609375" y="14.816665649414062"/>
+  <source index="2" snap="top.left" text="creates" x="187.1500244140625" y="69.320831298828125"/>
+  <target index="1" snap="right.center" text="" x="140.098052978515625" y="37.970462799072265"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="-1.058349609375" y="14.816665649414062"/>
+  <source index="1" snap="left.center" text="" x="113.506217956542968" y="37.970462799072265"/>
+  <target index="9" snap="right.bottom" text="" x="93.812545776367187" y="37.970466613769531"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="-1.058349609375" y="14.816665649414062"/>
+  <source index="10" snap="left.top" text="" x="113.241661071777343" y="14.641664505004882"/>
+  <target index="9" snap="top.center" text="" x="80.2437744140625" y="34.026519775390625"/>
+  <intermediatePoint x="80.2437744140625" y="14.641664505004882"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="2" snap="top.center" text="creates" x="196.512359619140625" y="69.320831298828125"/>
+  <target index="10" snap="right.top" text="" x="147.829910278320312" y="14.641664505004882"/>
+ </relationship>
+</diagram>

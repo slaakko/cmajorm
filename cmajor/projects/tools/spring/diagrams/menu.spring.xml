@@ -1,0 +1,90 @@
+<diagram>
+ <class abstract="true" name="MenuControl">
+  <boundingRect h="6.943944931030273" w="24.222988128662109" x="107.685409545898437" y="36.512496948242187"/>
+ </class>
+ <class abstract="true" name="Control">
+  <boundingRect h="6.943944931030273" w="15.683978080749511" x="67.468757629394531" y="36.512496948242187"/>
+ </class>
+ <class abstract="true" name="Component">
+  <boundingRect h="6.943944931030273" w="22.226211547851562" x="26.987499237060546" y="56.885421752929687"/>
+ </class>
+ <class abstract="false" name="MenuBar">
+  <boundingRect h="6.943944931030273" w="18.049724578857421" x="155.506790161132812" y="75.141670227050781"/>
+ </class>
+ <class abstract="false" name="MenuBox">
+  <boundingRect h="6.943944931030273" w="18.775260925292968" x="154.78125" y="10.905109405517578"/>
+ </class>
+ <class abstract="false" name="ContextMenu">
+  <boundingRect h="6.943944931030273" w="24.768692016601562" x="193.675048828125" y="11.377082824707031"/>
+ </class>
+ <class abstract="true" name="MenuItemBase">
+  <boundingRect h="6.943944931030273" w="27.137538909912109" x="67.468757629394531" y="75.67083740234375"/>
+ </class>
+ <class abstract="false" name="MenuItem">
+  <boundingRect h="6.943944931030273" w="19.320964813232421" x="107.420829772949218" y="53.974998474121093"/>
+ </class>
+ <class abstract="false" name="MenuItemSeparator">
+  <boundingRect h="6.943944931030273" w="34.588245391845703" x="107.685409545898437" y="97.631256103515625"/>
+ </class>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="left.center" text="" x="107.685409545898437" y="39.984470367431640"/>
+  <target index="1" snap="right.center" text="" x="83.152732849121093" y="39.984470367431640"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="5" snap="left.top" text="" x="193.675048828125" y="14.377082824707031"/>
+  <target index="4" snap="right.center" text="" x="173.5565185546875" y="14.377081871032714"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source snap="none.none" text="" x="0" y="0"/>
+  <sourceEndpoint index="1" snap="left.center" text="" x="67.468757629394531" y="39.984474182128906"/>
+  <sourceEndpoint index="6" snap="left.bottom" text="" x="67.468757629394531" y="79.614784240722656"/>
+  <target index="2" snap="right.center" text="" x="49.213710784912109" y="60.357395172119140"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source snap="none.none" text="" x="0" y="0"/>
+  <sourceEndpoint index="3" snap="left.top" text="" x="152.929183959960937" y="24.166664123535156"/>
+  <sourceEndpoint index="4" snap="left.center" text="" x="152.929183959960937" y="56.124061584472656"/>
+  <target index="0" snap="right.center" text="" x="131.908401489257812" y="39.984470367431640"/>
+ </relationship>
+ <relationship cardinality="one" kind="inheritance" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source snap="none.none" text="" x="0" y="0"/>
+  <sourceEndpoint index="7" snap="left.top" text="" x="107.685409545898437" y="64.118743896484375"/>
+  <sourceEndpoint index="8" snap="left.bottom" text="" x="107.685409545898437" y="93.108543395996093"/>
+  <target index="6" snap="right.bottom" text="" x="94.606292724609375" y="79.142807006835937"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="3" snap="top.center" text="" x="164.531646728515625" y="75.141670227050781"/>
+  <target index="4" snap="bottom.center" text="" x="164.16888427734375" y="17.849054336547851"/>
+ </relationship>
+ <relationship cardinality="one" kind="reference" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="bottom.right" text="" x="170.5565185546875" y="17.849054336547851"/>
+  <target index="3" snap="top.right" text="" x="170.5565185546875" y="75.141670227050781"/>
+ </relationship>
+ <relationship cardinality="one" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="bottom.left" text="rootItem" x="157.78125" y="17.849054336547851"/>
+  <target index="7" snap="right.bottom" text="" x="126.741790771484375" y="57.9189453125"/>
+  <intermediatePoint x="157.78125" y="57.918937683105468"/>
+ </relationship>
+ <relationship cardinality="many" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="3" snap="bottom.center" text="menuItems" x="164.531646728515625" y="82.085617065429687"/>
+  <target index="6" snap="bottom.center" text="" x="81.037528991699218" y="82.614784240722656"/>
+  <intermediatePoint x="164.531646728515625" y="90.222908020019531"/>
+  <intermediatePoint x="81.037528991699218" y="90.222908020019531"/>
+ </relationship>
+ <relationship cardinality="many" kind="aggregation" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="7" snap="top.center" text="subItems" x="117.081314086914062" y="53.974998474121093"/>
+  <target index="6" snap="top.center" text="" x="81.037528991699218" y="75.67083740234375"/>
+  <intermediatePoint x="117.081314086914062" y="48.154163360595703"/>
+  <intermediatePoint x="81.037528991699218" y="48.154163360595703"/>
+ </relationship>
+</diagram>

@@ -260,14 +260,81 @@
         It then calls the OnPaint() member function. The MyControl.OnPaint() can draw the entire content rectangle [0...contentSize.w, 0...contentSize.h] 
         without knowing which part of it will be visible. If MyControl wants to show some part of its content, it can call the SetContentLocation() function, 
         that notifies the ScrollableControl parent to adjust the scrolling parameters and invalidate the client area.
+        If the content of the MyControl changes, it should call SetContentSize() and SetContentChanged() functions.
     </p>
-
-    <img src="image/scrolled.view.png"/>
 
     <p>
         The MyWindow constructor creates an instance of MyControl and then gives it as an argument 
-        to the constructor of the ScrollableControl class. Then it adds the constructed scrollable control as a child of itself.
+        to the constructor of the ScrollableControl class. Then it adds the scrollable control as a child of itself.
     </p>
+
+    <img src="image/scrolled.view.png"/>
+    
+    <h2>Screen Metrics</h2>
+    
+    <p>
+        The ScreenMetrics class is a static class that is ment to provide reasonable default sizes for UI elements.
+        When a first toplevel window is constructed, the default screen metrics are loaded from the 
+        default metrics file <b>metrics.xml</b> that resides in the %CMAJOR_ROOT%\config directory (C:\cmajor\config by default).
+        After that the pixel values for UI elements are calculated using the DPI values of the 
+        device context of the toplevel window being constructed.
+        The defaults for my system are calculated using 96 x 96 DPI.
+        If you want to use the defaults for 96 x 96 DPI without calculating them from current DPI values, 
+        call ScreenMetrics.SetDefaults(true) before constructing first toplevel window.
+     </p>
+     
+     <p>
+        You can override some default value. For example to set the default size of a button, call ScreenMetrics.Get().SetDefaultButtonSize(Size(w, h))) 
+        from the constructor of your main window. The <em>w</em> and <em>h</em> values are in pixels. 
+        To save changed metrics, you can call ScreenMetrics.Get().SaveToFile(filePath, true).
+        To load changed metrics, construct a Metrics object, call its LoadFromFile(filePath) function, 
+        and then call ScreenMetrics.Set(metrics) with the loaded metrics object. The ScreenMetrics.Set() call should reside in the constructor of a main window.
+        Otherwise the loaded values could be overridden by the calculated values.
+    </p>
+    
+    <p>
+        As a European, I like to work with SI units, so the sizes are in millimeters. If you like to work with inches or printing point values instead,
+        you can convert them to millimeters first by calling the InchToMM() or PointToMM() functions respectively.
+    </p>
+    
+    <img src="image/screen.metrics.png"/>
+
+    <h3>Creating a Dialog with Screen Metrics</h3>
+
+    <p>
+        The <b>dialog</b> example in <b>cmajor\examples\dialog</b> directory contains an example program that constructs dialog with screen metrics. 
+        The dialog contains a bordered padded text box, an OK button and a cancel button. The following class and object diagrams show the structure
+        and participating objects in the example program.
+    </p>
+    
+    <img src="image/example.dialog.png"/> <br/>
+    
+    <img src="image/dialog.png"/>
+
+    <h2>Menus</h2>
+
+    <p>
+        The menu system consists of concrete classes that represent a menu bar, a context menu, a menu item, and a menu item separator. There are also a few implementation classes.
+    </p>
+
+    <h3>Structure</h3>
+
+    <p>
+        Menus do not have the clearest possible design mainly because the MenuBar, MenuItemBase, MenuItem and MenuItemSeparator classes were designed and tested first,
+        and the MenuControl, MenuBox and ContextMenu classes were added later.
+        Actually 'menuItems' and 'subItems' are Components enclosed in a Container, but we may think of them as being collections of MenuItemBase instances because that's 
+        what they really are.
+    </p>
+    
+    <img src="image/menu.png"/>
+
+    <h3>Usage</h3>
+
+    <p>
+        The following class diagram demonstrates creating a menu bar.
+    </p>
+    
+    <img src="image/menu.usage.png"/>
 
     <h2>Windows Application Lifecycle</h2>
 

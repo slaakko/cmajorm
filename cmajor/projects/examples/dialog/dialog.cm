@@ -1,0 +1,88 @@
+using System;
+using System.Windows;
+
+class DialogWindow : Window
+{
+    public DialogWindow() : base("DialogWindow", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), 
+        DefaultWindowBackgroundColor(), "dialog", 
+        Point(), Size(ScreenMetrics.Get().MMToHorizontalPixels(70), ScreenMetrics.Get().MMToVerticalPixels(50)), Dock.none, Anchors.none)
+    {
+        Size size = GetSize();
+        Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+        Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+        Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+        
+        Point textBoxLoc(defaultControlSpacing.w, defaultControlSpacing.h);
+        Size textBoxSize = defaultTextBoxSize;
+        int textBoxPadding = DefaultControlPadding();
+        int borderWidth = DefaultSingleBorderWidth();
+        Rect textBoxRect(textBoxLoc, textBoxSize);
+        textBoxRect.Inflate(textBoxPadding + borderWidth, textBoxPadding + borderWidth);
+        
+        str = "text";
+        UniquePtr<TextBox> textBoxPtr(new TextBox(str));
+        textBox = textBoxPtr.Get();
+        textBox->SelectAll();
+        textBox->TextChangedEvent().AddHandler(TextChanged);
+        UniquePtr<Control> paddedTextBox(new PaddedControl(textBoxPtr.Release()));
+        UniquePtr<Control> borderedTextBox(new BorderedControl(paddedTextBox.Release(), textBoxRect.location, textBoxRect.size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+        AddChild(borderedTextBox.Release());
+        
+        int x = size.w - defaultButtonSize.w - defaultControlSpacing.w;
+        int y = size.h - defaultButtonSize.h - defaultControlSpacing.h;
+        UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+        cancelButton = cancelButtonPtr.Get();
+        cancelButton->SetDialogResult(DialogResult.cancel);
+        x = x - defaultButtonSize.w - defaultControlSpacing.w;
+        UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+            Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+        okButton = okButtonPtr.Get();
+        okButton->SetDialogResult(DialogResult.ok);
+        AddChild(okButtonPtr.Release());
+        AddChild(cancelButtonPtr.Release());
+        SetDefaultButton(okButton);
+        SetCancelButton(cancelButton);
+    }
+    public const string& Str() const
+    {
+        return str;
+    }
+    private void TextChanged()
+    {
+        str = textBox->Text();
+    }
+    private TextBox* textBox;
+    private Button* okButton;
+    private Button* cancelButton;
+    private string str;
+}
+
+class MainWindow : Window
+{
+    public MainWindow() : base("main")
+    {
+        UniquePtr<MenuBar> menuBar(new MenuBar());
+        UniquePtr<MenuItem> dialogMenuItem(new MenuItem("&Dialog"));
+        UniquePtr<MenuItem> newMenuItem(new MenuItem("&New..."));
+        newMenuItem->ClickEvent().AddHandler(NewClick);
+        dialogMenuItem->AddMenuItem(newMenuItem.Release());
+        menuBar->AddMenuItem(dialogMenuItem.Release());
+        AddChild(menuBar.Release());
+    }
+    private void NewClick()
+    {
+        DialogWindow dialog;
+        if (dialog.ShowDialog(*this) == DialogResult.ok)
+        {
+            string s = dialog.Str();
+            MessageBox.Show(s, "Text");
+        }
+    }
+    
+}
+
+void main()
+{
+    MainWindow mainWindow;
+    Application.Run(mainWindow);
+}

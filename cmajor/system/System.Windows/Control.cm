@@ -1401,25 +1401,32 @@ namespace System.Windows
         }
         private void DoPaint()
         {
-            void* paintStruct = null;
-            void* hdc = BeginPaint(handle, paintStruct);
-            Rect clipRect;
-            WinGetClipRect(paintStruct, clipRect.location.x, clipRect.location.y, clipRect.size.w, clipRect.size.h);
-            PaintGuard paintGuard(hdc, paintStruct);
-            Graphics graphics(hdc);
-            PaintEventArgs args(graphics, clipRect);
-            if (!IsDecoratorControl())
+            try
             {
-                TranslateChildGraphics(graphics);
+                void* paintStruct = null;
+                void* hdc = BeginPaint(handle, paintStruct);
+                Rect clipRect;
+                WinGetClipRect(paintStruct, clipRect.location.x, clipRect.location.y, clipRect.size.w, clipRect.size.h);
+                PaintGuard paintGuard(hdc, paintStruct);
+                Graphics graphics(hdc);
+                PaintEventArgs args(graphics, clipRect);
+                if (!IsDecoratorControl())
+                {
+                    TranslateChildGraphics(graphics);
+                }
+                if (Focused())
+                {
+                    --caretShowCount;
+                }
+                OnPaint(args);
+                if (Focused() && CaretCreated())
+                {
+                    ShowCaret();
+                }
             }
-            if (Focused())
+            catch (const Exception& ex)
             {
-                --caretShowCount;
-            }
-            OnPaint(args);
-            if (Focused() && CaretCreated())
-            {
-                ShowCaret();
+                MessageBox.Show(ex.Message());
             }
         }
         protected virtual void OnPaint(PaintEventArgs& args)
