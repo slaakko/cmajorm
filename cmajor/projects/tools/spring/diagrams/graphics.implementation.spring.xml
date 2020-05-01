@@ -1,0 +1,101 @@
+<diagram>
+ <class abstract="false" name="Graphics">
+  <boundingRect h="24.775779724121093" w="50.177364349365234" x="16.139583587646484" y="15.610416412353515"/>
+  <operation abstract="false" name="Graphics()">
+   <boundingRect h="3.943944692611694" w="16.320964813232421" x="17.639583587646484" y="24.054361343383789"/>
+  </operation>
+  <operation abstract="false" name="DrawLine(const Pen&amp; pen, ...)">
+   <boundingRect h="3.943944692611694" w="44.677364349365234" x="17.639583587646484" y="27.998306274414062"/>
+  </operation>
+  <field name="void* nativeGraphics">
+   <boundingRect h="3.943944692611694" w="31.051845550537109" x="17.639583587646484" y="34.942253112792968"/>
+  </field>
+ </class>
+ <class abstract="false" name="cmrt">
+  <boundingRect h="21.775779724121093" w="43.084774017333984" x="16.404161453247070" y="78.845832824707031"/>
+  <operation abstract="false" name="WinCreateGraphics()">
+   <boundingRect h="3.943944692611694" w="31.766529083251953" x="17.904161453247070" y="87.289779663085937"/>
+  </operation>
+  <operation abstract="false" name="WinGraphicsCreatePen()">
+   <boundingRect h="3.943944692611694" w="37.584774017333984" x="17.904161453247070" y="91.233726501464843"/>
+  </operation>
+  <operation abstract="false" name="WinGraphicsDrawLine()">
+   <boundingRect h="3.943944692611694" w="35.764728546142578" x="17.904161453247070" y="95.17767333984375"/>
+  </operation>
+ </class>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="63.216464996337890" x="75.670829772949218" y="16.139581680297851"/>
+  <line value="nativeGraphics = WinCreateGraphics()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="93.475067138671875" x="75.670829772949218" y="26.722915649414062"/>
+  <line value="WinGraphicsDrawLine(nativeGraphics, pen.NativePen(), ...)"/>
+ </note>
+ <class abstract="false" name="Pen">
+  <boundingRect h="24.775779724121093" w="29.284072875976562" x="16.139583587646484" y="46.302082061767578"/>
+  <operation abstract="false" name="Pen()">
+   <boundingRect h="3.943944692611694" w="9.053192138671875" x="17.639583587646484" y="54.746025085449218"/>
+  </operation>
+  <operation abstract="false" name="NativePen()">
+   <boundingRect h="3.943944692611694" w="18.322389602661132" x="17.639583587646484" y="58.689968109130859"/>
+  </operation>
+  <field name="void* nativePen">
+   <boundingRect h="3.943944692611694" w="23.784072875976562" x="17.639583587646484" y="65.6339111328125"/>
+  </field>
+ </class>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="61.766941070556640" x="75.670829772949218" y="46.831249237060546"/>
+  <line value="nativePen = WinGraphicsCreatePen()"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="30.962627410888671" x="75.670829772949218" y="57.150001525878906"/>
+  <line value="return nativePen"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="54.21856689453125" x="75.670829772949218" y="78.316665649414062"/>
+  <line value="return new Gdiplus::Graphics(...)"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="46.950794219970703" x="75.670829772949218" y="88.106254577636718"/>
+  <line value="return new Gdiplus::Pen(...)"/>
+ </note>
+ <note name="note">
+  <boundingRect h="6.943944931030273" w="138.469223022460937" x="75.670829772949218" y="97.631240844726562"/>
+  <line value="static_cast&lt;Gdiplus::Graphics*>(graphics)->DrawLine(static_cast&lt;Gdiplus::Pen*>(pen), ...)"/>
+ </note>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="operation.0" text="" x="64.066947937011718" y="26.026332855224609"/>
+  <target index="2" snap="left.center" text="" x="75.670829772949218" y="19.611553192138671"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="0" snap="operation.1" text="" x="64.066947937011718" y="29.970277786254882"/>
+  <target index="3" snap="left.center" text="" x="75.670829772949218" y="30.194889068603515"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="operation.0" text="" x="43.173656463623046" y="56.717998504638671"/>
+  <target index="5" snap="left.top" text="" x="75.670829772949218" y="49.831249237060546"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="4" snap="operation.1" text="" x="43.173656463623046" y="60.661941528320312"/>
+  <target index="6" snap="left.top" text="" x="75.670829772949218" y="60.150001525878906"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="1" snap="operation.0" text="" x="57.238937377929687" y="89.261749267578125"/>
+  <target index="7" snap="left.top" text="" x="75.670829772949218" y="81.316665649414062"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="1" snap="operation.1" text="" x="57.238937377929687" y="93.205696105957031"/>
+  <target index="8" snap="left.top" text="" x="75.670829772949218" y="91.106254577636718"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="0" y="0"/>
+  <source index="1" snap="operation.2" text="" x="57.238937377929687" y="97.149642944335937"/>
+  <target index="9" snap="left.center" text="" x="75.670829772949218" y="101.10321044921875"/>
+ </relationship>
+</diagram>

@@ -302,7 +302,7 @@
     <h3>Creating a Dialog with Screen Metrics</h3>
 
     <p>
-        The <b>dialog</b> example in <b>cmajor\examples\dialog</b> directory contains an example program that constructs dialog with screen metrics. 
+        The <b>dialog</b> example in the <b>cmajor\examples\dialog</b> directory contains an example program that constructs a dialog with screen metrics. 
         The dialog contains a bordered padded text box, an OK button and a cancel button. The following class and object diagrams show the structure
         and participating objects in the example program.
     </p>
@@ -322,7 +322,7 @@
     <p>
         Menus do not have the clearest possible design mainly because the MenuBar, MenuItemBase, MenuItem and MenuItemSeparator classes were designed and tested first,
         and the MenuControl, MenuBox and ContextMenu classes were added later.
-        Actually 'menuItems' and 'subItems' are Components enclosed in a Container, but we may think of them as being collections of MenuItemBase instances because that's 
+        Actually 'menuItems' and 'subItems' are Components enclosed in a Container, but we may think of them as being collections of MenuItem and MenuItemSeparator instances because that's 
         what they really are.
     </p>
     
@@ -335,6 +335,159 @@
     </p>
     
     <img src="image/menu.usage.png"/>
+
+    <h2>Graphics</h2>
+
+    <p>
+        The System Windows library provides graphics by means of Microsoft <a href="https://docs.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-gdi-start">GDI+</a> library.
+    </p>
+    
+    <h3>Implementation</h3>
+    
+    <p>
+        The graphics objects contain a pointer to the corresponding GDI+ object that is created by the <b>cmrt</b> runtime library.
+        The following class diagram illustrates the implementation of the graphics library.
+    </p>
+    
+    <img src="image/graphics.implementation.png"/>
+
+    <h3>Structure</h3>
+
+    <p>
+        Each graphics function has too versions, one that returns a GraphicsStatus status code and does not throw, and another checked one that calls the first, 
+        checks the status code and throws an exception if the status is not OK. The names of the latter functions end with "Checked".
+        For example DrawLine() and DrawLineChecked()
+    </p>
+    
+    <img src="image/graphics.png"/>
+
+    <h3>The Spring Tool</h3>
+
+    <p>
+        The %CMAJOR_ROOT%\projects\tools\spring directory (C:\cmajor\projects\tools\spring by default) contains a graphical software diagram designer tool 
+        called <b>spring</b>, that uses the graphics library a lot. It is by no means perfect and it breaks occasionally, but with an extensive use of the save command,
+        one can use it. The diagrams in this document has been generated using spring.
+    </p>
+
+    <h2>Resources</h2>
+    
+    <h3>Resource file declaration</h3>
+    
+    <p>
+        To embed graphical resources in a program, you can put a <b>resource</b> file declaration to the <em>.cmp</em> project file.
+        A resource file declaration consists of the keyword <b>resource</b> followed by a name of an XML file in angle brackets and ending with a semicolon.
+        For example the spring.cmp project file looks like this:
+    </p>
+    
+    <p>
+    <code>
+        &nbsp;&nbsp;&nbsp;&nbsp;project spring;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;target=winguiapp;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;Action.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;Canvas.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;ClassPropertiesDialog.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;Command.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;Diagram.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;EditDiagramElementListDialog.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;IndexList.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;Layout.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;Main.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;NotePropertiesDialog.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;ObjectPropertiesDialog.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;Operation.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;RelationshipPropertiesDialog.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;resource &lt;Resources.xml>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;SaveImageDialog.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;Selection.cm>;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;source &lt;Tool.cm>;<br/>
+    </code>
+    </p>
+
+    <h3>Resource XML file</h3>
+        
+    <p>
+        A resource XML file consists of <b>resource</b> elements inside a <b>resources</b> element.
+        Each <b>resource</b> element has <b>name</b>, <b>type</b> and <b>file</b> attributes.
+        The resource is loaded in a program by its name that must be unique. The type of the resource can be <b>icon</b>, <b>bitmap</b> or <b>cursor</b>.
+        The value of the file attribute contains a relative or absolute path to an icon, bitmap or cursor file respectively.
+        Here's the contents of the <b>Resources.xml</b> file of the <b>spring</b> project:
+    </p>
+
+    <p>
+    <code>
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;?xml version="1.0" encoding="utf-8"?><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;resources><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="spring.icon" type="icon" file="res/spring.ico"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="class.tool.spring.bitmap" type="bitmap" file="res/class.tool.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="class.tool.spring.cursor" type="cursor" file="res/class.tool.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="object.tool.spring.bitmap" type="bitmap" file="res/object.tool.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="object.tool.spring.cursor" type="cursor" file="res/object.tool.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="note.tool.spring.bitmap" type="bitmap" file="res/note.tool.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="note.tool.spring.cursor" type="cursor" file="res/note.tool.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="note.corner.spring.bitmap" type="bitmap" file="res/note.corner.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="inheritance.tool.spring.bitmap" type="bitmap" file="res/inheritance.tool.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="inheritance.tool.spring.cursor" type="cursor" file="res/inheritance.tool.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="aggregation.tool.spring.bitmap" type="bitmap" file="res/aggregation.tool.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="aggregation.tool.spring.cursor" type="cursor" file="res/aggregation.tool.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="reference.tool.spring.bitmap" type="bitmap" file="res/reference.tool.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="reference.tool.spring.cursor" type="cursor" file="res/reference.tool.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="create.instance.tool.spring.bitmap" type="bitmap" file="res/create.instance.tool.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="create.instance.tool.spring.cursor" type="cursor" file="res/create.instance.tool.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="attach.note.tool.spring.bitmap" type="bitmap" file="res/attach.note.tool.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="attach.note.tool.spring.cursor" type="cursor" file="res/attach.note.tool.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="grab.tool.spring.bitmap" type="bitmap" file="res/grab.tool.spring.bmp"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="grab.open.spring.cursor" type="cursor" file="res/grab.open.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resource name="grab.closed.spring.cursor" type="cursor" file="res/grab.closed.spring.cur"/><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&lt;/resources><br/>
+    </code>
+    </p>
+    
+    <h3>
+        Location of resource content files
+    </h3>
+    
+    <p>
+        The icon, bitmap and cursor resource content files can reside in the <b>res</b> subdirectory of the project directory as in the <b>spring</b> project above.
+        Then the resource content file paths contain a <b>res</b> subdirectory prefix.
+        Another possibility is to put the resource content files to the %CMAJOR_ROOT%\res directory (C:\cmajor\res by default).
+        Then a bare file name without subdirectory prefix suffices, because the Cmajor compiler looks first from the C:\cmajor\res directory if the file can be found there.
+    </p>
+
+    <h3>
+        Creating resource content files
+    </h3>
+    
+    <p>
+        I have used the Visual Studio resource editors and Windows Paint to create the resource content files, 
+        but any tool can be of course used if the format of the content is right.
+    </p>
+    
+    <h3>
+        Accessing resources
+    </h3>
+    
+    <p>
+        The static Application class contains a resource manager class that can be used to access cursor and icon resources.
+        The Bitmap class contains a static FromResource function that loads the bitmap from the executable.
+    </p>
+    
+    <code>
+        &nbsp;&nbsp;&nbsp;&nbsp;public class MainWindow : Window<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public MainWindow() : ...<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;noteToolCursor(Application.GetResourceManager().GetCursor("note.tool.spring.cursor")),<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;noteCornerBitmap(new Bitmap(Bitmap.FromResource("note.corner.spring.bitmap"))),<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br/>            
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private Cursor& noteToolCursor;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private UniquePtr<Bitmap> noteCornerBitmap;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+        <br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;int main()<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;{<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MainWindow mainWindow;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mainWindow.SetSmallIcon(Application.GetResourceManager().GetIcon("spring.icon"));<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br/>
+    </code>
 
     <h2>Windows Application Lifecycle</h2>
 

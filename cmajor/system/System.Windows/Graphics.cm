@@ -2779,6 +2779,10 @@ namespace System.Windows
         {
             return cast<GraphicsStatus>(WinGraphicsSetTransform(m.NativeMatrix()));
         }
+        public void SetTransformChecked(Matrix& m)
+        {
+            CheckGraphicsStatus(SetTransform(m));
+        }
         public nothrow GraphicsStatus MultiplyTransform(const Matrix& matrix, MatrixOrder order)
         {
             return cast<GraphicsStatus>(WinGraphicsMultiplyTransform(nativeGraphics, matrix.NativeMatrix(), cast<int>(order)));
