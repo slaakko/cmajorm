@@ -187,8 +187,8 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_DoneThread_15374173D5CCC0DED81EF656786DE13275699435">DoneThread</a>()</td>
             </tr>
             <tr>
-                <td class="functionTableFirstCol" xml:space="preserve">uint64_t</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_DynamicInitVmt_19246CB986F9A9E4B5738FB0CA438F182A6456D6">DynamicInitVmt</a>(<span class="kw">void</span>* vmt)</td>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_DynamicInitVmtsAndCompare_FB7A11E9AB3BE265C60973B58885848A4B3178D0">DynamicInitVmtsAndCompare</a>(<span class="kw">void</span>* vmt1, <span class="kw">void</span>* vmt2)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -211,7 +211,7 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_ExecuteThreadMethodWithParam_A02BB35B96F52A2872F1E2AE03BBEB2C5F345C35">ExecuteThreadMethodWithParam</a>(ThreadMethodWithParam threadMethod, <span class="kw">void</span>* object, <span class="kw">void</span>* param, int32_t threadId)</td>
             </tr>
             <tr>
-                <td class="functionTableFirstCol" xml:space="preserve">uint64_t</td>
+                <td class="functionTableFirstCol" xml:space="preserve">boost::multiprecision::uint128_t</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_GetClassId_D7B414592E26D41BEAFD0DFCBD48F000CFF3083F">GetClassId</a>(<span class="kw">const </span>boost::uuids::uuid&amp; typeId)</td>
             </tr>
             <tr>
@@ -332,10 +332,6 @@
             <tr id="variable_currentException_C805E16377F32F1B38738E55DBFBF1487F0AE39A">
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve">currentException</td>
-            </tr>
-            <tr id="variable_currentExceptionClassId_4DDBBEAEA0A5584059B76CC9F781AAAF4BEB0BA1">
-                <td class="functionTableFirstCol" xml:space="preserve">uint64_t</td>
-                <td class="functionTableSecondCol" xml:space="preserve">currentExceptionClassId</td>
             </tr>
             <tr id="variable_destructionList_3067E16D77CC7220D87C4BE2FC969976999309BA">
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html">Destruction</a>*</td>
@@ -467,7 +463,7 @@
             <span class="kw">void</span>
              cmajor::rt::Done()</h4>
         <span>
-            Definition at line <a href="file/InitDone.cpp_83AED12D015037D3C3B775845AC258B0A9042A11.html#72">72</a>
+            Definition at line <a href="file/InitDone.cpp_83AED12D015037D3C3B775845AC258B0A9042A11.html#71">71</a>
              of <a href="file/InitDone.cpp_83AED12D015037D3C3B775845AC258B0A9042A11.html">InitDone.cpp</a>
         </span>
         <br/>
@@ -483,15 +479,15 @@
             <span class="kw">void</span>
              cmajor::rt::DoneClasses()</h4>
         <span>
-            Definition at line <a href="file/Classes.cpp_58A457D1AC77E108E5B51976EEBB70159D546EEA.html#131">131</a>
+            Definition at line <a href="file/Classes.cpp_58A457D1AC77E108E5B51976EEBB70159D546EEA.html#145">145</a>
              of <a href="file/Classes.cpp_58A457D1AC77E108E5B51976EEBB70159D546EEA.html">Classes.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ClassIdMap_FF5A3B0F6616B6701499BBA03FE9328C5F787ED3.html">ClassIdMap</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ClassIdMap_FF5A3B0F6616B6701499BBA03FE9328C5F787ED3.html">ClassIdMap</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -804,10 +800,12 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_DynamicInitVmt_19246CB986F9A9E4B5738FB0CA438F182A6456D6">DynamicInitVmt Function</h3>
+        <h3 id="function_DynamicInitVmtsAndCompare_FB7A11E9AB3BE265C60973B58885848A4B3178D0">DynamicInitVmtsAndCompare Function</h3>
         <h4>
-            uint64_t cmajor::rt::DynamicInitVmt(<span class="kw">void</span>
-            * vmt)</h4>
+            <span class="kw">bool</span>
+             cmajor::rt::DynamicInitVmtsAndCompare(<span class="kw">void</span>
+            * vmt1, <span class="kw">void</span>
+            * vmt2)</h4>
         <span>
             Definition at line <a href="file/Classes.cpp_58A457D1AC77E108E5B51976EEBB70159D546EEA.html#115">115</a>
              of <a href="file/Classes.cpp_58A457D1AC77E108E5B51976EEBB70159D546EEA.html">Classes.cpp</a>
@@ -909,7 +907,7 @@
         <hr/>
         <h3 id="function_GetClassId_D7B414592E26D41BEAFD0DFCBD48F000CFF3083F">GetClassId Function</h3>
         <h4>
-            uint64_t cmajor::rt::GetClassId(<span class="kw">const </span>
+            boost::multiprecision::uint128_t cmajor::rt::GetClassId(<span class="kw">const </span>
             boost::uuids::uuid&amp; typeId)</h4>
         <span>
             Definition at line <a href="file/Classes.cpp_58A457D1AC77E108E5B51976EEBB70159D546EEA.html#73">73</a>
@@ -1039,7 +1037,7 @@
             uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, <span class="kw">const </span>
             uint64_t* staticClassIdArray)</h4>
         <span>
-            Definition at line <a href="file/InitDone.cpp_83AED12D015037D3C3B775845AC258B0A9042A11.html#51">51</a>
+            Definition at line <a href="file/InitDone.cpp_83AED12D015037D3C3B775845AC258B0A9042A11.html#50">50</a>
              of <a href="file/InitDone.cpp_83AED12D015037D3C3B775845AC258B0A9042A11.html">InitDone.cpp</a>
         </span>
         <br/>
@@ -1070,7 +1068,7 @@
         <span>
             Calls: <a href="./class_ClassIdMap_FF5A3B0F6616B6701499BBA03FE9328C5F787ED3.html#function_Init_D2D3A9089A4DF1743E7B369E539B00DBD30F93C6">cmajor::rt::ClassIdMap::Init</a>
             , <a href="./class_ClassIdMap_FF5A3B0F6616B6701499BBA03FE9328C5F787ED3.html#function_Instance_7E79C3795EC310B0538275A89D2ADDE02D89770B">cmajor::rt::ClassIdMap::Instance</a>
-            , <a href="./class_ClassIdMap_FF5A3B0F6616B6701499BBA03FE9328C5F787ED3.html#function_SetClassId_A749B164212107AAF2BEA7B9988226BDCEB4B52D">cmajor::rt::ClassIdMap::SetClassId</a>
+            , <a href="./class_ClassIdMap_FF5A3B0F6616B6701499BBA03FE9328C5F787ED3.html#function_SetClassId_4CBEC1709E076ED6E833281DE032246E4B9B4711">cmajor::rt::ClassIdMap::SetClassId</a>
         </span>
         <br/>
         <br/>

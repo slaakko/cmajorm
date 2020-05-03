@@ -23,7 +23,7 @@
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#constructor_BoundFunction_0E23CAD81588CF312FECF0E7A851E0CD7B18D544">BoundFunction</a>(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* module_, <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>* functionSymbol_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#constructor_BoundFunction_B7F066D753089200E487D3B22004045BB373ECF9">BoundFunction</a>(Module* module_, FunctionSymbol* functionSymbol_)</td>
             </tr>
             <tr>
                 <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#constructor_BoundFunction_04F422167E13AB176CD1E27D1B0F243E6AD472A8">BoundFunction</a>(<span class="kw">const </span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a>&amp;) <span class="kw">delete</span></td>
@@ -73,6 +73,10 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_ResetCodeGenerated_4C5AB00E0656B378C1C0434D86570352EB8FC7E3">ResetCodeGenerated</a>() <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_SetBody_85F845AD68BEE775512998A8E9DEF75253EDF044">SetBody</a>(std::unique_ptr&lt;<a href="./class_BoundCompoundStatement_83075A2B16EF7318603436483D5B262D74A60859.html">BoundCompoundStatement</a>>&amp;&amp; body_)</td>
             </tr>
             <tr>
@@ -113,11 +117,9 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_BoundFunction_0E23CAD81588CF312FECF0E7A851E0CD7B18D544">BoundFunction Constructor</h3>
+        <h3 id="constructor_BoundFunction_B7F066D753089200E487D3B22004045BB373ECF9">BoundFunction Constructor</h3>
         <h4>
-            cmajor::binder::BoundFunction::BoundFunction(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
-            * module_, <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
-            * functionSymbol_)</h4>
+            cmajor::binder::BoundFunction::BoundFunction(Module* module_, FunctionSymbol* functionSymbol_)</h4>
         <span>
             Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#13">13</a>
              of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
@@ -133,12 +135,6 @@
             </span>
             <br/>
         </span>
-        <br/>
-        <span>
-            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#19">19</a>
-             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
-        </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="constructor_BoundFunction_04F422167E13AB176CD1E27D1B0F243E6AD472A8">BoundFunction Constructor</h3>
@@ -252,8 +248,8 @@
             Called by: <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindArrow_5149F3ED291739DEF4C1EBB81F924FE7BDCC4EDB">cmajor::binder::ExpressionBinder::BindArrow</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindBinaryOp_E3F8BE49ABA1A6849389AAC187C19334684CC435">cmajor::binder::ExpressionBinder::BindBinaryOp</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindUnaryOp_02ED2505ECD8A48B35E33508230FC37675E32B43">cmajor::binder::ExpressionBinder::BindUnaryOp</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_DEB63F59E111775EAAC9231447756AA9B53151A3">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_333FCA5FC1817A103EE015FE972C5B7D901E0477">cmajor::binder::ExpressionBinder::Visit</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_DEB63F59E111775EAAC9231447756AA9B53151A3">cmajor::binder::ExpressionBinder::Visit</a>
         </span>
         <br/>
         <br/>
@@ -314,27 +310,27 @@
             Called by: <a href="./class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#function_ContainsSourceFunctions_611135F97488856A51FA0709618880EC5FE85844">cmajor::binder::BoundClass::ContainsSourceFunctions</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindArrow_5149F3ED291739DEF4C1EBB81F924FE7BDCC4EDB">cmajor::binder::ExpressionBinder::BindArrow</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindBinaryOp_E3F8BE49ABA1A6849389AAC187C19334684CC435">cmajor::binder::ExpressionBinder::BindBinaryOp</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindSymbol_35E963E4AA3E33F15251B24574F34F968B6ABB5B">cmajor::binder::ExpressionBinder::BindSymbol</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindSymbol_087961403CDA5E7BA540C4F369F32BFD5B677B27">cmajor::binder::ExpressionBinder::BindSymbol</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_BindUnaryOp_02ED2505ECD8A48B35E33508230FC37675E32B43">cmajor::binder::ExpressionBinder::BindUnaryOp</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_2919BBB3C62CD8FE7C05BA5C78547A09AC60A79F">cmajor::binder::ExpressionBinder::Visit</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_EDF155EF83334BEB1ABE2ADFF6F62BDDCA7F1E9A">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_E5E7850A74F4FB3C2BD22BF9BEB490EE8A58BCB3">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_22C09DA349C71F5C2F859A6E47AA037B88760BEE">cmajor::binder::ExpressionBinder::Visit</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_0546E0A0B2FA340F92D61A4D4A4D05E47C3825ED">cmajor::binder::ExpressionBinder::Visit</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_2919BBB3C62CD8FE7C05BA5C78547A09AC60A79F">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_64BC56F46FAE13BD5B17991312D8F14EF0C91135">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_333FCA5FC1817A103EE015FE972C5B7D901E0477">cmajor::binder::ExpressionBinder::Visit</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_EDF155EF83334BEB1ABE2ADFF6F62BDDCA7F1E9A">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_DEB63F59E111775EAAC9231447756AA9B53151A3">cmajor::binder::ExpressionBinder::Visit</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_0546E0A0B2FA340F92D61A4D4A4D05E47C3825ED">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_757046458F58D2740096A51BEBDD113AC972B20E">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_FC8A28554E92226D45F06BDE10E7D5627DF5A036">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_E5C4EE4BCAAEE3DE8790BFB23BCFC36B2024F8C1">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_1EF5FC99D15E5C9D98078ACBA0F7210C2F840992">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_4BE4F162E42194D1E1C8186511AE82CC2F0F9B9D">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_09A14A297C598E5A658BE95508C8A07470178666">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_6339DFF3C91504421455383DD19E9AC7304289AC">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_C1EDDF2EDB86B38A18F38A87FC0FA36F5E05EA11">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_7EDCCEED4329DE9F33611B646E43120618529A68">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_188C244426C4D11503A88CBDD6E395EFFA821315">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_7EDCCEED4329DE9F33611B646E43120618529A68">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_09A14A297C598E5A658BE95508C8A07470178666">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_8D5184D8DBC4A9AB8A8BA5CBDBE6C3A304CD0CD6">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_1EF5FC99D15E5C9D98078ACBA0F7210C2F840992">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_E5C4EE4BCAAEE3DE8790BFB23BCFC36B2024F8C1">cmajor::binder::StatementBinder::Visit</a>
         </span>
         <br/>
         <br/>
@@ -391,7 +387,7 @@
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./../../../symbols/html/content/class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"cannot&nbsp;load&nbsp;from&nbsp;function"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"cannot&nbsp;load&nbsp;from&nbsp;function"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">}</span></span>
             </span>
@@ -460,6 +456,48 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_ResetCodeGenerated_4C5AB00E0656B378C1C0434D86570352EB8FC7E3">ResetCodeGenerated Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::binder::BoundFunction::ResetCodeGenerated() <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html#57">57</a>
+             of <a href="file/BoundFunction.cpp_2252CB530F1EFF8E3F54DD6C6DC21D15449FD363.html">BoundFunction.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_functionSymbol_923D8EA5DFA95FFA7CA3EC4B0923174AB2935E52">functionSymbol</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#variable_functionSymbol_923D8EA5DFA95FFA7CA3EC4B0923174AB2935E52">functionSymbol</a><span class="other">-></span><span class="identifier">ResetCodeGenerated</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html#35">35</a>
+             of <a href="file/BoundFunction.hpp_5C1C9CB8725D6AA409E667210D5C42B0DE8F7563.html">BoundFunction.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_ResetCodeGenerated_35D25AF856C72EA3C08602A9867E5FB74F614023">cmajor::binder::BoundNode::ResetCodeGenerated</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ResetCodeGenerated_43084472F37956D18B1D15528126DF6CC5C3CACE">cmajor::symbols::FunctionSymbol::ResetCodeGenerated</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_SetBody_85F845AD68BEE775512998A8E9DEF75253EDF044">SetBody Member Function</h3>
         <h4>
             <span class="kw">void</span>
@@ -520,7 +558,7 @@
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./../../../symbols/html/content/class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"cannot&nbsp;store&nbsp;to&nbsp;function"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">Exception</span><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"cannot&nbsp;store&nbsp;to&nbsp;function"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">}</span></span>
             </span>

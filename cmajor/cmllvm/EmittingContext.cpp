@@ -45,10 +45,10 @@ EmittingContext::EmittingContext(int optimizationLevel) : targetTriple(), optimi
     llvm::CodeGenOpt::Level codeGenLevel = llvm::CodeGenOpt::None;
     switch (optimizationLevel)
     {
-        case 0: codeGenLevel = llvm::CodeGenOpt::None; break;
-        case 1: codeGenLevel = llvm::CodeGenOpt::Less; break;
-        case 2: codeGenLevel = llvm::CodeGenOpt::Default; break;
-        case 3: codeGenLevel = llvm::CodeGenOpt::Aggressive; break;
+    case 0: codeGenLevel = llvm::CodeGenOpt::None; break;
+    case 1: codeGenLevel = llvm::CodeGenOpt::Less; break;
+    case 2: codeGenLevel = llvm::CodeGenOpt::Default; break;
+    case 3: codeGenLevel = llvm::CodeGenOpt::Aggressive; break;
     }
     targetMachine.reset(target->createTargetMachine(targetTriple, "generic", "", targetOptions, relocModel, codeModel, codeGenLevel));
     dataLayout.reset(new llvm::DataLayout(targetMachine->createDataLayout()));

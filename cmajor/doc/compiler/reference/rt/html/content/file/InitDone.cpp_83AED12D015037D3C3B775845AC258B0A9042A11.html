@@ -58,137 +58,135 @@
   <br/>
   <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;</span>
   <br/>
-  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">RtInit</span><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">numberOfPolymorphicClassIds</span><span class="other">,</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">uint64_t</span><span class="other">*</span>&nbsp;<span class="identifier">polymorphicClassIdArray</span><span class="other">,</span>&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">numberOfStaticClassIds</span><span class="other">,</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">uint64_t</span><span class="other">*</span>&nbsp;<span class="identifier">staticClassIdArray</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">RtInit</span><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">numberOfPolymorphicClassIds</span><span class="other">,</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">uint64_t</span><span class="other">*</span>&nbsp;<span class="identifier">polymorphicClassIdArray</span><span class="other">,</span>&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">numberOfStaticClassIds</span><span class="other">,</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">uint64_t</span><span class="other">*</span>&nbsp;<span class="identifier">staticClassIdArray</span><span class="other">)</span></span>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="identifier">numberOfPolymorphicClassIds</span><span class="other">,</span>&nbsp;<span class="identifier">polymorphicClassIdArray</span><span class="other">,</span>&nbsp;<span class="identifier">numberOfStaticClassIds</span><span class="other">,</span>&nbsp;<span class="identifier">staticClassIdArray</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="identifier">numberOfPolymorphicClassIds</span><span class="other">,</span>&nbsp;<span class="identifier">polymorphicClassIdArray</span><span class="other">,</span>&nbsp;<span class="identifier">numberOfStaticClassIds</span><span class="other">,</span>&nbsp;<span class="identifier">staticClassIdArray</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;</span>
   <br/>
-  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;</span>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">DynamicInitVmtsAndCompare</span><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">vmt1</span><span class="other">,</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">vmt2</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="identifier">uint64_t</span>&nbsp;<span class="identifier">RtDynamicInitVmt</span><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">vmt</span><span class="other">)</span></span>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">DynamicInitVmtsAndCompare</span><span class="other">(</span><span class="identifier">vmt1</span><span class="other">,</span>&nbsp;<span class="identifier">vmt2</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">DynamicInitVmt</span><span class="other">(</span><span class="identifier">vmt</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;</span>
   <br/>
-  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;</span>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">RtDone</span><span class="other">(</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">RtDone</span><span class="other">(</span><span class="other">)</span></span>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">rt</span><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;</span>
   <br/>
-  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;</span>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">RtExit</span><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">exitCode</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="string">"C"</span>&nbsp;<span class="kw">void</span>&nbsp;<span class="identifier">RtExit</span><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">exitCode</span><span class="other">)</span></span>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">exit</span><span class="other">(</span><span class="identifier">exitCode</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">exit</span><span class="other">(</span><span class="identifier">exitCode</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;</span>
   <br/>
-  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;</span>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">rt</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">rt</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;</span>
   <br/>
-  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;</span>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_Init_CD1CBFB28B54C8ABCB0BF5807689F3C7D66074D1">Init</a><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">numberOfPolymorphicClassIds</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">uint64_t</span><span class="other">*</span>&nbsp;<span class="identifier">polymorphicClassIdArray</span><span class="other">,&nbsp;</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">numberOfStaticClassIds</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">uint64_t</span><span class="other">*</span>&nbsp;<span class="identifier">staticClassIdArray</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_Init_CD1CBFB28B54C8ABCB0BF5807689F3C7D66074D1">Init</a><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">numberOfPolymorphicClassIds</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">uint64_t</span><span class="other">*</span>&nbsp;<span class="identifier">polymorphicClassIdArray</span><span class="other">,&nbsp;</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">numberOfStaticClassIds</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">uint64_t</span><span class="other">*</span>&nbsp;<span class="identifier">staticClassIdArray</span><span class="other">)</span></span>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitMutex</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitMutex</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">util</a><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">util</a><span class="other">::</span><span class="identifier">Init</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitIo</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitIo</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitScreen</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitScreen</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitDirectory</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitDirectory</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitError</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitError</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitString</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitString</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitMemory</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitMemory</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitConditionVariable</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitConditionVariable</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitThread</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitThread</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitSocket</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitSocket</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitEnvironment</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitEnvironment</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitStatics</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitStatics</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitClasses</span><span class="other">(</span><span class="identifier">numberOfPolymorphicClassIds</span><span class="other">,&nbsp;</span><span class="identifier">polymorphicClassIdArray</span><span class="other">,&nbsp;</span><span class="identifier">numberOfStaticClassIds</span><span class="other">,&nbsp;</span><span class="identifier">staticClassIdArray</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">InitClasses</span><span class="other">(</span><span class="identifier">numberOfPolymorphicClassIds</span><span class="other">,&nbsp;</span><span class="identifier">polymorphicClassIdArray</span><span class="other">,&nbsp;</span><span class="identifier">numberOfStaticClassIds</span><span class="other">,&nbsp;</span><span class="identifier">staticClassIdArray</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;<span class="pp">#ifdef&nbsp;_WIN32</span></span>
   <br/>
-  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;<span class="pp">#ifdef&nbsp;_WIN32</span></span>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;</span>
   <br/>
-  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;</span>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;<span class="pp">#endif</span></span>
   <br/>
-  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;<span class="pp">#endif</span></span>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;</span>
   <br/>
-  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;</span>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_Done_1969CD9A91D32915C2005492CCC7D3A9EE58228D">Done</a><span class="other">(</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html#function_Done_1969CD9A91D32915C2005492CCC7D3A9EE58228D">Done</a><span class="other">(</span><span class="other">)</span></span>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;<span class="pp">#ifdef&nbsp;_WIN32</span></span>
   <br/>
-  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;<span class="pp">#ifdef&nbsp;_WIN32</span></span>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;</span>
   <br/>
-  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;</span>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;<span class="pp">#endif</span></span>
   <br/>
-  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;<span class="pp">#endif</span></span>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneClasses</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneClasses</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneStatics</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneStatics</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneEnvironment</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneEnvironment</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneSocket</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneSocket</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneThread</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneThread</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneConditionVariable</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneConditionVariable</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneMemory</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneMemory</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneString</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneString</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneError</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneError</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneDirectory</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneDirectory</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneScreen</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneScreen</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneIo</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneIo</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">util</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">util</a><span class="other">::</span><span class="identifier">Done</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneMutex</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">DoneMutex</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">90</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">91</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">91</span>&nbsp;</span>
   <br/>
-  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">92</span>&nbsp;</span>
-  <br/>
-  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">93</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::rt</span></span>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">92</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::rt</span></span>
   <br/>
  </body>
 </html>

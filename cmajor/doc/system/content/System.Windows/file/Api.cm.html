@@ -2290,35 +2290,35 @@
   <br/>
   <span class="code" id="1140" xml:space="preserve"><span class="lineNumber">1140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1141" xml:space="preserve"><span class="lineNumber">1141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinIsClipboardFormatAvailable">WinIsClipboardFormatAvailable</a><span class="other">(</span><span class="identifier">format</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1141" xml:space="preserve"><span class="lineNumber">1141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Runtime/index.html#WinIsClipboardFormatAvailable">WinIsClipboardFormatAvailable</a><span class="other">(</span><span class="identifier">format</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1142" xml:space="preserve"><span class="lineNumber">1142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">result</span><span class="other">)</span></span>
+  <span class="code" id="1142" xml:space="preserve"><span class="lineNumber">1142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1143" xml:space="preserve"><span class="lineNumber">1143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1143" xml:space="preserve"><span class="lineNumber">1143</span>&nbsp;</span>
   <br/>
-  <span class="code" id="1144" xml:space="preserve"><span class="lineNumber">1144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ulong</span>&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1144" xml:space="preserve"><span class="lineNumber">1144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_AddClipboardFormatListener_1FD7827DB0A03F96EDEEFAC612622A788F1A2AC2">AddClipboardFormatListener</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">windowHandle</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1145" xml:space="preserve"><span class="lineNumber">1145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">error</span><span class="other">&nbsp;!=&nbsp;</span><span class="number">0u</span><span class="other">)</span></span>
+  <span class="code" id="1145" xml:space="preserve"><span class="lineNumber">1145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1146" xml:space="preserve"><span class="lineNumber">1146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1146" xml:space="preserve"><span class="lineNumber">1146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">succeeded</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinAddClipboardFormatListener">WinAddClipboardFormatListener</a><span class="other">(</span><span class="identifier">windowHandle</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1147" xml:space="preserve"><span class="lineNumber">1147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><span class="identifier">error</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1147" xml:space="preserve"><span class="lineNumber">1147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">succeeded</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1148" xml:space="preserve"><span class="lineNumber">1148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1148" xml:space="preserve"><span class="lineNumber">1148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1149" xml:space="preserve"><span class="lineNumber">1149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1149" xml:space="preserve"><span class="lineNumber">1149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1150" xml:space="preserve"><span class="lineNumber">1150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <span class="code" id="1150" xml:space="preserve"><span class="lineNumber">1150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
   <span class="code" id="1151" xml:space="preserve"><span class="lineNumber">1151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
   <span class="code" id="1152" xml:space="preserve"><span class="lineNumber">1152</span>&nbsp;</span>
   <br/>
-  <span class="code" id="1153" xml:space="preserve"><span class="lineNumber">1153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_AddClipboardFormatListener_1FD7827DB0A03F96EDEEFAC612622A788F1A2AC2">AddClipboardFormatListener</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">windowHandle</span><span class="other">)</span></span>
+  <span class="code" id="1153" xml:space="preserve"><span class="lineNumber">1153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_RemoveClipboardFormatListener_618E69B08DCE73A61549E816A9F3969A34CB8E33">RemoveClipboardFormatListener</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">windowHandle</span><span class="other">)</span></span>
   <br/>
   <span class="code" id="1154" xml:space="preserve"><span class="lineNumber">1154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1155" xml:space="preserve"><span class="lineNumber">1155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">succeeded</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinAddClipboardFormatListener">WinAddClipboardFormatListener</a><span class="other">(</span><span class="identifier">windowHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1155" xml:space="preserve"><span class="lineNumber">1155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">succeeded</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinRemoveClipboardFormatListener">WinRemoveClipboardFormatListener</a><span class="other">(</span><span class="identifier">windowHandle</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
   <span class="code" id="1156" xml:space="preserve"><span class="lineNumber">1156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">succeeded</span><span class="other">)</span></span>
   <br/>
@@ -2332,101 +2332,101 @@
   <br/>
   <span class="code" id="1161" xml:space="preserve"><span class="lineNumber">1161</span>&nbsp;</span>
   <br/>
-  <span class="code" id="1162" xml:space="preserve"><span class="lineNumber">1162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_RemoveClipboardFormatListener_618E69B08DCE73A61549E816A9F3969A34CB8E33">RemoveClipboardFormatListener</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">windowHandle</span><span class="other">)</span></span>
+  <span class="code" id="1162" xml:space="preserve"><span class="lineNumber">1162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">enum</span>&nbsp;<a href="../doc/enumerated_type_GlobalAllocFlags_9AD4C6350B2FC2D1A5621B860918BA9A8AE88BDA.html">GlobalAllocFlags</a><span class="other">&nbsp;:&nbsp;</span><span class="kw">uint</span></span>
   <br/>
   <span class="code" id="1163" xml:space="preserve"><span class="lineNumber">1163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1164" xml:space="preserve"><span class="lineNumber">1164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">succeeded</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinRemoveClipboardFormatListener">WinRemoveClipboardFormatListener</a><span class="other">(</span><span class="identifier">windowHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1164" xml:space="preserve"><span class="lineNumber">1164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GMEM_FIXED</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0u</span><span class="other">,&nbsp;</span></span>
   <br/>
-  <span class="code" id="1165" xml:space="preserve"><span class="lineNumber">1165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">succeeded</span><span class="other">)</span></span>
+  <span class="code" id="1165" xml:space="preserve"><span class="lineNumber">1165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GHND</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0042u</span><span class="other">,&nbsp;</span></span>
   <br/>
-  <span class="code" id="1166" xml:space="preserve"><span class="lineNumber">1166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1166" xml:space="preserve"><span class="lineNumber">1166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GMEM_MOVEABLE</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0002u</span><span class="other">,&nbsp;</span></span>
   <br/>
-  <span class="code" id="1167" xml:space="preserve"><span class="lineNumber">1167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1167" xml:space="preserve"><span class="lineNumber">1167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GMEM_ZEROINIT</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0040u</span><span class="other">,&nbsp;</span></span>
   <br/>
-  <span class="code" id="1168" xml:space="preserve"><span class="lineNumber">1168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1168" xml:space="preserve"><span class="lineNumber">1168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GPTR</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0040u</span></span>
   <br/>
   <span class="code" id="1169" xml:space="preserve"><span class="lineNumber">1169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
   <span class="code" id="1170" xml:space="preserve"><span class="lineNumber">1170</span>&nbsp;</span>
   <br/>
-  <span class="code" id="1171" xml:space="preserve"><span class="lineNumber">1171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">enum</span>&nbsp;<a href="../doc/enumerated_type_GlobalAllocFlags_9AD4C6350B2FC2D1A5621B860918BA9A8AE88BDA.html">GlobalAllocFlags</a><span class="other">&nbsp;:&nbsp;</span><span class="kw">uint</span></span>
+  <span class="code" id="1171" xml:space="preserve"><span class="lineNumber">1171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalAlloc_2BBF30DF97AE4CD214DF3D54F18EB7863BE6942A">GlobalAlloc</a><span class="other">(</span><a href="../doc/enumerated_type_GlobalAllocFlags_9AD4C6350B2FC2D1A5621B860918BA9A8AE88BDA.html">GlobalAllocFlags</a>&nbsp;<span class="identifier">flags</span><span class="other">,&nbsp;</span><span class="kw">ulong</span>&nbsp;<span class="identifier">size</span><span class="other">)</span></span>
   <br/>
   <span class="code" id="1172" xml:space="preserve"><span class="lineNumber">1172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1173" xml:space="preserve"><span class="lineNumber">1173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GMEM_FIXED</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0u</span><span class="other">,&nbsp;</span></span>
+  <span class="code" id="1173" xml:space="preserve"><span class="lineNumber">1173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">retval</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalAlloc">WinGlobalAlloc</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">uint</span><span class="other">></span><span class="other">(</span><span class="identifier">flags</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">size</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1174" xml:space="preserve"><span class="lineNumber">1174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GHND</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0042u</span><span class="other">,&nbsp;</span></span>
+  <span class="code" id="1174" xml:space="preserve"><span class="lineNumber">1174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">retval</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1175" xml:space="preserve"><span class="lineNumber">1175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GMEM_MOVEABLE</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0002u</span><span class="other">,&nbsp;</span></span>
+  <span class="code" id="1175" xml:space="preserve"><span class="lineNumber">1175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1176" xml:space="preserve"><span class="lineNumber">1176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GMEM_ZEROINIT</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0040u</span><span class="other">,&nbsp;</span></span>
+  <span class="code" id="1176" xml:space="preserve"><span class="lineNumber">1176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1177" xml:space="preserve"><span class="lineNumber">1177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GPTR</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0x0040u</span></span>
+  <span class="code" id="1177" xml:space="preserve"><span class="lineNumber">1177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1178" xml:space="preserve"><span class="lineNumber">1178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1178" xml:space="preserve"><span class="lineNumber">1178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">retval</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1179" xml:space="preserve"><span class="lineNumber">1179</span>&nbsp;</span>
+  <span class="code" id="1179" xml:space="preserve"><span class="lineNumber">1179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1180" xml:space="preserve"><span class="lineNumber">1180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalAlloc_2BBF30DF97AE4CD214DF3D54F18EB7863BE6942A">GlobalAlloc</a><span class="other">(</span><a href="../doc/enumerated_type_GlobalAllocFlags_9AD4C6350B2FC2D1A5621B860918BA9A8AE88BDA.html">GlobalAllocFlags</a>&nbsp;<span class="identifier">flags</span><span class="other">,&nbsp;</span><span class="kw">ulong</span>&nbsp;<span class="identifier">size</span><span class="other">)</span></span>
+  <span class="code" id="1180" xml:space="preserve"><span class="lineNumber">1180</span>&nbsp;</span>
   <br/>
-  <span class="code" id="1181" xml:space="preserve"><span class="lineNumber">1181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1181" xml:space="preserve"><span class="lineNumber">1181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalLock_D3938786A26F30F49FE30DF2F7F4EB06662ACFC2">GlobalLock</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">memHandle</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1182" xml:space="preserve"><span class="lineNumber">1182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">retval</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalAlloc">WinGlobalAlloc</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">uint</span><span class="other">></span><span class="other">(</span><span class="identifier">flags</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">size</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1182" xml:space="preserve"><span class="lineNumber">1182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1183" xml:space="preserve"><span class="lineNumber">1183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">retval</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <span class="code" id="1183" xml:space="preserve"><span class="lineNumber">1183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">retval</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalLock">WinGlobalLock</a><span class="other">(</span><span class="identifier">memHandle</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1184" xml:space="preserve"><span class="lineNumber">1184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1184" xml:space="preserve"><span class="lineNumber">1184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">retval</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1185" xml:space="preserve"><span class="lineNumber">1185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1185" xml:space="preserve"><span class="lineNumber">1185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1186" xml:space="preserve"><span class="lineNumber">1186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1186" xml:space="preserve"><span class="lineNumber">1186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1187" xml:space="preserve"><span class="lineNumber">1187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">retval</span><span class="other">;</span></span>
+  <span class="code" id="1187" xml:space="preserve"><span class="lineNumber">1187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1188" xml:space="preserve"><span class="lineNumber">1188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1188" xml:space="preserve"><span class="lineNumber">1188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">retval</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1189" xml:space="preserve"><span class="lineNumber">1189</span>&nbsp;</span>
+  <span class="code" id="1189" xml:space="preserve"><span class="lineNumber">1189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1190" xml:space="preserve"><span class="lineNumber">1190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalLock_D3938786A26F30F49FE30DF2F7F4EB06662ACFC2">GlobalLock</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">memHandle</span><span class="other">)</span></span>
+  <span class="code" id="1190" xml:space="preserve"><span class="lineNumber">1190</span>&nbsp;</span>
   <br/>
-  <span class="code" id="1191" xml:space="preserve"><span class="lineNumber">1191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1191" xml:space="preserve"><span class="lineNumber">1191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalUnlock_CD85691FDF99AB01B8A97C7D61A56BCFE926596B">GlobalUnlock</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">memHandle</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1192" xml:space="preserve"><span class="lineNumber">1192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">retval</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalLock">WinGlobalLock</a><span class="other">(</span><span class="identifier">memHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1192" xml:space="preserve"><span class="lineNumber">1192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1193" xml:space="preserve"><span class="lineNumber">1193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">retval</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <span class="code" id="1193" xml:space="preserve"><span class="lineNumber">1193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">retval</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalUnlock">WinGlobalUnlock</a><span class="other">(</span><span class="identifier">memHandle</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1194" xml:space="preserve"><span class="lineNumber">1194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1194" xml:space="preserve"><span class="lineNumber">1194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">retval</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1195" xml:space="preserve"><span class="lineNumber">1195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1195" xml:space="preserve"><span class="lineNumber">1195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1196" xml:space="preserve"><span class="lineNumber">1196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1196" xml:space="preserve"><span class="lineNumber">1196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ulong</span>&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1197" xml:space="preserve"><span class="lineNumber">1197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">retval</span><span class="other">;</span></span>
+  <span class="code" id="1197" xml:space="preserve"><span class="lineNumber">1197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">error</span><span class="other">&nbsp;!=&nbsp;</span><span class="number">0u</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1198" xml:space="preserve"><span class="lineNumber">1198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1198" xml:space="preserve"><span class="lineNumber">1198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1199" xml:space="preserve"><span class="lineNumber">1199</span>&nbsp;</span>
+  <span class="code" id="1199" xml:space="preserve"><span class="lineNumber">1199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><span class="identifier">error</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1200" xml:space="preserve"><span class="lineNumber">1200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalUnlock_CD85691FDF99AB01B8A97C7D61A56BCFE926596B">GlobalUnlock</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">memHandle</span><span class="other">)</span></span>
+  <span class="code" id="1200" xml:space="preserve"><span class="lineNumber">1200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1201" xml:space="preserve"><span class="lineNumber">1201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1201" xml:space="preserve"><span class="lineNumber">1201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1202" xml:space="preserve"><span class="lineNumber">1202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">retval</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalUnlock">WinGlobalUnlock</a><span class="other">(</span><span class="identifier">memHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1202" xml:space="preserve"><span class="lineNumber">1202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1203" xml:space="preserve"><span class="lineNumber">1203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">retval</span><span class="other">)</span></span>
+  <span class="code" id="1203" xml:space="preserve"><span class="lineNumber">1203</span>&nbsp;</span>
   <br/>
-  <span class="code" id="1204" xml:space="preserve"><span class="lineNumber">1204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1204" xml:space="preserve"><span class="lineNumber">1204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalFree_32D29F7307DC834DB1E6CBED8B925AFEE6D8C0C2">GlobalFree</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">memHandle</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1205" xml:space="preserve"><span class="lineNumber">1205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ulong</span>&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1205" xml:space="preserve"><span class="lineNumber">1205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1206" xml:space="preserve"><span class="lineNumber">1206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">error</span><span class="other">&nbsp;!=&nbsp;</span><span class="number">0u</span><span class="other">)</span></span>
+  <span class="code" id="1206" xml:space="preserve"><span class="lineNumber">1206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">retval</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalFree">WinGlobalFree</a><span class="other">(</span><span class="identifier">memHandle</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1207" xml:space="preserve"><span class="lineNumber">1207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="1207" xml:space="preserve"><span class="lineNumber">1207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">retval</span><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="1208" xml:space="preserve"><span class="lineNumber">1208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><span class="identifier">error</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1208" xml:space="preserve"><span class="lineNumber">1208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1209" xml:space="preserve"><span class="lineNumber">1209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1209" xml:space="preserve"><span class="lineNumber">1209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
   <span class="code" id="1210" xml:space="preserve"><span class="lineNumber">1210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
@@ -2434,13 +2434,13 @@
   <br/>
   <span class="code" id="1212" xml:space="preserve"><span class="lineNumber">1212</span>&nbsp;</span>
   <br/>
-  <span class="code" id="1213" xml:space="preserve"><span class="lineNumber">1213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalFree_32D29F7307DC834DB1E6CBED8B925AFEE6D8C0C2">GlobalFree</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">memHandle</span><span class="other">)</span></span>
+  <span class="code" id="1213" xml:space="preserve"><span class="lineNumber">1213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">ulong</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalSize_3A7409056F99276B335B26F6D404CACC46DB20CC">GlobalSize</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">memHandle</span><span class="other">)</span></span>
   <br/>
   <span class="code" id="1214" xml:space="preserve"><span class="lineNumber">1214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="1215" xml:space="preserve"><span class="lineNumber">1215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">retval</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalFree">WinGlobalFree</a><span class="other">(</span><span class="identifier">memHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="1215" xml:space="preserve"><span class="lineNumber">1215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ulong</span>&nbsp;<span class="identifier">size</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalSize">WinGlobalSize</a><span class="other">(</span><span class="identifier">memHandle</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1216" xml:space="preserve"><span class="lineNumber">1216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">retval</span><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <span class="code" id="1216" xml:space="preserve"><span class="lineNumber">1216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">size</span><span class="other">&nbsp;==&nbsp;</span><span class="number">0u</span><span class="other">)</span></span>
   <br/>
   <span class="code" id="1217" xml:space="preserve"><span class="lineNumber">1217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
@@ -2448,29 +2448,11 @@
   <br/>
   <span class="code" id="1219" xml:space="preserve"><span class="lineNumber">1219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1220" xml:space="preserve"><span class="lineNumber">1220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1220" xml:space="preserve"><span class="lineNumber">1220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">size</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="1221" xml:space="preserve"><span class="lineNumber">1221</span>&nbsp;</span>
+  <span class="code" id="1221" xml:space="preserve"><span class="lineNumber">1221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="1222" xml:space="preserve"><span class="lineNumber">1222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">ulong</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GlobalSize_3A7409056F99276B335B26F6D404CACC46DB20CC">GlobalSize</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">memHandle</span><span class="other">)</span></span>
-  <br/>
-  <span class="code" id="1223" xml:space="preserve"><span class="lineNumber">1223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-  <br/>
-  <span class="code" id="1224" xml:space="preserve"><span class="lineNumber">1224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">ulong</span>&nbsp;<span class="identifier">size</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinGlobalSize">WinGlobalSize</a><span class="other">(</span><span class="identifier">memHandle</span><span class="other">)</span><span class="other">;</span></span>
-  <br/>
-  <span class="code" id="1225" xml:space="preserve"><span class="lineNumber">1225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">size</span><span class="other">&nbsp;==&nbsp;</span><span class="number">0u</span><span class="other">)</span></span>
-  <br/>
-  <span class="code" id="1226" xml:space="preserve"><span class="lineNumber">1226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-  <br/>
-  <span class="code" id="1227" xml:space="preserve"><span class="lineNumber">1227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-  <br/>
-  <span class="code" id="1228" xml:space="preserve"><span class="lineNumber">1228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-  <br/>
-  <span class="code" id="1229" xml:space="preserve"><span class="lineNumber">1229</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">size</span><span class="other">;</span></span>
-  <br/>
-  <span class="code" id="1230" xml:space="preserve"><span class="lineNumber">1230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-  <br/>
-  <span class="code" id="1231" xml:space="preserve"><span class="lineNumber">1231</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="1222" xml:space="preserve"><span class="lineNumber">1222</span>&nbsp;<span class="other">}</span></span>
   <br/>
  </body>
 </html>

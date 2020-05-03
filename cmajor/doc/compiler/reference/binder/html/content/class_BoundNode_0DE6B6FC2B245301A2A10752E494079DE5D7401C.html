@@ -23,7 +23,7 @@
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#constructor_BoundNode_5FF5655F2BDB1910F0713A155A40A9B98C2CA54E">BoundNode</a>(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* module_, <span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span_, <a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a> boundNodeType_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#constructor_BoundNode_2B8C42E36BE8F2E37063F701D9B8A582F4369D4B">BoundNode</a>(Module* module_, <span class="kw">const </span>Span&amp; span_, <a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a> boundNodeType_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -44,6 +44,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_GetSpan_EF7BF8F6A4CFCCA323EC5FF257944D0BADB1A3AB">GetSpan</a>() <span class="kw">const</span></td>
             </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html#function_ResetCodeGenerated_35D25AF856C72EA3C08602A9867E5FB74F614023">ResetCodeGenerated</a>() <span class="kw">virtual</span></td>
+            </tr>
         </table>
         <h2>Member Variables</h2>
         <table>
@@ -62,12 +66,10 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_BoundNode_5FF5655F2BDB1910F0713A155A40A9B98C2CA54E">BoundNode Constructor</h3>
+        <h3 id="constructor_BoundNode_2B8C42E36BE8F2E37063F701D9B8A582F4369D4B">BoundNode Constructor</h3>
         <h4>
-            cmajor::binder::BoundNode::BoundNode(<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
-            * module_, <span class="kw">const </span>
-            <a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
-            &amp; span_, <a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a>
+            cmajor::binder::BoundNode::BoundNode(Module* module_, <span class="kw">const </span>
+            Span&amp; span_, <a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a>
              boundNodeType_)</h4>
         <span>
             Definition at line <a href="file/BoundNode.cpp_5C771174AAF4A2086A815E8AC3DB276CEBA808BF.html#10">10</a>
@@ -82,12 +84,6 @@
             </span>
             <br/>
         </span>
-        <br/>
-        <span>
-            Declaration at line <a href="file/BoundNode.hpp_9F4F3D7E83CC9A525A301EA4D0290C026A8F8D05.html#39">39</a>
-             of <a href="file/BoundNode.hpp_9F4F3D7E83CC9A525A301EA4D0290C026A8F8D05.html">BoundNode.hpp</a>
-        </span>
-        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -172,14 +168,14 @@
         <br/>
         <br/>
         <span>
-            Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_E8634DBBD57871205FB6E0E4523D4C916CCD1972">cmajor::binder::ControlFlowAnalyzer::Visit</a>
+            Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_C57DD454263F760E28F6757B58686636C32E06F0">cmajor::binder::ControlFlowAnalyzer::Visit</a>
+            , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_E8634DBBD57871205FB6E0E4523D4C916CCD1972">cmajor::binder::ControlFlowAnalyzer::Visit</a>
             , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_7AB656CE82771AC38BD8EC2C62F2B40CD4A8226E">cmajor::binder::ControlFlowAnalyzer::Visit</a>
             , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_E9C42282886875DCB9DA9AFDD94E88E5DC5E11DC">cmajor::binder::ControlFlowAnalyzer::Visit</a>
             , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_E3A4CD1605B8BA56304538C3A0B58A544ADCFCF5">cmajor::binder::ControlFlowAnalyzer::Visit</a>
             , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_B25E4EDF645E3DCA0495332BDBD268664932A1AD">cmajor::binder::ControlFlowAnalyzer::Visit</a>
-            , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_C57DD454263F760E28F6757B58686636C32E06F0">cmajor::binder::ControlFlowAnalyzer::Visit</a>
-            , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_B0613E25116CD0A00FFB85DA67325A47CE8951AF">cmajor::binder::ControlFlowAnalyzer::Visit</a>
             , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_0B8630F0EE0680C6305A6ABB62C2951B87921A5E">cmajor::binder::ControlFlowAnalyzer::Visit</a>
+            , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_B0613E25116CD0A00FFB85DA67325A47CE8951AF">cmajor::binder::ControlFlowAnalyzer::Visit</a>
             , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_8B82E81A80FA6CBF8EC7F8663F06BE9DA8C6AAC1">cmajor::binder::ControlFlowAnalyzer::Visit</a>
             , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_76DE45D12F4DB8B689700A912D596532307B654B">cmajor::binder::ControlFlowAnalyzer::Visit</a>
         </span>
@@ -207,26 +203,26 @@
             , <a href="./class_BoundAtomicConstraint_A29A7050399C393E2F748799A34ED6079AF5D0A9.html#function_Subsume_559D27FE8EBAC8F278EFAEAC3D144E41DE1D9892">cmajor::binder::BoundAtomicConstraint::Subsume</a>
             , <a href="./class_BoundCaseStatement_4FEE6EA6482A8618DE2491D7D5E742F76FE4FA80.html#function_AddStatement_68F1339BA67789ABE409B459BE1CEA2ED2B400E1">cmajor::binder::BoundCaseStatement::AddStatement</a>
             , <a href="./class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#function_ContainsSourceFunctions_611135F97488856A51FA0709618880EC5FE85844">cmajor::binder::BoundClass::ContainsSourceFunctions</a>
-            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetConversion_3BED5C850B9D50AC7F750B66C29D4FF6E4046763">cmajor::binder::BoundCompileUnit::GetConversion</a>
+            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetConversion_6B074B7199E6617424F3C39F70ABB5A5C3A89C68">cmajor::binder::BoundCompileUnit::GetConversion</a>
             , <a href="./class_BoundConjunctiveConstraint_E216290CEE69C66F885A809F08880CD641171D80.html#function_Subsume_763715D0D4DC6789DD032C677C4D0DBFA04ABDEF">cmajor::binder::BoundConjunctiveConstraint::Subsume</a>
             , <a href="./class_BoundDefaultStatement_7964CD8CACCBFB99CF250DDCD68A65146674800C.html#function_AddStatement_6111161AEE38594F4348FF83724BCF117D593244">cmajor::binder::BoundDefaultStatement::AddStatement</a>
             , <a href="./class_BoundDereferenceExpression_148C0D624D0D019C3691247C87FF0A797FA273CF.html#function_Load_80C7B2EADE6B10CFA3C2A26656FB8D902C7E9431">cmajor::binder::BoundDereferenceExpression::Load</a>
             , <a href="./class_BoundDereferenceExpression_148C0D624D0D019C3691247C87FF0A797FA273CF.html#function_Store_ADF782AF4FEA6C3DF588EAE2B05773E19A085E9B">cmajor::binder::BoundDereferenceExpression::Store</a>
             , <a href="./class_BoundDisjunctiveConstraint_1EA0A4FA6AD40F2192E613CBEF8F2075E8A99A4A.html#function_Subsume_7DE48261FAB4FBFDA050EFD33CEB8F9A6283AA77">cmajor::binder::BoundDisjunctiveConstraint::Subsume</a>
             , <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html#function_Block_8F50A878D511B2F9D4638968F492AB60CE1B12A3">cmajor::binder::BoundStatement::Block</a>
-            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_Instantiate_CE0E508C9EFF26C3FC38CFD6B0E620E07F160ECD">cmajor::binder::ClassTemplateRepository::Instantiate</a>
+            , <a href="./class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html#function_Instantiate_003D803D6A7DADB14637AF11D3718BDF7E5A8E3D">cmajor::binder::ClassTemplateRepository::Instantiate</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_FF365E6AAF51933B4258A6E09499810F444A705D">cmajor::binder::ExpressionBinder::Visit</a>
-            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_BAA85F7A02C9B0B468F177F039059732FB72E873">cmajor::binder::ExpressionBinder::Visit</a>
             , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_333FCA5FC1817A103EE015FE972C5B7D901E0477">cmajor::binder::ExpressionBinder::Visit</a>
-            , <a href="./class_InlineFunctionRepository_5087FA71559FE89FBD4D112BF75AFF6F24536D23.html#function_Instantiate_748F5998F71FF311399583C8FE0ED8171236A8D6">cmajor::binder::InlineFunctionRepository::Instantiate</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonConstructorImplementation_E4C0328960BC51407C5BDD4A67EF64F654145BD4">cmajor::binder::JsonAttributeProcessor::GenerateJsonConstructorImplementation</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonCreatorImplementation_F5CF8DE1D7A5548D77E66DF50732AA651ED3AC8D">cmajor::binder::JsonAttributeProcessor::GenerateJsonCreatorImplementation</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonImplementation_49B8B4F48867EF9707DD8293458D7FB463B13279">cmajor::binder::JsonAttributeProcessor::GenerateToJsonImplementation</a>
-            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonJsonObjectImplementation_91D668378A3A921EB0A98970E8FBD93FC3E9381F">cmajor::binder::JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation</a>
+            , <a href="./class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html#function_Visit_BAA85F7A02C9B0B468F177F039059732FB72E873">cmajor::binder::ExpressionBinder::Visit</a>
+            , <a href="./class_InlineFunctionRepository_5087FA71559FE89FBD4D112BF75AFF6F24536D23.html#function_Instantiate_3201D7C943391886049348D6C3CEDA94F96B9C82">cmajor::binder::InlineFunctionRepository::Instantiate</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonConstructorImplementation_AC07CF0E1A5DC43F01E740B75EDDC1CB0F12A793">cmajor::binder::JsonAttributeProcessor::GenerateJsonConstructorImplementation</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateJsonCreatorImplementation_FF6CC067584D317FE258876AB492F8EA46890785">cmajor::binder::JsonAttributeProcessor::GenerateJsonCreatorImplementation</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonImplementation_754128B46008E2C3CC8E7DB45354661910D35AAF">cmajor::binder::JsonAttributeProcessor::GenerateToJsonImplementation</a>
+            , <a href="./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html#function_GenerateToJsonJsonObjectImplementation_3FAF45A5B7E04DA984FA6524C226B27F24C608B1">cmajor::binder::JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_E7F0322DC0AD43848C62ED4291AE15B00E72EBB8">cmajor::binder::StatementBinder::Visit</a>
+            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_1CD4B52954B8243AF6C58E4827EE69A4C484E1C4">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_558820D6B8ABE685844CE49FA5C4C9CB2A77D4FD">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_F57EE4906DB1359AB6BF98FC6ECAB41A29FC4372">cmajor::binder::StatementBinder::Visit</a>
-            , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_1CD4B52954B8243AF6C58E4827EE69A4C484E1C4">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_9548582F3A89212A7380FA15BB019AF10A433959">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_1C89ABA4B09B369F5FB626B40A2D3E925A14A2DD">cmajor::binder::StatementBinder::Visit</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_8910F839BABB89EC73B946AD2EC770C7FAC82897">cmajor::binder::StatementBinder::Visit</a>
@@ -373,6 +369,7 @@
             , <a href="./class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_Load_1B0A52102A92AAF8FE6BB803C75E9CDA52ECE9E7">cmajor::binder::BoundClassDelegateCall::Load</a>
             , <a href="./class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_Store_F849B430325FAF14B5A3A6214158F2FAF8355DC2">cmajor::binder::BoundClassDelegateCall::Store</a>
             , <a href="./class_BoundClassOrClassDelegateConversionResult_D567FAC30733A2FFC5F2046B64EE2668ECCB14D4.html#function_Store_9F08E46E091A40E90AF2E95315F581998DB84B46">cmajor::binder::BoundClassOrClassDelegateConversionResult::Store</a>
+            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetConversion_6B074B7199E6617424F3C39F70ABB5A5C3A89C68">cmajor::binder::BoundCompileUnit::GetConversion</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_Load_B4936AABFEF6484C804CC085B6D35BAC977E583E">cmajor::binder::BoundCompileUnit::Load</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_ReleaseLastFileScope_163DBD42D3E3E3C1AD3321AAC57A7183DF450562">cmajor::binder::BoundCompileUnit::ReleaseLastFileScope</a>
             , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_RemoveLastFileScope_5171E434C34E7DABB6605399D42B27AA4A65D966">cmajor::binder::BoundCompileUnit::RemoveLastFileScope</a>
@@ -457,6 +454,38 @@
             , <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_ResolveGoto_C21123661D8AA4BC79EF45A963F256F5F6E81832">cmajor::binder::ControlFlowAnalyzer::ResolveGoto</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_AddStatement_D7B1DA463D0C3815D8A624D79E43185FC2312D1D">cmajor::binder::StatementBinder::AddStatement</a>
             , <a href="./class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html#function_Visit_53321E38F4CBB1DAE72430DCE09CDA0AFD31DB81">cmajor::binder::StatementBinder::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_ResetCodeGenerated_35D25AF856C72EA3C08602A9867E5FB74F614023">ResetCodeGenerated Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::binder::BoundNode::ResetCodeGenerated() <span class="kw">virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/BoundNode.cpp_5C771174AAF4A2086A815E8AC3DB276CEBA808BF.html#14">14</a>
+             of <a href="file/BoundNode.cpp_5C771174AAF4A2086A815E8AC3DB276CEBA808BF.html">BoundNode.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/BoundNode.hpp_9F4F3D7E83CC9A525A301EA4D0290C026A8F8D05.html#44">44</a>
+             of <a href="file/BoundNode.hpp_9F4F3D7E83CC9A525A301EA4D0290C026A8F8D05.html">BoundNode.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_BoundClass_7543829BD18DE42FC1CCF6D39DA9E4A67B655C73.html#function_ResetCodeGenerated_FF06D8DCB1FED7C0803CD36F80D445C4B3EDC725">cmajor::binder::BoundClass::ResetCodeGenerated</a>
+            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_ResetCodeGenerated_AC88863D5F33D8F8625CC0B8D4BEE804281D403B">cmajor::binder::BoundCompileUnit::ResetCodeGenerated</a>
+            , <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_ResetCodeGenerated_4C5AB00E0656B378C1C0434D86570352EB8FC7E3">cmajor::binder::BoundFunction::ResetCodeGenerated</a>
+            , <a href="./class_BoundNamespace_375BBA0BCE817278C8231A074DFE5AB7B3E7A456.html#function_ResetCodeGenerated_718E74AD548B207C859829D5BF6D7CB4B361BED5">cmajor::binder::BoundNamespace::ResetCodeGenerated</a>
         </span>
         <br/>
         <br/>

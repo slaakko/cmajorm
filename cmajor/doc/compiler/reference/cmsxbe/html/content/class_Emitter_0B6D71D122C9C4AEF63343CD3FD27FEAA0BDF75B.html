@@ -685,6 +685,10 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_DebugPrintDebugInfo_3EC21D1B3501F89A2E832B5490724892E7B1BE6F">DebugPrintDebugInfo</a>(<span class="kw">const </span>std::string&amp; filePath) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_DestroyModule_AE0F407BD6864F3348F90D1EDA4A57AC5A9A3098">DestroyModule</a>(<span class="kw">void</span>* module) <span class="kw">override</span></td>
             </tr>
             <tr>
@@ -737,7 +741,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_GetClassIdPtr_BF0CC080DA7B1264ED948146B29D430C4C3ED8F2">GetClassIdPtr</a>(<span class="kw">void</span>* vmtPtr) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_GetClassIdPtr_114C331F4B754114C37E452DA92190BD8A1F6072">GetClassIdPtr</a>(<span class="kw">void</span>* vmtPtr, int32_t classIdVmtIndexOffset) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
@@ -1057,7 +1061,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_MapClassPtr_0CD6B3EF50B45A2CA49FCF76585682D895803D81">MapClassPtr</a>(<span class="kw">const </span>boost::uuids::uuid&amp; typeId, <span class="kw">void</span>* classPtr) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_MapClassPtr_C64ED76E0C663A1FB4EF07B9376D04CA31BFFC36">MapClassPtr</a>(<span class="kw">const </span>boost::uuids::uuid&amp; typeId, <span class="kw">void</span>* classPtr, <span class="kw">const </span>std::string&amp; className) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -1133,7 +1137,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_SetDITypeByTypeId_A0F78D5A81401E621278C913D3CB828EBF6E165E">SetDITypeByTypeId</a>(<span class="kw">const </span>boost::uuids::uuid&amp; typeId, <span class="kw">void</span>* diType) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_SetDITypeByTypeId_F2DCF6EECCA7A3BF55F94BA8C733F738D4CB238B">SetDITypeByTypeId</a>(<span class="kw">const </span>boost::uuids::uuid&amp; typeId, <span class="kw">void</span>* diType, <span class="kw">const </span>std::string&amp; typeName) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -1150,6 +1154,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_SetFunction_F9CF076B9312DE4020E7B80394BA7F11043E48A6">SetFunction</a>(<span class="kw">void</span>* function_) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html#function_SetFunctionCallConventionToStdCall_C7D77744678D4CAC06B180742FA792FFB1A94B69">SetFunctionCallConventionToStdCall</a>(<span class="kw">void</span>* function) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -1346,12 +1354,12 @@
             * caseDest) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1673">1673</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1678">1678</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#307">307</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#308">308</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -1375,12 +1383,12 @@
             * exceptionTypeId) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1792">1792</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1797">1797</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#330">330</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#331">331</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -1447,12 +1455,12 @@
             * mdItem) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1734">1734</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1739">1739</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#318">318</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#319">319</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -1480,12 +1488,12 @@
             * function) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1652">1652</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1657">1657</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#303">303</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#304">304</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -1503,12 +1511,12 @@
             * function) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1657">1657</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1662">1662</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#304">304</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#305">305</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -1670,12 +1678,12 @@
             * irType) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1606">1606</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1611">1611</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#294">294</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#295">295</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -2224,12 +2232,12 @@
             * allocaInst) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1621">1621</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1626">1626</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#297">297</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#298">298</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -2251,12 +2259,12 @@
              flags) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1595">1595</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1600">1600</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#292">292</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#293">293</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -2307,12 +2315,12 @@
              flags) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1588">1588</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1593">1593</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#290">290</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#291">291</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -2334,12 +2342,12 @@
             * allocaInst) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1615">1615</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1620">1620</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#296">296</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#297">297</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -3365,12 +3373,12 @@
             >&amp; indeces) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1796">1796</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1801">1801</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#331">331</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#332">332</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -3850,12 +3858,12 @@
             >&amp; indeces) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1801">1801</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1806">1806</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#332">332</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#333">333</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -4583,12 +4591,12 @@
             * lpType) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1779">1779</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1784">1784</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#327">327</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#328">328</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -4606,12 +4614,12 @@
             Span&amp; span) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1662">1662</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1667">1667</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#305">305</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#306">306</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -4657,12 +4665,12 @@
             * bb) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1729">1729</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1734">1734</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#317">317</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#318">318</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -4690,12 +4698,12 @@
              value) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1699">1699</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1704">1704</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#311">311</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#312">312</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -4717,12 +4725,12 @@
             * cmsxbe::Emitter::CreateMDLong(int64_t value) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1704">1704</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1709">1709</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#312">312</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#313">313</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -4750,12 +4758,12 @@
             std::string&amp; value) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1709">1709</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1714">1714</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#313">313</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#314">314</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -4777,12 +4785,12 @@
             * cmsxbe::Emitter::CreateMDStruct() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1724">1724</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1729">1729</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#316">316</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#317">317</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -4810,12 +4818,12 @@
              id) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1714">1714</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1719">1719</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#314">314</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#315">315</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -5116,12 +5124,12 @@
             * exception) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1811">1811</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1816">1816</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#334">334</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#335">335</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -5139,12 +5147,12 @@
             * value) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1637">1637</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1642">1642</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#300">300</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#301">301</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -5166,12 +5174,12 @@
             * cmsxbe::Emitter::CreateRetVoid() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1642">1642</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1647">1647</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#301">301</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#302">302</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -5425,12 +5433,12 @@
             *>&amp; elementTypes) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1564">1564</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1569">1569</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#286">286</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#287">287</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -5450,12 +5458,12 @@
              numCases) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1668">1668</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1673">1673</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#306">306</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#307">307</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -5594,12 +5602,12 @@
             * type) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1806">1806</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1811">1811</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#333">333</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#334">334</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -5784,6 +5792,29 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_DebugPrintDebugInfo_3EC21D1B3501F89A2E832B5490724892E7B1BE6F">DebugPrintDebugInfo Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmsxbe::Emitter::DebugPrintDebugInfo(<span class="kw">const </span>
+            std::string&amp; filePath) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1820">1820</a>
+             of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#336">336</a>
+             of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_DebugPrintDebugInfo_51732ECBE7612906D0CC12E585397C15BB82DC4B">cmajor::ir::Emitter::DebugPrintDebugInfo</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_DestroyModule_AE0F407BD6864F3348F90D1EDA4A57AC5A9A3098">DestroyModule Member Function</h3>
         <h4>
             <span class="kw">void</span>
@@ -5951,12 +5982,12 @@
             * function) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1759">1759</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1764">1764</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#323">323</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#324">324</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -5975,12 +6006,12 @@
             *>&amp; args) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1679">1679</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1684">1684</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#308">308</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#309">309</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -6099,11 +6130,11 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_GetClassIdPtr_BF0CC080DA7B1264ED948146B29D430C4C3ED8F2">GetClassIdPtr Member Function</h3>
+        <h3 id="function_GetClassIdPtr_114C331F4B754114C37E452DA92190BD8A1F6072">GetClassIdPtr Member Function</h3>
         <h4>
             <span class="kw">void</span>
             * cmsxbe::Emitter::GetClassIdPtr(<span class="kw">void</span>
-            * vmtPtr) <span class="kw">override</span>
+            * vmtPtr, int32_t classIdVmtIndexOffset) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1348">1348</a>
@@ -6117,7 +6148,7 @@
         <br/>
         <br/>
         <span>
-            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_GetClassIdPtr_7C9ADC92414B7ECC06B3240A90BB127F7E2E3CD5">cmajor::ir::Emitter::GetClassIdPtr</a>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_GetClassIdPtr_B2D5FC3CC4C047B2DD5FD09B625E5EC88EA7E993">cmajor::ir::Emitter::GetClassIdPtr</a>
         </span>
         <br/>
         <br/>
@@ -6212,12 +6243,12 @@
             std::string&amp; typeId) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1694">1694</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1699">1699</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#310">310</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#311">311</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -6379,12 +6410,12 @@
              argumentIndex) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1627">1627</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1632">1632</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#298">298</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#299">299</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -6404,12 +6435,12 @@
              isExplicit) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1582">1582</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1587">1587</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#289">289</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#290">290</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -7390,12 +7421,12 @@
             * mdStruct) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1719">1719</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1724">1724</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#315">315</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#316">316</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -7418,12 +7449,12 @@
             std::string&amp; sourceFileName) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1749">1749</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1754">1754</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#321">321</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#322">322</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -7827,12 +7858,12 @@
              cmsxbe::Emitter::GetPureVirtualVirtuality() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1570">1570</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1575">1575</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#287">287</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#288">288</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -7916,12 +7947,12 @@
              cmsxbe::Emitter::GetVirtualVirtuality() <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1576">1576</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1581">1581</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#288">288</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#289">289</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8045,12 +8076,12 @@
             * basicBlock) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1788">1788</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1793">1793</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#329">329</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#330">330</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8068,12 +8099,12 @@
             std::string&amp; str) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1764">1764</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1769">1769</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#324">324</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#325">325</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8096,12 +8127,12 @@
             std::u16string&amp; str) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1769">1769</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1774">1774</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#325">325</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#326">326</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8124,12 +8155,12 @@
             std::u32string&amp; str) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1774">1774</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1779">1779</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#326">326</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#327">327</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8191,12 +8222,13 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_MapClassPtr_0CD6B3EF50B45A2CA49FCF76585682D895803D81">MapClassPtr Member Function</h3>
+        <h3 id="function_MapClassPtr_C64ED76E0C663A1FB4EF07B9376D04CA31BFFC36">MapClassPtr Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmsxbe::Emitter::MapClassPtr(<span class="kw">const </span>
             boost::uuids::uuid&amp; typeId, <span class="kw">void</span>
-            * classPtr) <span class="kw">override</span>
+            * classPtr, <span class="kw">const </span>
+            std::string&amp; className) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#633">633</a>
@@ -8210,7 +8242,7 @@
         <br/>
         <br/>
         <span>
-            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_MapClassPtr_76532C7108CB4E2623330C0447C8BA0C4F9CB3F5">cmajor::ir::Emitter::MapClassPtr</a>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_MapClassPtr_D0C0350D73AA6ACE8E0F92A2C2348DFDD2AE8DB7">cmajor::ir::Emitter::MapClassPtr</a>
         </span>
         <br/>
         <br/>
@@ -8246,12 +8278,12 @@
             * irType) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1610">1610</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1615">1615</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#295">295</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#296">296</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8434,12 +8466,12 @@
             std::string&amp; compileUnitId) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1689">1689</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1694">1694</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#309">309</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#310">310</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8541,12 +8573,12 @@
              currentLineNumber) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1744">1744</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1749">1749</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#320">320</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#321">321</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8640,12 +8672,12 @@
             * subprogram) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1601">1601</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1606">1606</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#293">293</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#294">294</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8656,12 +8688,13 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_SetDITypeByTypeId_A0F78D5A81401E621278C913D3CB828EBF6E165E">SetDITypeByTypeId Member Function</h3>
+        <h3 id="function_SetDITypeByTypeId_F2DCF6EECCA7A3BF55F94BA8C733F738D4CB238B">SetDITypeByTypeId Member Function</h3>
         <h4>
             <span class="kw">void</span>
              cmsxbe::Emitter::SetDITypeByTypeId(<span class="kw">const </span>
             boost::uuids::uuid&amp; typeId, <span class="kw">void</span>
-            * diType) <span class="kw">override</span>
+            * diType, <span class="kw">const </span>
+            std::string&amp; typeName) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#581">581</a>
@@ -8675,7 +8708,7 @@
         <br/>
         <br/>
         <span>
-            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_SetDITypeByTypeId_C2C95CD66DC449186039D29B27C0990219FD941B">cmajor::ir::Emitter::SetDITypeByTypeId</a>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_SetDITypeByTypeId_5DD87413B2945BB5893219D758CB38D615A6A356">cmajor::ir::Emitter::SetDITypeByTypeId</a>
         </span>
         <br/>
         <br/>
@@ -8710,12 +8743,12 @@
             * callInst) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1632">1632</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1637">1637</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#299">299</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#300">300</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8756,6 +8789,29 @@
             * function_) <span class="kw">override</span>
         </h4>
         <span>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1559">1559</a>
+             of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#285">285</a>
+             of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_SetFunction_8DD616323D5873F2F734660B8DB6695A18E6C965">cmajor::ir::Emitter::SetFunction</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetFunctionCallConventionToStdCall_C7D77744678D4CAC06B180742FA792FFB1A94B69">SetFunctionCallConventionToStdCall Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmsxbe::Emitter::SetFunctionCallConventionToStdCall(<span class="kw">void</span>
+            * function) <span class="kw">override</span>
+        </h4>
+        <span>
             Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1554">1554</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
@@ -8767,7 +8823,7 @@
         <br/>
         <br/>
         <span>
-            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_SetFunction_8DD616323D5873F2F734660B8DB6695A18E6C965">cmajor::ir::Emitter::SetFunction</a>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_SetFunctionCallConventionToStdCall_76D6C9997B5A90B104DB7E4C470C937D6D0659C1">cmajor::ir::Emitter::SetFunctionCallConventionToStdCall</a>
         </span>
         <br/>
         <br/>
@@ -8851,12 +8907,12 @@
              mdId) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1739">1739</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1744">1744</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#319">319</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#320">320</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -8928,12 +8984,12 @@
              inPrologue_) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1559">1559</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1564">1564</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#285">285</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#286">286</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -9028,12 +9084,12 @@
             * landingPad) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1784">1784</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1789">1789</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#328">328</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#329">329</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -9074,12 +9130,12 @@
             * mdStructRef) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1754">1754</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1759">1759</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#322">322</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#323">323</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>
@@ -9159,12 +9215,12 @@
             * personalityFunction) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1647">1647</a>
+            Definition at line <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html#1652">1652</a>
              of <a href="file/Emitter.cpp_67838ACA621B03389AA68DFC45A64CC9B90E4ED0.html">Emitter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#302">302</a>
+            Declaration at line <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html#303">303</a>
              of <a href="file/Emitter.hpp_541596EE5A5FA2F3292D0F7BCED4BFBE95D40307.html">Emitter.hpp</a>
         </span>
         <br/>

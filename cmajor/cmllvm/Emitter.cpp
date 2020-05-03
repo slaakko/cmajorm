@@ -383,10 +383,17 @@ void Emitter::EmitObjectCodeFile(const std::string& objectFilePath)
     llvm::legacy::PassManager passManager;
     std::error_code errorCode;
     llvm::raw_fd_ostream objectFile(objectFilePath, errorCode, llvm::sys::fs::F_None);
+#if (LLVM_VERSION_MAJOR >= 10)
+    if (static_cast<llvm::TargetMachine*>(emittingContext.TargetMachine())->addPassesToEmitFile(passManager, objectFile, nullptr, llvm::CodeGenFileType::CGFT_ObjectFile))
+    {
+        throw std::runtime_error("Emitter: cannot emit object code file '" + objectFilePath + "': addPassesToEmitFile failed");
+    }
+#else
     if (static_cast<llvm::TargetMachine*>(emittingContext.TargetMachine())->addPassesToEmitFile(passManager, objectFile, nullptr, llvm::TargetMachine::CodeGenFileType::CGFT_ObjectFile))
     {
         throw std::runtime_error("Emitter: cannot emit object code file '" + objectFilePath + "': addPassesToEmitFile failed");
     }
+#endif
     passManager.run(*module);
     objectFile.flush();
     if (objectFile.has_error())
@@ -1503,6 +1510,19 @@ void* Emitter::CreateDITypeForArray(void* elementDIType, const std::vector<void*
 
 }
 
+#if (LLVM_VERSION_MAJOR >= 10)
+
+void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span)
+{
+    uint64_t sizeInBits = dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)))->getSizeInBits();
+    uint64_t alignInBits = 8 * dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)))->getAlignment().value();
+    uint64_t offsetInBits = 0; // todo?
+    return diBuilder->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, name, nullptr, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)), span.line,
+        0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, mangledName);
+}
+
+#else
+
 void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& name, const std::string& mangledName, const Span& span)
 {
     uint64_t sizeInBits = dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)))->getSizeInBits();
@@ -1512,12 +1532,37 @@ void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& nam
         0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, mangledName);
 }
 
+#endif
+
 uint64_t Emitter::GetOffsetInBits(void* classIrType, int layoutIndex)
 {
     const llvm::StructLayout* structLayout = dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(classIrType)));
     uint64_t offsetInBits = structLayout->getElementOffsetInBits(layoutIndex);
     return offsetInBits;
 }
+
+#if (LLVM_VERSION_MAJOR >= 10)
+
+void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const std::string& name, void* vtableHolderClass,
+    const std::string& mangledName, void* baseClassDIType)
+{
+    std::vector<llvm::Metadata*> elements;
+    const llvm::StructLayout* structLayout = dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)));
+    for (void* element : memberVariableElements)
+    {
+        elements.push_back(static_cast<llvm::Metadata*>(element));
+    }
+    llvm::MDNode* templateParams = nullptr;
+    uint64_t sizeInBits = structLayout->getSizeInBits();
+    uint64_t alignInBits = 8 * structLayout->getAlignment().value();
+    uint64_t offsetInBits = 0; // todo?
+    llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
+    return diBuilder->createClassType(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(classSpan.fileIndex)), classSpan.line, sizeInBits, alignInBits, offsetInBits,
+        flags, static_cast<llvm::DIType*>(baseClassDIType), diBuilder->getOrCreateArray(elements), static_cast<llvm::DIType*>(vtableHolderClass), templateParams, mangledName);
+}
+
+
+#else
 
 void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& memberVariableElements, const Span& classSpan, const std::string& name, void* vtableHolderClass,
     const std::string& mangledName, void* baseClassDIType)
@@ -1536,6 +1581,8 @@ void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& 
     return diBuilder->createClassType(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(classSpan.fileIndex)), classSpan.line, sizeInBits, alignInBits, offsetInBits,
         flags, static_cast<llvm::DIType*>(baseClassDIType), diBuilder->getOrCreateArray(elements), static_cast<llvm::DIType*>(vtableHolderClass), templateParams, mangledName);
 }
+
+#endif
 
 void* Emitter::GetFunctionIrType(void* symbol) const
 {
@@ -1671,11 +1718,23 @@ uint64_t Emitter::GetClassTypeSizeInBits(void* classIrType)
     return sizeInBits;
 }
 
+#if (LLVM_VERSION_MAJOR >= 10)
+
+uint64_t Emitter::GetClassTypeAlignmentInBits(void* classIrType)
+{
+    uint64_t alignInBits = 8 * dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::StructType*>(classIrType)))->getAlignment().value();
+    return alignInBits;
+}
+
+#else
+
 uint64_t Emitter::GetClassTypeAlignmentInBits(void* classIrType)
 {
     uint32_t alignInBits = 8 * dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::StructType*>(classIrType)))->getAlignment();
     return alignInBits;
 }
+
+#endif
 
 void Emitter::AddInlineFunctionAttribute(void* function)
 {

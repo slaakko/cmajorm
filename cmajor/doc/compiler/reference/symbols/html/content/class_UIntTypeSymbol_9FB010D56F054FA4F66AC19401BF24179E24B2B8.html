@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>UIntTypeSymbol Class</title>
+        <title>UIntTypeSymbol Abstract Class</title>
         <link href="../style/style.css" rel="stylesheet" type="text/css"/>
         <script src="class_UIntTypeSymbol_9FB010D56F054FA4F66AC19401BF24179E24B2B8_inheritance.js" type="text/javascript"> </script>
     </head>
@@ -11,7 +11,7 @@
          | <a href="class_UCharValue_E02DF40BE40FB64E9A2D586E5B4AD88330C14DB4.html">prev</a>
          | <a href="class_UIntValue_48F155B503D9F354BD257AD831B2B69D2FBA1438.html">next</a>
         <hr/>
-        <h1>UIntTypeSymbol Class</h1>
+        <h1>UIntTypeSymbol Abstract Class</h1>
         <div class="diagram">
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
@@ -23,7 +23,7 @@
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_UIntTypeSymbol_9FB010D56F054FA4F66AC19401BF24179E24B2B8.html#constructor_UIntTypeSymbol_35747C7FB6D82D98C35B1367615DF4B60E1C5038">UIntTypeSymbol</a>(<span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_UIntTypeSymbol_9FB010D56F054FA4F66AC19401BF24179E24B2B8.html#constructor_UIntTypeSymbol_8578D6F78FE1A0EC0B28D00356724CEA769E7662">UIntTypeSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -34,11 +34,11 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UIntTypeSymbol_9FB010D56F054FA4F66AC19401BF24179E24B2B8.html#function_CreateDIType_5DB2EF5189A695DA97D4CD0ADBED1FF944772665">CreateDIType</a>(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>&amp; emitter) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UIntTypeSymbol_9FB010D56F054FA4F66AC19401BF24179E24B2B8.html#function_CreateDIType_AD339D325D0BA8E7C725EDAF3BD30D155D1B7AF4">CreateDIType</a>(Emitter&amp; emitter) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UIntTypeSymbol_9FB010D56F054FA4F66AC19401BF24179E24B2B8.html#function_CreateDefaultIrValue_AEE06030AA82B3567C8BF0C836397A9F5D186A22">CreateDefaultIrValue</a>(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>&amp; emitter) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UIntTypeSymbol_9FB010D56F054FA4F66AC19401BF24179E24B2B8.html#function_CreateDefaultIrValue_E50FB48247A66E1955DD5F670EA58AD34AD05ADC">CreateDefaultIrValue</a>(Emitter&amp; emitter) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a></td>
@@ -46,7 +46,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UIntTypeSymbol_9FB010D56F054FA4F66AC19401BF24179E24B2B8.html#function_IrType_6874C097573D7F36FB32D1D77DE4D983ECB8995C">IrType</a>(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>&amp; emitter) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UIntTypeSymbol_9FB010D56F054FA4F66AC19401BF24179E24B2B8.html#function_IrType_476F9CD4DC9B2E569F6DB93103531252916ADDC9">IrType</a>(Emitter&amp; emitter) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -71,24 +71,14 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_UIntTypeSymbol_35747C7FB6D82D98C35B1367615DF4B60E1C5038">UIntTypeSymbol Constructor</h3>
+        <h3 id="constructor_UIntTypeSymbol_8578D6F78FE1A0EC0B28D00356724CEA769E7662">UIntTypeSymbol Constructor</h3>
         <h4>
             cmajor::symbols::UIntTypeSymbol::UIntTypeSymbol(<span class="kw">const </span>
-            <a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
-            &amp; span_, <span class="kw">const </span>
+            Span&amp; span_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
             Definition at line <a href="file/BasicTypeSymbol.cpp_269286BDB4901324C1EAD0BCA0D3441C9ADE020B.html#300">300</a>
              of <a href="file/BasicTypeSymbol.cpp_269286BDB4901324C1EAD0BCA0D3441C9ADE020B.html">BasicTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">300</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_BasicTypeSymbol_0C5DF8AC79E0ECC3F7F9A2FE658C902BD1B7B018.html">BasicTypeSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_uintTypeSymbol_0E517D28092A8DF942C9CD4847248B0B6AEDA76E">uintTypeSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">301</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">302</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -108,12 +98,8 @@
         <span>
             Definition at line <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html#153">153</a>
              of <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html">BasicTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"UIntTypeSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_BasicTypeSymbol_0C5DF8AC79E0ECC3F7F9A2FE658C902BD1B7B018.html#function_ClassName_682111BC213E718C63B57D90BEBDE66DA27BF29A">cmajor::symbols::BasicTypeSymbol::ClassName</a>
@@ -124,24 +110,14 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_CreateDIType_5DB2EF5189A695DA97D4CD0ADBED1FF944772665">CreateDIType Member Function</h3>
+        <h3 id="function_CreateDIType_AD339D325D0BA8E7C725EDAF3BD30D155D1B7AF4">CreateDIType Member Function</h3>
         <h4>
             <span class="kw">void</span>
-            * cmajor::symbols::UIntTypeSymbol::CreateDIType(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>
-            &amp; emitter) <span class="kw">override</span>
+            * cmajor::symbols::UIntTypeSymbol::CreateDIType(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/BasicTypeSymbol.cpp_269286BDB4901324C1EAD0BCA0D3441C9ADE020B.html#314">314</a>
              of <a href="file/BasicTypeSymbol.cpp_269286BDB4901324C1EAD0BCA0D3441C9ADE020B.html">BasicTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">316</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateDITypeForUInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -150,40 +126,15 @@
         </span>
         <br/>
         <br/>
-        <span>
-            Base class overridden functions: <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_CreateDIType_EF238E677E0A5A20382E88D8DA7438516681F254">cmajor::symbols::TypeSymbol::CreateDIType</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Calls: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_CreateDITypeForUInt_78534131E56A9F4D2A8237D6A73BFA732EF38348">cmajor::ir::Emitter::CreateDITypeForUInt</a>
-        </span>
-        <br/>
-        <br/>
         <hr/>
-        <h3 id="function_CreateDefaultIrValue_AEE06030AA82B3567C8BF0C836397A9F5D186A22">CreateDefaultIrValue Member Function</h3>
+        <h3 id="function_CreateDefaultIrValue_E50FB48247A66E1955DD5F670EA58AD34AD05ADC">CreateDefaultIrValue Member Function</h3>
         <h4>
             <span class="kw">void</span>
-            * cmajor::symbols::UIntTypeSymbol::CreateDefaultIrValue(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>
-            &amp; emitter) <span class="kw">override</span>
+            * cmajor::symbols::UIntTypeSymbol::CreateDefaultIrValue(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html#146">146</a>
              of <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html">BasicTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateDefaultIrValueForUInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
-        </span>
-        <br/>
-        <span>
-            Base class overridden functions: <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_CreateDefaultIrValue_06FCAEC93D661C5D73CA1961BACA37E1156F3838">cmajor::symbols::TypeSymbol::CreateDefaultIrValue</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Calls: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_CreateDefaultIrValueForUInt_1C245E8F2B7F57954BA1F9323A2E4294786AC7DB">cmajor::ir::Emitter::CreateDefaultIrValueForUInt</a>
         </span>
         <br/>
         <br/>
@@ -196,15 +147,6 @@
         <span>
             Definition at line <a href="file/BasicTypeSymbol.cpp_269286BDB4901324C1EAD0BCA0D3441C9ADE020B.html#304">304</a>
              of <a href="file/BasicTypeSymbol.cpp_269286BDB4901324C1EAD0BCA0D3441C9ADE020B.html">BasicTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">305</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">306</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a><span class="other">::</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html#enumerator_uintValue_E79F7C22B54BCA6C0C80E41B0C29FB9A40DE2311">uintValue</a><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">307</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -219,29 +161,14 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_IrType_6874C097573D7F36FB32D1D77DE4D983ECB8995C">IrType Member Function</h3>
+        <h3 id="function_IrType_476F9CD4DC9B2E569F6DB93103531252916ADDC9">IrType Member Function</h3>
         <h4>
             <span class="kw">void</span>
-            * cmajor::symbols::UIntTypeSymbol::IrType(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>
-            &amp; emitter) <span class="kw">override</span>
+            * cmajor::symbols::UIntTypeSymbol::IrType(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html#145">145</a>
              of <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html">BasicTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">GetIrTypeForUInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
-        </span>
-        <br/>
-        <span>
-            Base class overridden functions: <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IrType_CF492E4F6EE5C2476955057615923BBB6B3B1F13">cmajor::symbols::TypeSymbol::IrType</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Calls: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_GetIrTypeForUInt_D118F2BBFE887357A12ABC43803F758EFD73599A">cmajor::ir::Emitter::GetIrTypeForUInt</a>
         </span>
         <br/>
         <br/>
@@ -254,12 +181,8 @@
         <span>
             Definition at line <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html#148">148</a>
              of <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html">BasicTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsIntegralType_A1BD3745BFC3AA98612487B1EDD525E0204E77AF">cmajor::symbols::TypeSymbol::IsIntegralType</a>
@@ -275,12 +198,8 @@
         <span>
             Definition at line <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html#150">150</a>
              of <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html">BasicTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsSwitchConditionType_C429B0499233624D62EC270557A6B8E5FE06EEDA">cmajor::symbols::TypeSymbol::IsSwitchConditionType</a>
@@ -296,12 +215,8 @@
         <span>
             Definition at line <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html#149">149</a>
              of <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html">BasicTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsUnsignedType_EA7D01772E849A6724E33CD41805357A90F7A484">cmajor::symbols::TypeSymbol::IsUnsignedType</a>
@@ -317,15 +232,6 @@
         <span>
             Definition at line <a href="file/BasicTypeSymbol.cpp_269286BDB4901324C1EAD0BCA0D3441C9ADE020B.html#309">309</a>
              of <a href="file/BasicTypeSymbol.cpp_269286BDB4901324C1EAD0BCA0D3441C9ADE020B.html">BasicTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">310</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">311</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_UIntValue_48F155B503D9F354BD257AD831B2B69D2FBA1438.html">UIntValue</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">312</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -352,12 +258,8 @@
         <span>
             Definition at line <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html#144">144</a>
              of <a href="file/BasicTypeSymbol.hpp_AF04EF323CE26F9A683885FFFB446A9FBB0E46C6.html">BasicTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"uint"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_BasicTypeSymbol_0C5DF8AC79E0ECC3F7F9A2FE658C902BD1B7B018.html#function_TypeString_E5ECA8F790218B18AA58FF46F05D183C88B279A2">cmajor::symbols::BasicTypeSymbol::TypeString</a>

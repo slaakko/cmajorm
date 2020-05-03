@@ -365,8 +365,8 @@
 
     <p>
         The %CMAJOR_ROOT%\projects\tools\spring directory (C:\cmajor\projects\tools\spring by default) contains a graphical software diagram designer tool 
-        called <b>spring</b>, that uses the graphics library a lot. It is by no means perfect and it breaks occasionally, but with an extensive use of the save command,
-        one can use it. The diagrams in this document has been generated using spring.
+        called <b>spring</b>, that uses the graphics library a lot. It's not perfect of course and it breaks occasionally, so diagrams should be saved often 
+        to not to lose work. The diagrams in this document has been generated using spring.
     </p>
 
     <h2>Resources</h2>
@@ -450,7 +450,8 @@
         The icon, bitmap and cursor resource content files can reside in the <b>res</b> subdirectory of the project directory as in the <b>spring</b> project above.
         Then the resource content file paths contain a <b>res</b> subdirectory prefix.
         Another possibility is to put the resource content files to the %CMAJOR_ROOT%\res directory (C:\cmajor\res by default).
-        Then a bare file name without subdirectory prefix suffices, because the Cmajor compiler looks first from the C:\cmajor\res directory if the file can be found there.
+        Then a bare file name without subdirectory prefix suffices, because the Cmajor compiler looks first from the C:\cmajor\res directory.
+        If the resource file is not found there, the compiler combines the path of the current directory with the resource content file path and looks by the resulting file path.
     </p>
 
     <h3>
@@ -458,7 +459,7 @@
     </h3>
     
     <p>
-        I have used the Visual Studio resource editors and Windows Paint to create the resource content files, 
+        I have used the Visual Studio resource editors and the good plain old Windows Paint to create the resource content files, 
         but any tool can be of course used if the format of the content is right.
     </p>
     
@@ -467,7 +468,7 @@
     </h3>
     
     <p>
-        The static Application class contains a resource manager class that can be used to access cursor and icon resources.
+        The static Application class contains an instance of a resource manager class that can be used to access cursor and icon resources.
         The Bitmap class contains a static FromResource function that loads the bitmap from the executable.
     </p>
     
@@ -509,6 +510,25 @@
         Finally the main function returns the exit code to the operating system and ends the execution of the program.
     </p>
     
+    <h2>Debugging Windows Applications</h2>
+    
+    <p>
+        Debugging an interactive graphical program can be quite challenging.
+        The System.Windows library contains a class called LogView for debugging purposes. The LogView class just displays text lines written to it.
+        The Application class contains static member functions SetLogView and GetLogView for setting and getting the LogView instance, so that the log view 
+        will be globally accessible once set.
+    </p>
+    
+    <p>
+        Intent is that MyWindow creates a control to be debugged, here called MyControl, and a LogView, 
+        configures the LogView instance to the Application using Application.SetLogView() function,
+        and adds the control to be debugged and the log view to a split container. 
+        Now MyControl can write debug messages to the LogView by getting the LogView instance from the Application using
+        Application.GetLogView() function. If the log view has been configured to the Application, it will be non-null, so debugging messages can be written to it.
+    </p>
+       
+    <img src="image/debugging.png"/>
+    
     <h2>Windows Applications and Visual Studio extension</h2>
     
     <p>
@@ -519,5 +539,11 @@
         project conversion tool to convert the project file to a <em>.cmproj</em> project file understood by the Visual Studio extension.
         The <a href="https://slaakko.github.io/cmajor/langref/langref.html#projects-syntax">syntax</a> of the project file is quite simple
         so a <em>.cmp</em> project file can also be created with any text editor.
+    </p>
+    
+    <h2>Reference</h2>
+    
+    <p>
+        The <a href="../content/System.Windows/index.html">System.Windows Module</a> document contains reference documentation genererated form the source code.
     </p>
 </body>

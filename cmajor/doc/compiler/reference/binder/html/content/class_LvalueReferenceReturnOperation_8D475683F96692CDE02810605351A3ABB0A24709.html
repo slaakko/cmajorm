@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>LvalueReferenceReturnOperation Class</title>
+        <title>LvalueReferenceReturnOperation Abstract Class</title>
         <link href="../style/style.css" rel="stylesheet" type="text/css"/>
         <script src="class_LvalueReferenceReturnOperation_8D475683F96692CDE02810605351A3ABB0A24709_inheritance.js" type="text/javascript"> </script>
     </head>
@@ -11,7 +11,7 @@
          | <a href="class_LvalueReferenceReturn_BF7AB55DC4BA8B370928E511DD2D025597421C41.html">prev</a>
          | <a href="class_NamespaceTypeSymbol_00CD2A1EB0E4A84CD849677EDDD2D09B99CCAF81.html">next</a>
         <hr/>
-        <h1>LvalueReferenceReturnOperation Class</h1>
+        <h1>LvalueReferenceReturnOperation Abstract Class</h1>
         <div class="diagram">
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
@@ -30,17 +30,17 @@
         <table class="functionTable">
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LvalueReferenceReturnOperation_8D475683F96692CDE02810605351A3ABB0A24709.html#function_CollectViableFunctions_C138E2C195F0C3EACA64B2C6A416114B16BD0337">CollectViableFunctions</a>(<a href="./../../../symbols/html/content/class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html">ContainerScope</a>* containerScope, <span class="kw">const </span>std::vector&lt;std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>>>&amp; arguments, <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a>* currentFunction, <a href="./../../../symbols/html/content/class_ViableFunctionSet_6B86FEE7674989B137025A1D90CE1E9450570418.html">ViableFunctionSet</a>&amp; viableFunctions, std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a>>&amp; exception, <span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span, <a href="./enum_CollectFlags_4688649AA556E4A052D36EA7BE37255FE9D13CC1.html">CollectFlags</a> flags) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LvalueReferenceReturnOperation_8D475683F96692CDE02810605351A3ABB0A24709.html#function_CollectViableFunctions_7327F81A7C0D63576BEE227EE9BFCDA670693FDE">CollectViableFunctions</a>(ContainerScope* containerScope, <span class="kw">const </span>std::vector&lt;std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>>>&amp; arguments, <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a>* currentFunction, ViableFunctionSet&amp; viableFunctions, std::unique_ptr&lt;Exception>&amp; exception, <span class="kw">const </span>Span&amp; span, <a href="./enum_CollectFlags_4688649AA556E4A052D36EA7BE37255FE9D13CC1.html">CollectFlags</a> flags) <span class="kw">override</span></td>
             </tr>
         </table>
         <h2>Member Variables</h2>
         <table>
             <tr id="variable_functionMap_6307B78E8280A8C77007A296D0AC9C9D683E04DB">
-                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;<a href="./../../../symbols/html/content/class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*, <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>*></td>
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;TypeSymbol*, FunctionSymbol*></td>
                 <td class="functionTableSecondCol" xml:space="preserve">functionMap</td>
             </tr>
             <tr id="variable_functions_1B16BA5D4B89812F3A0D5FA780A868A714F62293">
-                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>>></td>
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;FunctionSymbol>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">functions</td>
             </tr>
         </table>
@@ -53,15 +53,6 @@
         <span>
             Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#1295">1295</a>
              of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1295</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Operation_8F65927D68CA006D4A1FCF730CC955646E5C0F2E.html">Operation</a><span class="other">(</span><span class="string">U"@return"</span><span class="other">,&nbsp;</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">boundCompileUnit_</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1296</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1297</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -72,18 +63,14 @@
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
-        <h3 id="function_CollectViableFunctions_C138E2C195F0C3EACA64B2C6A416114B16BD0337">CollectViableFunctions Member Function</h3>
+        <h3 id="function_CollectViableFunctions_7327F81A7C0D63576BEE227EE9BFCDA670693FDE">CollectViableFunctions Member Function</h3>
         <h4>
             <span class="kw">void</span>
-             cmajor::binder::LvalueReferenceReturnOperation::CollectViableFunctions(<a href="./../../../symbols/html/content/class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html">ContainerScope</a>
-            * containerScope, <span class="kw">const </span>
+             cmajor::binder::LvalueReferenceReturnOperation::CollectViableFunctions(ContainerScope* containerScope, <span class="kw">const </span>
             std::vector&lt;std::unique_ptr&lt;<a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
             >>&amp; arguments, <a href="./class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a>
-            * currentFunction, <a href="./../../../symbols/html/content/class_ViableFunctionSet_6B86FEE7674989B137025A1D90CE1E9450570418.html">ViableFunctionSet</a>
-            &amp; viableFunctions, std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a>
-            >&amp; exception, <span class="kw">const </span>
-            <a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
-            &amp; span, <a href="./enum_CollectFlags_4688649AA556E4A052D36EA7BE37255FE9D13CC1.html">CollectFlags</a>
+            * currentFunction, ViableFunctionSet&amp; viableFunctions, std::unique_ptr&lt;Exception>&amp; exception, <span class="kw">const </span>
+            Span&amp; span, <a href="./enum_CollectFlags_4688649AA556E4A052D36EA7BE37255FE9D13CC1.html">CollectFlags</a>
              flags) <span class="kw">override</span>
         </h4>
         <span>
@@ -98,22 +85,10 @@
         <br/>
         <br/>
         <span>
-            Base class overridden functions: <a href="./class_Operation_8F65927D68CA006D4A1FCF730CC955646E5C0F2E.html#function_CollectViableFunctions_8D3636DB2195063E2AC15F0B9805557D70CC1FEE">cmajor::binder::Operation::CollectViableFunctions</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Calls: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_FinalizeBinding_EA4A78C31840AF6AD5731FA4F80FF7A5EA35CBE2">cmajor::binder::BoundCompileUnit::FinalizeBinding</a>
+            Calls: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_FinalizeBinding_8ABE90C9DD214AFF901F5494C56451A84F117A20">cmajor::binder::BoundCompileUnit::FinalizeBinding</a>
             , <a href="./class_Operation_8F65927D68CA006D4A1FCF730CC955646E5C0F2E.html#function_GetBoundCompileUnit_E80AA4550F4435A01633795157C52750959D5E16">cmajor::binder::Operation::GetBoundCompileUnit</a>
             , <a href="./class_Operation_8F65927D68CA006D4A1FCF730CC955646E5C0F2E.html#function_GetModule_650B3FC4419BED968EBB9F67D576084DB60A1C8A">cmajor::binder::Operation::GetModule</a>
             , <a href="./class_Operation_8F65927D68CA006D4A1FCF730CC955646E5C0F2E.html#function_GetSymbolTable_08BDAB3A1CB5B2E8EBF6F7B551ABBAD5F75BDC05">cmajor::binder::Operation::GetSymbolTable</a>
-            , <a href="./../../../symbols/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
-            , <a href="./../../../symbols/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetModule_44F802EF7A13E5CA4FD87942543B7E474204874D">cmajor::symbols::Symbol::SetModule</a>
-            , <a href="./../../../symbols/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_SetParent_256D25751D02F0A2F679144DE6938EE92A383AE2">cmajor::symbols::Symbol::SetParent</a>
-            , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GlobalNs_4B35AD85192382817D5D2A9425ADAF4F774D34F8">cmajor::symbols::SymbolTable::GlobalNs</a>
-            , <a href="./../../../symbols/html/content/class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_BaseType_16A29C1561B4D4CAB50A039B9A7B39C8257DBAB8">cmajor::symbols::TypeSymbol::BaseType</a>
-            , <a href="./../../../symbols/html/content/class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsLvalueReferenceType_E750E5E65A7F87935B0A0220025DBEBC40E55D33">cmajor::symbols::TypeSymbol::IsLvalueReferenceType</a>
-            , <a href="./../../../symbols/html/content/class_ViableFunctionSet_6B86FEE7674989B137025A1D90CE1E9450570418.html#function_Insert_0E53D706A004BDC259DCD747784459A2496C0C7E">cmajor::symbols::ViableFunctionSet::Insert</a>
         </span>
         <br/>
         <br/>

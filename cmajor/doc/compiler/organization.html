@@ -325,7 +325,7 @@
             </p>
 
             <p>
-                Each polymorphic class in Cmajor has a unique 64-bit identifier that is a product of prime number keys.
+                Each polymorphic class in Cmajor has a unique 128-bit identifier that is a product of prime number keys.
                 The prime number key of the class is based on the level of the class in the class hierarchy.
                 Ultimate base classes are assigned keys 2, 3, 5, etc., and the leaf classes of the class hierarchy have the largest keys.
                 The identifier of a class is the product of the key of itself, the key of its base class, the key of its ancestor class, and so on.
@@ -337,11 +337,11 @@
             </p>
 
             <p>
-                The 64-bit identifier of a class is stored to the virtual method table of the class at index 0.
+                The 128-bit identifier of a class is stored to the virtual method table of the class at index 0.
                 The class identifier is initially zero and dynamically initialized by calling the runtime library.
                 The runtime library looks up the class identifier from a hash table by using a 16-byte type identifier (UUID) of the class as a key
-                and stores the nonzero 64-bit class identifier to the virtual method table index 0.
-                The 16-byte type identifier (UUID) is initialized by the compiler and stored to the virtual method table at index 1 in 64-bit units.
+                and stores the nonzero 128-bit class identifier to the virtual method table index 0.
+                The 16-byte type identifier (UUID) is initialized by the compiler and stored to the virtual method table at index 2 in 64-bit units.
                 The hash table lookup is needed only first time. In the future the class id is found in the VMT at index 0.
             </p>
 </body>

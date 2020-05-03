@@ -1,0 +1,236 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>ResourceTable Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">prev</a>
+         | <a href="class_SByteTypeSymbol_3A52D1A4D9783D543BD1BB95D3AAADD226F06C66.html">next</a>
+        <hr/>
+        <h1>ResourceTable Class</h1>
+        <span>
+            Definition at line <a href="file/ResourceTable.hpp_3C697DA427D2E2CED7A00412E668C9A1D1B3BEA8.html#39">39</a>
+             of <a href="file/ResourceTable.hpp_3C697DA427D2E2CED7A00412E668C9A1D1B3BEA8.html">ResourceTable.hpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_AddResource_1E3E1CD73863B5A6EC2E2684406AC64A038EEF4E">AddResource</a>(<span class="kw">const </span><a href="./struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a>&amp; resource)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Contains_853B805DFF33300233F07D244FD3284D8728F5AD">Contains</a>(<span class="kw">const </span>std::u32string&amp; resourceName) <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Dump_AA7F6E0DDF039C3138714F7DC5DD2B62C11DA9C8">Dump</a>(CodeFormatter&amp; formatter)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Read_DFFAC94B529673EF6E9E7E874D53991DF2D673DB">Read</a>(BinaryReader&amp; reader)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::vector&lt;<a href="./struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a>>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Resources_99A1C5906C6DB4E46DB7D979E6980592B0754A1F">Resources</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Write_E2C8154C9DCC5C37C413E365296E3593BB0DD3B7">Write</a>(BinaryWriter&amp; writer)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_resourceNameSet_7ED09DCA09F75FE130210F8B8DA2C70DAE2734AF">
+                <td class="functionTableFirstCol" xml:space="preserve">std::set&lt;std::u32string></td>
+                <td class="functionTableSecondCol" xml:space="preserve">resourceNameSet</td>
+            </tr>
+            <tr id="variable_resources_D0E781AEB3D84D133A3B19D018F0EAF2CA2FE5A3">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;<a href="./struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">resources</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddResource_1E3E1CD73863B5A6EC2E2684406AC64A038EEF4E">AddResource Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ResourceTable::AddResource(<span class="kw">const </span>
+            <a href="./struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a>
+            &amp; resource)</h4>
+        <span>
+            Definition at line <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html#85">85</a>
+             of <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html">ResourceTable.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resourceNameSet_7ED09DCA09F75FE130210F8B8DA2C70DAE2734AF">resourceNameSet</a><span class="other">.</span><span class="identifier">insert</span><span class="other">(</span><span class="identifier">resource</span><span class="other">.</span><a href="./struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#variable_name_C28458DBFA9A27E9C54E7B599B1CB6C64DFDA95B">name</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resources_D0E781AEB3D84D133A3B19D018F0EAF2CA2FE5A3">resources</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">resource</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ResourceTable.hpp_3C697DA427D2E2CED7A00412E668C9A1D1B3BEA8.html#43">43</a>
+             of <a href="file/ResourceTable.hpp_3C697DA427D2E2CED7A00412E668C9A1D1B3BEA8.html">ResourceTable.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_ReadHeader_7519AEC5227E349AD63F3E1F532C0334A0F9B07E">cmajor::symbols::Module::ReadHeader</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Contains_853B805DFF33300233F07D244FD3284D8728F5AD">Contains Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::symbols::ResourceTable::Contains(<span class="kw">const </span>
+            std::u32string&amp; resourceName) <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html#80">80</a>
+             of <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html">ResourceTable.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resourceNameSet_7ED09DCA09F75FE130210F8B8DA2C70DAE2734AF">resourceNameSet</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">resourceName</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="./class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resourceNameSet_7ED09DCA09F75FE130210F8B8DA2C70DAE2734AF">resourceNameSet</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ResourceTable.hpp_3C697DA427D2E2CED7A00412E668C9A1D1B3BEA8.html#42">42</a>
+             of <a href="file/ResourceTable.hpp_3C697DA427D2E2CED7A00412E668C9A1D1B3BEA8.html">ResourceTable.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_ReadHeader_7519AEC5227E349AD63F3E1F532C0334A0F9B07E">cmajor::symbols::Module::ReadHeader</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Dump_AA7F6E0DDF039C3138714F7DC5DD2B62C11DA9C8">Dump Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ResourceTable::Dump(CodeFormatter&amp; formatter)</h4>
+        <span>
+            Definition at line <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html#128">128</a>
+             of <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html">ResourceTable.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"RESOURCE&nbsp;TABLE:"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">index</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><a href="./struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a><span class="other">&amp;</span>&nbsp;<span class="identifier">resource</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resources_D0E781AEB3D84D133A3B19D018F0EAF2CA2FE5A3">resources</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">resource</span><span class="other">.</span><span class="identifier">Dump</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">,&nbsp;</span><span class="identifier">index</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><span class="identifier">index</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Calls: <a href="./struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#function_Dump_46418A3385A206A708A726806C45A419F99C26E4">cmajor::symbols::Resource::Dump</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_Dump_97021D11B7AC0CE242D1971D9ABBE988A913EE6F">cmajor::symbols::Module::Dump</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Read_DFFAC94B529673EF6E9E7E874D53991DF2D673DB">Read Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ResourceTable::Read(BinaryReader&amp; reader)</h4>
+        <span>
+            Definition at line <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html#109">109</a>
+             of <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html">ResourceTable.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html#function_Read_F8AAB1D4CFF5F6CFC6214E253BF7AB4806C270C9">cmajor::symbols::Resource::Read</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_ReadHeader_7519AEC5227E349AD63F3E1F532C0334A0F9B07E">cmajor::symbols::Module::ReadHeader</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Resources_99A1C5906C6DB4E46DB7D979E6980592B0754A1F">Resources Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            std::vector&lt;<a href="./struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">Resource</a>
+            >&amp; cmajor::symbols::ResourceTable::Resources() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ResourceTable.hpp_3C697DA427D2E2CED7A00412E668C9A1D1B3BEA8.html#44">44</a>
+             of <a href="file/ResourceTable.hpp_3C697DA427D2E2CED7A00412E668C9A1D1B3BEA8.html">ResourceTable.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#variable_resources_D0E781AEB3D84D133A3B19D018F0EAF2CA2FE5A3">resources</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_ReadHeader_7519AEC5227E349AD63F3E1F532C0334A0F9B07E">cmajor::symbols::Module::ReadHeader</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_E2C8154C9DCC5C37C413E365296E3593BB0DD3B7">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ResourceTable::Write(BinaryWriter&amp; writer)</h4>
+        <span>
+            Definition at line <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html#91">91</a>
+             of <a href="file/ResourceTable.cpp_1B06856C7B5C39E415544EBC8DF0375C550B9DF0.html">ResourceTable.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Write_E2C8154C9DCC5C37C413E365296E3593BB0DD3B7">cmajor::symbols::ResourceTable::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_Write_D3F477A1696EC85516A92636E94282D0BE2F6BA7">cmajor::symbols::Module::Write</a>
+            , <a href="./class_ResourceTable_9D2EED64F3614EF92690CFC43C13B03F558BFBFB.html#function_Write_E2C8154C9DCC5C37C413E365296E3593BB0DD3B7">cmajor::symbols::ResourceTable::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="struct_Resource_17CFD589AE58366D9682A6F84476B74457287B00.html">prev</a>
+         | <a href="class_SByteTypeSymbol_3A52D1A4D9783D543BD1BB95D3AAADD226F06C66.html">next</a>
+    </body>
+</html>

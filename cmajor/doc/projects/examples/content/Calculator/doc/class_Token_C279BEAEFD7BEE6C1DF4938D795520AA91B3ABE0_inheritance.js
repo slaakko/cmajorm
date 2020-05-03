@@ -269,11 +269,11 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "Calculator.Token", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../Calculator/doc/class_Token_C279BEAEFD7BEE6C1DF4938D795520AA91B3ABE0.html" },
-        { name: "Calculator.EndToken", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../Calculator/doc/class_EndToken_650460E17E06276FEFCCC5A445430D74B6853AEA.html" },
+        { name: "Calculator.EndToken", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../Calculator/doc/class_EndToken_650460E17E06276FEFCCC5A445430D74B6853AEA.html" },
         { name: "Calculator.NumberToken", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../Calculator/doc/class_NumberToken_164F4C9C9CED5CD8E8393861055B13DDC4633255.html" },
         { name: "Calculator.OperatorToken", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../Calculator/doc/class_OperatorToken_164091B4AD4653519428A73A8CABF3C39DD441A8.html" },
         { name: "Calculator.PrintToken", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../Calculator/doc/class_PrintToken_C65217787161D74A5123773C9C7A5C224C550F28.html" },
-        { name: "Calculator.VariableNameToken", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../Calculator/doc/class_VariableNameToken_E0D19BF1420162F9799480809F5B474540F7B17D.html" }];
+        { name: "Calculator.VariableNameToken", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../Calculator/doc/class_VariableNameToken_E0D19BF1420162F9799480809F5B474540F7B17D.html" }];
     drawDiagram(diagramNodes);
 }
 

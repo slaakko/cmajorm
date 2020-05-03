@@ -43,8 +43,8 @@ namespace cmdevenv
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem14 = new System.Windows.Forms.ToolStripMenuItem();
             this.systemLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.compilerLibrariesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.examplesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.compilerLibrariesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.parserGeneratorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.systemXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.unitTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -180,6 +180,7 @@ namespace cmdevenv
             this.addProjectReferenceDialog = new System.Windows.Forms.OpenFileDialog();
             this.addExistingTextFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addExistingResourceFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.springToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editorSplitContainer)).BeginInit();
             this.editorSplitContainer.Panel2.SuspendLayout();
@@ -302,6 +303,7 @@ namespace cmdevenv
             this.examplesToolStripMenuItem,
             this.compilerLibrariesToolStripMenuItem,
             this.parserGeneratorToolStripMenuItem,
+            this.springToolStripMenuItem,
             this.systemXToolStripMenuItem,
             this.unitTestsToolStripMenuItem});
             this.toolStripMenuItem14.Name = "toolStripMenuItem14";
@@ -315,19 +317,19 @@ namespace cmdevenv
             this.systemLibraryToolStripMenuItem.Text = "System Library";
             this.systemLibraryToolStripMenuItem.Click += new System.EventHandler(this.systemLibraryToolStripMenuItem_Click);
             // 
-            // compilerLibrariesToolStripMenuItem
-            // 
-            this.compilerLibrariesToolStripMenuItem.Name = "compilerLibrariesToolStripMenuItem";
-            this.compilerLibrariesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.compilerLibrariesToolStripMenuItem.Text = "Compiler Platform";
-            this.compilerLibrariesToolStripMenuItem.Click += new System.EventHandler(this.compilerLibrariesToolStripMenuItem_Click);
-            // 
             // examplesToolStripMenuItem
             // 
             this.examplesToolStripMenuItem.Name = "examplesToolStripMenuItem";
             this.examplesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.examplesToolStripMenuItem.Text = "Examples";
             this.examplesToolStripMenuItem.Click += new System.EventHandler(this.examplesToolStripMenuItem_Click);
+            // 
+            // compilerLibrariesToolStripMenuItem
+            // 
+            this.compilerLibrariesToolStripMenuItem.Name = "compilerLibrariesToolStripMenuItem";
+            this.compilerLibrariesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.compilerLibrariesToolStripMenuItem.Text = "Compiler Platform";
+            this.compilerLibrariesToolStripMenuItem.Click += new System.EventHandler(this.compilerLibrariesToolStripMenuItem_Click);
             // 
             // parserGeneratorToolStripMenuItem
             // 
@@ -1351,6 +1353,13 @@ namespace cmdevenv
             this.addExistingResourceFileDialog.DefaultExt = "xml";
             this.addExistingResourceFileDialog.Filter = "Resource files|*.xml|All files|*.*";
             // 
+            // springToolStripMenuItem
+            // 
+            this.springToolStripMenuItem.Name = "springToolStripMenuItem";
+            this.springToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.springToolStripMenuItem.Text = "Spring";
+            this.springToolStripMenuItem.Click += new System.EventHandler(this.springToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1543,6 +1552,7 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripMenuItem existingResourceFileToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog addExistingResourceFileDialog;
         private System.Windows.Forms.ToolStripMenuItem compilerLibrariesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem springToolStripMenuItem;
     }
 }
 

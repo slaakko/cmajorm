@@ -270,9 +270,10 @@ function drawClassInheritanceDiagram() {
     var classes = [
         { name: "sngcm::ast::ProjectDeclaration", id: "class_0", level: 0, subject: true, hasDerivedClasses: true, link: "./class_ProjectDeclaration_B438CE5E8808713DC78B1681B380AAA801F5E2FB.html" },
         { name: "sngcm::ast::ReferenceDeclaration", id: "class_1", level: 1, subject: false, hasDerivedClasses: false, link: "./class_ReferenceDeclaration_D373FBD4E9372B14DBD920F41E12D3004095008B.html" },
-        { name: "sngcm::ast::SourceFileDeclaration", id: "class_2", level: 1, subject: false, hasDerivedClasses: false, link: "./class_SourceFileDeclaration_574B4145CF15AB4360B8B311FC0FA013F96601BE.html" },
-        { name: "sngcm::ast::TargetDeclaration", id: "class_3", level: 1, subject: false, hasDerivedClasses: false, link: "./class_TargetDeclaration_DD5FD0BB0D1128FC27CA2C5BF1DEA1470AE024DD.html" },
-        { name: "sngcm::ast::TextFileDeclaration", id: "class_4", level: 1, subject: false, hasDerivedClasses: false, link: "./class_TextFileDeclaration_AD44526512AED2BB6F47C61C990E7EA7F72E421F.html" }];
+        { name: "sngcm::ast::ResourceFileDeclaration", id: "class_2", level: 1, subject: false, hasDerivedClasses: false, link: "./class_ResourceFileDeclaration_E99D67DD9B1FFC8DA7D54CFFE782AD768E02ECBB.html" },
+        { name: "sngcm::ast::SourceFileDeclaration", id: "class_3", level: 1, subject: false, hasDerivedClasses: false, link: "./class_SourceFileDeclaration_574B4145CF15AB4360B8B311FC0FA013F96601BE.html" },
+        { name: "sngcm::ast::TargetDeclaration", id: "class_4", level: 1, subject: false, hasDerivedClasses: false, link: "./class_TargetDeclaration_DD5FD0BB0D1128FC27CA2C5BF1DEA1470AE024DD.html" },
+        { name: "sngcm::ast::TextFileDeclaration", id: "class_5", level: 1, subject: false, hasDerivedClasses: false, link: "./class_TextFileDeclaration_AD44526512AED2BB6F47C61C990E7EA7F72E421F.html" }];
     drawDiagram(classes);
 }
 

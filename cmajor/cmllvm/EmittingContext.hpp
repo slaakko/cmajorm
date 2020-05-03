@@ -25,6 +25,12 @@
 #include <llvm/Object/ObjectFile.h>
 #include <llvm/CodeGen/TargetPassConfig.h>
 
+#if (LLVM_VERSION_MAJOR >= 10)
+
+#include <llvm/InitializePasses.h>
+
+#endif
+
 namespace cmllvm {
 
 class EmittingContext : public cmajor::ir::EmittingContext

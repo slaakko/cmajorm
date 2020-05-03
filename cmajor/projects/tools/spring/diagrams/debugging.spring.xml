@@ -1,0 +1,79 @@
+<diagram>
+ <class abstract="false" name="MyWindow">
+  <boundingRect h="13.887889862060546" w="24.724660873413085" x="93.133308410644531" y="17.991668701171875"/>
+  <operation abstract="false" name="MyWindow()">
+   <boundingRect h="3.943944692611694" w="19.224660873413085" x="94.633308410644531" y="26.435613632202148"/>
+  </operation>
+ </class>
+ <class abstract="false" name="LogView">
+  <boundingRect h="13.887889862060546" w="45.128681182861328" x="10.626976013183593" y="17.991668701171875"/>
+  <operation abstract="false" name="WriteLine(const string&amp; text)">
+   <boundingRect h="3.943944692611694" w="42.128681182861328" x="12.126976013183593" y="26.435613632202148"/>
+  </operation>
+ </class>
+ <class abstract="false" name="Application">
+  <boundingRect h="24.775779724121093" w="24.049356460571289" x="21.166639328002929" y="54.504150390625"/>
+  <operation abstract="false" name="GetLogView()">
+   <boundingRect h="3.943944692611694" w="21.049356460571289" x="22.666639328002929" y="62.948097229003906"/>
+  </operation>
+  <operation abstract="false" name="SetLogView()">
+   <boundingRect h="3.943944692611694" w="20.686586380004882" x="22.666639328002929" y="66.892044067382812"/>
+  </operation>
+  <field name="logView">
+   <boundingRect h="3.943944692611694" w="12.510345458984375" x="22.666639328002929" y="73.835983276367187"/>
+  </field>
+ </class>
+ <note name="note">
+  <boundingRect h="34.551559448242187" w="130.37359619140625" x="143.668701171875" y="11.131805419921875"/>
+  <line value="UniquePtr&lt;SplitContainer> splitContainer(new SplitContrainer(...))"/>
+  <line value="UniquePtr&lt;MyControl> myControl(new MyControl(...))"/>
+  <line value="splitContainer->Pane1Container()->AddChild(myControl.Release())"/>
+  <line value="UniquePtr&lt;LogView>  logView = new LogView()"/>
+  <line value="Application.SetLogView(logView.Get())"/>
+  <line value="UniquePtr&lt;Control> scrollableLogView(new ScrollableControl(logView.Release(), ...))"/>
+  <line value="splitContainer->Pane2Container()->AddChild(scrollableLogView.Release())"/>
+  <line value="AddChild(splitContainer.Release())"/>
+ </note>
+ <class abstract="false" name="MyControl">
+  <boundingRect h="13.887889862060546" w="42.548374176025390" x="84.221450805664062" y="57.149986267089843"/>
+  <operation abstract="false" name="MethodToBeDebugged()">
+   <boundingRect h="3.943944692611694" w="37.048374176025390" x="85.721450805664062" y="65.59393310546875"/>
+  </operation>
+ </class>
+ <note name="note">
+  <boundingRect h="34.551559448242187" w="81.4385986328125" x="143.933319091796875" y="50.290122985839843"/>
+  <line value="..."/>
+  <line value="int x = y"/>
+  <line value="LogView* logView = Application.GetLogView()"/>
+  <line value="if (logView != null)"/>
+  <line value="{"/>
+  <line value='    logView->WriteLine("value of x is " + ToString(x))'/>
+  <line value="}"/>
+  <line value="..."/>
+ </note>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="-5.820846557617187" y="-25.664588928222656"/>
+  <source index="0" snap="operation.0" text="" x="115.60797119140625" y="28.407585144042968"/>
+  <target index="3" snap="left.center" text="" x="143.668701171875" y="28.407585144042968"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="-5.820846557617187" y="-25.664588928222656"/>
+  <source index="0" snap="left.center" text="creates" x="93.133308410644531" y="24.935613632202148"/>
+  <target index="1" snap="right.center" text="" x="55.755657196044921" y="24.935613632202148"/>
+ </relationship>
+ <relationship cardinality="one" kind="attachNote" name="">
+  <boundingRect h="0" w="0" x="-5.820846557617187" y="-25.664588928222656"/>
+  <source index="4" snap="operation.0" text="" x="124.519821166992187" y="67.565902709960937"/>
+  <target index="5" snap="left.center" text="" x="143.933319091796875" y="67.565902709960937"/>
+ </relationship>
+ <relationship cardinality="one" kind="createInstance" name="">
+  <boundingRect h="0" w="0" x="-5.820846557617187" y="-25.664588928222656"/>
+  <source index="0" snap="bottom.center" text="" x="105.495635986328125" y="31.879558563232421"/>
+  <target index="4" snap="top.center" text="" x="105.495635986328125" y="57.149986267089843"/>
+ </relationship>
+ <relationship cardinality="one" kind="reference" name="">
+  <boundingRect h="0" w="0" x="-5.820846557617187" y="-25.664588928222656"/>
+  <source index="2" snap="top.center" text="" x="33.191318511962890" y="54.504150390625"/>
+  <target index="1" snap="bottom.center" text="" x="33.191314697265625" y="31.879558563232421"/>
+ </relationship>
+</diagram>

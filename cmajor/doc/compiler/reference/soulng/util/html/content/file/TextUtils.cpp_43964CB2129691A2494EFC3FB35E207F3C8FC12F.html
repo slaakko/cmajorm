@@ -1016,43 +1016,71 @@
   <br/>
   <span class="code" id="506" xml:space="preserve"><span class="lineNumber">506</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="507" xml:space="preserve"><span class="lineNumber">507</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">fw</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_FormatWidth_F853F19DDAB272BBFE399B883B34302A489A2411.html">FormatWidth</a><span class="other">::</span><a href="../enum_FormatWidth_F853F19DDAB272BBFE399B883B34302A489A2411.html#enumerator_min_32053D4E51ED34FAA0661DE3823565BFF184759C">min</a><span class="other">)</span></span>
+  <span class="code" id="507" xml:space="preserve"><span class="lineNumber">507</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="508" xml:space="preserve"><span class="lineNumber">508</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="508" xml:space="preserve"><span class="lineNumber">508</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">m</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">s</span><span class="other">.</span><span class="identifier">length</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="509" xml:space="preserve"><span class="lineNumber">509</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">width</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">max</span><span class="other">(</span><span class="identifier">width</span><span class="other">,&nbsp;</span><span class="kw">int</span><span class="other">(</span><span class="identifier">s</span><span class="other">.</span><span class="identifier">length</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="509" xml:space="preserve"><span class="lineNumber">509</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">fw</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_FormatWidth_F853F19DDAB272BBFE399B883B34302A489A2411.html">FormatWidth</a><span class="other">::</span><a href="../enum_FormatWidth_F853F19DDAB272BBFE399B883B34302A489A2411.html#enumerator_min_32053D4E51ED34FAA0661DE3823565BFF184759C">min</a><span class="other">)</span></span>
   <br/>
-  <span class="code" id="510" xml:space="preserve"><span class="lineNumber">510</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="510" xml:space="preserve"><span class="lineNumber">510</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="511" xml:space="preserve"><span class="lineNumber">511</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">result</span><span class="other">(</span><span class="identifier">width</span><span class="other">,&nbsp;</span><span class="identifier">fillChar</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="511" xml:space="preserve"><span class="lineNumber">511</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">width</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">max</span><span class="other">(</span><span class="identifier">width</span><span class="other">,&nbsp;</span><span class="identifier">m</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="512" xml:space="preserve"><span class="lineNumber">512</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">min</span><span class="other">(</span><span class="kw">int</span><span class="other">(</span><span class="identifier">s</span><span class="other">.</span><span class="identifier">length</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">width</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="512" xml:space="preserve"><span class="lineNumber">512</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="513" xml:space="preserve"><span class="lineNumber">513</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">offset</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <span class="code" id="513" xml:space="preserve"><span class="lineNumber">513</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">fw</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_FormatWidth_F853F19DDAB272BBFE399B883B34302A489A2411.html">FormatWidth</a><span class="other">::</span><a href="../enum_FormatWidth_F853F19DDAB272BBFE399B883B34302A489A2411.html#enumerator_exact_693C4E0E7DF15E447E26074EBC5FDF2EF8EF62C3">exact</a><span class="other">)</span></span>
   <br/>
-  <span class="code" id="514" xml:space="preserve"><span class="lineNumber">514</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">justify</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_FormatJustify_E64647088F4689DF011AA5390A898B2E5D769B34.html">FormatJustify</a><span class="other">::</span><a href="../enum_FormatJustify_E64647088F4689DF011AA5390A898B2E5D769B34.html#enumerator_right_D18B2C537128E53DF42F2F3DA3175BB328E7C4CA">right</a><span class="other">)</span></span>
+  <span class="code" id="514" xml:space="preserve"><span class="lineNumber">514</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="515" xml:space="preserve"><span class="lineNumber">515</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="515" xml:space="preserve"><span class="lineNumber">515</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">m</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">min</span><span class="other">(</span><span class="identifier">m</span><span class="other">,&nbsp;</span><span class="identifier">width</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="516" xml:space="preserve"><span class="lineNumber">516</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">offset</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">width</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">n</span><span class="other">;</span></span>
+  <span class="code" id="516" xml:space="preserve"><span class="lineNumber">516</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="517" xml:space="preserve"><span class="lineNumber">517</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="517" xml:space="preserve"><span class="lineNumber">517</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">max</span><span class="other">(</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="identifier">width</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">m</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="518" xml:space="preserve"><span class="lineNumber">518</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+  <span class="code" id="518" xml:space="preserve"><span class="lineNumber">518</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">justify</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_FormatJustify_E64647088F4689DF011AA5390A898B2E5D769B34.html">FormatJustify</a><span class="other">::</span><a href="../enum_FormatJustify_E64647088F4689DF011AA5390A898B2E5D769B34.html#enumerator_right_D18B2C537128E53DF42F2F3DA3175BB328E7C4CA">right</a><span class="other">)</span></span>
   <br/>
   <span class="code" id="519" xml:space="preserve"><span class="lineNumber">519</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="520" xml:space="preserve"><span class="lineNumber">520</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">[</span><span class="identifier">i</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">offset</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">s</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">;</span></span>
+  <span class="code" id="520" xml:space="preserve"><span class="lineNumber">520</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="521" xml:space="preserve"><span class="lineNumber">521</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="521" xml:space="preserve"><span class="lineNumber">521</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="522" xml:space="preserve"><span class="lineNumber">522</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <span class="code" id="522" xml:space="preserve"><span class="lineNumber">522</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">fillChar</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="523" xml:space="preserve"><span class="lineNumber">523</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="523" xml:space="preserve"><span class="lineNumber">523</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="524" xml:space="preserve"><span class="lineNumber">524</span>&nbsp;</span>
+  <span class="code" id="524" xml:space="preserve"><span class="lineNumber">524</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="525" xml:space="preserve"><span class="lineNumber">525</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <span class="code" id="525" xml:space="preserve"><span class="lineNumber">525</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">m</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="526" xml:space="preserve"><span class="lineNumber">526</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="527" xml:space="preserve"><span class="lineNumber">527</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">s</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="528" xml:space="preserve"><span class="lineNumber">528</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="529" xml:space="preserve"><span class="lineNumber">529</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">justify</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_FormatJustify_E64647088F4689DF011AA5390A898B2E5D769B34.html">FormatJustify</a><span class="other">::</span><a href="../enum_FormatJustify_E64647088F4689DF011AA5390A898B2E5D769B34.html#enumerator_left_82F4947E3AA67C1DF343B944BAAB3CE2D636FF4F">left</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="530" xml:space="preserve"><span class="lineNumber">530</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="531" xml:space="preserve"><span class="lineNumber">531</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="532" xml:space="preserve"><span class="lineNumber">532</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="533" xml:space="preserve"><span class="lineNumber">533</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">fillChar</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="534" xml:space="preserve"><span class="lineNumber">534</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="535" xml:space="preserve"><span class="lineNumber">535</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="536" xml:space="preserve"><span class="lineNumber">536</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="537" xml:space="preserve"><span class="lineNumber">537</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="538" xml:space="preserve"><span class="lineNumber">538</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="539" xml:space="preserve"><span class="lineNumber">539</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
   <br/>
  </body>
 </html>

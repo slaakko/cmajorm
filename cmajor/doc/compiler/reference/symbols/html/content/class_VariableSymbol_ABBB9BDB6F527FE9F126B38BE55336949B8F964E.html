@@ -23,7 +23,7 @@
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#constructor_VariableSymbol_52BB7B3E00B0C046E98FE6E8B764A9D9DD4AFD9B">VariableSymbol</a>(<a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a> symbolType_, <span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#constructor_VariableSymbol_7BAAEE2FFA694F744EB1944C10BAC26B16222462">VariableSymbol</a>(<a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a> symbolType_, <span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -78,25 +78,15 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_VariableSymbol_52BB7B3E00B0C046E98FE6E8B764A9D9DD4AFD9B">VariableSymbol Constructor</h3>
+        <h3 id="constructor_VariableSymbol_7BAAEE2FFA694F744EB1944C10BAC26B16222462">VariableSymbol Constructor</h3>
         <h4>
             cmajor::symbols::VariableSymbol::VariableSymbol(<a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a>
              symbolType_, <span class="kw">const </span>
-            <a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
-            &amp; span_, <span class="kw">const </span>
+            Span&amp; span_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
             Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#22">22</a>
              of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">(</span><span class="identifier">symbolType_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#variable_type_60768DFA7ED0257FA013D30A0E5F1EF0F76F4594">type</a><span class="other">(</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -115,23 +105,6 @@
         <span>
             Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#46">46</a>
              of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#variable_type_60768DFA7ED0257FA013D30A0E5F1EF0F76F4594">type</a><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"variable&nbsp;symbol&nbsp;contains&nbsp;null&nbsp;type&nbsp;pointer"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -171,12 +144,8 @@
         <span>
             Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#28">28</a>
              of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"VariableSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_ClassName_C4FAFF23616F9C6F306CD331A2F514E68E55AE49">cmajor::symbols::Symbol::ClassName</a>
@@ -202,17 +171,6 @@
         <span>
             Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#40">40</a>
              of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;emplace&nbsp;type&nbsp;index"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#variable_type_60768DFA7ED0257FA013D30A0E5F1EF0F76F4594">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -236,12 +194,8 @@
         <span>
             Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#24">24</a>
              of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#variable_type_60768DFA7ED0257FA013D30A0E5F1EF0F76F4594">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_GetType_14C05D793AECFE077753292B1354FD70428B9196">GetType Member Function</h3>
@@ -251,12 +205,8 @@
         <span>
             Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#25">25</a>
              of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#variable_type_60768DFA7ED0257FA013D30A0E5F1EF0F76F4594">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Called by: <a href="./class_ClassDelegateTypeSymbol_128306583C73553FFFA4F5C051CE181C3EC4D435.html#function_Syntax_D836A180B044E362192168CAF774A85B19D6C4DC">cmajor::symbols::ClassDelegateTypeSymbol::Syntax</a>
@@ -264,25 +214,25 @@
             , <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_HasNontrivialDestructor_664359C6D5F2BE307AD6AC87BC4047BFD8F0ED03">cmajor::symbols::ClassTypeSymbol::HasNontrivialDestructor</a>
             , <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_IsRecursive_5E4761AE14E26F56D17BE36DC8074B2B6E455B41">cmajor::symbols::ClassTypeSymbol::IsRecursive</a>
             , <a href="./class_ConstructorSymbol_7601F80D7A15880441E04E3E7E153B24B38E567D.html#function_DocName_6D457FDF830F09BBB81F1634368B01B4CFB1F690">cmajor::symbols::ConstructorSymbol::DocName</a>
-            , <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_IrType_E7F3C86F3E46449401F550E2BE31C7F4E890AE39">cmajor::symbols::DelegateTypeSymbol::IrType</a>
+            , <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_IrType_D4CCAD2A6C6EDBFCA9B35B811CDA5DB1E7DA33DF">cmajor::symbols::DelegateTypeSymbol::IrType</a>
             , <a href="./class_DelegateTypeSymbol_3FECFD791A79DBF75CEC1BB6ABFDF26828491EDF.html#function_Syntax_5523B5DB348025D5311DF3613768A277C99149DE">cmajor::symbols::DelegateTypeSymbol::Syntax</a>
             , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_ComputeName_74AC9908F9E0A332C9D61C0A89F73A4D3942FCBE">cmajor::symbols::FunctionSymbol::ComputeName</a>
             , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_DocName_8F1A6B3BC1C1A5E91F74A80641C4514DA7B30D81">cmajor::symbols::FunctionSymbol::DocName</a>
             , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_FullName_FD4E65366E3C307338DFF4C995F5CD2A1855E8E3">cmajor::symbols::FunctionSymbol::FullName</a>
-            , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_IrType_9D492AE1D6514A287482C19324741DCF55FE1FFF">cmajor::symbols::FunctionSymbol::IrType</a>
-            , <a href="./class_GlobalVariableSymbol_E344A8F82685E02F7F980D3D5E40B920A0F8AEC3.html#function_CreateIrObject_E765E70F07754A8521C2561B1D8496CD9CD0A8CD">cmajor::symbols::GlobalVariableSymbol::CreateIrObject</a>
-            , <a href="./class_GlobalVariableSymbol_E344A8F82685E02F7F980D3D5E40B920A0F8AEC3.html#function_Dump_74339A72D5954612FAB1DEB13F45D715A6717D2E">cmajor::symbols::GlobalVariableSymbol::Dump</a>
-            , <a href="./class_GlobalVariableSymbol_E344A8F82685E02F7F980D3D5E40B920A0F8AEC3.html#function_IrObject_9C65B542781DB0AAA675CBF3241E08583B69AC55">cmajor::symbols::GlobalVariableSymbol::IrObject</a>
+            , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_IrType_7843DB9CEB6DBCFC1A6098BF45625A5B11562E27">cmajor::symbols::FunctionSymbol::IrType</a>
+            , <a href="./class_GlobalVariableSymbol_E344A8F82685E02F7F980D3D5E40B920A0F8AEC3.html#function_CreateIrObject_5A821FA47BE75EB555D527DCFAA30537A16A82D7">cmajor::symbols::GlobalVariableSymbol::CreateIrObject</a>
+            , <a href="./class_GlobalVariableSymbol_E344A8F82685E02F7F980D3D5E40B920A0F8AEC3.html#function_Dump_FFBBC7FF4D625FEEEC1CA215CBE07704B0C7DF78">cmajor::symbols::GlobalVariableSymbol::Dump</a>
+            , <a href="./class_GlobalVariableSymbol_E344A8F82685E02F7F980D3D5E40B920A0F8AEC3.html#function_IrObject_26AD3E0A28FFDE8AD4026739613347AF685548D2">cmajor::symbols::GlobalVariableSymbol::IrObject</a>
             , <a href="./class_GlobalVariableSymbol_E344A8F82685E02F7F980D3D5E40B920A0F8AEC3.html#function_Read_2DC204917F7E953EE7616C91D0BC571EEA1C2D2B">cmajor::symbols::GlobalVariableSymbol::Read</a>
             , <a href="./class_GlobalVariableSymbol_E344A8F82685E02F7F980D3D5E40B920A0F8AEC3.html#function_Syntax_4633D825FF877749BB8256591D2951AF6B6F4539">cmajor::symbols::GlobalVariableSymbol::Syntax</a>
             , <a href="./class_LocalVariableSymbol_F5A9F74EEFC0001129616C5EEBCFE3B2DFC74FCF.html#function_CreateDomElement_2265B7D382830DC52036E3C632768D2E7B066F98">cmajor::symbols::LocalVariableSymbol::CreateDomElement</a>
             , <a href="./class_MemberFunctionSymbol_3BF2D77D69165719C9D08538201EC0A12DBC5B03.html#function_DocName_8545EBB299777E3AB3D683C86BD213641C60E883">cmajor::symbols::MemberFunctionSymbol::DocName</a>
             , <a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_CreateDomElement_9B78A68FBCF194F3E191AEDECE6A1603199412B7">cmajor::symbols::MemberVariableSymbol::CreateDomElement</a>
-            , <a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_Dump_8F7D5D7D8C663D2BD1C70D5523FA87AFB2370DFB">cmajor::symbols::MemberVariableSymbol::Dump</a>
-            , <a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_GetDIMemberType_CEA9472BB06EC1205159E6B7284374FBBA58789C">cmajor::symbols::MemberVariableSymbol::GetDIMemberType</a>
+            , <a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_Dump_F6FF9DBDA012D0E00E6D1168C27DDBA38C4BBAC1">cmajor::symbols::MemberVariableSymbol::Dump</a>
+            , <a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_GetDIMemberType_C03271BB82AC331C6F0C02CD10DC6A09E040AC02">cmajor::symbols::MemberVariableSymbol::GetDIMemberType</a>
             , <a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_Syntax_C0BE2AEF322D0E9A097C381ACC5955BD0DDF12BF">cmajor::symbols::MemberVariableSymbol::Syntax</a>
             , <a href="./class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html#function_CreateDomElement_242AC67D03499A194749AE7A8DCEBD475F13A297">cmajor::symbols::ParameterSymbol::CreateDomElement</a>
-            , <a href="./class_StructuredValue_B2E6027F8490C6C3257E3986BF5B5EA7B7C7AF58.html#function_Read_BFD302E313A92D778BEEEC124B1C06A2C84E8C53">cmajor::symbols::StructuredValue::Read</a>
+            , <a href="./class_StructuredValue_B2E6027F8490C6C3257E3986BF5B5EA7B7C7AF58.html#function_Read_5B27ABD9BB54366510DB74BCABF28AEE54DF6472">cmajor::symbols::StructuredValue::Read</a>
         </span>
         <br/>
         <br/>
@@ -294,12 +244,8 @@
         <span>
             Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#27">27</a>
              of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Info_4C298F9C10CD52551E26E8A155C24685D4DB6BC1">cmajor::symbols::Symbol::Info</a>
@@ -320,12 +266,8 @@
         <span>
             Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#20">20</a>
              of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsVariableSymbol_4044F457CCB35C785CD5767790A1B709888F606B">cmajor::symbols::Symbol::IsVariableSymbol</a>
@@ -342,21 +284,6 @@
         <span>
             Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#32">32</a>
              of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span>&nbsp;<span class="identifier">typeId</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUuid</span><span class="other">(</span><span class="identifier">typeId</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">EmplaceTypeRequest</span><span class="other">(</span><span class="identifier">reader</span><span class="other">,&nbsp;</span><span class="kw">this</span><span class="other">,&nbsp;</span><span class="identifier">typeId</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -401,22 +328,18 @@
         <span>
             Definition at line <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html#26">26</a>
              of <a href="file/VariableSymbol.hpp_C4A6C7A64239013B0CE1BF7E699EB93DAB056056.html">VariableSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#variable_type_60768DFA7ED0257FA013D30A0E5F1EF0F76F4594">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">typeSymbol</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Called by: <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_CreateDestructorSymbol_79F2A2F969ACA6903843345E90D339213AADA4C0">cmajor::symbols::ClassTypeSymbol::CreateDestructorSymbol</a>
             , <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_CreateLayouts_8034CE4DF533C22632F3E631B9081752CE91ED27">cmajor::symbols::ClassTypeSymbol::CreateLayouts</a>
-            , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_CreateTemporary_3396771717A3E4E7147CE34EEF19B7BB109E4E9C">cmajor::symbols::FunctionSymbol::CreateTemporary</a>
+            , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_CreateTemporary_AD1A7877BBA122E1FCEF55A87386F5A8A1327EF1">cmajor::symbols::FunctionSymbol::CreateTemporary</a>
             , <a href="./class_GlobalVariableSymbol_E344A8F82685E02F7F980D3D5E40B920A0F8AEC3.html#function_Read_2DC204917F7E953EE7616C91D0BC571EEA1C2D2B">cmajor::symbols::GlobalVariableSymbol::Read</a>
-            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConstructor_7A465FD713F1DA87436B98754653805884796C33">cmajor::symbols::SymbolTable::BeginConstructor</a>
-            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_4074A6D895598815CF09C66201F721DD32A9BE1B">cmajor::symbols::SymbolTable::BeginConversionFunction</a>
-            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_17E41331868FE7F1E9F80B0382AD820B14385389">cmajor::symbols::SymbolTable::BeginDestructor</a>
-            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginMemberFunction_BFFEEB3A6BC5BBE54E63BA0BBBE94345CF3B39E5">cmajor::symbols::SymbolTable::BeginMemberFunction</a>
+            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConstructor_9FC182ABBA5DDCB3A455993458193C9A0243C1CA">cmajor::symbols::SymbolTable::BeginConstructor</a>
+            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginConversionFunction_D5D2C96B67785D0AC80A27ED396381CE918BB1C0">cmajor::symbols::SymbolTable::BeginConversionFunction</a>
+            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginDestructor_CAF36E85177E0F8B7EEFE44F13AD8789FECEADC9">cmajor::symbols::SymbolTable::BeginDestructor</a>
+            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginMemberFunction_AC8FAF979C48AC457C143B08BDE57F8747217DD1">cmajor::symbols::SymbolTable::BeginMemberFunction</a>
         </span>
         <br/>
         <br/>
@@ -430,17 +353,6 @@
         <span>
             Definition at line <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html#26">26</a>
              of <a href="file/VariableSymbol.cpp_06068979DC161353002CF38B00946121DC0431DF.html">VariableSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#variable_type_60768DFA7ED0257FA013D30A0E5F1EF0F76F4594">type</a><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>

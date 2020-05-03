@@ -2692,6 +2692,19 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private async void springToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "tools"), "spring"), "spring.cmp"));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
 
     public static class KeyboardUtil
