@@ -790,7 +790,9 @@ void Module::Write(SymbolWriter& writer)
         writer.GetBinaryWriter().Write(referencedModule->OriginalFilePath());
     }
     fileTable.Write(writer.GetBinaryWriter(), IsSystemModule());
+#ifdef _WIN32
     resourceTable.Write(writer.GetBinaryWriter());
+#endif
     uint32_t efn = exportedFunctions.size();
     writer.GetBinaryWriter().WriteULEB128UInt(efn);
     for (uint32_t i = 0; i < efn; ++i)
@@ -897,6 +899,7 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
 #endif
     }
+#ifdef _WIN32
     resourceTable.Read(reader.GetBinaryReader());
     int nres = resourceTable.Resources().size();
     for (int i = 0; i < nres; ++i)
@@ -908,6 +911,7 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         }
         rootModule->globalResourceTable.AddResource(resource);
     }
+#endif
     exportedFunctions.clear();
     uint32_t efn = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < efn; ++i)
@@ -980,7 +984,9 @@ void Module::Dump()
         formatter.DecIndent();
     }
     fileTable.Dump(formatter);
+#ifdef _WIN32
     resourceTable.Dump(formatter);
+#endif
     formatter.WriteLine("module dependencies:");
     formatter.IncIndent();
     formatter.WriteLine(ToUtf8(Name()));

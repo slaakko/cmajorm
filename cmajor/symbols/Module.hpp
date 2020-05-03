@@ -7,7 +7,9 @@
 #define CMAJOR_SYMBOLS_MODULE_INCLUDED
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Warning.hpp>
+#ifdef _WIN32
 #include <cmajor/symbols/ResourceTable.hpp>
+#endif
 #include <sngcm/ast/Project.hpp>
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <soulng/util/CodeFormatter.hpp>
@@ -112,8 +114,10 @@ public:
     uint32_t SymbolTablePos() const { return symbolTablePos; }
     FileTable& GetFileTable() { return fileTable; }
     void RegisterFileTable(FileTable* fileTable, Module* module);
+#ifdef _WIN32
     ResourceTable& GetResourceTable() { return resourceTable; }
     ResourceTable& GetGlobalResourceTable() { return globalResourceTable; }
+#endif
     void SetLexers(std::vector<std::unique_ptr<CmajorLexer>>&& lexers_);
     std::vector<soulng::lexer::Lexer*>* GetLexers();
     std::string GetFilePath(int32_t fileIndex) const;
@@ -183,8 +187,10 @@ private:
     std::string resourceFilePath;
     std::vector<std::string> referenceFilePaths;
     FileTable fileTable;
+#ifdef _WIN32
     ResourceTable resourceTable;
     ResourceTable globalResourceTable;
+#endif
     std::vector<FileTable*> fileTables;
     std::vector<std::unique_ptr<CmajorLexer>> lexers;
     std::vector<soulng::lexer::Lexer*> lexerVec;

@@ -37,7 +37,9 @@
 #include <cmajor/cmdoclib/SourceCodePrinter.hpp>
 #include <cmajor/cmdoclib/SymbolTableXml.hpp>
 #include <cmajor/cmdoclib/File.hpp>
+#ifdef _WIN32
 #include <cmajor/cmres/ResourceProcessor.hpp>
+#endif
 #include <sngcm/ast/Attribute.hpp>
 #include <sngcm/ast/Function.hpp>
 #include <sngcm/ast/BasicType.hpp>
@@ -670,8 +672,7 @@ void CreateDynamicListFile(const std::string& dynamicListFilePath, Module& modul
     formatter.WriteLine("};");
 }
 
-void LinkLlvm(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths,
-    const std::vector<std::string>& resourceFilePaths, const std::string& mainObjectFilePath, Module& module)
+void LinkLlvm(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, std::string mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -695,11 +696,6 @@ void LinkLlvm(const std::string& executableFilePath, const std::string& libraryF
     for (int i = 0; i < n - 1; ++i)
     {
         args.push_back(QuotedPath(libraryFilePaths[i]));
-    }
-    int m = resourceFilePaths.size();
-    for (int i = 0; i < m; ++i)
-    {
-        args.push_back(QuotedPath(resourceFilePaths[i]));
     }
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
@@ -1744,7 +1740,9 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 {
                     GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
                 }
+#ifdef _WIN32
                 cmajor::resources::ProcessResourcesInProject(*project, *rootModule);
+#endif
                 if (project->GetTarget() == Target::program || project->GetTarget() == Target::winguiapp || project->GetTarget() == Target::winapp)
                 {
                     Link(project->GetTarget(), project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(),

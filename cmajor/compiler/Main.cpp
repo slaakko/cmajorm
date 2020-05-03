@@ -12,7 +12,9 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/Warning.hpp>
+#ifdef _WIN32
 #include <cmajor/cmres/InitDone.hpp>
+#endif
 #include <soulng/lexer/ParsingException.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
@@ -37,11 +39,15 @@ struct InitDone
         sngcm::ast::Init();
         cmajor::symbols::Init();
         sngxml::xpath::Init();
+#ifdef _WIN32
         cmajor::resources::Init();
+#endif
     }
     ~InitDone()
     {
+#ifdef _WIN32
         cmajor::resources::Done();
+#endif
         sngxml::xpath::Done();
         cmajor::symbols::Done();
         sngcm::ast::Done();
