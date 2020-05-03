@@ -14,10 +14,10 @@ LIBRARIES = ../lib/libcmsngutil.a ../lib/libcmsnglexer.a ../lib/libcmsngparser.a
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ifeq ($(config),debug)
-soname=libcmrtd.so.3.3.0
+soname=libcmrtd.so.3.4.0
 sobasename=libcmrtd
 else
-soname=libcmrt.so.3.3.0
+soname=libcmrt.so.3.4.0
 sobasename=libcmrt
 endif
 

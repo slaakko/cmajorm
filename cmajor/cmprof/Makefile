@@ -12,9 +12,9 @@ LLVMLIBS = $(shell llvm-config --libs)
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ifeq ($(config),debug)
-    exename=cmprofd
+	exename=cmprofd
 else
-    exename=cmprof
+	exename=cmprof
 endif
 
 ../bin/$(exename): $(OBJECTS) $(LIBRARIES)

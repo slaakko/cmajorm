@@ -45,10 +45,10 @@ install:
 	mkdir -p $(prefix)/bin
 	cp bin/* $(prefix)/bin
 	mkdir -p $(prefix)/lib
-	cp lib/$(cmrtsoname).so.3.3.0 $(prefix)/lib
+	cp lib/$(cmrtsoname).so.3.4.0 $(prefix)/lib
 	cp lib/libgmpintf.a $(prefix)/lib
-	ln -f $(prefix)/lib/$(cmrtsoname).so.3.3.0 $(prefix)/lib/$(cmrtsoname).so.3
-	ln -f $(prefix)/lib/$(cmrtsoname).so.3.3.0 $(prefix)/lib/$(cmrtsoname).so
+	ln -f $(prefix)/lib/$(cmrtsoname).so.3.4.0 $(prefix)/lib/$(cmrtsoname).so.3
+	ln -f $(prefix)/lib/$(cmrtsoname).so.3.4.0 $(prefix)/lib/$(cmrtsoname).so
 
 sys:
 	cmc --verbose system/platform/linux/System.cms
