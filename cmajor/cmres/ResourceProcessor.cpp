@@ -141,12 +141,12 @@ void AddResourcesInProjectToCurrentModule(sngcm::ast::Project& project, cmajor::
     for (int i = 0; i < n; ++i)
     {
         const std::string& relativeResourceFilePath = project.RelativeResourceFilePaths()[i];
-        const std::string& resourceFilePath = project.ResourceFilePaths()[i];
+        const std::string& resourceXmlFilePath = project.ResourceFilePaths()[i];
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
             LogMessage(currentModule.LogStreamId(), "> " + relativeResourceFilePath);
         }
-        std::unique_ptr<sngxml::dom::Document> resourceXmlDoc = sngxml::dom::ReadDocument(resourceFilePath);
+        std::unique_ptr<sngxml::dom::Document> resourceXmlDoc = sngxml::dom::ReadDocument(resourceXmlFilePath);
         std::unique_ptr<sngxml::xpath::XPathObject> resourceResult = sngxml::xpath::Evaluate(U"/resources/resource", resourceXmlDoc.get());
         if (resourceResult)
         {
@@ -163,26 +163,26 @@ void AddResourcesInProjectToCurrentModule(sngcm::ast::Project& project, cmajor::
                         std::u32string resourceName = element->GetAttribute(U"name");
                         if (resourceName.empty())
                         {
-                            throw std::runtime_error(std::to_string(i) + "'th resource element has no name attribute in resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
+                            throw std::runtime_error(std::to_string(i) + "'th resource element has no name attribute in resource XML file '" + resourceXmlFilePath + "' in project '" + project.FilePath() + "'.");
                         }
                         if (currentModule.GetResourceTable().Contains(resourceName))
                         {
                             throw std::runtime_error("Resource table of module '" + ToUtf8(currentModule.Name()) + " (" + currentModule.OriginalFilePath() + ") already contains resource name '" + ToUtf8(resourceName) +
-                                ". Detected when processing resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
+                                ". Detected when processing resource XML file '" + resourceXmlFilePath + "' in project '" + project.FilePath() + "'.");
                         }
                         if (currentModule.GetGlobalResourceTable().Contains(resourceName))
                         {
-                            throw std::runtime_error(std::to_string(i) + "'th resource name '" + ToUtf8(resourceName) + "' not globally unique. Detected when processing resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
+                            throw std::runtime_error(std::to_string(i) + "'th resource name '" + ToUtf8(resourceName) + "' not globally unique. Detected when processing resource XML file '" + resourceXmlFilePath + "' in project '" + project.FilePath() + "'.");
                         }
                         std::u32string resourceType = element->GetAttribute(U"type");
                         if (resourceType.empty())
                         {
-                            throw std::runtime_error(std::to_string(i) + "'th resource element has no type attribute in resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
+                            throw std::runtime_error(std::to_string(i) + "'th resource element has no type attribute in resource XML file '" + resourceXmlFilePath + "' in project '" + project.FilePath() + "'.");
                         }
                         std::u32string resourceFile = element->GetAttribute(U"file");
                         if (resourceFile.empty())
                         {
-                            throw std::runtime_error(std::to_string(i) + "'th resource element has no file attribute in resource XML file '" + resourceFilePath + "' in project '" + project.FilePath() + "'.");
+                            throw std::runtime_error(std::to_string(i) + "'th resource element has no file attribute in resource XML file '" + resourceXmlFilePath + "' in project '" + project.FilePath() + "'.");
                         }
                         std::string resourceFilePath = Path::MakeCanonical(ToUtf8(resourceFile));
                         std::string fullResourceFilePath = resourceFilePath;

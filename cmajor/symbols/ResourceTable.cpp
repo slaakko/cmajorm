@@ -32,16 +32,16 @@ std::string MakeCmajorRootDirRelativeFilePath(const std::string& cmajorRootDir, 
 {
     if (filePath.find(cmajorRootDir, 0) == 0)
     {
-        return filePath.substr(cmajorRootDir.size());
+        return "$CMAJOR$" + filePath.substr(cmajorRootDir.size());
     }
     return filePath;
 }
 
 std::string MakeFullPathFromCmajorRootDirRelativeFilePath(const std::string& cmajorRootDir, const std::string& filePath)
 {
-    if (Path::IsRelative(filePath))
+    if (filePath.find("$CMAJOR$") == 0)
     {
-        return Path::Combine(cmajorRootDir, filePath);
+        return Path::Combine(cmajorRootDir, filePath.substr(8));
     }
     return filePath;
 }

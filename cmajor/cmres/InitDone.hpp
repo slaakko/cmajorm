@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_CMRES_INIT_DONE_INCLUDED
 #define CMAJOR_CMRES_INIT_DONE_INCLUDED
-#include <cmajor/cmres/CmReseApi.hpp>
+#include <cmajor/cmres/CmResApi.hpp>
 
 namespace cmajor { namespace resources {
 

@@ -296,15 +296,24 @@ namespace System.Windows
         }
         private Bitmap* GetOrCreateBitmap(const string& bitmapName)
         {
-            HashMap<string, Bitmap*>.ConstIterator it = bitmapMap.CFind(bitmapName);
-            if (it != bitmapMap.CEnd())
+            Bitmap* bitmap = null;
+            try
             {
-                return it->second;
+                HashMap<string, Bitmap*>.ConstIterator it = bitmapMap.CFind(bitmapName);
+                if (it != bitmapMap.CEnd())
+                {
+                    return it->second;
+                }
+                UniquePtr<Bitmap> bitmapPtr(new Bitmap(Bitmap.FromResource(bitmapName)));
+                bitmap = bitmapPtr.Get();
+                bitmapMap[bitmapName] = bitmap;
+                bitmaps.Add(Rvalue(bitmapPtr));
+                return bitmap;
+            }        
+            catch (const Exception& ex)
+            {
+                throw Exception("could not load bitmap '" + bitmapName + "': " + ex.Message());
             }
-            UniquePtr<Bitmap> bitmapPtr(new Bitmap(Bitmap.FromResource(bitmapName)));
-            Bitmap* bitmap = bitmapPtr.Get();
-            bitmapMap[bitmapName] = bitmap;
-            bitmaps.Add(Rvalue(bitmapPtr));
             return bitmap;
         }
         private nothrow ToolButton* GetToolButtonAt(const Point& location) const

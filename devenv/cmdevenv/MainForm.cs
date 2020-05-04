@@ -2463,7 +2463,9 @@ namespace cmdevenv
                     {
                         runUnitTestsToolStripMenuItem1.Enabled = true;
                     }
-                    if (selectedProject.Target == Target.program || selectedProject.Target == Target.library)
+                    if (selectedProject.Target == Target.program || selectedProject.Target == Target.library ||
+                        selectedProject.Target == Target.winapp || selectedProject.Target == Target.winguiapp ||
+                        selectedProject.Target == Target.winlib)
                     {
                         buildToolStripMenuItem2.Enabled = true;
                     }

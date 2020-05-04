@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_CMRES_RESOURCE_PROCESSOR_INCLUDED
 #define CMAJOR_CMRES_RESOURCE_PROCESSOR_INCLUDED
-#include <cmajor/cmres/CmReseApi.hpp>
+#include <cmajor/cmres/CmResApi.hpp>
 #include <sngcm/ast/Project.hpp>
 #include <cmajor/symbols/Module.hpp>
 

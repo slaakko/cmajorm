@@ -24,6 +24,8 @@
 
 namespace cmajor { namespace symbols {
 
+// #define RESOURCE_DEBUG
+
 using namespace soulng::unicode;
 using namespace soulng::util;
 
@@ -792,6 +794,15 @@ void Module::Write(SymbolWriter& writer)
     fileTable.Write(writer.GetBinaryWriter(), IsSystemModule());
 #ifdef _WIN32
     resourceTable.Write(writer.GetBinaryWriter());
+#ifdef RESOURCE_DEBUG
+    int nres = resourceTable.Resources().size();
+    for (int i = 0; i < nres; ++i)
+    {
+        const Resource& resource = resourceTable.Resources()[i];
+        LogMessage(LogStreamId(), "Module.Write: " + ToUtf8(name) + ": resource name=" + ToUtf8(resource.name) + ", file=" + resource.filePath);
+    }
+    LogMessage(LogStreamId(), "Module.Write: " + ToUtf8(name) + ": " + std::to_string(nres) + " resources written", DebugLogIndent());
+#endif
 #endif
     uint32_t efn = exportedFunctions.size();
     writer.GetBinaryWriter().WriteULEB128UInt(efn);
@@ -827,6 +838,24 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         rootModule->IncDebugLogIndent();
 #endif 
         rootModule->RegisterFileTable(&fileTable, this);
+#ifdef _WIN32
+        int nres = resourceTable.Resources().size();
+#ifdef RESOURCE_DEBUG
+        LogMessage(rootModule->LogStreamId(), "ReadHeader: cached " + ToUtf8(name) + ": " + std::to_string(nres) + " resources", rootModule->DebugLogIndent());
+#endif
+        for (int i = 0; i < nres; ++i)
+        {
+            Resource resource = resourceTable.Resources()[i];
+#ifdef RESOURCE_DEBUG
+            LogMessage(rootModule->LogStreamId(), "ReadHeader: " + ToUtf8(name) + ": resource name=" + ToUtf8(resource.name) + ", file=" + resource.filePath);
+#endif 
+            if (rootModule->globalResourceTable.Contains(resource.name))
+            {
+                throw std::runtime_error("duplicate resource name '" + ToUtf8(resource.name) + " read from file '" + reader.GetBinaryReader().FileName() + "'");
+            }
+            rootModule->globalResourceTable.AddResource(resource);
+        }
+#endif
         if (dependencyMap.find(originalFilePath) == dependencyMap.cend())
         {
             modules.push_back(this);
@@ -902,9 +931,15 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
 #ifdef _WIN32
     resourceTable.Read(reader.GetBinaryReader());
     int nres = resourceTable.Resources().size();
+#ifdef RESOURCE_DEBUG
+    LogMessage(rootModule->LogStreamId(), "ReadHeader: " + ToUtf8(name) + ": " + std::to_string(nres) + " resources read", rootModule->DebugLogIndent());
+#endif
     for (int i = 0; i < nres; ++i)
     {
         Resource resource = resourceTable.Resources()[i];
+#ifdef RESOURCE_DEBUG
+        LogMessage(rootModule->LogStreamId(), "ReadHeader: " + ToUtf8(name) + ": resource name=" + ToUtf8(resource.name) + ", file=" + resource.filePath);
+#endif 
         if (rootModule->globalResourceTable.Contains(resource.name))
         {
             throw std::runtime_error("duplicate resource name '" + ToUtf8(resource.name) + " read from file '" + reader.GetBinaryReader().FileName() + "'");

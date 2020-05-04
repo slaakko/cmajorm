@@ -26,38 +26,65 @@ namespace System.Windows
         }
         public Cursor& GetCursor(const string& cursorName)
         {
-            Resource* result = GetResource(cursorName);
-            if (result != null && result is Cursor*)
+            Cursor* cursor = null;
+            try
             {
-                return *cast<Cursor*>(result);
+                Resource* result = GetResource(cursorName);
+                if (result != null && result is Cursor*)
+                {
+                    return *cast<Cursor*>(result);
+                }
+                UniquePtr<Resource> resource(new Cursor(LoadCursor(cursorName)));
+                cursor = cast<Cursor*>(resource.Get());
+                resources.Add(Rvalue(resource));
+                return *cursor;
+            }        
+            catch (const Exception& ex)
+            {
+                throw Exception("could not load cursor '" + cursorName + "': " + ex.Message());
             }
-            UniquePtr<Resource> resource(new Cursor(LoadCursor(cursorName)));
-            Cursor* cursor = cast<Cursor*>(resource.Get());
-            resources.Add(Rvalue(resource));
             return *cursor;
         }
         public Icon& GetIcon(const string& iconName)
         {
-            Resource* result = GetResource(iconName);
-            if (result != null && result is Icon*)
+            Icon* icon = null;
+            try
             {
-                return *cast<Icon*>(result);
+                Resource* result = GetResource(iconName);
+                if (result != null && result is Icon*)
+                {
+                    return *cast<Icon*>(result);
+                }
+                UniquePtr<Resource> resource(new Icon(LoadIcon(iconName)));
+                icon = cast<Icon*>(resource.Get());
+                resources.Add(Rvalue(resource));
+                return *icon;
+            }        
+            catch (const Exception& ex)
+            {
+                throw Exception("could not load icon '" + iconName + "': " + ex.Message());
             }
-            UniquePtr<Resource> resource(new Icon(LoadIcon(iconName)));
-            Icon* icon = cast<Icon*>(resource.Get());
-            resources.Add(Rvalue(resource));
             return *icon;
         }
         public WinBitmap& GetBitmap(const string& bitmapName)
         {
-            Resource* result = GetResource(bitmapName);
-            if (result != null && result is WinBitmap*)
+            WinBitmap* bitmap = null;
+            try
             {
-                return *cast<WinBitmap*>(result);
+                Resource* result = GetResource(bitmapName);
+                if (result != null && result is WinBitmap*)
+                {
+                    return *cast<WinBitmap*>(result);
+                }
+                UniquePtr<Resource> resource(new WinBitmap(LoadBitmap(bitmapName)));
+                bitmap = cast<WinBitmap*>(resource.Get());
+                resources.Add(Rvalue(resource));
+                return *bitmap;
+            }        
+            catch (const Exception& ex)
+            {
+                throw Exception("could not load bitmap '" + bitmapName + "': " + ex.Message());
             }
-            UniquePtr<Resource> resource(new WinBitmap(LoadBitmap(bitmapName)));
-            WinBitmap* bitmap = cast<WinBitmap*>(resource.Get());
-            resources.Add(Rvalue(resource));
             return *bitmap;
         }
         private HashMap<string, Resource*> resourceMap;
