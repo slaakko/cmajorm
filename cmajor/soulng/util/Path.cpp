@@ -165,7 +165,7 @@ std::string Path::MakeCanonical(const std::string& path)
     {
         if (result[result.length() - 1] == '/')
         {
-            result.substr(0, result.length() - 1);
+            return result.substr(0, result.length() - 1);
         }
     }
     return result;

@@ -11,9 +11,9 @@
 
 namespace soulng { namespace unicode {
 
-std::string SoulNGVersionStr()
+std::string CmajorVersionStr()
 {
-    return "2.0.0";
+    return "3.5.0";
 }
 
 UnicodeException::UnicodeException(const std::string& message_) : std::runtime_error(message_)
@@ -2043,24 +2043,24 @@ const uint8_t headerMagic[8] =
     static_cast<uint8_t>('U'), static_cast<uint8_t>('C'), static_cast<uint8_t>('D'), current_soulng_ucd_version
 };
 
-std::string SoulNGRoot()
+std::string CmajorRoot()
 {
-    std::string soulngRoot;
-    const char* soulngRootEnv = getenv("SOULNG_ROOT");
-    if (soulngRootEnv)
+    std::string cmajorRoot;
+    const char* cmajorRootEnv = getenv("CMAJOR_ROOT");
+    if (cmajorRootEnv)
     {
-        soulngRoot = soulngRootEnv;
+        cmajorRoot = cmajorRootEnv;
     }
-    if (soulngRoot.empty())
+    if (cmajorRoot.empty())
     {
-        throw UnicodeException("please set 'SOULNG_ROOT' environment variable to contain /path/to/soulng-" + SoulNGVersionStr() + " directory.");
+        throw UnicodeException("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor-" + CmajorVersionStr() + " directory.");
     }
-    return soulngRoot;
+    return cmajorRoot;
 }
 
-std::string SoulNGUcdFilePath()
+std::string CmajorUcdFilePath()
 {
-    return (boost::filesystem::path(SoulNGRoot()) / boost::filesystem::path("unicode") / boost::filesystem::path("soulng_ucd.bin")).generic_string();
+    return (boost::filesystem::path(CmajorRoot()) / boost::filesystem::path("unicode") / boost::filesystem::path("cmajor_ucd.bin")).generic_string();
 }
 
 CharacterTable::CharacterTable() : headerRead(false), extendedHeaderStart(0), extendedHeaderEnd(0), extendedHeaderRead(false)
@@ -2069,7 +2069,7 @@ CharacterTable::CharacterTable() : headerRead(false), extendedHeaderStart(0), ex
 
 void CharacterTable::Write()
 {
-    std::string ucdFilePath = SoulNGUcdFilePath();
+    std::string ucdFilePath = CmajorUcdFilePath();
     BinaryWriter writer(ucdFilePath);
     WriteHeader(writer);
     writer.Seek(headerSize);
@@ -2159,7 +2159,7 @@ const CharacterInfo& CharacterTable::GetCharacterInfo(char32_t codePoint)
         std::lock_guard<std::mutex> lock(mtx);
         if (!page)
         {
-            std::string ucdFilePath = SoulNGUcdFilePath();
+            std::string ucdFilePath = CmajorUcdFilePath();
             BinaryReader reader(ucdFilePath);
             uint32_t pageStart = 0;
             if (!headerRead)
@@ -2218,7 +2218,7 @@ const ExtendedCharacterInfo& CharacterTable::GetExtendedCharacterInfo(char32_t c
         std::lock_guard<std::mutex> lock(mtx);
         if (!extendedPage)
         {
-            std::string ucdFilePath = SoulNGUcdFilePath();
+            std::string ucdFilePath = CmajorUcdFilePath();
             BinaryReader reader(ucdFilePath);
             uint32_t start = 0;
             uint32_t pageStart = 0;

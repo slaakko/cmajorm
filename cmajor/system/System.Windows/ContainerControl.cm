@@ -28,6 +28,12 @@ namespace System.Windows
             OnControlRemoved(args);
             return UniquePtr<Control>(childComponent.Release() as Control*);
         }
+        public void InsertChildBefore(Control* child, Control* before)
+        {
+            children.InsertBefore(child, before);
+            ControlEventArgs args(child);
+            OnControlAdded(args);
+        }
         public void InsertChildAfter(Control* child, Control* after)
         {
             children.InsertAfter(child, after);
