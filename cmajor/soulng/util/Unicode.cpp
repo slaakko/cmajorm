@@ -2040,7 +2040,7 @@ std::unique_ptr<CharacterTable> CharacterTable::instance;
 const uint8_t headerMagic[8] =
 {
     static_cast<uint8_t>('C'), static_cast<uint8_t>('M'), static_cast<uint8_t>('A'), static_cast<uint8_t>('J'),
-    static_cast<uint8_t>('U'), static_cast<uint8_t>('C'), static_cast<uint8_t>('D'), current_soulng_ucd_version
+    static_cast<uint8_t>('U'), static_cast<uint8_t>('C'), static_cast<uint8_t>('D'), current_cmajor_ucd_version
 };
 
 std::string CmajorRoot()
@@ -2118,12 +2118,12 @@ void CharacterTable::ReadHeader(BinaryReader& reader)
     {
         if (magic[i] != headerMagic[i])
         {
-            throw UnicodeException("invalid soulng_ucd.bin header magic: 'CMAJUCD' expected");
+            throw UnicodeException("invalid cmajor_ucd.bin header magic: 'CMAJUCD' expected");
         }
     }
     if (magic[7] != headerMagic[7])
     {
-        throw UnicodeException("invalid soulng_ucd.bin version: version " + std::string(1, headerMagic[7]) + " expected, version " + std::string(1, magic[7]) + " read");
+        throw UnicodeException("invalid cmajor_ucd.bin version: version " + std::string(1, headerMagic[7]) + " expected, version " + std::string(1, magic[7]) + " read");
     }
     extendedHeaderStart = reader.ReadUInt();
     extendedHeaderEnd = reader.ReadUInt();

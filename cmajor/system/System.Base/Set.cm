@@ -5,6 +5,7 @@
 
 using System;
 using System.Concepts;
+using System.IO;
 
 namespace System.Collections
 {
@@ -93,5 +94,25 @@ namespace System.Collections
         where T is Semiregular and C is Relation and C.Domain is T
     {
         return LexicographicalCompare(left.CBegin(), left.CEnd(), right.CBegin(), right.CEnd(), C());
+    }
+    
+    public TextWriter& operator<<<T, C>(TextWriter& writer, const Set<T, C>& set)
+    {
+        writer << "{";
+        bool first = true;
+        for (const T& element : set)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                writer << ", ";
+            }
+            writer << element;
+        }
+        writer << "}";
+        return writer;
     }
 }

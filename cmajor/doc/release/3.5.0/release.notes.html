@@ -3,8 +3,40 @@
 <h2>Release notes</h2>
 
 <ul>
-<li>The previous 3.4.0 version was broken. 
+<li><p>The previous 3.4.0 version was broken. 
 It printed an error message about missing SOULNG_ROOT environment variable.
 Sorry for the inconvenience for those who downloaded it and tried to use it.
-In this version this has been fixed.</li>
+In this version this has been fixed.</p></li>
+<li><p>Default TextWriter output operators for Pair&lt;T, U> and for the following containers:
+List&lt;T>, Set&lt;T, C>, Map&lt;Key, Value, KeyCompare>, HashSet&lt;T, H, C> and HashMap&lt;K, T, H, C>.
+The TextWriter output operator for Pair&lt;T, U> is defined as follows:</p>
+
+<pre><code>public TextWriter&amp; operator&lt;&lt;&lt;T, U&gt;(TextWriter&amp; writer, const Pair&lt;T, U&gt;&amp; pair)
+{
+    return writer &lt;&lt; "(" &lt;&lt; pair.first &lt;&lt; ", " &lt;&lt; pair.second &lt;&lt; ")";
+}
+</code></pre>
+
+<ul>
+<li>The default output operator for Pair&lt;T, U> prints the first and second members of the pair inside parentheses separated by a comma.</li>
+<li>The default output operator for List&lt;T> prints the elements of the list inside brackets "[" and "]" and separated by commas.</li>
+<li>The default output operator for Set&lt;T> prints the elements of the set inside braces "{" and "}" and separated by commas.</li>
+<li>The default output operator for Map&lt;Key, Value, KeyCompare> prints the elements (pairs) of the map inside braces "{" and "}" and separated by commas.</li>
+<li>The default output operator for HashSet&lt;T, H, C> prints the elements of the hashset inside braces "{" and "}" and separated by commas.</li>
+<li>The default output operator for HashMap&lt;K, T, H, C> prints the elements (pairs) of the hashmap inside braces "{" and "}" and separated by commas.</li>
 </ul>
+
+<p>If you want to define your own output operator for one of those container types, you can do so by deriving
+your own container type from that container type and define the output operator for that type.
+For example, deriving a class template from List&lt;T> called MyList&lt;T> and defining an output operator for it:</p>
+
+<p><pre><code>public class MyList&lt;T&gt; : List&lt;T&gt;
+{
+}
+public TextWriter&amp; operator&lt;&lt;&lt;T&gt;(TextWriter&amp; writer, const MyList&lt;T&gt;&amp; myList)
+{
+    // print myList
+    return writer;
+}
+</code></pre></li>
+</ul></p>

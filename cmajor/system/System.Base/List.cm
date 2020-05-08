@@ -5,6 +5,7 @@
 
 using System;
 using System.Concepts;
+using System.IO;
 
 namespace System.Collections
 {
@@ -369,4 +370,24 @@ namespace System.Collections
             ++items;
         }
     }
+    
+    public TextWriter& operator<<<T>(TextWriter& writer, const List<T>& list)
+    {
+        writer << "[";
+        bool first = true;
+        for (const T& element : list)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                writer << ", ";
+            }
+            writer << element;
+        }
+        writer << "]";
+        return writer;
+    }        
 }

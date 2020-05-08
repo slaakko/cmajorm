@@ -5,6 +5,7 @@
 
 using System;
 using System.Concepts;
+using System.IO;
 
 namespace System.Collections
 {
@@ -92,4 +93,25 @@ namespace System.Collections
         }
         return true;
     }
+    
+    public TextWriter& operator<<<T, H, C>(TextWriter& writer, const HashSet<T, H, C>& hashSet)
+    {
+        writer << "{";
+        bool first = true;
+        for (const T& element : hashSet)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                writer << ", ";
+            }
+            writer << element;
+        }
+        writer << "}";
+        return writer;
+    }        
+    
 }

@@ -4,6 +4,7 @@
 // =================================
 
 using System.Concepts;
+using System.IO;
 
 namespace System
 {
@@ -46,5 +47,10 @@ namespace System
         {
             return p.second;
         }
+    }
+    
+    public TextWriter& operator<<<T, U>(TextWriter& writer, const Pair<T, U>& pair)
+    {
+        return writer << "(" << pair.first << ", " << pair.second << ")";
     }
 }
