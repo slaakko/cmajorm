@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/codegensx/SystemXCodeGenerator.hpp>
-#include <cmajor/cmsxbe/EmittingContext.hpp>
+#include <cmajor/codegencpp/CmCppCodeGenerator.hpp>
+#include <cmajor/cmcppbe/EmittingContext.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundNamespace.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
@@ -18,7 +18,7 @@
 #include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 
-namespace cmajor { namespace codegensx {
+namespace cmajor { namespace codegencpp {
 
 using namespace soulng::util;
 using namespace soulng::unicode;
@@ -38,7 +38,7 @@ struct NativeModule
     void* module;
 };
 
-SystemXCodeGenerator::SystemXCodeGenerator(cmajor::ir::EmittingContext& emittingContext_) :
+CmCppCodeGenerator::CmCppCodeGenerator(cmajor::ir::EmittingContext& emittingContext_) :
     cmajor::codegenbase::CodeGenerator(emittingContext_), emitter(GetEmitter()), emittingContext(&emittingContext_), symbolTable(nullptr), module(nullptr), compileUnit(nullptr),
     nativeCompileUnit(nullptr), function(nullptr), entryBasicBlock(nullptr), lastInstructionWasRet(false), destructorCallGenerated(false), genJumpingBoolCode(false),
     trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr), sequenceSecond(nullptr), currentFunction(nullptr), currentBlock(nullptr),
@@ -49,13 +49,13 @@ SystemXCodeGenerator::SystemXCodeGenerator(cmajor::ir::EmittingContext& emitting
     emitter->SetEmittingDelegate(this);
 }
 
-void SystemXCodeGenerator::GenerateCode(void* boundCompileUnit)
+void CmCppCodeGenerator::GenerateCode(void* boundCompileUnit)
 {
     BoundCompileUnit* compileUnit = static_cast<BoundCompileUnit*>(boundCompileUnit);
     compileUnit->Accept(*this);
 }
 
-void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
+void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
     boundCompileUnit.ResetCodeGenerated();
     std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".i");
@@ -116,7 +116,7 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundNamespace& boundNamespace)
+void CmCppCodeGenerator::Visit(BoundNamespace& boundNamespace)
 {
     int n = boundNamespace.Members().size();
     for (int i = 0; i < n; ++i)
@@ -126,7 +126,7 @@ void SystemXCodeGenerator::Visit(BoundNamespace& boundNamespace)
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundClass& boundClass)
+void CmCppCodeGenerator::Visit(BoundClass& boundClass)
 {
     classStack.push(currentClass);
     currentClass = &boundClass;
@@ -140,7 +140,7 @@ void SystemXCodeGenerator::Visit(BoundClass& boundClass)
     classStack.pop();
 }
 
-void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
+void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
 {
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
@@ -335,7 +335,7 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     emitter->FinalizeFunction(function);
 }
 
-void SystemXCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
+void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
 {
     if (generateLineNumbers)
     {
@@ -360,12 +360,12 @@ void SystemXCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
     currentBlock = prevBlock;
 }
 
-void SystemXCodeGenerator::Visit(BoundSequenceStatement& boundSequenceStatement)
+void CmCppCodeGenerator::Visit(BoundSequenceStatement& boundSequenceStatement)
 {
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
-    SetTarget(&boundSequenceStatement); 
+    SetTarget(&boundSequenceStatement);
     BoundStatement* prevSequence = sequenceSecond;
     sequenceSecond = boundSequenceStatement.Second();
     boundSequenceStatement.First()->Accept(*this);
@@ -376,7 +376,7 @@ void SystemXCodeGenerator::Visit(BoundSequenceStatement& boundSequenceStatement)
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
+void CmCppCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
 {
     if (generateLineNumbers)
     {
@@ -421,7 +421,7 @@ void SystemXCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
+void CmCppCodeGenerator::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
 {
     if (generateLineNumbers)
     {
@@ -446,7 +446,7 @@ void SystemXCodeGenerator::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
+void CmCppCodeGenerator::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
 {
     if (generateLineNumbers)
     {
@@ -468,7 +468,7 @@ void SystemXCodeGenerator::Visit(BoundGotoDefaultStatement& boundGotoDefaultStat
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundBreakStatement& boundBreakStatement)
+void CmCppCodeGenerator::Visit(BoundBreakStatement& boundBreakStatement)
 {
     if (generateLineNumbers)
     {
@@ -489,7 +489,7 @@ void SystemXCodeGenerator::Visit(BoundBreakStatement& boundBreakStatement)
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundContinueStatement& boundContinueStatement)
+void CmCppCodeGenerator::Visit(BoundContinueStatement& boundContinueStatement)
 {
     if (generateLineNumbers)
     {
@@ -508,7 +508,7 @@ void SystemXCodeGenerator::Visit(BoundContinueStatement& boundContinueStatement)
     basicBlockOpen = true;
 }
 
-void SystemXCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
+void CmCppCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
 {
     if (generateLineNumbers)
     {
@@ -535,7 +535,7 @@ void SystemXCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
     basicBlockOpen = true;
 }
 
-void SystemXCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
+void CmCppCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
 {
     if (generateLineNumbers)
     {
@@ -544,7 +544,7 @@ void SystemXCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
-    SetTarget(&boundIfStatement); 
+    SetTarget(&boundIfStatement);
     void* prevTrueBlock = trueBlock;
     void* prevFalseBlock = falseBlock;
     trueBlock = emitter->CreateBasicBlock("true");
@@ -576,7 +576,7 @@ void SystemXCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
     basicBlockOpen = true;
 }
 
-void SystemXCodeGenerator::Visit(BoundWhileStatement& boundWhileStatement)
+void CmCppCodeGenerator::Visit(BoundWhileStatement& boundWhileStatement)
 {
     if (generateLineNumbers)
     {
@@ -585,7 +585,7 @@ void SystemXCodeGenerator::Visit(BoundWhileStatement& boundWhileStatement)
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
-    SetTarget(&boundWhileStatement); 
+    SetTarget(&boundWhileStatement);
     void* prevTrueBlock = trueBlock;
     void* prevFalseBlock = falseBlock;
     void* prevBreakTarget = breakTarget;
@@ -617,7 +617,7 @@ void SystemXCodeGenerator::Visit(BoundWhileStatement& boundWhileStatement)
     falseBlock = prevFalseBlock;
 }
 
-void SystemXCodeGenerator::Visit(BoundDoStatement& boundDoStatement)
+void CmCppCodeGenerator::Visit(BoundDoStatement& boundDoStatement)
 {
     if (generateLineNumbers)
     {
@@ -660,7 +660,7 @@ void SystemXCodeGenerator::Visit(BoundDoStatement& boundDoStatement)
     falseBlock = prevFalseBlock;
 }
 
-void SystemXCodeGenerator::Visit(BoundForStatement& boundForStatement)
+void CmCppCodeGenerator::Visit(BoundForStatement& boundForStatement)
 {
     if (generateLineNumbers)
     {
@@ -708,7 +708,7 @@ void SystemXCodeGenerator::Visit(BoundForStatement& boundForStatement)
     falseBlock = prevFalseBlock;
 }
 
-void SystemXCodeGenerator::Visit(BoundSwitchStatement& boundSwitchStatement)
+void CmCppCodeGenerator::Visit(BoundSwitchStatement& boundSwitchStatement)
 {
     if (generateLineNumbers)
     {
@@ -779,7 +779,7 @@ void SystemXCodeGenerator::Visit(BoundSwitchStatement& boundSwitchStatement)
     breakTarget = prevBreakTarget;
 }
 
-void SystemXCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
+void CmCppCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
 {
     if (generateLineNumbers)
     {
@@ -814,7 +814,7 @@ void SystemXCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
 
 }
 
-void SystemXCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
+void CmCppCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
 {
     if (generateLineNumbers)
     {
@@ -838,7 +838,7 @@ void SystemXCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundConstructionStatement& boundConstructionStatement)
+void CmCppCodeGenerator::Visit(BoundConstructionStatement& boundConstructionStatement)
 {
     if (generateLineNumbers)
     {
@@ -847,7 +847,7 @@ void SystemXCodeGenerator::Visit(BoundConstructionStatement& boundConstructionSt
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
-    SetTarget(&boundConstructionStatement); 
+    SetTarget(&boundConstructionStatement);
     boundConstructionStatement.ConstructorCall()->Accept(*this);
     if (!boundConstructionStatement.ConstructorCall()->GetFunctionSymbol()->IsBasicTypeOperation())
     {
@@ -863,7 +863,7 @@ void SystemXCodeGenerator::Visit(BoundConstructionStatement& boundConstructionSt
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(firstArgumentBaseType);
                     if (classType->Destructor())
                     {
-                        newCleanupNeeded = true; 
+                        newCleanupNeeded = true;
                         std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
                         std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, currentBlock->EndSpan(), classType->Destructor()));
                         destructorCall->AddArgument(std::move(classPtrArgument));
@@ -885,7 +885,7 @@ void SystemXCodeGenerator::Visit(BoundConstructionStatement& boundConstructionSt
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundAssignmentStatement& boundAssignmentStatement)
+void CmCppCodeGenerator::Visit(BoundAssignmentStatement& boundAssignmentStatement)
 {
     if (generateLineNumbers)
     {
@@ -894,11 +894,11 @@ void SystemXCodeGenerator::Visit(BoundAssignmentStatement& boundAssignmentStatem
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
-    SetTarget(&boundAssignmentStatement); 
+    SetTarget(&boundAssignmentStatement);
     boundAssignmentStatement.AssignmentCall()->Accept(*this);
 }
 
-void SystemXCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatement)
+void CmCppCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatement)
 {
     if (generateLineNumbers)
     {
@@ -915,7 +915,7 @@ void SystemXCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatem
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
+void CmCppCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
 {
     if (generateLineNumbers)
     {
@@ -928,12 +928,12 @@ void SystemXCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
     // todo
 }
 
-void SystemXCodeGenerator::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement)
+void CmCppCodeGenerator::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement)
 {
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
-    SetTarget(&boundSetVmtPtrStatement); 
+    SetTarget(&boundSetVmtPtrStatement);
     BoundExpression* classPtr = boundSetVmtPtrStatement.ClassPtr();
     TypeSymbol* type = classPtr->GetType()->BaseType();
     Assert(type->IsClassTypeSymbol(), "class type expected");
@@ -947,7 +947,7 @@ void SystemXCodeGenerator::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatemen
     emitter->CreateStore(vmtPtr, ptr);
 }
 
-void SystemXCodeGenerator::Visit(BoundThrowStatement& boundThrowStatement)
+void CmCppCodeGenerator::Visit(BoundThrowStatement& boundThrowStatement)
 {
     if (generateLineNumbers)
     {
@@ -960,7 +960,7 @@ void SystemXCodeGenerator::Visit(BoundThrowStatement& boundThrowStatement)
     boundThrowStatement.ThrowCallExpr()->Accept(*this);
 }
 
-void SystemXCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
+void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
 {
     if (generateLineNumbers)
     {
@@ -1011,7 +1011,7 @@ void SystemXCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     basicBlockOpen = true;
 }
 
-void SystemXCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
+void CmCppCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
 {
     if (generateLineNumbers)
     {
@@ -1043,138 +1043,138 @@ void SystemXCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
     emitter->SetCurrentBasicBlock(currentTryNextBlock);
 }
 
-void SystemXCodeGenerator::Visit(BoundParameter& boundParameter)
+void CmCppCodeGenerator::Visit(BoundParameter& boundParameter)
 {
     boundParameter.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundLocalVariable& boundLocalVariable)
+void CmCppCodeGenerator::Visit(BoundLocalVariable& boundLocalVariable)
 {
     boundLocalVariable.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundMemberVariable& boundMemberVariable)
+void CmCppCodeGenerator::Visit(BoundMemberVariable& boundMemberVariable)
 {
     boundMemberVariable.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundConstant& boundConstant)
+void CmCppCodeGenerator::Visit(BoundConstant& boundConstant)
 {
     boundConstant.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundEnumConstant& boundEnumConstant)
+void CmCppCodeGenerator::Visit(BoundEnumConstant& boundEnumConstant)
 {
     boundEnumConstant.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundLiteral& boundLiteral)
+void CmCppCodeGenerator::Visit(BoundLiteral& boundLiteral)
 {
     boundLiteral.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundTemporary& boundTemporary)
+void CmCppCodeGenerator::Visit(BoundTemporary& boundTemporary)
 {
     boundTemporary.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundSizeOfExpression& boundSizeOfExpression)
+void CmCppCodeGenerator::Visit(BoundSizeOfExpression& boundSizeOfExpression)
 {
     boundSizeOfExpression.Load(*emitter, OperationFlags::none);
 }
 
-void SystemXCodeGenerator::Visit(BoundAddressOfExpression& boundAddressOfExpression)
+void CmCppCodeGenerator::Visit(BoundAddressOfExpression& boundAddressOfExpression)
 {
     boundAddressOfExpression.Load(*emitter, OperationFlags::none);
 }
 
-void SystemXCodeGenerator::Visit(BoundDereferenceExpression& boundDereferenceExpression)
+void CmCppCodeGenerator::Visit(BoundDereferenceExpression& boundDereferenceExpression)
 {
     boundDereferenceExpression.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundReferenceToPointerExpression& boundReferenceToPointerExpression)
+void CmCppCodeGenerator::Visit(BoundReferenceToPointerExpression& boundReferenceToPointerExpression)
 {
     boundReferenceToPointerExpression.Load(*emitter, OperationFlags::none);
 }
 
-void SystemXCodeGenerator::Visit(BoundFunctionCall& boundFunctionCall)
+void CmCppCodeGenerator::Visit(BoundFunctionCall& boundFunctionCall)
 {
     boundFunctionCall.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundDelegateCall& boundDelegateCall)
+void CmCppCodeGenerator::Visit(BoundDelegateCall& boundDelegateCall)
 {
     boundDelegateCall.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundClassDelegateCall& boundClassDelegateCall)
+void CmCppCodeGenerator::Visit(BoundClassDelegateCall& boundClassDelegateCall)
 {
     boundClassDelegateCall.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundConversion& boundConversion)
+void CmCppCodeGenerator::Visit(BoundConversion& boundConversion)
 {
     boundConversion.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundConstructExpression& boundConstructExpression)
+void CmCppCodeGenerator::Visit(BoundConstructExpression& boundConstructExpression)
 {
     boundConstructExpression.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression)
+void CmCppCodeGenerator::Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression)
 {
     boundConstructAndReturnTemporaryExpression.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundClassOrClassDelegateConversionResult& boundClassOrClassDelegateConversionResult)
+void CmCppCodeGenerator::Visit(BoundClassOrClassDelegateConversionResult& boundClassOrClassDelegateConversionResult)
 {
     boundClassOrClassDelegateConversionResult.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundIsExpression& boundIsExpression)
+void CmCppCodeGenerator::Visit(BoundIsExpression& boundIsExpression)
 {
     boundIsExpression.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
 }
 
-void SystemXCodeGenerator::Visit(BoundAsExpression& boundAsExpression)
+void CmCppCodeGenerator::Visit(BoundAsExpression& boundAsExpression)
 {
     boundAsExpression.Load(*emitter, OperationFlags::none);
 }
 
-void SystemXCodeGenerator::Visit(BoundTypeNameExpression& boundTypeNameExpression)
+void CmCppCodeGenerator::Visit(BoundTypeNameExpression& boundTypeNameExpression)
 {
     boundTypeNameExpression.Load(*emitter, OperationFlags::none);
 }
 
-void SystemXCodeGenerator::Visit(BoundBitCast& boundBitCast)
+void CmCppCodeGenerator::Visit(BoundBitCast& boundBitCast)
 {
     boundBitCast.Load(*emitter, OperationFlags::none);
 }
 
-void SystemXCodeGenerator::Visit(BoundFunctionPtr& boundFunctionPtr)
+void CmCppCodeGenerator::Visit(BoundFunctionPtr& boundFunctionPtr)
 {
     boundFunctionPtr.Load(*emitter, OperationFlags::none);
 }
 
-void SystemXCodeGenerator::Visit(BoundDisjunction& boundDisjunction)
+void CmCppCodeGenerator::Visit(BoundDisjunction& boundDisjunction)
 {
     if (genJumpingBoolCode)
     {
@@ -1191,7 +1191,7 @@ void SystemXCodeGenerator::Visit(BoundDisjunction& boundDisjunction)
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundConjunction& boundConjunction)
+void CmCppCodeGenerator::Visit(BoundConjunction& boundConjunction)
 {
     if (genJumpingBoolCode)
     {
@@ -1208,13 +1208,13 @@ void SystemXCodeGenerator::Visit(BoundConjunction& boundConjunction)
     }
 }
 
-void SystemXCodeGenerator::Visit(BoundGlobalVariable& boundGlobalVariable)
+void CmCppCodeGenerator::Visit(BoundGlobalVariable& boundGlobalVariable)
 {
     GlobalVariableSymbol* globalVariableSymbol = boundGlobalVariable.GetGlobalVariableSymbol();
     globalVariableSymbol->CreateIrObject(*emitter);
 }
 
-void SystemXCodeGenerator::GenJumpingBoolCode()
+void CmCppCodeGenerator::GenJumpingBoolCode()
 {
     if (!genJumpingBoolCode) return;
     Assert(trueBlock, "true block not set");
@@ -1230,7 +1230,7 @@ void SystemXCodeGenerator::GenJumpingBoolCode()
     emitter->CreateCondBr(cond, trueBlock, falseBlock);
 }
 
-void SystemXCodeGenerator::SetTarget(BoundStatement* labeledStatement)
+void CmCppCodeGenerator::SetTarget(BoundStatement* labeledStatement)
 {
     if (labeledStatement->Label().empty()) return;
     auto it = labeledStatementMap.find(labeledStatement);
@@ -1246,7 +1246,7 @@ void SystemXCodeGenerator::SetTarget(BoundStatement* labeledStatement)
     }
 }
 
-void SystemXCodeGenerator::ExitBlocks(BoundCompoundStatement* targetBlock)
+void CmCppCodeGenerator::ExitBlocks(BoundCompoundStatement* targetBlock)
 {
     bool createBasicBlock = false;
     BoundStatement* lastStatement = nullptr;
@@ -1293,14 +1293,14 @@ void SystemXCodeGenerator::ExitBlocks(BoundCompoundStatement* targetBlock)
                     }
                     destructorCall->Accept(*this);
                     destructorCallGenerated = true;
-                    newCleanupNeeded = true; 
+                    newCleanupNeeded = true;
                 }
             }
         }
     }
 }
 
-void* SystemXCodeGenerator::GetGlobalStringPtr(int stringId)
+void* CmCppCodeGenerator::GetGlobalStringPtr(int stringId)
 {
     auto it = utf8stringMap.find(stringId);
     if (it != utf8stringMap.cend())
@@ -1315,7 +1315,7 @@ void* SystemXCodeGenerator::GetGlobalStringPtr(int stringId)
     }
 }
 
-void* SystemXCodeGenerator::GetGlobalWStringConstant(int stringId)
+void* CmCppCodeGenerator::GetGlobalWStringConstant(int stringId)
 {
     auto it = utf16stringMap.find(stringId);
     if (it != utf16stringMap.cend())
@@ -1344,7 +1344,7 @@ void* SystemXCodeGenerator::GetGlobalWStringConstant(int stringId)
     }
 }
 
-void* SystemXCodeGenerator::GetGlobalUStringConstant(int stringId)
+void* CmCppCodeGenerator::GetGlobalUStringConstant(int stringId)
 {
     auto it = utf32stringMap.find(stringId);
     if (it != utf32stringMap.cend())
@@ -1373,7 +1373,7 @@ void* SystemXCodeGenerator::GetGlobalUStringConstant(int stringId)
     }
 }
 
-void* SystemXCodeGenerator::GetGlobalUuidConstant(int uuidId)
+void* CmCppCodeGenerator::GetGlobalUuidConstant(int uuidId)
 {
     auto it = uuidMap.find(uuidId);
     if (it != uuidMap.cend())
@@ -1401,47 +1401,47 @@ void* SystemXCodeGenerator::GetGlobalUuidConstant(int uuidId)
     }
 }
 
-void* SystemXCodeGenerator::HandlerBlock()
+void* CmCppCodeGenerator::HandlerBlock()
 {
     return handlerBlock;
 }
 
-void* SystemXCodeGenerator::CleanupBlock()
+void* CmCppCodeGenerator::CleanupBlock()
 {
     return cleanupBlock;
 }
 
-bool SystemXCodeGenerator::NewCleanupNeeded()
+bool CmCppCodeGenerator::NewCleanupNeeded()
 {
     return newCleanupNeeded;
 }
 
-bool SystemXCodeGenerator::InTryBlock() const
+bool CmCppCodeGenerator::InTryBlock() const
 {
     return inTryBlock;
 }
 
-int SystemXCodeGenerator::CurrentTryBlockId() const
+int CmCppCodeGenerator::CurrentTryBlockId() const
 {
     return currentTryBlockId;
 }
 
-int SystemXCodeGenerator::Install(const std::string& str)
+int CmCppCodeGenerator::Install(const std::string& str)
 {
     return compileUnit->Install(str);
 }
 
-int SystemXCodeGenerator::Install(const std::u16string& str)
+int CmCppCodeGenerator::Install(const std::u16string& str)
 {
     return compileUnit->Install(str);
 }
 
-int SystemXCodeGenerator::Install(const std::u32string& str)
+int CmCppCodeGenerator::Install(const std::u32string& str)
 {
     return compileUnit->Install(str);
 }
 
-void SystemXCodeGenerator::CreateCleanup()
+void CmCppCodeGenerator::CreateCleanup()
 {
     cleanupBlock = emitter->CreateBasicBlock("cleanup");
     BoundCompoundStatement* targetBlock = nullptr;
@@ -1482,7 +1482,7 @@ void SystemXCodeGenerator::CreateCleanup()
     newCleanupNeeded = false;
 }
 
-void SystemXCodeGenerator::GenerateCodeForCleanups()
+void CmCppCodeGenerator::GenerateCodeForCleanups()
 {
     for (const std::unique_ptr<Cleanup>& cleanup : cleanups)
     {
@@ -1498,4 +1498,4 @@ void SystemXCodeGenerator::GenerateCodeForCleanups()
     }
 }
 
-} } // namespace cmajor::codegensx
+} } // namespace cmajor::codegencpp

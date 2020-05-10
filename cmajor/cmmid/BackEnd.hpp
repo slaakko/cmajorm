@@ -12,7 +12,7 @@ namespace cmajor { namespace mid {
 
 enum class BackEndKind : int
 {
-    llvmBackEnd = 0, cmsxBackEnd = 1
+    llvmBackEnd = 0, cmsxBackEnd = 1, cmcppBackEnd = 2
 };
 
 class BackEnd

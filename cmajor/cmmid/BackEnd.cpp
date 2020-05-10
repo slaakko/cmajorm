@@ -8,6 +8,7 @@
 #ifdef _WIN32
 #include <cmajor/cmmid/CmsxBackEnd.hpp>
 #endif
+#include <cmajor/cmmid/CmcppBackEnd.hpp>
 
 namespace cmajor { namespace mid {
 
@@ -15,6 +16,7 @@ LLvmBackEnd llvmBackEnd;
 #ifdef _WIN32
 CmsxBackEnd cmsxBackEnd;
 #endif
+CmcppBackEnd cmcppBackEnd;
 
 BackEnd* backEnd = &llvmBackEnd;
 
@@ -30,6 +32,7 @@ void SetBackEnd(BackEndKind backEndKind)
 #ifdef _WIN32
         case BackEndKind::cmsxBackEnd: backEnd = &cmsxBackEnd; break;
 #endif
+        case BackEndKind::cmcppBackEnd: backEnd = &cmcppBackEnd; break;
     }
 }
 

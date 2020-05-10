@@ -11,6 +11,7 @@
 #else
 #include <cmajor/codegenlinux/LinuxCodeGenerator.hpp>
 #endif
+#include <cmajor/codegencpp/CmCppCodeGenerator.hpp>
 
 namespace cmajor { namespace codegen {
 
@@ -33,6 +34,10 @@ cmajor::codegenbase::CodeGenerator* CreateCodeGenerator(cmajor::ir::EmittingCont
             return new cmajor::codegensx::SystemXCodeGenerator(emittingContext);
         }
 #endif
+        case cmajor::mid::BackEndKind::cmcppBackEnd:
+        {
+            return new cmajor::codegencpp::CmCppCodeGenerator(emittingContext);
+        }
     }
     return nullptr;
 }

@@ -45,7 +45,7 @@ enum class GlobalFlags : uint32_t
 
 enum class BackEnd : int
 {
-    llvm = 0, cmsx = 1
+    llvm = 0, cmsx = 1, cmcpp = 2
 };
 
 SYMBOLS_API void SetBackEnd(BackEnd backend_);

@@ -3,6 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
+using System.IO;
+
 namespace System
 {
     public class UniquePtr<T>
@@ -112,5 +114,19 @@ namespace System
     public nothrow inline bool operator<<T>(const UniquePtr<T>& left, const UniquePtr<T>& right)
     {
         return left.Get() < right.Get();
+    }
+
+    public TextWriter& operator<<<T>(TextWriter& writer, const UniquePtr<T>& ptr)
+    {
+        if (ptr.IsNull())
+        {
+            writer << "null";
+        }
+        else
+        {
+            const T& temp = *ptr;
+            writer << temp;
+        }
+        return writer;
     }
 }
