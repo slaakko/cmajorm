@@ -808,7 +808,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         else
         {
             void* nextBlock = nullptr;
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 nextBlock = emitter.CreateBasicBlock("next");
             }
@@ -831,7 +831,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
             {
                 emitter.Stack().Push(emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span));
             }
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 emitter.SetCurrentBasicBlock(nextBlock);
             }
@@ -853,7 +853,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         else
         {
             void* nextBlock = nullptr;
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 nextBlock = emitter.CreateBasicBlock("next");
             }
@@ -876,7 +876,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
             {
                 emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
             }
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 emitter.SetCurrentBasicBlock(nextBlock);
             }
@@ -951,7 +951,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         else
         {
             void* nextBlock = nullptr;
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 nextBlock = emitter.CreateBasicBlock("next");
             }
@@ -974,7 +974,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             {
                 emitter.Stack().Push(emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span));
             }
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 emitter.SetCurrentBasicBlock(nextBlock);
             }
@@ -996,7 +996,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         else
         {
             void* nextBlock = nullptr;
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 nextBlock = emitter.CreateBasicBlock("next");
             }
@@ -1019,7 +1019,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             {
                 emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
             }
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 emitter.SetCurrentBasicBlock(nextBlock);
             }

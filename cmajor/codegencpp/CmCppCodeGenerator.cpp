@@ -5,6 +5,7 @@
 
 #include <cmajor/codegencpp/CmCppCodeGenerator.hpp>
 #include <cmajor/cmcppbe/EmittingContext.hpp>
+#include <cmajor/cmcppi/CompileUnit.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundNamespace.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
@@ -58,7 +59,7 @@ void CmCppCodeGenerator::GenerateCode(void* boundCompileUnit)
 void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
     boundCompileUnit.ResetCodeGenerated();
-    std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".i");
+    std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".cpp");
     NativeModule nativeModule(emitter, intermediateFilePath);
     compileUnitId = boundCompileUnit.Id();
     emitter->SetCompileUnitId(compileUnitId);
@@ -67,7 +68,7 @@ void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     symbolTable = &boundCompileUnit.GetSymbolTable();
     module = &boundCompileUnit.GetModule();
     compileUnit = &boundCompileUnit;
-    nativeCompileUnit = static_cast<cmsxi::CompileUnit*>(nativeModule.module);
+    nativeCompileUnit = static_cast<cmcppi::CompileUnit*>(nativeModule.module);
     nativeCompileUnit->SetId(compileUnitId);
     nativeCompileUnit->SetSourceFilePath(boundCompileUnit.SourceFilePath());
     ConstantArrayRepository& constantArrayRepository = boundCompileUnit.GetConstantArrayRepository();
@@ -89,30 +90,16 @@ void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     nativeCompileUnit->Write();
     std::string intermediateCompileCommand;
     std::string intermediateCompileErrorFilePath = intermediateFilePath + ".error";
-    intermediateCompileCommand.append("cmfileredirector -2 " + intermediateCompileErrorFilePath + " cmsxic ").append(intermediateFilePath);
+    // intermediateCompileCommand.append("cmfileredirector -2 " + intermediateCompileErrorFilePath + " cmsxic ").append(intermediateFilePath); todo
     try
     {
-        System(intermediateCompileCommand);
-        boost::filesystem::remove(boost::filesystem::path(intermediateCompileErrorFilePath));
+        // System(intermediateCompileCommand); todo
+        // boost::filesystem::remove(boost::filesystem::path(intermediateCompileErrorFilePath)); todo
     }
     catch (const std::exception& ex)
     {
         std::string errors = ReadFile(intermediateCompileErrorFilePath);
         throw std::runtime_error("compiling intermediate code '" + intermediateFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
-    }
-    std::string assembleCommand;
-    std::string assemblyFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".s");
-    std::string assemblyErrorFilePath = assemblyFilePath + ".error";
-    assembleCommand.append("cmfileredirector -2 " + assemblyErrorFilePath + " cmsxas ").append(assemblyFilePath);
-    try
-    {
-        System(assembleCommand);
-        boost::filesystem::remove(boost::filesystem::path(assemblyErrorFilePath));
-    }
-    catch (const std::exception& ex)
-    {
-        std::string errors = ReadFile(assemblyErrorFilePath);
-        throw std::runtime_error("assembling '" + assemblyFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
 }
 
@@ -170,13 +157,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
     if (functionSymbol->HasSource())
     {
-        void* mdStruct = emitter->CreateMDStruct();
-        emitter->AddMDItem(mdStruct, "nodeType", emitter->CreateMDLong(funcInfoNodeType));
-        emitter->AddMDItem(mdStruct, "fullName", emitter->CreateMDString(ToUtf8(functionSymbol->FullName())));
-        void* mdFile = emitter->GetMDStructRefForSourceFile(module->GetFilePath(functionSymbol->GetSpan().fileIndex));
-        emitter->AddMDItem(mdStruct, "sourceFile", mdFile);
-        int mdId = emitter->GetMDStructId(mdStruct);
-        emitter->SetFunctionMdId(function, mdId);
+        // todo metadata
     }
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
     {
@@ -978,9 +959,6 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     currentTryBlockId = nextTryBlockId++;
     void* nop1 = emitter->CreateNop();
     void* beginTry = emitter->CreateMDStruct();
-    emitter->AddMDItem(beginTry, "nodeType", emitter->CreateMDLong(beginTryNodeType));
-    emitter->AddMDItem(beginTry, "tryBlockId", emitter->CreateMDLong(currentTryBlockId));
-    emitter->AddMDItem(beginTry, "parentTryBlockId", emitter->CreateMDLong(parentTryBlockId));
     int beginTryId = emitter->GetMDStructId(beginTry);
     void* beginTryMdRef = emitter->CreateMDStructRef(beginTryId);
     emitter->SetMetadataRef(nop1, beginTryMdRef);
@@ -990,8 +968,6 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     inTryBlock = prevInTryBlock;
     void* nop2 = emitter->CreateNop();
     void* endTry = emitter->CreateMDStruct();
-    emitter->AddMDItem(endTry, "nodeType", emitter->CreateMDLong(endTryNodeType));
-    emitter->AddMDItem(endTry, "tryBlockId", emitter->CreateMDLong(currentTryBlockId));
     int endTryId = emitter->GetMDStructId(endTry);
     void* endTryMdRef = emitter->CreateMDStructRef(endTryId);
     emitter->SetMetadataRef(nop2, endTryMdRef);
@@ -1025,19 +1001,12 @@ void CmCppCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
     emitter->SetCurrentBasicBlock(catchBlock);
     void* nop1 = emitter->CreateNop();
     void* catch_ = emitter->CreateMDStruct();
-    emitter->AddMDItem(catch_, "nodeType", emitter->CreateMDLong(catchNodeType));
-    emitter->AddMDItem(catch_, "tryBlockId", emitter->CreateMDLong(currentTryBlockId));
-    emitter->AddMDItem(catch_, "catchBlockId", emitter->CreateMDBasicBlockRef(catchBlock));
     const boost::uuids::uuid& uuid = compileUnit->GetUuid(boundCatchStatement.CatchedTypeUuidId());
     std::string uuidStr;
     for (const auto x : uuid)
     {
         uuidStr.append(soulng::util::ToHexString(x));
     }
-    emitter->AddMDItem(catch_, "catchedTypeId", emitter->CreateMDString(uuidStr));
-    int catchId = emitter->GetMDStructId(catch_);
-    void* catchMdRef = emitter->CreateMDStructRef(catchId);
-    emitter->SetMetadataRef(nop1, catchMdRef);
     boundCatchStatement.CatchBlock()->Accept(*this);
     emitter->CreateBr(currentTryNextBlock);
     emitter->SetCurrentBasicBlock(currentTryNextBlock);

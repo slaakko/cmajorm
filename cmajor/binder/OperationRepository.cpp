@@ -3163,7 +3163,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
         std::unique_ptr<BoundIfStatement> ifStatement(new BoundIfStatement(module, span, std::unique_ptr<BoundExpression>(new BoundMemberVariable(module, span, classType->InitializedVar())),
             std::unique_ptr<BoundStatement>(new BoundReturnStatement(module, std::unique_ptr<BoundFunctionCall>(nullptr), span)), std::unique_ptr<BoundStatement>(nullptr)));
         boundCompoundStatement->AddStatement(std::move(ifStatement));
-        if (GetBackEnd() == BackEnd::llvm)
+        if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
         {
             IdentifierNode staticInitCriticalSection(span, U"System.Runtime.StaticInitCriticalSection");
             TypeSymbol* staticInitCriticalSectionClassType = ResolveType(&staticInitCriticalSection, boundCompileUnit, containerScope);
@@ -3267,7 +3267,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
                 boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
                 if (memberVariableClassTypeWithDestructor)
                 {
-                    if (GetBackEnd() == BackEnd::llvm)
+                    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
                     {
                         std::vector<FunctionScopeLookup> enqueueLookups;
                         enqueueLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
@@ -3326,7 +3326,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
                 boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
                 if (memberVariableClassTypeWithDestructor)
                 {
-                    if (GetBackEnd() == BackEnd::llvm)
+                    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
                     {
                         std::vector<FunctionScopeLookup> enqueueLookups;
                         enqueueLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));

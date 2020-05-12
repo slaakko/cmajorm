@@ -60,7 +60,7 @@ class CMCPPI_API BinaryInstruction : public Instruction
 public:
     BinaryInstruction(Value* left_, Value* right_);
     Type* GetType(Context& context) override;
-    void WriteArgs(CodeFormatter& formatter, Context& context);
+    void WriteArgs(CodeFormatter& formatter, Context& context, const std::string& op);
 private:
     Value* left;
     Value* right;

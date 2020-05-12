@@ -1484,7 +1484,7 @@ BoundExpression* BoundIsExpression::Clone()
 
 void BoundIsExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    if (GetBackEnd() == BackEnd::llvm)
+    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
     {
         expr->Load(emitter, OperationFlags::none);
         void* thisPtr = emitter.Stack().Pop();
@@ -1581,7 +1581,7 @@ BoundExpression* BoundAsExpression::Clone()
 
 void BoundAsExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    if (GetBackEnd() == BackEnd::llvm)
+    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
     {
         expr->Load(emitter, OperationFlags::none);
         void* thisPtr = emitter.Stack().Pop();

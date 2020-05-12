@@ -7,7 +7,7 @@
 #define CMAJOR_CODEGENCPP_CMCPP_CODEGENERATOR_INCLUDED
 #include <cmajor/codegencpp/CodeGenCppApi.hpp>
 #include <cmajor/codegenbase/CodeGenerator.hpp>
-#include <cmajor/cmsxi/CompileUnit.hpp>
+#include <cmajor/cmcppi/CompileUnit.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/binder/BoundClass.hpp>
@@ -117,7 +117,7 @@ private:
     SymbolTable* symbolTable;
     Module* module;
     BoundCompileUnit* compileUnit;
-    cmsxi::CompileUnit* nativeCompileUnit;
+    cmcppi::CompileUnit* nativeCompileUnit;
     void* function;
     void* entryBasicBlock;
     bool lastInstructionWasRet;

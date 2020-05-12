@@ -1332,7 +1332,7 @@ UTIL_API bool IsAsciiDigit(char32_t c);
 
 inline bool IsUppercase(char32_t c)
 {
-    GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId::uppercase);
+    return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId::uppercase);
 }
 
 inline bool IsLowercase(char32_t c)

@@ -9,9 +9,9 @@
 
 namespace cmcppi {
 
-Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), linkOnce(false), mdId(-1), nextBBNumber(0)
+Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), linkOnce(false), nextBBNumber(0)
 {
-    entryBlock.reset(new BasicBlock(nextBBNumber++));
+    entryBlock.reset(new BasicBlock(nextBBNumber++, "entry"));
     for (Type* paramType : type->ParamTypes())
     {
         Instruction* paramInst = new ParamInstruction(paramType);
@@ -21,7 +21,7 @@ Function::Function(const std::string& name_, FunctionType* type_, Context& conte
     }
 }
 
-BasicBlock* Function::CreateBasicBlock()
+BasicBlock* Function::CreateBasicBlock(const std::string& name)
 {
     if (basicBlocks.empty())
     {
@@ -29,14 +29,14 @@ BasicBlock* Function::CreateBasicBlock()
         basicBlocks.push_back(std::move(entryBlock));
         return bb;
     }
-    BasicBlock* bb = new BasicBlock(nextBBNumber++);
+    BasicBlock* bb = new BasicBlock(nextBBNumber++, name);
     basicBlocks.push_back(std::unique_ptr<BasicBlock>(bb));
     return bb;
 }
 
 BasicBlock* Function::CreateCleanupBasicBlock()
 {
-    BasicBlock* cubb = new BasicBlock(-1);
+    BasicBlock* cubb = new BasicBlock(-1, "cleanup");
     cleanupBasicBlocks.push_back(std::unique_ptr<BasicBlock>(cubb));
     return cubb;
 }
@@ -72,12 +72,7 @@ void Function::Write(CodeFormatter& formatter, Context& context)
     {
         once = " once";
     }
-    std::string mdIdStr;
-    if (mdId != -1)
-    {
-        mdIdStr = " !" + std::to_string(mdId);
-    }
-    formatter.WriteLine("function " + type->Name() + once + " " + name + mdIdStr);
+    formatter.WriteLine("function " + type->Name() + once + " " + name);
     formatter.WriteLine("{");
     formatter.IncIndent();
     bool first = true;

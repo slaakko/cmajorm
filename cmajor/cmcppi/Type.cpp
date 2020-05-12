@@ -151,6 +151,16 @@ Type* StructureType::GetMemberType(uint64_t index) const
     return memberTypes[index];
 }
 
+int StructureType::SizeInBytes() const
+{
+    int size = 0;
+    for (Type* memberType : memberTypes)
+    {
+        size = size + memberType->SizeInBytes();
+    }
+    return size;
+}
+
 size_t StructureTypeHash::operator()(const std::vector<Type*>& memberTypes) const
 {
     size_t h = 0;
@@ -178,6 +188,11 @@ void ArrayType::WriteDeclaration(CodeFormatter& formatter)
     formatter.Write(" x ");
     elementType->Write(formatter);
     formatter.Write("]");
+}
+
+int ArrayType::SizeInBytes() const
+{
+    return size * elementType->SizeInBytes();
 }
 
 size_t ArrayTypeKeyHash::operator()(const ArrayTypeKey& key) const
@@ -244,7 +259,7 @@ void TypeRepository::Write(CodeFormatter& formatter)
 {
     formatter.WriteLine("#include <stdint.h>");
     formatter.WriteLine("#ifndef __cpp_char8_t");
-    formatter.WriteLine("using char8_t = unsigned char");
+    formatter.WriteLine("using char8_t = unsigned char;");
     formatter.WriteLine("#endif");
     // todo
 }

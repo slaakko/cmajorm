@@ -49,5 +49,4 @@ Function* CompileUnit::GetOrInsertFunction(const std::string& name, FunctionType
     }
 }
 
-
 } // namespace cmcppi

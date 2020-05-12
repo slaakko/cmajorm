@@ -33,18 +33,12 @@ void Instruction::WriteResult(CodeFormatter& formatter, Function& function, Cont
     formatter.Write(" " + Name(context));
 }
 
-void Instruction::WriteMetadataRef(CodeFormatter& formatter)
-{
-}
-
 UnaryInstruction::UnaryInstruction(Value* arg_) : Instruction(), arg(arg_)
 {
 }
 
 void UnaryInstruction::WriteArg(CodeFormatter& formatter, Context& context)
 {
-    formatter.Write(arg->GetType(context)->Name());
-    formatter.Write(" ");
     formatter.Write(arg->Name(context));
 }
 
@@ -62,14 +56,10 @@ Type* BinaryInstruction::GetType(Context& context)
     return left->GetType(context);
 }
 
-void BinaryInstruction::WriteArgs(CodeFormatter& formatter, Context& context)
+void BinaryInstruction::WriteArgs(CodeFormatter& formatter, Context& context, const std::string& op)
 {
-    formatter.Write(left->GetType(context)->Name());
-    formatter.Write(" ");
     formatter.Write(left->Name(context));
-    formatter.Write(", ");
-    formatter.Write(right->GetType(context)->Name());
-    formatter.Write(" ");
+    formatter.Write(" " + op + " ");
     formatter.Write(right->Name(context));
 }
 
@@ -80,9 +70,8 @@ NotInstruction::NotInstruction(Value* arg_) : UnaryInstruction(arg_)
 void NotInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = not ");
+    formatter.Write(" = !");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
 }
 
 NegInstruction::NegInstruction(Value* arg_) : UnaryInstruction(arg_)
@@ -92,9 +81,8 @@ NegInstruction::NegInstruction(Value* arg_) : UnaryInstruction(arg_)
 void NegInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = neg ");
+    formatter.Write(" = -");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
 }
 
 AddInstruction::AddInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -104,9 +92,8 @@ AddInstruction::AddInstruction(Value* left_, Value* right_) : BinaryInstruction(
 void AddInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = add ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "+");
 }
 
 SubInstruction::SubInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -116,9 +103,8 @@ SubInstruction::SubInstruction(Value* left_, Value* right_) : BinaryInstruction(
 void SubInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = sub ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "-");
 }
 
 MulInstruction::MulInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -128,9 +114,8 @@ MulInstruction::MulInstruction(Value* left_, Value* right_) : BinaryInstruction(
 void MulInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = mul ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "*");
 }
 
 DivInstruction::DivInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -140,9 +125,8 @@ DivInstruction::DivInstruction(Value* left_, Value* right_) : BinaryInstruction(
 void DivInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = div ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "/");
 }
 
 ModInstruction::ModInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -152,9 +136,8 @@ ModInstruction::ModInstruction(Value* left_, Value* right_) : BinaryInstruction(
 void ModInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = mod ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "%");
 }
 
 AndInstruction::AndInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -164,9 +147,8 @@ AndInstruction::AndInstruction(Value* left_, Value* right_) : BinaryInstruction(
 void AndInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = and ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "&");
 }
 
 OrInstruction::OrInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -176,9 +158,8 @@ OrInstruction::OrInstruction(Value* left_, Value* right_) : BinaryInstruction(le
 void OrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = or ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "|");
 }
 
 XorInstruction::XorInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -188,9 +169,8 @@ XorInstruction::XorInstruction(Value* left_, Value* right_) : BinaryInstruction(
 void XorInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = xor ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "^");
 }
 
 ShlInstruction::ShlInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -200,9 +180,8 @@ ShlInstruction::ShlInstruction(Value* left_, Value* right_) : BinaryInstruction(
 void ShlInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = shl ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "<<");
 }
 
 ShrInstruction::ShrInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -212,9 +191,8 @@ ShrInstruction::ShrInstruction(Value* left_, Value* right_) : BinaryInstruction(
 void ShrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = shr ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" =  ");
+    WriteArgs(formatter, context, ">>");
 }
 
 EqualInstruction::EqualInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -229,9 +207,8 @@ Type* EqualInstruction::GetType(Context& context)
 void EqualInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = equal ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "==");
 }
 
 LessInstruction::LessInstruction(Value* left_, Value* right_) : BinaryInstruction(left_, right_)
@@ -246,9 +223,8 @@ Type* LessInstruction::GetType(Context& context)
 void LessInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = less ");
-    WriteArgs(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(" = ");
+    WriteArgs(formatter, context, "<");
 }
 
 SignExtendInstruction::SignExtendInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)
@@ -258,9 +234,10 @@ SignExtendInstruction::SignExtendInstruction(Value* arg_, Type* destType_) : Una
 void SignExtendInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = signextend ");
+    formatter.Write(" = ");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
+    int sizeInBits = 8 * GetType(context)->SizeInBytes();
+    formatter.Write(" << " + std::to_string(64 - sizeInBits) + " >> " + std::to_string(64 - sizeInBits));
 }
 
 ZeroExtendInstruction::ZeroExtendInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)
@@ -270,9 +247,8 @@ ZeroExtendInstruction::ZeroExtendInstruction(Value* arg_, Type* destType_) : Una
 void ZeroExtendInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = zeroextend ");
+    formatter.Write(" = ");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
 }
 
 TruncateInstruction::TruncateInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)
@@ -282,9 +258,9 @@ TruncateInstruction::TruncateInstruction(Value* arg_, Type* destType_) : UnaryTy
 void TruncateInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = truncate ");
+    formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(")");
 }
 
 BitCastInstruction::BitCastInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)
@@ -294,9 +270,9 @@ BitCastInstruction::BitCastInstruction(Value* arg_, Type* destType_) : UnaryType
 void BitCastInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = bitcast ");
+    formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(")");
 }
 
 IntToFloatInstruction::IntToFloatInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)
@@ -306,9 +282,9 @@ IntToFloatInstruction::IntToFloatInstruction(Value* arg_, Type* destType_) : Una
 void IntToFloatInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = inttofloat ");
+    formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(")");
 }
 
 FloatToIntInstruction::FloatToIntInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)
@@ -318,9 +294,9 @@ FloatToIntInstruction::FloatToIntInstruction(Value* arg_, Type* destType_) : Una
 void FloatToIntInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = floattoint ");
+    formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(")");
 }
 
 IntToPtrInstruction::IntToPtrInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)
@@ -330,9 +306,9 @@ IntToPtrInstruction::IntToPtrInstruction(Value* arg_, Type* destType_) : UnaryTy
 void IntToPtrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = inttoptr ");
+    formatter.Write(" = reinterpret_cast<" + GetType(context)->Name() + ">(");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(")");
 }
 
 PtrToIntInstruction::PtrToIntInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)
@@ -342,9 +318,9 @@ PtrToIntInstruction::PtrToIntInstruction(Value* arg_, Type* destType_) : UnaryTy
 void PtrToIntInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = ptrtoint ");
+    formatter.Write(" = *reinterpret_cast<" + GetType(context)->Name() + "*>(&");
     WriteArg(formatter, context);
-    WriteMetadataRef(formatter);
+    formatter.Write(")");
 }
 
 ParamInstruction::ParamInstruction(Type* type_) : Instruction(), type(type_)
@@ -353,9 +329,7 @@ ParamInstruction::ParamInstruction(Type* type_) : Instruction(), type(type_)
 
 void ParamInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    WriteResult(formatter, function, context);
-    formatter.Write(" = param");
-    WriteMetadataRef(formatter);
+    // todo
 }
 
 LocalInstruction::LocalInstruction(Type* type_) : Instruction(), type(type_)
@@ -369,10 +343,9 @@ Type* LocalInstruction::GetType(Context& context)
 
 void LocalInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    WriteResult(formatter, function, context);
-    formatter.Write(" = local ");
     formatter.Write(type->Name());
-    WriteMetadataRef(formatter);
+    formatter.Write(" ");
+    WriteResult(formatter, function, context);
 }
 
 LoadInstruction::LoadInstruction(Value* ptr_) : Instruction(), ptr(ptr_)
@@ -389,11 +362,8 @@ Type* LoadInstruction::GetType(Context& context)
 void LoadInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = load ");
-    formatter.Write(ptr->GetType(context)->Name());
-    formatter.Write(" ");
+    formatter.Write(" = *");
     formatter.Write(ptr->Name(context));
-    WriteMetadataRef(formatter);
 }
 
 StoreInstruction::StoreInstruction(Value* value_, Value* ptr_) : Instruction(), value(value_), ptr(ptr_)
@@ -402,15 +372,11 @@ StoreInstruction::StoreInstruction(Value* value_, Value* ptr_) : Instruction(), 
 
 void StoreInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write(Format("store ", 8));
     formatter.Write(value->GetType(context)->Name());
     formatter.Write(" ");
     formatter.Write(value->Name(context));
-    formatter.Write(", ");
-    formatter.Write(ptr->GetType(context)->Name());
-    formatter.Write(" ");
+    formatter.Write(" *");
     formatter.Write(ptr->Name(context));
-    WriteMetadataRef(formatter);
 }
 
 ArgInstruction::ArgInstruction(Value* arg_) : Instruction(), arg(arg_)
@@ -419,11 +385,7 @@ ArgInstruction::ArgInstruction(Value* arg_) : Instruction(), arg(arg_)
 
 void ArgInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write(Format("arg ", 8));
-    formatter.Write(arg->GetType(context)->Name());
-    formatter.Write(" ");
-    formatter.Write(arg->Name(context));
-    WriteMetadataRef(formatter);
+    // todo
 }
 
 ElemAddrInstruction::ElemAddrInstruction(Value* ptr_, Value* index_) : Instruction(), ptr(ptr_), index(index_)
@@ -473,7 +435,6 @@ void ElemAddrInstruction::Write(CodeFormatter& formatter, Function& function, Co
     formatter.Write(index->GetType(context)->Name());
     formatter.Write(" ");
     formatter.Write(index->Name(context));
-    WriteMetadataRef(formatter);
 }
 
 PtrOffsetInstruction::PtrOffsetInstruction(Value* ptr_, Value* offset_) : Instruction(), ptr(ptr_), offset(offset_)
@@ -491,7 +452,6 @@ void PtrOffsetInstruction::Write(CodeFormatter& formatter, Function& function, C
     formatter.Write(offset->GetType(context)->Name());
     formatter.Write(" ");
     formatter.Write(offset->Name(context));
-    WriteMetadataRef(formatter);
 }
 
 PtrDiffInstruction::PtrDiffInstruction(Value* leftPtr_, Value* rightPtr_) : Instruction(), leftPtr(leftPtr_), rightPtr(rightPtr_)
@@ -514,7 +474,6 @@ void PtrDiffInstruction::Write(CodeFormatter& formatter, Function& function, Con
     formatter.Write(rightPtr->GetType(context)->Name());
     formatter.Write(" ");
     formatter.Write(rightPtr->Name(context));
-    WriteMetadataRef(formatter);
 }
 
 CallInstruction::CallInstruction(Value* function_) : Instruction(), function(function_)
@@ -555,7 +514,6 @@ void CallInstruction::Write(CodeFormatter& formatter, Function& function, Contex
     formatter.Write(this->function->GetType(context)->Name());
     formatter.Write(" ");
     formatter.Write(this->function->Name(context));
-    WriteMetadataRef(formatter);
 }
 
 RetInstruction::RetInstruction(Value* value_) : Instruction(), value(value_)
@@ -564,18 +522,11 @@ RetInstruction::RetInstruction(Value* value_) : Instruction(), value(value_)
 
 void RetInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write(Format("ret ", 8));
+    formatter.Write(Format("return", 8));
     if (value)
     {
-        formatter.Write(value->GetType(context)->Name());
-        formatter.Write(" ");
         formatter.Write(value->Name(context));
     }
-    else
-    {
-        formatter.Write("void");
-    }
-    WriteMetadataRef(formatter);
 }
 
 JumpInstruction::JumpInstruction(BasicBlock* dest_) : Instruction(), dest(dest_)
@@ -584,9 +535,8 @@ JumpInstruction::JumpInstruction(BasicBlock* dest_) : Instruction(), dest(dest_)
 
 void JumpInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write(Format("jmp ", 8));
-    formatter.Write("@" + std::to_string(dest->Id()));
-    WriteMetadataRef(formatter);
+    formatter.Write(Format("goto ", 8));
+    formatter.Write("__BB" + std::to_string(dest->Id()));
 }
 
 BranchInstruction::BranchInstruction(Value* cond_, BasicBlock* trueDest_, BasicBlock* falseDest_) : Instruction(), cond(cond_), trueDest(trueDest_), falseDest(falseDest_)
@@ -595,15 +545,12 @@ BranchInstruction::BranchInstruction(Value* cond_, BasicBlock* trueDest_, BasicB
 
 void BranchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write(Format("branch ", 8));
-    formatter.Write(cond->GetType(context)->Name());
-    formatter.Write(" ");
+    formatter.Write("if (");
     formatter.Write(cond->Name(context));
-    formatter.Write(", ");
-    formatter.Write("@" + std::to_string(trueDest->Id()));
-    formatter.Write(", ");
-    formatter.Write("@" + std::to_string(falseDest->Id()));
-    WriteMetadataRef(formatter);
+    formatter.Write(") ");
+    formatter.Write("goto __BB" + std::to_string(trueDest->Id()));
+    formatter.Write(" else ");
+    formatter.Write("goto __BB" + std::to_string(falseDest->Id()));
 }
 
 SwitchInstruction::SwitchInstruction(Value* cond_, BasicBlock* defaultDest_) : Instruction(), cond(cond_), defaultDest(defaultDest_), destinations()
@@ -617,13 +564,11 @@ void SwitchInstruction::AddCase(Value* caseValue, BasicBlock* dest)
 
 void SwitchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write(Format("switch ", 8));
-    formatter.Write(cond->GetType(context)->Name());
-    formatter.Write(" ");
+    formatter.Write("switch (");
     formatter.Write(cond->Name(context));
-    formatter.Write(" ");
-    formatter.Write("@" + std::to_string(defaultDest->Id()));
-    formatter.Write(", [");
+    formatter.WriteLine(")");
+    formatter.WriteLine("{");
+    formatter.Write("default: goto __BB" + std::to_string(defaultDest->Id()));
     bool first = true;
     for (const auto& p : destinations)
     {
@@ -633,18 +578,15 @@ void SwitchInstruction::Write(CodeFormatter& formatter, Function& function, Cont
         }
         else
         {
-            formatter.Write(" : ");
+            formatter.WriteLine();
         }
         Value* value = p.first;
         BasicBlock* dest = p.second;
-        formatter.Write(value->GetType(context)->Name());
-        formatter.Write(" ");
-        formatter.Write(value->Name(context));
-        formatter.Write(", ");
-        formatter.Write("@" + std::to_string(dest->Id()));
+        formatter.Write("case " + value->Name(context));
+        formatter.Write(": goto __BB");
+        formatter.Write(std::to_string(dest->Id()));
     }
-    formatter.Write("]");
-    WriteMetadataRef(formatter);
+    formatter.WriteLine("}");
 }
 
 NoOperationInstruction::NoOperationInstruction() : Instruction()
@@ -653,8 +595,7 @@ NoOperationInstruction::NoOperationInstruction() : Instruction()
 
 void NoOperationInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write("nop");
-    WriteMetadataRef(formatter);
+    formatter.Write(";");
 }
 
 } // namespace cmcppi

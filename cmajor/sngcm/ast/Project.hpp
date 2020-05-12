@@ -15,7 +15,7 @@ namespace sngcm { namespace ast {
 
 enum class BackEnd
 {
-    llvm, cmsx
+    llvm, cmsx, cppcm
 };
 
 class SNGCM_AST_API ModuleVersionTagVerifier

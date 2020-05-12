@@ -47,7 +47,7 @@ struct BackendInit
 {
     BackendInit()
     {
-        CmmInit(cmajor::mid::BackEndKind::cmsxBackEnd);
+        CmmInit(cmajor::mid::BackEndKind::cmcppBackEnd);
     }
     ~BackendInit()
     {

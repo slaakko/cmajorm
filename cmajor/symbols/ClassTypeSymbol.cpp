@@ -43,7 +43,7 @@ int32_t GetTypeIdVmtIndexOffset()
 
 int32_t GetClassNameVmtIndexOffset()
 {
-    if (GetBackEnd() == BackEnd::llvm)
+    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
     {
         return 4;
     }
@@ -59,7 +59,7 @@ int32_t GetClassNameVmtIndexOffset()
 
 int32_t GetImtsVmtIndexOffset()
 {
-    if (GetBackEnd() == BackEnd::llvm)
+    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
     {
         return 5;
     }
@@ -75,7 +75,7 @@ int32_t GetImtsVmtIndexOffset()
 
 int32_t GetFunctionVmtIndexOffset()
 {
-    if (GetBackEnd() == BackEnd::llvm)
+    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
     {
         return 6;
     }
@@ -1469,7 +1469,7 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         std::string vmtObjectName = VmtObjectName(emitter);
         void* comdat = emitter.GetOrInsertAnyComdat(vmtObjectName, vmtObject);
         std::vector<void*> vmtArray;
-        if (GetBackEnd() == BackEnd::llvm)
+        if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
         {
             vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); // 128-bit class id, initially 0, dynamically initialized
             vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); 

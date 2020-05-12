@@ -282,7 +282,7 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         else
         {
             void* nextBlock = nullptr;
-            if (GetBackEnd() == BackEnd::llvm) 
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 nextBlock = emitter.CreateBasicBlock("next");
             }
@@ -306,7 +306,7 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
                 void* invokeInst = emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
                 emitter.Stack().Push(invokeInst);
             }
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 emitter.SetCurrentBasicBlock(nextBlock);
             }
@@ -328,7 +328,7 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         else
         {
             void* nextBlock = nullptr;
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 nextBlock = emitter.CreateBasicBlock("next");
             }
@@ -351,7 +351,7 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
             {
                 emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
             }
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 emitter.SetCurrentBasicBlock(nextBlock);
             }

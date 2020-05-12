@@ -18,7 +18,7 @@ public:
     Function(const std::string& name_, FunctionType* type_, Context& context);
     Function(const Function&) = delete;
     Function& operator=(const Function&) = delete;
-    BasicBlock* CreateBasicBlock();
+    BasicBlock* CreateBasicBlock(const std::string& name);
     BasicBlock* CreateCleanupBasicBlock();
     void Finalize();
     uint64_t GetNextResultNumber() { return nextResultNumber++; }
@@ -27,7 +27,6 @@ public:
     std::string Name(Context& context) override { return name; }
     void Write(CodeFormatter& formatter, Context& context);
     void SetLinkOnce() { linkOnce = true; }
-    void SetMdId(int mdId_) { mdId = mdId_; }
 private:
     std::string name;
     FunctionType* type;
@@ -37,7 +36,6 @@ private:
     std::vector<std::unique_ptr<BasicBlock>> cleanupBasicBlocks;
     uint64_t nextResultNumber;
     bool linkOnce;
-    int mdId;
     int nextBBNumber;
 };
 

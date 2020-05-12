@@ -41,6 +41,7 @@ public:
     virtual bool IsStructureType() const { return false; }
     virtual bool IsArrayType() const { return false; }
     virtual bool IsFunctionType() const { return false; }
+    virtual int SizeInBytes() const = 0;
     bool IsPtrType() const { return id == ptrTypeId; }
     bool IsVoidType() const { return id == voidTypeId; }
     int Id() const { return id; }
@@ -59,6 +60,7 @@ class CMCPPI_API VoidType : public PrimitiveType
 {
 public:
     VoidType();
+    int SizeInBytes() const override { return 0; }
 };
 
 class CMCPPI_API BoolType : public PrimitiveType
@@ -66,6 +68,7 @@ class CMCPPI_API BoolType : public PrimitiveType
 public:
     BoolType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 1; }
 private:
     BoolValue defaultValue;
 };
@@ -75,6 +78,7 @@ class CMCPPI_API SByteType : public PrimitiveType
 public:
     SByteType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 1; }
 private:
     SByteValue defaultValue;
 };
@@ -84,6 +88,7 @@ class CMCPPI_API ByteType : public PrimitiveType
 public:
     ByteType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 1; }
 private:
     ByteValue defaultValue;
 };
@@ -93,6 +98,7 @@ class CMCPPI_API ShortType : public PrimitiveType
 public:
     ShortType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 2; }
 private:
     ShortValue defaultValue;
 };
@@ -102,6 +108,7 @@ class CMCPPI_API UShortType : public PrimitiveType
 public:
     UShortType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 2; }
 private:
     UShortValue defaultValue;
 };
@@ -111,6 +118,7 @@ class CMCPPI_API IntType : public PrimitiveType
 public:
     IntType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 4; }
 private:
     IntValue defaultValue;
 };
@@ -120,6 +128,7 @@ class CMCPPI_API UIntType : public PrimitiveType
 public:
     UIntType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 4; }
 private:
     UIntValue defaultValue;
 };
@@ -129,6 +138,7 @@ class CMCPPI_API LongType : public PrimitiveType
 public:
     LongType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 8; }
 private:
     LongValue defaultValue;
 };
@@ -138,6 +148,7 @@ class CMCPPI_API ULongType : public PrimitiveType
 public:
     ULongType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 8; }
 private:
     ULongValue defaultValue;
 };
@@ -147,6 +158,7 @@ class CMCPPI_API FloatType : public PrimitiveType
 public:
     FloatType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 4; }
 private:
     FloatValue defaultValue;
 };
@@ -156,6 +168,7 @@ class CMCPPI_API DoubleType : public PrimitiveType
 public:
     DoubleType();
     ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 8; }
 private:
     DoubleValue defaultValue;
 };
@@ -167,6 +180,7 @@ public:
     std::string Name() const override;
     ConstantValue* DefaultValue() override { return &defaultValue; }
     Type* BaseType() const { return baseType; }
+    int SizeInBytes() const override { return 8; }
 private:
     Type* baseType;
     NullValue defaultValue;
@@ -181,6 +195,7 @@ public:
     void WriteDeclaration(CodeFormatter& formatter) override;
     bool IsStructureType() const { return true; }
     Type* GetMemberType(uint64_t index) const;
+    int SizeInBytes() const override;
 private:
     std::vector<Type*> memberTypes;
 };
@@ -202,6 +217,7 @@ public:
     void WriteDeclaration(CodeFormatter& formatter) override;
     bool IsArrayType() const { return true; }
     Type* ElementType() const { return elementType; }
+    int SizeInBytes() const override;
 private:
     Type* elementType;
     uint64_t size;
@@ -232,6 +248,7 @@ public:
     bool IsFunctionType() const override { return true; }
     Type* ReturnType() const { return returnType; }
     const std::vector<Type*>& ParamTypes() const { return paramTypes; }
+    int SizeInBytes() const override { return 0; }
 private:
     Type* returnType;
     std::vector<Type*> paramTypes;

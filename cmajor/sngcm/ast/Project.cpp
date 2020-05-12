@@ -51,6 +51,15 @@ std::string CmajorSystemLibDir(const std::string& config, BackEnd backend)
         sld /= config;
         return GetFullPath(sld.generic_string());
     }
+    else if (backend == BackEnd::cppcm)
+    {
+        boost::filesystem::path sld(CmajorRootDir());
+        sld /= "system";
+        sld /= "lib";
+        sld /= "cpp";
+        sld /= config;
+        return GetFullPath(sld.generic_string());
+    }
     else
     {
         return std::string();
@@ -141,6 +150,10 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
         mfp = outdirBasePath;
     }
     mfp /= "lib";
+    if (backend == BackEnd::cppcm)
+    {
+        mfp /= "cpp";
+    }
     mfp /= config;
     mfp /= fn;
     mfp.replace_extension(".cmm");
@@ -152,6 +165,10 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
         lfp.replace_extension(".a");
     }
     else if (backend == BackEnd::llvm)
+    {
+        lfp.replace_extension(".lib");
+    }
+    else if (backend == BackEnd::cppcm)
     {
         lfp.replace_extension(".lib");
     }
@@ -174,6 +191,10 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
         efp.replace_extension();
     }
     else if (backend == BackEnd::llvm)
+    {
+        efp.replace_extension(".exe");
+    }
+    else if (backend == BackEnd::cppcm)
     {
         efp.replace_extension(".exe");
     }

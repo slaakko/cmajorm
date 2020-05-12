@@ -362,7 +362,7 @@ void BindStatements(BoundCompileUnit& boundCompileUnit)
 
 #ifdef _WIN32
 
-void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+void GenerateLibraryLlvmCpp(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -441,7 +441,7 @@ void GenerateLibrarySystemX(Module* module, const std::vector<std::string>& obje
 
 #else
 
-void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+void GenerateLibraryLlvmCpp(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -482,9 +482,9 @@ void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectF
 
 void GenerateLibrary(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
-    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
+    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm || GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
     {
-        GenerateLibraryLlvm(module, objectFilePaths, libraryFilePath);
+        GenerateLibraryLlvmCpp(module, objectFilePaths, libraryFilePath);
     }
 #ifdef _WIN32
     else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
@@ -520,7 +520,7 @@ void CreateDefFile(const std::string& defFilePath, Module& module)
     }
 }
 
-void LinkLlvm(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, std::string mainObjectFilePath, Module& module)
+void LinkLlvmCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, std::string mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -672,7 +672,7 @@ void CreateDynamicListFile(const std::string& dynamicListFilePath, Module& modul
     formatter.WriteLine("};");
 }
 
-void LinkLlvm(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, std::string mainObjectFilePath, Module& module)
+void LinkLlvmCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, std::string mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -740,9 +740,9 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
 
 void Link(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string mainObjectFilePath, Module& module)
 {
-    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
+    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm || GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
     {
-        LinkLlvm(target, executableFilePath, libraryFilePath, libraryFilePaths, mainObjectFilePath, module);
+        LinkLlvmCpp(target, executableFilePath, libraryFilePath, libraryFilePaths, mainObjectFilePath, module);
     }
 #ifdef _WIN32
     else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
@@ -1205,6 +1205,10 @@ void InstallSystemLibraries(Module* systemInstallModule)
     {
         backend = sngcm::ast::BackEnd::cmsx;
     }
+    else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+    {
+        backend = sngcm::ast::BackEnd::cppcm;
+    }
     boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig(), backend);
     boost::filesystem::create_directories(systemLibDir);
     for (Module* systemModule : systemInstallModule->AllReferencedModules())
@@ -1251,6 +1255,10 @@ void InstallSystemWindowsLibraries(Module* systemInstallWindowsModule)
     if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
     {
         backend = sngcm::ast::BackEnd::cmsx;
+    }
+    else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+    {
+        backend = sngcm::ast::BackEnd::cppcm;
     }
     boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig(), backend);
     boost::filesystem::create_directories(systemLibDir);
@@ -1598,6 +1606,10 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             {
                 astBackEnd = sngcm::ast::BackEnd::cmsx;
             }
+            else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+            {
+                astBackEnd = sngcm::ast::BackEnd::cppcm;
+            }
             upToDate = project->IsUpToDate(CmajorSystemModuleFilePath(config, astBackEnd));
         }
         if (upToDate)
@@ -1720,7 +1732,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                     {
                         CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
                     }
-                    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
+                    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm || GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
                     {
                         if (project->GetTarget() == Target::winguiapp)
                         {
@@ -1811,6 +1823,10 @@ void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& r
     if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
     {
         backend = sngcm::ast::BackEnd::cmsx;
+    }
+    else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+    {
+        backend = sngcm::ast::BackEnd::cppcm;
     }
     ContainerFileLexer containerFileLexer(p, projectFilePath, 0);
     std::unique_ptr<Project> project = ProjectFileParser::Parse(containerFileLexer, config, backend);
@@ -1994,6 +2010,10 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
         if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
         {
             backend = sngcm::ast::BackEnd::cmsx;
+        }
+        else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+        {
+            backend = sngcm::ast::BackEnd::cppcm;
         }
         ContainerFileLexer containerFileLexer(p, projectFilePath, 0);
         std::unique_ptr<Project> project = ProjectFileParser::Parse(containerFileLexer, config, backend);

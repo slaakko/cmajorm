@@ -671,7 +671,7 @@ void* Emitter::CreateBasicBlock(const std::string& name)
     }
     else
     {
-        return currentFunction->CreateBasicBlock();
+        return currentFunction->CreateBasicBlock(name);
     }
 }
 

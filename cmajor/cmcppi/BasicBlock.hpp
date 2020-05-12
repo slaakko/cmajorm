@@ -13,7 +13,7 @@ namespace cmcppi {
 class CMCPPI_API BasicBlock
 {
 public:
-    BasicBlock(int id_);
+    BasicBlock(int id_, const std::string& name_);
     BasicBlock(const BasicBlock&) = delete;
     BasicBlock& operator=(const BasicBlock&) = delete;
     void AddInstruction(Instruction* instruction);
@@ -23,6 +23,7 @@ public:
     void Write(CodeFormatter& formatter, Function& function, Context& context);
 private:
     int id;
+    std::string name;
     std::vector<std::unique_ptr<Instruction>> instructions;
 };
 

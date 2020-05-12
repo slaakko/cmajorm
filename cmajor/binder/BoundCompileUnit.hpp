@@ -74,6 +74,7 @@ public:
     ConstantStructureRepository& GetConstantStructureRepository() { return constantStructureRepository; }
     const std::string& SourceFilePath() const { return compileUnitNode->FilePath(); }
     const std::string& LLFilePath() const { return llFilePath; }
+    const std::string& CppFilePath() const { return cppFilePath; }
     const std::string& BCFilePath() const { return bcFilePath; }
     const std::string& OptLLFilePath() const { return optLLFilePath; }
     const std::string& OptBCFilePath() const { return optBCFilePath; }
@@ -112,6 +113,7 @@ private:
     std::string optBCFilePath;
     std::string optLLFilePath;
     std::string objectFilePath;
+    std::string cppFilePath;
     std::vector<std::unique_ptr<FileScope>> fileScopes;
     std::vector<std::unique_ptr<BoundNode>> boundNodes;
     std::vector<std::unique_ptr<FunctionSymbol>> functionSymbols;

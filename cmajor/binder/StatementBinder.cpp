@@ -1086,7 +1086,7 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
     {
         exceptionCapture = true;
     }
-    if (GetBackEnd() == BackEnd::llvm)
+    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
     {
         if (GetConfig() == "debug")
         {
@@ -1135,7 +1135,7 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
     std::vector<std::unique_ptr<BoundExpression>> arguments;
     arguments.push_back(std::move(memFreePtr));
     const char32_t* memFreeFunctionName = U"";
-    if (GetBackEnd() == BackEnd::llvm)
+    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
     {
         memFreeFunctionName = U"RtMemFree";
     }
@@ -1539,7 +1539,7 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
                 NewNode* newNode = new NewNode(span, new IdentifierNode(span, exceptionClassType->FullName()));
                 CloneContext cloneContext;
                 newNode->AddArgument(throwStatementNode.Expression()->Clone(cloneContext));
-                if (GetBackEnd() == BackEnd::llvm)
+                if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
                 {
                     InvokeNode invokeNode(span, new IdentifierNode(span, U"RtThrowException"));
                     invokeNode.AddArgument(newNode);
@@ -1620,7 +1620,7 @@ void StatementBinder::Visit(CatchNode& catchNode)
     CompoundStatementNode handlerBlock(span);
     handlerBlock.SetEndBraceSpan(catchNode.CatchBlock()->EndBraceSpan());
     handlerBlock.SetParent(catchNode.Parent());
-    if (GetBackEnd() == BackEnd::llvm)
+    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
     {
         ConstructionStatementNode* getExceptionAddr = new ConstructionStatementNode(span, new PointerNode(span, new IdentifierNode(span, U"void")), new IdentifierNode(span, U"@exceptionAddr"));
         getExceptionAddr->AddArgument(new InvokeNode(span, new IdentifierNode(span, U"RtGetException")));
@@ -1730,7 +1730,7 @@ void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
                 assertStatementNode.GetSpan().line)), symbolTable.GetTypeByName(U"int"))));
             std::unique_ptr<BoundExpression> assertExpression = BindExpression(assertStatementNode.AssertExpr(), boundCompileUnit, currentFunction, containerScope, this);
             const char32_t* failAssertionFunctionName = U"";
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 failAssertionFunctionName = U"RtFailAssertion";
             }

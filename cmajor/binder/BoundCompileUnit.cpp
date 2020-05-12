@@ -277,6 +277,7 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
         boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
         boost::filesystem::path directory = module.DirectoryPath();
         boost::filesystem::path llfp = (directory / fileName).replace_extension(".ll");
+        boost::filesystem::path cppfp = (directory / fileName).replace_extension(".cpp");
         boost::filesystem::path bcfp = (directory / fileName).replace_extension(".bc");
         boost::filesystem::path optbcfp = (directory / fileName).replace_extension(".opt.bc");
         boost::filesystem::path optllfp = (directory / fileName).replace_extension(".opt.ll");
@@ -290,10 +291,15 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
         {
             objfp = (directory / fileName).replace_extension(".o");
         }
+        else if (GetBackEnd() == BackEnd::cmcpp)
+        {
+            objfp = (directory / fileName).replace_extension(".obj");
+        }
 #else
         objfp = (directory / fileName).replace_extension(".o");
 #endif
         llFilePath = GetFullPath(llfp.generic_string());
+        cppFilePath = GetFullPath(cppfp.generic_string());
         bcFilePath = GetFullPath(bcfp.generic_string());
         optBCFilePath = GetFullPath(optbcfp.generic_string());
         optLLFilePath = GetFullPath(optllfp.generic_string());

@@ -192,7 +192,7 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
         else
         {
             void* nextBlock = nullptr;
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 nextBlock = emitter.CreateBasicBlock("next");
             }
@@ -215,7 +215,7 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
             {
                 emitter.Stack().Push(emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span));
             }
-            if (GetBackEnd() == BackEnd::llvm)
+            if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
             {
                 emitter.SetCurrentBasicBlock(nextBlock);
             }

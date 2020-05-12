@@ -71,6 +71,11 @@ struct BackendSelector
                 CmmInit(cmajor::mid::BackEndKind::cmsxBackEnd);
                 break;
             }
+            case cmajor::symbols::BackEnd::cmcpp:
+            {
+                CmmInit(cmajor::mid::BackEndKind::cmcppBackEnd);
+                break;
+            }
         }
     }
     ~BackendSelector()
@@ -356,6 +361,10 @@ int main(int argc, const char** argv)
                                 else if (components[1] == "cmsx")
                                 {
                                     SetBackEnd(cmajor::symbols::BackEnd::cmsx);
+                                }
+                                else if (components[1] == "cmcpp")
+                                {
+                                    SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
                                 }
                                 else
                                 {

@@ -387,6 +387,10 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
                 {
                     backend = sngcm::ast::BackEnd::cmsx;
                 }
+                else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+                {
+                    backend = sngcm::ast::BackEnd::cppcm;
+                }
                 mfp = CmajorSystemLibDir(config, backend);
                 searchedDirectories.append("\n").append(mfp.generic_string());
                 mfp /= mfn;
@@ -435,6 +439,10 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
                 if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
                 {
                     backend = sngcm::ast::BackEnd::cmsx;
+                }
+                else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+                {
+                    backend = sngcm::ast::BackEnd::cppcm;
                 }
                 mfp = CmajorSystemLibDir(config, backend);
                 mfp /= mfn;
@@ -505,6 +513,10 @@ void ImportModulesWithReferences(sngcm::ast::Target target,
         if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
         {
             backend = sngcm::ast::BackEnd::cmsx;
+        }
+        else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+        {
+            backend = sngcm::ast::BackEnd::cppcm;
         }
         if (first)
         {
@@ -597,6 +609,10 @@ Module::Module(const std::string& filePath)  :
         {
             libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
         }
+        else if (GetBackEnd() == BackEnd::cmcpp)
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+        }
 #else
         libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
 #endif
@@ -665,6 +681,10 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
             libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
         }
         else if (GetBackEnd() == BackEnd::llvm)
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+        }
+        else if (GetBackEnd() == BackEnd::cmcpp)
         {
             libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
         }
@@ -924,6 +944,10 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         {
             libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".lib").generic_string());
         }
+        else if (GetBackEnd() == BackEnd::cmcpp)
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".lib").generic_string());
+        }
 #else
         libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
 #endif
@@ -1145,6 +1169,10 @@ void Module::CheckUpToDate()
             boost::filesystem::path objectFilePath;
 #ifdef _WIN32
             if (GetBackEnd() == BackEnd::llvm)
+            {
+                objectFilePath = libDirPath / sfp.filename().replace_extension(".obj");
+            }
+            if (GetBackEnd() == BackEnd::cmcpp)
             {
                 objectFilePath = libDirPath / sfp.filename().replace_extension(".obj");
             }

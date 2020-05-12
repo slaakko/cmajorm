@@ -2485,7 +2485,7 @@ void ExpressionBinder::Visit(NewNode& newNode)
     CloneContext cloneContext;
     InvokeNode* invokeMemAlloc = nullptr;
     bool memDebug = boundCompileUnit.GetModule().IsSymbolDefined(U"MEM_DEBUG");
-    if (GetBackEnd() == BackEnd::llvm)
+    if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
     {
         if (memDebug)
         {
