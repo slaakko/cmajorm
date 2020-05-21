@@ -887,17 +887,17 @@ void BoundCompileUnit::AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs)
     globalNamespaceNodes.push_back(std::move(globalNs));
 }
 
-void BoundCompileUnit::AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol)
-{
-    functionSymbols.push_back(std::move(functionSymbol));
-}
-
 void BoundCompileUnit::ResetCodeGenerated()
 {
     for (std::unique_ptr<BoundNode>& node : boundNodes)
     {
         node->ResetCodeGenerated();
     }
+}
+
+void BoundCompileUnit::AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol)
+{
+    functionSymbols.push_back(std::move(functionSymbol));
 }
 
 } } // namespace cmajor::binder

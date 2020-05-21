@@ -62,7 +62,7 @@ namespace System.Windows
             }
             if (nodeLocation.y > contentLocation.y)
             {
-                int y = nodeLocation.y - Max(0, cast<int>(size.h - 2 * textHeight));
+                int y = nodeLocation.y - Max(cast<int>(0), cast<int>(size.h - 2 * textHeight));
                 Point newOrigin(0, y);
                 SetContentLocation(newOrigin);
                 Invalidate();

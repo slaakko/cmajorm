@@ -98,9 +98,9 @@ public:
     bool Immutable() const { return immutable; }
     void SetImmutable() { immutable = true; }
     void AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs);
-    void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
     int GetNextExitEntryIndex() { return nextExitEntryIndex++; }
     void ResetCodeGenerated() override;
+    void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -116,7 +116,6 @@ private:
     std::string cppFilePath;
     std::vector<std::unique_ptr<FileScope>> fileScopes;
     std::vector<std::unique_ptr<BoundNode>> boundNodes;
-    std::vector<std::unique_ptr<FunctionSymbol>> functionSymbols;
     std::vector<std::unique_ptr<NamespaceNode>> globalNamespaceNodes;
     bool hasGotos;
     OperationRepository operationRepository;
@@ -124,6 +123,7 @@ private:
     ClassTemplateRepository classTemplateRepository;
     InlineFunctionRepository inlineFunctionRepository;
     ConstExprFunctionRepository constExprFunctionRepository;
+    std::vector<std::unique_ptr<FunctionSymbol>> functionSymbols;
     StringRepository<std::string, const unsigned char*> utf8StringRepository;
     StringRepository<std::u16string, const char16_t*> utf16StringRepository;
     StringRepository<std::u32string, const char32_t*> utf32StringRepository;

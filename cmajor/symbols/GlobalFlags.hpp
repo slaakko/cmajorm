@@ -40,7 +40,9 @@ enum class GlobalFlags : uint32_t
     optimizeCmDoc = 1 << 21,
     singleThreadedCompile = 1 << 22,
     debugCompile = 1 << 23,
-    rebuild = 1 << 24
+    rebuild = 1 << 24,
+    disableCodeGen = 1 << 25,
+    disableSystem = 1 << 26
 };
 
 enum class BackEnd : int

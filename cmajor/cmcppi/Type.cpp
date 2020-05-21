@@ -5,6 +5,9 @@
 
 #include <cmajor/cmcppi/Type.hpp>
 #include <soulng/util/Error.hpp>
+#include <algorithm>
+#include <set>
+#include <unordered_set>
 
 namespace cmcppi {
 
@@ -44,10 +47,13 @@ ConstantValue* Type::DefaultValue()
     return nullptr;
 }
 
+void Type::WriteForwardDeclaration(CodeFormatter& formatter)
+{
+}
+
 void Type::WriteDeclaration(CodeFormatter& formatter)
 {
-    formatter.Write(Name());
-    formatter.Write(" = type ");
+    formatter.Write("using " + Name() + " = ");
 }
 
 void Type::Write(CodeFormatter& formatter)
@@ -107,6 +113,18 @@ DoubleType::DoubleType() : PrimitiveType(doubleTypeId)
 {
 }
 
+CharType::CharType() : PrimitiveType(charTypeId)
+{
+}
+
+WCharType::WCharType() : PrimitiveType(wcharTypeId)
+{
+}
+
+UCharType::UCharType() : PrimitiveType(ucharTypeId)
+{
+}
+
 PtrType::PtrType(Type* baseType_) : Type(ptrTypeId), baseType(baseType_), defaultValue(this)
 {
 }
@@ -125,10 +143,17 @@ void StructureType::SetMemberTypes(const std::vector<Type*>& memberTypes_)
     memberTypes = memberTypes_;
 }
 
+void StructureType::WriteForwardDeclaration(CodeFormatter& formatter)
+{
+    formatter.WriteLine("struct __struct" + std::to_string(Id()) + ";");
+    formatter.WriteLine("using " + Name() + " = struct __struct" + std::to_string(Id()) + ";");
+}
+
 void StructureType::WriteDeclaration(CodeFormatter& formatter)
 {
+    int memberIndex = 0;
     Type::WriteDeclaration(formatter);
-    formatter.Write("{ ");
+    formatter.Write("struct __struct" + std::to_string(Id()) + " { ");
     bool first = true;
     for (Type* memberType : memberTypes)
     {
@@ -138,11 +163,13 @@ void StructureType::WriteDeclaration(CodeFormatter& formatter)
         }
         else
         {
-            formatter.Write(", ");
+            formatter.Write(" ");
         }
         memberType->Write(formatter);
+        formatter.Write(" m" + std::to_string(memberIndex) + ";");
+        ++memberIndex;
     }
-    formatter.Write(" }");
+    formatter.Write(" };");
 }
 
 Type* StructureType::GetMemberType(uint64_t index) const
@@ -183,11 +210,10 @@ ArrayType::ArrayType(int id_, Type* elementType_, uint64_t size_) : Type(id_), e
 void ArrayType::WriteDeclaration(CodeFormatter& formatter)
 {
     Type::WriteDeclaration(formatter);
+    elementType->Write(formatter);
     formatter.Write("[");
     formatter.Write(std::to_string(size));
-    formatter.Write(" x ");
-    elementType->Write(formatter);
-    formatter.Write("]");
+    formatter.Write("];");
 }
 
 int ArrayType::SizeInBytes() const
@@ -212,9 +238,8 @@ FunctionType::FunctionType(int id_, Type* returnType_, const std::vector<Type*>&
 void FunctionType::WriteDeclaration(CodeFormatter& formatter)
 {
     Type::WriteDeclaration(formatter);
-    formatter.Write("function ");
     returnType->Write(formatter);
-    formatter.Write("(");
+    formatter.Write(" (*)(");
     bool first = true;
     for (Type* paramType : paramTypes)
     {
@@ -228,7 +253,7 @@ void FunctionType::WriteDeclaration(CodeFormatter& formatter)
         }
         paramType->Write(formatter);
     }
-    formatter.Write(")");
+    formatter.Write(");");
 }
 
 FunctionTypeKey::FunctionTypeKey(Type* returnType_, const std::vector<Type*>& paramTypes_) : returnType(returnType_), paramTypes(paramTypes_)
@@ -251,6 +276,71 @@ size_t FunctionTypeKeyEqual::operator()(const FunctionTypeKey& left, const Funct
     return left.paramTypes == right.paramTypes;
 }
 
+void Visit(std::vector<Type*>& order, Type* type, std::unordered_set<Type*>& visited, std::unordered_set<Type*>& tempVisit, const std::unordered_map<Type*, std::set<Type*>>& dependencies)
+{
+    if (tempVisit.find(type) == tempVisit.end())
+    {
+        if (visited.find(type) == visited.end())
+        {
+            tempVisit.insert(type);
+            auto i = dependencies.find(type);
+            if (i != dependencies.end())
+            {
+                const std::set<Type*>& dependsOn = i->second;
+                for (Type* type : dependsOn)
+                {
+                    Visit(order, type, visited, tempVisit, dependencies);
+                }
+                tempVisit.erase(type);
+                visited.insert(type);
+                order.push_back(type);
+            }
+            else
+            {
+                tempVisit.erase(type);
+                visited.insert(type);
+                order.push_back(type);
+            }
+        }
+    }
+    else
+    {
+        throw std::runtime_error("circular type dependency '" + type->Name() + "' detected");
+    }
+}
+
+std::vector<Type*> CreateTypeOrder(const std::vector<std::unique_ptr<Type>>& types)
+{
+    std::unordered_map<Type*, std::set<Type*>> dependencies;
+    for (const std::unique_ptr<Type>& type : types)
+    {
+        if (type->IsStructureType())
+        {
+            StructureType* structureType = static_cast<StructureType*>(type.get());
+            int n = structureType->MemberTypes().size();
+            for (int i = 0; i < n; ++i)
+            {
+                Type* memberType = structureType->GetMemberType(i);
+                if (memberType->IsStructureType())
+                {
+                    dependencies[type.get()].insert(memberType);
+                }
+            }
+        }
+    }
+    std::vector<Type*> order;
+    std::unordered_set<Type*> visited;
+    std::unordered_set<Type*> tempVisit;
+    for (const std::unique_ptr<Type>& type : types)
+    {
+        if (visited.find(type.get()) == visited.end())
+        {
+            Visit(order, type.get(), visited, tempVisit, dependencies);
+        }
+    }
+    return order;
+}
+
 TypeRepository::TypeRepository()
 {
 }
@@ -261,7 +351,35 @@ void TypeRepository::Write(CodeFormatter& formatter)
     formatter.WriteLine("#ifndef __cpp_char8_t");
     formatter.WriteLine("using char8_t = unsigned char;");
     formatter.WriteLine("#endif");
-    // todo
+    formatter.WriteLine();
+    formatter.WriteLine("namespace");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    for (const std::unique_ptr<Type>& type : types)
+    {
+        type->WriteForwardDeclaration(formatter);
+    }
+    for (const std::unique_ptr<Type>& type : types)
+    {
+        if (type->IsStructureType())
+        {
+            continue;
+        }
+        type->WriteDeclaration(formatter);
+        formatter.WriteLine();
+    }
+    std::vector<Type*> typeOrder = CreateTypeOrder(types);
+    for (Type* type : typeOrder)
+    {
+        if (!(type->IsStructureType()))
+        {
+            continue;
+        }
+        type->WriteDeclaration(formatter);
+        formatter.WriteLine();
+    }
+    formatter.DecIndent();
+    formatter.WriteLine("}");
 }
 
 Type* TypeRepository::GetPtrType(Type* baseType)

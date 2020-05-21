@@ -23,7 +23,7 @@ BUILD_API void BuildMsBuildProject(const std::string& projectName, const std::st
     std::unique_ptr<Module>& rootModule);
 BUILD_API void GenerateLibrary(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath);
 BUILD_API void Link(Target target,const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths,
-    const std::string mainObjectFilePath, cmajor::symbols::Module& module);
+    const std::string& mainObjectFilePath, cmajor::symbols::Module& module);
 BUILD_API void StopBuild();
 
 } } // namespace cmajor::build

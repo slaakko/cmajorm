@@ -26,22 +26,25 @@ void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& co
         formatter.DecIndent();
         indentDecremented = true;
     }
-    formatter.Write(Format("__BB" + std::to_string(id) + ":", indent, FormatWidth::min));
+    formatter.Write(Format("__bb" + std::to_string(id) + ":", indent, FormatWidth::min));
     bool first = true;
-    for (const auto& inst : instructions)
+    std::string n = "["+ name + "] ";
+    int ni = instructions.size();
+    for (int i = 0; i < ni; ++i)
     {
-        inst->Write(formatter, function, context);
-        formatter.Write(";");
+        Instruction* inst = instructions[i].get();
+        formatter.WriteLine("// " + n + inst->IrName() + " : source line=" + std::to_string(inst->SourceLineNumber()) + ":");
         if (first)
         {
             if (indentDecremented)
             {
                 formatter.IncIndent();
             }
-            formatter.Write(" // " + name);
             first = false;
         }
-        formatter.WriteLine();
+        inst->Write(formatter, function, context);
+        formatter.WriteLine(";");
+        n = "";
     }
 }
 

@@ -19,6 +19,7 @@ class CMCPPI_API Context
 public:
     Context();
     TypeRepository& GetTypeRepository() { return typeRepository; }
+    DataRepository& GetDataRepository() { return dataRepository; }
     Type* GetVoidType() { return typeRepository.GetVoidType(); }
     Type* GetBoolType() { return typeRepository.GetBoolType(); }
     Type* GetSByteType() { return typeRepository.GetSByteType(); }
@@ -31,6 +32,9 @@ public:
     Type* GetULongType() { return typeRepository.GetULongType(); }
     Type* GetFloatType() { return typeRepository.GetFloatType(); }
     Type* GetDoubleType() { return typeRepository.GetDoubleType(); }
+    Type* GetCharType() { return typeRepository.GetCharType(); }
+    Type* GetWCharType() { return typeRepository.GetWCharType(); }
+    Type* GetUCharType() { return typeRepository.GetUCharType(); }
     Type* GetPtrType(Type* baseType) { return typeRepository.GetPtrType(baseType); }
     Type* GetStructureType(const std::vector<Type*>& memberTypes) { return typeRepository.GetStructureType(memberTypes); }
     Type* CreateStructureType() { return typeRepository.CreateStructureType(); }
@@ -47,6 +51,9 @@ public:
     ConstantValue* GetDefaultULongValue() { return GetULongType()->DefaultValue(); }
     ConstantValue* GetDefaultFloatValue() { return GetFloatType()->DefaultValue(); }
     ConstantValue* GetDefaultDoubleValue() { return GetDoubleType()->DefaultValue(); }
+    ConstantValue* GetDefaultCharValue() { return GetCharType()->DefaultValue(); }
+    ConstantValue* GetDefaultWCharValue() { return GetWCharType()->DefaultValue(); }
+    ConstantValue* GetDefaultUCharValue() { return GetUCharType()->DefaultValue(); }
     ConstantValue* GetNullValue(PtrType* ptrType) { return ptrType->DefaultValue(); }
     ConstantValue* GetBoolValue(bool value);
     ConstantValue* GetSByteValue(int8_t value);
@@ -59,10 +66,16 @@ public:
     ConstantValue* GetULongValue(uint64_t value);
     ConstantValue* GetFloatValue(float value);
     ConstantValue* GetDoubleValue(double value);
-    ArrayValue* GetArrayValue(Type* arrayType, const std::vector<ConstantValue*>& elements, const std::string& prefix);
-    StructureValue* GetStructureValue(Type* structureType, const std::vector<ConstantValue*>& members);
+    ConstantValue* GetCharValue(char8_t value);
+    ConstantValue* GetWCharValue(char16_t value);
+    ConstantValue* GetUCharValue(char32_t value);
+    ArrayValue* GetArrayValue(Type* arrayType, const std::vector<Value*>& elements, const std::string& prefix);
+    StructureValue* GetStructureValue(Type* structureType, const std::vector<Value*>& members);
     StringValue* GetStringValue(Type* stringType, const std::string& value);
+    WStringValue* GetWStringValue(Type* stringType, const std::u16string& value);
+    UStringValue* GetUStringValue(Type* stringType, const std::u32string& value);
     ConversionValue* GetConversionValue(Type* type, ConstantValue* from);
+    ClsIdValue* GetClsIdValue(const std::string& typeId);
     void AddValue(Value* value);
     void SetCurrentBasicBlock(BasicBlock* bb) { currentBasicBlock = bb; }
     BasicBlock* GetCurrentBasicBlock() const { return currentBasicBlock; }
@@ -88,7 +101,6 @@ public:
     Instruction* CreateFloatToInt(Value* arg, Type* destType);
     Instruction* CreateIntToPtr(Value* arg, Type* destType);
     Instruction* CreatePtrToInt(Value* arg, Type* destType);
-    Instruction* CreateParam(Type* type);
     Instruction* CreateLocal(Type* type);
     Instruction* CreateLoad(Value* ptr);
     Instruction* CreateStore(Value* value, Value* ptr);
@@ -96,7 +108,8 @@ public:
     Instruction* CreateElemAddr(Value* ptr, Value* index);
     Instruction* CreatePtrOffset(Value* ptr, Value* offset);
     Instruction* CreatePtrDiff(Value* leftPtr, Value* rightPtr);
-    Instruction* CreateCall(Value* function);
+    Instruction* CreateCall(Value* function, const std::vector<Value*>& args);
+    Instruction* CreateInvoke(Value* function, const std::vector<Value*> args, BasicBlock* normalBlockNext, BasicBlock* unwindBlockNext);
     Instruction* CreateRet(Value* value);
     Instruction* CreateJump(BasicBlock* dest);
     Instruction* CreateBranch(Value* cond, BasicBlock* trueDest, BasicBlock* falseDest);
@@ -104,8 +117,11 @@ public:
     Instruction* CreateNop();
     GlobalVariable* GetOrInsertGlobal(const std::string& name, Type* type);
     GlobalVariable* CreateGlobalStringPtr(const std::string& stringValue);
+    GlobalVariable* CreateGlobalWStringPtr(const std::u16string& stringValue);
+    GlobalVariable* CreateGlobalUStringPtr(const std::u32string& stringValue);
     void SetCurrentLineNumber(int lineNumber);
     void AddLineInfo(Instruction* inst);
+    void SetCompileUnitId(const std::string& compileUnitId);
 private:
     TypeRepository typeRepository;
     DataRepository dataRepository;

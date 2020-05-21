@@ -92,6 +92,8 @@ enum class Target
     program, winguiapp, winapp, library, winlib, unitTest
 };
 
+SNGCM_AST_API std::string TargetStr(Target target);
+
 class SNGCM_AST_API TargetDeclaration : public ProjectDeclaration
 {
 public:
@@ -104,7 +106,7 @@ private:
 class SNGCM_AST_API Project
 {
 public:
-    Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend);
+    Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend_);
     Project(const Project&) = delete;
     Project& operator=(const Project&) = delete;
     const std::u32string& Name() const { return name; }
@@ -145,6 +147,7 @@ public:
     bool Ready() const;
     void SetExcludeSourceFilePath(const std::string& excludeSourceFilePath_);
 private:
+    BackEnd backend;
     std::u32string name;
     std::string filePath;
     std::string config;

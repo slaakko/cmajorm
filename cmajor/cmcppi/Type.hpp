@@ -26,7 +26,10 @@ const int longTypeId = -9;
 const int ulongTypeId = -10;
 const int floatTypeId = -11;
 const int doubleTypeId = -12;
-const int ptrTypeId = -13;
+const int charTypeId = -13;
+const int wcharTypeId = -14;
+const int ucharTypeId = -15;
+const int ptrTypeId = -16;
 
 std::string TypeName(int typeId);
 
@@ -37,7 +40,9 @@ public:
     virtual ~Type();
     virtual std::string Name() const;
     virtual ConstantValue* DefaultValue();
+    virtual void WriteForwardDeclaration(CodeFormatter& formatter);
     virtual void WriteDeclaration(CodeFormatter& formatter);
+    virtual bool IsPrimitiveType() const { return false; }
     virtual bool IsStructureType() const { return false; }
     virtual bool IsArrayType() const { return false; }
     virtual bool IsFunctionType() const { return false; }
@@ -54,6 +59,7 @@ class CMCPPI_API PrimitiveType : public Type
 {
 public:
     PrimitiveType(int id);
+    bool IsPrimitiveType() const override { return true; }
 };
 
 class CMCPPI_API VoidType : public PrimitiveType
@@ -173,6 +179,36 @@ private:
     DoubleValue defaultValue;
 };
 
+class CMCPPI_API CharType : public PrimitiveType
+{
+public:
+    CharType();
+    ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 8; }
+private:
+    CharValue defaultValue;
+};
+
+class CMCPPI_API WCharType : public PrimitiveType
+{
+public:
+    WCharType();
+    ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 16; }
+private:
+    WCharValue defaultValue;
+};
+
+class CMCPPI_API UCharType : public PrimitiveType
+{
+public:
+    UCharType();
+    ConstantValue* DefaultValue() override { return &defaultValue; }
+    int SizeInBytes() const override { return 32; }
+private:
+    UCharValue defaultValue;
+};
+
 class CMCPPI_API PtrType : public Type
 {
 public:
@@ -192,6 +228,7 @@ public:
     StructureType(int id_);
     const std::vector<Type*>& MemberTypes() const { return memberTypes; }
     void SetMemberTypes(const std::vector<Type*>& memberTypes_);
+    void WriteForwardDeclaration(CodeFormatter& formatter);
     void WriteDeclaration(CodeFormatter& formatter) override;
     bool IsStructureType() const { return true; }
     Type* GetMemberType(uint64_t index) const;
@@ -218,6 +255,7 @@ public:
     bool IsArrayType() const { return true; }
     Type* ElementType() const { return elementType; }
     int SizeInBytes() const override;
+    uint64_t Size() const { return size; }
 private:
     Type* elementType;
     uint64_t size;
@@ -290,6 +328,9 @@ public:
     Type* GetULongType() { return &ulongType; }
     Type* GetFloatType() { return &floatType; }
     Type* GetDoubleType() { return &doubleType; }
+    Type* GetCharType() { return &charType; }
+    Type* GetWCharType() { return &wcharType; }
+    Type* GetUCharType() { return &ucharType; }
     Type* GetPtrType(Type* baseType);
     Type* GetStructureType(const std::vector<Type*>& memberTypes);
     Type* CreateStructureType();
@@ -308,6 +349,9 @@ private:
     ULongType ulongType;
     FloatType floatType;
     DoubleType doubleType;
+    CharType charType;
+    WCharType wcharType;
+    UCharType ucharType;
     std::vector<std::unique_ptr<PtrType>> ptrTypes;
     std::unordered_map<Type*, PtrType*> ptrTypeMap;
     std::unordered_map<std::vector<Type*>, StructureType*, StructureTypeHash, StructureTypeEqual> structureTypeMap;

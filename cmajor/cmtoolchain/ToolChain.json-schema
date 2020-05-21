@@ -1,0 +1,27 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/cmtoolchain/ToolChainApi.hpp>
+
+struct api(CMTOOLCHAIN_API) Tool
+{
+    string name;
+    string commandName;
+    string outputFileExtension;
+    string debugInformationFileExtension;
+    string assemblyFileExtension;
+    string[] args; 
+}
+
+struct api(CMTOOLCHAIN_API) ToolChain
+{
+    string name;
+    Tool[] tools;
+}
+
+struct api(CMTOOLCHAIN_API) ToolChains
+{
+    ToolChain[] toolChains;
+}

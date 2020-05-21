@@ -736,6 +736,16 @@ void* Emitter::CreateGlobalStringPtr(const std::string& name)
     return llvm::ConstantExpr::getInBoundsGetElementPtr(gv->getValueType(), gv, indices);
 }
 
+void* Emitter::CreateGlobalWStringPtr(const std::u16string& name)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateGlobalUStringPtr(const std::u32string& name)
+{
+    return nullptr;
+}
+
 void* Emitter::CreateCall(void* callee, const std::vector<void*>& args)
 {
     std::vector<llvm::Value*> arguments;

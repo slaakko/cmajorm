@@ -1,0 +1,42 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <sngjson/json/JsonApi.hpp>
+
+classmap JsonClassMap;
+
+prefix "sngjson/json";
+
+tokens JsonTokens
+{
+    (STRING, "'string'"), (NUMBER, "'number'"), (LBRACKET, "'['"), (RBRACKET, "']"), (LBRACE, "{'"), (RBRACE, "'}'"), (COMMA, "','"), (COLON, "':'"), (TRUE, "'true'"), (FALSE, "'false'"), (NULLTOKEN, "'null'")
+}
+
+expressions
+{
+    ws = "[\n\r\t ]+";
+    hexdigit = "[0-9a-fA-F]";
+    hex4 = "{hexdigit}{hexdigit}{hexdigit}{hexdigit}";
+    escape = "\\([\"\\/bfnrt]|u{hex4})";
+    string = "\"([^\"\\]|{escape})*\"";
+    digit = "[0-9]";
+    number = "-?{digit}+(\.{digit}+)?([eE][+-]?{digit}+)?";
+}
+
+lexer api(SNGJSON_JSON_API) JsonLexer
+{
+    "{ws}" {}
+    "{string}" { return STRING; }
+    "{number}" { return NUMBER; }
+    "\[" { return LBRACKET; }
+    "\]" { return RBRACKET; }
+    "\{" { return LBRACE; }
+    "\}" { return RBRACE; }
+    "," { return COMMA; }
+    ":"{ return COLON; }
+    "true" { return TRUE; }
+    "false" { return FALSE; }
+    "null" { return NULL; }
+}

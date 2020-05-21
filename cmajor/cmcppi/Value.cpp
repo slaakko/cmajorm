@@ -6,14 +6,22 @@
 #include <cmajor/cmcppi/Value.hpp>
 #include <cmajor/cmcppi/Context.hpp>
 #include <soulng/util/TextUtils.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmcppi {
+
+using namespace soulng::unicode;
 
 Value::Value()
 {
 }
 
 Value::~Value()
+{
+}
+
+void Value::AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap, std::unordered_map<GlobalVariable*,
+    std::set<GlobalVariable*>>& dependencies, Context& context)
 {
 }
 
@@ -215,6 +223,60 @@ std::string DoubleValue::Name(Context& context)
     return std::to_string(value);
 }
 
+CharValue::CharValue() : value('\0')
+{
+}
+
+CharValue::CharValue(char8_t value_) :  value(value_)
+{
+}
+
+Type* CharValue::GetType(Context& context)
+{
+    return context.GetCharType();
+}
+
+std::string CharValue::Name(Context& context)
+{
+    return CharStr((char)value);
+}
+
+WCharValue::WCharValue() : value(u'\0')
+{
+}
+
+WCharValue::WCharValue(char16_t value_) : value(value_)
+{
+}
+
+Type* WCharValue::GetType(Context& context)
+{
+    return context.GetWCharType();
+}
+
+std::string WCharValue::Name(Context& context)
+{
+    return ToUtf8(U"u'" + CharStr((char32_t)value) + U"'");
+}
+
+UCharValue::UCharValue() : value(U'\0')
+{
+}
+
+UCharValue::UCharValue(char32_t value_) : value(value_)
+{
+}
+
+Type* UCharValue::GetType(Context& context)
+{
+    return context.GetUCharType();
+}
+
+std::string UCharValue::Name(Context& context)
+{
+    return ToUtf8(U"U'" + CharStr((char32_t)value) + U"'");
+}
+
 NullValue::NullValue(PtrType* ptrType_) : ConstantValue(), ptrType(ptrType_)
 {
 }
@@ -226,18 +288,18 @@ Type* NullValue::GetType(Context& context)
 
 std::string NullValue::Name(Context& context)
 {
-    return "null";
+    return "nullptr";
 }
 
-ArrayValue::ArrayValue(Type* type_, const std::vector<ConstantValue*>& elements_, const std::string& prefix_) : ConstantValue(), type(type_), elements(elements_), prefix(prefix_)
+ArrayValue::ArrayValue(Type* type_, const std::vector<Value*>& elements_, const std::string& prefix_) : ConstantValue(), type(type_), elements(elements_), prefix(prefix_)
 {
 }
 
 std::string ArrayValue::Name(Context& context)
 {
-    std::string name = prefix + "[ ";
+    std::string name = prefix + "{ ";
     bool first = true;
-    for (ConstantValue* element : elements)
+    for (Value* element : elements)
     {
         if (first)
         {
@@ -253,10 +315,10 @@ std::string ArrayValue::Name(Context& context)
         }
         else
         {
-            name.append(element->GetType(context)->Name()).append(" ").append(element->Name(context));
+            name.append(element->Name(context));
         }
     }
-    name.append(" ]");
+    name.append(" }");
     return name;
 }
 
@@ -265,7 +327,24 @@ void ArrayValue::AddElement(ConstantValue* element)
     elements.push_back(element);
 }
 
-StructureValue::StructureValue(Type* type_, const std::vector<ConstantValue*>& members_) : ConstantValue(), type(type_), members(members_)
+void ArrayValue::AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap,
+    std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies, Context& context)
+{
+    for (Value* element : elements)
+    {
+        if (element)
+        {
+            auto it = nameMap.find(element->Name(context));
+            if (it != nameMap.cend())
+            {
+                dependencies[variable].insert(it->second);
+            }
+            element->AddDependencies(variable, nameMap, dependencies, context);
+        }
+    }
+}
+
+StructureValue::StructureValue(Type* type_, const std::vector<Value*>& members_) : ConstantValue(), type(type_), members(members_)
 {
 }
 
@@ -278,7 +357,7 @@ std::string StructureValue::Name(Context& context)
 {
     std::string name = "{ ";
     bool first = true;
-    for (ConstantValue* member : members)
+    for (Value* member : members)
     {
         if (first)
         {
@@ -294,7 +373,7 @@ std::string StructureValue::Name(Context& context)
         }
         else
         {
-            name.append(member->GetType(context)->Name()).append(" ").append(member->Name(context));
+            name.append(member->Name(context));
         }
     }
     name.append(" }");
@@ -304,6 +383,20 @@ std::string StructureValue::Name(Context& context)
 void StructureValue::AddMember(ConstantValue* member)
 {
     members.push_back(member);
+}
+
+void StructureValue::AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap,
+    std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies, Context& context)
+{
+    for (Value* member : members)
+    {
+        auto it = nameMap.find(member->Name(context));
+        if (it != nameMap.cend())
+        {
+            dependencies[variable].insert(it->second);
+        }
+        member->AddDependencies(variable, nameMap, dependencies, context);
+    }
 }
 
 StringValue::StringValue(Type* type_, const std::string& value_) : ConstantValue(), type(type_), value(value_)
@@ -317,11 +410,11 @@ std::string StringValue::Name(Context& context)
     {
         if (c == '"')
         {
-            name.append("\\").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
+            name.append("\\u00").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
         }
         else if (c == '\\')
         {
-            name.append("\\").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
+            name.append("\\u00").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
         }
         else if (c >= 32 && c < 127)
         {
@@ -329,15 +422,84 @@ std::string StringValue::Name(Context& context)
         }
         else
         {
-            name.append("\\").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
+            name.append("\\u00").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
         }
     }
-    name.append("\\").append(soulng::util::ToHexString(static_cast<uint8_t>(0)));
     name.append("\"");
     return name;
 }
 
 Type* StringValue::GetType(Context& context)
+{
+    return type;
+}
+
+WStringValue::WStringValue(Type* type_, const std::u16string& value_) : ConstantValue(), type(type_), value(value_)
+{
+}
+
+std::string WStringValue::Name(Context& context)
+{
+    std::string name("u\"");
+    for (char16_t c : value)
+    {
+        if (c == '"')
+        {
+            name.append("\\u00").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
+        }
+        else if (c == '\\')
+        {
+            name.append("\\u00").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
+        }
+        else if (c >= 32 && c < 127)
+        {
+            name.append(1, c);
+        }
+        else
+        {
+            name.append("\\u").append(soulng::util::ToHexString(static_cast<uint16_t>(c)));
+        }
+    }
+    name.append("\"");
+    return name;
+}
+
+Type* WStringValue::GetType(Context& context)
+{
+    return type;
+}
+
+UStringValue::UStringValue(Type* type_, const std::u32string& value_) : ConstantValue(), type(type_), value(value_)
+{
+}
+
+std::string UStringValue::Name(Context& context)
+{
+    std::string name("U\"");
+    for (char16_t c : value)
+    {
+        if (c == '"')
+        {
+            name.append("\\U000000").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
+        }
+        else if (c == '\\')
+        {
+            name.append("\\U000000").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
+        }
+        else if (c >= 32 && c < 127)
+        {
+            name.append(1, c);
+        }
+        else
+        {
+            name.append("\\U").append(soulng::util::ToHexString(static_cast<uint32_t>(c)));
+        }
+    }
+    name.append("\"");
+    return name;
+}
+
+Type* UStringValue::GetType(Context& context)
 {
     return type;
 }
@@ -348,14 +510,39 @@ ConversionValue::ConversionValue(Type* type_, ConstantValue* from_) : ConstantVa
 
 std::string ConversionValue::Name(Context& context)
 {
-    std::string name = "conv(";
-    name.append(from->GetType(context)->Name()).append(1, ' ').append(from->Name(context)).append(1, ')');
+    std::string name = "(" + type->Name() + ")";
+    name.append("(").append(from->GetType(context)->Name()).append(1, ')').append(from->Name(context));
     return name;
 }
 
 Type* ConversionValue::GetType(Context& context)
 {
     return type;
+}
+
+void ConversionValue::AddDependencies(GlobalVariable* variable, const std::unordered_map<std::string, GlobalVariable*>& nameMap, std::unordered_map<GlobalVariable*, std::set<GlobalVariable*>>& dependencies,
+    Context& context)
+{
+    auto it = nameMap.find(from->Name(context));
+    if (it != nameMap.cend())
+    {
+        dependencies[variable].insert(it->second);
+    }
+}
+
+ClsIdValue::ClsIdValue(const std::string& typeId_) : ConstantValue(), typeId(typeId_)
+{
+}
+
+std::string ClsIdValue::Name(Context& context)
+{
+    std::string name = "(void*)" + typeId.substr(0, 8) + ", (void*)" + typeId.substr(8);
+    return name;
+}
+
+Type* ClsIdValue::GetType(Context& context)
+{
+    return context.GetPtrType(context.GetVoidType());
 }
 
 } // namespace cmcppi

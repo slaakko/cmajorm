@@ -78,17 +78,17 @@ void* Emitter::GetIrTypeForDouble()
 
 void* Emitter::GetIrTypeForChar()
 {
-    return context->GetByteType();
+    return context->GetCharType();
 }
 
 void* Emitter::GetIrTypeForWChar()
 {
-    return context->GetUShortType();
+    return context->GetWCharType();
 }
 
 void* Emitter::GetIrTypeForUChar()
 {
-    return context->GetUIntType();
+    return context->GetUCharType();
 }
 
 void* Emitter::GetIrTypeForVoid()
@@ -193,10 +193,10 @@ void* Emitter::GetIrTypeForPtrType(void* baseIrType)
 
 void* Emitter::CreateDefaultIrValueForArrayType(void* arrayIrType, const std::vector<void*>& arrayOfDefaults)
 {
-    std::vector<cmcppi::ConstantValue*> arrayOfConstants;
+    std::vector<cmcppi::Value*> arrayOfConstants;
     for (void* constant : arrayOfDefaults)
     {
-        arrayOfConstants.push_back(static_cast<cmcppi::ConstantValue*>(constant));
+        arrayOfConstants.push_back(static_cast<cmcppi::Value*>(constant));
     }
     cmcppi::Type* arrayType = static_cast<cmcppi::Type*>(arrayIrType);
     return context->GetArrayValue(arrayType, arrayOfConstants, std::string());
@@ -264,20 +264,20 @@ void* Emitter::CreateDefaultIrValueForChar()
 
 void* Emitter::CreateDefaultIrValueForWChar()
 {
-    return context->GetDefaultUShortValue();
+    return context->GetDefaultWCharValue();
 }
 
 void* Emitter::CreateDefaultIrValueForUChar()
 {
-    return context->GetDefaultUIntValue();
+    return context->GetDefaultUCharValue();
 }
 
 void* Emitter::CreateDefaultIrValueForStruct(void* irType, const std::vector<void*>& defaultMembers)
 {
-    std::vector<cmcppi::ConstantValue*> arrayOfDefaults;
+    std::vector<cmcppi::Value*> arrayOfDefaults;
     for (void* constant : defaultMembers)
     {
-        arrayOfDefaults.push_back(static_cast<cmcppi::ConstantValue*>(constant));
+        arrayOfDefaults.push_back(static_cast<cmcppi::Value*>(constant));
     }
     return context->GetStructureValue(static_cast<cmcppi::StructureType*>(irType), arrayOfDefaults);
 }
@@ -364,12 +364,12 @@ void* Emitter::CreateIrValueForChar(uint8_t value)
 
 void* Emitter::CreateIrValueForWChar(uint16_t value)
 {
-    return context->GetUShortValue(value);
+    return context->GetWCharValue(value);
 }
 
 void* Emitter::CreateIrValueForUChar(uint32_t value)
 {
-    return context->GetUIntValue(value);
+    return context->GetUCharValue(value);
 }
 
 void* Emitter::CreateIrValueForWString(void* wstringConstant)
@@ -384,7 +384,7 @@ void* Emitter::CreateIrValueForUString(void* ustringConstant)
 
 void* Emitter::CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants, const std::string& prefix)
 {
-    std::vector<cmcppi::ConstantValue*> elements;
+    std::vector<cmcppi::Value*> elements;
     for (void* elementConstant : elementConstants)
     {
         elements.push_back(static_cast<cmcppi::ConstantValue*>(elementConstant));
@@ -394,10 +394,10 @@ void* Emitter::CreateIrValueForConstantArray(void* arrayIrType, const std::vecto
 
 void* Emitter::CreateIrValueForConstantStruct(void* structIrType, const std::vector<void*>& elementConstants)
 {
-    std::vector<cmcppi::ConstantValue*> memberConstants;
+    std::vector<cmcppi::Value*> memberConstants;
     for (void* elementConstant : elementConstants)
     {
-        memberConstants.push_back(static_cast<cmcppi::ConstantValue*>(elementConstant));
+        memberConstants.push_back(static_cast<cmcppi::Value*>(elementConstant));
     }
     return context->GetStructureValue(static_cast<cmcppi::StructureType*>(structIrType), memberConstants);
 }
@@ -416,6 +416,16 @@ void* Emitter::GetConversionValue(void* type, void* from)
 void* Emitter::CreateGlobalStringPtr(const std::string& stringValue)
 {
     return context->CreateGlobalStringPtr(stringValue);
+}
+
+void* Emitter::CreateGlobalWStringPtr(const std::u16string& stringValue)
+{
+    return context->CreateGlobalWStringPtr(stringValue);
+}
+
+void* Emitter::CreateGlobalUStringPtr(const std::u32string& stringValue)
+{
+    return context->CreateGlobalUStringPtr(stringValue);
 }
 
 void* Emitter::GetGlobalStringPtr(int stringId)
@@ -1000,13 +1010,11 @@ void* Emitter::GetOrInsertGlobal(const std::string& name, void* type)
 
 void* Emitter::GetOrInsertAnyComdat(const std::string& name, void* global)
 {
-    static_cast<cmcppi::GlobalVariable*>(global)->SetLinkOnce();
     return nullptr;
 }
 
 void* Emitter::GetOrInsertAnyFunctionComdat(const std::string& name, void* function)
 {
-    static_cast<cmcppi::Function*>(function)->SetLinkOnce();
     return nullptr;
 }
 
@@ -1127,74 +1135,56 @@ void* Emitter::CreateClassDIType(void* classPtr)
 
 void* Emitter::CreateCall(void* callee, const std::vector<void*>& args)
 {
+    std::vector<cmcppi::Value*> argInsts;
     for (void* arg : args)
     {
         cmcppi::Value* argument = static_cast<cmcppi::Value*>(arg);
-        context->CreateArg(argument);
+        argInsts.push_back(context->CreateArg(argument));
     }
     cmcppi::Value* calleeValue = static_cast<cmcppi::Value*>(callee);
-    return context->CreateCall(calleeValue);
+    return context->CreateCall(calleeValue, argInsts);
 }
 
 void* Emitter::CreateCallInst(void* callee, const std::vector<void*>& args, const std::vector<void*>& bundles, const Span& span)
 {
+    std::vector<cmcppi::Value*> argInsts;
     for (void* arg : args)
     {
         cmcppi::Value* argument = static_cast<cmcppi::Value*>(arg);
-        context->CreateArg(argument);
+        argInsts.push_back(context->CreateArg(argument));
     }
     cmcppi::Value* calleeValue = static_cast<cmcppi::Value*>(callee);
-    return context->CreateCall(calleeValue);
+    return context->CreateCall(calleeValue, argInsts);
 }
 
 void* Emitter::CreateCallInstToBasicBlock(void* callee, const std::vector<void*>& args, const std::vector<void*>& bundles, void* basicBlock, const Span& span)
 {
+    std::vector<cmcppi::Value*> argInsts;
     void* prevBasicBlock = context->GetCurrentBasicBlock();
     SetCurrentBasicBlock(basicBlock);
     for (void* arg : args)
     {
         cmcppi::Value* argument = static_cast<cmcppi::Value*>(arg);
-        context->CreateArg(argument);
+        argInsts.push_back(context->CreateArg(argument));
     }
     cmcppi::Value* calleeValue = static_cast<cmcppi::Value*>(callee);
-    cmcppi::Instruction* callInst = context->CreateCall(calleeValue);
+    cmcppi::Instruction* callInst = context->CreateCall(calleeValue, argInsts);
     SetCurrentBasicBlock(prevBasicBlock);
     return callInst;
 }
 
 void* Emitter::CreateInvoke(void* callee, void* normalBlock, void* unwindBlock, const std::vector<void*>& args)
 {
-/*
-    void* cleanupBlock = CleanupBlock();
-    if (unwindBlock == cleanupBlock)
+    std::vector<cmcppi::Value*> argInsts;
+    for (void* arg : args)
     {
-        void* nop1 = CreateNop();
-        void* beginCleanup = CreateMDStruct();
-        AddMDItem(beginCleanup, "nodeType", CreateMDLong(cmcppi::beginCleanupNodeType));
-        AddMDItem(beginCleanup, "cleanupBlockId", CreateMDBasicBlockRef(cleanupBlock));
-        if (emittingDelegate->InTryBlock())
-        {
-            AddMDItem(beginCleanup, "tryBlockId", CreateMDLong(emittingDelegate->CurrentTryBlockId()));
-        }
-        int beginCleanupId = GetMDStructId(beginCleanup);
-        void* beginCleanupMdRef = CreateMDStructRef(beginCleanupId);
-        SetMetadataRef(nop1, beginCleanupMdRef);
+        cmcppi::Value* argument = static_cast<cmcppi::Value*>(arg);
+        argInsts.push_back(context->CreateArg(argument));
     }
-*/
-    void* call = CreateCall(callee, args);
-/*
-    if (unwindBlock == cleanupBlock)
-    {
-        void* nop2 = CreateNop();
-        void* endCleanup = CreateMDStruct();
-        AddMDItem(endCleanup, "nodeType", CreateMDLong(cmcppi::endCleanupNodeType));
-        AddMDItem(endCleanup, "cleanupBlockId", CreateMDBasicBlockRef(cleanupBlock));
-        int endCleanupId = GetMDStructId(endCleanup);
-        void* endCleanupMdRef = CreateMDStructRef(endCleanupId);
-        SetMetadataRef(nop2, endCleanupMdRef);
-    }
-*/
-    return call;
+    cmcppi::Value* calleeValue = static_cast<cmcppi::Value*>(callee);
+    cmcppi::BasicBlock* normalBlockNext = static_cast<cmcppi::BasicBlock*>(normalBlock);
+    cmcppi::BasicBlock* unwindBlockNext = static_cast<cmcppi::BasicBlock*>(unwindBlock);
+    return context->CreateInvoke(calleeValue, argInsts, normalBlockNext, unwindBlockNext);
 }
 
 void* Emitter::CreateInvokeInst(void* callee, void* normalBlock, void* unwindBlock, const std::vector<void*>& args, const std::vector<void*>& bundles, const Span& span)
@@ -1358,7 +1348,7 @@ void* Emitter::GetClassName(void* vmtPtr, int32_t classNameVmtIndexOffset)
 {
     cmcppi::Value* classNamePtrPtr = context->CreateElemAddr(static_cast<cmcppi::Value*>(vmtPtr), context->GetLongValue(classNameVmtIndexOffset));
     cmcppi::Value* classNamePtr = context->CreateLoad(classNamePtrPtr);
-    cmcppi::Value* classNameCharPtr = context->CreateBitCast(classNamePtr, context->GetPtrType(context->GetPtrType(context->GetByteType())));
+    cmcppi::Value* classNameCharPtr = context->CreateBitCast(classNamePtr, context->GetPtrType(context->GetPtrType(context->GetCharType())));
     cmcppi::Value* className = context->CreateLoad(classNameCharPtr);
     return className;
 }
@@ -1550,8 +1540,7 @@ void Emitter::SetFunctionLinkage(void* function, bool setInline)
 
 void Emitter::SetFunctionLinkageToLinkOnceODRLinkage(void* function)
 {
-    // todo
-    //static_cast<cmcppi::Function*>(function)->SetLinkOnce();
+    static_cast<cmcppi::Function*>(function)->SetLinkOnce();
 }
 
 void Emitter::SetFunctionCallConventionToStdCall(void* function)
@@ -1691,6 +1680,7 @@ void* Emitter::GenerateTrap(const std::vector<void*>& args)
 
 void Emitter::SetCompileUnitId(const std::string& compileUnitId)
 {
+    context->SetCompileUnitId(compileUnitId);
 }
 
 void* Emitter::GetClsIdValue(const std::string& typeId)

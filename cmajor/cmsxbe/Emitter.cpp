@@ -419,6 +419,16 @@ void* Emitter::CreateGlobalStringPtr(const std::string& stringValue)
     return context->CreateGlobalStringPtr(stringValue);
 }
 
+void* Emitter::CreateGlobalWStringPtr(const std::u16string& stringValue)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateGlobalUStringPtr(const std::u32string& stringValue)
+{
+    return nullptr;
+}
+
 void* Emitter::GetGlobalStringPtr(int stringId)
 {
     return emittingDelegate->GetGlobalStringPtr(stringId);

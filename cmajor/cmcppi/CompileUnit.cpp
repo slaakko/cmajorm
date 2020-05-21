@@ -27,10 +27,37 @@ void CompileUnit::Write()
 {
     std::ofstream file(filePath);
     CodeFormatter formatter(file);
-    formatter.SetIndentSize(8);
+    formatter.SetIndentSize(4);
     formatter.WriteLine("// " + sourceFilePath);
     formatter.WriteLine();
     context.GetTypeRepository().Write(formatter);
+    formatter.WriteLine();
+    if (!functions.empty())
+    {
+        formatter.WriteLine("extern \"C\" {");
+        for (const auto& f : functions)
+        {
+            f->WriteDeclaration(formatter, context);
+        }
+        formatter.WriteLine("} // extern \"C\"");
+        formatter.WriteLine();
+    }
+    context.GetDataRepository().Write(context, formatter);
+    if (!functions.empty())
+    {
+        bool first = true;
+        for (const auto& f : functions)
+        {
+            formatter.WriteLine();
+            if (first)
+            {
+                formatter.WriteLine("extern \"C\" {");
+                first = false;
+            }
+            f->Write(formatter, context);
+        }
+        formatter.WriteLine("} // extern \"C\"");
+    }
 }
 
 Function* CompileUnit::GetOrInsertFunction(const std::string& name, FunctionType* type)

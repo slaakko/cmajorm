@@ -287,9 +287,9 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->MangledName() == U"destructor_Edge_int_E57D66B72F5D4567500CC822E3AB34B236FB95FB")
+    if (functionSymbol->Parent()->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol && functionSymbol->IsTemplateSpecialization())
     {
-        int x = 0;
+        functionSymbol->SetFlag(FunctionSymbolFlags::dontReuse);
     }
     if (functionSymbol->CodeGenerated()) return;
     functionSymbol->SetCodeGenerated();

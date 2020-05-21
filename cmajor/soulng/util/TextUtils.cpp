@@ -194,6 +194,13 @@ std::u32string HexEscape(uint32_t c)
     return ToUtf32(s.str());
 }
 
+std::u32string CharHexEscape(char32_t c)
+{
+    std::stringstream s;
+    s << "\\U" << ToHexString(static_cast<uint32_t>(c));
+    return ToUtf32(s.str());
+}
+
 std::string CharStr(char c)
 {
     switch (c)
@@ -217,7 +224,7 @@ std::string CharStr(char c)
             }
             else
             {
-                return HexEscape(c);
+                return ToUtf8(CharHexEscape(c));
             }
         }
     }
@@ -246,7 +253,7 @@ std::u32string CharStr(char32_t c)
             }
             else
             {
-                return HexEscape(c);
+                return CharHexEscape(c);
             }
         }
     }

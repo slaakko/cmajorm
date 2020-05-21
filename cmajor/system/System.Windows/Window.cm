@@ -100,7 +100,7 @@ namespace System.Windows
             Point parentLoc = parentWindow.Location();
             Size parentSize = parentWindow.GetSize();
             Size size = GetSize();
-            SetLocation(Point(Max(0, parentLoc.x + (parentSize.w - size.w) / 2), Max(0, parentLoc.y + (parentSize.h - size.h) / 2)));
+            SetLocation(Point(Max(cast<int>(0), parentLoc.x + (parentSize.w - size.w) / 2), Max(cast<int>(0), parentLoc.y + (parentSize.h - size.h) / 2)));
             SetDialogResult(DialogResult.none);
             GetDialogResultFunction dialogResultFunction = System.Windows.GetDialogResult;
             DialogWindowKeyPreviewFunction keyPreviewFunction = System.Windows.DialogWindowKeyPreview;

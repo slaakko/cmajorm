@@ -95,14 +95,35 @@ ConstantValue* Context::GetDoubleValue(double value)
     return doubleValue;
 }
 
-ArrayValue* Context::GetArrayValue(Type* arrayType, const std::vector<ConstantValue*>& elements, const std::string& prefix)
+ConstantValue* Context::GetCharValue(char8_t value)
+{
+    ConstantValue* charValue = new CharValue(value);
+    AddValue(charValue);
+    return charValue;
+}
+
+ConstantValue* Context::GetWCharValue(char16_t value)
+{
+    ConstantValue* wcharValue = new WCharValue(value);
+    AddValue(wcharValue);
+    return wcharValue;
+}
+
+ConstantValue* Context::GetUCharValue(char32_t value)
+{
+    ConstantValue* ucharValue = new UCharValue(value);
+    AddValue(ucharValue);
+    return ucharValue;
+}
+
+ArrayValue* Context::GetArrayValue(Type* arrayType, const std::vector<Value*>& elements, const std::string& prefix)
 {
     ArrayValue* arrayValue = new ArrayValue(arrayType, elements, prefix);
     AddValue(arrayValue);
     return arrayValue;
 }
 
-StructureValue* Context::GetStructureValue(Type* structureType, const std::vector<ConstantValue*>& members)
+StructureValue* Context::GetStructureValue(Type* structureType, const std::vector<Value*>& members)
 {
     StructureValue* structureValue = new StructureValue(structureType, members);
     AddValue(structureValue);
@@ -116,11 +137,32 @@ StringValue* Context::GetStringValue(Type* stringType, const std::string& value)
     return stringValue;
 }
 
+WStringValue* Context::GetWStringValue(Type* stringType, const std::u16string& value)
+{
+    WStringValue* stringValue = new WStringValue(stringType, value);
+    AddValue(stringValue);
+    return stringValue;
+}
+
+UStringValue* Context::GetUStringValue(Type* stringType, const std::u32string& value)
+{
+    UStringValue* stringValue = new UStringValue(stringType, value);
+    AddValue(stringValue);
+    return stringValue;
+}
+
 ConversionValue* Context::GetConversionValue(Type* type, ConstantValue* from)
 {
     ConversionValue* conversionValue = new ConversionValue(type, from);
     AddValue(conversionValue);
     return conversionValue;
+}
+
+ClsIdValue* Context::GetClsIdValue(const std::string& typeId)
+{
+    ClsIdValue* clsIdValue = new ClsIdValue(typeId);
+    AddValue(clsIdValue);
+    return clsIdValue;
 }
 
 Instruction* Context::CreateNot(Value* arg)
@@ -299,14 +341,6 @@ Instruction* Context::CreatePtrToInt(Value* arg, Type* destType)
     return inst;
 }
 
-Instruction* Context::CreateParam(Type* type)
-{
-    Instruction* inst = new ParamInstruction(type);
-    AddLineInfo(inst);
-    currentBasicBlock->AddInstruction(inst);
-    return inst;
-}
-
 Instruction* Context::CreateLocal(Type* type)
 {
     Instruction* inst = new LocalInstruction(type);
@@ -363,9 +397,17 @@ Instruction* Context::CreatePtrDiff(Value* leftPtr, Value* rightPtr)
     return inst;
 }
 
-Instruction* Context::CreateCall(Value* function)
+Instruction* Context::CreateCall(Value* function, const std::vector<Value*>& args)
 {
-    Instruction* inst = new CallInstruction(function);
+    Instruction* inst = new CallInstruction(function, args);
+    AddLineInfo(inst);
+    currentBasicBlock->AddInstruction(inst);
+    return inst;
+}
+
+Instruction* Context::CreateInvoke(Value* function, const std::vector<Value*> args, BasicBlock* normalBlockNext, BasicBlock* unwindBlockNext)
+{
+    Instruction* inst = new InvokeInstruction(function, args, normalBlockNext, unwindBlockNext);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
     return inst;
@@ -420,6 +462,16 @@ GlobalVariable* Context::CreateGlobalStringPtr(const std::string& stringValue)
     return dataRepository.CreateGlobalStringPtr(*this, stringValue);
 }
 
+GlobalVariable* Context::CreateGlobalWStringPtr(const std::u16string& stringValue)
+{
+    return dataRepository.CreateGlobalWStringPtr(*this, stringValue);
+}
+
+GlobalVariable* Context::CreateGlobalUStringPtr(const std::u32string& stringValue)
+{
+    return dataRepository.CreateGlobalUStringPtr(*this, stringValue);
+}
+
 void Context::SetCurrentLineNumber(int lineNumber)
 {
     if (lineNumber != -1)
@@ -430,7 +482,12 @@ void Context::SetCurrentLineNumber(int lineNumber)
 
 void Context::AddLineInfo(Instruction* inst)
 {
-    // todo
+    inst->SetSourceLineNumber(currentLineNumber);
+}
+
+void Context::SetCompileUnitId(const std::string& compileUnitId)
+{
+    dataRepository.SetCompileUnitId(compileUnitId);
 }
 
 } // namespace cmcppi

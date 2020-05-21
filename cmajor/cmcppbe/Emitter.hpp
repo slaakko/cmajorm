@@ -92,6 +92,8 @@ public:
     void* CreateIrValueForUuid(void* uuidConstant) override;
     void* GetConversionValue(void* type, void* from) override;
     void* CreateGlobalStringPtr(const std::string& name) override;
+    void* CreateGlobalWStringPtr(const std::u16string& name) override;
+    void* CreateGlobalUStringPtr(const std::u32string& name) override;
     void* GetGlobalStringPtr(int stringId) override;
     void* GetGlobalWStringConstant(int stringId) override;
     void* GetGlobalUStringConstant(int stringId) override;

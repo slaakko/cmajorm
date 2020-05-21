@@ -86,7 +86,9 @@ enum class FunctionSymbolFlags : uint32_t
     copy = 1 << 17,
     varArg = 1 << 18,
     winapi = 1 << 19,
-    codeGenerated = 1 << 20
+    codeGenerated = 1 << 20,
+    dontReuse = 1 << 21,
+    hasArtificialBody = 1 << 22
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -209,6 +211,8 @@ public:
     bool CodeGenerated() const { return GetFlag(FunctionSymbolFlags::codeGenerated); }
     void SetCodeGenerated() { SetFlag(FunctionSymbolFlags::codeGenerated); }
     void ResetCodeGenerated() { ResetFlag(FunctionSymbolFlags::codeGenerated); }
+    void SetHasArtificialBody() { SetFlag(FunctionSymbolFlags::hasArtificialBody); }
+    bool HasArtificialBody() const { return GetFlag(FunctionSymbolFlags::hasArtificialBody); }
     virtual bool DontThrow() const { return IsNothrow() || IsBasicTypeOperation(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }

@@ -1237,6 +1237,7 @@ void LvalueReferenceMoveAssignmentOperation::CollectViableFunctions(ContainerSco
     }
     TypeSymbol* lvalueRefType = type->RemovePointer(span);
     if (lvalueRefType->PlainType(span)->IsClassTypeSymbol()) return;
+    if (lvalueRefType->PlainType(span)->IsArrayType()) return;
     if (TypesEqual(arguments[1]->GetType()->RemoveConst(span), lvalueRefType->PlainType(span)->AddRvalueReference(span)) || arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
         FunctionSymbol* function = functionMap[lvalueRefType];
@@ -2112,7 +2113,6 @@ void ClassDefaultConstructorOperation::CollectViableFunctions(ContainerScope* co
         function->SetModule(GetModule());
         function->SetParent(classType);
         function->SetLinkOnceOdrLinkage();
-        function->SetInline();
         functionMap[classType->TypeId()] = function;
         defaultConstructor->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
         defaultConstructor->SetModule(GetModule());
@@ -2318,7 +2318,6 @@ void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
             function->SetModule(GetModule());
             function->SetParent(classType);
             function->SetLinkOnceOdrLinkage();
-            function->SetInline();
             functionMap[classType->TypeId()] = function;
             copyConstructor->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
             copyConstructor->SetModule(GetModule());
@@ -2532,7 +2531,6 @@ void ClassMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
             function->SetModule(GetModule());
             function->SetParent(classType);
             function->SetLinkOnceOdrLinkage();
-            function->SetInline();
             functionMap[classType->TypeId()] = function;
             moveConstructor->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
             moveConstructor->SetModule(GetModule());
@@ -2754,7 +2752,6 @@ void ClassCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             function->SetModule(GetModule());
             function->SetParent(classType);
             function->SetLinkOnceOdrLinkage();
-            function->SetInline();
             functionMap[classType->TypeId()] = function;
             copyAssignment->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
             copyAssignment->SetModule(GetModule());
@@ -2942,7 +2939,6 @@ void ClassMoveAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             function->SetModule(GetModule());
             function->SetParent(classType);
             function->SetLinkOnceOdrLinkage();
-            function->SetInline();
             functionMap[classType->TypeId()] = function;
             moveAssignment->SetCompileUnit(GetBoundCompileUnit().GetCompileUnitNode());
             moveAssignment->SetModule(GetModule());
@@ -3153,6 +3149,7 @@ BoundExpression* MakeExitEntryPtr(BoundCompileUnit& boundCompileUnit, ContainerS
 void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructorSymbol, StaticConstructorNode* staticConstructorNode, BoundCompileUnit& boundCompileUnit, 
     BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder, const Span& span)
 {
+    staticConstructorSymbol->SetLinkOnceOdrLinkage();
     Module* module = &boundCompileUnit.GetModule();
     Symbol* parent = staticConstructorSymbol->Parent();
     Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
@@ -3375,6 +3372,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
 void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, ConstructorNode* constructorNode, BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction, 
     BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, StatementBinder* statementBinder, bool generateDefault, const Span& span)
 {
+    constructorSymbol->SetLinkOnceOdrLinkage();
     Module* module = &boundCompileUnit.GetModule();
     Symbol* parent = constructorSymbol->Parent();
     Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
@@ -3695,6 +3693,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
 void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, MemberFunctionNode* assignmentNode, BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction,
     BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, StatementBinder* statementBinder, bool generateDefault, const Span& span)
 {
+    assignmentFunctionSymbol->SetLinkOnceOdrLinkage();
     Module* module = &boundCompileUnit.GetModule();
     Symbol* parent = assignmentFunctionSymbol->Parent();
     Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
@@ -3839,6 +3838,7 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
 void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode* destructorNode, BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction,
     BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, StatementBinder* statementBinder, const Span& span)
 {
+    destructorSymbol->SetLinkOnceOdrLinkage();
     Module* module = &boundCompileUnit.GetModule();
     Symbol* parent = destructorSymbol->Parent();
     Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
@@ -4065,7 +4065,6 @@ void OperationRepository::GenerateCopyConstructorFor(ClassTypeSymbol* classTypeS
         copyConstructor->SetModule(&boundCompileUnit.GetModule());
         copyConstructor->SetParent(classTypeSymbol);
         copyConstructor->SetLinkOnceOdrLinkage();
-        copyConstructor->SetInline();
         boundCompileUnit.AddCopyConstructorFor(classTypeSymbol->TypeId(), std::move(copyConstructor));
     }
     else

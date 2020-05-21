@@ -611,10 +611,19 @@ Module::Module(const std::string& filePath)  :
         }
         else if (GetBackEnd() == BackEnd::cmcpp)
         {
-            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+            const Tool& libraryManagerTool = GetLibraryManagerTool();
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
         }
 #else
-        libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
+        if (GetBackEnd() == BackEnd::cmcpp)
+        {
+            const Tool& libraryManagerTool = GetLibraryManagerTool();
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+        }
+        else
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
+        }
 #endif
     }
     for (Module* module : finishReadOrder)
@@ -686,16 +695,32 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
         }
         else if (GetBackEnd() == BackEnd::cmcpp)
         {
-            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+            const Tool& libraryManagerTool = GetLibraryManagerTool();
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
         }
 #else
-        libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
+        if (GetBackEnd() == BackEnd::cmcpp)
+        {
+            const Tool& libraryManagerTool = GetLibraryManagerTool();
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+        }
+        else
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
+        }
 #endif
     }
     for (Module* module : finishReadOrder)
     {
         if (!module->LibraryFilePath().empty())
         {
+            if (GetGlobalFlag(GlobalFlags::disableSystem))
+            {
+                if (module->IsSystemModule())
+                {
+                    continue;
+                }
+            }
             libraryFilePaths.push_back(module->LibraryFilePath());
         }
     }
@@ -946,10 +971,19 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         }
         else if (GetBackEnd() == BackEnd::cmcpp)
         {
-            libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".lib").generic_string());
+            const Tool& libraryManagerTool = GetLibraryManagerTool();
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
         }
 #else
-        libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
+        if (GetBackEnd() == BackEnd::cmcpp)
+        {
+            const Tool& libraryManagerTool = GetLibraryManagerTool();
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+        }
+        else
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
+        }
 #endif
     }
 #ifdef _WIN32

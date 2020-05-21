@@ -1,0 +1,58 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <sngjson/json/JsonApi.hpp>
+
+classmap JsonSchemaClassMap;
+
+prefix "sngjson/json";
+
+tokens JsonSchemaTokens
+{
+    (STRUCT, "'struct'"), (STRING, "'string'"), (INT, "'int'"), (LONG, "'long'"), (FLOAT, "'float'"), (DOUBLE, "'double'"), (BOOL, "'bool'"), (API, "'api'"),
+    (ID, "'id'"), (SEMICOLON, "';'"), (LBRACE, "'{'"), (RBRACE, "'}'"), (LBRACKET, "'['"), (RBRACKET, "']'"), (LPAREN, "'('"), (RPAREN, "')'"), (HASH, "'#'"), (FILEPATH, "'filepath'"), (INCLUDE, "'include'")
+}
+
+keywords JsonSchemaKeywords
+{
+    ("struct", STRUCT), ("string", STRING), ("int", INT), ("double", DOUBLE), ("bool", BOOL), ("api", API), ("include", INCLUDE)
+}
+
+expressions
+{
+    ws = "[\n\r\t ]";
+    newline = "\r\n|\n|\r";
+    linecomment = "//[^\n\r]*{newline}";
+    blockcomment = "/\*([^*]|\*[^/])*\*/";
+    comment = "{linecomment}|{blockcomment}";
+    separators = "({ws}|{comment})+";
+    id = "{idstart}{idcont}*";
+    filepath = "<[^\n>]*>";
+}
+
+lexer api(SNGJSON_JSON_API) JsonSchemaLexer
+{
+    "{separators}" {}
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "{filepath}" $(0) { return FILEPATH; }
+    ";" { return SEMICOLON; }
+    "\{"{ return LBRACE; }
+    "\}"{ return RBRACE; }
+    "\["{ return LBRACKET; }
+    "\]"{ return RBRACKET; }
+    "\("{ return LPAREN; }
+    "\)"{ return RPAREN; }
+    "#" { return HASH; }
+
+    variables
+    {
+        bool parsingIncludeDeclaration;
+    }
+
+    actions
+    {
+        $(0)={ if (!parsingIncludeDeclaration) return INVALID_TOKEN; }
+    }
+}

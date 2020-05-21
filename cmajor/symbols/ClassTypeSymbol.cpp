@@ -1469,7 +1469,7 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         std::string vmtObjectName = VmtObjectName(emitter);
         void* comdat = emitter.GetOrInsertAnyComdat(vmtObjectName, vmtObject);
         std::vector<void*> vmtArray;
-        if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
+        if (GetBackEnd() == BackEnd::llvm)
         {
             vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); // 128-bit class id, initially 0, dynamically initialized
             vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); 
@@ -1505,6 +1505,42 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
                 }
             }
         }
+        else if (GetBackEnd() == BackEnd::cmcpp)
+        {
+            vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); // 128-bit class id, initially 0, dynamically initialized
+            vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+            uint64_t typeId1 = 0;
+            uint64_t typeId2 = 0;
+            UuidToInts(TypeId(), typeId1, typeId2);
+            //      16-byte type id:
+            vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), emitter.CreateIrValueForULong(typeId1)));
+            vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), emitter.CreateIrValueForULong(typeId2)));
+            vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), className)); // class name pointer
+            if (!implementedInterfaces.empty())
+            {
+                void* itabsArrayObject = CreateImts(emitter);
+                vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), itabsArrayObject)); // interface method table pointer
+            }
+            else
+            {
+                vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+            }
+            //      virtual method table:
+            int n = vmt.size();
+            for (int i = 0; i < n; ++i)
+            {
+                FunctionSymbol* virtualFunction = vmt[i];
+                if (!virtualFunction || virtualFunction->IsAbstract())
+                {
+                    vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+                }
+                else
+                {
+                    void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter));
+                    vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), functionObject));
+                }
+            }
+        }
         else if (GetBackEnd() == BackEnd::cmsx)
         {
             uint64_t typeId1 = 0;
@@ -1514,7 +1550,7 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
             {
                 typeId.append(soulng::util::ToHexString(x));
             }
-            vmtArray.push_back(emitter.GetClsIdValue(typeId)); // 64-bit class id
+            vmtArray.push_back(emitter.GetClsIdValue(typeId)); // 128-bit type id
             vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), className)); // class name pointer
             if (!implementedInterfaces.empty())
             {

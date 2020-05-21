@@ -934,13 +934,15 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
     {
         std::unique_ptr<BoundExpression>& argument = arguments[i];
         if (i == 0 && !bestFun->IsConstructorDestructorOrNonstaticMemberFunction() && 
-            (bestFun->GroupName() == U"@constructor" || bestFun->GroupName() == U"operator=" || bestFun->GroupName() == U"operator->") && 
-            argument->GetBoundNodeType() == BoundNodeType::boundAddressOfExpression)
+            (bestFun->GroupName() == U"@constructor" || bestFun->GroupName() == U"operator=" || bestFun->GroupName() == U"operator->"))
         {
-            BoundAddressOfExpression* addrOf = static_cast<BoundAddressOfExpression*>(argument.get());
-            std::unique_ptr<BoundExpression> subject(std::move(addrOf->Subject()));
-            addrOf->MoveTemporaryDestructorCallsTo(*subject);
-            argument.reset(subject.release());
+            if (argument->GetBoundNodeType() == BoundNodeType::boundAddressOfExpression)
+            {
+                BoundAddressOfExpression* addrOf = static_cast<BoundAddressOfExpression*>(argument.get());
+                std::unique_ptr<BoundExpression> subject(std::move(addrOf->Subject()));
+                addrOf->MoveTemporaryDestructorCallsTo(*subject);
+                argument.reset(subject.release());
+            }
         }
         const ArgumentMatch& argumentMatch = bestMatch.argumentMatches[i];
         if (argumentMatch.preReferenceConversionFlags != OperationFlags::none)
@@ -1152,6 +1154,10 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
     std::vector<std::unique_ptr<BoundConstraint>> boundConstraints;
     for (FunctionSymbol* viableFunction : viableFunctions.Get())
     {
+        if (viableFunction->GetFlag(FunctionSymbolFlags::dontReuse))
+        {
+            continue;
+        }
         FunctionMatch functionMatch(viableFunction);
         if (viableFunction->IsFunctionTemplate())
         {

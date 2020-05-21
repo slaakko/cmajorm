@@ -34,7 +34,7 @@ namespace System.Lex
             if (lineLength > MaxLineLength())
             {
                 lineLength = lineLength + 3;
-                s = converted.Substring(0, Max(0, convertedLength - (lineLength - MaxLineLength()))) + u"...";
+                s = converted.Substring(0, Max(cast<int>(0), convertedLength - (lineLength - MaxLineLength()))) + u"...";
             }
             Write(u"<" + elementName + u">" + s + u"</" + elementName + u">");
         }

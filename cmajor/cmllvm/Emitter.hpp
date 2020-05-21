@@ -187,6 +187,8 @@ public:
     void SetPrivateLinkage(void* global) override;
     void* GetOrInsertFunction(const std::string& name, void* type) override;
     void* CreateGlobalStringPtr(const std::string& name) override;
+    void* CreateGlobalWStringPtr(const std::u16string& name) override;
+    void* CreateGlobalUStringPtr(const std::u32string& name) override;
     void* CreateCall(void* callee, const std::vector<void*>& args) override;
     void* CreateCallInst(void* callee, const std::vector<void*>& args, const std::vector<void*>& bundles, const Span& span) override;
     void* CreateCallInstToBasicBlock(void* callee, const std::vector<void*>& args, const std::vector<void*>& bundles, void* basicBlock, const Span& span) override;

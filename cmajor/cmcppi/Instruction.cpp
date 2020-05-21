@@ -12,7 +12,7 @@
 
 namespace cmcppi {
 
-Instruction::Instruction() : resultId(-1), metadataRef(nullptr)
+Instruction::Instruction() : resultId(-1), sourceLineNumber(0)
 {
 }
 
@@ -23,7 +23,7 @@ Type* Instruction::GetType(Context& context)
 
 std::string Instruction::Name(Context& context)
 {
-    return "__V" + std::to_string(resultId);
+    return "__v" + std::to_string(resultId);
 }
 
 void Instruction::WriteResult(CodeFormatter& formatter, Function& function, Context& context)
@@ -52,7 +52,7 @@ BinaryInstruction::BinaryInstruction(Value* left_, Value* right_) : Instruction(
 
 Type* BinaryInstruction::GetType(Context& context)
 {
-    Assert(left->GetType(context) == right->GetType(context), "types differ");
+    //Assert(left->GetType(context) == right->GetType(context), "types differ");
     return left->GetType(context);
 }
 
@@ -236,8 +236,6 @@ void SignExtendInstruction::Write(CodeFormatter& formatter, Function& function, 
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
     WriteArg(formatter, context);
-    int sizeInBits = 8 * GetType(context)->SizeInBytes();
-    formatter.Write(" << " + std::to_string(64 - sizeInBits) + " >> " + std::to_string(64 - sizeInBits));
 }
 
 ZeroExtendInstruction::ZeroExtendInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)
@@ -270,7 +268,14 @@ BitCastInstruction::BitCastInstruction(Value* arg_, Type* destType_) : UnaryType
 void BitCastInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
+    if (GetType(context)->IsPrimitiveType())
+    {
+        formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
+    }
+    else
+    {
+        formatter.Write(" = reinterpret_cast<" + GetType(context)->Name() + ">(");
+    }
     WriteArg(formatter, context);
     formatter.Write(")");
 }
@@ -323,13 +328,12 @@ void PtrToIntInstruction::Write(CodeFormatter& formatter, Function& function, Co
     formatter.Write(")");
 }
 
-ParamInstruction::ParamInstruction(Type* type_) : Instruction(), type(type_)
+ParamInstruction::ParamInstruction(Type* type_, const std::string& paramName_) : Instruction(), type(type_), paramName(paramName_)
 {
 }
 
 void ParamInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    // todo
 }
 
 LocalInstruction::LocalInstruction(Type* type_) : Instruction(), type(type_)
@@ -343,9 +347,11 @@ Type* LocalInstruction::GetType(Context& context)
 
 void LocalInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write(type->Name());
-    formatter.Write(" ");
+    int localNumber = function.GetNextLocalNumber();
+    localName = "__local" + std::to_string(localNumber);
+    formatter.WriteLine(type->Name() + " " + localName + ";");
     WriteResult(formatter, function, context);
+    formatter.Write(" = &" + localName);
 }
 
 LoadInstruction::LoadInstruction(Value* ptr_) : Instruction(), ptr(ptr_)
@@ -362,8 +368,7 @@ Type* LoadInstruction::GetType(Context& context)
 void LoadInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = *");
-    formatter.Write(ptr->Name(context));
+    formatter.Write(" = *" + ptr->Name(context));
 }
 
 StoreInstruction::StoreInstruction(Value* value_, Value* ptr_) : Instruction(), value(value_), ptr(ptr_)
@@ -372,11 +377,14 @@ StoreInstruction::StoreInstruction(Value* value_, Value* ptr_) : Instruction(), 
 
 void StoreInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write(value->GetType(context)->Name());
-    formatter.Write(" ");
-    formatter.Write(value->Name(context));
-    formatter.Write(" *");
-    formatter.Write(ptr->Name(context));
+    if (value->GetType(context)->IsFunctionType())
+    {
+        formatter.Write("**" + ptr->Name(context) + " = " + value->Name(context));
+    }
+    else
+    {
+        formatter.Write("*" + ptr->Name(context) + " = " + value->Name(context));
+    }
 }
 
 ArgInstruction::ArgInstruction(Value* arg_) : Instruction(), arg(arg_)
@@ -385,7 +393,8 @@ ArgInstruction::ArgInstruction(Value* arg_) : Instruction(), arg(arg_)
 
 void ArgInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    // todo
+    argName = "__arg" + std::to_string(function.GetNextArgumentNumber());
+    formatter.Write(arg->GetType(context)->Name() + " " + argName + " = " + arg->Name(context));
 }
 
 ElemAddrInstruction::ElemAddrInstruction(Value* ptr_, Value* index_) : Instruction(), ptr(ptr_), index(index_)
@@ -396,7 +405,7 @@ Type* ElemAddrInstruction::GetType(Context& context)
 {
     Type* type = ptr->GetType(context);
     Assert(type->IsPtrType(), "pointer type expected");
-    PtrType* ptrType = static_cast<PtrType*>(ptr->GetType(context));
+    PtrType* ptrType = static_cast<PtrType*>(type);
     Type* aggregateType = ptrType->BaseType();
     if (aggregateType->IsStructureType())
     {
@@ -420,21 +429,37 @@ Type* ElemAddrInstruction::GetType(Context& context)
     else
     {
         Assert(false, "structure or array type expected");
-        return nullptr;
     }
 }
 
 void ElemAddrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    WriteResult(formatter, function, context);
-    formatter.Write(" = elemaddr ");
-    formatter.Write(ptr->GetType(context)->Name());
-    formatter.Write(" ");
-    formatter.Write(ptr->Name(context));
-    formatter.Write(", ");
-    formatter.Write(index->GetType(context)->Name());
-    formatter.Write(" ");
-    formatter.Write(index->Name(context));
+    Type* type = ptr->GetType(context);
+    Assert(type->IsPtrType(), "pointer type expected");
+    PtrType* ptrType = static_cast<PtrType*>(type);
+    Type* aggregateType = ptrType->BaseType();
+    if (aggregateType->IsStructureType())
+    {
+        WriteResult(formatter, function, context);
+        formatter.Write(" = &");
+        formatter.Write(ptr->Name(context));
+        formatter.Write("->m");
+        formatter.Write(index->Name(context));
+    }
+    else if (aggregateType->IsArrayType())
+    {
+        WriteResult(formatter, function, context);
+        formatter.Write(" = &");
+        formatter.Write("(*");
+        formatter.Write(ptr->Name(context));
+        formatter.Write(")[");
+        formatter.Write(index->Name(context));
+        formatter.Write("]");
+    }
+    else 
+    {
+        Assert(false, "structure or array type expected");
+    }
 }
 
 PtrOffsetInstruction::PtrOffsetInstruction(Value* ptr_, Value* offset_) : Instruction(), ptr(ptr_), offset(offset_)
@@ -444,13 +469,11 @@ PtrOffsetInstruction::PtrOffsetInstruction(Value* ptr_, Value* offset_) : Instru
 void PtrOffsetInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = ptroffset ");
+    formatter.Write(" = (");
     formatter.Write(ptr->GetType(context)->Name());
-    formatter.Write(" ");
+    formatter.Write(")");
     formatter.Write(ptr->Name(context));
-    formatter.Write(", ");
-    formatter.Write(offset->GetType(context)->Name());
-    formatter.Write(" ");
+    formatter.Write(" + ");
     formatter.Write(offset->Name(context));
 }
 
@@ -466,17 +489,17 @@ Type* PtrDiffInstruction::GetType(Context& context)
 void PtrDiffInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = ptrdiff ");
+    formatter.Write(" = (");
     formatter.Write(leftPtr->GetType(context)->Name());
-    formatter.Write(" ");
+    formatter.Write(")");
     formatter.Write(leftPtr->Name(context));
-    formatter.Write(", ");
+    formatter.Write(" - (");
     formatter.Write(rightPtr->GetType(context)->Name());
-    formatter.Write(" ");
+    formatter.Write(")");
     formatter.Write(rightPtr->Name(context));
 }
 
-CallInstruction::CallInstruction(Value* function_) : Instruction(), function(function_)
+CallInstruction::CallInstruction(Value* function_, const std::vector<Value*>& args_) : Instruction(), function(function_), args(args_)
 {
 }
 
@@ -502,18 +525,110 @@ Type* CallInstruction::GetType(Context& context)
 
 void CallInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    if (GetType(context)->IsVoidType())
+    if (!GetType(context)->IsVoidType())
     {
-        formatter.Write(Format("call ", 8));
+        WriteResult(formatter, function, context);
+        formatter.Write(" = ");
+    }
+    Type* type = this->function->GetType(context);
+    if (type->IsPtrType())
+    {
+        formatter.Write("(*" + this->function->Name(context) + ")");
     }
     else
     {
-        WriteResult(formatter, function, context);
-        formatter.Write(" = call ");
+        formatter.Write(this->function->Name(context));
     }
-    formatter.Write(this->function->GetType(context)->Name());
-    formatter.Write(" ");
-    formatter.Write(this->function->Name(context));
+    formatter.Write("(");
+    bool first = true;
+    for (Value* arg : args)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            formatter.Write(", ");
+        }
+        formatter.Write(arg->Name(context));
+    }
+    formatter.Write(")");
+}
+
+InvokeInstruction::InvokeInstruction(Value* function_, const std::vector<Value*> args_, BasicBlock* normalBlockNext_, BasicBlock* unwindBlockNext_) :
+    function(function_), args(args_), normalBlockNext(normalBlockNext_), unwindBlockNext(unwindBlockNext_)
+{
+}
+
+Type* InvokeInstruction::GetType(Context& context)
+{
+    Type* type = function->GetType(context);
+    if (type->IsPtrType())
+    {
+        PtrType* ptrType = static_cast<PtrType*>(type);
+        type = ptrType->BaseType();
+    }
+    if (type->IsFunctionType())
+    {
+        FunctionType* functionType = static_cast<FunctionType*>(type);
+        return functionType->ReturnType();
+    }
+    else
+    {
+        Assert(false, "function or function pointer type expected");
+        return nullptr;
+    }
+}
+
+void InvokeInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    if (!GetType(context)->IsVoidType())
+    {
+        WriteResult(formatter, function, context); 
+        formatter.WriteLine(";");
+    }
+    formatter.WriteLine("try");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    if (!GetType(context)->IsVoidType())
+    {
+        formatter.Write(Name(context));
+        formatter.Write(" = ");
+    }
+    Type* type = this->function->GetType(context);
+    if (type->IsPtrType())
+    {
+        formatter.Write("(*" + this->function->Name(context) + ")");
+    }
+    else
+    {
+        formatter.Write(this->function->Name(context));
+    }
+    formatter.Write("(");
+    bool first = true;
+    for (Value* arg : args)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            formatter.Write(", ");
+        }
+        formatter.Write(arg->Name(context));
+    }
+    formatter.WriteLine(");");
+    formatter.WriteLine("goto __bb" + std::to_string(normalBlockNext->Id()) + ";");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine("catch (...)");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    formatter.WriteLine("goto __bb" + std::to_string(unwindBlockNext->Id()) + ";");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
 }
 
 RetInstruction::RetInstruction(Value* value_) : Instruction(), value(value_)
@@ -536,7 +651,7 @@ JumpInstruction::JumpInstruction(BasicBlock* dest_) : Instruction(), dest(dest_)
 void JumpInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     formatter.Write(Format("goto ", 8));
-    formatter.Write("__BB" + std::to_string(dest->Id()));
+    formatter.Write("__bb" + std::to_string(dest->Id()));
 }
 
 BranchInstruction::BranchInstruction(Value* cond_, BasicBlock* trueDest_, BasicBlock* falseDest_) : Instruction(), cond(cond_), trueDest(trueDest_), falseDest(falseDest_)
@@ -548,9 +663,9 @@ void BranchInstruction::Write(CodeFormatter& formatter, Function& function, Cont
     formatter.Write("if (");
     formatter.Write(cond->Name(context));
     formatter.Write(") ");
-    formatter.Write("goto __BB" + std::to_string(trueDest->Id()));
+    formatter.Write("goto __bb" + std::to_string(trueDest->Id()) + ";");
     formatter.Write(" else ");
-    formatter.Write("goto __BB" + std::to_string(falseDest->Id()));
+    formatter.Write("goto __bb" + std::to_string(falseDest->Id()));
 }
 
 SwitchInstruction::SwitchInstruction(Value* cond_, BasicBlock* defaultDest_) : Instruction(), cond(cond_), defaultDest(defaultDest_), destinations()
@@ -568,24 +683,17 @@ void SwitchInstruction::Write(CodeFormatter& formatter, Function& function, Cont
     formatter.Write(cond->Name(context));
     formatter.WriteLine(")");
     formatter.WriteLine("{");
-    formatter.Write("default: goto __BB" + std::to_string(defaultDest->Id()));
-    bool first = true;
+    formatter.IncIndent();
+    formatter.WriteLine("default: goto __bb" + std::to_string(defaultDest->Id()) + ";");
     for (const auto& p : destinations)
     {
-        if (first)
-        {
-            first = false;
-        }
-        else
-        {
-            formatter.WriteLine();
-        }
         Value* value = p.first;
         BasicBlock* dest = p.second;
         formatter.Write("case " + value->Name(context));
-        formatter.Write(": goto __BB");
-        formatter.Write(std::to_string(dest->Id()));
+        formatter.Write(": goto __bb");
+        formatter.WriteLine(std::to_string(dest->Id()) + ";");
     }
+    formatter.DecIndent();
     formatter.WriteLine("}");
 }
 

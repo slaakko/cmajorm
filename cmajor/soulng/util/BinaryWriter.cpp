@@ -6,12 +6,22 @@
 #include <soulng/util/BinaryWriter.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <cstring>
+#include <stdio.h>
  
 namespace soulng { namespace util {
 
 using namespace soulng::unicode;
 
-BinaryWriter::BinaryWriter(const std::string& fileName_) : fileName(fileName_), file(std::fopen(fileName.c_str(), "wb")), bufp(buffer), bufend(buffer + N), pos(0)
+FILE* OpenFile(const char* fileName)
+{
+#ifdef _WIN32
+    return _fsopen(fileName, "wb", _SH_DENYWR);
+#else
+    return std::fopen(fileName, "wb");
+#endif
+}
+
+BinaryWriter::BinaryWriter(const std::string& fileName_) : fileName(fileName_), file(OpenFile(fileName.c_str())), bufp(buffer), bufend(buffer + N), pos(0)
 {
     if (!file)
     {

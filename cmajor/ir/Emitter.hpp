@@ -121,6 +121,8 @@ public:
     virtual void* CreateIrValueForUuid(void* uuidConstant) = 0;
     virtual void* GetConversionValue(void* type, void* from) = 0;
     virtual void* CreateGlobalStringPtr(const std::string& name) = 0;
+    virtual void* CreateGlobalWStringPtr(const std::u16string& name) = 0;
+    virtual void* CreateGlobalUStringPtr(const std::u32string& name) = 0;
     virtual void* GetGlobalStringPtr(int stringId) = 0;
     virtual void* GetGlobalWStringConstant(int stringId) = 0;
     virtual void* GetGlobalUStringConstant(int stringId) = 0;

@@ -12,6 +12,7 @@
 #endif
 #include <sngcm/ast/Project.hpp>
 #include <sngcm/cmlexer/CmajorLexer.hpp>
+#include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <mutex>
 #include <set>

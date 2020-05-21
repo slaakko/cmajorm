@@ -496,7 +496,7 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     }
     if (constructorNode.Body())
     {
-        if (constructorSymbol->IsDefault() || constructorSymbol->IsSuppressed())
+        if ((constructorSymbol->IsDefault() || constructorSymbol->IsSuppressed()) && !constructorSymbol->HasArtificialBody())
         {
             throw Exception(module, "default or suppressed constructor cannot have a body", constructorSymbol->GetSpan());
         }
@@ -554,7 +554,7 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     }
     if (destructorNode.Body())
     {
-        if (destructorSymbol->IsDefault())
+        if (destructorSymbol->IsDefault() && !destructorSymbol->HasArtificialBody())
         {
             throw Exception(module, "default destructor cannot have a body", destructorSymbol->GetSpan());
         }
@@ -650,7 +650,7 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     }
     if (memberFunctionNode.Body())
     {
-        if (memberFunctionSymbol->IsDefault() || memberFunctionSymbol->IsSuppressed())
+        if ((memberFunctionSymbol->IsDefault() || memberFunctionSymbol->IsSuppressed()) && !memberFunctionSymbol->HasArtificialBody())
         {
             throw Exception(module, "default or suppressed member function cannot have a body", memberFunctionSymbol->GetSpan());
         }

@@ -4,6 +4,7 @@
 // =================================
 
 #include <sngcm/ast/Project.hpp>
+#include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
@@ -19,6 +20,20 @@ ModuleVersionTagVerifier* moduleVersionTagVerifier = nullptr;
 void SetModuleVersionTagVerifier(ModuleVersionTagVerifier* verifier)
 {
     moduleVersionTagVerifier = verifier;
+}
+
+std::string TargetStr(Target target)
+{
+    switch (target)
+    {
+        case Target::program: return "program";
+        case Target::library: return "library";
+        case Target::winapp : return "winapp";
+        case Target::winlib: return "winlib";
+        case Target::winguiapp: return "winguiapp";
+        case Target::unitTest: return "unitTest";
+    }
+    return "library";
 }
 
 std::string CmajorRootDir()
@@ -127,8 +142,8 @@ TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(Projec
 {
 }
 
-Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend) :
-    name(name_), filePath(filePath_), config(config_), target(Target::program), sourceBasePath(filePath), outdirBasePath(filePath), isSystemProject(false), logStreamId(0), built(false)
+Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend_) :
+    backend(backend_), name(name_), filePath(filePath_), config(config_), target(Target::program), sourceBasePath(filePath), outdirBasePath(filePath), isSystemProject(false), logStreamId(0), built(false)
 {
     if (!outDir.empty())
     {
@@ -170,10 +185,19 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     }
     else if (backend == BackEnd::cppcm)
     {
-        lfp.replace_extension(".lib");
+        const Tool& libraryManagerTool = GetLibraryManagerTool();
+        lfp.replace_extension(libraryManagerTool.outputFileExtension);
     }
 #else
-    lfp.replace_extension(".a");
+    if (backend == BackEnd::cppcm)
+    {
+        const Tool& libraryManagerTool = GetLibraryManagerTool();
+        lfp.replace_extension(libraryManagerTool.outputFileExtension);
+    }
+    else
+    {
+        lfp.replace_extension(".a");
+    }
 #endif
     libraryFilePath = GetFullPath(lfp.generic_string());
     boost::filesystem::path efp(filePath);
@@ -196,10 +220,19 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     }
     else if (backend == BackEnd::cppcm)
     {
-        efp.replace_extension(".exe");
+        const Tool& linkerTool = GetLinkerTool();
+        efp.replace_extension(linkerTool.outputFileExtension);
     }
 #else
-    efp.replace_extension();
+    if (backend == BackEnd::cppcm)
+    {
+        const Tool& linkerTool = GetLinkerTool();
+        efp.replace_extension(linkerTool.outputFileExtension);
+    }
+    else
+    {
+        efp.replace_extension();
+    }
 #endif
     executableFilePath = GetFullPath(efp.generic_string());
 }
@@ -253,6 +286,10 @@ void Project::ResolveDeclarations()
                         rp = outdirBasePath / rp;
                     }
                     rp /= "lib";
+                    if (backend == BackEnd::cppcm)
+                    {
+                        rp /= "cpp";
+                    }
                     rp /= config;
                     rp /= fn;
                     if (rp.extension() == ".cmp" || rp.extension() == ".cmproj")

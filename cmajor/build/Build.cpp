@@ -6,6 +6,7 @@
 #include <cmajor/build/Build.hpp>
 #include <cmajor/codegen/EmittingContext.hpp>
 #include <cmajor/codegen/Interface.hpp>
+#include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <soulng/lexer/XmlParsingLog.hpp>
 #include <sngcm/cmlexer/ContainerFileLexer.hpp>
 #include <sngcm/cmlexer/CmajorLexer.hpp>
@@ -360,9 +361,66 @@ void BindStatements(BoundCompileUnit& boundCompileUnit)
     boundCompileUnit.GetCompileUnitNode()->Accept(statementBinder);
 }
 
+void GenerateLibraryCpp(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        LogMessage(module->LogStreamId(), "Creating library...");
+    }
+    const Tool& libraryManagerTool = GetLibraryManagerTool();
+    module->SetCurrentToolName(ToUtf32(libraryManagerTool.commandName));
+    std::string command;
+    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "lib.error");
+    command.append("cmfileredirector -2 ").append(libErrorFilePath).append(" ").append(libraryManagerTool.commandName);
+    for (const std::string& arg : libraryManagerTool.args)
+    {
+        std::string a = arg;
+        if (a.find('$') != std::string::npos)
+        {
+            if (a.find("$LIBRARY_FILE$") != std::string::npos)
+            {
+                a = soulng::util::Replace(a, "$LIBRARY_FILE$", QuotedPath(libraryFilePath));
+            }
+            else if (a.find("$OBJECT_FILES$") != std::string::npos)
+            {
+                std::string value;
+                bool first = true;
+                for (const std::string& objectFilePath : objectFilePaths)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        value.append(" ");
+                    }
+                    value.append(QuotedPath(objectFilePath));
+                }
+                a = soulng::util::Replace(a, "$OBJECT_FILES$", value);
+            }
+        }
+        command.append(1, ' ').append(a);
+    }
+    try
+    {
+        System(command);
+        boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(libErrorFilePath);
+        throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        LogMessage(module->LogStreamId(), "==> " + libraryFilePath);
+    }
+}
+
 #ifdef _WIN32
 
-void GenerateLibraryLlvmCpp(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -441,7 +499,7 @@ void GenerateLibrarySystemX(Module* module, const std::vector<std::string>& obje
 
 #else
 
-void GenerateLibraryLlvmCpp(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -482,9 +540,13 @@ void GenerateLibraryLlvmCpp(Module* module, const std::vector<std::string>& obje
 
 void GenerateLibrary(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
-    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm || GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
     {
-        GenerateLibraryLlvmCpp(module, objectFilePaths, libraryFilePath);
+        GenerateLibraryLlvm(module, objectFilePaths, libraryFilePath);
+    }
+    else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+    {
+        GenerateLibraryCpp(module, objectFilePaths, libraryFilePath);
     }
 #ifdef _WIN32
     else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
@@ -492,6 +554,168 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
         GenerateLibrarySystemX(module, objectFilePaths, libraryFilePath);
     }
 #endif
+}
+
+void LinkCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        LogMessage(module.LogStreamId(), "Linking...");
+    }
+    boost::filesystem::path bdp = executableFilePath;
+    bdp.remove_filename();
+    boost::filesystem::create_directories(bdp);
+    const Tool& linkerTool = GetLinkerTool();
+    std::string cmrtLibName = "cmrt350.lib";
+    if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
+    {
+        cmrtLibName = "cmrt350d.lib";
+    }
+    std::string cmrtLibFilePath = QuotedPath(GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
+    std::string linkCommandLine;
+    std::string linkErrorFilePath;
+    linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "link.error");
+    linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " " + linkerTool.commandName;
+    for (const std::string& arg : linkerTool.args)
+    {
+        if (arg.find('$') != std::string::npos)
+        {
+            if (arg.find("$LIBRARY_FILES$") != std::string::npos)
+            {
+                std::string libFilePaths;
+                libFilePaths.append(cmrtLibFilePath);
+                for (const std::string& libFilePath : libraryFilePaths)
+                {
+                    libFilePaths.append(1, ' ');
+                    libFilePaths.append(QuotedPath(libFilePath));
+                }
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$LIBRARY_FILES$", libFilePaths));
+            }
+            else if (arg.find("$MAIN_OBJECT_FILE$") != std::string::npos)
+            {
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$MAIN_OBJECT_FILE$", QuotedPath(mainObjectFilePath)));
+            }
+            else if (arg.find("$EXECUTABLE_FILE$") != std::string::npos)
+            {
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$EXECUTABLE_FILE$", QuotedPath(executableFilePath)));
+            }
+            else if (arg.find("$DEBUG_INFORMATION_FILE$") != std::string::npos)
+            {
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$DEBUG_INFORMATION_FILE$", QuotedPath(Path::ChangeExtension(executableFilePath, linkerTool.debugInformationFileExtension))));
+            }
+            else if (arg.find("$ENTRY$") != std::string::npos)
+            {
+                if (target == Target::winguiapp)
+                {
+                    linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$ENTRY$", "WinMain"));
+                }
+                else
+                {
+                    linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$ENTRY$", "main"));
+                }
+            }
+            else if (arg.find("$SUBSYSTEM$") != std::string::npos)
+            {
+                if (target == Target::winguiapp)
+                {
+                    linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$SUBSYSTEM$", "windows"));
+                }
+                else
+                {
+                    linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$SUBSYSTEM$", "console"));
+                }
+            }
+        }
+        else
+        {
+            linkCommandLine.append(1, ' ').append(arg);
+        }
+    }
+    try
+    {
+        System(linkCommandLine);
+        boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(linkErrorFilePath);
+        throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        LogMessage(module.LogStreamId(), "==> " + executableFilePath);
+    }
+}
+
+void CreateCppProjectFiles(Project* project, Module& module)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        LogMessage(module.LogStreamId(), "Creating project files...");
+    }
+    std::vector<std::string> configs;
+    configs.push_back("debug");
+    //configs.push_back("release"); // todo!!!
+    for (const std::string& config : configs)
+    {
+        const Tool& projectFileGeneratorTool = GetProjectFileGeneratorTool();
+        std::string commandLine;
+        std::string errorFilePath;
+        std::string projectFilePath;
+        errorFilePath = Path::Combine(Path::GetDirectoryName(project->LibraryFilePath()), "project.file.generator.error");
+        commandLine = "cmfileredirector -2 " + errorFilePath + " " + projectFileGeneratorTool.commandName;
+        for (const std::string& arg : projectFileGeneratorTool.args)
+        {
+            if (arg.find('$') != std::string::npos)
+            {
+                if (arg.find("$PROJECT_NAME$") != std::string::npos)
+                {
+                    commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$PROJECT_NAME$", ToUtf8(project->Name())));
+                }
+                else if (arg.find("$PROJECT_FILE_PATH$") != std::string::npos)
+                {
+                    projectFilePath = GetFullPath(Path::Combine(Path::Combine(Path::Combine(Path::Combine(project->SourceBasePath().generic_string(), "lib"), "cpp"), config), ToUtf8(project->Name()) + projectFileGeneratorTool.outputFileExtension));
+                    commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$PROJECT_FILE_PATH$", projectFilePath));
+                }
+                else if (arg.find("$PROJECT_TARGET$") != std::string::npos)
+                {
+                    commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$PROJECT_TARGET$", TargetStr(project->GetTarget())));
+                }
+                else if (arg.find("$PROJECT_CONFIG$") != std::string::npos)
+                {
+                    commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$PROJECT_CONFIG$", config));
+                }
+                else if (arg.find("$SOURCE_FILES$") != std::string::npos)
+                {
+                    std::string sourceFilePaths;
+                    for (const std::string& sourceFilePath : project->RelativeSourceFilePaths())
+                    {
+                        sourceFilePaths.append(1, ' ');
+                        sourceFilePaths.append(QuotedPath(Path::ChangeExtension(sourceFilePath, ".cpp")));
+                    }
+                    commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$SOURCE_FILES$", sourceFilePaths));
+                }
+            }
+            else
+            {
+                commandLine.append(1, ' ').append(arg);
+            }
+        }
+        try
+        {
+            System(commandLine);
+            boost::filesystem::remove(boost::filesystem::path(errorFilePath));
+        }
+        catch (const std::exception& ex)
+        {
+            std::string errors = ReadFile(errorFilePath);
+            throw std::runtime_error("generating C++ project file '" + projectFilePath + "' for project '" + ToUtf8(project->Name()) + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+        }
+        if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+        {
+            LogMessage(module.LogStreamId(), "==> " + projectFilePath);
+        }
+    }
 }
 
 #ifdef _WIN32
@@ -520,7 +744,7 @@ void CreateDefFile(const std::string& defFilePath, Module& module)
     }
 }
 
-void LinkLlvmCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, std::string mainObjectFilePath, Module& module)
+void LinkLlvm(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -556,7 +780,7 @@ void LinkLlvmCpp(Target target, const std::string& executableFilePath, const std
     {
         cmrtLibName = "cmrt350d.lib";
     }
-    args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
+    args.push_back(QuotedPath(GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName))));
     args.push_back(QuotedPath(mainObjectFilePath));
     int n = libraryFilePaths.size();
     for (int i = 0; i < n; ++i)
@@ -599,7 +823,7 @@ void LinkLlvmCpp(Target target, const std::string& executableFilePath, const std
     }
 }
 
-void LinkSystemX(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string mainObjectFilePath, Module& module)
+void LinkSystemX(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -672,7 +896,7 @@ void CreateDynamicListFile(const std::string& dynamicListFilePath, Module& modul
     formatter.WriteLine("};");
 }
 
-void LinkLlvmCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, std::string mainObjectFilePath, Module& module)
+void LinkLlvmCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -738,11 +962,15 @@ void LinkLlvmCpp(Target target, const std::string& executableFilePath, const std
 
 #endif
 
-void Link(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string mainObjectFilePath, Module& module)
+void Link(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
 {
-    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm || GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
     {
-        LinkLlvmCpp(target, executableFilePath, libraryFilePath, libraryFilePaths, mainObjectFilePath, module);
+        LinkLlvm(target, executableFilePath, libraryFilePath, libraryFilePaths, mainObjectFilePath, module);
+    }
+    else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+    {
+        LinkCpp(target, executableFilePath, libraryFilePath, libraryFilePaths, mainObjectFilePath, module);
     }
 #ifdef _WIN32
     else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
@@ -970,6 +1198,134 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
     mainObjectFilePath = boundMainCompileUnit.ObjectFilePath();
 }
 
+void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
+    std::string& mainObjectFilePath)
+{
+    CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    mainCompileUnit.SetSynthesizedUnit();
+    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"__polymorphicClassArray"));
+    mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"__staticClassArray"));
+    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
+#ifndef _WIN32
+    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
+    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
+#endif
+    mainFunction->SetProgramMain();
+    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
+    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
+    mainFunctionBody->AddStatement(constructExitCode);
+    ExpressionStatementNode* rtInitCall = nullptr;
+    if (GetGlobalFlag(GlobalFlags::profile))
+    {
+        InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtStartProfiling"));
+        invokeRtInit->AddArgument(new DivNode(Span(),
+            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
+            new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        invokeRtInit->AddArgument(new DivNode(Span(),
+            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"Length"))),
+            new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
+    }
+    else
+    {
+        InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit"));
+        invokeRtInit->AddArgument(new DivNode(Span(),
+            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
+            new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        invokeRtInit->AddArgument(new DivNode(Span(),
+            new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"Length"))),
+            new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
+        invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
+    }
+    mainFunctionBody->AddStatement(rtInitCall);
+#ifdef _WIN32
+    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
+    argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
+    mainFunctionBody->AddStatement(argc);
+    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
+    argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
+    mainFunctionBody->AddStatement(argv);
+#endif
+    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
+    if (!module.GetSymbolTable().JsonClasses().empty())
+    {
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        tryBlock->AddStatement(registerJsonClassesCall);
+    }
+    FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
+    InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
+    if (!userMain->Parameters().empty())
+    {
+        invokeMain->AddArgument(new IdentifierNode(Span(), U"argc"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), U"argv"));
+    }
+    StatementNode* callMainStatement = nullptr;
+    if (!userMain->ReturnType() || userMain->ReturnType()->IsVoidType())
+    {
+        callMainStatement = new ExpressionStatementNode(Span(), invokeMain);
+    }
+    else
+    {
+        callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
+    }
+    InvokeNode* invokeInitialize = new InvokeNode(Span(), new IdentifierNode(Span(), U"Initialize"));
+    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), invokeInitialize);
+    tryBlock->AddStatement(callInitializeStatement);
+    tryBlock->AddStatement(callMainStatement);
+    TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
+    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
+    InvokeNode* consoleError = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"System.Console"), new IdentifierNode(Span(), U"Error")));
+    DotNode* writeLine = new DotNode(Span(), consoleError, new IdentifierNode(Span(), U"WriteLine"));
+    InvokeNode* printEx = new InvokeNode(Span(), writeLine);
+    InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
+    printEx->AddArgument(exToString);
+    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), printEx);
+    catchBlock->AddStatement(printExStatement);
+    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
+    catchBlock->AddStatement(assignExitCodeStatement);
+    CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
+    tryStatement->AddCatch(catchAll);
+    mainFunctionBody->AddStatement(tryStatement);
+    ExpressionStatementNode* rtDoneCall = nullptr;
+    if (GetGlobalFlag(GlobalFlags::profile))
+    {
+        rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtEndProfiling")));
+    }
+    else
+    {
+        rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
+    }
+    mainFunctionBody->AddStatement(rtDoneCall);
+    InvokeNode* exitCall = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtExit"));
+    exitCall->AddArgument(new IdentifierNode(Span(), U"exitCode"));
+    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), exitCall);
+    mainFunctionBody->AddStatement(rtExitCall);
+    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
+    mainFunctionBody->AddStatement(returnStatement);
+    mainFunction->SetBody(mainFunctionBody);
+    mainCompileUnit.GlobalNs()->AddMember(mainFunction);
+    SymbolCreatorVisitor symbolCreator(module.GetSymbolTable());
+    mainCompileUnit.Accept(symbolCreator);
+    BoundCompileUnit boundMainCompileUnit(module, &mainCompileUnit, attributeBinder);
+    boundMainCompileUnit.PushBindingTypes();
+    TypeBinder typeBinder(boundMainCompileUnit);
+    mainCompileUnit.Accept(typeBinder);
+    boundMainCompileUnit.PopBindingTypes();
+    StatementBinder statementBinder(boundMainCompileUnit);
+    mainCompileUnit.Accept(statementBinder);
+    if (boundMainCompileUnit.HasGotos())
+    {
+        AnalyzeControlFlow(boundMainCompileUnit);
+    }
+    cmajor::codegen::GenerateCode(emittingContext, boundMainCompileUnit);
+    mainObjectFilePath = boundMainCompileUnit.ObjectFilePath();
+}
+
 void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
     std::string& mainObjectFilePath)
 {
@@ -1041,7 +1397,7 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     mainObjectFilePath = boundMainCompileUnit.ObjectFilePath();
 }
 
-void CreateMainUnitWindowGUI(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
+void CreateMainUnitLlvmWindowsGUI(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
     std::string& mainObjectFilePath)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
@@ -1162,6 +1518,127 @@ void CreateMainUnitWindowGUI(std::vector<std::string>& objectFilePaths, Module& 
     mainObjectFilePath = boundMainCompileUnit.ObjectFilePath();
 }
 
+void CreateMainUnitCppWindowsGUI(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
+    std::string& mainObjectFilePath)
+{
+    CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    mainCompileUnit.SetSynthesizedUnit();
+    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
+    mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"__polymorphicClassArray"));
+    mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"__staticClassArray"));
+    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_ | Specifiers::winapi, new IntNode(Span()), U"WinMain", nullptr));
+    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new VoidNode(Span())), new IdentifierNode(Span(), U"instance")));
+    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new VoidNode(Span())), new IdentifierNode(Span(), U"prevInstance")));
+    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new CharNode(Span())), new IdentifierNode(Span(), U"commandLine")));
+    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"cmdShow")));
+    mainFunction->SetProgramMain();
+    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
+    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
+    mainFunctionBody->AddStatement(constructExitCode);
+    ExpressionStatementNode* rtInitCall = nullptr;
+    InvokeNode* invokeRtInit = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtInit"));
+    invokeRtInit->AddArgument(new DivNode(Span(),
+        new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"Length"))),
+        new LongLiteralNode(Span(), 4))); // 4 64-bit integers per entry
+    invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__polymorphicClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+    invokeRtInit->AddArgument(new DivNode(Span(),
+        new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"Length"))),
+        new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
+    invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+    rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
+    mainFunctionBody->AddStatement(rtInitCall);
+    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
+    argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
+    mainFunctionBody->AddStatement(argc);
+    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
+    argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
+    mainFunctionBody->AddStatement(argv);
+    if (!module.GetSymbolTable().JsonClasses().empty())
+    {
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        mainFunctionBody->AddStatement(registerJsonClassesCall);
+    }
+    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
+    if (!module.GetSymbolTable().JsonClasses().empty())
+    {
+        ExpressionStatementNode* registerJsonClassesCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RegisterJsonClasses")));
+        tryBlock->AddStatement(registerJsonClassesCall);
+    }
+    FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
+    InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
+    if (!userMain->Parameters().empty())
+    {
+        invokeMain->AddArgument(new IdentifierNode(Span(), U"argc"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), U"argv"));
+    }
+    StatementNode* callMainStatement = nullptr;
+    if (!userMain->ReturnType() || userMain->ReturnType()->IsVoidType())
+    {
+        callMainStatement = new ExpressionStatementNode(Span(), invokeMain);
+    }
+    else
+    {
+        callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
+    }
+    InvokeNode* invokeInitialize = new InvokeNode(Span(), new IdentifierNode(Span(), U"Initialize"));
+    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), invokeInitialize);
+    tryBlock->AddStatement(callInitializeStatement);
+    InvokeNode* invokeSetInstance = new InvokeNode(Span(), new IdentifierNode(Span(), U"WinSetInstance"));
+    ExpressionStatementNode* setInstanceStatement = new ExpressionStatementNode(Span(), invokeSetInstance);
+    tryBlock->AddStatement(setInstanceStatement);
+    tryBlock->AddStatement(callMainStatement);
+    TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
+    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
+    CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
+    tryStatement->AddCatch(catchAll);
+    InvokeNode* invokeWinShowMessageBox = new InvokeNode(Span(), new IdentifierNode(Span(), U"WinShowMessageBoxWithType"));
+    InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
+    ConstructionStatementNode* constructExStr = new ConstructionStatementNode(Span(), new IdentifierNode(Span(), U"string"), new IdentifierNode(Span(), U"exStr"));
+    constructExStr->AddArgument(exToString);
+    catchBlock->AddStatement(constructExStr);
+    ConstructionStatementNode* constructExCharPtr = new ConstructionStatementNode(Span(), new PointerNode(Span(), new CharNode(Span())), new IdentifierNode(Span(), U"exCharPtr"));
+    catchBlock->AddStatement(constructExCharPtr);
+    InvokeNode* invokeExChars = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"exStr"), new IdentifierNode(Span(), U"Chars")));
+    constructExCharPtr->AddArgument(invokeExChars);
+    invokeWinShowMessageBox->AddArgument(new IdentifierNode(Span(), U"exCharPtr"));
+    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span()));
+    invokeWinShowMessageBox->AddArgument(new NullLiteralNode(Span()));
+    invokeWinShowMessageBox->AddArgument(new UIntLiteralNode(Span(), 0x00000010 | 0x00000000)); // MB_ICONSTOP | MB_OK
+    ExpressionStatementNode* showMessageBoxStatement = new ExpressionStatementNode(Span(), invokeWinShowMessageBox);
+    catchBlock->AddStatement(showMessageBoxStatement);
+    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
+    catchBlock->AddStatement(assignExitCodeStatement);
+    mainFunctionBody->AddStatement(tryStatement);
+    ExpressionStatementNode* winDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"WinDone")));
+    mainFunctionBody->AddStatement(winDoneCall);
+    ExpressionStatementNode* rtDoneCall = nullptr;
+    rtDoneCall = new ExpressionStatementNode(Span(), new InvokeNode(Span(), new IdentifierNode(Span(), U"RtDone")));
+    mainFunctionBody->AddStatement(rtDoneCall);
+    InvokeNode* exitCall = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtExit"));
+    exitCall->AddArgument(new IdentifierNode(Span(), U"exitCode"));
+    ExpressionStatementNode* rtExitCall = new ExpressionStatementNode(Span(), exitCall);
+    mainFunctionBody->AddStatement(rtExitCall);
+    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
+    mainFunctionBody->AddStatement(returnStatement);
+    mainFunction->SetBody(mainFunctionBody);
+    mainCompileUnit.GlobalNs()->AddMember(mainFunction);
+    SymbolCreatorVisitor symbolCreator(module.GetSymbolTable());
+    mainCompileUnit.Accept(symbolCreator);
+    BoundCompileUnit boundMainCompileUnit(module, &mainCompileUnit, attributeBinder);
+    boundMainCompileUnit.PushBindingTypes();
+    TypeBinder typeBinder(boundMainCompileUnit);
+    mainCompileUnit.Accept(typeBinder);
+    boundMainCompileUnit.PopBindingTypes();
+    StatementBinder statementBinder(boundMainCompileUnit);
+    mainCompileUnit.Accept(statementBinder);
+    if (boundMainCompileUnit.HasGotos())
+    {
+        AnalyzeControlFlow(boundMainCompileUnit);
+    }
+    cmajor::codegen::GenerateCode(emittingContext, boundMainCompileUnit);
+    mainObjectFilePath = boundMainCompileUnit.ObjectFilePath();
+}
+
 void SetDefines(Module* module, const std::string& definesFilePath)
 {
     module->ClearDefines();
@@ -1224,7 +1701,7 @@ void InstallSystemLibraries(Module* systemInstallModule)
         {
             LogMessage(systemInstallModule->LogStreamId(), from.generic_string() + " -> " + to.generic_string());
         }
-        if (!systemModule->LibraryFilePath().empty())
+        if (!systemModule->LibraryFilePath().empty() && !GetGlobalFlag(GlobalFlags::disableCodeGen))
         {
             from = systemModule->LibraryFilePath();
             to = systemLibDir / from.filename();
@@ -1275,7 +1752,7 @@ void InstallSystemWindowsLibraries(Module* systemInstallWindowsModule)
         {
             LogMessage(systemInstallWindowsModule->LogStreamId(), from.generic_string() + " -> " + to.generic_string());
         }
-        if (!systemModule->LibraryFilePath().empty())
+        if (!systemModule->LibraryFilePath().empty() && !GetGlobalFlag(GlobalFlags::disableCodeGen))
         {
             from = systemModule->LibraryFilePath();
             to = systemLibDir / from.filename();
@@ -1732,15 +2209,26 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                     {
                         CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
                     }
-                    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm || GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+                    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
                     {
                         if (project->GetTarget() == Target::winguiapp)
                         {
-                            CreateMainUnitWindowGUI(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
+                            CreateMainUnitLlvmWindowsGUI(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
                         }
                         else
                         {
                             CreateMainUnitLlvm(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
+                        }
+                    }
+                    else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+                    {
+                        if (project->GetTarget() == Target::winguiapp)
+                        {
+                            CreateMainUnitCppWindowsGUI(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
+                        }
+                        else
+                        {
+                            CreateMainUnitCpp(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
                         }
                     }
                     else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
@@ -1748,7 +2236,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                         CreateMainUnitSystemX(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
                     }
                 }
-                if (!objectFilePaths.empty())
+                if (!objectFilePaths.empty() && !GetGlobalFlag(GlobalFlags::disableCodeGen))
                 {
                     GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
                 }
@@ -1759,6 +2247,10 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 {
                     Link(project->GetTarget(), project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(),
                         mainObjectFilePath, *rootModule);
+                }
+                if (GetBackEnd() == BackEnd::cmcpp)
+                {
+                    CreateCppProjectFiles(project, *rootModule);
                 }
                 if (GetGlobalFlag(GlobalFlags::verbose))
                 {

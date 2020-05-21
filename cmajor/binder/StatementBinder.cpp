@@ -422,10 +422,6 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&destructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::destructorSymbol, "destructor symbol expected");
     DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(symbol);
-    if (destructorSymbol->MangledName() == U"destructor_Edge_int_E57D66B72F5D4567500CC822E3AB34B236FB95FB")
-    {
-        int x = 0;
-    }
     if (!dontCheckDuplicateFunctionSymbols)
     {
         destructorSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
@@ -474,10 +470,6 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&memberFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::memberFunctionSymbol, "member function symbol expected");
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
-    if (memberFunctionSymbol->GroupName() == U"ReadString")
-    {
-        int x = 0;
-    }
     if (!dontCheckDuplicateFunctionSymbols)
     {
         memberFunctionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
@@ -1202,7 +1194,7 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
         exceptionCapture = true;
     }
     TypeSymbol* targetPlainType = target->GetType()->PlainType(assignmentStatementNode.GetSpan());
-    if (targetPlainType->IsClassTypeSymbol() && target->GetType()->IsReferenceType())
+    if ((targetPlainType->IsClassTypeSymbol() || targetPlainType->IsArrayType()) && target->GetType()->IsReferenceType())
     {
         TypeSymbol* type = target->GetType()->RemoveReference(assignmentStatementNode.GetSpan())->AddPointer(assignmentStatementNode.GetSpan());
         target.reset(new BoundReferenceToPointerExpression(module, std::unique_ptr<BoundExpression>(target.release()), type));

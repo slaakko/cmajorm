@@ -758,7 +758,8 @@ void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     emitter.CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
     genObjects[0]->Load(emitter, OperationFlags::addr);
-    void* ptr = emitter.Stack().Pop();
+    void* ptrPtr = emitter.Stack().Pop();
+    void* ptr = emitter.CreateLoad(ptrPtr);
     genObjects[1]->Load(emitter, OperationFlags::none);
     void* sourcePtr = emitter.Stack().Pop();
     loopVar->Load(emitter, OperationFlags::none);

@@ -1,0 +1,70 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngjson/json/JsonApi.hpp>
+[hpp]#include <sngjson/json/JsonSchema.hpp>
+[hpp]#include <sngjson/json/JsonSchemaLexer.hpp>
+[cpp]#include <sngjson/json/JsonSchemaTokens.hpp>
+[cpp]#include <soulng/lexer/Token.hpp>
+
+using namespace soulng::lexer;
+using namespace JsonSchemaTokens;
+
+parser api(SNGJSON_JSON_API) JsonSchemaParser
+{
+    uselexer JsonSchemaLexer;
+    main;
+
+    JsonSchemaFile(sngjson::json::Context* context)
+        ::= empty{ lexer.parsingIncludeDeclaration = true; } 
+            IncludeDirectives(context):id*
+            empty{ lexer.parsingIncludeDeclaration = false; } 
+            StructDeclaration(context):sd*
+        ;
+
+    IncludeDirectives(sngjson::json::Context* context)
+        ::= HASH INCLUDE FILEPATH{ Token token = lexer.GetToken(pos); context->AddInclude(soulng::unicode::ToUtf8(token.match.ToString())); }
+        ;
+
+    StructDeclaration(sngjson::json::Context* context, var sngjson::json::StructType* s)
+        ::= STRUCT Api:a ID{ Token token = lexer.GetToken(pos); s = new sngjson::json::StructType(soulng::unicode::ToUtf8(token.match.ToString()), a); context->AddType(s); }
+            LBRACE FieldDeclarations(context, s):fields RBRACE
+        ;
+
+    Api(var std::string a) : std::string
+        ::= (API LPAREN ID{ soulng::lexer::Token token = lexer.GetToken(pos); a = soulng::unicode::ToUtf8(token.match.ToString()); } RPAREN){ return a; }
+        |   empty{ return ""; }
+        ;
+
+    FieldDeclarations(sngjson::json::Context* context, sngjson::json::StructType* s)
+        ::= FieldDeclaration(context, s):field*
+        ;
+
+    FieldDeclaration(sngjson::json::Context* context, sngjson::json::StructType* s)
+        ::= Type(context):type ID{ Token token = lexer.GetToken(pos); sngjson::json::Field* f = new sngjson::json::Field(type, soulng::unicode::ToUtf8(token.match.ToString())); s->AddField(f); } SEMICOLON
+        ;
+
+    TypeName(sngjson::json::Context* context) : sngjson::json::Type*
+        ::= STRING{ return context->GetType("string"); }
+        |   DOUBLE{ return context->GetType("double"); }
+        |   FLOAT{ return context->GetType("float"); }
+        |   INT{ return context->GetType("int"); }
+        |   LONG{ return context->GetType("long"); }
+        |   BOOL{ return context->GetType("bool"); }
+        |   ID{ Token token = lexer.GetToken(pos); return context->GetType(soulng::unicode::ToUtf8(token.match.ToString())); }
+        ;
+
+    Type(sngjson::json::Context* context, var sngjson::json::Type* elementType) : sngjson::json::Type*
+        ::= TypeName(context):etype{ elementType = etype; } LBRACKET RBRACKET
+        {
+            sngjson::json::Type* arrayType = context->GetTypeNoThrow("array of " + elementType->Name());
+            if (arrayType) return arrayType;
+            sngjson::json::ArrayType* a = new sngjson::json::ArrayType(elementType);
+            context->AddType(a);
+            return a;
+        }
+        |   TypeName(context):typeName{ return typeName; } 
+        ;
+}

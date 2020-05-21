@@ -11,6 +11,7 @@
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/System.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -56,6 +57,59 @@ void CmCppCodeGenerator::GenerateCode(void* boundCompileUnit)
     compileUnit->Accept(*this);
 }
 
+void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
+{
+    const Tool& compilerTool = GetCompilerTool();
+    std::string intermediateCompileCommand;
+    std::string intermediateCompileErrorFilePath = intermediateCodeFile + ".error";
+    intermediateCompileCommand.append("cmfileredirector -2 ").append(intermediateCompileErrorFilePath).append("  ").append(compilerTool.commandName);
+    for (const std::string& arg : compilerTool.args)
+    {
+        if (arg.find('$') != std::string::npos)
+        {
+            std::string modifiedArg = arg;
+            if (arg.find("$SOURCE_FILE$") != std::string::npos)
+            {
+                modifiedArg = soulng::util::Replace(arg, "$SOURCE_FILE$", QuotedPath(intermediateCodeFile));
+            }
+            else if (arg.find("$OBJECT_FILE$") != std::string::npos)
+            {
+                modifiedArg = soulng::util::Replace(modifiedArg, "$OBJECT_FILE$", QuotedPath(Path::ChangeExtension(intermediateCodeFile, compilerTool.outputFileExtension)));
+            }
+            else if (arg.find("$ASSEMBLY_FILE$") != std::string::npos)
+            {
+                if (GetGlobalFlag(GlobalFlags::emitLlvm))
+                {
+                    modifiedArg = soulng::util::Replace(modifiedArg, "$ASSEMBLY_FILE$", QuotedPath(Path::ChangeExtension(intermediateCodeFile, compilerTool.assemblyFileExtension)));
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            else if (arg.find("$DEBUG_INFORMATION_FILE$") != std::string::npos)
+            {
+                modifiedArg = soulng::util::Replace(modifiedArg, "$DEBUG_INFORMATION_FILE$", QuotedPath(Path::ChangeExtension(module->LibraryFilePath(), compilerTool.debugInformationFileExtension)));
+            }
+            intermediateCompileCommand.append(" ").append(modifiedArg);
+        }
+        else
+        {
+            intermediateCompileCommand.append(" ").append(arg);
+        }
+    }
+    try
+    {
+        System(intermediateCompileCommand); 
+        boost::filesystem::remove(boost::filesystem::path(intermediateCompileErrorFilePath)); 
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(intermediateCompileErrorFilePath);
+        throw std::runtime_error("compiling intermediate code '" + intermediateCodeFile + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+}
+
 void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
     boundCompileUnit.ResetCodeGenerated();
@@ -88,18 +142,9 @@ void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
         node->Accept(*this);
     }
     nativeCompileUnit->Write();
-    std::string intermediateCompileCommand;
-    std::string intermediateCompileErrorFilePath = intermediateFilePath + ".error";
-    // intermediateCompileCommand.append("cmfileredirector -2 " + intermediateCompileErrorFilePath + " cmsxic ").append(intermediateFilePath); todo
-    try
+    if (!GetGlobalFlag(GlobalFlags::disableCodeGen))
     {
-        // System(intermediateCompileCommand); todo
-        // boost::filesystem::remove(boost::filesystem::path(intermediateCompileErrorFilePath)); todo
-    }
-    catch (const std::exception& ex)
-    {
-        std::string errors = ReadFile(intermediateCompileErrorFilePath);
-        throw std::runtime_error("compiling intermediate code '" + intermediateFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+        Compile(intermediateFilePath);
     }
 }
 
@@ -132,6 +177,10 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->Parent()->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol && functionSymbol->IsTemplateSpecialization())
+    {
+        functionSymbol->SetFlag(FunctionSymbolFlags::dontReuse);
+    }
     if (functionSymbol->CodeGenerated()) return;
     functionSymbol->SetCodeGenerated();
     void* functionType = functionSymbol->IrType(*emitter);
@@ -312,7 +361,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
             lastInstructionWasRet = true;
         }
     }
-    GenerateCodeForCleanups();
+    GenerateCodeForCleanups(functionSymbol);
     emitter->FinalizeFunction(function);
 }
 
@@ -1294,20 +1343,7 @@ void* CmCppCodeGenerator::GetGlobalWStringConstant(int stringId)
     else
     {
         const std::u16string& str = compileUnit->GetUtf16String(stringId);
-        uint64_t length = str.length();
-        std::vector<void*> wcharConstants;
-        for (char16_t c : str)
-        {
-            wcharConstants.push_back(emitter->CreateIrValueForUShort(static_cast<uint16_t>(c)));
-        }
-        wcharConstants.push_back(emitter->CreateIrValueForUShort(static_cast<uint16_t>(0)));
-        void* arrayType = emitter->GetIrTypeForArrayType(emitter->GetIrTypeForUShort(), length + 1);
-        void* stringObject = emitter->GetOrInsertGlobal("wstring" + std::to_string(stringId) + "_" + compileUnitId, emitter->GetIrTypeForUShort());
-        void* stringGlobal = stringObject;
-        emitter->SetPrivateLinkage(stringGlobal);
-        void* constant = emitter->CreateIrValueForConstantArray(arrayType, wcharConstants, "w");
-        emitter->SetInitializer(stringGlobal, constant);
-        void* stringValue = stringGlobal;
+        void* stringValue = emitter->CreateGlobalWStringPtr(str);
         utf16stringMap[stringId] = stringValue;
         return stringValue;
     }
@@ -1323,20 +1359,7 @@ void* CmCppCodeGenerator::GetGlobalUStringConstant(int stringId)
     else
     {
         const std::u32string& str = compileUnit->GetUtf32String(stringId);
-        uint64_t length = str.length();
-        std::vector<void*> ucharConstants;
-        for (char32_t c : str)
-        {
-            ucharConstants.push_back(emitter->CreateIrValueForUInt(static_cast<uint32_t>(c)));
-        }
-        ucharConstants.push_back(emitter->CreateIrValueForUInt(static_cast<uint32_t>(0)));
-        void* arrayType = emitter->GetIrTypeForArrayType(emitter->GetIrTypeForUInt(), length + 1);
-        void* stringObject = emitter->GetOrInsertGlobal("ustring" + std::to_string(stringId) + "_" + compileUnitId, emitter->GetIrTypeForUInt());
-        void* stringGlobal = stringObject;
-        emitter->SetPrivateLinkage(stringGlobal);
-        void* constant = emitter->CreateIrValueForConstantArray(arrayType, ucharConstants, "u");
-        emitter->SetInitializer(stringGlobal, constant);
-        void* stringValue = stringGlobal;
+        void* stringValue = emitter->CreateGlobalUStringPtr(str);
         utf32stringMap[stringId] = stringValue;
         return stringValue;
     }
@@ -1359,10 +1382,10 @@ void* CmCppCodeGenerator::GetGlobalUuidConstant(int uuidId)
             byteConstants.push_back(emitter->CreateIrValueForByte(static_cast<int8_t>(x)));
         }
         void* arrayType = emitter->GetIrTypeForArrayType(emitter->GetIrTypeForByte(), length);
-        void* uuidObject = emitter->GetOrInsertGlobal("uuid" + std::to_string(uuidId) + "_" + compileUnitId, emitter->GetIrTypeForByte());
+        void* uuidObject = emitter->GetOrInsertGlobal("uuid" + std::to_string(uuidId) + "_" + compileUnitId, arrayType);
         void* uuidGlobal = uuidObject;
         emitter->SetPrivateLinkage(uuidGlobal);
-        void* constant = emitter->CreateIrValueForConstantArray(arrayType, byteConstants, "b");
+        void* constant = emitter->CreateIrValueForConstantArray(arrayType, byteConstants, "");
         emitter->SetInitializer(uuidGlobal, constant);
         void* uuidValue = uuidGlobal;
         uuidMap[uuidId] = uuidValue;
@@ -1451,7 +1474,7 @@ void CmCppCodeGenerator::CreateCleanup()
     newCleanupNeeded = false;
 }
 
-void CmCppCodeGenerator::GenerateCodeForCleanups()
+void CmCppCodeGenerator::GenerateCodeForCleanups(FunctionSymbol* function)
 {
     for (const std::unique_ptr<Cleanup>& cleanup : cleanups)
     {
@@ -1461,9 +1484,19 @@ void CmCppCodeGenerator::GenerateCodeForCleanups()
             destructorCall->Accept(*this);
         }
         void* resumeFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), std::vector<void*>());
+/*
         void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType);
         emitter->CreateCall(callee, std::vector<void*>());
-        emitter->CreateRetVoid();
+*/
+        if (function->ReturnType() && function->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !function->ReturnsClassInterfaceOrClassDelegateByValue())
+        {
+            void* defaultValue = function->ReturnType()->CreateDefaultIrValue(*emitter);
+            emitter->CreateRet(defaultValue);
+        }
+        else
+        {
+            emitter->CreateRetVoid();
+        }
     }
 }
 

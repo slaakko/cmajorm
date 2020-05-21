@@ -559,7 +559,7 @@ void* DerivedTypeSymbol::IrType(Emitter& emitter)
     void* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
-        if (baseType->IsVoidType() && (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp))
+        if (baseType->IsVoidType() && GetBackEnd() == BackEnd::llvm)
         {
             localIrType = emitter.GetIrTypeForByte();
         }

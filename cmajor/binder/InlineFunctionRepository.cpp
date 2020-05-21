@@ -80,6 +80,11 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         }
     }
     FunctionNode* functionInstanceNode = static_cast<FunctionNode*>(functionNode->Clone(cloneContext));
+    if (inlineFunction->IsDefault())
+    {
+        functionInstanceNode->SetBody(new sngcm::ast::CompoundStatementNode(span));
+        inlineFunction->SetHasArtificialBody();
+    }
     currentNs->AddMember(functionInstanceNode);
     symbolTable.SetCurrentCompileUnit(boundCompileUnit.GetCompileUnitNode());
     if (!inlineFunction->Parent()->IsClassTypeSymbol())
@@ -88,6 +93,10 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         symbolCreatorVisitor.SetLeaveFunction();
         globalNs->Accept(symbolCreatorVisitor);
         std::unique_ptr<FunctionSymbol> functionSymbol(symbolTable.GetCreatedFunctionSymbol());
+        if (inlineFunction->IsDefault())
+        {
+            functionSymbol->SetHasArtificialBody();
+        }
         functionSymbol->SetParent(inlineFunction->Parent());
         functionSymbol->SetLinkOnceOdrLinkage();
         TypeBinder typeBinder(boundCompileUnit);
@@ -125,6 +134,12 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         symbolCreatorVisitor.SetLeaveFunction();
         globalNs->Accept(symbolCreatorVisitor);
         std::unique_ptr<FunctionSymbol> functionSymbol(symbolTable.GetCreatedFunctionSymbol());
+        functionSymbol->SetVmtIndex(inlineFunction->VmtIndex());
+        functionSymbol->SetImtIndex(inlineFunction->ImtIndex());
+        if (inlineFunction->IsDefault())
+        {
+            functionSymbol->SetHasArtificialBody();
+        }
         functionSymbol->SetParent(classTypeSymbol);
         functionSymbol->SetLinkOnceOdrLinkage();
         TypeBinder typeBinder(boundCompileUnit);
@@ -169,8 +184,8 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         boundClass->AddMember(std::move(boundFunction));
         boundCompileUnit.AddBoundNode(std::move(boundClass));
         FunctionSymbol* result = functionSymbol.get();
-        boundCompileUnit.AddFunctionSymbol(std::move(functionSymbol));
         boundCompileUnit.AddGlobalNs(std::move(globalNs));
+        boundCompileUnit.AddFunctionSymbol(std::move(functionSymbol));
         if (fileScopeAdded)
         {
             boundCompileUnit.RemoveLastFileScope();

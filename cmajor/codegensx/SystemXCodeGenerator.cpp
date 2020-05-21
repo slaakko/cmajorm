@@ -145,6 +145,10 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->Parent()->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol && functionSymbol->IsTemplateSpecialization())
+    {
+        functionSymbol->SetFlag(FunctionSymbolFlags::dontReuse);
+    }
     if (functionSymbol->CodeGenerated()) return;
     functionSymbol->SetCodeGenerated();
     void* functionType = functionSymbol->IrType(*emitter);

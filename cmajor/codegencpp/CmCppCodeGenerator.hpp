@@ -105,12 +105,13 @@ public:
     void* CleanupBlock() override;
     bool NewCleanupNeeded() override;
     void CreateCleanup() override;
-    void GenerateCodeForCleanups();
+    void GenerateCodeForCleanups(FunctionSymbol* function);
     bool InTryBlock() const override;
     int CurrentTryBlockId() const override;
     int Install(const std::string& str) override;
     int Install(const std::u16string& str) override;
     int Install(const std::u32string& str) override;
+    void Compile(const std::string& intermediateCodeFile);
 private:
     cmajor::ir::Emitter* emitter;
     cmajor::ir::EmittingContext* emittingContext;

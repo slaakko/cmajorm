@@ -40,8 +40,7 @@ FunctionTemplateRepository::FunctionTemplateRepository(BoundCompileUnit& boundCo
 {
 }
 
-FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping,  
-    const Span& span)
+FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* functionTemplate, const std::unordered_map<TemplateParameterSymbol*, TypeSymbol*>& templateParameterMapping,  const Span& span)
 {
     std::vector<TypeSymbol*> templateArgumentTypes;
     for (TemplateParameterSymbol* templateParameter : functionTemplate->TemplateParameters())

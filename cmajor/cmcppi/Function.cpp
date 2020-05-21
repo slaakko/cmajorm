@@ -9,15 +9,17 @@
 
 namespace cmcppi {
 
-Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), linkOnce(false), nextBBNumber(0)
+Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), nextLocalNumber(0), nextArgumentNumber(0),
+    linkOnce(false), nextBBNumber(0)
 {
     entryBlock.reset(new BasicBlock(nextBBNumber++, "entry"));
+    int paramIndex = 0;
     for (Type* paramType : type->ParamTypes())
     {
-        Instruction* paramInst = new ParamInstruction(paramType);
+        ParamInstruction* paramInst = new ParamInstruction(paramType, "__param" + std::to_string(paramIndex));
         context.AddLineInfo(paramInst);
-        entryBlock->AddInstruction(paramInst);
-        params.push_back(paramInst);
+        params.push_back(std::unique_ptr<ParamInstruction>(paramInst));
+        ++paramIndex;
     }
 }
 
@@ -61,7 +63,26 @@ void Function::Finalize()
 Value* Function::GetParam(int index) const
 {
     Assert(index >= 0 && index < params.size(), "invalid param index");
-    return params[index];
+    return params[index].get();
+}
+
+void Function::WriteDeclaration(CodeFormatter& formatter, Context& context)
+{
+    std::string once;
+    if (linkOnce)
+    {
+        once = "inline ";
+    }
+    formatter.Write(once + type->ReturnType()->Name() + " " + name + "(");
+    for (int i = 0; i < type->ParamTypes().size(); ++i)
+    {
+        if (i > 0)
+        {
+            formatter.Write(", ");
+        }
+        formatter.Write(params[i]->GetType(context)->Name() + " " + params[i]->Name(context));
+    }
+    formatter.WriteLine(");");
 }
 
 void Function::Write(CodeFormatter& formatter, Context& context)
@@ -70,9 +91,18 @@ void Function::Write(CodeFormatter& formatter, Context& context)
     std::string once;
     if (linkOnce)
     {
-        once = " once";
+        once = "inline ";
     }
-    formatter.WriteLine("function " + type->Name() + once + " " + name);
+    formatter.Write(once + type->ReturnType()->Name() + " " + name + "(");
+    for (int i = 0; i < type->ParamTypes().size(); ++i)
+    {
+        if (i > 0)
+        {
+            formatter.Write(", ");
+        }
+        formatter.Write(params[i]->GetType(context)->Name() + " " + params[i]->Name(context));
+    }
+    formatter.WriteLine(")");
     formatter.WriteLine("{");
     formatter.IncIndent();
     bool first = true;

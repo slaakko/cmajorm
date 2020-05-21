@@ -6,7 +6,11 @@
 #include <sngcm/ast/InitDone.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <cmajor/build/Build.hpp>
+#include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <cmajor/cmmid/InitDone.hpp>
+#ifdef _WIN32
+#include <cmajor/cmres/InitDone.hpp>
+#endif
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -15,6 +19,7 @@
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/CharacterData.hpp>
+#include <sngxml/xpath/InitDone.hpp>
 #include <soulng/lexer/ParsingException.hpp>
 #include <soulng/util/Util.hpp>
 #include <soulng/util/Path.hpp>
@@ -34,9 +39,17 @@ struct InitDone
         soulng::util::Init();
         sngcm::ast::Init();
         cmajor::symbols::Init();
+        sngxml::xpath::Init();
+#ifdef _WIN32
+        cmajor::resources::Init();
+#endif
     }
     ~InitDone()
     {
+#ifdef _WIN32
+        cmajor::resources::Done();
+#endif
+        sngxml::xpath::Done();
         cmajor::symbols::Done();
         sngcm::ast::Done();
         soulng::util::Done();
@@ -79,6 +92,8 @@ void PrintHelp()
         "   print verbose messages\n" <<
         "--quiet (-q)\n" <<
         "   print no messages\n" <<
+        "--tool-chain=TOOL_CHAIN (-tc=TOOL_CHAIN)\n" <<
+        "   use tool chain TOOL_CHAIN (default vs)\n" << 
         "--strict-nothrow (-s)\n" <<
         "   treat nothrow violation as an error\n" <<
         "--time (-t)\n" <<
@@ -105,6 +120,10 @@ void PrintHelp()
         "   compile source files in a project using a single thread\n" <<
         "--debug-compile (-dc)\n" <<
         "   show debug messages from multithreaded compilation\n" <<
+        "--disable-codegen (-dg)\n" <<
+        "   disable code generation\n" <<
+        "--emit-asm (-f)\n" <<
+        "   emit assembly code into file.asm\n" <<
         std::endl;
 }
 
@@ -116,8 +135,9 @@ using namespace cmajor::build;
 int main(int argc, const char** argv)
 {
     SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
-    //SetNumBuildThreads(1);
-    //SetGlobalFlag(GlobalFlags::singleThreadedCompile);
+    SetToolChain("vs");
+    SetNumBuildThreads(1);
+    SetGlobalFlag(GlobalFlags::singleThreadedCompile);
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
     try
@@ -202,6 +222,14 @@ int main(int argc, const char** argv)
                     {
                         SetGlobalFlag(GlobalFlags::debugCompile);
                     }
+                    else if (arg == "--disable-codegen" || arg == "-dg")
+                    {
+                        SetGlobalFlag(GlobalFlags::disableCodeGen);
+                    }
+                    else if (arg == "--emit-asm" || arg == "-f")
+                    {
+                        SetGlobalFlag(GlobalFlags::emitLlvm);
+                    }
                     else if (arg.find('=') != std::string::npos)
                     {
                         std::vector<std::string> components = Split(arg, '=');
@@ -266,6 +294,11 @@ int main(int argc, const char** argv)
                                 std::string outdir = components[1];
                                 SetOutDir(outdir);
                             }
+                            else if (components[0] == "--tool-chain" || components[0] == "-tc")
+                            {
+                                std::string toolChain = components[1];
+                                SetToolChain(toolChain);
+                            }
                             else
                             {
                                 throw std::runtime_error("unknown option '" + arg + "'");
@@ -317,6 +350,7 @@ int main(int argc, const char** argv)
             SetNumBuildThreads(1);
             SetGlobalFlag(GlobalFlags::singleThreadedCompile);
 #endif
+            ReadToolChains(GetGlobalFlag(GlobalFlags::verbose));
             for (const std::string& file : files)
             {
                 boost::filesystem::path fp(file);
