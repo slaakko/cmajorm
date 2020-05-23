@@ -43,7 +43,10 @@ void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& co
             first = false;
         }
         inst->Write(formatter, function, context);
-        formatter.WriteLine(";");
+        if (!inst->NoSemicolon())
+        {
+            formatter.WriteLine(";");
+        }
         n = "";
     }
 }

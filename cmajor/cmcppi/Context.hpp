@@ -115,6 +115,9 @@ public:
     Instruction* CreateBranch(Value* cond, BasicBlock* trueDest, BasicBlock* falseDest);
     Instruction* CreateSwitch(Value* cond, BasicBlock* defaultDest);
     Instruction* CreateNop();
+    Instruction* CreateBeginTry();
+    Instruction* CreateEndTry(BasicBlock* nextDest, BasicBlock* handlersDest);
+    Instruction* CreateResume();
     GlobalVariable* GetOrInsertGlobal(const std::string& name, Type* type);
     GlobalVariable* CreateGlobalStringPtr(const std::string& stringValue);
     GlobalVariable* CreateGlobalWStringPtr(const std::u16string& stringValue);

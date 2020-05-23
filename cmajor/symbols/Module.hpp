@@ -126,7 +126,9 @@ public:
     void GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) const;
     void Write(SymbolWriter& writer);
     void SetDirectoryPath(const std::string& directoryPath_);
+    void SetObjectFileDirectoryPath(const std::string& objectFileDirectoryPath_);
     const std::string& DirectoryPath() const { return directoryPath; }
+    const std::string& ObjectFileDirectoryPath() const { return objectFileDirectoryPath; }
     const std::vector<std::string>& LibraryFilePaths() const { return libraryFilePaths; }
     bool IsSystemModule () const { return GetFlag(ModuleFlags::system); }
     void SetSystemModule() { SetFlag(ModuleFlags::system); }
@@ -206,6 +208,7 @@ private:
     uint32_t symbolTablePos;
     std::unique_ptr<SymbolTable> symbolTable;
     std::string directoryPath;
+    std::string objectFileDirectoryPath;
     std::vector<std::string> libraryFilePaths;
     std::u32string currentProjectName;
     std::u32string currentToolName;

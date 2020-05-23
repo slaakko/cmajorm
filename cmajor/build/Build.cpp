@@ -558,6 +558,10 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
 
 void LinkCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
 {
+    if (GetToolChain() == "vs")
+    {
+        return;
+    }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
         LogMessage(module.LogStreamId(), "Linking...");
@@ -566,12 +570,16 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
     const Tool& linkerTool = GetLinkerTool();
-    std::string cmrtLibName = "cmrt350.lib";
-    if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
+    std::string cmrtLibName = "cmrts.lib";
+    std::string ehLibName = "eh.lib";
+    if (GetConfig() == "debug")
     {
-        cmrtLibName = "cmrt350d.lib";
+        cmrtLibName = "cmrtsd.lib";
+        ehLibName = "ehd.lib";
     }
-    std::string cmrtLibFilePath = QuotedPath(GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
+    std::string cmrtLibFileName = cmrtLibName;
+    std::string ehLibFileName = ehLibName;
+    std::string cmajorLibDir = QuotedPath(GetFullPath(Path::Combine(CmajorRootDir(), "lib")));
     std::string linkCommandLine;
     std::string linkErrorFilePath;
     linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "link.error");
@@ -580,10 +588,45 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     {
         if (arg.find('$') != std::string::npos)
         {
-            if (arg.find("$LIBRARY_FILES$") != std::string::npos)
+            if (arg.find("$CMAJOR_LIBRARY_DIRECTORY$") != std::string::npos)
+            {
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$CMAJOR_LIBRARY_DIRECTORY$", cmajorLibDir));
+            }
+            else if (arg.find("$LIBRARY_FILES$") != std::string::npos)
             {
                 std::string libFilePaths;
-                libFilePaths.append(cmrtLibFilePath);
+                libFilePaths.append(QuotedPath(cmrtLibFileName));
+                libFilePaths.append(1, ' ').append(QuotedPath(ehLibFileName));
+                libFilePaths.append(1, ' ').append("cmsngxmldomd.lib");
+                libFilePaths.append(1, ' ').append("cmsnglexerd.lib");
+                libFilePaths.append(1, ' ').append("cmsngparserd.lib");
+                libFilePaths.append(1, ' ').append("cmsngutild.lib");
+                libFilePaths.append(1, ' ').append("cmsngxmlxmld.lib");
+                libFilePaths.append(1, ' ').append("cmsngxmlxpathd.lib");
+                libFilePaths.append(1, ' ').append("libbz2.lib");
+                libFilePaths.append(1, ' ').append("zlibstat.lib");
+                libFilePaths.append(1, ' ').append("libgnutls-30.lib");
+                libFilePaths.append(1, ' ').append("pdcurses.lib");
+                libFilePaths.append(1, ' ').append("cmrt350gmp.lib");
+                libFilePaths.append(1, ' ').append("ws2_32.lib");
+                libFilePaths.append(1, ' ').append("kernel32.lib");
+                libFilePaths.append(1, ' ').append("user32.lib");
+                libFilePaths.append(1, ' ').append("gdi32.lib");
+                libFilePaths.append(1, ' ').append("winspool.lib");
+                libFilePaths.append(1, ' ').append("comdlg32.lib");
+                libFilePaths.append(1, ' ').append("advapi32.lib");
+                libFilePaths.append(1, ' ').append("shell32.lib");
+                libFilePaths.append(1, ' ').append("ole32.lib");
+                libFilePaths.append(1, ' ').append("oleaut32.lib");
+                libFilePaths.append(1, ' ').append("uuid.lib");
+                libFilePaths.append(1, ' ').append("odbc32.lib");
+                libFilePaths.append(1, ' ').append("odbccp32.lib");
+
+                libFilePaths.append(1, ' ').append("msvcrtd.lib");
+                libFilePaths.append(1, ' ').append("msvcprtd.lib");
+                libFilePaths.append(1, ' ').append("vcruntimed.lib");
+                libFilePaths.append(1, ' ').append("ucrtd.lib");
+
                 for (const std::string& libFilePath : libraryFilePaths)
                 {
                     libFilePaths.append(1, ' ');
@@ -597,7 +640,7 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
             }
             else if (arg.find("$EXECUTABLE_FILE$") != std::string::npos)
             {
-                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$EXECUTABLE_FILE$", QuotedPath(executableFilePath)));
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$EXECUTABLE_FILE$", QuotedPath(Path::ChangeExtension(executableFilePath, ""))));
             }
             else if (arg.find("$DEBUG_INFORMATION_FILE$") != std::string::npos)
             {
@@ -647,11 +690,41 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     }
 }
 
-void CreateCppProjectFiles(Project* project, Module& module)
+void CreateCppProjectFiles(Project* project, Module& module, const std::string& mainSourceFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
         LogMessage(module.LogStreamId(), "Creating project files...");
+    }
+    std::set<std::string> libraryDirectories;
+    std::set<std::string> libraryNames;
+    std::string libraryDir = GetFullPath(Path::GetDirectoryName(libraryFilePath));
+    libraryDirectories.insert(libraryDir);
+    std::string libraryName = QuotedPath(Path::GetFileName(libraryFilePath));
+    libraryNames.insert(libraryName);
+    std::string cmrtLibName = "cmrts.lib";
+    if (GetConfig() == "debug")
+    {
+        cmrtLibName = "cmrtsd.lib";
+    }
+    std::string cmajorLibDir = GetFullPath(Path::Combine(CmajorRootDir(), "lib"));
+    libraryDirectories.insert(cmajorLibDir);
+    std::string boostLibDir = GetFullPath("C:\\Boost\\lib");
+    libraryDirectories.insert(boostLibDir);
+    libraryNames.insert(cmrtLibName);
+    libraryNames.insert("pdcurses.lib");
+    libraryNames.insert("libbz2.lib");
+    libraryNames.insert("libgnutls-30.lib");
+    libraryNames.insert("zlibstat.lib");
+    libraryNames.insert("ws2_32.lib");
+    libraryNames.insert("User32.lib");
+    libraryNames.insert("Advapi32.lib");
+    for (const std::string& libraryFilePath : libraryFilePaths)
+    {
+        std::string libraryDir = GetFullPath(Path::GetDirectoryName(libraryFilePath));
+        libraryDirectories.insert(libraryDir);
+        std::string libraryName = QuotedPath(Path::GetFileName(libraryFilePath));
+        libraryNames.insert(libraryName);
     }
     std::vector<std::string> configs;
     configs.push_back("debug");
@@ -685,6 +758,50 @@ void CreateCppProjectFiles(Project* project, Module& module)
                 {
                     commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$PROJECT_CONFIG$", config));
                 }
+                else if (arg.find("$LIBRARY_DIRECTORIES$") != std::string::npos)
+                {
+                    std::string libraryDirectoriesStr;
+                    bool first = true;
+                    for (const std::string& libraryDirectory : libraryDirectories)
+                    {
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            libraryDirectoriesStr.append(1, ';');
+                        }
+                        libraryDirectoriesStr.append(QuotedPath(libraryDirectory));
+                    }
+                    commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$LIBRARY_DIRECTORIES$", libraryDirectoriesStr));
+                }
+                else if (arg.find("$LIBRARY_FILE_NAMES$") != std::string::npos)
+                {
+                    std::string libraryNamesStr;
+                    bool first = true;
+                    for (const std::string& libraryName : libraryNames)
+                    {
+                        if (libraryName == "System.IO.Compression")
+                        {
+                            continue;
+                        }
+                        if (libraryName == "System.Init")
+                        {
+                            continue;
+                        }
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            libraryNamesStr.append(1, ';');
+                        }
+                        libraryNamesStr.append(QuotedPath(libraryName));
+                    }
+                    commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$LIBRARY_FILE_NAMES$", libraryNamesStr));
+                }
                 else if (arg.find("$SOURCE_FILES$") != std::string::npos)
                 {
                     std::string sourceFilePaths;
@@ -693,6 +810,8 @@ void CreateCppProjectFiles(Project* project, Module& module)
                         sourceFilePaths.append(1, ' ');
                         sourceFilePaths.append(QuotedPath(Path::ChangeExtension(sourceFilePath, ".cpp")));
                     }
+                    sourceFilePaths.append(1, ' ');
+                    sourceFilePaths.append(QuotedPath(mainSourceFilePath));
                     commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$SOURCE_FILES$", sourceFilePaths));
                 }
             }
@@ -1199,7 +1318,7 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
 }
 
 void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
-    std::string& mainObjectFilePath)
+    std::string& mainObjectFilePath, std::string& mainSourceFilePath)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
@@ -1273,6 +1392,7 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
     {
         callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
     }
+
     InvokeNode* invokeInitialize = new InvokeNode(Span(), new IdentifierNode(Span(), U"Initialize"));
     StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), invokeInitialize);
     tryBlock->AddStatement(callInitializeStatement);
@@ -1324,6 +1444,7 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
     }
     cmajor::codegen::GenerateCode(emittingContext, boundMainCompileUnit);
     mainObjectFilePath = boundMainCompileUnit.ObjectFilePath();
+    mainSourceFilePath = Path::ChangeExtension(boundMainCompileUnit.LLFilePath(), ".cpp");
 }
 
 void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
@@ -1519,7 +1640,7 @@ void CreateMainUnitLlvmWindowsGUI(std::vector<std::string>& objectFilePaths, Mod
 }
 
 void CreateMainUnitCppWindowsGUI(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
-    std::string& mainObjectFilePath)
+    std::string& mainObjectFilePath, std::string& mainSourceFilePath)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
@@ -1637,6 +1758,7 @@ void CreateMainUnitCppWindowsGUI(std::vector<std::string>& objectFilePaths, Modu
     }
     cmajor::codegen::GenerateCode(emittingContext, boundMainCompileUnit);
     mainObjectFilePath = boundMainCompileUnit.ObjectFilePath();
+    mainSourceFilePath = Path::ChangeExtension(boundMainCompileUnit.LLFilePath(), ".cpp");
 }
 
 void SetDefines(Module* module, const std::string& definesFilePath)
@@ -2202,6 +2324,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                     symbolTableDoc->Write(formatter);
                 }
                 std::string mainObjectFilePath;
+                std::string mainSourceFilePath;
                 if (project->GetTarget() == Target::program || project->GetTarget() == Target::winguiapp || project->GetTarget() == Target::winapp)
                 {
                     CheckMainFunctionSymbol(*rootModule);
@@ -2224,11 +2347,11 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                     {
                         if (project->GetTarget() == Target::winguiapp)
                         {
-                            CreateMainUnitCppWindowsGUI(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
+                            CreateMainUnitCppWindowsGUI(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath, mainSourceFilePath);
                         }
                         else
                         {
-                            CreateMainUnitCpp(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath);
+                            CreateMainUnitCpp(objectFilePaths, *rootModule, emittingContext, &attributeBinder, mainObjectFilePath, mainSourceFilePath);
                         }
                     }
                     else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
@@ -2243,14 +2366,14 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
 #ifdef _WIN32
                 cmajor::resources::ProcessResourcesInProject(*project, *rootModule);
 #endif
+                if (GetBackEnd() == BackEnd::cmcpp)
+                {
+                    CreateCppProjectFiles(project, *rootModule, mainSourceFilePath, project->LibraryFilePath(), rootModule->LibraryFilePaths());
+                }
                 if (project->GetTarget() == Target::program || project->GetTarget() == Target::winguiapp || project->GetTarget() == Target::winapp)
                 {
                     Link(project->GetTarget(), project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(),
                         mainObjectFilePath, *rootModule);
-                }
-                if (GetBackEnd() == BackEnd::cmcpp)
-                {
-                    CreateCppProjectFiles(project, *rootModule);
                 }
                 if (GetGlobalFlag(GlobalFlags::verbose))
                 {

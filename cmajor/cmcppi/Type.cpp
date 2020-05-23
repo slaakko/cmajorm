@@ -131,7 +131,14 @@ PtrType::PtrType(Type* baseType_) : Type(ptrTypeId), baseType(baseType_), defaul
 
 std::string PtrType::Name() const
 {
-    return baseType->Name() + "*";
+    if (baseType->IsFunctionType())
+    {
+        return baseType->Name();
+    }
+    else
+    {
+        return baseType->Name() + "*";
+    }
 }
 
 StructureType::StructureType(int id_) : Type(id_)

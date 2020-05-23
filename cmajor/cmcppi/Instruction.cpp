@@ -12,7 +12,7 @@
 
 namespace cmcppi {
 
-Instruction::Instruction() : resultId(-1), sourceLineNumber(0)
+Instruction::Instruction() : resultId(-1), sourceLineNumber(0), noSemicolon(false)
 {
 }
 
@@ -52,7 +52,7 @@ BinaryInstruction::BinaryInstruction(Value* left_, Value* right_) : Instruction(
 
 Type* BinaryInstruction::GetType(Context& context)
 {
-    //Assert(left->GetType(context) == right->GetType(context), "types differ");
+    Assert(left->GetType(context) == right->GetType(context), "types differ");
     return left->GetType(context);
 }
 
@@ -377,14 +377,7 @@ StoreInstruction::StoreInstruction(Value* value_, Value* ptr_) : Instruction(), 
 
 void StoreInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    if (value->GetType(context)->IsFunctionType())
-    {
-        formatter.Write("**" + ptr->Name(context) + " = " + value->Name(context));
-    }
-    else
-    {
-        formatter.Write("*" + ptr->Name(context) + " = " + value->Name(context));
-    }
+    formatter.Write("*" + ptr->Name(context) + " = " + value->Name(context));
 }
 
 ArgInstruction::ArgInstruction(Value* arg_) : Instruction(), arg(arg_)
@@ -429,6 +422,7 @@ Type* ElemAddrInstruction::GetType(Context& context)
     else
     {
         Assert(false, "structure or array type expected");
+        return nullptr;
     }
 }
 
@@ -629,6 +623,7 @@ void InvokeInstruction::Write(CodeFormatter& formatter, Function& function, Cont
     formatter.WriteLine("goto __bb" + std::to_string(unwindBlockNext->Id()) + ";");
     formatter.DecIndent();
     formatter.WriteLine("}");
+    SetNoSemicolon();
 }
 
 RetInstruction::RetInstruction(Value* value_) : Instruction(), value(value_)
@@ -695,6 +690,7 @@ void SwitchInstruction::Write(CodeFormatter& formatter, Function& function, Cont
     }
     formatter.DecIndent();
     formatter.WriteLine("}");
+    SetNoSemicolon();
 }
 
 NoOperationInstruction::NoOperationInstruction() : Instruction()
@@ -704,6 +700,44 @@ NoOperationInstruction::NoOperationInstruction() : Instruction()
 void NoOperationInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     formatter.Write(";");
+}
+
+BeginTryInstruction::BeginTryInstruction() : Instruction()
+{
+}
+
+void BeginTryInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    formatter.WriteLine("try");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+}
+
+EndTryInstruction::EndTryInstruction(BasicBlock* nextDest_, BasicBlock* handlersDest_) : Instruction(), nextDest(nextDest_), handlersDest(handlersDest_)
+{
+}
+
+void EndTryInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    formatter.WriteLine("goto __bb" + std::to_string(nextDest->Id()) + ";");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine("catch (...)");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    formatter.WriteLine("goto __bb" + std::to_string(handlersDest->Id()) + ";");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    SetNoSemicolon();
+}
+
+ResumeInstruction::ResumeInstruction() : Instruction()
+{
+}
+
+void ResumeInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    formatter.Write("throw");
 }
 
 } // namespace cmcppi

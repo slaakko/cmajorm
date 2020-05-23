@@ -33,9 +33,12 @@ public:
     void SetSourceLineNumber(int sourceLineNumber_) { sourceLineNumber = sourceLineNumber_; }
     int SourceLineNumber() const { return sourceLineNumber; }
     void SetResultId(int resultId_) { resultId = resultId_; }
+    void SetNoSemicolon() { noSemicolon = true; }
+    bool NoSemicolon() const { return noSemicolon; }
 private:
     int resultId;
     int sourceLineNumber;
+    bool noSemicolon;
 };
 
 class CMCPPI_API UnaryInstruction : public Instruction
@@ -420,6 +423,33 @@ public:
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     bool IsNoOperation() const override { return true; }
     std::string IrName() const override { return "nop"; }
+};
+
+class CMCPPI_API BeginTryInstruction : public Instruction
+{
+public:
+    BeginTryInstruction();
+    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    std::string IrName() const override { return "beginTry"; }
+};
+
+class CMCPPI_API EndTryInstruction : public Instruction
+{
+public:
+    EndTryInstruction(BasicBlock* nextDest_, BasicBlock* handlersDest_);
+    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    std::string IrName() const override { return "endTry"; }
+private:
+    BasicBlock* nextDest;
+    BasicBlock* handlersDest;
+};
+
+class CMCPPI_API ResumeInstruction : public Instruction
+{
+public:
+    ResumeInstruction();
+    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    std::string IrName() const override { return "resume"; }
 };
 
 } // namespace cmcppi

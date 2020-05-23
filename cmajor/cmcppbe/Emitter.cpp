@@ -934,6 +934,16 @@ void* Emitter::CreateSave()
     return nullptr;
 }
 
+void* Emitter::CreateBeginTry()
+{
+    return context->CreateBeginTry();
+}
+
+void* Emitter::CreateEndTry(void* nextDest, void* handlersDest)
+{
+    return context->CreateEndTry(static_cast<cmcppi::BasicBlock*>(nextDest), static_cast<cmcppi::BasicBlock*>(handlersDest));
+}
+
 std::string Emitter::GetVmtObjectName(void* symbol) const
 {
     // todo
@@ -1799,6 +1809,7 @@ void* Emitter::CreateUndefValue(void* type)
 
 void Emitter::CreateResume(void* exception)
 {
+    context->CreateResume();
 }
 
 void Emitter::DebugPrintDebugInfo(const std::string& filePath)

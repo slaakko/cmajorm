@@ -452,6 +452,27 @@ Instruction* Context::CreateNop()
     return inst;
 }
 
+Instruction* Context::CreateBeginTry()
+{
+    Instruction* inst = new BeginTryInstruction();
+    currentBasicBlock->AddInstruction(inst);
+    return inst;
+}
+
+Instruction* Context::CreateEndTry(BasicBlock* nextDest, BasicBlock* handlersDest)
+{
+    Instruction* inst = new EndTryInstruction(nextDest, handlersDest);
+    currentBasicBlock->AddInstruction(inst);
+    return inst;
+}
+
+Instruction* Context::CreateResume()
+{
+    Instruction* inst = new ResumeInstruction();
+    currentBasicBlock->AddInstruction(inst);
+    return inst;
+}
+
 GlobalVariable* Context::GetOrInsertGlobal(const std::string& name, Type* type)
 {
     return dataRepository.GetOrInsertGlobal(name, type);

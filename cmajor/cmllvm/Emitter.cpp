@@ -682,6 +682,16 @@ void* Emitter::CreateSave()
     return nullptr;
 }
 
+void* Emitter::CreateBeginTry()
+{
+    return nullptr;
+}
+
+void* Emitter::CreateEndTry(void* nextDest, void* handlersDest)
+{
+    return nullptr;
+}
+
 void* Emitter::GetOrInsertGlobal(const std::string& name, void* type)
 {
     return module->getOrInsertGlobal(name, static_cast<llvm::Type*>(type));

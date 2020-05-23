@@ -60,6 +60,8 @@ void CmCppCodeGenerator::GenerateCode(void* boundCompileUnit)
 void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
 {
     const Tool& compilerTool = GetCompilerTool();
+    std::string outputDirectory = GetFullPath(Path::Combine(Path::GetDirectoryName(intermediateCodeFile), compilerTool.outputDirectory));
+    boost::filesystem::create_directories(outputDirectory);
     std::string intermediateCompileCommand;
     std::string intermediateCompileErrorFilePath = intermediateCodeFile + ".error";
     intermediateCompileCommand.append("cmfileredirector -2 ").append(intermediateCompileErrorFilePath).append("  ").append(compilerTool.commandName);
@@ -72,15 +74,11 @@ void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
             {
                 modifiedArg = soulng::util::Replace(arg, "$SOURCE_FILE$", QuotedPath(intermediateCodeFile));
             }
-            else if (arg.find("$OBJECT_FILE$") != std::string::npos)
-            {
-                modifiedArg = soulng::util::Replace(modifiedArg, "$OBJECT_FILE$", QuotedPath(Path::ChangeExtension(intermediateCodeFile, compilerTool.outputFileExtension)));
-            }
-            else if (arg.find("$ASSEMBLY_FILE$") != std::string::npos)
+            else if (arg.find("$GENERATE_ASSEMBLY_FILE_OPTION$") != std::string::npos)
             {
                 if (GetGlobalFlag(GlobalFlags::emitLlvm))
                 {
-                    modifiedArg = soulng::util::Replace(modifiedArg, "$ASSEMBLY_FILE$", QuotedPath(Path::ChangeExtension(intermediateCodeFile, compilerTool.assemblyFileExtension)));
+                    modifiedArg = soulng::util::Replace(modifiedArg, "$GENERATE_ASSEMBLY_FILE_OPTION$", "");
                 }
                 else
                 {
@@ -89,7 +87,16 @@ void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
             }
             else if (arg.find("$DEBUG_INFORMATION_FILE$") != std::string::npos)
             {
-                modifiedArg = soulng::util::Replace(modifiedArg, "$DEBUG_INFORMATION_FILE$", QuotedPath(Path::ChangeExtension(module->LibraryFilePath(), compilerTool.debugInformationFileExtension)));
+                modifiedArg = soulng::util::Replace(modifiedArg, "$DEBUG_INFORMATION_FILE$",
+                    QuotedPath(GetFullPath(Path::ChangeExtension(intermediateCodeFile, compilerTool.debugInformationFileExtension))));
+            }
+            else if (arg.find("$ASSEMBLY_FILE$") != std::string::npos)
+            {
+                modifiedArg = soulng::util::Replace(modifiedArg, "$ASSEMBLY_FILE$", QuotedPath(GetFullPath(Path::ChangeExtension(intermediateCodeFile, compilerTool.assemblyFileExtension))));
+            }
+            else if (arg.find("$OBJECT_FILE$") != std::string::npos)
+            {
+                modifiedArg = soulng::util::Replace(modifiedArg, "$OBJECT_FILE$", QuotedPath(compileUnit->ObjectFilePath()));
             }
             intermediateCompileCommand.append(" ").append(modifiedArg);
         }
@@ -113,7 +120,7 @@ void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
 void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
     boundCompileUnit.ResetCodeGenerated();
-    std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".cpp");
+    std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.LLFilePath(), ".cpp");
     NativeModule nativeModule(emitter, intermediateFilePath);
     compileUnitId = boundCompileUnit.Id();
     emitter->SetCompileUnitId(compileUnitId);
@@ -1003,7 +1010,10 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     void* prevHandlerBlock = handlerBlock;
     void* prevCleanupBlock = cleanupBlock;
     handlerBlock = emitter->CreateBasicBlock("handlers");
+    void* resumeBlock = emitter->CreateBasicBlock("resume");
     cleanupBlock = nullptr;
+
+/*
     int64_t parentTryBlockId = currentTryBlockId;
     currentTryBlockId = nextTryBlockId++;
     void* nop1 = emitter->CreateNop();
@@ -1011,54 +1021,70 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     int beginTryId = emitter->GetMDStructId(beginTry);
     void* beginTryMdRef = emitter->CreateMDStructRef(beginTryId);
     emitter->SetMetadataRef(nop1, beginTryMdRef);
+*/
     bool prevInTryBlock = inTryBlock;
     inTryBlock = true;
+    void* beginTryBlock = emitter->CreateBasicBlock("beginTry");
+    emitter->CreateBr(beginTryBlock);
+    emitter->SetCurrentBasicBlock(beginTryBlock);
+    emitter->CreateBeginTry();
     boundTryStatement.TryBlock()->Accept(*this);
     inTryBlock = prevInTryBlock;
+    void* endTryBlock = emitter->CreateBasicBlock("endTry");
+    emitter->CreateBr(endTryBlock);
+    emitter->SetCurrentBasicBlock(endTryBlock);
+/*
     void* nop2 = emitter->CreateNop();
     void* endTry = emitter->CreateMDStruct();
     int endTryId = emitter->GetMDStructId(endTry);
     void* endTryMdRef = emitter->CreateMDStructRef(endTryId);
     emitter->SetMetadataRef(nop2, endTryMdRef);
+*/
     void* tryNextBlock = emitter->CreateBasicBlock("tryNext");
-    emitter->CreateBr(tryNextBlock);
+    emitter->CreateEndTry(tryNextBlock, handlerBlock);
     void* prevTryNextBlock = currentTryNextBlock;
     currentTryNextBlock = tryNextBlock;
+    emitter->SetCurrentBasicBlock(handlerBlock);
     handlerBlock = prevHandlerBlock;
-    for (const auto& c : boundTryStatement.Catches())
+    int n = boundTryStatement.Catches().size();
+    void* catchTarget = emitter->CreateBasicBlock("catch");
+    for (int i = 0; i < n; ++i)
     {
-        c->Accept(*this);
+        const std::unique_ptr<BoundCatchStatement>& boundCatchStatement = boundTryStatement.Catches()[i];
+        std::vector<void*> handleExceptionParamTypes;
+        handleExceptionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
+        void* handleExceptionFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForBool(), handleExceptionParamTypes);
+        std::vector<void*> handleExceptionArgs;
+        UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->CatchedTypeUuidId());
+        void* catchTypeIdValue = uuidValue.IrValue(*emitter);
+        handleExceptionArgs.push_back(catchTypeIdValue);
+        void* handleException = emitter->GetOrInsertFunction("RtHandleException", handleExceptionFunctionType);
+        void* handleThisEx = emitter->CreateCall(handleException, handleExceptionArgs);
+        void* nextHandlerTarget = nullptr;
+        if (i < n - 1)
+        {
+            catchTarget = emitter->CreateBasicBlock("catch");
+            nextHandlerTarget = catchTarget;
+        }
+        else
+        {
+            nextHandlerTarget = resumeBlock;
+        }
+        void* thisHandlerTarget = emitter->CreateBasicBlock("handler");
+        emitter->CreateCondBr(handleThisEx, thisHandlerTarget, nextHandlerTarget);
+        emitter->SetCurrentBasicBlock(thisHandlerTarget);
+        boundCatchStatement->CatchBlock()->Accept(*this);
+        emitter->CreateBr(tryNextBlock);
     }
+    emitter->SetCurrentBasicBlock(resumeBlock);
+    emitter->CreateResume(nullptr);
     emitter->SetCurrentBasicBlock(tryNextBlock);
+/*
     currentTryBlockId = parentTryBlockId;
     currentTryNextBlock = prevTryNextBlock;
+*/
     cleanupBlock = prevCleanupBlock;
     basicBlockOpen = true;
-}
-
-void CmCppCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
-{
-    if (generateLineNumbers)
-    {
-        emitter->SetCurrentLineNumber(boundCatchStatement.GetSpan().line);
-    }
-    destructorCallGenerated = false;
-    lastInstructionWasRet = false;
-    basicBlockOpen = false;
-    SetTarget(&boundCatchStatement);
-    void* catchBlock = emitter->CreateBasicBlock("catch");
-    emitter->SetCurrentBasicBlock(catchBlock);
-    void* nop1 = emitter->CreateNop();
-    void* catch_ = emitter->CreateMDStruct();
-    const boost::uuids::uuid& uuid = compileUnit->GetUuid(boundCatchStatement.CatchedTypeUuidId());
-    std::string uuidStr;
-    for (const auto x : uuid)
-    {
-        uuidStr.append(soulng::util::ToHexString(x));
-    }
-    boundCatchStatement.CatchBlock()->Accept(*this);
-    emitter->CreateBr(currentTryNextBlock);
-    emitter->SetCurrentBasicBlock(currentTryNextBlock);
 }
 
 void CmCppCodeGenerator::Visit(BoundParameter& boundParameter)
@@ -1483,11 +1509,7 @@ void CmCppCodeGenerator::GenerateCodeForCleanups(FunctionSymbol* function)
         {
             destructorCall->Accept(*this);
         }
-        void* resumeFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), std::vector<void*>());
-/*
-        void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType);
-        emitter->CreateCall(callee, std::vector<void*>());
-*/
+        emitter->CreateResume(nullptr);
         if (function->ReturnType() && function->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !function->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             void* defaultValue = function->ReturnType()->CreateDefaultIrValue(*emitter);

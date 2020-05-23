@@ -3149,7 +3149,6 @@ BoundExpression* MakeExitEntryPtr(BoundCompileUnit& boundCompileUnit, ContainerS
 void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructorSymbol, StaticConstructorNode* staticConstructorNode, BoundCompileUnit& boundCompileUnit, 
     BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder, const Span& span)
 {
-    staticConstructorSymbol->SetLinkOnceOdrLinkage();
     Module* module = &boundCompileUnit.GetModule();
     Symbol* parent = staticConstructorSymbol->Parent();
     Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
@@ -3372,7 +3371,6 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
 void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, ConstructorNode* constructorNode, BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction, 
     BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, StatementBinder* statementBinder, bool generateDefault, const Span& span)
 {
-    constructorSymbol->SetLinkOnceOdrLinkage();
     Module* module = &boundCompileUnit.GetModule();
     Symbol* parent = constructorSymbol->Parent();
     Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
@@ -3693,7 +3691,6 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
 void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, MemberFunctionNode* assignmentNode, BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction,
     BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, StatementBinder* statementBinder, bool generateDefault, const Span& span)
 {
-    assignmentFunctionSymbol->SetLinkOnceOdrLinkage();
     Module* module = &boundCompileUnit.GetModule();
     Symbol* parent = assignmentFunctionSymbol->Parent();
     Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");
@@ -3838,7 +3835,6 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
 void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode* destructorNode, BoundCompoundStatement* boundCompoundStatement, BoundFunction* boundFunction,
     BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, StatementBinder* statementBinder, const Span& span)
 {
-    destructorSymbol->SetLinkOnceOdrLinkage();
     Module* module = &boundCompileUnit.GetModule();
     Symbol* parent = destructorSymbol->Parent();
     Assert(parent->GetSymbolType() == SymbolType::classTypeSymbol || parent->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol, "class type symbol expected");

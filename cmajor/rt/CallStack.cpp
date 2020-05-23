@@ -113,6 +113,11 @@ extern "C" RT_API void RtPrintCallStack(int fileHandle)
 {
     std::stringstream s;
     cmajor::rt::CallStack* callStack = cmajor::rt::callStack;
+    if (!callStack)
+    {
+        callStack = new cmajor::rt::CallStack();
+        cmajor::rt::callStack = callStack;
+    }
     s << "CALL STACK:\n";
     int n = callStack->Locations().size();
     for (int i = n - 1; i >= 0; --i)
@@ -128,6 +133,11 @@ extern "C" RT_API const char* RtGetStackTrace()
 {
     std::stringstream s;
     cmajor::rt::CallStack* callStack = cmajor::rt::callStack;
+    if (!callStack)
+    {
+        callStack = new cmajor::rt::CallStack();
+        cmajor::rt::callStack = callStack;
+    }
     int n = callStack->Locations().size();
     for (int i = n - 1; i >= 0; --i)
     {

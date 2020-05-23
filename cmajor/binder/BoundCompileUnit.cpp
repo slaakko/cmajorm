@@ -276,6 +276,7 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
     {
         boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
         boost::filesystem::path directory = module.DirectoryPath();
+        boost::filesystem::path objectFileDirectory = module.ObjectFileDirectoryPath();
         boost::filesystem::path llfp = (directory / fileName).replace_extension(".ll");
         boost::filesystem::path cppfp = (directory / fileName).replace_extension(".cpp");
         boost::filesystem::path bcfp = (directory / fileName).replace_extension(".bc");
@@ -285,18 +286,18 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
 #ifdef _WIN32
         if (GetBackEnd() == BackEnd::llvm)
         {
-            objfp = (directory / fileName).replace_extension(".obj");
+            objfp = (objectFileDirectory / fileName).replace_extension(".obj");
         }
         else if (GetBackEnd() == BackEnd::cmsx)
         {
-            objfp = (directory / fileName).replace_extension(".o");
+            objfp = (objectFileDirectory / fileName).replace_extension(".o");
         }
         else if (GetBackEnd() == BackEnd::cmcpp)
         {
-            objfp = (directory / fileName).replace_extension(".obj");
+            objfp = (objectFileDirectory / fileName).replace_extension(".obj");
         }
 #else
-        objfp = (directory / fileName).replace_extension(".o");
+        objfp = (objectFileDirectory / fileName).replace_extension(".o");
 #endif
         llFilePath = GetFullPath(llfp.generic_string());
         cppFilePath = GetFullPath(cppfp.generic_string());

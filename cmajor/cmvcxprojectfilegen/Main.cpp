@@ -47,13 +47,18 @@ int main(int argc, const char** argv)
         bool prevWasFile = false;
         bool prevWasTarget = false;
         bool prevWasConfig = false;
+        bool prevWasLibraryDirs = false;
+        bool prevWasLibs = false;
         std::string projectName;
         std::string projectFilePath;
         std::string projectDir;
         std::string projectGuidStr;
         std::string projectTargetStr;
         std::string projectConfigStr;
+        std::string libraryDirectoriesStr;
+        std::string librariesStr;
         std::vector<std::string> sourceFiles;
+        std::string target;
         for (int i = 1; i < argc; ++i)
         {
             std::string arg = argv[i];
@@ -78,6 +83,14 @@ int main(int argc, const char** argv)
                 else if (arg == "--config")
                 {
                     prevWasConfig = true;
+                }
+                else if (arg == "--librarydirs")
+                {
+                    prevWasLibraryDirs = true;
+                }
+                else if (arg == "--libs")
+                {
+                    prevWasLibs = true;
                 }
                 else
                 {
@@ -116,6 +129,16 @@ int main(int argc, const char** argv)
                             prevWasConfig = true;
                             break;
                         }
+                        case 'L':
+                        {
+                            prevWasLibraryDirs = true;
+                            break;
+                        }
+                        case 'l':
+                        {
+                            prevWasLibs = true;
+                            break;
+                        }
                         default:
                         {
                             throw std::runtime_error("unknown option '-" + arg + "'");
@@ -138,7 +161,7 @@ int main(int argc, const char** argv)
                 }
                 else if (prevWasTarget)
                 {
-                    std::string target = arg;
+                    target = arg;
                     if (target == "library" || target == "winlib")
                     {
                         projectTargetStr = "StaticLibrary";
@@ -153,6 +176,16 @@ int main(int argc, const char** argv)
                 {
                     projectConfigStr = arg;
                     prevWasConfig = false;
+                }
+                else if (prevWasLibraryDirs)
+                {
+                    libraryDirectoriesStr = arg;
+                    prevWasLibraryDirs = false;
+                }
+                else if (prevWasLibs)
+                {
+                    librariesStr = arg;
+                    prevWasLibs = false;
                 }
                 else
                 {
@@ -188,15 +221,25 @@ int main(int argc, const char** argv)
 
             sngxml::dom::Element* globalsProjectGroupElement = new sngxml::dom::Element(U"PropertyGroup");
             globalsProjectGroupElement->SetAttribute(U"Label", U"Globals");
-            sngxml::dom::Element* projectGuidElement = new sngxml::dom::Element(U"ProjectGuid");
             projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(globalsProjectGroupElement));
+            sngxml::dom::Element* vcProjectVersionElement = new sngxml::dom::Element(U"VCProjectVersion");
+            vcProjectVersionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"16.0")));
+            globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(vcProjectVersionElement));
+            sngxml::dom::Element* projectGuidElement = new sngxml::dom::Element(U"ProjectGuid");
             globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(projectGuidElement));
             sngxml::dom::Text* projectGuidText = new sngxml::dom::Text(ToUtf32(projectGuidStr));
             projectGuidElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(projectGuidText));
+            sngxml::dom::Element* keywordElement = new sngxml::dom::Element(U"Keyword");
+            keywordElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Win32Proj")));
+            globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement));
             sngxml::dom::Element* projectRootNamespaceElement = new sngxml::dom::Element(U"RootNamespace");
             globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(projectRootNamespaceElement));
             sngxml::dom::Text* rootNamespaceText = new sngxml::dom::Text(ToUtf32(projectName));
             projectRootNamespaceElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(rootNamespaceText));
+            sngxml::dom::Element* windowsTargetPlatformVersionElement = new sngxml::dom::Element(U"WindowsTargetPlatformVersion");
+            globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(windowsTargetPlatformVersionElement));
+            sngxml::dom::Text* windowsTargetPlatformVersionText = new sngxml::dom::Text(U"10.0");
+            windowsTargetPlatformVersionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(windowsTargetPlatformVersionText));
 
             sngxml::dom::Element* importCppDefaultPropsElement = new sngxml::dom::Element(U"Import");
             importCppDefaultPropsElement->SetAttribute(U"Project", U"$(VCTargetsPath)\\Microsoft.Cpp.Default.props");
@@ -216,17 +259,39 @@ int main(int argc, const char** argv)
             sngxml::dom::Text* debugPlatformToolsetText = new sngxml::dom::Text(U"v142");
             debugPlatformToolsetElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugPlatformToolsetText));
             debugPropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugPlatformToolsetElement));
+            sngxml::dom::Element* debugCharacterElement = new sngxml::dom::Element(U"CharacterSet");
+            sngxml::dom::Text* debugCharacterText = new sngxml::dom::Text(U"Unicode");
+            debugCharacterElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugCharacterText));
+            debugPropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugCharacterElement));
             projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugPropertyGroupElement));
 
             sngxml::dom::Element* importCppPropsElement = new sngxml::dom::Element(U"Import");
             importCppPropsElement->SetAttribute(U"Project", U"$(VCTargetsPath)\\Microsoft.Cpp.props");
             projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(importCppPropsElement));
 
+            sngxml::dom::Element* debugTargetPropertyGroupElement = new sngxml::dom::Element(U"PropertyGroup");
+            debugTargetPropertyGroupElement->SetAttribute(U"Condition", U"'$(Configuration)|$(Platform)'=='Debug|x64'");
+            sngxml::dom::Element* debugTargetLinkElement = new sngxml::dom::Element(U"LinkIncremental");
+            debugTargetLinkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+            debugTargetPropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugTargetLinkElement));
+            sngxml::dom::Element* debugTargetNameElement = new sngxml::dom::Element(U"TargetName");
+            debugTargetNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(projectName))));
+            debugTargetPropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugTargetNameElement));
+
             sngxml::dom::Element* debugItemDefinitionGroup = new sngxml::dom::Element(U"ItemDefinitionGroup");
             debugItemDefinitionGroup->SetAttribute(U"Condition", U"'$(Configuration)|$(Platform)'=='Debug|x64'");
             projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugItemDefinitionGroup));
             sngxml::dom::Element* debugClCompileItemDefinition = new sngxml::dom::Element(U"ClCompile");
             debugItemDefinitionGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugClCompileItemDefinition));
+            sngxml::dom::Element* warningLevelElement = new sngxml::dom::Element(U"WarningLevel");
+            debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(warningLevelElement));
+            warningLevelElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Level3")));
+            sngxml::dom::Element* sdlCheckElement = new sngxml::dom::Element(U"SDLCheck");
+            debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(sdlCheckElement));
+            sdlCheckElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+            sngxml::dom::Element* exceptionHandlingElement = new sngxml::dom::Element(U"ExceptionHandling");
+            debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(exceptionHandlingElement));
+            exceptionHandlingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"SyncCThrow")));
             sngxml::dom::Element* debugPrecompiledHeaderElement = new sngxml::dom::Element(U"PrecompiledHeader");
             debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugPrecompiledHeaderElement));
             sngxml::dom::Text* debugNotUsingPrecompiledHeaderText = new sngxml::dom::Text(U"NotUsing");
@@ -235,6 +300,11 @@ int main(int argc, const char** argv)
             debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugDebugInformationFormatElement));
             sngxml::dom::Text* debugProgramDatabaseText = new sngxml::dom::Text(U"ProgramDatabase");
             debugDebugInformationFormatElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugProgramDatabaseText));
+            sngxml::dom::Element* languageStandardElement = new sngxml::dom::Element(U"LanguageStandard");
+            debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(languageStandardElement));
+            sngxml::dom::Text* languageStandardText = new sngxml::dom::Text(U"stdcpplatest");
+            languageStandardElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(languageStandardText));
+
             sngxml::dom::Element* debugOptimizationElement = new sngxml::dom::Element(U"Optimization");
             debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugOptimizationElement));
             sngxml::dom::Text* debugOptimizationText = new sngxml::dom::Text(U"Disabled");
@@ -243,18 +313,27 @@ int main(int argc, const char** argv)
             debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugRuntimeLibraryElement));
             sngxml::dom::Text* debugRuntimeLibraryText = new sngxml::dom::Text(U"MultiThreadedDebugDLL");
             debugRuntimeLibraryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugRuntimeLibraryText));
+            sngxml::dom::Element* debugDisableWarningsElement = new sngxml::dom::Element(U"DisableSpecificWarnings");
+            debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugDisableWarningsElement));
+            debugDisableWarningsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"4102;4146;4244")));
 
-            if (projectTargetStr == "program" || projectTargetStr == "winapp" || projectTargetStr == "winguiapp")
+            if (projectTargetStr == "Application")
             {
                 sngxml::dom::Element* debugLinkItemDefinition = new sngxml::dom::Element(U"Link");
                 debugItemDefinitionGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugLinkItemDefinition));
                 sngxml::dom::Element* subSystemElement = new sngxml::dom::Element(U"SubSystem");
                 debugLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(subSystemElement));
                 std::u32string subsystem = U"Console";
-                if (projectTargetStr == "winapp" || projectTargetStr == "winguiapp")
+                if (target == "winapp" || target == "winguiapp")
                 {
                     subsystem = U"Windows";
                 }
+                sngxml::dom::Element* libraryDirectoriesElement = new sngxml::dom::Element(U"AdditionalLibraryDirectories");
+                libraryDirectoriesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(libraryDirectoriesStr))));
+                debugLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(libraryDirectoriesElement));
+                sngxml::dom::Element* dependenciesElement = new sngxml::dom::Element(U"AdditionalDependencies");
+                dependenciesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(librariesStr))));
+                debugLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(dependenciesElement));
                 sngxml::dom::Text* subSystemTextStr = new sngxml::dom::Text(subsystem);
                 subSystemElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(subSystemTextStr));
                 sngxml::dom::Element* generateDebugInformationElement = new sngxml::dom::Element(U"GenerateDebugInformation");
@@ -263,25 +342,6 @@ int main(int argc, const char** argv)
                 generateDebugInformationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugInfoText));
             }
 
-            sngxml::dom::Element* debugSetDirectoriesPropertyGroup = new sngxml::dom::Element(U"PropertyGroup"); // overriding default directories:
-            debugSetDirectoriesPropertyGroup->SetAttribute(U"Condition", U"'$(Configuration)|$(Platform)'=='Debug|x64'"); // can override for example TargetName, BaseIntermediateOutputPath, OutDir etc.
-            projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugSetDirectoriesPropertyGroup));
-            sngxml::dom::Element* debugIntermediateDirectoryElement = new sngxml::dom::Element(U"BaseIntermediateOutputPath");
-            sngxml::dom::Text* debugIntermediateDirectoryText = new sngxml::dom::Text(U".");
-            debugIntermediateDirectoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugIntermediateDirectoryText));
-            debugSetDirectoriesPropertyGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugIntermediateDirectoryElement));
-            sngxml::dom::Element* debugBaseOutputPathDirectoryElement = new sngxml::dom::Element(U"BaseOutputPath");
-            sngxml::dom::Text* debugBaseOutputPathDirectoryText = new sngxml::dom::Text(U".");
-            debugBaseOutputPathDirectoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugBaseOutputPathDirectoryText));
-            debugSetDirectoriesPropertyGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugBaseOutputPathDirectoryElement));
-            sngxml::dom::Element* debugOutputPathDirectoryElement = new sngxml::dom::Element(U"OutputPath");
-            sngxml::dom::Text* debugOutputPathDirectoryText = new sngxml::dom::Text(U".");
-            debugOutputPathDirectoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugOutputPathDirectoryText));
-            debugSetDirectoriesPropertyGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugOutputPathDirectoryElement));
-            sngxml::dom::Element* debugIntermediateOutputPathDirectoryElement = new sngxml::dom::Element(U"IntermediateOutputPath");
-            sngxml::dom::Text* debugIntermediateOutputPathDirectoryText = new sngxml::dom::Text(U".");
-            debugIntermediateOutputPathDirectoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugIntermediateOutputPathDirectoryText));
-            debugSetDirectoriesPropertyGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugIntermediateOutputPathDirectoryElement));
             sngxml::dom::Element* debugSources = new sngxml::dom::Element(U"ItemGroup");
             projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugSources));
             for (const std::string& sourceFile : sourceFiles)

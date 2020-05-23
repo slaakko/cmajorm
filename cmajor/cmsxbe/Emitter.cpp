@@ -935,6 +935,16 @@ void* Emitter::CreateSave()
     return context->CreateSave();
 }
 
+void* Emitter::CreateBeginTry()
+{
+    return nullptr;
+}
+
+void* Emitter::CreateEndTry(void* nextDest, void* handlersDest)
+{
+    return nullptr;
+}
+
 std::string Emitter::GetVmtObjectName(void* symbol) const
 {
     // todo

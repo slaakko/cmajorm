@@ -215,6 +215,8 @@ public:
     virtual void* CreateFNeg(void* value) = 0;
     virtual void* CreateNop() = 0;
     virtual void* CreateSave() = 0;
+    virtual void* CreateBeginTry() = 0;
+    virtual void* CreateEndTry(void* nextDest, void* handlersDest) = 0;
     virtual std::string GetVmtObjectName(void* symbol) const = 0;
     virtual void SetVmtObjectName(void* symbol, const std::string& vmtObjectName) = 0;
     virtual std::string GetImtArrayObjectName(void* symbol) const = 0;

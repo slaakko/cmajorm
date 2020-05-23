@@ -554,14 +554,14 @@ void ImportModules(sngcm::ast::Target target, Module* rootModule, Module* module
 
 Module::Module() : 
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
-    symbolTable(nullptr), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0), index(-1),
+    symbolTable(nullptr), directoryPath(), objectFileDirectoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0), index(-1),
     buildStartMs(0), buildStopMs(0), preparing(false)
 {
 }
 
 Module::Module(const std::string& filePath)  :
     format(currentModuleFormat), flags(ModuleFlags::none), name(), originalFilePath(), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0), 
-    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
+    symbolTable(new SymbolTable(this)), directoryPath(), objectFileDirectoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
     index(-1), buildStartMs(0), buildStopMs(0), preparing(false)
 {
     SymbolReader reader(filePath);
@@ -638,7 +638,7 @@ Module::Module(const std::string& filePath)  :
 
 Module::Module(const std::u32string& name_, const std::string& filePath_, sngcm::ast::Target target) :
     format(currentModuleFormat), flags(ModuleFlags::none), name(name_), originalFilePath(filePath_), filePathReadFrom(), referenceFilePaths(), moduleDependency(this), symbolTablePos(0),
-    symbolTable(new SymbolTable(this)), directoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
+    symbolTable(new SymbolTable(this)), directoryPath(), objectFileDirectoryPath(), libraryFilePaths(), moduleIdMap(), logStreamId(0), headerRead(false), systemCoreModule(nullptr), debugLogIndent(0),
     index(-1), buildStartMs(0), buildStopMs(0), preparing(false)
 {
     if (SystemModuleSet::Instance().IsSystemModule(name))
@@ -662,6 +662,12 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
     mfd.remove_filename();
     boost::filesystem::create_directories(mfd);
     SetDirectoryPath(GetFullPath(mfd.generic_string()));
+    SetObjectFileDirectoryPath(GetFullPath(mfd.generic_string()));
+    if (GetBackEnd() == BackEnd::cmcpp)
+    {
+        const Tool& compilerTool = GetCompilerTool();
+        SetObjectFileDirectoryPath(GetFullPath((mfd / compilerTool.outputDirectory).generic_string()));
+    }
     if (name == U"System.Core")
     {
         InitCoreSymbolTable(*symbolTable);
@@ -1037,6 +1043,11 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
 void Module::SetDirectoryPath(const std::string& directoryPath_)
 {
     directoryPath = directoryPath_;
+}
+
+void Module::SetObjectFileDirectoryPath(const std::string& objectFileDirectoryPath_)
+{
+    objectFileDirectoryPath = objectFileDirectoryPath_;
 }
 
 void Module::AddExportedFunction(const std::string& exportedFunction)

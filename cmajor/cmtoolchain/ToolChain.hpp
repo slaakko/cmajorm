@@ -14,6 +14,7 @@ struct CMTOOLCHAIN_API Tool
     std::string name;
     std::string commandName;
     std::string outputFileExtension;
+    std::string outputDirectory;
     std::string debugInformationFileExtension;
     std::string assemblyFileExtension;
     std::vector<std::string> args;

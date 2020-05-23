@@ -207,6 +207,10 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
         efp = outdirBasePath;
     }
     efp /= "bin";
+    if (backend == BackEnd::cppcm)
+    {
+        efp /= "cpp";
+    }
     efp /= config;
     efp /= fn;
 #ifdef _WIN32
