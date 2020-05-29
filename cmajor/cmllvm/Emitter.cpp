@@ -215,6 +215,10 @@ void Emitter::SaveObjectPointer(void* objectPointer_)
     }
 }
 
+void Emitter::SetFunctionName(const std::string& functionName)
+{
+}
+
 void Emitter::PushScope(void* scope)
 {
     scopes.push_back(static_cast<llvm::DIScope*>(scope));
@@ -454,6 +458,27 @@ void* Emitter::CreateBasicBlock(const std::string& name)
     return llvm::BasicBlock::Create(context, name, Function());
 }
 
+void* Emitter::CreateIncludeBasicBlockInstruction(void* basicBlock)
+{
+    return nullptr;
+}
+
+void Emitter::PushParentBlock()
+{
+}
+
+void Emitter::PopParentBlock()
+{
+}
+
+void Emitter::SetHandlerBlock(void* tryBlock, void* catchBlock)
+{
+}
+
+void Emitter::SetCleanupBlock(void* cleanupBlock)
+{
+}
+
 int Emitter::GetBasicBlockId(void* basicBlock)
 {
     return -1;
@@ -687,7 +712,17 @@ void* Emitter::CreateBeginTry()
     return nullptr;
 }
 
-void* Emitter::CreateEndTry(void* nextDest, void* handlersDest)
+void* Emitter::CreateEndTry(void* nextDest)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateBeginCatch()
+{
+    return nullptr;
+}
+
+void* Emitter::CreateEndCatch(void* nextDest)
 {
     return nullptr;
 }

@@ -18,5 +18,6 @@ CMTOOLCHAIN_API const Tool& GetCompilerTool();
 CMTOOLCHAIN_API const Tool& GetLibraryManagerTool();
 CMTOOLCHAIN_API const Tool& GetLinkerTool();
 CMTOOLCHAIN_API const Tool& GetProjectFileGeneratorTool();
+CMTOOLCHAIN_API const Tool& GetSolutionFileGeneratorTool();
 
 #endif // CMAJOR_CMTOOLCHAINS_INCLUDED

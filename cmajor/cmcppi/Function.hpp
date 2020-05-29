@@ -18,8 +18,9 @@ public:
     Function(const std::string& name_, FunctionType* type_, Context& context);
     Function(const Function&) = delete;
     Function& operator=(const Function&) = delete;
-    BasicBlock* CreateBasicBlock(const std::string& name);
-    BasicBlock* CreateCleanupBasicBlock();
+    BasicBlock* CreateBasicBlock(const std::string& name, Context& context);
+    BasicBlock* CreateCleanupBasicBlock(Context& context);
+    const std::vector<std::unique_ptr<BasicBlock>>& BasicBlocks() const { return basicBlocks; }
     void Finalize();
     uint64_t GetNextResultNumber() { return nextResultNumber++; }
     uint64_t GetNextLocalNumber() { return nextLocalNumber++; }
@@ -27,11 +28,14 @@ public:
     Type* GetType(Context& context) override { return type; }
     Value* GetParam(int index) const;
     std::string Name(Context& context) override { return name; }
+    void SetFullName(const std::string& functionName);
     void WriteDeclaration(CodeFormatter& formatter, Context& context);
     void Write(CodeFormatter& formatter, Context& context);
     void SetLinkOnce() { linkOnce = true; }
+    void RemoveUnreferencedBasicBlocks();
 private:
     std::string name;
+    std::string fullName;
     FunctionType* type;
     std::vector<std::unique_ptr<ParamInstruction>> params;
     std::unique_ptr<BasicBlock> entryBlock;

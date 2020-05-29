@@ -101,6 +101,8 @@ public:
     int GetNextExitEntryIndex() { return nextExitEntryIndex++; }
     void ResetCodeGenerated() override;
     void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
+    bool IsGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol) const;
+    void SetGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol);
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -139,6 +141,7 @@ private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> copyConstructorMap;
     std::vector<std::unique_ptr<FunctionSymbol>> copyConstructors;
     int nextExitEntryIndex;
+    std::set<DestructorSymbol*> instantiatedGeneratedDestructors;
 };
 
 } } // namespace cmajor::binder

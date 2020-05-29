@@ -277,6 +277,10 @@ void StatementBinder::Visit(ClassNode& classNode)
     {
         return;
     }
+    if (classTypeSymbol->GroupName() == U"CompoundStatementNode")
+    {
+        int x = 0;
+    }
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundClass> boundClass(new BoundClass(module, classTypeSymbol));
     BoundClass* prevClass = currentClass;
@@ -292,10 +296,37 @@ void StatementBinder::Visit(ClassNode& classNode)
     DestructorSymbol* destructorSymbol = classTypeSymbol->Destructor();
     if (destructorSymbol && destructorSymbol->IsProject() && destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
     {
-        GenerateDestructorImplementation(currentClass, destructorSymbol, boundCompileUnit, containerScope, currentFunction, classNode.GetSpan());
+        if (!boundCompileUnit.IsGeneratedDestructorInstantiated(destructorSymbol))
+        {
+            boundCompileUnit.SetGeneratedDestructorInstantiated(destructorSymbol);
+            GenerateDestructorImplementation(currentClass, destructorSymbol, boundCompileUnit, containerScope, currentFunction, classNode.GetSpan());
+        }
     }
     currentClass = prevClass;
     containerScope = prevContainerScope;
+}
+
+void StatementBinder::Visit(MemberVariableNode& memberVariableNode)
+{
+    Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&memberVariableNode);
+    Assert(symbol->GetSymbolType() == SymbolType::memberVariableSymbol, "member variable symbol expected");
+    MemberVariableSymbol* memberVariableSymbol = static_cast<MemberVariableSymbol*>(symbol);
+    TypeSymbol* typeSymbol = memberVariableSymbol->GetType();
+    if (typeSymbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    {
+        ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(typeSymbol);
+        DestructorSymbol* destructorSymbol = specialization->Destructor();
+        if (destructorSymbol && destructorSymbol->IsProject() && destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
+        {
+            if (!boundCompileUnit.IsGeneratedDestructorInstantiated(destructorSymbol))
+            {
+                boundCompileUnit.SetGeneratedDestructorInstantiated(destructorSymbol);
+                std::unique_ptr<BoundClass> boundClass(new BoundClass(module, specialization));
+                GenerateDestructorImplementation(boundClass.get(), destructorSymbol, boundCompileUnit, containerScope, currentFunction, memberVariableNode.GetSpan());
+                boundCompileUnit.AddBoundNode(std::move(boundClass));
+            }
+        }
+    }
 }
 
 void StatementBinder::Visit(FunctionNode& functionNode)

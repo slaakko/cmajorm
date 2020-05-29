@@ -6,16 +6,22 @@
 #include <cmajor/cmcppi/Context.hpp>
 #include <cmajor/cmcppi/Instruction.hpp>
 #include <cmajor/cmcppi/BasicBlock.hpp>
+#include <cmajor/cmcppi/Function.hpp>
 
 namespace cmcppi {
 
-Context::Context() : currentLineNumber(0), currentFunction(nullptr), currentBasicBlock(nullptr)
+Context::Context() : currentLineNumber(0), currentFunction(nullptr), currentBasicBlock(nullptr), currentParentBlock(nullptr)
 {
 }
 
 void Context::AddValue(Value* value)
 {
     values.push_back(std::unique_ptr<Value>(value));
+}
+
+void Context::SetCurrentBasicBlock(BasicBlock* bb)
+{
+    currentBasicBlock = bb;
 }
 
 ConstantValue* Context::GetBoolValue(bool value)
@@ -459,9 +465,24 @@ Instruction* Context::CreateBeginTry()
     return inst;
 }
 
-Instruction* Context::CreateEndTry(BasicBlock* nextDest, BasicBlock* handlersDest)
+Instruction* Context::CreateEndTry(BasicBlock* nextDest)
 {
-    Instruction* inst = new EndTryInstruction(nextDest, handlersDest);
+    Instruction* inst = new EndTryInstruction(nextDest);
+    currentBasicBlock->AddInstruction(inst);
+    return inst;
+}
+
+Instruction* Context::CreateBeginCatch()
+{
+    Instruction* inst = new BeginCatchInstruction();
+    currentBasicBlock->AddInstruction(inst);
+    return inst;
+}
+
+
+Instruction* Context::CreateEndCatch(BasicBlock* nextDest)
+{
+    Instruction* inst = new EndCatchInstruction(nextDest);
     currentBasicBlock->AddInstruction(inst);
     return inst;
 }
@@ -469,6 +490,13 @@ Instruction* Context::CreateEndTry(BasicBlock* nextDest, BasicBlock* handlersDes
 Instruction* Context::CreateResume()
 {
     Instruction* inst = new ResumeInstruction();
+    currentBasicBlock->AddInstruction(inst);
+    return inst;
+}
+
+Instruction* Context::CreateIncludeBasicBlockInstruction(BasicBlock* block)
+{
+    Instruction* inst = new IncludeBasicBlockInstruction(block);
     currentBasicBlock->AddInstruction(inst);
     return inst;
 }
@@ -509,6 +537,29 @@ void Context::AddLineInfo(Instruction* inst)
 void Context::SetCompileUnitId(const std::string& compileUnitId)
 {
     dataRepository.SetCompileUnitId(compileUnitId);
+}
+
+void Context::PushParent()
+{
+    blockStack.push(currentParentBlock);
+    currentParentBlock = currentBasicBlock;
+}
+
+void Context::PopParent()
+{
+    currentParentBlock = blockStack.top();
+    blockStack.pop();
+}
+
+void Context::SetHandlerBlock(BasicBlock* tryBlock, BasicBlock* catchBlock)
+{
+    tryBlock->SetHandlerBlock(catchBlock);
+}
+
+void Context::SetCleanupBlock(BasicBlock* cleanupBlock)
+{
+    cleanupBlock->SetAsCleanupBlock();
+    currentBasicBlock->SetCleanupBlock(cleanupBlock);
 }
 
 } // namespace cmcppi

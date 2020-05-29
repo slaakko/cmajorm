@@ -35,10 +35,12 @@ void CompileUnit::Write()
     if (!functions.empty())
     {
         formatter.WriteLine("extern \"C\" {");
+        formatter.WriteLine();
         for (const auto& f : functions)
         {
             f->WriteDeclaration(formatter, context);
         }
+        formatter.WriteLine();
         formatter.WriteLine("} // extern \"C\"");
         formatter.WriteLine();
     }
@@ -48,14 +50,20 @@ void CompileUnit::Write()
         bool first = true;
         for (const auto& f : functions)
         {
+            if (f->BasicBlocks().empty())
+            {
+                continue;
+            }
             formatter.WriteLine();
             if (first)
             {
                 formatter.WriteLine("extern \"C\" {");
+                formatter.WriteLine();
                 first = false;
             }
             f->Write(formatter, context);
         }
+        formatter.WriteLine();
         formatter.WriteLine("} // extern \"C\"");
     }
 }

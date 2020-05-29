@@ -139,6 +139,11 @@ public:
     void* GetArrayBeginAddress(void* arrayPtr) override;
     void* GetArrayEndAddress(void* arrayPtr, uint64_t size) override;
     void* CreateBasicBlock(const std::string& name) override;
+    void* CreateIncludeBasicBlockInstruction(void* basicBlock) override;
+    void PushParentBlock() override;
+    void PopParentBlock() override;
+    void SetHandlerBlock(void* tryBlock, void* catchBlock) override;
+    void SetCleanupBlock(void* cleanupBlock) override;
     int GetBasicBlockId(void* basicBlock) override;
     void CreateBr(void* targetBasicBlock) override;
     void* CurrentBasicBlock() const override;
@@ -187,7 +192,9 @@ public:
     void* CreateNop() override;
     void* CreateSave() override;
     void* CreateBeginTry() override;
-    void* CreateEndTry(void* nextDest, void* handlersDest) override;
+    void* CreateEndTry(void* nextDest) override;
+    void* CreateBeginCatch() override;
+    void* CreateEndCatch(void* nextDest) override;
     std::string GetVmtObjectName(void* symbol) const override;
     void SetVmtObjectName(void* symbol, const std::string& vmtObjectName) override;
     std::string GetImtArrayObjectName(void* symbol) const override;
@@ -289,6 +296,7 @@ public:
     void SetFunctionLinkageToLinkOnceODRLinkage(void* function) override;
     void SetFunctionCallConventionToStdCall(void* function) override;
     void SetFunction(void* function_) override;
+    void SetFunctionName(const std::string& functionName) override;
     void SetInPrologue(bool inPrologue_) override;
     void* CreateSubroutineType(const std::vector<void*>& elementTypes) override;
     unsigned GetPureVirtualVirtuality() override;

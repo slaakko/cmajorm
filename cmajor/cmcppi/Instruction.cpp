@@ -33,6 +33,10 @@ void Instruction::WriteResult(CodeFormatter& formatter, Function& function, Cont
     formatter.Write(" " + Name(context));
 }
 
+void Instruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
+{
+}
+
 UnaryInstruction::UnaryInstruction(Value* arg_) : Instruction(), arg(arg_)
 {
 }
@@ -52,7 +56,7 @@ BinaryInstruction::BinaryInstruction(Value* left_, Value* right_) : Instruction(
 
 Type* BinaryInstruction::GetType(Context& context)
 {
-    Assert(left->GetType(context) == right->GetType(context), "types differ");
+    //Assert(left->GetType(context) == right->GetType(context), "types differ");
     return left->GetType(context);
 }
 
@@ -582,9 +586,6 @@ void InvokeInstruction::Write(CodeFormatter& formatter, Function& function, Cont
         WriteResult(formatter, function, context); 
         formatter.WriteLine(";");
     }
-    formatter.WriteLine("try");
-    formatter.WriteLine("{");
-    formatter.IncIndent();
     if (!GetType(context)->IsVoidType())
     {
         formatter.Write(Name(context));
@@ -615,15 +616,13 @@ void InvokeInstruction::Write(CodeFormatter& formatter, Function& function, Cont
     }
     formatter.WriteLine(");");
     formatter.WriteLine("goto __bb" + std::to_string(normalBlockNext->Id()) + ";");
-    formatter.DecIndent();
-    formatter.WriteLine("}");
-    formatter.WriteLine("catch (...)");
-    formatter.WriteLine("{");
-    formatter.IncIndent();
-    formatter.WriteLine("goto __bb" + std::to_string(unwindBlockNext->Id()) + ";");
-    formatter.DecIndent();
-    formatter.WriteLine("}");
     SetNoSemicolon();
+}
+
+void InvokeInstruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
+{
+    basicBlocks.insert(normalBlockNext);
+    basicBlocks.insert(unwindBlockNext);
 }
 
 RetInstruction::RetInstruction(Value* value_) : Instruction(), value(value_)
@@ -649,6 +648,11 @@ void JumpInstruction::Write(CodeFormatter& formatter, Function& function, Contex
     formatter.Write("__bb" + std::to_string(dest->Id()));
 }
 
+void JumpInstruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
+{
+    basicBlocks.insert(dest);
+}
+
 BranchInstruction::BranchInstruction(Value* cond_, BasicBlock* trueDest_, BasicBlock* falseDest_) : Instruction(), cond(cond_), trueDest(trueDest_), falseDest(falseDest_)
 {
 }
@@ -661,6 +665,12 @@ void BranchInstruction::Write(CodeFormatter& formatter, Function& function, Cont
     formatter.Write("goto __bb" + std::to_string(trueDest->Id()) + ";");
     formatter.Write(" else ");
     formatter.Write("goto __bb" + std::to_string(falseDest->Id()));
+}
+
+void BranchInstruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
+{
+    basicBlocks.insert(trueDest);
+    basicBlocks.insert(falseDest);
 }
 
 SwitchInstruction::SwitchInstruction(Value* cond_, BasicBlock* defaultDest_) : Instruction(), cond(cond_), defaultDest(defaultDest_), destinations()
@@ -693,6 +703,18 @@ void SwitchInstruction::Write(CodeFormatter& formatter, Function& function, Cont
     SetNoSemicolon();
 }
 
+void SwitchInstruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
+{
+    if (defaultDest)
+    {
+        basicBlocks.insert(defaultDest);
+    }
+    for (const auto& destination : destinations)
+    {
+        basicBlocks.insert(destination.second);
+    }
+}
+
 NoOperationInstruction::NoOperationInstruction() : Instruction()
 {
 }
@@ -711,24 +733,111 @@ void BeginTryInstruction::Write(CodeFormatter& formatter, Function& function, Co
     formatter.WriteLine("try");
     formatter.WriteLine("{");
     formatter.IncIndent();
+    SetNoSemicolon();
 }
 
-EndTryInstruction::EndTryInstruction(BasicBlock* nextDest_, BasicBlock* handlersDest_) : Instruction(), nextDest(nextDest_), handlersDest(handlersDest_)
+EndTryInstruction::EndTryInstruction(BasicBlock* nextDest_) : Instruction(), nextDest(nextDest_)
 {
 }
 
 void EndTryInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.WriteLine("goto __bb" + std::to_string(nextDest->Id()) + ";");
-    formatter.DecIndent();
-    formatter.WriteLine("}");
-    formatter.WriteLine("catch (...)");
-    formatter.WriteLine("{");
-    formatter.IncIndent();
-    formatter.WriteLine("goto __bb" + std::to_string(handlersDest->Id()) + ";");
+    if (nextDest)
+    {
+        formatter.WriteLine("goto __bb" + std::to_string(nextDest->Id()) + ";");
+    }
+    for (BasicBlock* child : context.GetCurrentBasicBlock()->Children())
+    {
+        if (child == context.GetCurrentBasicBlock()->HandlerBlock())
+        {
+            continue;
+        }
+        if (child->IsCleanupBlock())
+        {
+            continue;
+        }
+        if (!child->Included())
+        {
+            child->SetIncluded();
+            formatter.WriteLine();
+            child->Write(formatter, function, context);
+            SetNoSemicolon();
+        }
+    }
+    if (nextDest)
+    {
+        formatter.WriteLine("goto __bb" + std::to_string(nextDest->Id()) + ";");
+    }
     formatter.DecIndent();
     formatter.WriteLine("}");
     SetNoSemicolon();
+}
+
+void EndTryInstruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
+{
+    basicBlocks.insert(parent);
+    if (nextDest)
+    {
+        basicBlocks.insert(nextDest);
+    }
+}
+
+BeginCatchInstruction::BeginCatchInstruction() : Instruction()
+{
+}
+
+void BeginCatchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    formatter.WriteLine("catch (...)");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    SetNoSemicolon();
+}
+
+void BeginCatchInstruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
+{
+    basicBlocks.insert(parent);
+}
+
+EndCatchInstruction::EndCatchInstruction(BasicBlock* nextDest_) : Instruction(), nextDest(nextDest_)
+{
+}
+
+void EndCatchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    for (BasicBlock* child : context.GetCurrentBasicBlock()->Children())
+    {
+        if (child == context.GetCurrentBasicBlock()->HandlerBlock())
+        {
+            continue;
+        }
+        if (!child->Included())
+        {
+            child->SetIncluded();
+            child->Write(formatter, function, context);
+            formatter.WriteLine();
+            SetNoSemicolon();
+        }
+    }
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    if (nextDest)
+    {
+        formatter.Write("goto __bb" + std::to_string(nextDest->Id()));
+    }
+    else
+    {
+        SetNoSemicolon();
+    }
+}
+
+void EndCatchInstruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
+{
+    basicBlocks.insert(parent);
+    if (nextDest)
+    {
+        basicBlocks.insert(nextDest);
+    }
 }
 
 ResumeInstruction::ResumeInstruction() : Instruction()
@@ -738,6 +847,27 @@ ResumeInstruction::ResumeInstruction() : Instruction()
 void ResumeInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     formatter.Write("throw");
+}
+
+IncludeBasicBlockInstruction::IncludeBasicBlockInstruction(BasicBlock* block_) : block(block_)
+{
+}
+
+void IncludeBasicBlockInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    if (!block->Included())
+    {
+        block->SetIncluded();
+        block->Write(formatter, function, context);
+        formatter.WriteLine();
+        SetNoSemicolon();
+    }
+}
+
+void IncludeBasicBlockInstruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
+{
+    basicBlocks.insert(parent);
+    basicBlocks.insert(block);
 }
 
 } // namespace cmcppi

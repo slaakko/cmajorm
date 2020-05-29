@@ -7,6 +7,7 @@
 #define CMAJOR_CMCPPI_CONTEXT_INCLUDED
 #include <cmajor/cmcppi/Type.hpp>
 #include <cmajor/cmcppi/Data.hpp>
+#include <stack>
 
 namespace cmcppi {
 
@@ -77,8 +78,10 @@ public:
     ConversionValue* GetConversionValue(Type* type, ConstantValue* from);
     ClsIdValue* GetClsIdValue(const std::string& typeId);
     void AddValue(Value* value);
-    void SetCurrentBasicBlock(BasicBlock* bb) { currentBasicBlock = bb; }
+    void SetCurrentBasicBlock(BasicBlock* bb);
     BasicBlock* GetCurrentBasicBlock() const { return currentBasicBlock; }
+    void SetCurrentFunction(Function* fun) { currentFunction = fun; }
+    Function* CurrentFunction() const { return currentFunction; }
     Instruction* CreateNot(Value* arg);
     Instruction* CreateNeg(Value* arg);
     Instruction* CreateAdd(Value* left, Value* right);
@@ -116,8 +119,11 @@ public:
     Instruction* CreateSwitch(Value* cond, BasicBlock* defaultDest);
     Instruction* CreateNop();
     Instruction* CreateBeginTry();
-    Instruction* CreateEndTry(BasicBlock* nextDest, BasicBlock* handlersDest);
+    Instruction* CreateEndTry(BasicBlock* nextDest);
+    Instruction* CreateBeginCatch();
+    Instruction* CreateEndCatch(BasicBlock* nextDest);
     Instruction* CreateResume();
+    Instruction* CreateIncludeBasicBlockInstruction(BasicBlock* block);
     GlobalVariable* GetOrInsertGlobal(const std::string& name, Type* type);
     GlobalVariable* CreateGlobalStringPtr(const std::string& stringValue);
     GlobalVariable* CreateGlobalWStringPtr(const std::u16string& stringValue);
@@ -125,12 +131,19 @@ public:
     void SetCurrentLineNumber(int lineNumber);
     void AddLineInfo(Instruction* inst);
     void SetCompileUnitId(const std::string& compileUnitId);
+    void PushParent();
+    void PopParent();
+    void SetHandlerBlock(BasicBlock* tryBlock, BasicBlock* catchBlock);
+    void SetCleanupBlock(BasicBlock* cleanupBlock);
+    BasicBlock* CurrentParent() const { return currentParentBlock; }
 private:
     TypeRepository typeRepository;
     DataRepository dataRepository;
     std::vector<std::unique_ptr<Value>> values;
     Function* currentFunction;
     BasicBlock* currentBasicBlock;
+    BasicBlock* currentParentBlock;
+    std::stack<BasicBlock*> blockStack;
     int currentLineNumber;
 };
 

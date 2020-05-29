@@ -677,12 +677,37 @@ void* Emitter::CreateBasicBlock(const std::string& name)
 {
     if (name == "cleanup")
     {
-        return currentFunction->CreateCleanupBasicBlock();
+        return currentFunction->CreateCleanupBasicBlock(*context);
     }
     else
     {
-        return currentFunction->CreateBasicBlock(name);
+        return currentFunction->CreateBasicBlock(name, *context);
     }
+}
+
+void* Emitter::CreateIncludeBasicBlockInstruction(void* basicBlock)
+{
+    return context->CreateIncludeBasicBlockInstruction(static_cast<cmcppi::BasicBlock*>(basicBlock));
+}
+
+void Emitter::PushParentBlock()
+{
+    context->PushParent();
+}
+
+void Emitter::PopParentBlock()
+{
+    context->PopParent();
+}
+
+void Emitter::SetHandlerBlock(void* tryBlock, void* catchBlock)
+{
+    context->SetHandlerBlock(static_cast<cmcppi::BasicBlock*>(tryBlock), static_cast<cmcppi::BasicBlock*>(catchBlock));
+}
+
+void Emitter::SetCleanupBlock(void* cleanupBlock)
+{
+    context->SetCleanupBlock(static_cast<cmcppi::BasicBlock*>(cleanupBlock));
 }
 
 int Emitter::GetBasicBlockId(void* basicBlock)
@@ -939,9 +964,19 @@ void* Emitter::CreateBeginTry()
     return context->CreateBeginTry();
 }
 
-void* Emitter::CreateEndTry(void* nextDest, void* handlersDest)
+void* Emitter::CreateEndTry(void* nextDest)
 {
-    return context->CreateEndTry(static_cast<cmcppi::BasicBlock*>(nextDest), static_cast<cmcppi::BasicBlock*>(handlersDest));
+    return context->CreateEndTry(static_cast<cmcppi::BasicBlock*>(nextDest));
+}
+
+void* Emitter::CreateBeginCatch()
+{
+    return context->CreateBeginCatch();
+}
+
+void* Emitter::CreateEndCatch(void* nextDest)
+{
+    return context->CreateEndCatch(static_cast<cmcppi::BasicBlock*>(nextDest));
 }
 
 std::string Emitter::GetVmtObjectName(void* symbol) const
@@ -1020,6 +1055,7 @@ void* Emitter::GetOrInsertGlobal(const std::string& name, void* type)
 
 void* Emitter::GetOrInsertAnyComdat(const std::string& name, void* global)
 {
+    static_cast<cmcppi::GlobalVariable*>(global)->SetLinkOnce();
     return nullptr;
 }
 
@@ -1076,7 +1112,7 @@ void* Emitter::CleanupBlock()
 
 bool Emitter::NewCleanupNeeded()
 {
-    return emittingDelegate->NewCleanupNeeded();
+    return false;
 }
 
 void Emitter::CreateCleanup()
@@ -1358,8 +1394,7 @@ void* Emitter::GetClassName(void* vmtPtr, int32_t classNameVmtIndexOffset)
 {
     cmcppi::Value* classNamePtrPtr = context->CreateElemAddr(static_cast<cmcppi::Value*>(vmtPtr), context->GetLongValue(classNameVmtIndexOffset));
     cmcppi::Value* classNamePtr = context->CreateLoad(classNamePtrPtr);
-    cmcppi::Value* classNameCharPtr = context->CreateBitCast(classNamePtr, context->GetPtrType(context->GetPtrType(context->GetCharType())));
-    cmcppi::Value* className = context->CreateLoad(classNameCharPtr);
+    cmcppi::Value* className = context->CreateBitCast(classNamePtr, context->GetPtrType(context->GetCharType()));
     return className;
 }
 
@@ -1561,6 +1596,11 @@ void Emitter::SetFunctionCallConventionToStdCall(void* function)
 void Emitter::SetFunction(void* function_)
 {
     currentFunction = static_cast<cmcppi::Function*>(function_);
+}
+
+void Emitter::SetFunctionName(const std::string& functionName)
+{
+    currentFunction->SetFullName(functionName);
 }
 
 void Emitter::SetInPrologue(bool inPrologue_)
@@ -1807,13 +1847,13 @@ void* Emitter::CreateUndefValue(void* type)
     return nullptr;
 }
 
+void Emitter::DebugPrintDebugInfo(const std::string& filePath)
+{
+}
+
 void Emitter::CreateResume(void* exception)
 {
     context->CreateResume();
-}
-
-void Emitter::DebugPrintDebugInfo(const std::string& filePath)
-{
 }
 
 } // namespace cmsxbe

@@ -391,7 +391,7 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
                 {
                     backend = sngcm::ast::BackEnd::cppcm;
                 }
-                mfp = CmajorSystemLibDir(config, backend);
+                mfp = CmajorSystemLibDir(config, backend, GetToolChain());
                 searchedDirectories.append("\n").append(mfp.generic_string());
                 mfp /= mfn;
                 if (!boost::filesystem::exists(mfp))
@@ -444,7 +444,7 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
                 {
                     backend = sngcm::ast::BackEnd::cppcm;
                 }
-                mfp = CmajorSystemLibDir(config, backend);
+                mfp = CmajorSystemLibDir(config, backend, GetToolChain());
                 mfp /= mfn;
                 if (!boost::filesystem::exists(mfp))
                 {
@@ -523,11 +523,11 @@ void ImportModulesWithReferences(sngcm::ast::Target target,
             first = false;
             if (target == sngcm::ast::Target::winguiapp || target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib)
             {
-                allReferences.push_back(CmajorSystemWindowsModuleFilePath(GetConfig()));
+                allReferences.push_back(CmajorSystemWindowsModuleFilePath(GetConfig(), GetToolChain()));
             }
             else
             {
-                allReferences.push_back(CmajorSystemModuleFilePath(GetConfig(), backend));
+                allReferences.push_back(CmajorSystemModuleFilePath(GetConfig(), backend, GetToolChain()));
             }
         }
     }
@@ -612,13 +612,29 @@ Module::Module(const std::string& filePath)  :
         else if (GetBackEnd() == BackEnd::cmcpp)
         {
             const Tool& libraryManagerTool = GetLibraryManagerTool();
-            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            libraryFilePath = GetFullPath(
+                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
+                    libraryManagerTool.outputFileExtension).generic_string());
+            if (IsSystemModule())
+            {
+                libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
+                    "system"), "platform"), "windows"), "cpp"), GetToolChain()),
+                    GetConfig()), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            }
         }
 #else
         if (GetBackEnd() == BackEnd::cmcpp)
         {
             const Tool& libraryManagerTool = GetLibraryManagerTool();
-            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            libraryFilePath = GetFullPath(
+                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
+                    libraryManagerTool.outputFileExtension).generic_string());
+            if (IsSystemModule())
+            {
+                libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
+                    "system"), "platform"), "linux"), "cpp"), GetToolChain()),
+                    GetConfig()), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            }
         }
         else
         {
@@ -702,13 +718,29 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
         else if (GetBackEnd() == BackEnd::cmcpp)
         {
             const Tool& libraryManagerTool = GetLibraryManagerTool();
-            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            libraryFilePath = GetFullPath(
+                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
+                    libraryManagerTool.outputFileExtension).generic_string());
+            if (IsSystemModule())
+            {
+                libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
+                    "system"), "platform"), "windows"), "cpp"), GetToolChain()),
+                    GetConfig()), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            }
         }
 #else
         if (GetBackEnd() == BackEnd::cmcpp)
         {
             const Tool& libraryManagerTool = GetLibraryManagerTool();
-            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            libraryFilePath = GetFullPath(
+                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
+                    libraryManagerTool.outputFileExtension).generic_string());
+            if (IsSystemModule())
+            {
+                libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
+                    "system"), "platform"), "linux"), "cpp"), GetToolChain()),
+                    GetConfig()), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            }
         }
         else
         {
@@ -978,13 +1010,29 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         else if (GetBackEnd() == BackEnd::cmcpp)
         {
             const Tool& libraryManagerTool = GetLibraryManagerTool();
-            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            libraryFilePath = GetFullPath(
+                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
+                    libraryManagerTool.outputFileExtension).generic_string());
+            if (IsSystemModule())
+            {
+                libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
+                    "system"), "platform"), "windows"), "cpp"), GetToolChain()),
+                    GetConfig()), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            }
         }
 #else
         if (GetBackEnd() == BackEnd::cmcpp)
         {
             const Tool& libraryManagerTool = GetLibraryManagerTool();
-            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            libraryFilePath = GetFullPath(
+                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
+                    libraryManagerTool.outputFileExtension).generic_string());
+            if (IsSystemModule())
+            {
+                libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
+                    "system"), "platform"), "linux"), "cpp"), GetToolChain()),
+                    GetConfig()), libraryManagerTool.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+            }
         }
         else
         {
@@ -1217,9 +1265,11 @@ void Module::CheckUpToDate()
             {
                 objectFilePath = libDirPath / sfp.filename().replace_extension(".obj");
             }
-            if (GetBackEnd() == BackEnd::cmcpp)
+            else if (GetBackEnd() == BackEnd::cmcpp)
             {
-                objectFilePath = libDirPath / sfp.filename().replace_extension(".obj");
+                const Tool& compilerTool = GetCompilerTool();
+                std::string outputDirPath = compilerTool.outputDirectory;
+                objectFilePath = libDirPath / outputDirPath / sfp.filename().replace_extension(compilerTool.outputFileExtension);
             }
             else if (GetBackEnd() == BackEnd::cmsx)
             {

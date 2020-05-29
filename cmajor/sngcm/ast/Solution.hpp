@@ -59,6 +59,7 @@ public:
     Solution& operator=(const Solution&) = delete;
     const std::u32string& Name() const { return name; }
     const std::string& FilePath() const { return filePath; }
+    const std::vector<std::unique_ptr<Project>>& Projects() const { return projects; }
     const boost::filesystem::path& BasePath() const { return basePath; }
     const std::vector<std::string>& ProjectFilePaths() const { return projectFilePaths; }
     const std::vector<std::string>& RelativeProjectFilePaths() const { return relativeProjectFilePaths; }

@@ -37,6 +37,38 @@ struct InitDone
     }
 };
 
+const char* version = "3.5.0";
+
+void PrintHelp()
+{
+    std::cout << "Cmajor Visual Studio C++ .vcxproj project file generator version " << version << std::endl;
+    std::cout << "Usage: cmvcxprojectfilegen [options] { SOURCEFILE.cpp }" << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "--help (-h):" << std::endl;
+    std::cout << "  Print help and exit." << std::endl;
+    std::cout << "--verbose (-v):" << std::endl;
+    std::cout << "  Be verbose." << std::endl;
+    std::cout << "--name (-n) $PROJECT_NAME$" << std::endl;
+    std::cout << "  Set project name to $PROJECT_NAME$." << std::endl;
+    std::cout << "--file (-f) $PROJECT_FILE_PATH$" << std::endl;
+    std::cout << "  Generate project file $PROJECT_FILE_PATH$." << std::endl;
+    std::cout << "--target (-t) $PROJECT_TARGET$" << std::endl;
+    std::cout << "  Set project target to $PROJECT_TARGET$," << std::endl;
+    std::cout << "  where target can be 'program', 'library', 'winapp', 'winguiapp', 'winlib'" << std::endl;
+    std::cout << "--config (-c) $PROJECT_CONFIG$" << std::endl;
+    std::cout << "  Set project configuration to $PROJECT_CONFIG$," << std::endl;
+    std::cout << "  where config can be 'debug' or 'release'" << std::endl;
+    std::cout << "--librarydirs (-L) $LIBRARY_DIRECTORIES$" << std::endl;
+    std::cout << "  Set library directories to semicolon-separated list of directories." << std::endl;
+    std::cout << "--libs (-l) $LIBRARY_FILE_NAMES$" << std::endl;
+    std::cout << "  Set libraries to semicolon-separated list of library file names." << std::endl;
+    std::cout << "--options (-o) $OPTIONS$" << std::endl;
+    std::cout << "  Set compilation options to $OPTIONS$," << std::endl;
+    std::cout << "  where options can contain /FAs for generating assembly listings," << std::endl;
+    std::cout << "  /JMC for enabling Just My Code debugging, and" << std::endl;
+    std::cout << "  /GR for enabling C++ runtime type-information." << std::endl;
+}
+
 int main(int argc, const char** argv)
 {
     InitDone initDone;
@@ -49,6 +81,7 @@ int main(int argc, const char** argv)
         bool prevWasConfig = false;
         bool prevWasLibraryDirs = false;
         bool prevWasLibs = false;
+        bool prevWasOptions = false;
         std::string projectName;
         std::string projectFilePath;
         std::string projectDir;
@@ -57,6 +90,7 @@ int main(int argc, const char** argv)
         std::string projectConfigStr;
         std::string libraryDirectoriesStr;
         std::string librariesStr;
+        std::string optionsStr;
         std::vector<std::string> sourceFiles;
         std::string target;
         for (int i = 1; i < argc; ++i)
@@ -64,6 +98,11 @@ int main(int argc, const char** argv)
             std::string arg = argv[i];
             if (StartsWith(arg, "--"))
             {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
                 if (arg == "--verbose")
                 {
                     verbose = true;
@@ -92,6 +131,10 @@ int main(int argc, const char** argv)
                 {
                     prevWasLibs = true;
                 }
+                else if (arg == "--options")
+                {
+                    prevWasOptions = true;
+                }
                 else
                 {
                     throw std::runtime_error("unknown option '" + arg + "'");
@@ -108,6 +151,11 @@ int main(int argc, const char** argv)
                         {
                             verbose = true;
                             break;
+                        }
+                        case 'h':
+                        {
+                            PrintHelp();
+                            return 1;
                         }
                         case 'n':
                         {
@@ -137,6 +185,11 @@ int main(int argc, const char** argv)
                         case 'l':
                         {
                             prevWasLibs = true;
+                            break;
+                        }
+                        case 'o':
+                        {
+                            prevWasOptions = true;
                             break;
                         }
                         default:
@@ -187,11 +240,20 @@ int main(int argc, const char** argv)
                     librariesStr = arg;
                     prevWasLibs = false;
                 }
+                else if (prevWasOptions)
+                {
+                    optionsStr = arg;
+                    prevWasOptions = false;
+                }
                 else
                 {
                     sourceFiles.push_back(Path::MakeCanonical(arg));
                 }
             }
+        }
+        if (verbose)
+        {
+            std::cout << "Cmajor Visual Studio C++ .vcxproj project file generator 'cmvcxprojectfilegen' version " << version << std::endl;
         }
         if (projectConfigStr == "debug")
         {
@@ -302,9 +364,8 @@ int main(int argc, const char** argv)
             debugDebugInformationFormatElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugProgramDatabaseText));
             sngxml::dom::Element* languageStandardElement = new sngxml::dom::Element(U"LanguageStandard");
             debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(languageStandardElement));
-            sngxml::dom::Text* languageStandardText = new sngxml::dom::Text(U"stdcpplatest");
+            sngxml::dom::Text* languageStandardText = new sngxml::dom::Text(U"stdcpp17");
             languageStandardElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(languageStandardText));
-
             sngxml::dom::Element* debugOptimizationElement = new sngxml::dom::Element(U"Optimization");
             debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugOptimizationElement));
             sngxml::dom::Text* debugOptimizationText = new sngxml::dom::Text(U"Disabled");
@@ -316,7 +377,30 @@ int main(int argc, const char** argv)
             sngxml::dom::Element* debugDisableWarningsElement = new sngxml::dom::Element(U"DisableSpecificWarnings");
             debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugDisableWarningsElement));
             debugDisableWarningsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"4102;4146;4244")));
-
+            if (optionsStr.find("/FAs") != std::string::npos)
+            {
+                sngxml::dom::Element* debugAssemblerOutputElement = new sngxml::dom::Element(U"AssemblerOutput");
+                debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugAssemblerOutputElement));
+                debugAssemblerOutputElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"AssemblyAndSourceCode")));
+            }
+            if (optionsStr.find("/JMC") != std::string::npos)
+            {
+                sngxml::dom::Element* debugJustMyCodeElement = new sngxml::dom::Element(U"SupportJustMyCode");
+                debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugJustMyCodeElement));
+                debugJustMyCodeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+            }
+            else
+            {
+                sngxml::dom::Element* debugJustMyCodeElement = new sngxml::dom::Element(U"SupportJustMyCode");
+                debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugJustMyCodeElement));
+                debugJustMyCodeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"false")));
+            }
+            if (optionsStr.find("/GR") != std::string::npos)
+            {
+                sngxml::dom::Element* debugRTTI = new sngxml::dom::Element(U"RuntimeTypeInfo");
+                debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugRTTI));
+                debugRTTI->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+            }
             if (projectTargetStr == "Application")
             {
                 sngxml::dom::Element* debugLinkItemDefinition = new sngxml::dom::Element(U"Link");
@@ -357,6 +441,10 @@ int main(int argc, const char** argv)
             std::ofstream projectFile(projectFilePath);
             CodeFormatter formatter(projectFile);
             projectFileDoc.Write(formatter);
+        }
+        if (verbose)
+        {
+            std::cout << "==> " << projectFilePath << std::endl;
         }
     }
     catch (const std::exception& ex)

@@ -1418,7 +1418,10 @@ void* ClassTypeSymbol::CreateImt(Emitter& emitter, int index)
     std::string imtObjectName = ImtObjectName(index);
     void* imtType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), imt.size());
     void* imtObject = emitter.GetOrInsertGlobal(imtObjectName, imtType);
-    void* comdat = emitter.GetOrInsertAnyComdat(imtObjectName, imtObject);
+    if (GetBackEnd() != BackEnd::cmcpp)
+    {
+        void* comdat = emitter.GetOrInsertAnyComdat(imtObjectName, imtObject);
+    }
     std::vector<void*> irImt;
     int n = imt.size();
     for (int i = 0; i < n; ++i)
@@ -1436,7 +1439,10 @@ void* ClassTypeSymbol::CreateImts(Emitter& emitter)
     std::string imtArrayObjectName = ImtArrayObjectName(emitter);
     void* imtsArrayType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), implementedInterfaces.size());
     void* imtsArrayObject = emitter.GetOrInsertGlobal(imtArrayObjectName, imtsArrayType);
-    void* comdat = emitter.GetOrInsertAnyComdat(imtArrayObjectName, imtsArrayObject);
+    if (GetBackEnd() != BackEnd::cmcpp)
+    {
+        void* comdat = emitter.GetOrInsertAnyComdat(imtArrayObjectName, imtsArrayObject);
+    }
     std::vector<void*> imtsArray;
     int n = imts.size();
     for (int i = 0; i < n; ++i)
@@ -1466,8 +1472,20 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
     if (!emitter.IsVmtObjectCreated(this) && create)
     {
         emitter.SetVmtObjectCreated(this);
-        std::string vmtObjectName = VmtObjectName(emitter);
-        void* comdat = emitter.GetOrInsertAnyComdat(vmtObjectName, vmtObject);
+        bool specialization = GetSymbolType() == SymbolType::classTemplateSpecializationSymbol;
+        if (GetBackEnd() == BackEnd::cmcpp && !specialization)
+        {
+            if (VmtEmitted())
+            {
+                return vmtObject;
+            }
+            SetVmtEmitted();
+        }
+        else
+        {
+            std::string vmtObjectName = VmtObjectName(emitter);
+            void* comdat = emitter.GetOrInsertAnyComdat(vmtObjectName, vmtObject);
+        }
         std::vector<void*> vmtArray;
         if (GetBackEnd() == BackEnd::llvm)
         {

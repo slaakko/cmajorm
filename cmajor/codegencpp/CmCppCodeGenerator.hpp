@@ -67,6 +67,7 @@ public:
     void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) override;
     void Visit(BoundThrowStatement& boundThrowStatement) override;
     void Visit(BoundTryStatement& boundTryStatement) override;
+    void Visit(BoundRethrowStatement& boundRethrowStatement) override;
     void Visit(BoundParameter& boundParameter) override;
     void Visit(BoundLocalVariable& boundLocalVariable) override;
     void Visit(BoundMemberVariable& boundMemberVariable) override;
@@ -102,15 +103,17 @@ public:
     void* GetGlobalUuidConstant(int uuidId) override;
     void* HandlerBlock() override;
     void* CleanupBlock() override;
-    bool NewCleanupNeeded() override;
-    void CreateCleanup() override;
-    void GenerateCodeForCleanups(FunctionSymbol* function);
+    void GenerateCleanup(int tryIndex, BoundFunctionCall* destructorCall);
+    void GenerateCodeForCleanups();
     bool InTryBlock() const override;
     int CurrentTryBlockId() const override;
     int Install(const std::string& str) override;
     int Install(const std::u16string& str) override;
     int Install(const std::u32string& str) override;
+    void SetLineNumber(int32_t lineNumber) override;
+    std::string GetSourceFilePath(int32_t fileIndex) override;
     void Compile(const std::string& intermediateCodeFile);
+    void CreateExitFunctionCall();
 private:
     cmajor::ir::Emitter* emitter;
     cmajor::ir::EmittingContext* emittingContext;
@@ -135,8 +138,11 @@ private:
     BoundCompoundStatement* continueTargetBlock;
     std::unordered_map<BoundStatement*, void*> labeledStatementMap;
     std::unordered_map<BoundCompoundStatement*, std::vector<std::unique_ptr<BoundFunctionCall>>> blockDestructionMap;
-    std::vector<std::unique_ptr<Cleanup>> cleanups;
     std::vector<BoundCompoundStatement*> blocks;
+    std::vector<std::unique_ptr<Cleanup>> cleanups;
+    std::unordered_map<int, Cleanup*> cleanupMap;
+    std::unordered_map<int, void*> tryIndexCleanupTryBlockMap;
+    std::unordered_map<int, int> tryIndexMap;
     void* lastAlloca;
     BoundClass* currentClass;
     std::stack<BoundClass*> classStack;
@@ -147,6 +153,7 @@ private:
     std::unordered_map<int, void*> utf16stringMap;
     std::unordered_map<int, void*> utf32stringMap;
     std::unordered_map<int, void*> uuidMap;
+    std::unordered_map<void*, int> unwindBlockMap;
     std::string compileUnitId;
     bool generateLineNumbers;
     int64_t currentTryBlockId;
@@ -154,8 +161,10 @@ private:
     void* currentTryNextBlock;
     void* handlerBlock;
     void* cleanupBlock;
-    bool newCleanupNeeded;
     bool inTryBlock;
+    int numTriesInCurrentBlock;
+    int tryIndex;
+    int32_t prevLineNumber;
 };
 
 } } // namespace cmajor::codegencpp

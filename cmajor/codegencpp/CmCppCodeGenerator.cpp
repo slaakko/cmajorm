@@ -45,8 +45,8 @@ CmCppCodeGenerator::CmCppCodeGenerator(cmajor::ir::EmittingContext& emittingCont
     nativeCompileUnit(nullptr), function(nullptr), entryBasicBlock(nullptr), lastInstructionWasRet(false), destructorCallGenerated(false), genJumpingBoolCode(false),
     trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr), sequenceSecond(nullptr), currentFunction(nullptr), currentBlock(nullptr),
     breakTargetBlock(nullptr), continueTargetBlock(nullptr), lastAlloca(nullptr), currentClass(nullptr), basicBlockOpen(false), defaultDest(nullptr), currentCaseMap(nullptr),
-    generateLineNumbers(false), currentTryBlockId(-1), nextTryBlockId(0), currentTryNextBlock(nullptr), handlerBlock(nullptr), cleanupBlock(nullptr), newCleanupNeeded(false),
-    inTryBlock(false), prevWasTerminator(false)
+    generateLineNumbers(false), currentTryBlockId(-1), nextTryBlockId(0), currentTryNextBlock(nullptr), handlerBlock(nullptr), cleanupBlock(nullptr), inTryBlock(false),
+    prevWasTerminator(false), numTriesInCurrentBlock(0), tryIndex(0), prevLineNumber(0)
 {
     emitter->SetEmittingDelegate(this);
 }
@@ -59,6 +59,7 @@ void CmCppCodeGenerator::GenerateCode(void* boundCompileUnit)
 
 void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
 {
+    if (GetGlobalFlag(GlobalFlags::disableCodeGen)) return;
     const Tool& compilerTool = GetCompilerTool();
     std::string outputDirectory = GetFullPath(Path::Combine(Path::GetDirectoryName(intermediateCodeFile), compilerTool.outputDirectory));
     boost::filesystem::create_directories(outputDirectory);
@@ -197,9 +198,13 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     lastAlloca = nullptr;
     handlerBlock = nullptr;
     cleanupBlock = nullptr;
-    newCleanupNeeded = false;
     labeledStatementMap.clear();
     cleanups.clear();
+    cleanupMap.clear();
+    tryIndexCleanupTryBlockMap.clear();
+    tryIndexMap.clear();
+    numTriesInCurrentBlock = 0;
+    tryIndex = 0;
     if (functionSymbol->HasSource())
     {
         generateLineNumbers = true;
@@ -211,10 +216,6 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         emitter->SetCurrentLineNumber(0);
     }
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
-    if (functionSymbol->HasSource())
-    {
-        // todo metadata
-    }
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
     {
         emitter->AddInlineFunctionAttribute(function);
@@ -226,9 +227,11 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         emitter->SetFunctionLinkageToLinkOnceODRLinkage(function);
     }
     emitter->SetFunction(function);
+    emitter->SetFunctionName(ToUtf8(functionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     entryBasicBlock = entryBlock;
     emitter->SetCurrentBasicBlock(entryBlock);
+    emitter->PushParentBlock();
     if (currentClass && !currentClass->IsInlineFunctionContainer())
     {
         ClassTypeSymbol* classTypeSymbol = currentClass->GetClassTypeSymbol();
@@ -264,21 +267,21 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         emitter->SetIrObject(localVariable, allocaInst);
         lastAlloca = allocaInst;
     }
-    bool byValueComplexParams = false;
-    for (int i = 0; i < np; ++i)
+    if (!functionSymbol->DontThrow())
     {
-        ParameterSymbol* parameter = functionSymbol->Parameters()[i];
-        if (parameter->GetType()->IsClassTypeSymbol() ||
-            (parameter->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol) ||
-            (parameter->GetType()->GetSymbolType() == SymbolType::interfaceTypeSymbol))
-        {
-            byValueComplexParams = true;
-            break;
-        }
-    }
-    if (byValueComplexParams)
-    {
-        emitter->CreateSave();
+        int funId = compileUnit->Install(ToUtf8(functionSymbol->FullName()));
+        int sfpId = compileUnit->Install(compileUnit->SourceFilePath());
+        void* funValue = GetGlobalStringPtr(funId);
+        void* sfpValue = GetGlobalStringPtr(sfpId);
+        std::vector<void*> enterFunctionParamTypes;
+        enterFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
+        enterFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
+        void* enterFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), enterFunctionParamTypes);
+        void* enterFunction = emitter->GetOrInsertFunction("RtEnterFunction", enterFunctionType);
+        std::vector<void*> enterFunctionArgs;
+        enterFunctionArgs.push_back(funValue);
+        enterFunctionArgs.push_back(sfpValue);
+        emitter->CreateCall(enterFunction, enterFunctionArgs);
     }
     for (int i = 0; i < np; ++i)
     {
@@ -356,6 +359,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!lastStatement || lastStatement->GetBoundNodeType() != BoundNodeType::boundReturnStatement ||
         lastStatement->GetBoundNodeType() == BoundNodeType::boundReturnStatement && destructorCallGenerated)
     {
+        CreateExitFunctionCall();
         if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             void* defaultValue = functionSymbol->ReturnType()->CreateDefaultIrValue(*emitter);
@@ -368,7 +372,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
             lastInstructionWasRet = true;
         }
     }
-    GenerateCodeForCleanups(functionSymbol);
+    emitter->PopParentBlock();
     emitter->FinalizeFunction(function);
 }
 
@@ -381,11 +385,14 @@ void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
+    int prevNumTriesInCurrentBlock = numTriesInCurrentBlock;
+    numTriesInCurrentBlock = 0;
     SetTarget(&boundCompoundStatement);
     BoundCompoundStatement* prevBlock = currentBlock;
     currentBlock = &boundCompoundStatement;
     blockDestructionMap[currentBlock] = std::vector<std::unique_ptr<BoundFunctionCall>>();
     blocks.push_back(currentBlock);
+    SetLineNumber(boundCompoundStatement.GetSpan().line);
     int n = boundCompoundStatement.Statements().size();
     for (int i = 0; i < n; ++i)
     {
@@ -393,8 +400,14 @@ void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
         statement->Accept(*this);
     }
     ExitBlocks(prevBlock);
+    GenerateCodeForCleanups();
+    for (int i = 0; i < numTriesInCurrentBlock; ++i)
+    {
+        emitter->PopParentBlock();
+    }
     blocks.pop_back();
     currentBlock = prevBlock;
+    numTriesInCurrentBlock = prevNumTriesInCurrentBlock;
 }
 
 void CmCppCodeGenerator::Visit(BoundSequenceStatement& boundSequenceStatement)
@@ -900,10 +913,17 @@ void CmCppCodeGenerator::Visit(BoundConstructionStatement& boundConstructionStat
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(firstArgumentBaseType);
                     if (classType->Destructor())
                     {
-                        newCleanupNeeded = true;
+                        void* cleanupTry = emitter->CreateBasicBlock("cleanupTry");
+                        emitter->CreateBr(cleanupTry);
+                        emitter->SetCurrentBasicBlock(cleanupTry);
+                        emitter->PushParentBlock();
+                        emitter->CreateBeginTry();
+                        tryIndexMap[numTriesInCurrentBlock] = tryIndex;
+                        tryIndexCleanupTryBlockMap[tryIndex] = cleanupTry;
                         std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
                         std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, currentBlock->EndSpan(), classType->Destructor()));
                         destructorCall->AddArgument(std::move(classPtrArgument));
+                        GenerateCleanup(tryIndex, destructorCall.get());
                         Assert(currentBlock, "current block not set");
                         auto it = blockDestructionMap.find(currentBlock);
                         if (it != blockDestructionMap.cend())
@@ -915,6 +935,8 @@ void CmCppCodeGenerator::Visit(BoundConstructionStatement& boundConstructionStat
                         {
                             Assert(false, "block destruction not found");
                         }
+                        ++numTriesInCurrentBlock;
+                        ++tryIndex;
                     }
                 }
             }
@@ -962,7 +984,7 @@ void CmCppCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundEmptyStatement);
-    // todo
+    emitter->CreateNop();
 }
 
 void CmCppCodeGenerator::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement)
@@ -1009,45 +1031,30 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     SetTarget(&boundTryStatement);
     void* prevHandlerBlock = handlerBlock;
     void* prevCleanupBlock = cleanupBlock;
-    handlerBlock = emitter->CreateBasicBlock("handlers");
-    void* resumeBlock = emitter->CreateBasicBlock("resume");
+    void* tryNextBlock = emitter->CreateBasicBlock("tryNext");
+    void* prevTryNextBlock = currentTryNextBlock;
+    currentTryNextBlock = tryNextBlock;
     cleanupBlock = nullptr;
-
-/*
-    int64_t parentTryBlockId = currentTryBlockId;
-    currentTryBlockId = nextTryBlockId++;
-    void* nop1 = emitter->CreateNop();
-    void* beginTry = emitter->CreateMDStruct();
-    int beginTryId = emitter->GetMDStructId(beginTry);
-    void* beginTryMdRef = emitter->CreateMDStructRef(beginTryId);
-    emitter->SetMetadataRef(nop1, beginTryMdRef);
-*/
     bool prevInTryBlock = inTryBlock;
     inTryBlock = true;
-    void* beginTryBlock = emitter->CreateBasicBlock("beginTry");
-    emitter->CreateBr(beginTryBlock);
-    emitter->SetCurrentBasicBlock(beginTryBlock);
+    void* tryBlock = emitter->CreateBasicBlock("try");
+    emitter->CreateBr(tryBlock);
+    emitter->SetCurrentBasicBlock(tryBlock);
+    emitter->PushParentBlock();
     emitter->CreateBeginTry();
     boundTryStatement.TryBlock()->Accept(*this);
     inTryBlock = prevInTryBlock;
-    void* endTryBlock = emitter->CreateBasicBlock("endTry");
-    emitter->CreateBr(endTryBlock);
-    emitter->SetCurrentBasicBlock(endTryBlock);
-/*
-    void* nop2 = emitter->CreateNop();
-    void* endTry = emitter->CreateMDStruct();
-    int endTryId = emitter->GetMDStructId(endTry);
-    void* endTryMdRef = emitter->CreateMDStructRef(endTryId);
-    emitter->SetMetadataRef(nop2, endTryMdRef);
-*/
-    void* tryNextBlock = emitter->CreateBasicBlock("tryNext");
-    emitter->CreateEndTry(tryNextBlock, handlerBlock);
-    void* prevTryNextBlock = currentTryNextBlock;
-    currentTryNextBlock = tryNextBlock;
+    emitter->SetCurrentBasicBlock(tryBlock);
+    emitter->CreateEndTry(tryNextBlock);
+    emitter->CreateBeginCatch();
+    handlerBlock = emitter->CreateBasicBlock("handlers");
+    emitter->CreateBr(handlerBlock);
+    emitter->CreateIncludeBasicBlockInstruction(handlerBlock);
+    emitter->SetHandlerBlock(tryBlock, handlerBlock);
     emitter->SetCurrentBasicBlock(handlerBlock);
-    handlerBlock = prevHandlerBlock;
+    emitter->PushParentBlock();
+    void* resumeBlock = nullptr;
     int n = boundTryStatement.Catches().size();
-    void* catchTarget = emitter->CreateBasicBlock("catch");
     for (int i = 0; i < n; ++i)
     {
         const std::unique_ptr<BoundCatchStatement>& boundCatchStatement = boundTryStatement.Catches()[i];
@@ -1063,11 +1070,11 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         void* nextHandlerTarget = nullptr;
         if (i < n - 1)
         {
-            catchTarget = emitter->CreateBasicBlock("catch");
-            nextHandlerTarget = catchTarget;
+            nextHandlerTarget = emitter->CreateBasicBlock("catch");
         }
         else
         {
+            resumeBlock = emitter->CreateBasicBlock("resume");
             nextHandlerTarget = resumeBlock;
         }
         void* thisHandlerTarget = emitter->CreateBasicBlock("handler");
@@ -1078,13 +1085,31 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     }
     emitter->SetCurrentBasicBlock(resumeBlock);
     emitter->CreateResume(nullptr);
+    emitter->CreateBr(tryNextBlock);
+    emitter->PopParentBlock();
+    emitter->SetCurrentBasicBlock(tryBlock);
+    emitter->CreateEndCatch(nullptr);
+    emitter->CreateBr(tryNextBlock);
+    basicBlockOpen = false;
+    emitter->PopParentBlock();
     emitter->SetCurrentBasicBlock(tryNextBlock);
-/*
-    currentTryBlockId = parentTryBlockId;
     currentTryNextBlock = prevTryNextBlock;
-*/
     cleanupBlock = prevCleanupBlock;
     basicBlockOpen = true;
+}
+
+void CmCppCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
+{
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundRethrowStatement.GetSpan().line);
+    }
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    SetTarget(&boundRethrowStatement);
+    boundRethrowStatement.ReleaseCall()->Accept(*this);
+    emitter->CreateResume(nullptr);
 }
 
 void CmCppCodeGenerator::Visit(BoundParameter& boundParameter)
@@ -1337,7 +1362,6 @@ void CmCppCodeGenerator::ExitBlocks(BoundCompoundStatement* targetBlock)
                     }
                     destructorCall->Accept(*this);
                     destructorCallGenerated = true;
-                    newCleanupNeeded = true;
                 }
             }
         }
@@ -1429,11 +1453,6 @@ void* CmCppCodeGenerator::CleanupBlock()
     return cleanupBlock;
 }
 
-bool CmCppCodeGenerator::NewCleanupNeeded()
-{
-    return newCleanupNeeded;
-}
-
 bool CmCppCodeGenerator::InTryBlock() const
 {
     return inTryBlock;
@@ -1459,67 +1478,80 @@ int CmCppCodeGenerator::Install(const std::u32string& str)
     return compileUnit->Install(str);
 }
 
-void CmCppCodeGenerator::CreateCleanup()
+void CmCppCodeGenerator::GenerateCleanup(int tryIndex, BoundFunctionCall* destructorCall)
 {
     cleanupBlock = emitter->CreateBasicBlock("cleanup");
-    BoundCompoundStatement* targetBlock = nullptr;
-    BoundStatement* parent = currentBlock->Parent();
-    while (parent && parent->GetBoundNodeType() != BoundNodeType::boundTryStatement)
-    {
-        parent = parent->Parent();
-    }
-    if (parent)
-    {
-        targetBlock = parent->Block();
-    }
-    Cleanup* cleanup = new Cleanup(cleanupBlock);
-    int n = blocks.size();
-    for (int i = n - 1; i >= 0; --i)
-    {
-        BoundCompoundStatement* block = blocks[i];
-        if (block == targetBlock)
-        {
-            break;
-        }
-        auto it = blockDestructionMap.find(block);
-        if (it != blockDestructionMap.cend())
-        {
-            std::vector<std::unique_ptr<BoundFunctionCall>>& destructorCallVec = it->second;
-            int nd = destructorCallVec.size();
-            for (int i = nd - 1; i >= 0; --i)
-            {
-                std::unique_ptr<BoundFunctionCall>& destructorCall = destructorCallVec[i];
-                if (destructorCall)
-                {
-                    cleanup->destructors.push_back(std::unique_ptr<BoundFunctionCall>(static_cast<BoundFunctionCall*>(destructorCall->Clone())));
-                }
-            }
-        }
-    }
-    cleanups.push_back(std::unique_ptr<Cleanup>(cleanup));
-    newCleanupNeeded = false;
+    emitter->SetCleanupBlock(cleanupBlock);
+    std::unique_ptr<Cleanup> cleanup(new Cleanup(cleanupBlock));
+    cleanup->destructors.push_back(std::unique_ptr<BoundFunctionCall>(static_cast<BoundFunctionCall*>(destructorCall->Clone())));
+    cleanupMap[tryIndex] = cleanup.get();
+    cleanups.push_back(std::move(cleanup));
 }
 
-void CmCppCodeGenerator::GenerateCodeForCleanups(FunctionSymbol* function)
+void CmCppCodeGenerator::GenerateCodeForCleanups()
 {
-    for (const std::unique_ptr<Cleanup>& cleanup : cleanups)
+    for (int i = 0; i < numTriesInCurrentBlock; ++i)
     {
-        emitter->SetCurrentBasicBlock(cleanup->cleanupBlock);
-        for (const std::unique_ptr<BoundFunctionCall>& destructorCall : cleanup->destructors)
+        --tryIndex;
+        auto cleanupIt = cleanupMap.find(tryIndex);
+        if (cleanupIt != cleanupMap.cend())
         {
-            destructorCall->Accept(*this);
-        }
-        emitter->CreateResume(nullptr);
-        if (function->ReturnType() && function->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !function->ReturnsClassInterfaceOrClassDelegateByValue())
-        {
-            void* defaultValue = function->ReturnType()->CreateDefaultIrValue(*emitter);
-            emitter->CreateRet(defaultValue);
+            Cleanup* cleanup = cleanupIt->second;
+            auto it = tryIndexCleanupTryBlockMap.find(tryIndex);
+            if (it != tryIndexCleanupTryBlockMap.cend())
+            {
+                void* cleanupTryBlock = it->second;
+                void* prevBasicBlock = emitter->CurrentBasicBlock();
+                emitter->SetCurrentBasicBlock(cleanupTryBlock);
+                emitter->CreateEndTry(nullptr);
+                emitter->CreateBeginCatch();
+                for (const std::unique_ptr<BoundFunctionCall>& destructorCall : cleanup->destructors)
+                {
+                    destructorCall->Accept(*this);
+                }
+                emitter->CreateResume(nullptr);
+                emitter->CreateEndCatch(nullptr);
+                emitter->SetCurrentBasicBlock(prevBasicBlock);
+            }
+            else
+            {
+                throw std::runtime_error("internal error: try index " + std::to_string(tryIndex) + " not found");
+            }
         }
         else
         {
-            emitter->CreateRetVoid();
+            throw std::runtime_error("internal error: cleanup for try index " + std::to_string(tryIndex) + " not found");
         }
     }
+}
+
+void CmCppCodeGenerator::CreateExitFunctionCall()
+{
+    if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
+    std::vector<void*> exitFunctionParamTypes;
+    void* exitFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), exitFunctionParamTypes);
+    void* exitFunction = emitter->GetOrInsertFunction("RtExitFunction", exitFunctionType);
+    std::vector<void*> exitFunctionArgs;
+    emitter->CreateCall(exitFunction, exitFunctionArgs);
+}
+
+void CmCppCodeGenerator::SetLineNumber(int32_t lineNumber)
+{
+    if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
+    if (prevLineNumber == lineNumber) return;
+    prevLineNumber = lineNumber;
+    std::vector<void*> setLineNumberFunctionParamTypes;
+    setLineNumberFunctionParamTypes.push_back(emitter->GetIrTypeForInt());
+    void* setLineNumberFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), setLineNumberFunctionParamTypes);
+    void* setLineNumberFunction = emitter->GetOrInsertFunction("RtSetLineNumber", setLineNumberFunctionType);
+    std::vector<void*> setLineNumberFunctionArgs;
+    setLineNumberFunctionArgs.push_back(emitter->CreateIrValueForInt(lineNumber));
+    emitter->CreateCall(setLineNumberFunction, setLineNumberFunctionArgs);
+}
+
+std::string CmCppCodeGenerator::GetSourceFilePath(int32_t fileIndex)
+{
+    return module->GetFilePath(fileIndex);
 }
 
 } } // namespace cmajor::codegencpp

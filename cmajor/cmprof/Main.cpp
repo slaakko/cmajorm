@@ -625,7 +625,7 @@ void ReadProject(const std::string& projectFilePath, sngcm::ast::Solution& solut
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
     std::string config = "profile";
     ContainerFileLexer containerFileLexer(p, projectFilePath, 0);
-    std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(containerFileLexer, config, sngcm::ast::BackEnd::llvm);
+    std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(containerFileLexer, config, sngcm::ast::BackEnd::llvm, "");
     if (!IsSystemModule(project->Name()))
     {
         std::string systemProjectFilePath = Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(), "system"), "System"), "System.cmp");

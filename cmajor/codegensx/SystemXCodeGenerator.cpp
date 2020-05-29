@@ -1047,6 +1047,23 @@ void SystemXCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
     emitter->SetCurrentBasicBlock(currentTryNextBlock);
 }
 
+void SystemXCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
+{
+    // TODO???
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundRethrowStatement.GetSpan().line);
+    }
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    SetTarget(&boundRethrowStatement);
+    void* resumeFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), std::vector<void*>());
+    void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType);
+    emitter->CreateCall(callee, std::vector<void*>());
+    emitter->CreateRetVoid();
+}
+
 void SystemXCodeGenerator::Visit(BoundParameter& boundParameter)
 {
     boundParameter.Load(*emitter, OperationFlags::none);

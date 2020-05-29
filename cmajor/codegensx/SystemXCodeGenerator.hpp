@@ -68,6 +68,7 @@ public:
     void Visit(BoundThrowStatement& boundThrowStatement) override;
     void Visit(BoundTryStatement& boundTryStatement) override;
     void Visit(BoundCatchStatement& boundCatchStatement) override;
+    void Visit(BoundRethrowStatement& boundRethrowStatement) override;
     void Visit(BoundParameter& boundParameter) override;
     void Visit(BoundLocalVariable& boundLocalVariable) override;
     void Visit(BoundMemberVariable& boundMemberVariable) override;

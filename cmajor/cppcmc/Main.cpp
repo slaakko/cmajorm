@@ -68,14 +68,14 @@ struct BackendInit
     }
 };
 
-const char* version = "0.1.0";
+const char* version = "3.5.0";
 
 void PrintHelp()
 {
 #ifdef _WIN32
-    std::cout << "Cmajor to C++ compiler version " << version << " for Windows x64" << std::endl;
+    std::cout << "Cmajor with C++ backend compiler version " << version << " for Windows x64" << std::endl;
 #else
-    std::cout << "Cmajor to C++ compiler version " << version << std::endl;
+    std::cout << "Cmajor with C++ backend compiler version " << version << std::endl;
 #endif
     std::cout << "Usage: cppcmc [options] { project.cmp | solution.cms }" << std::endl;
     std::cout << "Compiles given Cmajor solutions and projects to C++ libraries or executables." << std::endl;
@@ -124,6 +124,8 @@ void PrintHelp()
         "   disable code generation\n" <<
         "--emit-asm (-f)\n" <<
         "   emit assembly code into file.asm\n" <<
+        "--just-my-code (-j)" <<
+        "   enable Just My Code debugging\n" <<
         std::endl;
 }
 
@@ -136,8 +138,6 @@ int main(int argc, const char** argv)
 {
     SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
     SetToolChain("vs");
-    SetNumBuildThreads(1);
-    SetGlobalFlag(GlobalFlags::singleThreadedCompile);
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
     try
@@ -229,6 +229,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--emit-asm" || arg == "-f")
                     {
                         SetGlobalFlag(GlobalFlags::emitLlvm);
+                    }
+                    else if (arg == "--just-my-code" || arg == "-j")
+                    {
+                        SetGlobalFlag(GlobalFlags::justMyCodeDebugging);
                     }
                     else if (arg.find('=') != std::string::npos)
                     {
@@ -332,9 +336,9 @@ int main(int argc, const char** argv)
             if (GetGlobalFlag(GlobalFlags::verbose))
             {
 #ifdef _WIN32
-                std::cout << "Cmajor to C++ compiler version " << version << " for Windows x64" << std::endl;
+                std::cout << "Cmajor with C++ backend compiler version " << version << " for Windows x64" << std::endl;
 #else
-                std::cout << "Cmajor to C++ compiler version " << version << std::endl;
+                std::cout << "Cmajor with C++ backend C++ compiler version " << version << std::endl;
 #endif
             }
 #ifndef _WIN32
@@ -351,6 +355,24 @@ int main(int argc, const char** argv)
             SetGlobalFlag(GlobalFlags::singleThreadedCompile);
 #endif
             ReadToolChains(GetGlobalFlag(GlobalFlags::verbose));
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                std::cout << "current tool chain is '" << GetToolChain() + "'" << std::endl;
+            }
+            if (GetToolChain() == "vs")
+            {
+                SetGlobalFlag(GlobalFlags::disableCodeGen);
+                if (GetGlobalFlag(GlobalFlags::verbose))
+                {
+                    std::cout << "Note: Native code generation for 'vs' tool chain is disabled. Just generating C++ source files and Visual Studio C++ project and solution files. " <<
+                        "You can generate native code by compiling those project and solution files using Visual Studio or msbuild." << std::endl;
+                }
+            }
+            else
+            {
+                SetNumBuildThreads(1);
+                SetGlobalFlag(GlobalFlags::singleThreadedCompile);
+            }
             for (const std::string& file : files)
             {
                 boost::filesystem::path fp(file);

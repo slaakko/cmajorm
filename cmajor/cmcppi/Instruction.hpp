@@ -9,6 +9,7 @@
 #include <soulng/util/CodeFormatter.hpp>
 #include <vector>
 #include <utility>
+#include <set>
 
 namespace cmcppi {
 
@@ -35,6 +36,7 @@ public:
     void SetResultId(int resultId_) { resultId = resultId_; }
     void SetNoSemicolon() { noSemicolon = true; }
     bool NoSemicolon() const { return noSemicolon; }
+    virtual void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks);
 private:
     int resultId;
     int sourceLineNumber;
@@ -47,6 +49,7 @@ public:
     UnaryInstruction(Value* arg_);
     Type* GetType(Context& context) override { return arg->GetType(context); }
     void WriteArg(CodeFormatter& formatter, Context& context);
+    Value* Arg() const { return arg; }
 private:
     Value* arg;
 };
@@ -364,6 +367,7 @@ public:
     Type* GetType(Context& context) override;
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "invoke"; }
+    void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
     Value* function;
     std::vector<Value*> args;
@@ -387,6 +391,7 @@ public:
     JumpInstruction(BasicBlock* dest_);
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "jmp"; }
+    void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
     BasicBlock* dest;
 };
@@ -397,6 +402,7 @@ public:
     BranchInstruction(Value* cond_, BasicBlock* trueDest_, BasicBlock* falseDest_);
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "branch"; }
+    void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
     Value* cond;
     BasicBlock* trueDest;
@@ -410,6 +416,7 @@ public:
     void AddCase(Value* caseValue, BasicBlock* dest);
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "switch"; }
+    void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
     Value* cond;
     BasicBlock* defaultDest;
@@ -436,12 +443,32 @@ public:
 class CMCPPI_API EndTryInstruction : public Instruction
 {
 public:
-    EndTryInstruction(BasicBlock* nextDest_, BasicBlock* handlersDest_);
+    EndTryInstruction(BasicBlock* nextDest_);
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "endTry"; }
+    void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
     BasicBlock* nextDest;
-    BasicBlock* handlersDest;
+};
+
+class CMCPPI_API BeginCatchInstruction : public Instruction
+{
+public:
+    BeginCatchInstruction();
+    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    std::string IrName() const override { return "beginCatch"; }
+    void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
+};
+
+class CMCPPI_API EndCatchInstruction : public Instruction
+{
+public:
+    EndCatchInstruction(BasicBlock* nextDest_);
+    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    std::string IrName() const override { return "endCatch"; }
+    void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
+private:
+    BasicBlock* nextDest;
 };
 
 class CMCPPI_API ResumeInstruction : public Instruction
@@ -450,6 +477,17 @@ public:
     ResumeInstruction();
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "resume"; }
+};
+
+class CMCPPI_API IncludeBasicBlockInstruction : public Instruction
+{
+public:
+    IncludeBasicBlockInstruction(BasicBlock* block_);
+    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    std::string IrName() const override { return "include"; }
+    void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
+private:
+    BasicBlock* block;
 };
 
 } // namespace cmcppi

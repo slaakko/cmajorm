@@ -686,6 +686,27 @@ void* Emitter::CreateBasicBlock(const std::string& name)
     }
 }
 
+void* Emitter::CreateIncludeBasicBlockInstruction(void* basicBlock)
+{
+    return nullptr;
+}
+
+void Emitter::PushParentBlock()
+{
+}
+
+void Emitter::PopParentBlock()
+{
+}
+
+void Emitter::SetHandlerBlock(void* tryBlock, void* catchBlock)
+{
+}
+
+void Emitter::SetCleanupBlock(void* cleanupBlock)
+{
+}
+
 int Emitter::GetBasicBlockId(void* basicBlock)
 {
     return static_cast<cmsxi::BasicBlock*>(basicBlock)->Id();
@@ -940,7 +961,17 @@ void* Emitter::CreateBeginTry()
     return nullptr;
 }
 
-void* Emitter::CreateEndTry(void* nextDest, void* handlersDest)
+void* Emitter::CreateEndTry(void* nextDest)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateBeginCatch()
+{
+    return nullptr;
+}
+
+void* Emitter::CreateEndCatch(void* nextDest)
 {
     return nullptr;
 }
@@ -1579,6 +1610,10 @@ void Emitter::SetFunctionCallConventionToStdCall(void* function)
 void Emitter::SetFunction(void* function_)
 {
     currentFunction = static_cast<cmsxi::Function*>(function_);
+}
+
+void Emitter::SetFunctionName(const std::string& functionName)
+{
 }
 
 void Emitter::SetInPrologue(bool inPrologue_)

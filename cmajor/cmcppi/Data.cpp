@@ -11,7 +11,7 @@
 
 namespace cmcppi {
 
-GlobalVariable::GlobalVariable(Type* type_, const std::string& name_) : type(type_), name(name_), initializer(nullptr), linkOnce(true), stringPtr(false)
+GlobalVariable::GlobalVariable(Type* type_, const std::string& name_) : type(type_), name(name_), initializer(nullptr), linkOnce(false), stringPtr(false)
 {
 }
 
@@ -38,10 +38,21 @@ void GlobalVariable::Write(Context& context, CodeFormatter& formatter)
     {
         formatter.Write("inline ");
     }
+    if (!initializer)
+    {
+        formatter.Write("extern ");
+    }
     if (type->IsArrayType())
     {
         ArrayType* arrayType = static_cast<ArrayType*>(type);
-        formatter.Write(arrayType->ElementType()->Name());
+        if (initializer)
+        {
+            formatter.Write(arrayType->ElementType()->Name());
+        }
+        else
+        {
+            formatter.Write(arrayType->Name());
+        }
     }
     else
     {
@@ -49,16 +60,19 @@ void GlobalVariable::Write(Context& context, CodeFormatter& formatter)
     }
     formatter.Write(" ");
     formatter.Write("__global_" + name);
-    if (type->IsArrayType())
+    if (initializer)
     {
-        ArrayType* arrayType = static_cast<ArrayType*>(type);
-        if (arrayType->Size() != 0)
+        if (type->IsArrayType())
         {
-            formatter.Write("[" + std::to_string(arrayType->Size()) + "]");
-        }
-        else
-        {
-            formatter.Write("[]");
+            ArrayType* arrayType = static_cast<ArrayType*>(type);
+            if (arrayType->Size() != 0)
+            {
+                formatter.Write("[" + std::to_string(arrayType->Size()) + "]");
+            }
+            else
+            {
+                formatter.Write("[]");
+            }
         }
     }
     if (initializer)
@@ -94,23 +108,20 @@ void GlobalVariable::Write(Context& context, CodeFormatter& formatter)
             formatter.Write(initializer->Name(context));
         }
     }
+    else if (linkOnce)
+    {
+        throw std::runtime_error("global variable '" + name + "' with inline linkage has no initializer");
+    }
     formatter.WriteLine(";");
     if (stringPtr)
     {
-        if (linkOnce)
-        {
-            formatter.Write("inline ");
-        }
         formatter.Write(type->Name());
         formatter.Write(" ");
         formatter.Write(name + " = __global_" + name);
     }
     else
     {
-        if (linkOnce)
-        {
-            formatter.Write("inline ");
-        }
+        formatter.Write("inline ");
         formatter.Write(context.GetPtrType(type)->Name());
         formatter.Write(" ");
         formatter.Write(name + " = &__global_" + name);
@@ -227,12 +238,16 @@ std::vector<GlobalVariable*> CreateDataOrder(const std::vector<std::unique_ptr<G
 void DataRepository::Write(Context& context, CodeFormatter& formatter)
 {
     if (globalVariableDefinitions.empty()) return;
+    formatter.WriteLine("extern \"C\" {");
+    formatter.WriteLine();
     std::vector<GlobalVariable*> dataOrder = CreateDataOrder(globalVariableDefinitions, context);
     for (GlobalVariable* globalVariable : dataOrder)
     {
         globalVariable->Write(context, formatter);
         formatter.WriteLine(";");
     }
+    formatter.WriteLine();
+    formatter.WriteLine("} // extern \"C\"");
 }
 
 void DataRepository::SetCompileUnitId(const std::string& compileUnitId_)

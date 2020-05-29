@@ -294,6 +294,10 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
         }
     }
     classTypeSymbol->ComputeName();
+    if (classTypeSymbol->GroupName() == U"NodeList")
+    {
+        int x = 0;
+    }
     int nb = classNode->BaseClassOrInterfaces().Count();
     for (int i = 0; i < nb; ++i)
     {

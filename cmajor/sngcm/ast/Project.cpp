@@ -46,7 +46,7 @@ std::string CmajorRootDir()
     return std::string(e);
 }
 
-std::string CmajorSystemLibDir(const std::string& config, BackEnd backend)
+std::string CmajorSystemLibDir(const std::string& config, BackEnd backend, const std::string& toolChain)
 {
     if (backend == BackEnd::llvm)
     {
@@ -72,6 +72,7 @@ std::string CmajorSystemLibDir(const std::string& config, BackEnd backend)
         sld /= "system";
         sld /= "lib";
         sld /= "cpp";
+        sld /= toolChain;
         sld /= config;
         return GetFullPath(sld.generic_string());
     }
@@ -100,16 +101,16 @@ const std::string& OutDir()
     return outDir;
 }
 
-std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend)
+std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend, const std::string& toolChain)
 {
-    boost::filesystem::path smfp(CmajorSystemLibDir(config, backend));
+    boost::filesystem::path smfp(CmajorSystemLibDir(config, backend, toolChain));
     smfp /= "System.cmm";
     return GetFullPath(smfp.generic_string());
 }
 
-std::string CmajorSystemWindowsModuleFilePath(const std::string& config)
+std::string CmajorSystemWindowsModuleFilePath(const std::string& config, const std::string& toolChain)
 {
-    boost::filesystem::path smfp(CmajorSystemLibDir(config, BackEnd::llvm));
+    boost::filesystem::path smfp(CmajorSystemLibDir(config, BackEnd::llvm, toolChain));
     smfp /= "System.Windows.cmm";
     return GetFullPath(smfp.generic_string());
 }
@@ -142,8 +143,9 @@ TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(Projec
 {
 }
 
-Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend_) :
-    backend(backend_), name(name_), filePath(filePath_), config(config_), target(Target::program), sourceBasePath(filePath), outdirBasePath(filePath), isSystemProject(false), logStreamId(0), built(false)
+Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend_, const std::string& toolChain_) :
+    backend(backend_), name(name_), filePath(filePath_), config(config_), target(Target::program), sourceBasePath(filePath), outdirBasePath(filePath), isSystemProject(false), logStreamId(0), built(false),
+    toolChain(toolChain_)
 {
     if (!outDir.empty())
     {
@@ -156,7 +158,7 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
         sourceBasePath.remove_filename();
         outdirBasePath = sourceBasePath;
     }
-    systemLibDir = CmajorSystemLibDir(config, backend);
+    systemLibDir = CmajorSystemLibDir(config, backend, toolChain);
     boost::filesystem::path mfp(filePath);
     boost::filesystem::path fn = mfp.filename();
     mfp.remove_filename();
@@ -168,6 +170,7 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     if (backend == BackEnd::cppcm)
     {
         mfp /= "cpp";
+        mfp /= toolChain;
     }
     mfp /= config;
     mfp /= fn;
@@ -210,6 +213,7 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     if (backend == BackEnd::cppcm)
     {
         efp /= "cpp";
+        efp /= toolChain;
     }
     efp /= config;
     efp /= fn;
@@ -293,6 +297,7 @@ void Project::ResolveDeclarations()
                     if (backend == BackEnd::cppcm)
                     {
                         rp /= "cpp";
+                        rp /= toolChain;
                     }
                     rp /= config;
                     rp /= fn;

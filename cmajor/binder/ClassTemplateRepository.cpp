@@ -230,13 +230,6 @@ void ClassTemplateRepository::BindClassTemplateSpecialization(ClassTemplateSpeci
 
 bool ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span)
 {
-/*
-    if (memberFunction->IsDefault())
-    {
-        throw Exception(&boundCompileUnit.GetModule(), "Compilation of class template member function '" + ToUtf8(memberFunction->FullName()) +
-            "' failed: 'default' members in class templates not supported.", memberFunction->GetSpan(), span);
-    }
-*/
     if (instantiatedMemberFunctions.find(memberFunction) != instantiatedMemberFunctions.cend()) return true;
     instantiatedMemberFunctions.insert(memberFunction);
     try

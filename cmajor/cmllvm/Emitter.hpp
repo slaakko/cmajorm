@@ -135,6 +135,11 @@ public:
     void* GetArrayBeginAddress(void* arrayPtr) override;
     void* GetArrayEndAddress(void* arrayPtr, uint64_t size) override;
     void* CreateBasicBlock(const std::string& name) override;
+    void* CreateIncludeBasicBlockInstruction(void* basicBlock) override;
+    void PushParentBlock() override;
+    void PopParentBlock() override;
+    void SetHandlerBlock(void* tryBlock, void* catchBlock) override;
+    void SetCleanupBlock(void* cleanupBlock) override;
     int GetBasicBlockId(void* basicBlock) override;
     void CreateBr(void* targetBasicBlock) override;
     void CreateCondBr(void* cond, void* trueBasicBlock, void* falseBasicBlock) override;
@@ -181,7 +186,9 @@ public:
     void* CreateNop() override;
     void* CreateSave() override;
     void* CreateBeginTry() override;
-    void* CreateEndTry(void* nextDest, void* handlersDest) override;
+    void* CreateEndTry(void* nextDest) override;
+    void* CreateBeginCatch() override;
+    void* CreateEndCatch(void* nextDest) override;
     void* GetOrInsertGlobal(const std::string& name, void* type) override;
     void* GetOrInsertAnyComdat(const std::string& name, void* global) override;
     void* GetOrInsertAnyFunctionComdat(const std::string& name, void* function) override;
@@ -238,6 +245,7 @@ public:
     void SetObjectPointer(void* objectPointer_) override { objectPointer = static_cast<llvm::Value*>(objectPointer_); }
     void* GetObjectPointer() override { return objectPointer; }
     void SetFunction(void* function_) override { function = static_cast<llvm::Function*>(function_); }
+    void SetFunctionName(const std::string& functionName) override;
     llvm::Function* Function() { return function; }
     void* CurrentBasicBlock() const override { return currentBasicBlock; }
     void SetCurrentBasicBlock(void* currentBasicBlock_) override { currentBasicBlock = static_cast<llvm::BasicBlock*>(currentBasicBlock_); builder.SetInsertPoint(currentBasicBlock); }

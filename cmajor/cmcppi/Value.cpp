@@ -536,7 +536,7 @@ ClsIdValue::ClsIdValue(const std::string& typeId_) : ConstantValue(), typeId(typ
 
 std::string ClsIdValue::Name(Context& context)
 {
-    std::string name = "(void*)" + typeId.substr(0, 8) + ", (void*)" + typeId.substr(8);
+    std::string name = "(const void*)" + typeId.substr(0, 8) + ", (const void*)" + typeId.substr(8);
     return name;
 }
 

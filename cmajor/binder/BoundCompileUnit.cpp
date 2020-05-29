@@ -901,4 +901,14 @@ void BoundCompileUnit::AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& funct
     functionSymbols.push_back(std::move(functionSymbol));
 }
 
+bool BoundCompileUnit::IsGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol) const
+{
+    return instantiatedGeneratedDestructors.find(generatedDestructorSymbol) != instantiatedGeneratedDestructors.cend();
+}
+
+void BoundCompileUnit::SetGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol)
+{
+    instantiatedGeneratedDestructors.insert(generatedDestructorSymbol);
+}
+
 } } // namespace cmajor::binder

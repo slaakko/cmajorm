@@ -30,6 +30,7 @@ public:
     virtual Type* GetType(Context& context) = 0;
     virtual std::string Name(Context& context) = 0;
     virtual bool IsLongValue() const { return false; }
+    virtual bool IsNullValue() const { return false; }
     virtual bool IsAggregateValue() const { return false; }
     virtual bool IsStringValue() const { return false; }
     virtual bool IsWStringValue() const { return false; }
@@ -207,6 +208,7 @@ public:
     NullValue(PtrType* ptrType_);
     Type* GetType(Context& context) override;
     std::string Name(Context& context) override;
+    bool IsNullValue() const override { return true; }
 private:
     PtrType* ptrType;
 };

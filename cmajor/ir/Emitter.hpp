@@ -168,6 +168,11 @@ public:
     virtual void* GetArrayBeginAddress(void* arrayPtr) = 0;
     virtual void* GetArrayEndAddress(void* arrayPtr, uint64_t size) = 0;
     virtual void* CreateBasicBlock(const std::string& name) = 0;
+    virtual void* CreateIncludeBasicBlockInstruction(void* basicBlock) = 0;
+    virtual void PushParentBlock() = 0;
+    virtual void PopParentBlock() = 0;
+    virtual void SetHandlerBlock(void* tryBlock, void* catchBlock) = 0;
+    virtual void SetCleanupBlock(void* cleanupBlock) = 0;
     virtual int GetBasicBlockId(void* basicBlock) = 0;
     virtual void CreateBr(void* targetBasicBlock) = 0;
     virtual void* CurrentBasicBlock() const = 0;
@@ -216,7 +221,9 @@ public:
     virtual void* CreateNop() = 0;
     virtual void* CreateSave() = 0;
     virtual void* CreateBeginTry() = 0;
-    virtual void* CreateEndTry(void* nextDest, void* handlersDest) = 0;
+    virtual void* CreateEndTry(void* nextDest) = 0;
+    virtual void* CreateBeginCatch() = 0;
+    virtual void* CreateEndCatch(void* nextDest) = 0;
     virtual std::string GetVmtObjectName(void* symbol) const = 0;
     virtual void SetVmtObjectName(void* symbol, const std::string& vmtObjectName) = 0;
     virtual std::string GetImtArrayObjectName(void* symbol) const = 0;
@@ -318,6 +325,7 @@ public:
     virtual void SetFunctionLinkageToLinkOnceODRLinkage(void* function) = 0;
     virtual void SetFunctionCallConventionToStdCall(void* function) = 0;
     virtual void SetFunction(void* function_) = 0;
+    virtual void SetFunctionName(const std::string& functionName) = 0;
     virtual void SetInPrologue(bool inPrologue_) = 0;
     virtual void* CreateSubroutineType(const std::vector<void*>& elementTypes) = 0;
     virtual unsigned GetPureVirtualVirtuality() = 0;

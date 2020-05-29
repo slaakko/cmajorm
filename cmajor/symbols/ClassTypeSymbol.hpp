@@ -41,7 +41,7 @@ private:
     std::unordered_map<int, ClassTypeSymbol*> arityClassMap;
 };
 
-enum class ClassTypeSymbolFlags : uint8_t
+enum class ClassTypeSymbolFlags : uint16_t
 {
     none = 0,
     abstract_ = 1 << 0,
@@ -51,22 +51,23 @@ enum class ClassTypeSymbolFlags : uint8_t
     layoutsComputed = 1 << 4,
     statementsNotBound = 1 << 5,
     recursiveComputed = 1 << 6,
-    recursive = 1 << 7
+    recursive = 1 << 7,
+    vmtEmitted = 1 << 8
 };
 
 inline ClassTypeSymbolFlags operator|(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
 {
-    return ClassTypeSymbolFlags(uint8_t(left) | uint8_t(right));
+    return ClassTypeSymbolFlags(uint16_t(left) | uint16_t(right));
 }
 
 inline ClassTypeSymbolFlags operator&(ClassTypeSymbolFlags left, ClassTypeSymbolFlags right)
 {
-    return ClassTypeSymbolFlags(uint8_t(left) & uint8_t(right));
+    return ClassTypeSymbolFlags(uint16_t(left) & uint16_t(right));
 }
 
 inline ClassTypeSymbolFlags operator~(ClassTypeSymbolFlags operand)
 {
-    return ClassTypeSymbolFlags(~uint8_t(operand));
+    return ClassTypeSymbolFlags(~uint16_t(operand));
 }
 
 SYMBOLS_API int32_t GetClassIdVmtIndexOffset();     // 128-bit class id, was 64-bit before
@@ -168,6 +169,8 @@ public:
     bool IsRecursive();
     bool Recursive() const { return GetFlag(ClassTypeSymbolFlags::recursive); }
     void SetRecursive() { SetFlag(ClassTypeSymbolFlags::recursive); }
+    bool VmtEmitted() const { return GetFlag(ClassTypeSymbolFlags::vmtEmitted); }
+    void SetVmtEmitted() { SetFlag(ClassTypeSymbolFlags::vmtEmitted); }
     ClassTypeSymbolFlags GetClassTypeSymbolFlags() const { return flags; }
     bool GetFlag(ClassTypeSymbolFlags flag) const { return (flags & flag) != ClassTypeSymbolFlags::none; }
     void SetFlag(ClassTypeSymbolFlags flag) { flags = flags | flag; }

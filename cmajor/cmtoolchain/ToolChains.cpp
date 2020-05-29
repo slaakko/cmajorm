@@ -49,6 +49,8 @@ void CreateVSToolChain(bool verbose)
     compiler.args.push_back("$SOURCE_FILE$");
     compiler.args.push_back("/Fd:$DEBUG_INFORMATION_FILE$");
     compiler.args.push_back("$GENERATE_ASSEMBLY_FILE_OPTION$/FAs");
+    compiler.args.push_back("$GENERATE_JUST_MY_CODE_OPTION$/JMC");
+    compiler.args.push_back("$ENABLE_RUNTIME_TYPE_INFORMATION_OPTION$/GR");
     compiler.args.push_back("/Zc:inline");
     compiler.args.push_back("/fp:precise");
     compiler.args.push_back("/RTC1");
@@ -58,13 +60,13 @@ void CreateVSToolChain(bool verbose)
     compiler.args.push_back("/EHs");
     compiler.args.push_back("/Fo:$OBJECT_FILE$");
     compiler.args.push_back("/diagnostics:column ");
-    compiler.args.push_back("/std:c++latest");
+    compiler.args.push_back("/std:c++17");
     vs.tools.push_back(compiler);
     Tool libraryManager;
     libraryManager.name = "library-manager";
     libraryManager.commandName = "lib";
     libraryManager.outputFileExtension = ".lib";
-    libraryManager.outputDirectory = ".";
+    libraryManager.outputDirectory = "x64/Debug";
     libraryManager.args.push_back("/VERBOSE");
     libraryManager.args.push_back("/MACHINE:X64");
     libraryManager.args.push_back("/OUT:$LIBRARY_FILE$");
@@ -92,13 +94,13 @@ void CreateVSToolChain(bool verbose)
     linker.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"");
     linker.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"");
     linker.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"");
-    linker.args.push_back("/LIBPATH:\"C:\\Boost\\lib\"");
     linker.args.push_back("/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$");
     vs.tools.push_back(linker);
     Tool projectFileGenerator;
     projectFileGenerator.name = "project-file-generator";
     projectFileGenerator.commandName = "cmvcxprojectfilegen";
     projectFileGenerator.outputFileExtension = ".vcxproj";
+    projectFileGenerator.outputDirectory = "x64/Debug";
     projectFileGenerator.args.push_back("--verbose");
     projectFileGenerator.args.push_back("--name");
     projectFileGenerator.args.push_back("$PROJECT_NAME$");
@@ -112,15 +114,23 @@ void CreateVSToolChain(bool verbose)
     projectFileGenerator.args.push_back("$LIBRARY_DIRECTORIES$");
     projectFileGenerator.args.push_back("--libs");
     projectFileGenerator.args.push_back("$LIBRARY_FILE_NAMES$");
+    projectFileGenerator.args.push_back("$GENERATE_ASSEMBLY_FILE_OPTION$/FAs");
+    projectFileGenerator.args.push_back("$GENERATE_JUST_MY_CODE_OPTION$/JMC");
+    projectFileGenerator.args.push_back("$ENABLE_RUNTIME_TYPE_INFORMATION_OPTION$/GR");
+    projectFileGenerator.args.push_back("--options");
+    projectFileGenerator.args.push_back("$OPTIONS$");
     projectFileGenerator.args.push_back("$SOURCE_FILES$");
     vs.tools.push_back(projectFileGenerator);
     Tool solutionFileGenerator;
     solutionFileGenerator.name = "solution-file-generator";
     solutionFileGenerator.commandName = "cmslnfilegen";
     solutionFileGenerator.outputFileExtension = ".sln";
+    solutionFileGenerator.args.push_back("--verbose");
+    solutionFileGenerator.args.push_back("--name");
     solutionFileGenerator.args.push_back("$SOLUTION_NAME$");
+    solutionFileGenerator.args.push_back("--file");
     solutionFileGenerator.args.push_back("$SOLUTION_FILE_PATH$");
-    solutionFileGenerator.args.push_back("$PROJECT_FILES$");
+    solutionFileGenerator.args.push_back("$PROJECT_FILE_PATHS$");
     vs.tools.push_back(solutionFileGenerator);
     toolChains.toolChains.push_back(vs);
     if (verbose)
@@ -297,6 +307,26 @@ const Tool& GetProjectFileGeneratorTool()
                 }
             }
             throw std::runtime_error("'project-file-generator' tool not found from tool chain '" + toolChain + "'");
+        }
+    }
+    throw std::runtime_error("'" + toolChain + "' tool chain not found");
+}
+
+const Tool& GetSolutionFileGeneratorTool()
+{
+    const ToolChains& toolChains = GetToolChains();
+    for (const ToolChain& tc : toolChains.toolChains)
+    {
+        if (tc.name == toolChain)
+        {
+            for (const Tool& tool : tc.tools)
+            {
+                if (tool.name == "solution-file-generator")
+                {
+                    return tool;
+                }
+            }
+            throw std::runtime_error("'solution-file-generator' tool not found from tool chain '" + toolChain + "'");
         }
     }
     throw std::runtime_error("'" + toolChain + "' tool chain not found");

@@ -16,10 +16,10 @@ parser api(SNGCM_PARSER_API) ProjectFileParser
     uselexer ContainerFileLexer;
     main;
 
-    ProjectFile(std::string config, sngcm::ast::BackEnd backend, std::string toolChain, var std::unique_ptr<Project> project) : sngcm::ast::Project*
+    ProjectFile(std::string config, sngcm::ast::BackEnd backend, var std::unique_ptr<Project> project) : sngcm::ast::Project*
         ::=
         (
-            PROJECT QualifiedId:name! SEMICOLON!{ project.reset(new Project(name, lexer.FileName(), config, backend, toolChain)); }
+            PROJECT QualifiedId:name! SEMICOLON!{ project.reset(new Project(name, lexer.FileName(), config, backend)); }
             (Declaration:declaration{ project->AddDeclaration(declaration); })*
         )
         {
