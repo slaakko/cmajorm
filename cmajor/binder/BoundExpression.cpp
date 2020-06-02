@@ -1507,7 +1507,7 @@ void BoundIsExpression::Load(Emitter& emitter, OperationFlags flags)
         paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
         paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
         void* dynamicInitAndCompareFnType = emitter.GetIrTypeForFunction(retType, paramTypes);
-        void* dynamicInitAndCompareFn = emitter.GetOrInsertFunction("DynamicInitVmtsAndCompare", dynamicInitAndCompareFnType);
+        void* dynamicInitAndCompareFn = emitter.GetOrInsertFunction("DynamicInitVmtsAndCompare", dynamicInitAndCompareFnType, true);
         std::vector<void*> args;
         args.push_back(emitter.CreateBitCast(leftClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
         args.push_back(emitter.CreateBitCast(rightClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
@@ -1605,7 +1605,7 @@ void BoundAsExpression::Load(Emitter& emitter, OperationFlags flags)
         paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
         paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
         void* dynamicInitAndCompareFnType = emitter.GetIrTypeForFunction(retType, paramTypes);
-        void* dynamicInitAndCompareFn = emitter.GetOrInsertFunction("DynamicInitVmtsAndCompare", dynamicInitAndCompareFnType);
+        void* dynamicInitAndCompareFn = emitter.GetOrInsertFunction("DynamicInitVmtsAndCompare", dynamicInitAndCompareFnType, true);
         std::vector<void*> args;
         args.push_back(emitter.CreateBitCast(leftClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
         args.push_back(emitter.CreateBitCast(rightClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
@@ -1842,7 +1842,7 @@ BoundExpression* BoundFunctionPtr::Clone()
 
 void BoundFunctionPtr::Load(Emitter& emitter, OperationFlags flags)
 {
-    void* irObject = emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
+    void* irObject = emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter), function->DontThrow());
     emitter.Stack().Push(irObject);
     DestroyTemporaries(emitter);
 }

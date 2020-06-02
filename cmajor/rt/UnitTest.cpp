@@ -130,7 +130,7 @@ void UnitTestEngine::SetUnitTestAssertionResult(int32_t assertionIndex, bool ass
 extern "C" RT_API void RtStartUnitTest(int32_t numAssertions, const char* unitTestFilePath, int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray,
     int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
 {
-    RtInit(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
+    RtInit(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray, nullptr);
     cmajor::rt::UnitTestEngine::Init();
     cmajor::rt::UnitTestEngine::Instance().StartUnitTest(numAssertions, unitTestFilePath);
 }

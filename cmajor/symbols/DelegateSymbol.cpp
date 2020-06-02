@@ -590,7 +590,7 @@ FunctionToDelegateConversion::FunctionToDelegateConversion(TypeSymbol* sourceTyp
 void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter)));
+    emitter.Stack().Push(emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter), function->DontThrow()));
 }
 
 void FunctionToDelegateConversion::Check()
@@ -1184,7 +1184,7 @@ void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std
         throw Exception(GetRootModuleForCurrentThread(), "cannot construct class delegate because expression has no this pointer", GetSpan());
     }
     void* objectValueAsVoidPtr = emitter.CreateBitCast(objectValue, emitter.GetIrTypeForVoidPtrType());
-    void* memFunPtrValue = emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
+    void* memFunPtrValue = emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter), function->DontThrow());
     genObjects[0]->Load(emitter, OperationFlags::addr);
     void* ptr = emitter.Stack().Pop();
     void* objectPtr = emitter.GetObjectFromClassDelegate(ptr);

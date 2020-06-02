@@ -1062,7 +1062,7 @@ void* Emitter::GetOrInsertAnyFunctionComdat(const std::string& name, void* funct
     return nullptr;
 }
 
-void* Emitter::GetOrInsertFunction(const std::string& name, void* type)
+void* Emitter::GetOrInsertFunction(const std::string& name, void* type, bool nothrow)
 {
     return compileUnit->GetOrInsertFunction(name, static_cast<cmsxi::FunctionType*>(type));
 }
@@ -1816,7 +1816,7 @@ void Emitter::SetMetadataRef(void* inst, void* mdStructRef)
     context->SetMetadataRef(static_cast<cmsxi::Instruction*>(inst), static_cast<cmsxi::MDStructRef*>(mdStructRef));
 }
 
-void Emitter::FinalizeFunction(void* function)
+void Emitter::FinalizeFunction(void* function, bool hasCleanup)
 {
     static_cast<cmsxi::Function*>(function)->Finalize();
 }
@@ -1873,6 +1873,14 @@ void Emitter::CreateResume(void* exception)
 }
 
 void Emitter::DebugPrintDebugInfo(const std::string& filePath)
+{
+}
+
+void Emitter::BeginSubstituteLineNumber(int32_t lineNumber)
+{
+}
+
+void Emitter::EndSubstituteLineNumber()
 {
 }
 

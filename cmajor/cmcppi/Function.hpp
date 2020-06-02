@@ -21,7 +21,7 @@ public:
     BasicBlock* CreateBasicBlock(const std::string& name, Context& context);
     BasicBlock* CreateCleanupBasicBlock(Context& context);
     const std::vector<std::unique_ptr<BasicBlock>>& BasicBlocks() const { return basicBlocks; }
-    void Finalize();
+    void Finalize(bool hasCleanup);
     uint64_t GetNextResultNumber() { return nextResultNumber++; }
     uint64_t GetNextLocalNumber() { return nextLocalNumber++; }
     uint64_t GetNextArgumentNumber() { return nextArgumentNumber++; }
@@ -33,6 +33,8 @@ public:
     void Write(CodeFormatter& formatter, Context& context);
     void SetLinkOnce() { linkOnce = true; }
     void RemoveUnreferencedBasicBlocks();
+    void SetNothrow() { nothrow = true; }
+    void RemoveNothrow() { nothrow = false; }
 private:
     std::string name;
     std::string fullName;
@@ -46,6 +48,7 @@ private:
     uint64_t nextArgumentNumber;
     bool linkOnce;
     int nextBBNumber;
+    bool nothrow;
 };
 
 } // namespace cmcppi

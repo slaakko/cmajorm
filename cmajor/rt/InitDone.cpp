@@ -23,11 +23,16 @@
 #endif
 #include <cmajor/rt/Socket.hpp>
 #include <cmajor/rt/Environment.hpp>
+#include <cmajor/rt/Unwind.hpp>
 #include <csignal>
 
-extern "C" RT_API void RtInit(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
+GlobalInitFunctionType initCompileUnitsFunction = nullptr;
+
+extern "C" RT_API void RtInit(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray,
+    GlobalInitFunctionType globalInitializationFunction)
 {
     cmajor::rt::Init(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
+    initCompileUnitsFunction = globalInitializationFunction;
 }
 
 extern "C" RT_API bool DynamicInitVmtsAndCompare(void* vmt1, void* vmt2)
@@ -43,6 +48,30 @@ extern "C" RT_API void RtDone()
 extern "C" RT_API void RtExit(int32_t exitCode)
 {
     exit(exitCode);
+}
+
+std::recursive_mutex initMutex;
+
+void RtInitCompileUnits()
+{
+    std::lock_guard<std::recursive_mutex> initLock(initMutex);
+    if (initCompileUnitsFunction)
+    {
+        GlobalInitFunctionType init = initCompileUnitsFunction;
+        initCompileUnitsFunction = nullptr;
+        init();
+    }
+}
+
+extern "C" RT_API void RtBeginUnwindInfoInit()
+{
+    initMutex.lock();
+    RtInitCompileUnits();
+}
+
+extern "C" RT_API void RtEndUnwindInfoInit()
+{
+    initMutex.unlock();
 }
 
 namespace cmajor { namespace rt {
@@ -66,10 +95,12 @@ void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassI
 #ifdef _WIN32
     InitCommandLine();
 #endif
+    InitUnwind();
 }
 
 void Done()
 {
+    DoneUnwind();
 #ifdef _WIN32
     DoneCommandLine();
 #endif

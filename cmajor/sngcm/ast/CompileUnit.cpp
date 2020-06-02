@@ -8,17 +8,18 @@
 #include <sngcm/ast/Visitor.hpp>
 #include <sngcm/ast/Namespace.hpp>
 #include <sngcm/ast/Class.hpp>
+#include <soulng/util/Path.hpp>
 #include <soulng/util/Sha1.hpp>
 #include <algorithm>
 
 namespace sngcm { namespace ast {
 
-CompileUnitNode::CompileUnitNode(const Span& span_) : Node(NodeType::compileUnitNode, span_), globalNs(), isSynthesizedUnit(false)
+CompileUnitNode::CompileUnitNode(const Span& span_) : Node(NodeType::compileUnitNode, span_), globalNs(), isSynthesizedUnit(false), isProgramMainUnit(false)
 {
 }
 
 CompileUnitNode::CompileUnitNode(const Span& span_, const std::string& filePath_) : 
-    Node(NodeType::compileUnitNode, span_), filePath(filePath_), globalNs(new NamespaceNode(span_, new IdentifierNode(span_, U""))), isSynthesizedUnit(false)
+    Node(NodeType::compileUnitNode, span_), filePath(filePath_), globalNs(new NamespaceNode(span_, new IdentifierNode(span_, U""))), isSynthesizedUnit(false), isProgramMainUnit(false)
 {
 }
 
@@ -83,7 +84,15 @@ const std::string& CompileUnitNode::Id()
 {
     if (id.empty())
     {
-        id = GetSha1MessageDigest(filePath);
+        std::string baseName = Path::GetFileNameWithoutExtension(filePath);
+        for (char& c : baseName)
+        {
+            if (!std::isalnum(c))
+            {
+                c = '_';
+            }
+        }
+        id = baseName + "_" + GetSha1MessageDigest(filePath);
     }
     return id;
 }

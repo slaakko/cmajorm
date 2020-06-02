@@ -74,7 +74,14 @@ NotInstruction::NotInstruction(Value* arg_) : UnaryInstruction(arg_)
 void NotInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    formatter.Write(" = !");
+    if (Arg()->GetType(context)->Id() == boolTypeId)
+    {
+        formatter.Write(" = !");
+    }
+    else
+    {
+        formatter.Write(" = ~");
+    }
     WriteArg(formatter, context);
 }
 

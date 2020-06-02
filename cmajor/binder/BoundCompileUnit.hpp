@@ -103,6 +103,20 @@ public:
     void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
     bool IsGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol) const;
     void SetGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol);
+    void SetSystemRuntimeUnwindInfoSymbol(TypeSymbol* systemRuntimeUnwindInfoSymbol_);
+    TypeSymbol* GetSystemRuntimeUnwindInfoSymbol() const { return systemRuntimeUnwindInfoSymbol; }
+    void GenerateInitUnwindInfoFunctionSymbol();
+    FunctionSymbol* GetInitUnwindInfoFunctionSymbol() const { return initUnwindInfoFunctionSymbol.get(); }
+    void GenerateCompileUnitInitialization();
+    FunctionSymbol* GetInitCompileUnitFunctionSymbol() const { return initCompileUnitFunctionSymbol.get(); }
+    FunctionSymbol* GetPushCompileUnitUnwindInfoInitFunctionSymbol() const { return pushCompileUnitUnwindInfoInitFunctionSymbol; }
+    GlobalVariableSymbol* GetCompileUnitUnwindInfoVarSymbol() const { return compileUnitUnwindInfoVarSymbol.get(); }
+    TypeSymbol* GetInitUnwindInfoDelegateType() const { return initUnwindInfoDelegateType; }
+    FunctionSymbol* GetSystemRuntimeAddCompileUnitFunctionSymbol() const { return systemRuntimeAddCompileUnitFunctionSymbol; }
+    void SetSystemRuntimeAddCompileUnitFunctionSymbol(FunctionSymbol* systemRuntimeAddCompileUnitFunctionSymbol_) { systemRuntimeAddCompileUnitFunctionSymbol = systemRuntimeAddCompileUnitFunctionSymbol_; }
+    void GenerateGlobalInitializationFunction();
+    FunctionSymbol* GetGlobalInitializationFunctionSymbol() const { return globalInitFunctionSymbol; }
+    const std::vector<std::unique_ptr<FunctionSymbol>>& AllCompileUnitInitFunctionSymbols() const { return allCompileUnitInitFunctionSymbols; }
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -142,6 +156,15 @@ private:
     std::vector<std::unique_ptr<FunctionSymbol>> copyConstructors;
     int nextExitEntryIndex;
     std::set<DestructorSymbol*> instantiatedGeneratedDestructors;
+    TypeSymbol* systemRuntimeUnwindInfoSymbol;
+    std::unique_ptr<FunctionSymbol> initUnwindInfoFunctionSymbol;
+    std::unique_ptr<FunctionSymbol> initCompileUnitFunctionSymbol;
+    FunctionSymbol* systemRuntimeAddCompileUnitFunctionSymbol;
+    FunctionSymbol* pushCompileUnitUnwindInfoInitFunctionSymbol;
+    TypeSymbol* initUnwindInfoDelegateType;
+    std::unique_ptr<GlobalVariableSymbol> compileUnitUnwindInfoVarSymbol;
+    FunctionSymbol* globalInitFunctionSymbol;
+    std::vector<std::unique_ptr<FunctionSymbol>> allCompileUnitInitFunctionSymbols;
 };
 
 } } // namespace cmajor::binder

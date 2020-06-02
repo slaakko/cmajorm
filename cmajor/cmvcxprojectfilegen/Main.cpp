@@ -376,7 +376,7 @@ int main(int argc, const char** argv)
             debugRuntimeLibraryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugRuntimeLibraryText));
             sngxml::dom::Element* debugDisableWarningsElement = new sngxml::dom::Element(U"DisableSpecificWarnings");
             debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugDisableWarningsElement));
-            debugDisableWarningsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"4102;4146;4244")));
+            debugDisableWarningsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"4102;4146;4244;4297")));
             if (optionsStr.find("/FAs") != std::string::npos)
             {
                 sngxml::dom::Element* debugAssemblerOutputElement = new sngxml::dom::Element(U"AssemblerOutput");

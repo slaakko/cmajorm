@@ -82,6 +82,7 @@ public:
     BoundStatement* ReleaseStatement() { return statement.release(); }
     bool CompilingThrow() const { return compilingThrow; }
     bool InsideCatch() const { return insideCatch; }
+    void GenerateEnterAndExitFunctionCode(BoundFunction* boundFunction, const Span& span);
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;

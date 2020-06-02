@@ -435,7 +435,6 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode, int32_t functionInde
         {
             functionSymbol->SetCDecl();
             functionSymbol->SetProgramMain();
-            functionSymbol->SetNothrow();
         }
         else
         {

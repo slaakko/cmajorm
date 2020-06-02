@@ -110,10 +110,14 @@ public:
     int Install(const std::string& str) override;
     int Install(const std::u16string& str) override;
     int Install(const std::u32string& str) override;
+    void Compile(const std::string& intermediateCodeFile);
     void SetLineNumber(int32_t lineNumber) override;
     std::string GetSourceFilePath(int32_t fileIndex) override;
-    void Compile(const std::string& intermediateCodeFile);
-    void CreateExitFunctionCall();
+    void GenerateEnterFunctionCode(BoundFunction& boundFunction);
+    void GenerateExitFunctionCode(BoundFunction& boundFunction);
+    void GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCompileUnit);
+    void GenerateInitCompileUnitFunction(BoundCompileUnit& boundCompileUnit);
+    void GenerateGlobalInitFuncion(BoundCompileUnit& boundCompileUnit);
 private:
     cmajor::ir::Emitter* emitter;
     cmajor::ir::EmittingContext* emittingContext;
@@ -165,6 +169,7 @@ private:
     int numTriesInCurrentBlock;
     int tryIndex;
     int32_t prevLineNumber;
+    std::set<FunctionSymbol*> compileUnitFunctions;
 };
 
 } } // namespace cmajor::codegencpp

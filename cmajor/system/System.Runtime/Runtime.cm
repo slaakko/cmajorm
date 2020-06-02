@@ -3,7 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-public extern cdecl nothrow void RtInit(long numberOfPolymorphicClassIds, const ulong* polymorphicClassIdArray, long numberOfStaticClassIds, const ulong* staticClassIdArray);
+public delegate void GlobalInitFunctionType();
+public extern cdecl nothrow void RtInit(long numberOfPolymorphicClassIds, const ulong* polymorphicClassIdArray, long numberOfStaticClassIds, const ulong* staticClassIdArray,
+    GlobalInitFunctionType globalInitFunction);
 public extern cdecl nothrow void RtDone();
 public extern cdecl nothrow ulong RtDynamicInitVmt(void* vmt);
 public extern cdecl nothrow int RtArgc();
@@ -232,3 +234,10 @@ public extern cdecl nothrow short RtCyan();
 public extern cdecl nothrow short RtMagenta();
 public extern cdecl nothrow short RtYellow();
 public extern cdecl nothrow bool RtRunningOnWsl();
+public extern cdecl nothrow void RtBeginUnwindInfoInit();
+public extern cdecl nothrow void RtEndUnwindInfoInit();
+public extern cdecl nothrow void RtAddCompileUnitFunction(void* functionAddress, const char* functionName, const char* sourceFilePath);
+public extern cdecl nothrow void* RtPushUnwindInfo(void* unwindInfo);
+public extern cdecl nothrow void RtPopUnwindInfo(void* prevUnwindInfo);
+public extern cdecl nothrow const char* RtGetCallStack();
+public extern cdecl nothrow void RtDisposeCallStack();

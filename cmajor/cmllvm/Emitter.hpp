@@ -194,7 +194,7 @@ public:
     void* GetOrInsertAnyFunctionComdat(const std::string& name, void* function) override;
     void SetInitializer(void* global, void* initializer) override;
     void SetPrivateLinkage(void* global) override;
-    void* GetOrInsertFunction(const std::string& name, void* type) override;
+    void* GetOrInsertFunction(const std::string& name, void* type, bool nothrow) override;
     void* CreateGlobalStringPtr(const std::string& name) override;
     void* CreateGlobalWStringPtr(const std::u16string& name) override;
     void* CreateGlobalUStringPtr(const std::u32string& name) override;
@@ -337,7 +337,7 @@ public:
     void* GetGlobalUStringConstant(int stringId) override { return emittingDelegate->GetGlobalUStringConstant(stringId); }
     void* GetGlobalUuidConstant(int uuidId) override { return emittingDelegate->GetGlobalUuidConstant(uuidId); }
     void* GenerateTrap(const std::vector<void*>& args) override;
-    void SetCompileUnitId(const std::string& compileUnitId) override;
+    void SetCompileUnitId(const std::string& compileUnitId_) override;
     void* GetClsIdValue(const std::string& typeId) override;
     void* CreateMDBool(bool value) override;
     void* CreateMDLong(int64_t value) override;
@@ -351,7 +351,7 @@ public:
     void SetCurrentLineNumber(int currentLineNumber) override;
     void* GetMDStructRefForSourceFile(const std::string& sourceFileName) override;
     void SetMetadataRef(void* inst, void* mdStructRef) override;
-    void FinalizeFunction(void* function) override;
+    void FinalizeFunction(void* function, bool hasCleanup) override;
     int Install(const std::string& str) override;
     int Install(const std::u16string& str) override;
     int Install(const std::u32string& str) override;
@@ -364,6 +364,8 @@ public:
     void* CreateUndefValue(void* type) override;
     void CreateResume(void* exception) override;
     void DebugPrintDebugInfo(const std::string& filePath) override;
+    void BeginSubstituteLineNumber(int32_t lineNumber) override;
+    void EndSubstituteLineNumber() override;
 private:
     cmajor::ir::EmittingContext& emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;
@@ -377,6 +379,7 @@ private:
     llvm::DIBuilder* currentDIBuilder;
     cmajor::common::ColumnSpanProvider* columnSpanProvider;
     int32_t compileUnitIndex;
+    std::string compileUnitId;
     ValueStack stack;
     llvm::Value* objectPointer;
     llvm::Function* function;
@@ -402,6 +405,8 @@ private:
     std::unordered_map<void*, std::string> staticObjectNameMap;
     std::unordered_map<void*, std::string> vmtObjectNameMap;
     std::unordered_map<void*, std::string> imtArrayObjectNameMap;
+    int32_t currentLineNumber;
+    bool substituteLineNumber;
 };
 
 } // namespace cmllvm

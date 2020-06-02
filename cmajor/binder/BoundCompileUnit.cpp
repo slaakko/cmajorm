@@ -270,7 +270,9 @@ std::unique_ptr<Value> CharacterPointerLiteralToStringFunctionContainerConversio
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) :
     BoundNode(&module_, Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), currentNamespace(nullptr), 
     hasGotos(false), operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), 
-    constExprFunctionRepository(*this), conversionTable(nullptr), bindingTypes(false), compileUnitIndex(-2), immutable(false), nextExitEntryIndex(0)
+    constExprFunctionRepository(*this), conversionTable(nullptr), bindingTypes(false), compileUnitIndex(-2), immutable(false), nextExitEntryIndex(0),
+    systemRuntimeUnwindInfoSymbol(nullptr), systemRuntimeAddCompileUnitFunctionSymbol(nullptr), pushCompileUnitUnwindInfoInitFunctionSymbol(nullptr),
+    initUnwindInfoDelegateType(nullptr), globalInitFunctionSymbol(nullptr)
 {
     if (compileUnitNode)
     {
@@ -909,6 +911,117 @@ bool BoundCompileUnit::IsGeneratedDestructorInstantiated(DestructorSymbol* gener
 void BoundCompileUnit::SetGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol)
 {
     instantiatedGeneratedDestructors.insert(generatedDestructorSymbol);
+}
+
+void BoundCompileUnit::SetSystemRuntimeUnwindInfoSymbol(TypeSymbol* systemRuntimeUnwindInfoSymbol_)
+{
+    systemRuntimeUnwindInfoSymbol = systemRuntimeUnwindInfoSymbol_;
+}
+
+void BoundCompileUnit::GenerateInitUnwindInfoFunctionSymbol()
+{
+    std::string compileUnitId = compileUnitNode->Id();
+    std::u32string groupName = U"InitUnwindInfo_" + ToUtf32(compileUnitId);
+    FunctionSymbol* functionSymbol = new FunctionSymbol(Span(), groupName);
+    functionSymbol->SetParent(&symbolTable.GlobalNs());
+    functionSymbol->SetGroupName(groupName);
+    functionSymbol->SetAccess(SymbolAccess::public_);
+    functionSymbol->SetCDecl();
+    functionSymbol->SetNothrow();
+    functionSymbol->ComputeMangledName();
+    functionSymbol->SetReturnType(symbolTable.GetTypeByName(U"void"));
+    symbolTable.SetFunctionIdFor(functionSymbol);
+    initUnwindInfoFunctionSymbol.reset(functionSymbol);
+}
+
+void BoundCompileUnit::GenerateCompileUnitInitialization()
+{
+    if (module.IsCore()) return;
+    std::string compileUnitId = compileUnitNode->Id();
+    std::u32string groupName = U"InitCompileUnit_" + ToUtf32(compileUnitId);
+    FunctionSymbol* functionSymbol = new FunctionSymbol(Span(), groupName);
+    functionSymbol->SetParent(&symbolTable.GlobalNs());
+    functionSymbol->SetGroupName(groupName);
+    functionSymbol->SetAccess(SymbolAccess::public_);
+    functionSymbol->SetCDecl();
+    functionSymbol->SetNothrow();
+    functionSymbol->ComputeMangledName();
+    functionSymbol->SetReturnType(symbolTable.GetTypeByName(U"void"));
+    symbolTable.SetFunctionIdFor(functionSymbol);
+    initCompileUnitFunctionSymbol.reset(functionSymbol);
+    Symbol* symbol = symbolTable.GlobalNs().GetContainerScope()->Lookup(U"System.Runtime.PushCompileUnitUnwindInfoInit");
+    if (symbol)
+    {
+        if (symbol->GetSymbolType() == SymbolType::functionGroupSymbol)
+        {
+            FunctionGroupSymbol* functionGroup = static_cast<FunctionGroupSymbol*>(symbol);
+            pushCompileUnitUnwindInfoInitFunctionSymbol = functionGroup->GetFunction();
+        }
+    }
+    if (!pushCompileUnitUnwindInfoInitFunctionSymbol)
+    {
+        throw std::runtime_error("internal error: 'System.Runtime.PushCompileUnitUnwindInfoInit' symbol not found");
+    }
+    Span span = functionSymbol->GetSpan();
+    compileUnitUnwindInfoVarSymbol.reset(new GlobalVariableSymbol(span, U"unwindInfoInit_" + ToUtf32(compileUnitId)));
+    compileUnitUnwindInfoVarSymbol->SetAccess(SymbolAccess::public_);
+    compileUnitUnwindInfoVarSymbol->ComputeMangledName();
+    Symbol* cuUnwindInfoTypeSymbol = symbolTable.GlobalNs().GetContainerScope()->Lookup(U"System.Runtime.CompileUnitUnwindInfo");
+    if (cuUnwindInfoTypeSymbol && cuUnwindInfoTypeSymbol->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+    {
+        ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(cuUnwindInfoTypeSymbol);
+        ClassTypeSymbol* classTypeSymbol = classGroup->GetClass(0);
+        if (!classTypeSymbol)
+        {
+            throw std::runtime_error("internal error: 'System.Runtime.CompileUnitUnwindInfo' class not found");
+        }
+        compileUnitUnwindInfoVarSymbol->SetType(classTypeSymbol);
+        BoundGlobalVariable* compileUnitUnwindInfoVar = new BoundGlobalVariable(symbolTable.GetModule(), span, compileUnitUnwindInfoVarSymbol.get());
+        AddBoundNode(std::unique_ptr<BoundNode>(compileUnitUnwindInfoVar));
+    }
+    else
+    {
+        throw std::runtime_error("internal error: 'System.Runtime.CompileUnitUnwindInfo' symbol not found");
+    }
+    Symbol* initUnwindInfoDelegateSymbol = symbolTable.GlobalNs().GetContainerScope()->Lookup(U"System.Runtime.InitCompileUnitUnwindInfoFunction");
+    if (initUnwindInfoDelegateSymbol && initUnwindInfoDelegateSymbol->IsTypeSymbol())
+    {
+        initUnwindInfoDelegateType = static_cast<TypeSymbol*>(initUnwindInfoDelegateSymbol);
+    }
+    else
+    {
+        throw std::runtime_error("internal error: 'System.Runtime.InitCompileUnitUnwindInfoFunction' symbol not found");
+    }
+}
+
+void BoundCompileUnit::GenerateGlobalInitializationFunction()
+{
+    std::u32string groupName = U"GlobalInitCompileUnits";
+    globalInitFunctionSymbol = new FunctionSymbol(Span(), groupName);
+    globalInitFunctionSymbol->SetParent(&symbolTable.GlobalNs());
+    globalInitFunctionSymbol->SetGroupName(groupName);
+    globalInitFunctionSymbol->SetAccess(SymbolAccess::public_);
+    globalInitFunctionSymbol->SetCDecl();
+    globalInitFunctionSymbol->SetNothrow();
+    globalInitFunctionSymbol->ComputeMangledName();
+    globalInitFunctionSymbol->SetReturnType(symbolTable.GetTypeByName(U"void"));
+    symbolTable.SetFunctionIdFor(globalInitFunctionSymbol);
+    symbolTable.GlobalNs().AddMember(globalInitFunctionSymbol);
+    const std::set<std::string>& compileUnitIds = symbolTable.GetModule()->AllCompileUnitIds();
+    for (const std::string& compileUnitId : compileUnitIds)
+    {
+        std::u32string groupName = U"InitCompileUnit_" + ToUtf32(compileUnitId);
+        FunctionSymbol* initFunctionSymbol = new FunctionSymbol(Span(), groupName);
+        initFunctionSymbol->SetParent(&symbolTable.GlobalNs());
+        initFunctionSymbol->SetGroupName(groupName);
+        initFunctionSymbol->SetAccess(SymbolAccess::public_);
+        initFunctionSymbol->SetCDecl();
+        initFunctionSymbol->SetNothrow();
+        initFunctionSymbol->ComputeMangledName();
+        initFunctionSymbol->SetReturnType(symbolTable.GetTypeByName(U"void"));
+        symbolTable.SetFunctionIdFor(initFunctionSymbol);
+        allCompileUnitInitFunctionSymbols.push_back(std::unique_ptr<FunctionSymbol>(initFunctionSymbol));
+    }
 }
 
 } } // namespace cmajor::binder

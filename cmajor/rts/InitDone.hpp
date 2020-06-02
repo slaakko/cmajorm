@@ -8,10 +8,14 @@
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
-extern "C" RT_API void RtInit(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray);
+using GlobalInitFunctionType = void(*)();
+extern "C" RT_API void RtInit(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray,
+    GlobalInitFunctionType globalInitializationFunction);
 extern "C" RT_API void RtDone();
 extern "C" RT_API bool DynamicInitVmtsAndCompare(void* vmt1, void* vmt2);
 extern "C" RT_API void RtExit(int32_t exitCode);
+extern "C" RT_API void RtBeginUnwindInfoInit();
+extern "C" RT_API void RtEndUnwindInfoInit();
 
 namespace cmajor { namespace rt {
 

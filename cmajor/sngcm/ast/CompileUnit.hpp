@@ -27,12 +27,15 @@ public:
     bool IsSynthesizedUnit() const { return isSynthesizedUnit; }
     int GetColumn(const Span& span) const override;
     const std::string& Id();
+    bool IsProgramMainUnit() const { return isProgramMainUnit; }
+    void SetProgramMainUnit() { isProgramMainUnit = true; }
 private:
     std::string filePath;
     std::unique_ptr<NamespaceNode> globalNs;
     std::vector<int32_t> lineStarts;
     bool isSynthesizedUnit;
     std::string id;
+    bool isProgramMainUnit;
 };
 
 SNGCM_AST_API void CombineNamespaces(CompileUnitNode& cu);

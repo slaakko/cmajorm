@@ -261,4 +261,18 @@ void FunctionNode::SetBodySource(CompoundStatementNode* bodySource_)
     bodySource->SetParent(this);
 }
 
+FunctionPtrNode::FunctionPtrNode(const Span& span_) : Node(NodeType::functionPtrNode, span_), boundExpression(nullptr)
+{
+}
+
+Node* FunctionPtrNode::Clone(CloneContext& cloneContext) const
+{
+    throw std::runtime_error("internal error: function ptr node cannot be cloned");
+}
+
+void FunctionPtrNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 } } // namespace sngcm::ast

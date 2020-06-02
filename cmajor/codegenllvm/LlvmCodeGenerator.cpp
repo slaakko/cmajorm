@@ -58,6 +58,12 @@ void LlvmCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     boundCompileUnit.ResetCodeGenerated();
     symbolTable = &boundCompileUnit.GetSymbolTable();
     symbolsModule = &boundCompileUnit.GetModule();
+    compileUnitId = boundCompileUnit.Id();
+    if (!symbolsModule->IsCore())
+    {
+        symbolsModule->AddCompileUnitId(compileUnitId);
+    }
+    emitter->SetCompileUnitId(compileUnitId);
     NativeModule nativeModule(emitter, boundCompileUnit.GetCompileUnitNode()->FilePath());
     module = nativeModule.module;
     emitter->SetTargetTriple(emittingContext->TargetTriple());
@@ -86,6 +92,12 @@ void LlvmCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     {
         BoundNode* boundNode = boundCompileUnit.BoundNodes()[i].get();
         boundNode->Accept(*this);
+    }
+    GenerateInitUnwindInfoFunction(boundCompileUnit);
+    GenerateInitCompileUnitFunction(boundCompileUnit);
+    if (boundCompileUnit.GetGlobalInitializationFunctionSymbol() != nullptr)
+    {
+        GenerateGlobalInitFuncion(boundCompileUnit);
     }
     if (debugInfo)
     {
@@ -294,7 +306,7 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     if (functionSymbol->CodeGenerated()) return;
     functionSymbol->SetCodeGenerated();
     void* functionType = functionSymbol->IrType(*emitter);
-    function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
+    function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType, functionSymbol->DontThrow());
     bool setInline = false;
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
     {
@@ -430,19 +442,7 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     }
     if (!functionSymbol->DontThrow())
     {
-        int funId = compileUnit->Install(ToUtf8(functionSymbol->FullName()));
-        int sfpId = compileUnit->Install(compileUnit->SourceFilePath());
-        void* funValue = GetGlobalStringPtr(funId);
-        void* sfpValue = GetGlobalStringPtr(sfpId);
-        std::vector<void*> enterFunctionParamTypes;
-        enterFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
-        enterFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
-        void* enterFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), enterFunctionParamTypes);
-        void* enterFunction = emitter->GetOrInsertFunction("RtEnterFunction", enterFunctionType);
-        std::vector<void*> enterFunctionArgs;
-        enterFunctionArgs.push_back(funValue);
-        enterFunctionArgs.push_back(sfpValue);
-        emitter->CreateCall(enterFunction, enterFunctionArgs);
+        GenerateEnterFunctionCode(boundFunction);
     }
     for (int i = 0; i < np; ++i)
     {
@@ -457,7 +457,7 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
                 copyConstructor = compileUnit->GetCopyConstructorFor(classType->TypeId());
             }
             void* copyCtorType = copyConstructor->IrType(*emitter);
-            void* callee = emitter->GetOrInsertFunction(ToUtf8(copyConstructor->MangledName()), copyCtorType);
+            void* callee = emitter->GetOrInsertFunction(ToUtf8(copyConstructor->MangledName()), copyCtorType, copyConstructor->DontThrow());
             std::vector<void*> args;
             args.push_back(parameter->IrObject(*emitter));
             args.push_back(arg);
@@ -556,7 +556,8 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     }
     if (!lastStatement || lastStatement->GetBoundNodeType() != BoundNodeType::boundReturnStatement || lastStatement->GetBoundNodeType() == BoundNodeType::boundReturnStatement && destructorCallGenerated)
     {
-        CreateExitFunctionCall();
+        //CreateExitFunctionCall();
+        GenerateExitFunctionCode(boundFunction);
         if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             void* defaultValue = functionSymbol->ReturnType()->CreateDefaultIrValue(*emitter);
@@ -991,7 +992,7 @@ void LlvmCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
     void* retType = emitter->GetIrTypeForVoid();
     std::vector<void*> paramTypes;
     void* doNothingFunType = emitter->GetIrTypeForFunction(retType, paramTypes);
-    void* doNothingFun = emitter->GetOrInsertFunction("llvm.donothing", doNothingFunType);
+    void* doNothingFun = emitter->GetOrInsertFunction("llvm.donothing", doNothingFunType, true);
     std::vector<void*> args;
     std::vector<void*> bundles;
     if (currentPad != nullptr)
@@ -1312,27 +1313,221 @@ void LlvmCodeGenerator::SetLineNumber(int32_t lineNumber)
 {
     if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
     if (prevLineNumber == lineNumber) return;
-    if (debugInfo)
-    {
-        emitter->SetCurrentDebugLocation(Span());
-    }
     prevLineNumber = lineNumber;
-    std::vector<void*> setLineNumberFunctionParamTypes;
-    setLineNumberFunctionParamTypes.push_back(emitter->GetIrTypeForInt());
-    void* setLineNumberFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), setLineNumberFunctionParamTypes);
-    void* setLineNumberFunction = emitter->GetOrInsertFunction("RtSetLineNumber", setLineNumberFunctionType);
-    std::vector<void*> setLineNumberFunctionArgs;
-    setLineNumberFunctionArgs.push_back(emitter->CreateIrValueForInt(lineNumber));
-    if (currentPad == nullptr)
+    BoundStatement* setLineNumberStatement = currentFunction->GetLineCode();
+    if (setLineNumberStatement)
     {
-        emitter->CreateCall(setLineNumberFunction, setLineNumberFunctionArgs);
+        bool prevGenJumpingBoolCode = genJumpingBoolCode;
+        genJumpingBoolCode = false;
+        emitter->BeginSubstituteLineNumber(lineNumber);
+        setLineNumberStatement->Accept(*this);
+        emitter->EndSubstituteLineNumber();
+        genJumpingBoolCode = prevGenJumpingBoolCode;
     }
-    else
+}
+
+void LlvmCodeGenerator::GenerateEnterFunctionCode(BoundFunction& boundFunction)
+{
+    const std::vector<std::unique_ptr<BoundStatement>>& enterCode = boundFunction.EnterCode();
+    if (enterCode.empty()) return;
+    compileUnitFunctions.insert(boundFunction.GetFunctionSymbol());
+    LocalVariableSymbol* prevUnwindInfoVar = boundFunction.GetFunctionSymbol()->PrevUnwindInfoVar();
+    void* prevUnwindInfoAlloca = emitter->CreateAlloca(prevUnwindInfoVar->GetType()->IrType(*emitter));
+    emitter->SetIrObject(prevUnwindInfoVar, prevUnwindInfoAlloca);
+    LocalVariableSymbol* unwindInfoVar = boundFunction.GetFunctionSymbol()->UnwindInfoVar();
+    void* unwindInfoAlloca = emitter->CreateAlloca(unwindInfoVar->GetType()->IrType(*emitter));
+    emitter->SetIrObject(unwindInfoVar, unwindInfoAlloca);
+    lastAlloca = unwindInfoAlloca;
+    for (const auto& statement : enterCode)
     {
-        std::vector<void*> bundles;
-        bundles.push_back(currentPad->value);
-        void* callInst = emitter->CreateCallInst(setLineNumberFunction, setLineNumberFunctionArgs, bundles, Span());
+        statement->Accept(*this);
     }
+}
+
+void LlvmCodeGenerator::GenerateExitFunctionCode(BoundFunction& boundFunction)
+{
+    const std::vector<std::unique_ptr<BoundStatement>>& exitCode = boundFunction.ExitCode();
+    if (exitCode.empty()) return;
+    for (const auto& statement : exitCode)
+    {
+        statement->Accept(*this);
+    }
+}
+
+void LlvmCodeGenerator::GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCompileUnit)
+{
+    void* prevDIBuilder = emitter->DIBuilder();
+    emitter->SetCurrentDIBuilder(nullptr);
+    bool prevDebugInfo = debugInfo;
+    debugInfo = false;
+    emitter->SetCurrentLineNumber(0);
+    handlerBlock = nullptr;
+    cleanupBlock = nullptr;
+    newCleanupNeeded = false;
+    currentPad = nullptr;
+    prevLineNumber = 0;
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    lastAlloca = nullptr;
+    compoundLevel = 0;
+    cleanups.clear();
+    pads.clear();
+    labeledStatementMap.clear();
+    FunctionSymbol* initUnwindInfoFunctionSymbol = boundCompileUnit.GetInitUnwindInfoFunctionSymbol();
+    if (!initUnwindInfoFunctionSymbol)
+    {
+        emitter->SetCurrentDIBuilder(prevDIBuilder);
+        debugInfo = prevDebugInfo;
+        return;
+    }
+    if (compileUnitFunctions.empty())
+    {
+        emitter->SetCurrentDIBuilder(prevDIBuilder);
+        debugInfo = prevDebugInfo;
+        return;
+    }
+    FunctionSymbol* addCompileUnitFunctionSymbol = boundCompileUnit.GetSystemRuntimeAddCompileUnitFunctionSymbol();
+    if (!addCompileUnitFunctionSymbol)
+    {
+        emitter->SetCurrentDIBuilder(prevDIBuilder);
+        debugInfo = prevDebugInfo;
+        return;
+    }
+    void* functionType = initUnwindInfoFunctionSymbol->IrType(*emitter);
+    void* function = emitter->GetOrInsertFunction(ToUtf8(initUnwindInfoFunctionSymbol->MangledName()), functionType, true);
+    emitter->SetFunction(function);
+    emitter->SetFunctionName(ToUtf8(initUnwindInfoFunctionSymbol->FullName()));
+    void* entryBlock = emitter->CreateBasicBlock("entry");
+    emitter->SetCurrentBasicBlock(entryBlock);
+    for (FunctionSymbol* compileUnitFunction : compileUnitFunctions)
+    {
+        std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(symbolsModule, compileUnitFunction->GetSpan(), addCompileUnitFunctionSymbol));
+        BoundBitCast* functionPtrAsVoidPtr = new BoundBitCast(symbolsModule, std::unique_ptr<BoundExpression>(
+            new BoundFunctionPtr(symbolsModule, compileUnitFunction->GetSpan(), compileUnitFunction, symbolTable->GetTypeByName(U"void")->AddPointer(compileUnitFunction->GetSpan()))),
+            symbolTable->GetTypeByName(U"void")->AddPointer(compileUnitFunction->GetSpan()));
+        boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(functionPtrAsVoidPtr));
+        std::string functionName = ToUtf8(compileUnitFunction->FullName());
+        int functionNameStringId = Install(functionName);
+        BoundLiteral* boundFunctionNameLiteral = new BoundLiteral(symbolsModule, std::unique_ptr<Value>(new StringValue(compileUnitFunction->GetSpan(), functionNameStringId, functionName)),
+            symbolTable->GetTypeByName(U"char")->AddConst(compileUnitFunction->GetSpan())->AddPointer(compileUnitFunction->GetSpan()));
+        boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(boundFunctionNameLiteral));
+        std::string sourceFilePath = GetSourceFilePath(compileUnitFunction->GetSpan().fileIndex);
+        int sourceFilePathStringId = Install(sourceFilePath);
+        BoundLiteral* boundSourceFilePathLiteral = new BoundLiteral(symbolsModule, std::unique_ptr<Value>(new StringValue(compileUnitFunction->GetSpan(), sourceFilePathStringId, sourceFilePath)),
+            symbolTable->GetTypeByName(U"char")->AddConst(compileUnitFunction->GetSpan())->AddPointer(compileUnitFunction->GetSpan()));
+        boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(boundSourceFilePathLiteral));
+        boundFunctionCall->Accept(*this);
+    }
+    emitter->CreateRetVoid();
+    debugInfo = prevDebugInfo;
+    emitter->SetCurrentDIBuilder(prevDIBuilder);
+}
+
+void LlvmCodeGenerator::GenerateInitCompileUnitFunction(BoundCompileUnit& boundCompileUnit)
+{
+    void* prevDIBuilder = emitter->DIBuilder();
+    emitter->SetCurrentDIBuilder(nullptr);
+    bool prevDebugInfo = debugInfo;
+    debugInfo = false;
+    emitter->ResetCurrentDebugLocation();
+    emitter->SetCurrentLineNumber(0);
+    handlerBlock = nullptr;
+    cleanupBlock = nullptr;
+    newCleanupNeeded = false;
+    currentPad = nullptr;
+    prevLineNumber = 0;
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    lastAlloca = nullptr;
+    compoundLevel = 0;
+    cleanups.clear();
+    pads.clear();
+    labeledStatementMap.clear();
+    FunctionSymbol* initCompileUnitFunctionSymbol = boundCompileUnit.GetInitCompileUnitFunctionSymbol();
+    if (!initCompileUnitFunctionSymbol)
+    {
+        emitter->SetCurrentDIBuilder(prevDIBuilder);
+        debugInfo = prevDebugInfo;
+        return;
+    }
+    Span span = initCompileUnitFunctionSymbol->GetSpan();
+    void* functionType = initCompileUnitFunctionSymbol->IrType(*emitter);
+    void* function = emitter->GetOrInsertFunction(ToUtf8(initCompileUnitFunctionSymbol->MangledName()), functionType, true);
+    emitter->SetFunction(function);
+    emitter->SetFunctionName(ToUtf8(initCompileUnitFunctionSymbol->FullName()));
+    void* entryBlock = emitter->CreateBasicBlock("entry");
+    emitter->SetCurrentBasicBlock(entryBlock);
+    FunctionSymbol* initUnwindInfoFunctionSymbol = boundCompileUnit.GetInitUnwindInfoFunctionSymbol();
+    if (!initUnwindInfoFunctionSymbol)
+    {
+        emitter->SetCurrentDIBuilder(prevDIBuilder);
+        debugInfo = prevDebugInfo;
+        emitter->CreateRetVoid();
+        return;
+    }
+    FunctionSymbol* pushCompileUnitUnwindInfoInitFunctionSymbol = boundCompileUnit.GetPushCompileUnitUnwindInfoInitFunctionSymbol();
+    TypeSymbol* initUnwindInfoDelegateType = boundCompileUnit.GetInitUnwindInfoDelegateType();
+    GlobalVariableSymbol* compileUnitUnwindInfoVarSymbol = boundCompileUnit.GetCompileUnitUnwindInfoVarSymbol();
+    BoundGlobalVariable* boundCompileUnitUnwindInfoVar = new BoundGlobalVariable(symbolsModule, span, compileUnitUnwindInfoVarSymbol);
+    BoundAddressOfExpression* unwindInfoVarAddress = new BoundAddressOfExpression(symbolsModule, std::unique_ptr<BoundExpression>(boundCompileUnitUnwindInfoVar),
+        boundCompileUnitUnwindInfoVar->GetType()->AddPointer(span));
+    BoundFunctionPtr* boundInitUnwindInfoFunction = new BoundFunctionPtr(symbolsModule, span, initUnwindInfoFunctionSymbol, initUnwindInfoDelegateType);
+    std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(symbolsModule, span, pushCompileUnitUnwindInfoInitFunctionSymbol));
+    boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(boundInitUnwindInfoFunction));
+    boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(unwindInfoVarAddress));
+    boundFunctionCall->Accept(*this);
+    emitter->CreateRetVoid();
+    emitter->SetCurrentDIBuilder(prevDIBuilder);
+    debugInfo = prevDebugInfo;
+}
+
+void LlvmCodeGenerator::GenerateGlobalInitFuncion(BoundCompileUnit& boundCompileUnit)
+{
+    void* prevDIBuilder = emitter->DIBuilder();
+    emitter->SetCurrentDIBuilder(nullptr);
+    bool prevDebugInfo = debugInfo;
+    debugInfo = false;
+    emitter->ResetCurrentDebugLocation();
+    emitter->SetCurrentLineNumber(0);
+    emitter->ResetCurrentDebugLocation();
+    FunctionSymbol* globalInitFunctionSymbol = boundCompileUnit.GetGlobalInitializationFunctionSymbol();
+    if (!globalInitFunctionSymbol)
+    {
+        emitter->SetCurrentDIBuilder(prevDIBuilder);
+        debugInfo = prevDebugInfo;
+        return;
+    }
+    handlerBlock = nullptr;
+    cleanupBlock = nullptr;
+    newCleanupNeeded = false;
+    currentPad = nullptr;
+    prevLineNumber = 0;
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    lastAlloca = nullptr;
+    compoundLevel = 0;
+    cleanups.clear();
+    pads.clear();
+    labeledStatementMap.clear();
+    Span span = globalInitFunctionSymbol->GetSpan();
+    void* functionType = globalInitFunctionSymbol->IrType(*emitter);
+    void* function = emitter->GetOrInsertFunction(ToUtf8(globalInitFunctionSymbol->MangledName()), functionType, true);
+    emitter->SetFunction(function);
+    emitter->SetFunctionName(ToUtf8(globalInitFunctionSymbol->FullName()));
+    void* entryBlock = emitter->CreateBasicBlock("entry");
+    emitter->SetCurrentBasicBlock(entryBlock);
+    const std::vector<std::unique_ptr<FunctionSymbol>>& allCompileUnitInitFunctionSymbols = boundCompileUnit.AllCompileUnitInitFunctionSymbols();
+    for (const std::unique_ptr<FunctionSymbol>& initCompileUnitFunctionSymbol : allCompileUnitInitFunctionSymbols)
+    {
+        std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(symbolsModule, span, initCompileUnitFunctionSymbol.get()));
+        boundFunctionCall->Accept(*this);
+    }
+    emitter->CreateRetVoid();
+    emitter->SetCurrentDIBuilder(prevDIBuilder);
+    debugInfo = prevDebugInfo;
 }
 
 void* LlvmCodeGenerator::HandlerBlock()
@@ -1371,7 +1566,7 @@ void LlvmCodeGenerator::CreateExitFunctionCall()
     if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
     std::vector<void*> exitFunctionParamTypes;
     void* exitFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), exitFunctionParamTypes);
-    void* exitFunction = emitter->GetOrInsertFunction("RtExitFunction", exitFunctionType);
+    void* exitFunction = emitter->GetOrInsertFunction("RtExitFunction", exitFunctionType, true);
     std::vector<void*> exitFunctionArgs;
     if (currentPad == nullptr)
     {

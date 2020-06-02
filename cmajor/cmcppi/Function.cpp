@@ -10,7 +10,7 @@
 namespace cmcppi {
 
 Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), nextLocalNumber(0), nextArgumentNumber(0), 
-    linkOnce(false), nextBBNumber(0)
+    linkOnce(false), nextBBNumber(0), nothrow(false)
 {
     context.SetCurrentFunction(this);
     entryBlock.reset(new BasicBlock(nextBBNumber++, "entry"));
@@ -47,7 +47,7 @@ BasicBlock* Function::CreateCleanupBasicBlock(Context& context)
     return cubb;
 }
 
-void Function::Finalize()
+void Function::Finalize(bool hasCleanup)
 {
     nextBBNumber = 0;
     for (std::unique_ptr<BasicBlock>& cubb : cleanupBasicBlocks)
@@ -65,6 +65,10 @@ void Function::Finalize()
             continue;
         }
         bb->SetId(nextBBNumber++);
+    }
+    if (hasCleanup)
+    {
+        RemoveNothrow();
     }
 }
 
@@ -95,7 +99,12 @@ void Function::WriteDeclaration(CodeFormatter& formatter, Context& context)
         }
         formatter.Write(params[i]->GetType(context)->Name() + " " + params[i]->Name(context));
     }
-    formatter.WriteLine(");");
+    formatter.Write(")");
+    if (nothrow)
+    {
+        formatter.Write(" noexcept");
+    }
+    formatter.WriteLine(";");
 }
 
 void Function::RemoveUnreferencedBasicBlocks()
@@ -130,7 +139,12 @@ void Function::Write(CodeFormatter& formatter, Context& context)
         }
         formatter.Write(params[i]->GetType(context)->Name() + " " + params[i]->Name(context));
     }
-    formatter.WriteLine(")");
+    formatter.Write(")");
+    if (nothrow)
+    {
+        formatter.Write(" noexcept");
+    }
+    formatter.WriteLine();
     formatter.WriteLine("{");
     formatter.IncIndent();
     formatter.WriteLine("// " + fullName);

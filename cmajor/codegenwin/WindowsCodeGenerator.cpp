@@ -42,14 +42,16 @@ void WindowsCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
             sequenceSecond->Accept(*this);
         }
         ExitBlocks(nullptr);
-        CreateExitFunctionCall();
+        //CreateExitFunctionCall();
+        GenerateExitFunctionCode(*currentFunction);
         emitter->CreateRet(returnValue);
         lastInstructionWasRet = true;
     }
     else
     {
         ExitBlocks(nullptr);
-        CreateExitFunctionCall();
+        //CreateExitFunctionCall();
+        GenerateExitFunctionCode(*currentFunction);
         emitter->CreateRetVoid();
         lastInstructionWasRet = true;
     }
@@ -285,7 +287,7 @@ void WindowsCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->CatchedTypeUuidId());
         void* catchTypeIdValue = uuidValue.IrValue(*emitter);
         handleExceptionArgs.push_back(catchTypeIdValue);
-        void* handleException = emitter->GetOrInsertFunction("RtHandleException", handleExceptionFunctionType);
+        void* handleException = emitter->GetOrInsertFunction("RtHandleException", handleExceptionFunctionType, true);
         void* handleThisEx = nullptr;
         if (currentPad == nullptr)
         {
@@ -318,7 +320,7 @@ void WindowsCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     cxxThrowFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
     cxxThrowFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
     void* cxxThrowFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), cxxThrowFunctionParamTypes);
-    void* cxxThrowFunction = emitter->GetOrInsertFunction("_CxxThrowException", cxxThrowFunctionType);
+    void* cxxThrowFunction = emitter->GetOrInsertFunction("_CxxThrowException", cxxThrowFunctionType, false);
     std::vector<void*> rethrowArgs;
     rethrowArgs.push_back(emitter->CreateDefaultIrValueForVoidPtrType());
     rethrowArgs.push_back(emitter->CreateDefaultIrValueForVoidPtrType());
@@ -348,7 +350,7 @@ void WindowsCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     cxxThrowFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
     cxxThrowFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
     void* cxxThrowFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), cxxThrowFunctionParamTypes);
-    void* cxxThrowFunction = emitter->GetOrInsertFunction("_CxxThrowException", cxxThrowFunctionType);
+    void* cxxThrowFunction = emitter->GetOrInsertFunction("_CxxThrowException", cxxThrowFunctionType, false);
     std::vector<void*> rethrowArgs;
     rethrowArgs.push_back(emitter->CreateDefaultIrValueForVoidPtrType());
     rethrowArgs.push_back(emitter->CreateDefaultIrValueForVoidPtrType());
@@ -401,7 +403,7 @@ void WindowsCodeGenerator::CreateCleanup()
 void* WindowsCodeGenerator::GetPersonalityFunction() const
 {
     void* personalityFunctionType = emitter->GetIrTypeForVariableParamFunction(emitter->GetIrTypeForInt());
-    void* personalityFunction = emitter->GetOrInsertFunction("__CxxFrameHandler3", personalityFunctionType);
+    void* personalityFunction = emitter->GetOrInsertFunction("__CxxFrameHandler3", personalityFunctionType, false);
     return personalityFunction;
 }
 

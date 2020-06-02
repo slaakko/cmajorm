@@ -211,6 +211,19 @@ void FunctionGroupSymbol::RemoveFunction(FunctionSymbol* function)
     functionList.erase(end, functionList.end());
 }
 
+FunctionSymbol* FunctionGroupSymbol::GetFunction()
+{
+    if (arityFunctionListMap.size() == 1)
+    {
+        std::vector<FunctionSymbol*>& functionList = arityFunctionListMap.begin()->second;
+        if (functionList.size() == 1)
+        {
+            return functionList[0];
+        }
+    }
+    return nullptr;
+}
+
 void FunctionGroupSymbol::CollectViableFunctions(int arity, ViableFunctionSet& viableFunctions, Module* module)
 {
     auto it = arityFunctionListMap.find(arity);
@@ -375,7 +388,7 @@ FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) :
     ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionTemplate(nullptr), master(nullptr),
     functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
     returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
-    nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false)
+    nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false), unwindInfoVar(nullptr)
 {
 }
 
@@ -383,7 +396,7 @@ FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const 
     ContainerSymbol(symbolType_, span_, name_), functionTemplate(nullptr), master(nullptr),
     functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
     returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
-    nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false)
+    nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false), unwindInfoVar(nullptr)
 {
 }
 
@@ -770,7 +783,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     }
     emitter.SetCurrentDebugLocation(span);
     void* functionType = IrType(emitter);
-    void* callee = emitter.GetOrInsertFunction(ToUtf8(MangledName()), functionType);
+    void* callee = emitter.GetOrInsertFunction(ToUtf8(MangledName()), functionType, DontThrow());
     std::vector<void*> args;
     int n = parameters.size();
     if (ReturnsClassInterfaceOrClassDelegateByValue())
@@ -1354,6 +1367,16 @@ void FunctionSymbol::Check()
     {
         throw SymbolCheckException(GetRootModuleForCurrentThread(), "function symbol has empty group name", GetSpan());
     }
+}
+
+void FunctionSymbol::SetPrevUnwindInfoVar(LocalVariableSymbol* prevUnwindInfoVar_)
+{
+    prevUnwindInfoVar.reset(prevUnwindInfoVar_);
+}
+
+void FunctionSymbol::SetUnwindInfoVar(LocalVariableSymbol* unwindInfoVar_)
+{
+    unwindInfoVar.reset(unwindInfoVar_);
 }
 
 StaticConstructorSymbol::StaticConstructorSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::staticConstructorSymbol, span_, name_)

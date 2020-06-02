@@ -206,7 +206,7 @@ public:
     void* GetOrInsertGlobal(const std::string& name, void* type) override;
     void* GetOrInsertAnyComdat(const std::string& name, void* global) override;
     void* GetOrInsertAnyFunctionComdat(const std::string& name, void* function) override;
-    void* GetOrInsertFunction(const std::string& name, void* type) override;
+    void* GetOrInsertFunction(const std::string& name, void* type, bool nothrow) override;
     void SetInitializer(void* global, void* initializer) override;
     void SetPrivateLinkage(void* global) override;
     bool IsVmtObjectCreated(void* symbol) const override;
@@ -333,7 +333,7 @@ public:
     void SetCurrentLineNumber(int currentLineNumber) override;
     void* GetMDStructRefForSourceFile(const std::string& sourceFileName) override;
     void SetMetadataRef(void* inst, void* mdStructRef) override;
-    void FinalizeFunction(void* function) override;
+    void FinalizeFunction(void* function, bool hasCleanup) override;
     int Install(const std::string& str) override;
     int Install(const std::u16string& str) override;
     int Install(const std::u32string& str) override;
@@ -346,6 +346,8 @@ public:
     void* CreateUndefValue(void* type) override;
     void CreateResume(void* exception) override;
     void DebugPrintDebugInfo(const std::string& filePath) override;
+    void BeginSubstituteLineNumber(int32_t lineNumber) override;
+    void EndSubstituteLineNumber() override;
 private:
     cmsxbe::EmittingContext* emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;

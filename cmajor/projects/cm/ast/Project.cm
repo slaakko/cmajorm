@@ -78,7 +78,7 @@ namespace Cm.Ast
     
     public enum ProjectDeclarationType
     {
-        referenceDeclaration, sourceFileDeclaration, textFileDeclaration, targetDeclaration
+        referenceDeclaration, sourceFileDeclaration, resourceFileDeclaration, textFileDeclaration, targetDeclaration
     }
     
     public abstract class ProjectDeclaration
@@ -109,6 +109,18 @@ namespace Cm.Ast
     public class SourceFileDeclaration : ProjectDeclaration
     {
         public nothrow SourceFileDeclaration(const string& filePath_) : base(ProjectDeclarationType.sourceFileDeclaration), filePath(filePath_)
+        {
+        }
+        public nothrow const string& FilePath() const
+        {
+            return filePath;
+        }
+        private string filePath;
+    }
+
+    public class ResourceFileDeclaration : ProjectDeclaration
+    {
+        public nothrow ResourceFileDeclaration(const string& filePath_) : base(ProjectDeclarationType.resourceFileDeclaration), filePath(filePath_)
         {
         }
         public nothrow const string& FilePath() const
@@ -249,6 +261,14 @@ namespace Cm.Ast
         public nothrow const List<string>& RelativeSourceFilePaths() const
         {
             return relativeSourceFilePaths;
+        }
+        public nothrow const List<string>& ResourceFilePaths() const
+        {
+            return resourceFilePaths;
+        }
+        public nothrow const List<string>& RelativeResourceFilePaths() const
+        {
+            return relativeResourceFilePaths;
         }
         public nothrow const List<string>& RelativeTextFilePaths() const
         {
@@ -436,6 +456,31 @@ namespace Cm.Ast
                         }
                         break;
                     }
+                    case ProjectDeclarationType.resourceFileDeclaration:
+                    {
+                        ResourceFileDeclaration* resourceFileDeclaration = cast<ResourceFileDeclaration*>(declaration.Get());
+                        string filePath = resourceFileDeclaration->FilePath();
+                        relativeResourceFilePaths.Add(filePath);
+                        if (Path.IsRelative(filePath))
+                        {
+                            filePath = Path.Combine(sourceBasePath, filePath);
+                        }
+                        string extension = Path.GetExtension(filePath);
+                        if (extension != ".xml")
+                        {
+                            throw Exception("invalid resource file extension '" + extension + "' (not .xml)");
+                        }
+                        string resourceFilePath = GetFullPath(filePath);
+                        if (!File.Exists(resourceFilePath))
+                        {
+                            throw Exception("resource file path '" + resourceFilePath + "' not found");
+                        }
+                        if (Find(resourceFilePaths.CBegin(), resourceFilePaths.CEnd(), resourceFilePath) == resourceFilePaths.CEnd())
+                        {
+                            resourceFilePaths.Add(resourceFilePath);
+                        }
+                        break;
+                    }
                     case ProjectDeclarationType.targetDeclaration:
                     {
                         TargetDeclaration* targetDeclaration = cast<TargetDeclaration*>(declaration.Get());
@@ -485,6 +530,8 @@ namespace Cm.Ast
         private List<string> referencedProjectFilePaths;
         private List<string> sourceFilePaths;
         private List<string> relativeSourceFilePaths;
+        private List<string> resourceFilePaths;
+        private List<string> relativeResourceFilePaths;
         private List<string> relativeReferencedProjectFilePaths;
         private List<string> relativeTextFilePaths;
         private List<string> textFilePaths;

@@ -33,7 +33,7 @@ const unsigned cmajorLanguageTag = llvm::dwarf::DW_LANG_C_plus_plus_11; // close
 Emitter::Emitter(llvm::LLVMContext& context_, cmajor::ir::EmittingContext& emittingContext_) :
     cmajor::ir::Emitter(&stack), emittingContext(emittingContext_), emittingDelegate(nullptr),
     context(context_), builder(context), module(nullptr), dataLayout(nullptr), diCompileUnit(nullptr), diFile(nullptr), diBuilder(nullptr), columnSpanProvider(nullptr), compileUnitIndex(-1),
-    stack(), objectPointer(nullptr), function(nullptr), currentBasicBlock(nullptr), inPrologue(false), currentDIBuilder(nullptr)
+    stack(), objectPointer(nullptr), function(nullptr), currentBasicBlock(nullptr), inPrologue(false), currentDIBuilder(nullptr), substituteLineNumber(false), currentLineNumber(-1)
 {
 }
 
@@ -761,7 +761,7 @@ void Emitter::SetPrivateLinkage(void* global)
     globalVar->setLinkage(llvm::GlobalValue::PrivateLinkage);
 }
 
-void* Emitter::GetOrInsertFunction(const std::string& name, void* type)
+void* Emitter::GetOrInsertFunction(const std::string& name, void* type, bool nothrow)
 {
 #if (LLVM_VERSION_MAJOR >= 9)
     return module->getOrInsertFunction(name, static_cast<llvm::FunctionType*>(type)).getCallee();
@@ -1390,7 +1390,14 @@ void* Emitter::CreateIrValueForUShort(uint16_t value)
 
 void* Emitter::CreateIrValueForInt(int32_t value)
 {
-    return builder.getInt32(static_cast<uint32_t>(value));
+    if (substituteLineNumber)
+    {
+        return builder.getInt32(static_cast<uint32_t>(currentLineNumber));
+    }
+    else
+    {
+        return builder.getInt32(static_cast<uint32_t>(value));
+    }
 }
 
 void* Emitter::CreateIrValueForUInt(uint32_t value)
@@ -2040,8 +2047,9 @@ void* Emitter::GenerateTrap(const std::vector<void*>& args)
     return nullptr;
 }
 
-void Emitter::SetCompileUnitId(const std::string& compileUnitId)
+void Emitter::SetCompileUnitId(const std::string& compileUnitId_)
 {
+    compileUnitId = compileUnitId_;
 }
 
 void* Emitter::GetClsIdValue(const std::string& typeId)
@@ -2105,7 +2113,7 @@ void Emitter::SetMetadataRef(void* inst, void* mdStructRef)
 {
 }
 
-void Emitter::FinalizeFunction(void* function)
+void Emitter::FinalizeFunction(void* function, bool hasCleanup)
 {
 }
 
@@ -2201,6 +2209,17 @@ void Emitter::DebugPrintDebugInfo(const std::string& filePath)
     {
         file << line << std::endl;
     }
+}
+
+void Emitter::BeginSubstituteLineNumber(int32_t lineNumber)
+{
+    substituteLineNumber = true;
+    currentLineNumber = lineNumber;
+}
+
+void Emitter::EndSubstituteLineNumber()
+{
+    substituteLineNumber = false;
 }
 
 } // namespace cmllvm

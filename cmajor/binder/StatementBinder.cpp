@@ -28,6 +28,7 @@
 #include <sngcm/ast/Identifier.hpp>
 #include <sngcm/ast/Expression.hpp>
 #include <sngcm/ast/BasicType.hpp>
+#include <sngcm/ast/Statement.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
@@ -224,6 +225,21 @@ void StatementBinder::Visit(CompileUnitNode& compileUnitNode)
     }
     compileUnitNode.GlobalNs()->Accept(*this);
     dontCheckDuplicateFunctionSymbols = false;
+    Symbol* symbol = symbolTable.GlobalNs().GetContainerScope()->Lookup(U"System.Runtime.AddCompileUnitFunction");
+    if (symbol)
+    {
+        if (symbol->GetSymbolType() == SymbolType::functionGroupSymbol)
+        {
+            FunctionGroupSymbol* functionGroup = static_cast<FunctionGroupSymbol*>(symbol);
+            FunctionSymbol* systemRuntimeAddCompileUnitFunctionSymbol = functionGroup->GetFunction();
+            boundCompileUnit.SetSystemRuntimeAddCompileUnitFunctionSymbol(systemRuntimeAddCompileUnitFunctionSymbol);
+        }
+    }
+    FunctionSymbol* initCompileUnitSymbol = boundCompileUnit.GetInitCompileUnitFunctionSymbol();
+    if (initCompileUnitSymbol == nullptr)
+    {
+        boundCompileUnit.GenerateCompileUnitInitialization();
+    }
 }
 
 struct NamespaceVisitor
@@ -276,10 +292,6 @@ void StatementBinder::Visit(ClassNode& classNode)
     if (classTypeSymbol->IsClassTemplate())
     {
         return;
-    }
-    if (classTypeSymbol->GroupName() == U"CompoundStatementNode")
-    {
-        int x = 0;
     }
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundClass> boundClass(new BoundClass(module, classTypeSymbol));
@@ -349,6 +361,7 @@ void StatementBinder::Visit(FunctionNode& functionNode)
     currentFunction = boundFunction.get();
     if (functionNode.Body())
     {
+        GenerateEnterAndExitFunctionCode(currentFunction, functionSymbol->GetSpan());
         compoundLevel = 0;
         functionNode.Body()->Accept(*this);
         BoundStatement* boundStatement = statement.release();
@@ -381,6 +394,7 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
     currentFunction = boundFunction.get();
     if (staticConstructorNode.Body())
     {
+        GenerateEnterAndExitFunctionCode(currentFunction, staticConstructorSymbol->GetSpan());
         StaticConstructorNode* prevStaticConstructorNode = currentStaticConstructorNode;
         currentStaticConstructorNode = &staticConstructorNode;
         compoundLevel = 0;
@@ -397,6 +411,101 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
     currentFunction = prevFunction;
     containerScope = prevContainerScope;
     currentStaticConstructorSymbol = prevStaticConstructorSymbol;
+}
+
+void StatementBinder::GenerateEnterAndExitFunctionCode(BoundFunction* boundFunction, const Span& span)
+{
+    if (boundFunction->GetFunctionSymbol()->DontThrow()) return;
+    TypeSymbol* systemRuntimeUnwindInfoSymbol = boundCompileUnit.GetSystemRuntimeUnwindInfoSymbol();
+    if (systemRuntimeUnwindInfoSymbol == nullptr)
+    {
+        sngcm::ast::IdentifierNode systemRuntimeUnwindInfoNode(span, U"System.Runtime.UnwindInfo");
+        systemRuntimeUnwindInfoSymbol = ResolveType(&systemRuntimeUnwindInfoNode, boundCompileUnit, containerScope);
+        boundCompileUnit.SetSystemRuntimeUnwindInfoSymbol(systemRuntimeUnwindInfoSymbol);
+    }
+    FunctionSymbol* initUnwindSymbol = boundCompileUnit.GetInitUnwindInfoFunctionSymbol();
+    if (initUnwindSymbol == nullptr)
+    {
+        boundCompileUnit.GenerateInitUnwindInfoFunctionSymbol();
+    }
+    LocalVariableSymbol* prevUnwindInfoVariableSymbol = new LocalVariableSymbol(span, U"@prevUnwindInfo");
+    containerScope->Install(prevUnwindInfoVariableSymbol);
+    prevUnwindInfoVariableSymbol->SetType(systemRuntimeUnwindInfoSymbol->AddPointer(span));
+    boundFunction->GetFunctionSymbol()->SetPrevUnwindInfoVar(prevUnwindInfoVariableSymbol);
+    sngcm::ast::IdentifierNode* prevUnwindInfoNode1 = new IdentifierNode(span, U"@prevUnwindInfo");
+    symbolTable.MapSymbol(prevUnwindInfoNode1, prevUnwindInfoVariableSymbol);
+    symbolTable.MapNode(prevUnwindInfoNode1, prevUnwindInfoVariableSymbol);
+    sngcm::ast::InvokeNode* pushUnwindInfo = new sngcm::ast::InvokeNode(span, new sngcm::ast::IdentifierNode(span, U"RtPushUnwindInfo"));
+    LocalVariableSymbol* unwindInfoVariableSymbol = new LocalVariableSymbol(span, U"@unwindInfo");
+    containerScope->Install(unwindInfoVariableSymbol);
+    unwindInfoVariableSymbol->SetType(systemRuntimeUnwindInfoSymbol);
+    boundFunction->GetFunctionSymbol()->SetUnwindInfoVar(unwindInfoVariableSymbol);
+    sngcm::ast::IdentifierNode* unwindInfoNode1 = new IdentifierNode(span, U"@unwindInfo");
+    symbolTable.MapSymbol(unwindInfoNode1, unwindInfoVariableSymbol);
+    symbolTable.MapNode(unwindInfoNode1, unwindInfoVariableSymbol);
+    pushUnwindInfo->AddArgument(new sngcm::ast::CastNode(span, new sngcm::ast::PointerNode(span, new sngcm::ast::VoidNode(span)), new AddrOfNode(span, unwindInfoNode1)));
+    sngcm::ast::AssignmentStatementNode assignUnwindInfo(span, prevUnwindInfoNode1,
+        new sngcm::ast::CastNode(span, new PointerNode(span, new IdentifierNode(span, U"System.Runtime.UnwindInfo")), pushUnwindInfo));
+    assignUnwindInfo.Accept(*this);
+    std::unique_ptr<BoundStatement> pushUnwindInfoStatement(statement.release());
+
+    sngcm::ast::IdentifierNode* prevUnwindInfoNode2 = new IdentifierNode(span, U"@prevUnwindInfo");
+    symbolTable.MapSymbol(prevUnwindInfoNode2, prevUnwindInfoVariableSymbol);
+    symbolTable.MapNode(prevUnwindInfoNode2, prevUnwindInfoVariableSymbol);
+    sngcm::ast::IdentifierNode* unwindInfoNode2 = new IdentifierNode(span, U"@unwindInfo");
+    symbolTable.MapSymbol(unwindInfoNode2, unwindInfoVariableSymbol);
+    symbolTable.MapNode(unwindInfoNode2, unwindInfoVariableSymbol);
+    sngcm::ast::AssignmentStatementNode assignUnwindInfoNext(span, new sngcm::ast::DotNode(span, unwindInfoNode2, new IdentifierNode(span, U"next")), prevUnwindInfoNode2);
+    assignUnwindInfoNext.Accept(*this);
+    std::unique_ptr<BoundStatement> assignUnwindInfoNextStatement(statement.release());
+
+    sngcm::ast::IdentifierNode* unwindInfoNode3 = new IdentifierNode(span, U"@unwindInfo");
+    symbolTable.MapSymbol(unwindInfoNode3, unwindInfoVariableSymbol);
+    symbolTable.MapNode(unwindInfoNode3, unwindInfoVariableSymbol);
+    sngcm::ast::FunctionPtrNode* functionPtrNode = new sngcm::ast::FunctionPtrNode(span);
+    BoundFunctionPtr* boundFunctionPtr = new BoundFunctionPtr(module, span, boundFunction->GetFunctionSymbol(), boundCompileUnit.GetSymbolTable().GetTypeByName(U"void")->AddPointer(span));
+    BoundBitCast* boundBitCast = new BoundBitCast(module, std::unique_ptr<BoundExpression>(boundFunctionPtr), boundCompileUnit.GetSymbolTable().GetTypeByName(U"void")->AddPointer(span));
+    std::unique_ptr<BoundExpression> boundFunctionPtrAsVoidPtr(boundBitCast);
+    functionPtrNode->SetBoundExpression(boundFunctionPtrAsVoidPtr.get());
+    sngcm::ast::AssignmentStatementNode assignFunctionPtr(span, new sngcm::ast::DotNode(span, unwindInfoNode3, new IdentifierNode(span, U"function")),
+        new sngcm::ast::CastNode(span, new sngcm::ast::PointerNode(span, new sngcm::ast::VoidNode(span)), functionPtrNode));
+    assignFunctionPtr.Accept(*this);
+    std::unique_ptr<BoundStatement> assignFunctionPtrStatement(statement.release());
+
+    sngcm::ast::IdentifierNode* unwindInfoNode4 = new IdentifierNode(span, U"@unwindInfo");
+    symbolTable.MapSymbol(unwindInfoNode4, unwindInfoVariableSymbol);
+    symbolTable.MapNode(unwindInfoNode4, unwindInfoVariableSymbol);
+    sngcm::ast::AssignmentStatementNode assignUnwindInfoLine(span, new sngcm::ast::DotNode(span, unwindInfoNode4, new IdentifierNode(span, U"line")), new IntLiteralNode(span, 0));
+    assignUnwindInfoLine.Accept(*this);
+    std::unique_ptr<BoundStatement> assignUnwindInfoLineStatement(statement.release());
+
+    sngcm::ast::IdentifierNode* prevUnwindInfoNode3 = new IdentifierNode(span, U"@prevUnwindInfo");
+    symbolTable.MapSymbol(prevUnwindInfoNode3, prevUnwindInfoVariableSymbol);
+    symbolTable.MapNode(prevUnwindInfoNode3, prevUnwindInfoVariableSymbol);
+    sngcm::ast::InvokeNode* setPrevUnwindInfoListPtr = new sngcm::ast::InvokeNode(span, new sngcm::ast::IdentifierNode(span, U"RtPopUnwindInfo"));
+    setPrevUnwindInfoListPtr->AddArgument(new CastNode(span, new PointerNode(span, new VoidNode(span)), prevUnwindInfoNode3));
+    sngcm::ast::ExpressionStatementNode setPrevUnwindInfoList(span, setPrevUnwindInfoListPtr);
+    setPrevUnwindInfoList.Accept(*this);
+    std::unique_ptr<BoundStatement> setPrevUnwindInfoListStatement(statement.release());
+
+    std::vector<std::unique_ptr<BoundStatement>> enterCode;
+    enterCode.push_back(std::move(pushUnwindInfoStatement));
+    enterCode.push_back(std::move(assignUnwindInfoNextStatement));
+    enterCode.push_back(std::move(assignFunctionPtrStatement));
+    enterCode.push_back(std::move(assignUnwindInfoLineStatement));
+    boundFunction->SetEnterCode(std::move(enterCode));
+
+    std::unique_ptr<BoundStatement> setLineCode;
+    sngcm::ast::IdentifierNode* unwindInfoNode5 = new IdentifierNode(span, U"@unwindInfo");
+    symbolTable.MapSymbol(unwindInfoNode5, unwindInfoVariableSymbol);
+    sngcm::ast::AssignmentStatementNode setUnwindInfoLine(span, new sngcm::ast::DotNode(span, unwindInfoNode5, new IdentifierNode(span, U"line")), new IntLiteralNode(span, 0));
+    setUnwindInfoLine.Accept(*this);
+    std::unique_ptr<BoundStatement> setLineStatement(statement.release());
+    boundFunction->SetLineCode(std::move(setLineStatement));
+
+    std::vector<std::unique_ptr<BoundStatement>> exitCode;
+    exitCode.push_back(std::move(setPrevUnwindInfoListStatement));
+    boundFunction->SetExitCode(std::move(exitCode));
 }
 
 void StatementBinder::Visit(ConstructorNode& constructorNode)
@@ -417,6 +526,7 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
     currentFunction = boundFunction.get();
     if (constructorNode.Body())
     {
+        GenerateEnterAndExitFunctionCode(currentFunction, constructorSymbol->GetSpan());
         ConstructorNode* prevConstructorNode = currentConstructorNode;
         currentConstructorNode = &constructorNode;
         compoundLevel = 0;
@@ -465,6 +575,7 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     currentFunction = boundFunction.get();
     if (destructorNode.Body())
     {
+        GenerateEnterAndExitFunctionCode(currentFunction, destructorSymbol->GetSpan());
         DestructorNode* prevDestructorNode = currentDestructorNode;
         currentDestructorNode = &destructorNode;
         compoundLevel = 0;
@@ -513,6 +624,7 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     currentFunction = boundFunction.get();
     if (memberFunctionNode.Body())
     {
+        GenerateEnterAndExitFunctionCode(currentFunction, memberFunctionSymbol->GetSpan());
         MemberFunctionNode* prevMemberFunctionNode = currentMemberFunctionNode;
         currentMemberFunctionNode = &memberFunctionNode;
         compoundLevel = 0;
@@ -560,6 +672,7 @@ void StatementBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     currentFunction = boundFunction.get();
     if (conversionFunctionNode.Body())
     {
+        GenerateEnterAndExitFunctionCode(currentFunction, conversionFunctionSymbol->GetSpan());
         compoundLevel = 0;
         conversionFunctionNode.Body()->Accept(*this);
         BoundStatement* boundStatement = statement.release();

@@ -875,6 +875,12 @@ void Module::Write(SymbolWriter& writer)
         writer.GetBinaryWriter().Write(referencedModule->OriginalFilePath());
     }
     fileTable.Write(writer.GetBinaryWriter(), IsSystemModule());
+    uint32_t n = compileUnitIds.size();
+    writer.GetBinaryWriter().WriteULEB128UInt(n);
+    for (const std::string& compileUnitId : compileUnitIds)
+    {
+        writer.GetBinaryWriter().Write(compileUnitId);
+    }
 #ifdef _WIN32
     resourceTable.Write(writer.GetBinaryWriter());
 #ifdef RESOURCE_DEBUG
@@ -921,6 +927,10 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
         rootModule->IncDebugLogIndent();
 #endif 
         rootModule->RegisterFileTable(&fileTable, this);
+        for (const std::string& compileUnitId : compileUnitIds)
+        {
+            rootModule->allCompileUnitIds.insert(compileUnitId);
+        }
 #ifdef _WIN32
         int nres = resourceTable.Resources().size();
 #ifdef RESOURCE_DEBUG
@@ -1039,6 +1049,16 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
             libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
         }
 #endif
+    }
+    uint32_t numCompileUnitIds = reader.GetBinaryReader().ReadULEB128UInt();
+    for (uint32_t i = 0; i < numCompileUnitIds; ++i)
+    {
+        std::string compileUnitId = reader.GetBinaryReader().ReadUtf8String();
+        compileUnitIds.insert(compileUnitId);
+    }
+    for (const std::string& compileUnitId : compileUnitIds)
+    {
+        rootModule->allCompileUnitIds.insert(compileUnitId);
     }
 #ifdef _WIN32
     resourceTable.Read(reader.GetBinaryReader());
@@ -1457,6 +1477,12 @@ void Module::StopBuild()
 int Module::GetBuildTimeMs()
 {
     return static_cast<int>(buildStopMs - buildStartMs);
+}
+
+void Module::AddCompileUnitId(const std::string& compileUnitId)
+{
+    compileUnitIds.insert(compileUnitId);
+    allCompileUnitIds.insert(compileUnitId);
 }
 
 #ifdef _WIN32

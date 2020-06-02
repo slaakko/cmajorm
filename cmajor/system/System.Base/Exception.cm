@@ -7,27 +7,27 @@ namespace System
 {
     public class Exception
     {
-        public nothrow Exception(const string& message_) : message(message_), stackTrace(RtGetStackTrace())
+        public nothrow Exception(const string& message_) : message(message_), callStack(System.Runtime.GetCallStack())
         {
-            RtDisposeStackTrace();
+            System.Runtime.DisposeCallStack();
         }
         public default virtual ~Exception();
         public nothrow inline const string& Message() const
         {
             return message;
         }
-        public nothrow inline const string& StackTrace() const
+        public nothrow inline const string& CallStack() const
         {
-            return stackTrace;
+            return callStack;
         }
         public nothrow virtual string ToString() const
         {
             string s = typename(*this);
-            s.Append(": ").Append(message).Append("\nCALL STACK:\n").Append(stackTrace);
+            s.Append(": ").Append(message).Append("\nCALL STACK:\n").Append(callStack);
             return s;
         }
         private string message;
-        private string stackTrace;
+        private string callStack;
     }
     
     public class ExceptionPtr

@@ -33,12 +33,21 @@ public:
     void AddLabeledStatement(BoundStatement* labeledStatement);
     const std::vector<BoundStatement*>& LabeledStatements() const { return labeledStatements; }
     void ResetCodeGenerated() override;
+    void SetEnterCode(std::vector<std::unique_ptr<BoundStatement>>&& enterCode_);
+    const std::vector<std::unique_ptr<BoundStatement>>& EnterCode() const { return enterCode; }
+    void SetExitCode(std::vector<std::unique_ptr<BoundStatement>>&& exitCode_);
+    const std::vector<std::unique_ptr<BoundStatement>>& ExitCode() const { return exitCode; }
+    void SetLineCode(std::unique_ptr<BoundStatement>&& lineCode_);
+    BoundStatement* GetLineCode() const { return lineCode.get(); }
 private:
     FunctionSymbol* functionSymbol;
     std::unique_ptr<BoundCompoundStatement> body;
     bool hasGotos;
     std::vector<std::unique_ptr<BoundFunctionCall>> temporaryDestructorCalls;
     std::vector<BoundStatement*> labeledStatements;
+    std::vector<std::unique_ptr<BoundStatement>> enterCode;
+    std::vector<std::unique_ptr<BoundStatement>> exitCode;
+    std::unique_ptr<BoundStatement> lineCode;
 };
 
 } } // namespace cmajor::binder

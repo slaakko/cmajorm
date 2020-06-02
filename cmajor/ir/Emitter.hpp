@@ -237,7 +237,7 @@ public:
     virtual void* GetOrInsertGlobal(const std::string& name, void* type) = 0;
     virtual void* GetOrInsertAnyComdat(const std::string& name, void* global) = 0;
     virtual void* GetOrInsertAnyFunctionComdat(const std::string& name, void* function) = 0;
-    virtual void* GetOrInsertFunction(const std::string& name, void* type) = 0;
+    virtual void* GetOrInsertFunction(const std::string& name, void* type, bool nothrow) = 0;
     virtual void SetInitializer(void* global, void* initializer) = 0;
     virtual void SetPrivateLinkage(void* global) = 0;
     virtual bool IsVmtObjectCreated(void* symbol) const = 0;
@@ -364,7 +364,7 @@ public:
     virtual void* GetMDStructRefForSourceFile(const std::string& sourceFileName) = 0;
     virtual void SetCurrentLineNumber(int currentLineNumber) = 0;
     virtual void SetMetadataRef(void* inst, void* mdStructRef) = 0;
-    virtual void FinalizeFunction(void* function) = 0;
+    virtual void FinalizeFunction(void* function, bool hasCleanup) = 0;
     virtual int Install(const std::string& str) = 0;
     virtual int Install(const std::u16string& str) = 0;
     virtual int Install(const std::u32string& str) = 0;
@@ -377,6 +377,8 @@ public:
     virtual void* CreateUndefValue(void* type) = 0;
     virtual void CreateResume(void* exception) = 0;
     virtual void DebugPrintDebugInfo(const std::string& filePath) = 0;
+    virtual void BeginSubstituteLineNumber(int32_t lineNumber) = 0;
+    virtual void EndSubstituteLineNumber() = 0;
 private:
     ValueStack* stack;
 };

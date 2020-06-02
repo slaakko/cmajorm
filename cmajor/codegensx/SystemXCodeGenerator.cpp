@@ -171,7 +171,7 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
         generateLineNumbers = false;
         emitter->SetCurrentLineNumber(0);
     }
-    function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
+    function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType, functionSymbol->DontThrow());
     if (functionSymbol->HasSource())
     {
         void* mdStruct = emitter->CreateMDStruct();
@@ -260,7 +260,7 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
                 copyConstructor = compileUnit->GetCopyConstructorFor(classType->TypeId());
             }
             void* copyCtorType = copyConstructor->IrType(*emitter);
-            void* callee = emitter->GetOrInsertFunction(ToUtf8(copyConstructor->MangledName()), copyCtorType);
+            void* callee = emitter->GetOrInsertFunction(ToUtf8(copyConstructor->MangledName()), copyCtorType, copyConstructor->DontThrow());
             std::vector<void*> args;
             args.push_back(parameter->IrObject(*emitter));
             args.push_back(arg);
@@ -336,7 +336,7 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
         }
     }
     GenerateCodeForCleanups();
-    emitter->FinalizeFunction(function);
+    emitter->FinalizeFunction(function, functionSymbol->HasCleanup());
 }
 
 void SystemXCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
@@ -1059,7 +1059,7 @@ void SystemXCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     basicBlockOpen = false;
     SetTarget(&boundRethrowStatement);
     void* resumeFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), std::vector<void*>());
-    void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType);
+    void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType, false);
     emitter->CreateCall(callee, std::vector<void*>());
     emitter->CreateRetVoid();
 }
@@ -1513,7 +1513,7 @@ void SystemXCodeGenerator::GenerateCodeForCleanups()
             destructorCall->Accept(*this);
         }
         void* resumeFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), std::vector<void*>());
-        void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType);
+        void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType, false);
         emitter->CreateCall(callee, std::vector<void*>());
         emitter->CreateRetVoid();
     }

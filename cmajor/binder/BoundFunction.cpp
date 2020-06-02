@@ -62,4 +62,19 @@ void BoundFunction::ResetCodeGenerated()
     }
 }
 
+void BoundFunction::SetEnterCode(std::vector<std::unique_ptr<BoundStatement>>&& enterCode_)
+{
+    enterCode = std::move(enterCode_);
+}
+
+void BoundFunction::SetExitCode(std::vector<std::unique_ptr<BoundStatement>>&& exitCode_)
+{
+    exitCode = std::move(exitCode_);
+}
+
+void BoundFunction::SetLineCode(std::unique_ptr<BoundStatement>&& lineCode_)
+{
+    lineCode.reset(lineCode_.release());
+}
+
 } } // namespace cmajor::binder

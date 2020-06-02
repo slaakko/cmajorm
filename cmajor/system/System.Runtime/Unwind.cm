@@ -1,0 +1,73 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Runtime
+{
+    public class UnwindInfo
+    {
+        public UnwindInfo* next;
+        public void* function;
+        public int line;
+    }
+
+    public nothrow delegate void InitCompileUnitUnwindInfoFunction();
+
+    public class CompileUnitUnwindInfo
+    {
+        public CompileUnitUnwindInfo* next;
+        public InitCompileUnitUnwindInfoFunction initUnwindInfoFunction;
+    }
+
+    public CompileUnitUnwindInfo* compileUnitUnwindInfoInitList = null;
+
+    public nothrow void PushCompileUnitUnwindInfoInit(InitCompileUnitUnwindInfoFunction initFunction, CompileUnitUnwindInfo* info)
+    {
+        info->next = compileUnitUnwindInfoInitList;
+        info->initUnwindInfoFunction = initFunction;
+        compileUnitUnwindInfoInitList = info;
+    }
+
+    public nothrow void AddCompileUnitFunction(void* functionAddress, const char* functionName, const char* sourceFilePath)
+    {
+        RtAddCompileUnitFunction(functionAddress, functionName, sourceFilePath);
+    }
+
+    internal class UnwindInfoInit
+    {
+        public nothrow UnwindInfoInit()
+        {   
+            while (compileUnitUnwindInfoInitList != null)
+            {
+                CompileUnitUnwindInfo* info = compileUnitUnwindInfoInitList;
+                compileUnitUnwindInfoInitList = null;
+                info->initUnwindInfoFunction();
+                compileUnitUnwindInfoInitList = info->next;
+            }
+        }
+        public ~UnwindInfoInit()
+        {
+            RtEndUnwindInfoInit();
+        }
+    }
+
+    internal nothrow void InitUnwindInfo()
+    {
+        RtBeginUnwindInfoInit();
+        UnwindInfoInit init;
+    }
+
+    public nothrow const char* GetCallStack()
+    {
+        InitUnwindInfo();
+        return RtGetCallStack();
+    }
+
+    public nothrow void DisposeCallStack()
+    {
+        RtDisposeCallStack();
+    }
+}

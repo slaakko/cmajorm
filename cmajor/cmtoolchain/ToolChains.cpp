@@ -45,6 +45,7 @@ void CreateVSToolChain(bool verbose)
     compiler.args.push_back("/wd\"4102\"");
     compiler.args.push_back("/wd\"4146\"");
     compiler.args.push_back("/wd\"4244\"");
+    compiler.args.push_back("/wd\"4297\"");
     compiler.args.push_back("/c");
     compiler.args.push_back("$SOURCE_FILE$");
     compiler.args.push_back("/Fd:$DEBUG_INFORMATION_FILE$");

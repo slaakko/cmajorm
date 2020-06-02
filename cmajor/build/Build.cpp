@@ -1346,6 +1346,7 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
+    mainCompileUnit.SetProgramMainUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"@polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"@staticClassArray"));
@@ -1370,6 +1371,7 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
             new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
             new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
         invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
         rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     }
     else
@@ -1383,6 +1385,7 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
             new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
             new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
         invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
         rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     }
     mainFunctionBody->AddStatement(rtInitCall);
@@ -1474,6 +1477,7 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
+    mainCompileUnit.SetProgramMainUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"__polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"__staticClassArray"));
@@ -1498,6 +1502,7 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
             new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"Length"))),
             new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
         invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
         rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     }
     else
@@ -1511,6 +1516,7 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
             new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"Length"))),
             new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
         invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+        invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
         rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     }
     mainFunctionBody->AddStatement(rtInitCall);
@@ -1603,6 +1609,7 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
+    mainCompileUnit.SetProgramMainUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
     mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
@@ -1674,6 +1681,7 @@ void CreateMainUnitLlvmWindowsGUI(std::vector<std::string>& objectFilePaths, Mod
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
+    mainCompileUnit.SetProgramMainUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"@polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"@staticClassArray"));
@@ -1696,6 +1704,7 @@ void CreateMainUnitLlvmWindowsGUI(std::vector<std::string>& objectFilePaths, Mod
         new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"Length"))),
         new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
     invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+    invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
     rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     mainFunctionBody->AddStatement(rtInitCall);
     ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
@@ -1795,6 +1804,7 @@ void CreateMainUnitCppWindowsGUI(std::vector<std::string>& objectFilePaths, Modu
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
+    mainCompileUnit.SetProgramMainUnit();
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"__polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"__staticClassArray"));
@@ -1817,6 +1827,7 @@ void CreateMainUnitCppWindowsGUI(std::vector<std::string>& objectFilePaths, Modu
         new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"Length"))),
         new LongLiteralNode(Span(), 2))); // 2 64-bit integers per entry
     invokeRtInit->AddArgument(new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"__staticClassArray"), new IdentifierNode(Span(), U"CBegin"))));
+    invokeRtInit->AddArgument(new IdentifierNode(Span(), U"GlobalInitCompileUnits"));
     rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     mainFunctionBody->AddStatement(rtInitCall);
     ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));

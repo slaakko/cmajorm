@@ -181,6 +181,8 @@ public:
     int GetBuildTimeMs();
     bool Preparing() const { return preparing; }
     void SetPreparing(bool preparing_) { preparing = preparing_; }
+    void AddCompileUnitId(const std::string& compileUnitId);
+    const std::set<std::string>& AllCompileUnitIds() const { return allCompileUnitIds; }
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -191,6 +193,8 @@ private:
     std::string resourceFilePath;
     std::vector<std::string> referenceFilePaths;
     FileTable fileTable;
+    std::set<std::string> compileUnitIds;
+    std::set<std::string> allCompileUnitIds;
 #ifdef _WIN32
     ResourceTable resourceTable;
     ResourceTable globalResourceTable;

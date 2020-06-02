@@ -123,6 +123,7 @@ public:
     void Visit(ThisNode& thisNode) override;
     void Visit(BaseNode& baseNode) override;
     void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) override;
+    void Visit(FunctionPtrNode& functionPtrNode) override;
     void BindUnaryOp(BoundExpression* operand, Node& node, const std::u32string& groupName);
 private:
     Span span;
@@ -923,6 +924,11 @@ void ExpressionBinder::Visit(DotNode& dotNode)
     else
     {
         TypeSymbol* type = expression->GetType()->PlainType(dotNode.GetSpan());
+        if (type->IsClassDelegateType())
+        {
+            ClassDelegateTypeSymbol* classDelegateType = static_cast<ClassDelegateTypeSymbol*>(type);
+            type = classDelegateType->ObjectDelegatePairType();
+        }
         if (type->IsClassTypeSymbol())
         {
             ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type->BaseType());
@@ -2591,6 +2597,12 @@ void ExpressionBinder::Visit(BaseNode& baseNode)
 void ExpressionBinder::Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
 {
     parenthesizedExpressionNode.Subject()->Accept(*this);
+}
+
+void ExpressionBinder::Visit(FunctionPtrNode& functionPtrNode)
+{
+    BoundExpression* boundExpression = static_cast<BoundFunctionPtr*>(functionPtrNode.GetBoundExpression());
+    expression.reset(boundExpression->Clone());
 }
 
 std::unique_ptr<BoundExpression> BindExpression(Node* node, BoundCompileUnit& boundCompileUnit, BoundFunction* boundFunction, ContainerScope* containerScope, StatementBinder* statementBinder)

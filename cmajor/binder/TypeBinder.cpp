@@ -109,6 +109,10 @@ void TypeBinder::AddUsingNodesToCurrentCompileUnit(Node* node)
 
 void TypeBinder::Visit(CompileUnitNode& compileUnitNode)
 {
+    if (compileUnitNode.IsProgramMainUnit())
+    {
+        boundCompileUnit.GenerateGlobalInitializationFunction();
+    }
     boundCompileUnit.AddFileScope(new FileScope(&boundCompileUnit.GetModule()));
     compileUnitNode.GlobalNs()->Accept(*this);
 }
@@ -459,9 +463,6 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
         Assert(symbol->GetSymbolType() == SymbolType::parameterSymbol, "parameter symbol expected");
         ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
         parameterSymbol->SetType(parameterType);
-    }
-    if (constructorNode.WhereConstraint())
-    {
     }
     if (!constructorSymbol->Constraint() && constructorNode.WhereConstraint())
     {
@@ -871,7 +872,7 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     }
     classDelegateTypeSymbol->SetSpecifiers(classDelegateNode.GetSpecifiers());
     classDelegateTypeSymbol->ComputeMangledName();
-    DelegateTypeSymbol* memberDelegateType = new DelegateTypeSymbol(classDelegateNode.GetSpan(), U"@dlg_type");
+    DelegateTypeSymbol* memberDelegateType = new DelegateTypeSymbol(classDelegateNode.GetSpan(), U"delegate_type");
     memberDelegateType->SetModule(module);
     symbolTable.SetTypeIdFor(memberDelegateType);
     ParameterSymbol* objectParam = new ParameterSymbol(classDelegateNode.GetSpan(), U"@obj");
@@ -911,10 +912,13 @@ void TypeBinder::Visit(ClassDelegateNode& classDelegateNode)
     }
     classDelegateTypeSymbol->AddMember(memberDelegateType);
     ClassTypeSymbol* objectDelegatePairType = new ClassTypeSymbol(classDelegateNode.GetSpan(), U"@objectDelegatePairType");
+    objectDelegatePairType->SetAccess(SymbolAccess::public_);
     objectDelegatePairType->SetGroupName(U"@objectDelegatePairType");
-    MemberVariableSymbol* objVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"@obj");
+    MemberVariableSymbol* objVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"obj");
+    objVar->SetAccess(SymbolAccess::public_);
     objVar->SetType(voidPtrType);
-    MemberVariableSymbol* dlgVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"@dlg");
+    MemberVariableSymbol* dlgVar = new MemberVariableSymbol(classDelegateNode.GetSpan(), U"dlg");
+    dlgVar->SetAccess(SymbolAccess::public_);
     dlgVar->SetType(memberDelegateType);
     objectDelegatePairType->AddMember(objVar);
     objectDelegatePairType->AddMember(dlgVar);

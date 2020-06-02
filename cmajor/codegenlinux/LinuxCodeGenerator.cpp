@@ -32,14 +32,16 @@ void LinuxCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
             sequenceSecond->Accept(*this);
         }
         ExitBlocks(nullptr);
-        CreateExitFunctionCall();
+        //CreateExitFunctionCall();
+        GenerateExitFunctionCode(*currentFunction);
         emitter->CreateRet(returnValue);
         lastInstructionWasRet = true;
     }
     else
     {
         ExitBlocks(nullptr);
-        CreateExitFunctionCall();
+        //CreateExitFunctionCall();
+        GenerateExitFunctionCode(*currentFunction);
         emitter->CreateRetVoid();
         lastInstructionWasRet = true;
     }
@@ -195,7 +197,7 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     std::vector<void*> llvmEhParamTypes;
     llvmEhParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
     void* llvmEHTypeIdForType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForInt(), llvmEhParamTypes);
-    void* llvmEHTypeIdFor = emitter->GetOrInsertFunction("llvm.eh.typeid.for", llvmEHTypeIdForType);
+    void* llvmEHTypeIdFor = emitter->GetOrInsertFunction("llvm.eh.typeid.for", llvmEHTypeIdForType, true);
     std::vector<void*> llvmEHTypeIdForArgs;
     llvmEHTypeIdForArgs.push_back(emitter->CreateBitCast(exceptionTypeId, emitter->GetIrTypeForVoidPtrType()));
     void* ehSelector = emitter->CreateCall(llvmEHTypeIdFor, llvmEHTypeIdForArgs);
@@ -207,7 +209,7 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     std::vector<void*> cxaBeginCatchParamTypes;
     cxaBeginCatchParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
     void* cxaBeginCatchType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoidPtrType(), cxaBeginCatchParamTypes);
-    void* cxaBeginCatch = emitter->GetOrInsertFunction("__cxa_begin_catch", cxaBeginCatchType);
+    void* cxaBeginCatch = emitter->GetOrInsertFunction("__cxa_begin_catch", cxaBeginCatchType, true);
     std::vector<void*> cxaBeginCatchArgs;
     void* loadedExPtr = emitter->CreateLoad(exPtrAlloca);
     cxaBeginCatchArgs.push_back(loadedExPtr);
@@ -226,7 +228,7 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->CatchedTypeUuidId());
         void* catchTypeIdValue = uuidValue.IrValue(*emitter);
         handleExceptionArgs.push_back(catchTypeIdValue);
-        void* handleException = emitter->GetOrInsertFunction("RtHandleException", handleExceptionFunctionType);
+        void* handleException = emitter->GetOrInsertFunction("RtHandleException", handleExceptionFunctionType, true);
         void* handleThisEx = emitter->CreateCall(handleException, handleExceptionArgs);
         void* nextHandlerTarget = nullptr;
         if (i < n - 1)
@@ -244,7 +246,7 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         boundCatchStatement->CatchBlock()->Accept(*this);
         std::vector<void*> cxaEndCatchParamTypes;
         void* cxaEndCatchType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), cxaEndCatchParamTypes);
-        void* cxaEndCatch = emitter->GetOrInsertFunction("__cxa_end_catch", cxaEndCatchType);
+        void* cxaEndCatch = emitter->GetOrInsertFunction("__cxa_end_catch", cxaEndCatchType, true);
         std::vector<void*> cxaEndCatchArgs;
         void* cxaEndCatchValue = emitter->CreateCall(cxaEndCatch, cxaEndCatchArgs);
         emitter->CreateBr(nextTarget);
@@ -268,7 +270,7 @@ void LinuxCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     SetTarget(&boundRethrowStatement);
     boundRethrowStatement.ReleaseCall()->Accept(*this);
     void* rethrowFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), std::vector<void*>());
-    void* cxaRethrowFunction = emitter->GetOrInsertFunction("__cxa_rethrow", rethrowFunctionType);
+    void* cxaRethrowFunction = emitter->GetOrInsertFunction("__cxa_rethrow", rethrowFunctionType, false);
     std::vector<void*> rethrowArgs;
     emitter->CreateCall(cxaRethrowFunction, rethrowArgs);
 }
@@ -317,7 +319,7 @@ void LinuxCodeGenerator::CreateCleanup()
 void* LinuxCodeGenerator::GetPersonalityFunction() const
 {
     void* personalityFunctionType = emitter->GetIrTypeForVariableParamFunction(emitter->GetIrTypeForInt());
-    void* personalityFunction = emitter->GetOrInsertFunction("__gxx_personality_v0", personalityFunctionType);
+    void* personalityFunction = emitter->GetOrInsertFunction("__gxx_personality_v0", personalityFunctionType, true);
     return personalityFunction;
 }
 

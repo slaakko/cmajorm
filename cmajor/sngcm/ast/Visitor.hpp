@@ -55,6 +55,7 @@ class IdentifierNode;
 class CursorIdNode;
 class TemplateIdNode;
 class FunctionNode;
+class FunctionPtrNode;
 class ClassNode;
 class ThisInitializerNode;
 class BaseInitializerNode;
@@ -241,6 +242,7 @@ public:
     virtual void Visit(CursorIdNode& cursorIdNode) {}
     virtual void Visit(TemplateIdNode& templateIdNode) {}
     virtual void Visit(FunctionNode& functionNode) {}
+    virtual void Visit(FunctionPtrNode& functionPtrNode) {}
     virtual void Visit(ClassNode& classNode) {}
     virtual void Visit(ThisInitializerNode& thisInitializerNode) {}
     virtual void Visit(BaseInitializerNode& baseInitializerNode) {}

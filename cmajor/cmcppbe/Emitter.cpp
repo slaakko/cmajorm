@@ -12,7 +12,7 @@ namespace cmcppbe {
 
 Emitter::Emitter(cmcppbe::EmittingContext* emittingContext_) :
     cmajor::ir::Emitter(&stack), emittingContext(emittingContext_), emittingDelegate(nullptr), context(nullptr), compileUnit(nullptr), currentFunction(nullptr),
-    objectPointer(nullptr)
+    objectPointer(nullptr), substituteLineNumber(false), currentLineNumber(-1)
 {
 }
 
@@ -329,7 +329,14 @@ void* Emitter::CreateIrValueForUShort(uint16_t value)
 
 void* Emitter::CreateIrValueForInt(int32_t value)
 {
-    return context->GetIntValue(value);
+    if (substituteLineNumber)
+    {
+        return context->GetIntValue(currentLineNumber);
+    }
+    else
+    {
+        return context->GetIntValue(value);
+    }
 }
 
 void* Emitter::CreateIrValueForUInt(uint32_t value)
@@ -1064,10 +1071,16 @@ void* Emitter::GetOrInsertAnyFunctionComdat(const std::string& name, void* funct
     return nullptr;
 }
 
-void* Emitter::GetOrInsertFunction(const std::string& name, void* type)
+void* Emitter::GetOrInsertFunction(const std::string& name, void* type, bool nothrow)
 {
-    return compileUnit->GetOrInsertFunction(name, static_cast<cmcppi::FunctionType*>(type));
+    cmcppi::Function* function = compileUnit->GetOrInsertFunction(name, static_cast<cmcppi::FunctionType*>(type));
+    if (nothrow)
+    {
+        function->SetNothrow();
+    }
+    return function;
 }
+
 
 void Emitter::SetInitializer(void* global, void* initializer)
 {
@@ -1795,9 +1808,9 @@ void Emitter::SetMetadataRef(void* inst, void* mdStructRef)
 {
 }
 
-void Emitter::FinalizeFunction(void* function)
+void Emitter::FinalizeFunction(void* function, bool hasCleanup)
 {
-    static_cast<cmcppi::Function*>(function)->Finalize();
+    static_cast<cmcppi::Function*>(function)->Finalize(hasCleanup);
 }
 
 int Emitter::Install(const std::string& str)
@@ -1854,6 +1867,17 @@ void Emitter::DebugPrintDebugInfo(const std::string& filePath)
 void Emitter::CreateResume(void* exception)
 {
     context->CreateResume();
+}
+
+void Emitter::BeginSubstituteLineNumber(int32_t lineNumber)
+{
+    substituteLineNumber = true;
+    currentLineNumber = lineNumber;
+}
+
+void Emitter::EndSubstituteLineNumber()
+{
+    substituteLineNumber = false;
 }
 
 } // namespace cmsxbe

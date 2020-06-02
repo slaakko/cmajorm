@@ -91,6 +91,11 @@ public:
     cmajor::ir::Pad* CurrentPad() override;
     void* CreateClassDIType(void* classPtr) override;
     void CreateExitFunctionCall();
+    void GenerateEnterFunctionCode(BoundFunction& boundFunction);
+    void GenerateExitFunctionCode(BoundFunction& boundFunction);
+    void GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCompileUnit);
+    void GenerateInitCompileUnitFunction(BoundCompileUnit& boundCompileUnit);
+    void GenerateGlobalInitFuncion(BoundCompileUnit& boundCompileUnit);
     virtual void* GetPersonalityFunction() const = 0;
     virtual void GenerateCodeForCleanups() = 0;
     void SetTarget(BoundStatement* labeledStatement);
@@ -132,6 +137,7 @@ protected:
     bool basicBlockOpen;
     void* lastAlloca;
     int compoundLevel;
+    std::string compileUnitId;
     BoundStatement* sequenceSecond;
     BoundCompoundStatement* currentBlock;
     std::vector<std::unique_ptr<Cleanup>> cleanups;
@@ -145,6 +151,7 @@ protected:
     BoundCompoundStatement* continueTargetBlock;
     void* defaultDest;
     std::unordered_map<IntegralValue, void*, IntegralValueHash>* currentCaseMap;
+    std::set<FunctionSymbol*> compileUnitFunctions;
 };
 
 } } // namespace cmajor::codegen

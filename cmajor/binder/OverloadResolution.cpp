@@ -9,6 +9,7 @@
 #include <cmajor/binder/BoundConstraint.hpp>
 #include <cmajor/binder/Concept.hpp>
 #include <cmajor/binder/TypeBinder.hpp>
+#include <cmajor/binder/BoundClass.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -1138,6 +1139,25 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
         for (LocalVariableSymbol* temporaryLocalVariable : temporaryLocalVariables)
         {
             boundFunctionCall->AddTemporary(std::unique_ptr<BoundLocalVariable>(new BoundLocalVariable(module, span, temporaryLocalVariable)));
+        }
+    }
+    FunctionSymbol* functionSymbol = boundFunctionCall->GetFunctionSymbol();
+    if (functionSymbol->GetSymbolType() == SymbolType::destructorSymbol)
+    {
+        DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(functionSymbol);
+        if (destructorSymbol->IsProject() && destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
+        {
+            if (destructorSymbol->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+            {
+                ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(destructorSymbol->Parent());
+                if (!boundCompileUnit.IsGeneratedDestructorInstantiated(destructorSymbol))
+                {
+                    boundCompileUnit.SetGeneratedDestructorInstantiated(destructorSymbol);
+                    std::unique_ptr<BoundClass> boundClass(new BoundClass(module, specialization));
+                    GenerateDestructorImplementation(boundClass.get(), destructorSymbol, boundCompileUnit, containerScope, boundFunction, span);
+                    boundCompileUnit.AddBoundNode(std::move(boundClass));
+                }
+            }
         }
     }
     return boundFunctionCall;

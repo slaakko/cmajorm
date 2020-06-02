@@ -36,6 +36,7 @@ parser ProjectFileParser
     Declaration : ProjectDeclaration*
         ::= ReferenceDeclaration:referenceDeclaration{ return referenceDeclaration; }
         |   SourceFileDeclaration:sourceFileDeclaration{ return sourceFileDeclaration; }
+        |   ResourceFileDeclaration:resourceFileDeclaration{ return resourceFileDeclaration; }
         |   TextFileDeclaration:textFileDeclaration{ return textFileDeclaration; }
         |   TargetDeclaration:targetDeclaration{ return targetDeclaration; }
         ;
@@ -46,6 +47,10 @@ parser ProjectFileParser
         
     SourceFileDeclaration(var string filePath) : ProjectDeclaration*
         ::= SOURCE FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new Cm.Ast.SourceFileDeclaration(filePath); }
+        ;
+
+    ResourceFileDeclaration(var string filePath) : ProjectDeclaration*
+        ::= RESOURCE FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new Cm.Ast.ResourceFileDeclaration(filePath); }
         ;
         
     TextFileDeclaration(var string filePath) : ProjectDeclaration*

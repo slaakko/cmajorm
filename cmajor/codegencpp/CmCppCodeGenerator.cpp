@@ -124,12 +124,16 @@ void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.LLFilePath(), ".cpp");
     NativeModule nativeModule(emitter, intermediateFilePath);
     compileUnitId = boundCompileUnit.Id();
-    emitter->SetCompileUnitId(compileUnitId);
-    emitter->SetCurrentLineNumber(0);
-    generateLineNumbers = false;
     symbolTable = &boundCompileUnit.GetSymbolTable();
     module = &boundCompileUnit.GetModule();
     compileUnit = &boundCompileUnit;
+    if (!module->IsCore())
+    {
+        module->AddCompileUnitId(compileUnitId);
+    }
+    emitter->SetCompileUnitId(compileUnitId);
+    emitter->SetCurrentLineNumber(0);
+    generateLineNumbers = false;
     nativeCompileUnit = static_cast<cmcppi::CompileUnit*>(nativeModule.module);
     nativeCompileUnit->SetId(compileUnitId);
     nativeCompileUnit->SetSourceFilePath(boundCompileUnit.SourceFilePath());
@@ -148,6 +152,12 @@ void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     {
         BoundNode* node = boundCompileUnit.BoundNodes()[i].get();
         node->Accept(*this);
+    }
+    GenerateInitUnwindInfoFunction(boundCompileUnit);
+    GenerateInitCompileUnitFunction(boundCompileUnit);
+    if (boundCompileUnit.GetGlobalInitializationFunctionSymbol() != nullptr)
+    {
+        GenerateGlobalInitFuncion(boundCompileUnit);
     }
     nativeCompileUnit->Write();
     if (!GetGlobalFlag(GlobalFlags::disableCodeGen))
@@ -205,6 +215,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     tryIndexMap.clear();
     numTriesInCurrentBlock = 0;
     tryIndex = 0;
+    prevLineNumber = 0;
     if (functionSymbol->HasSource())
     {
         generateLineNumbers = true;
@@ -215,7 +226,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         generateLineNumbers = false;
         emitter->SetCurrentLineNumber(0);
     }
-    function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
+    function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType, functionSymbol->DontThrow());
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
     {
         emitter->AddInlineFunctionAttribute(function);
@@ -269,19 +280,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     }
     if (!functionSymbol->DontThrow())
     {
-        int funId = compileUnit->Install(ToUtf8(functionSymbol->FullName()));
-        int sfpId = compileUnit->Install(compileUnit->SourceFilePath());
-        void* funValue = GetGlobalStringPtr(funId);
-        void* sfpValue = GetGlobalStringPtr(sfpId);
-        std::vector<void*> enterFunctionParamTypes;
-        enterFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
-        enterFunctionParamTypes.push_back(emitter->GetIrTypeForVoidPtrType());
-        void* enterFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), enterFunctionParamTypes);
-        void* enterFunction = emitter->GetOrInsertFunction("RtEnterFunction", enterFunctionType);
-        std::vector<void*> enterFunctionArgs;
-        enterFunctionArgs.push_back(funValue);
-        enterFunctionArgs.push_back(sfpValue);
-        emitter->CreateCall(enterFunction, enterFunctionArgs);
+        GenerateEnterFunctionCode(boundFunction);
     }
     for (int i = 0; i < np; ++i)
     {
@@ -296,7 +295,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
                 copyConstructor = compileUnit->GetCopyConstructorFor(classType->TypeId());
             }
             void* copyCtorType = copyConstructor->IrType(*emitter);
-            void* callee = emitter->GetOrInsertFunction(ToUtf8(copyConstructor->MangledName()), copyCtorType);
+            void* callee = emitter->GetOrInsertFunction(ToUtf8(copyConstructor->MangledName()), copyCtorType, copyConstructor->DontThrow());
             std::vector<void*> args;
             args.push_back(parameter->IrObject(*emitter));
             args.push_back(arg);
@@ -359,7 +358,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!lastStatement || lastStatement->GetBoundNodeType() != BoundNodeType::boundReturnStatement ||
         lastStatement->GetBoundNodeType() == BoundNodeType::boundReturnStatement && destructorCallGenerated)
     {
-        CreateExitFunctionCall();
+        GenerateExitFunctionCode(boundFunction);
         if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             void* defaultValue = functionSymbol->ReturnType()->CreateDefaultIrValue(*emitter);
@@ -373,7 +372,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         }
     }
     emitter->PopParentBlock();
-    emitter->FinalizeFunction(function);
+    emitter->FinalizeFunction(function, functionSymbol->HasCleanup());
 }
 
 void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
@@ -447,12 +446,14 @@ void CmCppCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
             sequenceSecond->SetGenerated();
             sequenceSecond->Accept(*this);
         }
+        GenerateExitFunctionCode(*currentFunction);
         emitter->CreateRet(returnValue);
         lastInstructionWasRet = true;
     }
     else
     {
         ExitBlocks(nullptr);
+        GenerateExitFunctionCode(*currentFunction);
         emitter->CreateRetVoid();
         lastInstructionWasRet = true;
     }
@@ -1065,7 +1066,7 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->CatchedTypeUuidId());
         void* catchTypeIdValue = uuidValue.IrValue(*emitter);
         handleExceptionArgs.push_back(catchTypeIdValue);
-        void* handleException = emitter->GetOrInsertFunction("RtHandleException", handleExceptionFunctionType);
+        void* handleException = emitter->GetOrInsertFunction("RtHandleException", handleExceptionFunctionType, true);
         void* handleThisEx = emitter->CreateCall(handleException, handleExceptionArgs);
         void* nextHandlerTarget = nullptr;
         if (i < n - 1)
@@ -1085,6 +1086,7 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     }
     emitter->SetCurrentBasicBlock(resumeBlock);
     emitter->CreateResume(nullptr);
+    currentFunction->GetFunctionSymbol()->SetHasCleanup();
     emitter->CreateBr(tryNextBlock);
     emitter->PopParentBlock();
     emitter->SetCurrentBasicBlock(tryBlock);
@@ -1110,6 +1112,7 @@ void CmCppCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     SetTarget(&boundRethrowStatement);
     boundRethrowStatement.ReleaseCall()->Accept(*this);
     emitter->CreateResume(nullptr);
+    currentFunction->GetFunctionSymbol()->SetHasCleanup();
 }
 
 void CmCppCodeGenerator::Visit(BoundParameter& boundParameter)
@@ -1511,6 +1514,7 @@ void CmCppCodeGenerator::GenerateCodeForCleanups()
                 }
                 emitter->CreateResume(nullptr);
                 emitter->CreateEndCatch(nullptr);
+                currentFunction->GetFunctionSymbol()->SetHasCleanup();
                 emitter->SetCurrentBasicBlock(prevBasicBlock);
             }
             else
@@ -1525,33 +1529,144 @@ void CmCppCodeGenerator::GenerateCodeForCleanups()
     }
 }
 
-void CmCppCodeGenerator::CreateExitFunctionCall()
-{
-    if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
-    std::vector<void*> exitFunctionParamTypes;
-    void* exitFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), exitFunctionParamTypes);
-    void* exitFunction = emitter->GetOrInsertFunction("RtExitFunction", exitFunctionType);
-    std::vector<void*> exitFunctionArgs;
-    emitter->CreateCall(exitFunction, exitFunctionArgs);
-}
-
 void CmCppCodeGenerator::SetLineNumber(int32_t lineNumber)
 {
     if (currentFunction->GetFunctionSymbol()->DontThrow()) return;
     if (prevLineNumber == lineNumber) return;
     prevLineNumber = lineNumber;
-    std::vector<void*> setLineNumberFunctionParamTypes;
-    setLineNumberFunctionParamTypes.push_back(emitter->GetIrTypeForInt());
-    void* setLineNumberFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), setLineNumberFunctionParamTypes);
-    void* setLineNumberFunction = emitter->GetOrInsertFunction("RtSetLineNumber", setLineNumberFunctionType);
-    std::vector<void*> setLineNumberFunctionArgs;
-    setLineNumberFunctionArgs.push_back(emitter->CreateIrValueForInt(lineNumber));
-    emitter->CreateCall(setLineNumberFunction, setLineNumberFunctionArgs);
+    BoundStatement* setLineNumberStatement = currentFunction->GetLineCode();
+    if (setLineNumberStatement)
+    {
+        bool prevGenJumpingBoolCode = genJumpingBoolCode;
+        genJumpingBoolCode = false;
+        emitter->BeginSubstituteLineNumber(lineNumber);
+        setLineNumberStatement->Accept(*this);
+        emitter->EndSubstituteLineNumber();
+        genJumpingBoolCode = prevGenJumpingBoolCode;
+    }
 }
 
 std::string CmCppCodeGenerator::GetSourceFilePath(int32_t fileIndex)
 {
     return module->GetFilePath(fileIndex);
+}
+
+void CmCppCodeGenerator::GenerateEnterFunctionCode(BoundFunction& boundFunction)
+{
+    const std::vector<std::unique_ptr<BoundStatement>>& enterCode = boundFunction.EnterCode();
+    if (enterCode.empty()) return;
+    compileUnitFunctions.insert(boundFunction.GetFunctionSymbol());
+    LocalVariableSymbol* prevUnwindInfoVar = boundFunction.GetFunctionSymbol()->PrevUnwindInfoVar();
+    void* prevUnwindInfoAlloca = emitter->CreateAlloca(prevUnwindInfoVar->GetType()->IrType(*emitter));
+    emitter->SetIrObject(prevUnwindInfoVar, prevUnwindInfoAlloca);
+    LocalVariableSymbol* unwindInfoVar = boundFunction.GetFunctionSymbol()->UnwindInfoVar();
+    void* unwindInfoAlloca = emitter->CreateAlloca(unwindInfoVar->GetType()->IrType(*emitter));
+    emitter->SetIrObject(unwindInfoVar, unwindInfoAlloca);
+    lastAlloca = unwindInfoAlloca;
+    for (const auto& statement : enterCode)
+    {
+        statement->Accept(*this);
+    }
+}
+
+void CmCppCodeGenerator::GenerateExitFunctionCode(BoundFunction& boundFunction)
+{
+    const std::vector<std::unique_ptr<BoundStatement>>& exitCode = boundFunction.ExitCode();
+    if (exitCode.empty()) return;
+    for (const auto& statement : exitCode)
+    {
+        statement->Accept(*this);
+    }
+}
+
+void CmCppCodeGenerator::GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCompileUnit)
+{
+    FunctionSymbol* initUnwindInfoFunctionSymbol = boundCompileUnit.GetInitUnwindInfoFunctionSymbol();
+    if (!initUnwindInfoFunctionSymbol) return;
+    if (compileUnitFunctions.empty()) return;
+    FunctionSymbol* addCompileUnitFunctionSymbol = boundCompileUnit.GetSystemRuntimeAddCompileUnitFunctionSymbol();
+    if (!addCompileUnitFunctionSymbol) return;
+    void* functionType = initUnwindInfoFunctionSymbol->IrType(*emitter);
+    void* function = emitter->GetOrInsertFunction(ToUtf8(initUnwindInfoFunctionSymbol->MangledName()), functionType, true);
+    emitter->SetFunction(function);
+    emitter->SetFunctionName(ToUtf8(initUnwindInfoFunctionSymbol->FullName()));
+    void* entryBlock = emitter->CreateBasicBlock("entry");
+    emitter->SetCurrentBasicBlock(entryBlock);
+    for (FunctionSymbol* compileUnitFunction : compileUnitFunctions)
+    {
+        std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(module, compileUnitFunction->GetSpan(), addCompileUnitFunctionSymbol));
+        BoundBitCast* functionPtrAsVoidPtr = new BoundBitCast(module, std::unique_ptr<BoundExpression>(
+                new BoundFunctionPtr(module, compileUnitFunction->GetSpan(), compileUnitFunction, symbolTable->GetTypeByName(U"void")->AddPointer(compileUnitFunction->GetSpan()))),
+                symbolTable->GetTypeByName(U"void")->AddPointer(compileUnitFunction->GetSpan()));
+        boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(functionPtrAsVoidPtr));
+        std::string functionName = ToUtf8(compileUnitFunction->FullName());
+        int functionNameStringId = Install(functionName);
+        BoundLiteral* boundFunctionNameLiteral = new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(compileUnitFunction->GetSpan(), functionNameStringId, functionName)),
+            symbolTable->GetTypeByName(U"char")->AddConst(compileUnitFunction->GetSpan())->AddPointer(compileUnitFunction->GetSpan()));
+        boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(boundFunctionNameLiteral));
+        std::string sourceFilePath = GetSourceFilePath(compileUnitFunction->GetSpan().fileIndex);
+        int sourceFilePathStringId = Install(sourceFilePath);
+        BoundLiteral* boundSourceFilePathLiteral = new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(compileUnitFunction->GetSpan(), sourceFilePathStringId, sourceFilePath)),
+            symbolTable->GetTypeByName(U"char")->AddConst(compileUnitFunction->GetSpan())->AddPointer(compileUnitFunction->GetSpan()));
+        boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(boundSourceFilePathLiteral));
+        boundFunctionCall->Accept(*this);
+    }
+    emitter->CreateRetVoid();
+}
+
+void CmCppCodeGenerator::GenerateInitCompileUnitFunction(BoundCompileUnit& boundCompileUnit)
+{
+    generateLineNumbers = false;
+    emitter->SetCurrentLineNumber(0);
+    FunctionSymbol* initCompileUnitFunctionSymbol = boundCompileUnit.GetInitCompileUnitFunctionSymbol();
+    if (!initCompileUnitFunctionSymbol) return;
+    Span span = initCompileUnitFunctionSymbol->GetSpan();
+    void* functionType = initCompileUnitFunctionSymbol->IrType(*emitter);
+    void* function = emitter->GetOrInsertFunction(ToUtf8(initCompileUnitFunctionSymbol->MangledName()), functionType, true);
+    emitter->SetFunction(function);
+    emitter->SetFunctionName(ToUtf8(initCompileUnitFunctionSymbol->FullName()));
+    void* entryBlock = emitter->CreateBasicBlock("entry");
+    emitter->SetCurrentBasicBlock(entryBlock);
+    FunctionSymbol* initUnwindInfoFunctionSymbol = boundCompileUnit.GetInitUnwindInfoFunctionSymbol();
+    if (!initUnwindInfoFunctionSymbol)
+    {
+        emitter->CreateRetVoid();
+        return;
+    }
+    FunctionSymbol* pushCompileUnitUnwindInfoInitFunctionSymbol = boundCompileUnit.GetPushCompileUnitUnwindInfoInitFunctionSymbol();
+    TypeSymbol* initUnwindInfoDelegateType = boundCompileUnit.GetInitUnwindInfoDelegateType();
+    GlobalVariableSymbol* compileUnitUnwindInfoVarSymbol = boundCompileUnit.GetCompileUnitUnwindInfoVarSymbol();
+    BoundGlobalVariable* boundCompileUnitUnwindInfoVar = new BoundGlobalVariable(module, span, compileUnitUnwindInfoVarSymbol);
+    BoundAddressOfExpression* unwindInfoVarAddress = new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(boundCompileUnitUnwindInfoVar),
+        boundCompileUnitUnwindInfoVar->GetType()->AddPointer(span));
+    BoundFunctionPtr* boundInitUnwindInfoFunction = new BoundFunctionPtr(module, span, initUnwindInfoFunctionSymbol, initUnwindInfoDelegateType);
+    std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(module, span, pushCompileUnitUnwindInfoInitFunctionSymbol));
+    boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(boundInitUnwindInfoFunction));
+    boundFunctionCall->AddArgument(std::unique_ptr<BoundExpression>(unwindInfoVarAddress));
+    boundFunctionCall->Accept(*this);
+    emitter->CreateRetVoid();
+}
+
+void CmCppCodeGenerator::GenerateGlobalInitFuncion(BoundCompileUnit& boundCompileUnit)
+{
+    generateLineNumbers = false;
+    emitter->SetCurrentLineNumber(0);
+    FunctionSymbol* globalInitFunctionSymbol = boundCompileUnit.GetGlobalInitializationFunctionSymbol();
+    if (!globalInitFunctionSymbol) return;
+    Span span = globalInitFunctionSymbol->GetSpan();
+    void* functionType = globalInitFunctionSymbol->IrType(*emitter);
+    void* function = emitter->GetOrInsertFunction(ToUtf8(globalInitFunctionSymbol->MangledName()), functionType, true);
+    emitter->SetFunction(function);
+    emitter->SetFunctionName(ToUtf8(globalInitFunctionSymbol->FullName()));
+    void* entryBlock = emitter->CreateBasicBlock("entry");
+    emitter->SetCurrentBasicBlock(entryBlock);
+    const std::vector<std::unique_ptr<FunctionSymbol>>& allCompileUnitInitFunctionSymbols = boundCompileUnit.AllCompileUnitInitFunctionSymbols();
+    for (const std::unique_ptr<FunctionSymbol>& initCompileUnitFunctionSymbol : allCompileUnitInitFunctionSymbols)
+    {
+        std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(module, span, initCompileUnitFunctionSymbol.get()));
+        boundFunctionCall->Accept(*this);
+    }
+    emitter->CreateRetVoid();
 }
 
 } } // namespace cmajor::codegencpp

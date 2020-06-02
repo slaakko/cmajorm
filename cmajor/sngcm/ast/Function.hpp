@@ -71,6 +71,18 @@ private:
     bool programMain;
 };
 
+class SNGCM_AST_API FunctionPtrNode : public Node
+{
+public:
+    FunctionPtrNode(const Span& span_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void SetBoundExpression(void* boundExpression_) { boundExpression = boundExpression_; }
+    void* GetBoundExpression() const { return boundExpression; }
+private:
+    void* boundExpression;
+};
+
 } } // namespace sngcm::ast
 
 #endif // SNGCM_AST_FUNCTION_INCLUDED

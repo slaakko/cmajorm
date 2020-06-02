@@ -46,6 +46,7 @@ public:
     void ComputeMangledName() override;
     void AddFunction(FunctionSymbol* function);
     void RemoveFunction(FunctionSymbol* function);
+    FunctionSymbol* GetFunction();
     void CollectViableFunctions(int arity, ViableFunctionSet& viableFunctions, Module* module);
     bool HasProjectMembers() const override;
     void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const override;
@@ -88,7 +89,8 @@ enum class FunctionSymbolFlags : uint32_t
     winapi = 1 << 19,
     codeGenerated = 1 << 20,
     dontReuse = 1 << 21,
-    hasArtificialBody = 1 << 22
+    hasArtificialBody = 1 << 22,
+    hasCleanup = 1 << 23
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -213,7 +215,9 @@ public:
     void ResetCodeGenerated() { ResetFlag(FunctionSymbolFlags::codeGenerated); }
     void SetHasArtificialBody() { SetFlag(FunctionSymbolFlags::hasArtificialBody); }
     bool HasArtificialBody() const { return GetFlag(FunctionSymbolFlags::hasArtificialBody); }
-    virtual bool DontThrow() const { return IsNothrow() || IsBasicTypeOperation(); }
+    bool HasCleanup() const { return GetFlag(FunctionSymbolFlags::hasCleanup); }
+    void SetHasCleanup() { SetFlag(FunctionSymbolFlags::hasCleanup); }
+    virtual bool DontThrow() const { return (IsNothrow() || IsBasicTypeOperation()) && !HasCleanup(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }
     void SetFlag(FunctionSymbolFlags flag) { flags = flags | flag; }
@@ -257,6 +261,10 @@ public:
     void Check() override;
     FunctionSymbol* Master() const { return master; }
     void SetMaster(FunctionSymbol* master_) { master = master_; }
+    void SetPrevUnwindInfoVar(LocalVariableSymbol* prevUnwindInfoVar_);
+    LocalVariableSymbol* PrevUnwindInfoVar() const { return prevUnwindInfoVar.get(); }
+    void SetUnwindInfoVar(LocalVariableSymbol* unwindInfoVar_);
+    LocalVariableSymbol* UnwindInfoVar() const { return unwindInfoVar.get(); }
 private:
     FunctionSymbol* functionTemplate;
     FunctionSymbol* master;
@@ -267,6 +275,8 @@ private:
     std::vector<ParameterSymbol*> parameters;
     std::unique_ptr<ParameterSymbol> returnParam;
     std::vector<LocalVariableSymbol*> localVariables;
+    std::unique_ptr<LocalVariableSymbol> unwindInfoVar;
+    std::unique_ptr<LocalVariableSymbol> prevUnwindInfoVar;
     TypeSymbol* returnType;
     FunctionSymbolFlags flags;
     int32_t index;

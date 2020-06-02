@@ -56,7 +56,7 @@ const char* nodeTypeStr[] =
     "isNode", "asNode", "indexingNode", "invokeNode", "postfixIncrementNode", "postfixDecrementNode", "sizeOfNode", "typeNameNode", "typeIdNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
     "conditionalCompilationDisjunctionNode", "conditionalCompilationConjunctionNode", "conditionalCompilationNotNode", "conditionalCompilationPrimaryNode", "conditionalCompilationPartNode", 
     "conditionalCompilationStatementNode", "uuidLiteralNode", "cursorIdNode", "parenthesizedExpressionNode", "globalVariableNode", "parenthesizedCondCompExpressionNode", "labeledStatementNode",
-    "commentNode",
+    "commentNode", "functionPtrNode",
     "maxNode"
 };
 
@@ -381,6 +381,7 @@ NodeFactory::NodeFactory()
     Register(NodeType::parenthesizedExpressionNode, new ConcreteNodeCreator<ParenthesizedExpressionNode>());
     Register(NodeType::globalVariableNode, new ConcreteNodeCreator<GlobalVariableNode>());
     Register(NodeType::commentNode, new ConcreteNodeCreator<CommentNode>());
+    Register(NodeType::functionPtrNode, new ConcreteNodeCreator<FunctionPtrNode>());
 }
 
 void NodeFactory::Register(NodeType nodeType, NodeCreator* creator)

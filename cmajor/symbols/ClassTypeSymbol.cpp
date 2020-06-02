@@ -1427,7 +1427,7 @@ void* ClassTypeSymbol::CreateImt(Emitter& emitter, int index)
     for (int i = 0; i < n; ++i)
     {
         FunctionSymbol* memFun = imt[i];
-        void* interfaceFun = emitter.GetOrInsertFunction(ToUtf8(memFun->MangledName()), memFun->IrType(emitter));
+        void* interfaceFun = emitter.GetOrInsertFunction(ToUtf8(memFun->MangledName()), memFun->IrType(emitter), memFun->DontThrow());
         irImt.push_back(emitter.CreateBitCast(interfaceFun, emitter.GetIrTypeForVoidPtrType()));
     }
     emitter.SetInitializer(imtObject, emitter.CreateIrValueForConstantArray(imtType, irImt, std::string()));
@@ -1518,7 +1518,7 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
                 }
                 else
                 {
-                    void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter));
+                    void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter), virtualFunction->DontThrow());
                     vmtArray.push_back(emitter.CreateBitCast(functionObject, emitter.GetIrTypeForVoidPtrType()));
                 }
             }
@@ -1554,7 +1554,7 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
                 }
                 else
                 {
-                    void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter));
+                    void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter), virtualFunction->DontThrow());
                     vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), functionObject));
                 }
             }
@@ -1590,7 +1590,7 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
                 }
                 else
                 {
-                    void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter));
+                    void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter), virtualFunction->DontThrow());
                     vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), functionObject));
                 }
             }

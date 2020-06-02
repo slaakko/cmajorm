@@ -132,7 +132,7 @@ extern "C" RT_API void RtStartProfiling(int64_t numberOfPolymorphicClassIds, con
     int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
 {
     cmajor::rt::InitProfiler();
-    RtInit(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
+    RtInit(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray, nullptr);
 }
 
 extern "C" RT_API void RtEndProfiling()

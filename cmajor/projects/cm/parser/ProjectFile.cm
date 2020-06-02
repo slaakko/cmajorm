@@ -386,6 +386,7 @@ public static class ProjectFileParser
         #endif
         UniquePtr<ProjectDeclaration> referenceDeclaration;
         UniquePtr<ProjectDeclaration> sourceFileDeclaration;
+        UniquePtr<ProjectDeclaration> resourceFileDeclaration;
         UniquePtr<ProjectDeclaration> textFileDeclaration;
         UniquePtr<ProjectDeclaration> targetDeclaration;
         Match match(false);
@@ -403,45 +404,78 @@ public static class ProjectFileParser
                     Match match(false);
                     Match* parentMatch3 = &match;
                     {
-                        long pos = lexer.GetPos();
-                        Match match = ProjectFileParser.ReferenceDeclaration(lexer);
-                        referenceDeclaration.Reset(cast<ProjectDeclaration*>(match.value));
-                        if (match.hit)
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch4 = &match;
                         {
+                            long pos = lexer.GetPos();
+                            Match match = ProjectFileParser.ReferenceDeclaration(lexer);
+                            referenceDeclaration.Reset(cast<ProjectDeclaration*>(match.value));
+                            if (match.hit)
                             {
-                                #if (DEBUG)
-                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Declaration");
-                                #endif
-                                return Match(true, referenceDeclaration.Release());
+                                {
+                                    #if (DEBUG)
+                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Declaration");
+                                    #endif
+                                    return Match(true, referenceDeclaration.Release());
+                                }
                             }
+                            *parentMatch4 = match;
                         }
                         *parentMatch3 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = ProjectFileParser.SourceFileDeclaration(lexer);
+                                    sourceFileDeclaration.Reset(cast<ProjectDeclaration*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        {
+                                            #if (DEBUG)
+                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Declaration");
+                                            #endif
+                                            return Match(true, sourceFileDeclaration.Release());
+                                        }
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch3 = match;
+                        }
                     }
                     *parentMatch2 = match;
                     if (!match.hit)
                     {
                         Match match(false);
-                        Match* parentMatch4 = &match;
+                        Match* parentMatch7 = &match;
                         lexer.SetPos(save);
                         {
                             Match match(false);
-                            Match* parentMatch5 = &match;
+                            Match* parentMatch8 = &match;
                             {
                                 long pos = lexer.GetPos();
-                                Match match = ProjectFileParser.SourceFileDeclaration(lexer);
-                                sourceFileDeclaration.Reset(cast<ProjectDeclaration*>(match.value));
+                                Match match = ProjectFileParser.ResourceFileDeclaration(lexer);
+                                resourceFileDeclaration.Reset(cast<ProjectDeclaration*>(match.value));
                                 if (match.hit)
                                 {
                                     {
                                         #if (DEBUG)
                                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Declaration");
                                         #endif
-                                        return Match(true, sourceFileDeclaration.Release());
+                                        return Match(true, resourceFileDeclaration.Release());
                                     }
                                 }
-                                *parentMatch5 = match;
+                                *parentMatch8 = match;
                             }
-                            *parentMatch4 = match;
+                            *parentMatch7 = match;
                         }
                         *parentMatch2 = match;
                     }
@@ -450,11 +484,11 @@ public static class ProjectFileParser
                 if (!match.hit)
                 {
                     Match match(false);
-                    Match* parentMatch6 = &match;
+                    Match* parentMatch9 = &match;
                     lexer.SetPos(save);
                     {
                         Match match(false);
-                        Match* parentMatch7 = &match;
+                        Match* parentMatch10 = &match;
                         {
                             long pos = lexer.GetPos();
                             Match match = ProjectFileParser.TextFileDeclaration(lexer);
@@ -468,9 +502,9 @@ public static class ProjectFileParser
                                     return Match(true, textFileDeclaration.Release());
                                 }
                             }
-                            *parentMatch7 = match;
+                            *parentMatch10 = match;
                         }
-                        *parentMatch6 = match;
+                        *parentMatch9 = match;
                     }
                     *parentMatch1 = match;
                 }
@@ -479,11 +513,11 @@ public static class ProjectFileParser
             if (!match.hit)
             {
                 Match match(false);
-                Match* parentMatch8 = &match;
+                Match* parentMatch11 = &match;
                 lexer.SetPos(save);
                 {
                     Match match(false);
-                    Match* parentMatch9 = &match;
+                    Match* parentMatch12 = &match;
                     {
                         long pos = lexer.GetPos();
                         Match match = ProjectFileParser.TargetDeclaration(lexer);
@@ -497,9 +531,9 @@ public static class ProjectFileParser
                                 return Match(true, targetDeclaration.Release());
                             }
                         }
-                        *parentMatch9 = match;
+                        *parentMatch12 = match;
                     }
-                    *parentMatch8 = match;
+                    *parentMatch11 = match;
                 }
                 *parentMatch0 = match;
             }
@@ -770,6 +804,134 @@ public static class ProjectFileParser
                 else
                 {
                     System.Lex.WriteFailureToLog(lexer, u"SourceFileDeclaration");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match ResourceFileDeclaration(ContainerFileLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ResourceFileDeclaration");
+            }
+        #endif
+        string filePath;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                if (*lexer == RESOURCE)
+                {
+                    ++lexer;
+                    match.hit = true;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match(true);
+                        Match* parentMatch4 = &match;
+                        {
+                            System.Lex.Span span = lexer.GetSpan();
+                            Match match(false);
+                            if (*lexer == FILEPATH)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch4 = match;
+                            }
+                            else
+                            {
+                                lexer.ThrowExpectationFailure(span, GetTokenName(FILEPATH));
+                            }
+                        }
+                        if (match.hit)
+                        {
+                            filePath = lexer.filePath;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch5 = &match;
+            {
+                Match match(false);
+                Match* parentMatch6 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(true);
+                    Match* parentMatch7 = &match;
+                    {
+                        System.Lex.Span span = lexer.GetSpan();
+                        Match match(false);
+                        if (*lexer == SEMICOLON)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            *parentMatch7 = match;
+                        }
+                        else
+                        {
+                            lexer.ThrowExpectationFailure(span, GetTokenName(SEMICOLON));
+                        }
+                    }
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ResourceFileDeclaration");
+                            #endif
+                            return Match(true, new Cm.Ast.ResourceFileDeclaration(filePath));
+                        }
+                    }
+                    *parentMatch6 = match;
+                }
+                *parentMatch5 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ResourceFileDeclaration");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ResourceFileDeclaration");
                 }
             }
         #endif
