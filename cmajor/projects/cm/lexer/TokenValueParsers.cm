@@ -243,13 +243,13 @@ namespace Cm.Lexer
             }
             else
             {
-                string s;
+                ustring s;
                 while (p != e && cast<uchar>(*p) != '\r' && cast<uchar>(*p) != '\n' && cast<uchar>(*p) != '\'')
                 {
-                    s.Append(cast<char>(*p));
+                    s.Append(*p);
                     ++p;
                 }
-                ustring u = ToUtf32(s);
+                ustring u = s;
                 if (u.Length() != 1)
                 {
                     throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));

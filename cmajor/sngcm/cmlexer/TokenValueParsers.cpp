@@ -238,13 +238,13 @@ void ParseCharacterLiteral(const std::string& fileName, const Token& token, char
         }
         else 
         {
-            std::string s;
+            std::u32string s;
             while (p != e && *p != '\r' && *p != '\n' && *p != '\'')
             {
-                s.append(1, static_cast<unsigned char>(*p));
+                s.append(1, *p);
                 ++p;
             }
-            std::u32string u = ToUtf32(s);
+            std::u32string u = s;
             if (u.size() != 1)
             {
                 throw std::runtime_error("invalid character literal at " + fileName + ":" + std::to_string(token.line) + ": " + ToUtf8(std::u32string(token.match.begin, token.match.end)));

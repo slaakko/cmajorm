@@ -407,6 +407,10 @@ void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
     blocks.pop_back();
     currentBlock = prevBlock;
     numTriesInCurrentBlock = prevNumTriesInCurrentBlock;
+    if (boundCompoundStatement.Parent() && boundCompoundStatement.Parent()->GetBoundNodeType() == BoundNodeType::boundTryStatement)
+    {
+        emitter->CreateBr(currentTryNextBlock);
+    }
 }
 
 void CmCppCodeGenerator::Visit(BoundSequenceStatement& boundSequenceStatement)

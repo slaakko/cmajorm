@@ -193,6 +193,10 @@ void ParseSourceFile(ParserData* parserData)
             }
             else
             {
+                if (Path::GetFileName(sourceFilePath) == "ustring.cm")
+                {
+                    int x = 0;
+                }
                 MappedInputFile sourceFile(sourceFilePath);
                 ParsingContext parsingContext;
                 int fileIndex = parserData->fileIndeces[index];

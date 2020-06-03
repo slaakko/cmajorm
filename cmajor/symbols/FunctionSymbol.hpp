@@ -251,7 +251,7 @@ public:
     std::u32string Info() const override { return groupName; }
     const char* ClassName() const override { return "FunctionSymbol"; }
     virtual int ClassArity() const { return 0; }
-    bool HasSource() const { return GetFlag(FunctionSymbolFlags::hasSource); }
+    bool HasSource() const { return GetFlag(FunctionSymbolFlags::hasSource) && !IsDefault(); }
     void SetHasSource() { SetFlag(FunctionSymbolFlags::hasSource); }
     std::u32string Id() const override;
     FunctionSymbol* FunctionTemplate() { return functionTemplate; }
