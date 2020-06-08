@@ -7,6 +7,8 @@
 #include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/Sha1.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 
@@ -34,6 +36,35 @@ std::string TargetStr(Target target)
         case Target::unitTest: return "unitTest";
     }
     return "library";
+}
+
+Target ParseTarget(const std::string& targetStr)
+{
+    if (targetStr == "program")
+    {
+        return Target::program;
+    }
+    else if (targetStr == "library")
+    {
+        return Target::library;
+    }
+    else if (targetStr == "winapp")
+    {
+        return Target::winapp;
+    }
+    else if (targetStr == "winlib")
+    {
+        return Target::winlib;
+    }
+    else if (targetStr == "winguiapp")
+    {
+        return Target::winguiapp;
+    }
+    else if (targetStr == "unitTest")
+    {
+        return Target::unitTest;
+    }
+    return Target::program;
 }
 
 std::string CmajorRootDir()
@@ -127,26 +158,52 @@ ReferenceDeclaration::ReferenceDeclaration(const std::string& filePath_) : Proje
 {
 }
 
+void ReferenceDeclaration::Write(CodeFormatter& formatter)
+{
+    formatter.WriteLine("reference <" + filePath + ">;");
+}
+
 SourceFileDeclaration::SourceFileDeclaration(const std::string& filePath_) : ProjectDeclaration(ProjectDeclarationType::sourceFileDeclaration), filePath(filePath_)
 {
+}
+
+void SourceFileDeclaration::Write(CodeFormatter& formatter)
+{
+    formatter.WriteLine("source <" + filePath + ">;");
 }
 
 ResourceFileDeclaration::ResourceFileDeclaration(const std::string& filePath_) : ProjectDeclaration(ProjectDeclarationType::resourceFileDeclaration), filePath(filePath_)
 {
 }
 
+void ResourceFileDeclaration::Write(CodeFormatter& formatter)
+{
+    formatter.WriteLine("resource <" + filePath + ">;");
+}
+
 TextFileDeclaration::TextFileDeclaration(const std::string& filePath_) : ProjectDeclaration(ProjectDeclarationType::textFileDeclaration), filePath(filePath_)
 {
+}
+
+void TextFileDeclaration::Write(CodeFormatter& formatter)
+{
+    formatter.WriteLine("text <" + filePath + ">;");
 }
 
 TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(ProjectDeclarationType::targetDeclaration), target(target_)
 {
 }
 
+void TargetDeclaration::Write(CodeFormatter& formatter)
+{
+    formatter.WriteLine("target=" + TargetStr(target) + ";");
+}
+
 Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend_, const std::string& toolChain_) :
     backend(backend_), name(name_), filePath(filePath_), config(config_), target(Target::program), sourceBasePath(filePath), outdirBasePath(filePath), isSystemProject(false), logStreamId(0), built(false),
     toolChain(toolChain_)
 {
+    std::string platform = GetPlatform();
     if (!outDir.empty())
     {
         sourceBasePath.remove_filename();
@@ -188,13 +245,13 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     }
     else if (backend == BackEnd::cppcm)
     {
-        const Tool& libraryManagerTool = GetLibraryManagerTool();
+        const Tool& libraryManagerTool = GetLibraryManagerTool(platform, toolChain);
         lfp.replace_extension(libraryManagerTool.outputFileExtension);
     }
 #else
     if (backend == BackEnd::cppcm)
     {
-        const Tool& libraryManagerTool = GetLibraryManagerTool();
+        const Tool& libraryManagerTool = GetLibraryManagerTool(platform, toolChain);
         lfp.replace_extension(libraryManagerTool.outputFileExtension);
     }
     else
@@ -228,13 +285,13 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     }
     else if (backend == BackEnd::cppcm)
     {
-        const Tool& linkerTool = GetLinkerTool();
+        const Tool& linkerTool = GetLinkerTool(platform, toolChain);
         efp.replace_extension(linkerTool.outputFileExtension);
     }
 #else
     if (backend == BackEnd::cppcm)
     {
-        const Tool& linkerTool = GetLinkerTool();
+        const Tool& linkerTool = GetLinkerTool(platform, toolChain);
         efp.replace_extension(linkerTool.outputFileExtension);
     }
     else
@@ -392,6 +449,17 @@ void Project::ResolveDeclarations()
     }
 }
 
+void Project::Write(const std::string& projectFilePath)
+{
+    std::ofstream projectFile(projectFilePath);
+    CodeFormatter formatter(projectFile);
+    formatter.WriteLine("project " + ToUtf8(Name()) + ";");
+    for (const std::unique_ptr<ProjectDeclaration>& declaration : declarations)
+    {
+        declaration->Write(formatter);
+    }
+}
+
 bool Project::DependsOn(Project* that) const
 {
     return std::find(references.cbegin(), references.cend(), that->moduleFilePath) != references.cend();
@@ -457,6 +525,18 @@ bool Project::Ready() const
 void Project::SetExcludeSourceFilePath(const std::string& excludeSourceFilePath_)
 {
     excludeSourceFilePath = excludeSourceFilePath_;
+}
+
+std::string Project::Id() const
+{
+    std::string id = "project_";
+    id.append(ToUtf8(name)).append(1, '_').append(GetSha1MessageDigest(filePath));
+    return id;
+}
+
+void Project::AddDependsOnId(const std::string& dependsOnId)
+{
+    dependsOnIds.push_back(dependsOnId);
 }
 
 } } // namespace sngcm::ast

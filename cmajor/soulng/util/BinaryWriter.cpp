@@ -138,12 +138,20 @@ void BinaryWriter::Write(char32_t x)
 
 void BinaryWriter::Write(const std::string& s)
 {
+    Write(s, true);
+}
+
+void BinaryWriter::Write(const std::string& s, bool writeNull)
+{
     for (char c : s)
     {
         uint8_t x = static_cast<uint8_t>(c);
         Write(x);
     }
-    Write(static_cast<uint8_t>(0));
+    if (writeNull)
+    {
+        Write(static_cast<uint8_t>(0));
+    }
 }
 
 void BinaryWriter::Write(const std::u16string& s)

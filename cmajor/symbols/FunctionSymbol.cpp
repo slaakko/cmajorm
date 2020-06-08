@@ -807,7 +807,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     }
     if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassInterfaceOrClassDelegateByValue())
     {
-        if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
+        if (DontThrow() || GetSymbolType() == SymbolType::destructorSymbol || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
             if (currentPad == nullptr)
             {
@@ -852,7 +852,7 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     }
     else
     {
-        if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
+        if (DontThrow() || GetSymbolType() == SymbolType::destructorSymbol || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
             if (currentPad == nullptr)
             {
@@ -950,7 +950,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     }
     if (ReturnType() && !ReturnType()->IsVoidType() && !ReturnsClassInterfaceOrClassDelegateByValue())
     {
-        if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
+        if (DontThrow() || GetSymbolType() == SymbolType::destructorSymbol || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
             if (currentPad == nullptr)
             {
@@ -995,7 +995,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     }
     else
     {
-        if (DontThrow() || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
+        if (DontThrow() || GetSymbolType() == SymbolType::destructorSymbol || (!handlerBlock && !cleanupBlock && !newCleanupNeeded))
         {
             if (currentPad == nullptr)
             {
@@ -1747,6 +1747,15 @@ void DestructorSymbol::SetSpecifiers(Specifiers specifiers)
 std::u32string DestructorSymbol::CodeName() const
 {
     return U"~" + Parent()->CodeName();
+}
+
+bool DestructorSymbol::DontThrow() const
+{
+    if (GetBackEnd() == BackEnd::cmcpp)
+    {
+        return !HasCleanup();
+    }
+    return true;
 }
 
 MemberFunctionSymbol::MemberFunctionSymbol(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::memberFunctionSymbol, span_, name_)

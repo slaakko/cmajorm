@@ -18,6 +18,8 @@ enum class JsonValueType
     object, array, string, number, boolean, null
 };
 
+class CodeFormatter;
+
 class UTIL_API JsonValue
 {
 public:
@@ -27,6 +29,7 @@ public:
     virtual ~JsonValue();
     JsonValueType Type() const { return type; }
     virtual std::string ToString() const = 0;
+    virtual void Write(CodeFormatter& formatter);
 private:
     JsonValueType type;
 };
@@ -72,7 +75,9 @@ public:
     JsonObject();
     void AddField(const std::u32string& fieldName, std::unique_ptr<JsonValue>&& fieldValue);
     JsonValue* GetField(const std::u32string& fieldName);
+    std::string GetStringField(const std::u32string& fieldName);
     std::string ToString() const override;
+    void Write(CodeFormatter& formatter) override;
 private:
     std::vector<std::unique_ptr<JsonValue>> fieldValues;
     std::map<std::u32string, JsonValue*> fieldMap;
@@ -86,6 +91,7 @@ public:
     int Count() const { return items.size(); }
     JsonValue* operator[](int index) const;
     std::string ToString() const override;
+    void Write(CodeFormatter& formatter) override;
 private:
     std::vector<std::unique_ptr<JsonValue>> items;
 };

@@ -27,6 +27,8 @@ public:
     bool IsSynthesizedUnit() const { return isSynthesizedUnit; }
     int GetColumn(const Span& span) const override;
     const std::string& Id();
+    const std::string& Hash() const { return hash; }
+    void SetHash(const std::string& hash_) { hash = hash_; }
     bool IsProgramMainUnit() const { return isProgramMainUnit; }
     void SetProgramMainUnit() { isProgramMainUnit = true; }
 private:
@@ -35,6 +37,7 @@ private:
     std::vector<int32_t> lineStarts;
     bool isSynthesizedUnit;
     std::string id;
+    std::string hash;
     bool isProgramMainUnit;
 };
 

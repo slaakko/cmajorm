@@ -96,6 +96,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -143,6 +144,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..;../..;C:\Boost\include\boost-1_71</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -156,10 +158,60 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Build.cpp" />
+    <ClCompile Include="Command.cpp" />
+    <ClCompile Include="ExecutionContext.cpp" />
+    <ClCompile Include="BuildLangClassMap.cpp" />
+    <ClCompile Include="BuildLangClientParser.cpp" />
+    <ClCompile Include="BuildLangKeywords.cpp" />
+    <ClCompile Include="BuildLangLexer.cpp" />
+    <ClCompile Include="BuildLangOptionParser.cpp" />
+    <ClCompile Include="BuildLangServerParser.cpp" />
+    <ClCompile Include="BuildLangTokens.cpp" />
+    <ClCompile Include="BuildOption.cpp" />
+    <ClCompile Include="BuildServer.cpp" />
+    <ClCompile Include="BuildServerMessage.cpp" />
+    <ClCompile Include="BuildClient.cpp" />
+    <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="FiberExecutionContext.cpp" />
+    <ClCompile Include="InitDone.cpp" />
+    <ClCompile Include="Log.cpp" />
+    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="MessageHandler.cpp" />
+    <ClCompile Include="ProjectInfo.cpp" />
+    <ClCompile Include="FiberConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Build.hpp" />
     <ClInclude Include="BuildApi.hpp" />
+    <ClInclude Include="Command.hpp" />
+    <ClInclude Include="ExecutionContext.hpp" />
+    <ClInclude Include="BuildLangClassMap.hpp" />
+    <ClInclude Include="BuildLangClientParser.hpp" />
+    <ClInclude Include="BuildLangKeywords.hpp" />
+    <ClInclude Include="BuildLangLexer.hpp" />
+    <ClInclude Include="BuildLangOptionParser.hpp" />
+    <ClInclude Include="BuildLangServerParser.hpp" />
+    <ClInclude Include="BuildLangTokens.hpp" />
+    <ClInclude Include="BuildOption.hpp" />
+    <ClInclude Include="BuildServer.hpp" />
+    <ClInclude Include="BuildServerMessage.hpp" />
+    <ClInclude Include="BuildClient.hpp" />
+    <ClInclude Include="Connection.hpp" />
+    <ClInclude Include="FiberExecutionContext.hpp" />
+    <ClInclude Include="InitDone.hpp" />
+    <ClInclude Include="Log.hpp" />
+    <ClInclude Include="Message.hpp" />
+    <ClInclude Include="MessageHandler.hpp" />
+    <ClInclude Include="ProjectInfo.hpp" />
+    <ClInclude Include="FiberConnection.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BuildLang.lexer" />
+    <None Include="BuildLangClientParser.parser" />
+    <None Include="BuildLangOptionParser.parser" />
+    <None Include="BuildLangParsers.spg" />
+    <None Include="BuildLangServerParser.parser" />
+    <None Include="ProjectInfo.json-schema" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

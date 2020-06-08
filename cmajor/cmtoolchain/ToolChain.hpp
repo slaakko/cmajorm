@@ -6,6 +6,16 @@
 #include <vector>
 #include <memory>
 
+struct CMTOOLCHAIN_API Configuration
+{
+    Configuration();
+    Configuration(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string name;
+    std::string outputDirectory;
+    std::vector<std::string> args;
+};
+
 struct CMTOOLCHAIN_API Tool
 {
     Tool();
@@ -14,10 +24,9 @@ struct CMTOOLCHAIN_API Tool
     std::string name;
     std::string commandName;
     std::string outputFileExtension;
-    std::string outputDirectory;
     std::string debugInformationFileExtension;
     std::string assemblyFileExtension;
-    std::vector<std::string> args;
+    std::vector<Configuration> configurations;
 };
 
 struct CMTOOLCHAIN_API ToolChain
@@ -29,12 +38,21 @@ struct CMTOOLCHAIN_API ToolChain
     std::vector<Tool> tools;
 };
 
-struct CMTOOLCHAIN_API ToolChains
+struct CMTOOLCHAIN_API Platform
 {
-    ToolChains();
-    ToolChains(soulng::util::JsonValue* value);
+    Platform();
+    Platform(soulng::util::JsonValue* value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string name;
     std::vector<ToolChain> toolChains;
+};
+
+struct CMTOOLCHAIN_API Platforms
+{
+    Platforms();
+    Platforms(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::vector<Platform> platforms;
 };
 
 #endif // HPP_87DFBD1E06DDC83F99A0E744C366852A5D970885

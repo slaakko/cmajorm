@@ -1,0 +1,47 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/build/BuildApi.hpp>
+
+classmap BuildLangClassMap;
+
+prefix "cmajor/build";
+
+tokens BuildLangTokens
+{
+    (ADD, "'add'"), (REMOVE, "'remove'"), (RUN, "'run'"), (PORT, "'port'"), (DEFAULT, "'default'"), (TOOLCHAIN, "'toolchain'"), (CLANG, "'clang'"), (GCC, "'gcc'"), (VS, "'vs'"),
+    (PUSH, "'push'"), (BUILD, "'build'"), (DEBUG, "'debug'"), (RELEASE, "'release'"), (INSTALL, "'install'"), (TO, "'to'"), (FROM, "'from'"), (USING, "'using'"), (SERVER, "'server'"),
+    (ID, "'id'"), (FILEPATH, "'filepath'"), (INTEGER, "'integer'"),
+    (VERBOSE, "'verbose'"), (FORCE, "'force'"), (ONLY, "'only"), (ALL, "'all'"), (CONFIG, "'config'"), (EQ, "'='"), (LBRACKET, "'['"), (RBRACKET, "']'")
+}
+
+keywords BuildLangKeywords
+{
+    ("add", ADD), ("remove", REMOVE), ("run", RUN), ("port", PORT), ("default", DEFAULT), ("toolchain", TOOLCHAIN), ("clang", CLANG), ("gcc", GCC), ("vs", VS),
+    ("push", PUSH), ("build", BUILD), ("debug", DEBUG), ("release", RELEASE), ("install", INSTALL), ("to", TO), ("from", FROM), ("using", USING), ("server", SERVER),
+    ("verbose", VERBOSE), ("force", FORCE), ("only", ONLY), ("all", ALL), ("config", CONFIG)
+}
+
+expressions
+{
+    ws = "[\t ]+";
+    newline = "\r\n|\n|\r";
+    id = "{idstart}{idcont}*";
+    filepath = "<[^>]*>";
+    digit = "[0-9]";
+    integer = "digit+";
+}
+
+lexer api(BUILD_API) BuildLangLexer
+{
+    "{ws}" { }
+    "{newline}" { }
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "{filepath}"{ return FILEPATH; }
+    "{integer}"{ return INTEGER; }
+    "\["{ return LBRACKET; }
+    "\]"{ return RBRACKET; }
+    "="{ return EQ; }
+}

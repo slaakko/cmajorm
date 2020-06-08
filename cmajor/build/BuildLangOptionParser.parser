@@ -1,0 +1,47 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/build/BuildApi.hpp>
+[hpp]#include <cmajor/build/BuildOption.hpp>
+[cpp]#include <cmajor/build/BuildLangLexer.hpp>
+[cpp]#include <cmajor/build/BuildLangTokens.hpp>
+
+using namespace BuildLangTokens;
+
+parser api(BUILD_API) BuildLangOptionParser
+{
+    uselexer BuildLangLexer;
+
+    Options(cmajor::build::BuildOptionSetter* optionSetter)
+        ::= LBRACKET OptionsWithinBrackets(optionSetter):options! RBRACKET!
+        ;
+
+    OptionsWithinBrackets(cmajor::build::BuildOptionSetter* optionSetter)
+        ::= Option(optionSetter):option*
+        ;
+
+    Option(cmajor::build::BuildOptionSetter* optionSetter)
+        ::= VERBOSE{ optionSetter->SetOption(cmajor::build::BuildOptions::verbose); }
+        |   DEBUG{ optionSetter->SetOption(cmajor::build::BuildOptions::debug); }
+        |   FORCE{ optionSetter->SetOption(cmajor::build::BuildOptions::force); }
+        |   ONLY{ optionSetter->SetOption(cmajor::build::BuildOptions::only); }
+        |   ALL{ optionSetter->SetOption(cmajor::build::BuildOptions::all); }
+        |   PUSH{ optionSetter->SetOption(cmajor::build::BuildOptions::push); }
+        |   BUILD{ optionSetter->SetOption(cmajor::build::BuildOptions::build); }
+        |   CONFIG EQ! Config:config!{ optionSetter->SetConfigOption(config); }
+        |   TOOLCHAIN EQ! ToolChain:toolChain!{ optionSetter->SetToolChainOption(toolChain); }
+        ;
+
+    Config : std::string
+        ::= DEBUG{ return "debug"; }
+        |   RELEASE{ return "release"; }
+        ;
+
+    ToolChain : std::string
+        ::= CLANG{ return "clang"; }
+        |   GCC{ return "gcc"; }
+        |   VS{ return "vs"; }
+        ;
+}

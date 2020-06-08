@@ -50,6 +50,7 @@ public:
     void Write(char16_t x);
     void Write(char32_t x);
     void Write(const std::string& s);
+    void Write(const std::string& s, bool writeNull);
     void Write(const std::u16string& s);
     void Write(const std::u32string& s);
     void WriteULEB128UInt(uint32_t x);

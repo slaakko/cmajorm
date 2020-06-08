@@ -1,0 +1,123 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/build/BuildApi.hpp>
+[hpp]#include <cmajor/build/BuildOption.hpp>
+[cpp]#include <cmajor/build/BuildLangLexer.hpp>
+[cpp]#include <cmajor/build/BuildLangTokens.hpp>
+[cpp]#include <cmajor/build/BuildLangOptionParser.hpp>
+[hpp]#include <cmajor/build/Command.hpp>
+[hpp]#include <memory>
+
+using namespace BuildLangTokens;
+
+parser api(BUILD_API) BuildLangClientParser
+{
+    uselexer BuildLangLexer;
+    main;
+    using BuildLangOptionParser.Options;
+
+    ClientSentence(cmajor::build::BuildOptionSetter* optionSetter) : cmajor::build::Command*
+        ::= Options(optionSetter):options?
+            ClientCommandSentence:sentence!{ return sentence; }
+        ;
+
+    ClientCommandSentence : cmajor::build::Command*
+        ::=
+        (   PushProjectSentence:pushCommand{ return pushCommand; }
+        |   RemoveProjectSentence:removeCommand{ return removeCommand; }
+        |   BuildProjectSentence:buildCommand{ return buildCommand; }
+        |   DebugProjectSentence:debugCommand{ return debugCommand; }
+        |   InstallProjectSentence:installCommand{ return installCommand; }
+        )
+        ;
+
+    PushProjectSentence(var std::string serverName) : cmajor::build::Command*
+        ::=
+        (
+            PUSH ProjectFilePath:project!
+            (   TO SERVER! ServerName:server!{ serverName = server; }
+            )?
+        )
+        {
+            return new cmajor::build::PushProjectCommand(project, serverName);
+        }
+        ;
+
+    RemoveProjectSentence(var std::string serverName) : cmajor::build::Command*
+        ::=
+        (
+            REMOVE ProjectFilePath:project!
+            (   FROM SERVER! ServerName:server!{ serverName = server; }
+            )?
+        )
+        {
+            return new cmajor::build::RemoveProjectCommand(project, serverName);
+        }
+        ;
+
+    BuildProjectSentence(var std::string serverName) : cmajor::build::Command*
+        ::=
+        (
+            BUILD ProjectFilePath:project!
+            (   USING SERVER! ServerName:server!{ serverName = server; }
+            )?
+        )
+        {
+            return new cmajor::build::BuildProjectCommand(project, serverName);
+        }
+        ;
+
+    DebugProjectSentence(var std::string serverName) : cmajor::build::Command*
+        ::=
+        (
+            DEBUG ProjectFilePath:project!
+            (   USING SERVER! ServerName:server!{ serverName = server; }
+            )?
+        )
+        {
+            return new cmajor::build::DebugProjectCommand(project, serverName);
+        }
+        ;
+
+    InstallProjectSentence(var std::string serverName) : cmajor::build::Command*
+        ::=
+        (
+            INSTALL ProjectFilePath:project! TO! DirectoryPath:directory!
+            (
+                FROM SERVER! ServerName:server!{ serverName = server; }
+            )?
+        )
+        {
+            return new cmajor::build::InstallProjectCommand(project, directory, serverName);
+        }
+        ;
+
+    ProjectFilePath : std::string
+        ::= FILEPATH{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+        ;
+
+    DirectoryPath : std::string
+        ::= FILEPATH{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+        ;
+
+    ServerName : std::string
+        ::= ID{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+        ;
+
+    ruleinfo
+    {
+        (ClientSentence, "cmclient [options] (push | remove | build | debug | install) ..."),
+        (ClientCommandSentence, "cmclient [options] (push | remove | build | debug | install) ..."),
+        (ProjectFilePath, "PROJECT.cmp | SOLUTION.cms"),
+        (DirectoryPath, "directory name"),
+        (ServerName, "server name"),
+        (PushProjectSentence, "push command"),
+        (RemoveProjectSentence, "remove command"),
+        (BuildProjectSentence, "build command"),
+        (DebugProjectSentence, "debug command"),
+        (InstallProjectSentence, "install command")
+    }
+}

@@ -84,7 +84,7 @@ struct BackendSelector
     }
 };
 
-const char* version = "3.5.0";
+const char* version = "3.6.0";
 
 void PrintHelp()
 {
@@ -134,7 +134,7 @@ void PrintHelp()
         "--bdt2xml (-bd)\n" <<
         "   output bound tree as xml\n" <<
         "--link-with-debug-runtime (-d)\n" <<
-        "   link with the debug version of the runtime library cmrt350(d).dll\n" <<
+        "   link with the debug version of the runtime library cmrt360(d).dll\n" <<
         "--link-using-ms-link (-m)\n" <<
         "   use Microsoft's link.exe as the linker\n" << 
         "--define SYMBOL (-D SYMBOL)\n" <<
@@ -155,6 +155,8 @@ void PrintHelp()
         "   compile source files in a project using a single thread\n" <<
         "--debug-compile (-dc)\n" <<
         "   show debug messages from multithreaded compilation\n" <<
+        "--all (-a)\n" <<
+        "   build all dependencies\n" <<
         std::endl;
 }
 
@@ -213,10 +215,12 @@ int main(int argc, const char** argv)
 {
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
+    std::set<std::string> builtProjects;
     try
     {
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
         InitDone initDone;
+        bool all = false;
         std::string projectName;
         std::string projectDirectory;
         std::string target = "program";
@@ -312,6 +316,10 @@ int main(int argc, const char** argv)
                     {
                         SetGlobalFlag(GlobalFlags::rebuild);
                     }
+                    else if (arg == "--all" || arg == "-a")
+                    {
+                        SetGlobalFlag(GlobalFlags::buildAll);
+                    }
                     else if (arg == "--define" || arg == "-D")
                     {
                         prevWasDefine = true;
@@ -403,7 +411,7 @@ int main(int argc, const char** argv)
                                 }
                                 resourceFiles.push_back(file);
                             }
-                            else if (components[0] == "--target" || components[0] == "-a")
+                            else if (components[0] == "--target")
                             {
                                 target = components[1];
                                 if (target != "program" && target != "winguiapp" && target != "winapp" && target != "library" && target != "winlib" && target != "unitTest")
@@ -510,7 +518,7 @@ int main(int argc, const char** argv)
                     }
                     else
                     {
-                        BuildProject(GetFullPath(fp.generic_string()), rootModule);
+                        BuildProject(GetFullPath(fp.generic_string()), rootModule, builtProjects);
                     }
                 }
                 else if (fp.extension() == ".cm")

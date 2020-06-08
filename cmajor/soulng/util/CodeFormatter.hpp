@@ -14,7 +14,7 @@ namespace soulng { namespace util {
 class UTIL_API CodeFormatter
 {
 public:
-    CodeFormatter(std::ostream& stream_) : stream(stream_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false), preserveSpace(false) {}
+    CodeFormatter(std::ostream& stream_) : stream(stream_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false), preserveSpace(false), contentCount(0), logging(false) {}
     int Indent() const { return indent; }
     int IndentSize() const { return indentSize; }
     void SetIndentSize(int indentSize_) { indentSize = indentSize_; }
@@ -40,6 +40,9 @@ public:
     const std::string& StartText() const { return startText; }
     bool PreserveSpace() const { return preserveSpace; }
     void SetPreserveSpace(bool preserveSpace_) { preserveSpace = preserveSpace_; }
+    void SetLogging() { logging = true; }
+    void BeginContent() { ++contentCount; }
+    void EndContent() { --contentCount; }
 private:
     std::ostream& stream;
     int indent;
@@ -49,6 +52,8 @@ private:
     bool start;
     std::string startText;
     bool preserveSpace;
+    int contentCount;
+    bool logging;
 };
 
 UTIL_API void WriteUtf8(std::ostream& s, const std::string& str);

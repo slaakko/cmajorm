@@ -95,7 +95,14 @@ requires JsonConstructible<T>
 {
     soulng::util::JsonObject* object = static_cast<soulng::util::JsonObject*>(container);
     soulng::util::JsonValue* value = object->GetField(soulng::unicode::ToUtf32(fieldName));
-    FromJson(value, field);
+    if (value)
+    {
+        FromJson(value, field);
+    }
+    else
+    {
+        field = T();
+    }
 }
 
 template<typename T>
@@ -103,7 +110,14 @@ void FromJson(soulng::util::JsonValue* container, const std::string& fieldName, 
 {
     soulng::util::JsonObject* object = static_cast<soulng::util::JsonObject*>(container);
     soulng::util::JsonValue* value = object->GetField(soulng::unicode::ToUtf32(fieldName));
-    FromJson(value, field);
+    if (value)
+    {
+        FromJson(value, field);
+    }
+    else
+    {
+        field = std::vector<T>();
+    }
 }
 
 } } // sngjson::json

@@ -327,65 +327,78 @@ soulng::parser::Match JsonParser::Object(JsonLexer& lexer)
             soulng::parser::Match match(false);
             soulng::parser::Match* parentMatch3 = &match;
             {
-                soulng::parser::Match match(false);
+                soulng::parser::Match match(true);
+                int64_t save = lexer.GetPos();
                 soulng::parser::Match* parentMatch4 = &match;
                 {
                     soulng::parser::Match match(false);
                     soulng::parser::Match* parentMatch5 = &match;
                     {
-                        soulng::parser::Match match = JsonParser::Field(lexer, o.get());
-                        *parentMatch5 = match;
-                    }
-                    if (match.hit)
-                    {
                         soulng::parser::Match match(false);
                         soulng::parser::Match* parentMatch6 = &match;
                         {
-                            soulng::parser::Match match(true);
+                            soulng::parser::Match match = JsonParser::Field(lexer, o.get());
+                            *parentMatch6 = match;
+                        }
+                        if (match.hit)
+                        {
+                            soulng::parser::Match match(false);
                             soulng::parser::Match* parentMatch7 = &match;
                             {
-                                while (true)
+                                soulng::parser::Match match(true);
+                                soulng::parser::Match* parentMatch8 = &match;
                                 {
-                                    int64_t save = lexer.GetPos();
+                                    while (true)
                                     {
-                                        soulng::parser::Match match(false);
-                                        soulng::parser::Match* parentMatch8 = &match;
-                                        {
-                                            soulng::parser::Match match(false);
-                                            if (*lexer == COMMA)
-                                            {
-                                                ++lexer;
-                                                match.hit = true;
-                                            }
-                                            *parentMatch8 = match;
-                                        }
-                                        if (match.hit)
+                                        int64_t save = lexer.GetPos();
                                         {
                                             soulng::parser::Match match(false);
                                             soulng::parser::Match* parentMatch9 = &match;
                                             {
-                                                soulng::parser::Match match = JsonParser::Field(lexer, o.get());
+                                                soulng::parser::Match match(false);
+                                                if (*lexer == COMMA)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
                                                 *parentMatch9 = match;
                                             }
-                                            *parentMatch8 = match;
-                                        }
-                                        if (match.hit)
-                                        {
-                                            *parentMatch7 = match;
-                                        }
-                                        else
-                                        {
-                                            lexer.SetPos(save);
-                                            break;
+                                            if (match.hit)
+                                            {
+                                                soulng::parser::Match match(false);
+                                                soulng::parser::Match* parentMatch10 = &match;
+                                                {
+                                                    soulng::parser::Match match = JsonParser::Field(lexer, o.get());
+                                                    *parentMatch10 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                *parentMatch8 = match;
+                                            }
+                                            else
+                                            {
+                                                lexer.SetPos(save);
+                                                break;
+                                            }
                                         }
                                     }
                                 }
+                                *parentMatch7 = match;
                             }
                             *parentMatch6 = match;
                         }
                         *parentMatch5 = match;
                     }
-                    *parentMatch4 = match;
+                    if (match.hit)
+                    {
+                        *parentMatch4 = match;
+                    }
+                    else
+                    {
+                        lexer.SetPos(save);
+                    }
                 }
                 *parentMatch3 = match;
             }
@@ -396,10 +409,10 @@ soulng::parser::Match JsonParser::Object(JsonLexer& lexer)
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch10 = &match;
+        soulng::parser::Match* parentMatch11 = &match;
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch11 = &match;
+            soulng::parser::Match* parentMatch12 = &match;
             {
                 int64_t pos = lexer.GetPos();
                 soulng::parser::Match match(false);
@@ -417,9 +430,9 @@ soulng::parser::Match JsonParser::Object(JsonLexer& lexer)
                         return soulng::parser::Match(true, o.release());
                     }
                 }
-                *parentMatch11 = match;
+                *parentMatch12 = match;
             }
-            *parentMatch10 = match;
+            *parentMatch11 = match;
         }
         *parentMatch0 = match;
     }
@@ -570,7 +583,8 @@ soulng::parser::Match JsonParser::Array(JsonLexer& lexer)
             soulng::parser::Match match(false);
             soulng::parser::Match* parentMatch3 = &match;
             {
-                soulng::parser::Match match(false);
+                soulng::parser::Match match(true);
+                int64_t save = lexer.GetPos();
                 soulng::parser::Match* parentMatch4 = &match;
                 {
                     soulng::parser::Match match(false);
@@ -579,13 +593,79 @@ soulng::parser::Match JsonParser::Array(JsonLexer& lexer)
                         soulng::parser::Match match(false);
                         soulng::parser::Match* parentMatch6 = &match;
                         {
-                            int64_t pos = lexer.GetPos();
-                            soulng::parser::Match match = JsonParser::Value(lexer);
-                            v.reset(static_cast<soulng::util::JsonValue*>(match.value));
-                            if (match.hit)
+                            soulng::parser::Match match(false);
+                            soulng::parser::Match* parentMatch7 = &match;
                             {
-                                std::unique_ptr<soulng::util::JsonValue> item = std::unique_ptr < soulng::util::JsonValue > (v.release());
-                                a->AddItem(std::move(item));
+                                int64_t pos = lexer.GetPos();
+                                soulng::parser::Match match = JsonParser::Value(lexer);
+                                v.reset(static_cast<soulng::util::JsonValue*>(match.value));
+                                if (match.hit)
+                                {
+                                    std::unique_ptr<soulng::util::JsonValue> item = std::unique_ptr < soulng::util::JsonValue > (v.release());
+                                    a->AddItem(std::move(item));
+                                }
+                                *parentMatch7 = match;
+                            }
+                            *parentMatch6 = match;
+                        }
+                        if (match.hit)
+                        {
+                            soulng::parser::Match match(false);
+                            soulng::parser::Match* parentMatch8 = &match;
+                            {
+                                soulng::parser::Match match(true);
+                                soulng::parser::Match* parentMatch9 = &match;
+                                {
+                                    while (true)
+                                    {
+                                        int64_t save = lexer.GetPos();
+                                        {
+                                            soulng::parser::Match match(false);
+                                            soulng::parser::Match* parentMatch10 = &match;
+                                            {
+                                                soulng::parser::Match match(false);
+                                                if (*lexer == COMMA)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                *parentMatch10 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                soulng::parser::Match match(false);
+                                                soulng::parser::Match* parentMatch11 = &match;
+                                                {
+                                                    soulng::parser::Match match(false);
+                                                    soulng::parser::Match* parentMatch12 = &match;
+                                                    {
+                                                        int64_t pos = lexer.GetPos();
+                                                        soulng::parser::Match match = JsonParser::Value(lexer);
+                                                        v.reset(static_cast<soulng::util::JsonValue*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            std::unique_ptr<soulng::util::JsonValue> item = std::unique_ptr < soulng::util::JsonValue > (v.release());
+                                                            a->AddItem(std::move(item));
+                                                        }
+                                                        *parentMatch12 = match;
+                                                    }
+                                                    *parentMatch11 = match;
+                                                }
+                                                *parentMatch10 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                *parentMatch9 = match;
+                                            }
+                                            else
+                                            {
+                                                lexer.SetPos(save);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                *parentMatch8 = match;
                             }
                             *parentMatch6 = match;
                         }
@@ -593,66 +673,12 @@ soulng::parser::Match JsonParser::Array(JsonLexer& lexer)
                     }
                     if (match.hit)
                     {
-                        soulng::parser::Match match(false);
-                        soulng::parser::Match* parentMatch7 = &match;
-                        {
-                            soulng::parser::Match match(true);
-                            soulng::parser::Match* parentMatch8 = &match;
-                            {
-                                while (true)
-                                {
-                                    int64_t save = lexer.GetPos();
-                                    {
-                                        soulng::parser::Match match(false);
-                                        soulng::parser::Match* parentMatch9 = &match;
-                                        {
-                                            soulng::parser::Match match(false);
-                                            if (*lexer == COMMA)
-                                            {
-                                                ++lexer;
-                                                match.hit = true;
-                                            }
-                                            *parentMatch9 = match;
-                                        }
-                                        if (match.hit)
-                                        {
-                                            soulng::parser::Match match(false);
-                                            soulng::parser::Match* parentMatch10 = &match;
-                                            {
-                                                soulng::parser::Match match(false);
-                                                soulng::parser::Match* parentMatch11 = &match;
-                                                {
-                                                    int64_t pos = lexer.GetPos();
-                                                    soulng::parser::Match match = JsonParser::Value(lexer);
-                                                    v.reset(static_cast<soulng::util::JsonValue*>(match.value));
-                                                    if (match.hit)
-                                                    {
-                                                        std::unique_ptr<soulng::util::JsonValue> item = std::unique_ptr < soulng::util::JsonValue > (v.release());
-                                                        a->AddItem(std::move(item));
-                                                    }
-                                                    *parentMatch11 = match;
-                                                }
-                                                *parentMatch10 = match;
-                                            }
-                                            *parentMatch9 = match;
-                                        }
-                                        if (match.hit)
-                                        {
-                                            *parentMatch8 = match;
-                                        }
-                                        else
-                                        {
-                                            lexer.SetPos(save);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            *parentMatch7 = match;
-                        }
-                        *parentMatch5 = match;
+                        *parentMatch4 = match;
                     }
-                    *parentMatch4 = match;
+                    else
+                    {
+                        lexer.SetPos(save);
+                    }
                 }
                 *parentMatch3 = match;
             }
@@ -663,10 +689,10 @@ soulng::parser::Match JsonParser::Array(JsonLexer& lexer)
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch12 = &match;
+        soulng::parser::Match* parentMatch13 = &match;
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch13 = &match;
+            soulng::parser::Match* parentMatch14 = &match;
             {
                 int64_t pos = lexer.GetPos();
                 soulng::parser::Match match(false);
@@ -684,9 +710,9 @@ soulng::parser::Match JsonParser::Array(JsonLexer& lexer)
                         return soulng::parser::Match(true, a.release());
                     }
                 }
-                *parentMatch13 = match;
+                *parentMatch14 = match;
             }
-            *parentMatch12 = match;
+            *parentMatch13 = match;
         }
         *parentMatch0 = match;
     }

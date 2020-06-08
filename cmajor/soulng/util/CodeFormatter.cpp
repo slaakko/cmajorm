@@ -100,7 +100,14 @@ void CodeFormatter::Write(const std::string& text)
             atBeginningOfLine = false;
         }
     }
-    WriteUtf8(stream, text);
+    if (logging && contentCount > 0)
+    {
+        WriteUtf8(stream, "length=" + std::to_string(text.length()));
+    }
+    else
+    {
+        WriteUtf8(stream, text);
+    }
 }
 
 void CodeFormatter::WriteLine(const std::string& text)

@@ -179,7 +179,7 @@ void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, cmajor::symbols::Mo
     }
 }
 
-const char* version = "3.5.0";
+const char* version = "3.6.0";
 
 extern "C" int Compile(const char16_t* compileXmlRequest)
 {
@@ -191,6 +191,7 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
     bool noDebugInfo = false;
     std::unique_ptr<cmajor::symbols::Module> rootModule;
     std::vector<std::unique_ptr<cmajor::symbols::Module>> rootModules;
+    std::set<std::string> builtProjects;
     sngxml::dom::Document compileResultDoc;
     std::unique_ptr<sngxml::dom::Element> compileResultElement(new sngxml::dom::Element(U"compileResult"));
     std::unique_ptr<sngxml::dom::Element> diagnosticsElement(new sngxml::dom::Element(U"diagnostics"));
@@ -278,7 +279,7 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
         else if (Path::GetExtension(filePath) == ".cmp")
         {
             module = rootModule.get();
-            cmajor::build::BuildProject(GetFullPath(filePath), rootModule);
+            cmajor::build::BuildProject(GetFullPath(filePath), rootModule, builtProjects);
         }
         else
         {

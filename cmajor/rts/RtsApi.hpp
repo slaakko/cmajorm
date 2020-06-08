@@ -18,9 +18,9 @@
 #define RT_API __declspec(dllimport)
 
 #ifdef NDEBUG
-#pragma comment(lib, "cmrt350.lib")
+#pragma comment(lib, "cmrt360.lib")
 #else
-#pragma comment(lib, "cmrt350d.lib")
+#pragma comment(lib, "cmrt360d.lib")
 #endif
 
 #endif

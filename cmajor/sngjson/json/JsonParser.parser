@@ -23,7 +23,7 @@ parser api(SNGJSON_JSON_API) JsonParser
         ;
         
     Object(var std::unique_ptr<soulng::util::JsonObject> o) : soulng::util::JsonObject*
-        ::= LBRACE{ o.reset(new soulng::util::JsonObject()); } (Field(o.get()):field % COMMA) RBRACE{ return o.release(); }
+        ::= LBRACE{ o.reset(new soulng::util::JsonObject()); } (Field(o.get()):field % COMMA)? RBRACE{ return o.release(); }
         ;
         
     Field(soulng::util::JsonObject* o, var std::u32string n)
@@ -31,6 +31,6 @@ parser api(SNGJSON_JSON_API) JsonParser
         ;
         
     Array(var std::unique_ptr<soulng::util::JsonArray> a) : soulng::util::JsonArray*
-        ::= LBRACKET{ a.reset(new soulng::util::JsonArray()); } (Value:v{ std::unique_ptr<soulng::util::JsonValue> item = std::unique_ptr<soulng::util::JsonValue>(v); a->AddItem(std::move(item)); } % COMMA) RBRACKET{ return a.release(); }
+        ::= LBRACKET{ a.reset(new soulng::util::JsonArray()); } (Value:v{ std::unique_ptr<soulng::util::JsonValue> item = std::unique_ptr<soulng::util::JsonValue>(v); a->AddItem(std::move(item)); } % COMMA)? RBRACKET{ return a.release(); }
         ;
 }

@@ -68,7 +68,7 @@ struct BackendInit
     }
 };
 
-const char* version = "3.5.0";
+const char* version = "3.6.0";
 
 void PrintHelp()
 {
@@ -124,8 +124,10 @@ void PrintHelp()
         "   disable code generation\n" <<
         "--emit-asm (-f)\n" <<
         "   emit assembly code into file.asm\n" <<
-        "--just-my-code (-j)" <<
+        "--just-my-code (-j)\n" <<
         "   enable Just My Code debugging\n" <<
+        "--all (-a)\n" <<
+        "   build all dependencies\n" << 
         std::endl;
 }
 
@@ -140,6 +142,7 @@ int main(int argc, const char** argv)
     SetToolChain("vs");
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
+    std::set<std::string> builtProjects;
     try
     {
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
@@ -197,6 +200,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--rebuild" || arg == "-u")
                     {
                         SetGlobalFlag(GlobalFlags::rebuild);
+                    }
+                    else if (arg == "--all" || arg == "-a")
+                    {
+                        SetGlobalFlag(GlobalFlags::buildAll);
                     }
                     else if (arg == "--define" || arg == "-D")
                     {
@@ -272,7 +279,7 @@ int main(int argc, const char** argv)
                                 }
                                 referenceFiles.push_back(file);
                             }
-                            else if (components[0] == "--target" || components[0] == "-a")
+                            else if (components[0] == "--target")
                             {
                                 target = components[1];
                                 if (target != "program" && target != "library" && target != "unitTest")
@@ -403,7 +410,7 @@ int main(int argc, const char** argv)
                     }
                     else
                     {
-                        BuildProject(GetFullPath(fp.generic_string()), rootModule);
+                        BuildProject(GetFullPath(fp.generic_string()), rootModule, builtProjects);
                     }
                 }
                 else if (fp.extension() == ".cm")

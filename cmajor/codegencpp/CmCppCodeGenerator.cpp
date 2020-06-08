@@ -60,13 +60,14 @@ void CmCppCodeGenerator::GenerateCode(void* boundCompileUnit)
 void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
 {
     if (GetGlobalFlag(GlobalFlags::disableCodeGen)) return;
-    const Tool& compilerTool = GetCompilerTool();
-    std::string outputDirectory = GetFullPath(Path::Combine(Path::GetDirectoryName(intermediateCodeFile), compilerTool.outputDirectory));
+    const Tool& compilerTool = GetCompilerTool(GetPlatform(), GetToolChain());
+    const Configuration& configuration = GetToolConfiguration(compilerTool, GetConfig());
+    std::string outputDirectory = GetFullPath(Path::Combine(Path::GetDirectoryName(intermediateCodeFile), configuration.outputDirectory));
     boost::filesystem::create_directories(outputDirectory);
     std::string intermediateCompileCommand;
     std::string intermediateCompileErrorFilePath = intermediateCodeFile + ".error";
     intermediateCompileCommand.append("cmfileredirector -2 ").append(intermediateCompileErrorFilePath).append("  ").append(compilerTool.commandName);
-    for (const std::string& arg : compilerTool.args)
+    for (const std::string& arg : configuration.args)
     {
         if (arg.find('$') != std::string::npos)
         {
@@ -122,6 +123,10 @@ void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
     boundCompileUnit.ResetCodeGenerated();
     std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.LLFilePath(), ".cpp");
+    if (intermediateFilePath.find("FileStream.cpp") != std::string::npos)
+    {
+        int x = 0;
+    }
     NativeModule nativeModule(emitter, intermediateFilePath);
     compileUnitId = boundCompileUnit.Id();
     symbolTable = &boundCompileUnit.GetSymbolTable();
@@ -467,7 +472,7 @@ void CmCppCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
     {
         lastStatement = body->Statements().back().get();
     }
-    if (lastStatement && lastStatement != &boundReturnStatement)
+    if (lastStatement && !lastStatement->IsOrContainsBoundReturnStatement())
     {
         void* nextBlock = emitter->CreateBasicBlock("next");
         emitter->SetCurrentBasicBlock(nextBlock);
@@ -1511,11 +1516,13 @@ void CmCppCodeGenerator::GenerateCodeForCleanups()
                 void* prevBasicBlock = emitter->CurrentBasicBlock();
                 emitter->SetCurrentBasicBlock(cleanupTryBlock);
                 emitter->CreateEndTry(nullptr);
+                emitter->SetCurrentBasicBlock(cleanupTryBlock);
                 emitter->CreateBeginCatch();
                 for (const std::unique_ptr<BoundFunctionCall>& destructorCall : cleanup->destructors)
                 {
                     destructorCall->Accept(*this);
                 }
+                emitter->SetCurrentBasicBlock(cleanupTryBlock);
                 emitter->CreateResume(nullptr);
                 emitter->CreateEndCatch(nullptr);
                 currentFunction->GetFunctionSymbol()->SetHasCleanup();

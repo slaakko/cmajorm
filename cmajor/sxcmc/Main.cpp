@@ -118,6 +118,7 @@ int main(int argc, const char** argv)
     SetBackEnd(cmajor::symbols::BackEnd::cmsx);
     //SetNumBuildThreads(1);
     //SetGlobalFlag(GlobalFlags::singleThreadedCompile);
+    std::set<std::string> builtProjects;
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
     try
@@ -347,7 +348,7 @@ int main(int argc, const char** argv)
                     }
                     else
                     {
-                        BuildProject(GetFullPath(fp.generic_string()), rootModule);
+                        BuildProject(GetFullPath(fp.generic_string()), rootModule, builtProjects);
                     }
                 }
                 else if (fp.extension() == ".cm")

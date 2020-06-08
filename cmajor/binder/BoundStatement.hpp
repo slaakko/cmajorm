@@ -53,6 +53,7 @@ public:
     bool Postfix() const { return GetFlag(BoundStatementFlags::postfix); }
     void SetGenerated() { SetFlag(BoundStatementFlags::generated); }
     bool Generated() const { return GetFlag(BoundStatementFlags::generated); }
+    virtual bool IsOrContainsBoundReturnStatement() const { return false; }
 private:
     std::u32string label;
     BoundStatement* parent;
@@ -68,6 +69,7 @@ public:
     void Accept(BoundNodeVisitor& visitor) override;
     BoundStatement* First() { return first.get(); }
     BoundStatement* Second() { return second.get(); }
+    bool IsOrContainsBoundReturnStatement() const override { return second->IsOrContainsBoundReturnStatement(); }
 private:
     std::unique_ptr<BoundStatement> first;
     std::unique_ptr<BoundStatement> second;
@@ -98,6 +100,7 @@ public:
     BoundReturnStatement& operator=(const BoundReturnStatement&) = delete;
     void Accept(BoundNodeVisitor& visitor) override;
     BoundFunctionCall* ReturnFunctionCall() { return returnFunctionCall.get(); }
+    bool IsOrContainsBoundReturnStatement() const override { return true; }
 private:
     std::unique_ptr<BoundFunctionCall> returnFunctionCall;
 };

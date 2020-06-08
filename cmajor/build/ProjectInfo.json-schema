@@ -1,0 +1,56 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/build/BuildApi.hpp>
+
+struct api(BUILD_API) SourceFileInfo
+{
+    string fileId;
+    string fileHash;
+    string filePath;
+    string content;
+    string info;
+}
+
+struct api(BUILD_API) ProjectInfo
+{
+    string projectId;
+    string projectHash;
+    string projectFilePath;
+    string projectName;
+    SourceFileInfo[] fileInfos;
+    string[] dependsOnProjects;
+    string target;
+    string info;
+    string error;
+}
+
+struct api(BUILD_API) ProjectUpToDate
+{
+    string projectId;
+    bool upToDate;
+    string info;
+    string error;
+}
+
+struct api(BUILD_API) ProjectUpdated
+{
+    string projectId;
+    bool ok;
+    string info;
+    string error;
+}
+
+struct api(BUILD_API) Error
+{
+    string info;
+    string error;
+}
+
+struct api(BUILD_API) CloseConnection
+{
+    string info;
+    string error;
+}

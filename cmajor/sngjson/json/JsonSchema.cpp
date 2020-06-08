@@ -94,7 +94,11 @@ bool StructType::WriteDeclaration(CodeFormatter& formatter)
 
 bool StructType::WriteDefinition(CodeFormatter& formatter)
 {
-    formatter.Write(Name() + "::" + Name() + "() : ");
+    formatter.Write(Name() + "::" + Name() + "()");
+    if (!fields.empty())
+    {
+        formatter.Write(" : ");
+    }
     bool first = true;
     for (const std::unique_ptr<Field>& field : fields)
     {

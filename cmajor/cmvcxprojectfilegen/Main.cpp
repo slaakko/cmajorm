@@ -37,7 +37,7 @@ struct InitDone
     }
 };
 
-const char* version = "3.5.0";
+const char* version = "3.6.0";
 
 void PrintHelp()
 {
@@ -307,6 +307,14 @@ int main(int argc, const char** argv)
             importCppDefaultPropsElement->SetAttribute(U"Project", U"$(VCTargetsPath)\\Microsoft.Cpp.Default.props");
             projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(importCppDefaultPropsElement));
 
+            sngxml::dom::Element* configurationPropertyGroup = new sngxml::dom::Element(U"PropertyGroup");
+            configurationPropertyGroup->SetAttribute(U"Label", U"Configuration");
+            configurationPropertyGroup->SetAttribute(U"Condition", U"'$(Configuration)|$(Platform)'=='Debug|x64'");
+            sngxml::dom::Element* preferredToolArchitecture = new sngxml::dom::Element(U"PreferredToolArchitecture");
+            preferredToolArchitecture->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"x64")));
+            configurationPropertyGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(preferredToolArchitecture));
+            projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(configurationPropertyGroup));
+
             sngxml::dom::Element* debugPropertyGroupElement = new sngxml::dom::Element(U"PropertyGroup");
             debugPropertyGroupElement->SetAttribute(U"Condition", U"'$(Configuration)|$(Platform)'=='Debug|x64'");
             sngxml::dom::Element* debugConfigurationTypeElement = new sngxml::dom::Element(U"ConfigurationType");
@@ -376,7 +384,7 @@ int main(int argc, const char** argv)
             debugRuntimeLibraryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugRuntimeLibraryText));
             sngxml::dom::Element* debugDisableWarningsElement = new sngxml::dom::Element(U"DisableSpecificWarnings");
             debugClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugDisableWarningsElement));
-            debugDisableWarningsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"4102;4146;4244;4297")));
+            debugDisableWarningsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"4102;4146;4244")));
             if (optionsStr.find("/FAs") != std::string::npos)
             {
                 sngxml::dom::Element* debugAssemblerOutputElement = new sngxml::dom::Element(U"AssemblerOutput");
@@ -424,6 +432,9 @@ int main(int argc, const char** argv)
                 debugLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(generateDebugInformationElement));
                 sngxml::dom::Text* debugInfoText = new sngxml::dom::Text(U"true");
                 generateDebugInformationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugInfoText));
+                sngxml::dom::Element* stackSizeElement = new sngxml::dom::Element(U"StackReserveSize");
+                stackSizeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"16777216")));
+                debugLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(stackSizeElement));
             }
 
             sngxml::dom::Element* debugSources = new sngxml::dom::Element(U"ItemGroup");
@@ -441,6 +452,222 @@ int main(int argc, const char** argv)
             std::ofstream projectFile(projectFilePath);
             CodeFormatter formatter(projectFile);
             projectFileDoc.Write(formatter);
+        }
+        else
+        {
+            if (projectConfigStr == "release")
+            {
+                boost::uuids::uuid projectGuid = boost::uuids::random_generator()();
+                projectGuidStr = "{" + boost::uuids::to_string(projectGuid) + "}";
+                sngxml::dom::Document projectFileDoc;
+                sngxml::dom::Element* projectElement = new sngxml::dom::Element(U"Project");
+                projectFileDoc.SetXmlVersion(U"1.0");
+                projectFileDoc.SetXmlEncoding(U"utf-8");
+                projectFileDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(projectElement));
+                projectElement->SetAttribute(U"DefaultTargets", U"Build");
+                projectElement->SetAttribute(U"xmlns", U"http://schemas.microsoft.com/developer/msbuild/2003");
+                sngxml::dom::Element* projectConfigurationsElement = new sngxml::dom::Element(U"ItemGroup");
+                projectConfigurationsElement->SetAttribute(U"Label", U"ProjectConfigurations");
+                projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(projectConfigurationsElement));
+                sngxml::dom::Element* releaseProjectConfigurationElement = new sngxml::dom::Element(U"ProjectConfiguration");
+                releaseProjectConfigurationElement->SetAttribute(U"Include", U"Release|x64");
+                projectConfigurationsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseProjectConfigurationElement));
+                sngxml::dom::Element* releaseConfigurationElement = new sngxml::dom::Element(U"Configuration");
+                sngxml::dom::Text* releaseText = new sngxml::dom::Text(U"Release");
+                releaseConfigurationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseText));
+                releaseProjectConfigurationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseConfigurationElement));
+                sngxml::dom::Element* platformConfigurationElement = new sngxml::dom::Element(U"Platform");
+                sngxml::dom::Text* platformText = new sngxml::dom::Text(U"x64");
+                platformConfigurationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(platformText));
+                releaseProjectConfigurationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(platformConfigurationElement));
+
+                sngxml::dom::Element* globalsProjectGroupElement = new sngxml::dom::Element(U"PropertyGroup");
+                globalsProjectGroupElement->SetAttribute(U"Label", U"Globals");
+                projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(globalsProjectGroupElement));
+                sngxml::dom::Element* vcProjectVersionElement = new sngxml::dom::Element(U"VCProjectVersion");
+                vcProjectVersionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"16.0")));
+                globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(vcProjectVersionElement));
+                sngxml::dom::Element* projectGuidElement = new sngxml::dom::Element(U"ProjectGuid");
+                globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(projectGuidElement));
+                sngxml::dom::Text* projectGuidText = new sngxml::dom::Text(ToUtf32(projectGuidStr));
+                projectGuidElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(projectGuidText));
+                sngxml::dom::Element* keywordElement = new sngxml::dom::Element(U"Keyword");
+                keywordElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Win32Proj")));
+                globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement));
+                sngxml::dom::Element* projectRootNamespaceElement = new sngxml::dom::Element(U"RootNamespace");
+                globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(projectRootNamespaceElement));
+                sngxml::dom::Text* rootNamespaceText = new sngxml::dom::Text(ToUtf32(projectName));
+                projectRootNamespaceElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(rootNamespaceText));
+                sngxml::dom::Element* windowsTargetPlatformVersionElement = new sngxml::dom::Element(U"WindowsTargetPlatformVersion");
+                globalsProjectGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(windowsTargetPlatformVersionElement));
+                sngxml::dom::Text* windowsTargetPlatformVersionText = new sngxml::dom::Text(U"10.0");
+                windowsTargetPlatformVersionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(windowsTargetPlatformVersionText));
+
+                sngxml::dom::Element* importCppDefaultPropsElement = new sngxml::dom::Element(U"Import");
+                importCppDefaultPropsElement->SetAttribute(U"Project", U"$(VCTargetsPath)\\Microsoft.Cpp.Default.props");
+                projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(importCppDefaultPropsElement));
+
+                sngxml::dom::Element* releasePropertyGroupElement = new sngxml::dom::Element(U"PropertyGroup");
+                releasePropertyGroupElement->SetAttribute(U"Condition", U"'$(Configuration)|$(Platform)'=='Release|x64'");
+                sngxml::dom::Element* releaseConfigurationTypeElement = new sngxml::dom::Element(U"ConfigurationType");
+                sngxml::dom::Text* releaseConfigurationTypeText = new sngxml::dom::Text(ToUtf32(projectTargetStr));
+                releaseConfigurationTypeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseConfigurationTypeText));
+                releasePropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseConfigurationTypeElement));
+                sngxml::dom::Element* releaseUseDebugLibrariesElement = new sngxml::dom::Element(U"UseDebugLibraries");
+                sngxml::dom::Text* releaseUseDebugLibrariesText = new sngxml::dom::Text(U"false");
+                releaseUseDebugLibrariesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseUseDebugLibrariesText));
+                releasePropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseUseDebugLibrariesElement));
+                sngxml::dom::Element* releasePlatformToolsetElement = new sngxml::dom::Element(U"PlatformToolset");
+                sngxml::dom::Text* releasePlatformToolsetText = new sngxml::dom::Text(U"v142");
+                releasePlatformToolsetElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releasePlatformToolsetText));
+                releasePropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releasePlatformToolsetElement));
+                sngxml::dom::Element* wholeProgramOptimizationElement = new sngxml::dom::Element(U"WholeProgramOptimization");
+                wholeProgramOptimizationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"false")));
+                releasePropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(wholeProgramOptimizationElement));
+                sngxml::dom::Element* releaseCharacterElement = new sngxml::dom::Element(U"CharacterSet");
+                sngxml::dom::Text* releaseCharacterText = new sngxml::dom::Text(U"Unicode");
+                releaseCharacterElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseCharacterText));
+                releasePropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseCharacterElement));
+                projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releasePropertyGroupElement));
+
+                sngxml::dom::Element* importCppPropsElement = new sngxml::dom::Element(U"Import");
+                importCppPropsElement->SetAttribute(U"Project", U"$(VCTargetsPath)\\Microsoft.Cpp.props");
+                projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(importCppPropsElement));
+
+                sngxml::dom::Element* configurationPropertyGroup = new sngxml::dom::Element(U"PropertyGroup");
+                configurationPropertyGroup->SetAttribute(U"Label", U"Configuration");
+                configurationPropertyGroup->SetAttribute(U"Condition", U"'$(Configuration)|$(Platform)'=='Release|x64'");
+                sngxml::dom::Element* preferredToolArchitecture = new sngxml::dom::Element(U"PreferredToolArchitecture");
+                preferredToolArchitecture->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"x64")));
+                configurationPropertyGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(preferredToolArchitecture));
+                projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(configurationPropertyGroup));
+
+                sngxml::dom::Element* releaseTargetPropertyGroupElement = new sngxml::dom::Element(U"PropertyGroup");
+                releaseTargetPropertyGroupElement->SetAttribute(U"Condition", U"'$(Configuration)|$(Platform)'=='Release|x64'");
+                sngxml::dom::Element* releaseTargetLinkElement = new sngxml::dom::Element(U"LinkIncremental");
+                releaseTargetLinkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"false")));
+                releaseTargetPropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseTargetLinkElement));
+                sngxml::dom::Element* releaseTargetNameElement = new sngxml::dom::Element(U"TargetName");
+                releaseTargetNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(projectName))));
+                releaseTargetPropertyGroupElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseTargetNameElement));
+
+                sngxml::dom::Element* releaseItemDefinitionGroup = new sngxml::dom::Element(U"ItemDefinitionGroup");
+                releaseItemDefinitionGroup->SetAttribute(U"Condition", U"'$(Configuration)|$(Platform)'=='Release|x64'");
+                projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseItemDefinitionGroup));
+                sngxml::dom::Element* releaseClCompileItemDefinition = new sngxml::dom::Element(U"ClCompile");
+                releaseItemDefinitionGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseClCompileItemDefinition));
+                sngxml::dom::Element* warningLevelElement = new sngxml::dom::Element(U"WarningLevel");
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(warningLevelElement));
+                warningLevelElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Level3")));
+                sngxml::dom::Element* sdlCheckElement = new sngxml::dom::Element(U"SDLCheck");
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(sdlCheckElement));
+                sdlCheckElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+                sngxml::dom::Element* exceptionHandlingElement = new sngxml::dom::Element(U"ExceptionHandling");
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(exceptionHandlingElement));
+                exceptionHandlingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"SyncCThrow")));
+                sngxml::dom::Element* releasePrecompiledHeaderElement = new sngxml::dom::Element(U"PrecompiledHeader");
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(releasePrecompiledHeaderElement));
+                sngxml::dom::Text* releaseNotUsingPrecompiledHeaderText = new sngxml::dom::Text(U"NotUsing");
+                releasePrecompiledHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseNotUsingPrecompiledHeaderText));
+                sngxml::dom::Element* releaseDebugInformationFormatElement = new sngxml::dom::Element(U"DebugInformationFormat");
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseDebugInformationFormatElement));
+                sngxml::dom::Text* releaseProgramDatabaseText = new sngxml::dom::Text(U"ProgramDatabase");
+                releaseDebugInformationFormatElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseProgramDatabaseText));
+                sngxml::dom::Element* languageStandardElement = new sngxml::dom::Element(U"LanguageStandard");
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(languageStandardElement));
+                sngxml::dom::Text* languageStandardText = new sngxml::dom::Text(U"stdcpp17");
+                languageStandardElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(languageStandardText));
+                sngxml::dom::Element* releaseOptimizationElement = new sngxml::dom::Element(U"Optimization");
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseOptimizationElement));
+                sngxml::dom::Text* releaseOptimizationText = new sngxml::dom::Text(U"MaxSpeed");
+                releaseOptimizationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseOptimizationText));
+                sngxml::dom::Element* functionLevelLinkingElement = new sngxml::dom::Element(U"FunctionLevelLinking");
+                functionLevelLinkingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(functionLevelLinkingElement));
+                sngxml::dom::Element* intrinsicFunctionsElement = new sngxml::dom::Element(U"IntrinsicFunctions");
+                intrinsicFunctionsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(intrinsicFunctionsElement));
+                sngxml::dom::Element* releaseRuntimeLibraryElement = new sngxml::dom::Element(U"RuntimeLibrary");
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseRuntimeLibraryElement));
+                sngxml::dom::Text* releaseRuntimeLibraryText = new sngxml::dom::Text(U"MultiThreadedDLL");
+                releaseRuntimeLibraryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseRuntimeLibraryText));
+                sngxml::dom::Element* releaseDisableWarningsElement = new sngxml::dom::Element(U"DisableSpecificWarnings");
+                releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseDisableWarningsElement));
+                releaseDisableWarningsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"4102;4146;4244")));
+                if (optionsStr.find("/FAs") != std::string::npos)
+                {
+                    sngxml::dom::Element* releaseAssemblerOutputElement = new sngxml::dom::Element(U"AssemblerOutput");
+                    releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseAssemblerOutputElement));
+                    releaseAssemblerOutputElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"AssemblyAndSourceCode")));
+                }
+                if (optionsStr.find("/JMC") != std::string::npos)
+                {
+                    sngxml::dom::Element* releaseJustMyCodeElement = new sngxml::dom::Element(U"SupportJustMyCode");
+                    releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseJustMyCodeElement));
+                    releaseJustMyCodeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+                }
+                else
+                {
+                    sngxml::dom::Element* releaseJustMyCodeElement = new sngxml::dom::Element(U"SupportJustMyCode");
+                    releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseJustMyCodeElement));
+                    releaseJustMyCodeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"false")));
+                }
+                if (optionsStr.find("/GR") != std::string::npos)
+                {
+                    sngxml::dom::Element* releaseRTTI = new sngxml::dom::Element(U"RuntimeTypeInfo");
+                    releaseClCompileItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseRTTI));
+                    releaseRTTI->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+                }
+                if (projectTargetStr == "Application")
+                {
+                    sngxml::dom::Element* releaseLinkItemDefinition = new sngxml::dom::Element(U"Link");
+                    releaseItemDefinitionGroup->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseLinkItemDefinition));
+                    sngxml::dom::Element* subSystemElement = new sngxml::dom::Element(U"SubSystem");
+                    releaseLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(subSystemElement));
+                    std::u32string subsystem = U"Console";
+                    if (target == "winapp" || target == "winguiapp")
+                    {
+                        subsystem = U"Windows";
+                    }
+                    sngxml::dom::Element* libraryDirectoriesElement = new sngxml::dom::Element(U"AdditionalLibraryDirectories");
+                    libraryDirectoriesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(libraryDirectoriesStr))));
+                    releaseLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(libraryDirectoriesElement));
+                    sngxml::dom::Element* dependenciesElement = new sngxml::dom::Element(U"AdditionalDependencies");
+                    dependenciesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(librariesStr))));
+                    releaseLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(dependenciesElement));
+                    sngxml::dom::Text* subSystemTextStr = new sngxml::dom::Text(subsystem);
+                    subSystemElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(subSystemTextStr));
+                    sngxml::dom::Element* enableComdataFoldingElement = new sngxml::dom::Element(U"EnableCOMDATFolding");
+                    enableComdataFoldingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+                    releaseLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(enableComdataFoldingElement));
+                    sngxml::dom::Element* optimizeReferencesElement = new sngxml::dom::Element(U"OptimizeReferences");
+                    optimizeReferencesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"true")));
+                    releaseLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(optimizeReferencesElement));
+                    sngxml::dom::Element* generateDebugInformationElement = new sngxml::dom::Element(U"GenerateDebugInformation");
+                    releaseLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(generateDebugInformationElement));
+                    sngxml::dom::Text* debugInfoText = new sngxml::dom::Text(U"true");
+                    generateDebugInformationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(debugInfoText));
+                    sngxml::dom::Element* stackSizeElement = new sngxml::dom::Element(U"StackReserveSize");
+                    stackSizeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"16777216")));
+                    releaseLinkItemDefinition->AppendChild(std::unique_ptr<sngxml::dom::Node>(stackSizeElement));
+                }
+
+                sngxml::dom::Element* releaseSources = new sngxml::dom::Element(U"ItemGroup");
+                projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(releaseSources));
+                for (const std::string& sourceFile : sourceFiles)
+                {
+                    sngxml::dom::Element* clCompileElement = new sngxml::dom::Element(U"ClCompile");
+                    clCompileElement->SetAttribute(U"Include", ToUtf32(sourceFile));
+                    releaseSources->AppendChild(std::unique_ptr<sngxml::dom::Node>(clCompileElement));
+                }
+
+                sngxml::dom::Element* importCppTargetsElement = new sngxml::dom::Element(U"Import");
+                importCppTargetsElement->SetAttribute(U"Project", U"$(VCTargetsPath)\\Microsoft.Cpp.targets");
+                projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(importCppTargetsElement));
+                std::ofstream projectFile(projectFilePath);
+                CodeFormatter formatter(projectFile);
+                projectFileDoc.Write(formatter);
+            }
         }
         if (verbose)
         {

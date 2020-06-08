@@ -359,7 +359,7 @@ void BoundTryStatement::Accept(BoundNodeVisitor& visitor)
 }
 
 BoundCatchStatement::BoundCatchStatement(Module* module_, const Span& span_) : 
-    BoundStatement(module_, span_, BoundNodeType::boundCatchStatement), catchedType(nullptr), catchTypeUuidId(-1)
+    BoundStatement(module_, span_, BoundNodeType::boundCatchStatement), catchedType(nullptr), catchTypeUuidId(-1), catchVar(nullptr)
 {
 }
 

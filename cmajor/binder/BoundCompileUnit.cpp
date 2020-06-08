@@ -962,7 +962,7 @@ void BoundCompileUnit::GenerateCompileUnitInitialization()
     {
         throw std::runtime_error("internal error: 'System.Runtime.PushCompileUnitUnwindInfoInit' symbol not found");
     }
-    Span span = functionSymbol->GetSpan();
+    Span span = initCompileUnitFunctionSymbol->GetSpan();
     compileUnitUnwindInfoVarSymbol.reset(new GlobalVariableSymbol(span, U"unwindInfoInit_" + ToUtf32(compileUnitId)));
     compileUnitUnwindInfoVarSymbol->SetAccess(SymbolAccess::public_);
     compileUnitUnwindInfoVarSymbol->ComputeMangledName();

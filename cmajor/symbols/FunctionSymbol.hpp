@@ -334,7 +334,7 @@ public:
     std::u32string CodeName() const override;
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     bool IsGeneratedFunction() const { return generated; }
-    bool DontThrow() const override { return true; }
+    bool DontThrow() const override;
     void SetSpecifiers(Specifiers specifiers);
     void SetGenerated() { generated = true; }
     std::u32string Info() const override { return std::u32string(); }

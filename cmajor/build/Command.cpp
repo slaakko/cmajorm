@@ -1,0 +1,129 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/build/Command.hpp>
+#include <cmajor/build/BuildLangLexer.hpp>
+#include <cmajor/build/BuildLangClientParser.hpp>
+#include <cmajor/build/BuildOption.hpp>
+#include <cmajor/build/BuildServerMessage.hpp>
+#include <cmajor/build/Log.hpp>
+#include <cmajor/build/BuildClient.hpp>
+#include <cmajor/build/BuildServer.hpp>
+#include <cmajor/build/FiberExecutionContext.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
+#include <soulng/util/Fiber.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Error.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Log.hpp>
+
+namespace cmajor { namespace build {
+
+using namespace soulng::unicode;
+using namespace cmajor::symbols;
+
+std::string GetFilePath(const std::string& path)
+{
+    Assert(path.size() >= 2, "invalid path");
+    Assert(path[0] == '<' && path[path.size() - 1] == '>', "invalid path");
+    std::string p = path.substr(1, path.size() - 2);
+    return GetFullPath(p);
+}
+
+std::unique_ptr<ExecutionContext> CreateExecutionContext(const std::string& serverName)
+{
+    if (serverName.empty())
+    {
+        return std::unique_ptr<ExecutionContext>(new FiberExecutionContext());
+    }
+    else
+    {
+        throw std::runtime_error("server execution context not implemented yet");
+    }
+}
+
+Command::Command()
+{
+}
+
+Command::~Command()
+{
+}
+
+PushProjectCommand::PushProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
+{
+}
+
+void PushProjectCommand::Execute()
+{
+    std::set<std::string> pushedProjects;
+    std::unique_ptr<ExecutionContext> context = CreateExecutionContext(serverName);
+    context->GetClient()->PushProject(projectFilePath, pushedProjects);
+    Connection* connection = context->GetConnection();
+    if (connection)
+    {
+        if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+        {
+            LogMessage(-1, "buildclient: closing connection");
+        }
+        if (connection->ServerAlive())
+        {
+            connection->SetServerAlive(false);
+            CloseConnectionRequest closeConnectionRequest;
+            closeConnectionRequest.SendTo(*connection);
+        }
+        connection->Close();
+    }
+    if (serverName.empty())
+    {
+        LogMessage(-1, "project '" + projectFilePath + "' pushed to local build repository");
+    }
+    else
+    {
+        LogMessage(-1, "project '" + projectFilePath + "' pushed to server '" + serverName + "'");
+    }
+}
+
+RemoveProjectCommand::RemoveProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
+{
+}
+
+void RemoveProjectCommand::Execute()
+{
+}
+
+BuildProjectCommand::BuildProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
+{
+}
+
+void BuildProjectCommand::Execute()
+{
+}
+
+DebugProjectCommand::DebugProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
+{
+}
+
+void DebugProjectCommand::Execute()
+{
+}
+
+InstallProjectCommand::InstallProjectCommand(const std::string& projectFilePath_, const std::string& directory_, const std::string& serverName_) :
+    projectFilePath(GetFilePath(projectFilePath_)), directory(GetFilePath(directory_)), serverName(serverName_)
+{
+}
+
+void InstallProjectCommand::Execute()
+{
+}
+
+std::unique_ptr<Command> ParseCommand(const std::string& command)
+{
+    BuildLangLexer lexer(ToUtf32(command), "", 0);
+    BuildOptionSetter optionSetter;
+    return BuildLangClientParser::Parse(lexer, &optionSetter);
+}
+
+} } // namespace cmajor::build;

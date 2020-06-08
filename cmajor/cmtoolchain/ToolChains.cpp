@@ -16,124 +16,250 @@
 using namespace soulng::util;
 using namespace soulng::unicode;
 
-ToolChains toolChains;
+Platforms platforms;
 
-ToolChains& GetToolChains()
+Platforms& GetPlatforms()
 {
-    return toolChains;
+    return platforms;
+}
+
+std::string GetPlatform()
+{
+#ifdef _WIN32
+    return "windows";
+#else
+    return "linux";
+#endif
+}
+
+Platform& GetOrInsertPlatform(const std::string& name)
+{
+    Platforms& platforms = GetPlatforms();
+    for (Platform& pl : platforms.platforms)
+    {
+        if (pl.name == name)
+        {
+            return pl;
+        }
+    }
+    Platform pl;
+    pl.name = name;
+    platforms.platforms.push_back(pl);
+    return GetOrInsertPlatform(name);
 }
 
 void CreateVSToolChain(bool verbose)
 {
+    Platform& windows = GetOrInsertPlatform("windows");
+
     ToolChain vs;
     vs.name = "vs";
+
     Tool compiler;
     compiler.name = "compiler";
     compiler.commandName = "cl";
     compiler.outputFileExtension = ".obj";
-    compiler.outputDirectory = "x64/Debug";
+
+    Configuration compilerDebugConfig;
+    compilerDebugConfig.name = "debug";
+    compilerDebugConfig.outputDirectory = "x64/Debug";
     compiler.debugInformationFileExtension = ".pdb";
     compiler.assemblyFileExtension = ".asm";
-    compiler.args.push_back("/GS");
-    compiler.args.push_back("/W3");
-    compiler.args.push_back("/Zc:wchar_");
-    compiler.args.push_back("/I\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\include\"");
-    compiler.args.push_back("/Zi");
-    compiler.args.push_back("/Gm-");
-    compiler.args.push_back("/Od");
-    compiler.args.push_back("/sld");
-    compiler.args.push_back("/wd\"4102\"");
-    compiler.args.push_back("/wd\"4146\"");
-    compiler.args.push_back("/wd\"4244\"");
-    compiler.args.push_back("/wd\"4297\"");
-    compiler.args.push_back("/c");
-    compiler.args.push_back("$SOURCE_FILE$");
-    compiler.args.push_back("/Fd:$DEBUG_INFORMATION_FILE$");
-    compiler.args.push_back("$GENERATE_ASSEMBLY_FILE_OPTION$/FAs");
-    compiler.args.push_back("$GENERATE_JUST_MY_CODE_OPTION$/JMC");
-    compiler.args.push_back("$ENABLE_RUNTIME_TYPE_INFORMATION_OPTION$/GR");
-    compiler.args.push_back("/Zc:inline");
-    compiler.args.push_back("/fp:precise");
-    compiler.args.push_back("/RTC1");
-    compiler.args.push_back("/MDd");
-    compiler.args.push_back("/FC");
-    compiler.args.push_back("/Fa$ASSEMBLY_FILE$");
-    compiler.args.push_back("/EHs");
-    compiler.args.push_back("/Fo:$OBJECT_FILE$");
-    compiler.args.push_back("/diagnostics:column ");
-    compiler.args.push_back("/std:c++17");
+    compilerDebugConfig.args.push_back("/GS");
+    compilerDebugConfig.args.push_back("/W3");
+    compilerDebugConfig.args.push_back("/Zc:wchar_");
+    compilerDebugConfig.args.push_back("/I\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\include\"");
+    compilerDebugConfig.args.push_back("/Zi");
+    compilerDebugConfig.args.push_back("/Gm-");
+    compilerDebugConfig.args.push_back("/Od");
+    compilerDebugConfig.args.push_back("/sld");
+    compilerDebugConfig.args.push_back("/wd\"4102\"");
+    compilerDebugConfig.args.push_back("/wd\"4146\"");
+    compilerDebugConfig.args.push_back("/wd\"4244\"");
+    compilerDebugConfig.args.push_back("/wd\"4297\"");
+    compilerDebugConfig.args.push_back("/c");
+    compilerDebugConfig.args.push_back("$SOURCE_FILE$");
+    compilerDebugConfig.args.push_back("/Fd:$DEBUG_INFORMATION_FILE$");
+    compilerDebugConfig.args.push_back("$GENERATE_ASSEMBLY_FILE_OPTION$/FAs");
+    compilerDebugConfig.args.push_back("$GENERATE_JUST_MY_CODE_OPTION$/JMC");
+    compilerDebugConfig.args.push_back("$ENABLE_RUNTIME_TYPE_INFORMATION_OPTION$/GR");
+    compilerDebugConfig.args.push_back("/Zc:inline");
+    compilerDebugConfig.args.push_back("/fp:precise");
+    compilerDebugConfig.args.push_back("/RTC1");
+    compilerDebugConfig.args.push_back("/MDd");
+    compilerDebugConfig.args.push_back("/FC");
+    compilerDebugConfig.args.push_back("/Fa$ASSEMBLY_FILE$");
+    compilerDebugConfig.args.push_back("/EHs");
+    compilerDebugConfig.args.push_back("/Fo:$OBJECT_FILE$");
+    compilerDebugConfig.args.push_back("/diagnostics:column ");
+    compilerDebugConfig.args.push_back("/std:c++17");
+    compiler.configurations.push_back(compilerDebugConfig);
+
+    Configuration compilerReleaseConfig;
+    compilerReleaseConfig.name = "release";
+    compilerReleaseConfig.outputDirectory = "x64/Release";
+    compiler.configurations.push_back(compilerReleaseConfig);
     vs.tools.push_back(compiler);
+
     Tool libraryManager;
     libraryManager.name = "library-manager";
     libraryManager.commandName = "lib";
     libraryManager.outputFileExtension = ".lib";
-    libraryManager.outputDirectory = "x64/Debug";
-    libraryManager.args.push_back("/VERBOSE");
-    libraryManager.args.push_back("/MACHINE:X64");
-    libraryManager.args.push_back("/OUT:$LIBRARY_FILE$");
-    libraryManager.args.push_back("$OBJECT_FILES$");
+
+    Configuration libraryManagerDebugConfig;
+    libraryManagerDebugConfig.name = "debug";
+    libraryManagerDebugConfig.outputDirectory = "x64/Debug";
+    libraryManagerDebugConfig.args.push_back("/VERBOSE");
+    libraryManagerDebugConfig.args.push_back("/MACHINE:X64");
+    libraryManagerDebugConfig.args.push_back("/OUT:$LIBRARY_FILE$");
+    libraryManagerDebugConfig.args.push_back("$OBJECT_FILES$");
+    libraryManager.configurations.push_back(libraryManagerDebugConfig);
+
+    Configuration libraryManagerReleaseConfig;
+    libraryManagerReleaseConfig.name = "release";
+    libraryManagerReleaseConfig.outputDirectory = "x64/Release";
+    libraryManagerReleaseConfig.args.push_back("/VERBOSE");
+    libraryManagerReleaseConfig.args.push_back("/MACHINE:X64");
+    libraryManagerReleaseConfig.args.push_back("/OUT:$LIBRARY_FILE$");
+    libraryManagerReleaseConfig.args.push_back("$OBJECT_FILES$");
+    libraryManager.configurations.push_back(libraryManagerReleaseConfig);
+
     vs.tools.push_back(libraryManager);
+
     Tool linker;
     linker.name = "linker";
     linker.commandName = "cl";
     linker.outputFileExtension = ".exe";
     linker.debugInformationFileExtension = ".pdb";
-    linker.args.push_back("$MAIN_OBJECT_FILE$");
-    linker.args.push_back("$LIBRARY_FILES$");
-    linker.args.push_back("/link");
-    linker.args.push_back("/OUT:$EXECUTABLE_FILE$d.exe");
-    linker.args.push_back("/MACHINE:X64");
-    linker.args.push_back("/ENTRY:$ENTRY$");
-    linker.args.push_back("/DEBUG");
-    linker.args.push_back("/SUBSYSTEM:$SUBSYSTEM$");
-    linker.args.push_back("/STACK:16777216");
-    linker.args.push_back("/PDB:$DEBUG_INFORMATION_FILE$");
-    linker.args.push_back("/DYNAMICBASE");
-    linker.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\lib\\x64\"");
-    linker.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\atlmfc\\lib\\x64\"");
-    linker.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\VS\\lib\\x64\"");
-    linker.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"");
-    linker.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"");
-    linker.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"");
-    linker.args.push_back("/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$");
+
+    Configuration linkerDebugConfig;
+    linkerDebugConfig.name = "debug";
+    linkerDebugConfig.args.push_back("$MAIN_OBJECT_FILE$");
+    linkerDebugConfig.args.push_back("$LIBRARY_FILES$");
+    linkerDebugConfig.args.push_back("/link");
+    linkerDebugConfig.args.push_back("/OUT:$EXECUTABLE_FILE$d.exe");
+    linkerDebugConfig.args.push_back("/MACHINE:X64");
+    linkerDebugConfig.args.push_back("/ENTRY:$ENTRY$");
+    linkerDebugConfig.args.push_back("/DEBUG");
+    linkerDebugConfig.args.push_back("/SUBSYSTEM:$SUBSYSTEM$");
+    linkerDebugConfig.args.push_back("/STACK:16777216");
+    linkerDebugConfig.args.push_back("/PDB:$DEBUG_INFORMATION_FILE$");
+    linkerDebugConfig.args.push_back("/DYNAMICBASE");
+    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\lib\\x64\"");
+    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\atlmfc\\lib\\x64\"");
+    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\VS\\lib\\x64\"");
+    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"");
+    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"");
+    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"");
+    linkerDebugConfig.args.push_back("/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$");
+    linker.configurations.push_back(linkerDebugConfig);
+
+    Configuration linkerReleaseConfig;
+    linkerReleaseConfig.name = "release";
+    linkerReleaseConfig.args.push_back("$MAIN_OBJECT_FILE$");
+    linkerReleaseConfig.args.push_back("$LIBRARY_FILES$");
+    linkerReleaseConfig.args.push_back("/link");
+    linkerReleaseConfig.args.push_back("/OUT:$EXECUTABLE_FILE$.exe");
+    linkerReleaseConfig.args.push_back("/MACHINE:X64");
+    linkerReleaseConfig.args.push_back("/ENTRY:$ENTRY$");
+    linkerReleaseConfig.args.push_back("/SUBSYSTEM:$SUBSYSTEM$");
+    linkerReleaseConfig.args.push_back("/STACK:16777216");
+    linkerReleaseConfig.args.push_back("/PDB:$DEBUG_INFORMATION_FILE$");
+    linkerReleaseConfig.args.push_back("/DYNAMICBASE");
+    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\lib\\x64\"");
+    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\atlmfc\\lib\\x64\"");
+    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\VS\\lib\\x64\"");
+    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"");
+    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"");
+    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"");
+    linkerReleaseConfig.args.push_back("/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$");
+    linker.configurations.push_back(linkerReleaseConfig);
+
     vs.tools.push_back(linker);
+
     Tool projectFileGenerator;
     projectFileGenerator.name = "project-file-generator";
     projectFileGenerator.commandName = "cmvcxprojectfilegen";
     projectFileGenerator.outputFileExtension = ".vcxproj";
-    projectFileGenerator.outputDirectory = "x64/Debug";
-    projectFileGenerator.args.push_back("--verbose");
-    projectFileGenerator.args.push_back("--name");
-    projectFileGenerator.args.push_back("$PROJECT_NAME$");
-    projectFileGenerator.args.push_back("--file");
-    projectFileGenerator.args.push_back("$PROJECT_FILE_PATH$");
-    projectFileGenerator.args.push_back("--target");
-    projectFileGenerator.args.push_back("$PROJECT_TARGET$");
-    projectFileGenerator.args.push_back("--config");
-    projectFileGenerator.args.push_back("$PROJECT_CONFIG$");
-    projectFileGenerator.args.push_back("--librarydirs");
-    projectFileGenerator.args.push_back("$LIBRARY_DIRECTORIES$");
-    projectFileGenerator.args.push_back("--libs");
-    projectFileGenerator.args.push_back("$LIBRARY_FILE_NAMES$");
-    projectFileGenerator.args.push_back("$GENERATE_ASSEMBLY_FILE_OPTION$/FAs");
-    projectFileGenerator.args.push_back("$GENERATE_JUST_MY_CODE_OPTION$/JMC");
-    projectFileGenerator.args.push_back("$ENABLE_RUNTIME_TYPE_INFORMATION_OPTION$/GR");
-    projectFileGenerator.args.push_back("--options");
-    projectFileGenerator.args.push_back("$OPTIONS$");
-    projectFileGenerator.args.push_back("$SOURCE_FILES$");
+
+    Configuration projectFileGeneratorDebugConfig;
+    projectFileGeneratorDebugConfig.name = "debug";
+    projectFileGeneratorDebugConfig.outputDirectory = "x64/Debug";
+    projectFileGeneratorDebugConfig.args.push_back("--verbose");
+    projectFileGeneratorDebugConfig.args.push_back("--name");
+    projectFileGeneratorDebugConfig.args.push_back("$PROJECT_NAME$");
+    projectFileGeneratorDebugConfig.args.push_back("--file");
+    projectFileGeneratorDebugConfig.args.push_back("$PROJECT_FILE_PATH$");
+    projectFileGeneratorDebugConfig.args.push_back("--target");
+    projectFileGeneratorDebugConfig.args.push_back("$PROJECT_TARGET$");
+    projectFileGeneratorDebugConfig.args.push_back("--config");
+    projectFileGeneratorDebugConfig.args.push_back("$PROJECT_CONFIG$");
+    projectFileGeneratorDebugConfig.args.push_back("--librarydirs");
+    projectFileGeneratorDebugConfig.args.push_back("$LIBRARY_DIRECTORIES$");
+    projectFileGeneratorDebugConfig.args.push_back("--libs");
+    projectFileGeneratorDebugConfig.args.push_back("$LIBRARY_FILE_NAMES$");
+    projectFileGeneratorDebugConfig.args.push_back("$GENERATE_ASSEMBLY_FILE_OPTION$/FAs");
+    projectFileGeneratorDebugConfig.args.push_back("$GENERATE_JUST_MY_CODE_OPTION$/JMC");
+    projectFileGeneratorDebugConfig.args.push_back("$ENABLE_RUNTIME_TYPE_INFORMATION_OPTION$/GR");
+    projectFileGeneratorDebugConfig.args.push_back("--options");
+    projectFileGeneratorDebugConfig.args.push_back("$OPTIONS$");
+    projectFileGeneratorDebugConfig.args.push_back("$SOURCE_FILES$");
+    projectFileGenerator.configurations.push_back(projectFileGeneratorDebugConfig);
+
+    Configuration projectFileGeneratorReleaseConfig;
+    projectFileGeneratorReleaseConfig.name = "release";
+    projectFileGeneratorReleaseConfig.outputDirectory = "x64/Release";
+    projectFileGeneratorReleaseConfig.args.push_back("--verbose");
+    projectFileGeneratorReleaseConfig.args.push_back("--name");
+    projectFileGeneratorReleaseConfig.args.push_back("$PROJECT_NAME$");
+    projectFileGeneratorReleaseConfig.args.push_back("--file");
+    projectFileGeneratorReleaseConfig.args.push_back("$PROJECT_FILE_PATH$");
+    projectFileGeneratorReleaseConfig.args.push_back("--target");
+    projectFileGeneratorReleaseConfig.args.push_back("$PROJECT_TARGET$");
+    projectFileGeneratorReleaseConfig.args.push_back("--config");
+    projectFileGeneratorReleaseConfig.args.push_back("$PROJECT_CONFIG$");
+    projectFileGeneratorReleaseConfig.args.push_back("--librarydirs");
+    projectFileGeneratorReleaseConfig.args.push_back("$LIBRARY_DIRECTORIES$");
+    projectFileGeneratorReleaseConfig.args.push_back("--libs");
+    projectFileGeneratorReleaseConfig.args.push_back("$LIBRARY_FILE_NAMES$");
+    projectFileGeneratorReleaseConfig.args.push_back("$GENERATE_ASSEMBLY_FILE_OPTION$/FAs");
+    projectFileGeneratorReleaseConfig.args.push_back("$GENERATE_JUST_MY_CODE_OPTION$/JMC");
+    projectFileGeneratorReleaseConfig.args.push_back("$ENABLE_RUNTIME_TYPE_INFORMATION_OPTION$/GR");
+    projectFileGeneratorReleaseConfig.args.push_back("--options");
+    projectFileGeneratorReleaseConfig.args.push_back("$OPTIONS$");
+    projectFileGeneratorReleaseConfig.args.push_back("$SOURCE_FILES$");
+    projectFileGenerator.configurations.push_back(projectFileGeneratorReleaseConfig);
+
     vs.tools.push_back(projectFileGenerator);
     Tool solutionFileGenerator;
     solutionFileGenerator.name = "solution-file-generator";
     solutionFileGenerator.commandName = "cmslnfilegen";
     solutionFileGenerator.outputFileExtension = ".sln";
-    solutionFileGenerator.args.push_back("--verbose");
-    solutionFileGenerator.args.push_back("--name");
-    solutionFileGenerator.args.push_back("$SOLUTION_NAME$");
-    solutionFileGenerator.args.push_back("--file");
-    solutionFileGenerator.args.push_back("$SOLUTION_FILE_PATH$");
-    solutionFileGenerator.args.push_back("$PROJECT_FILE_PATHS$");
+
+    Configuration solutionFileGeneratorDebugConfig;
+    solutionFileGeneratorDebugConfig.name = "debug";
+    solutionFileGeneratorDebugConfig.args.push_back("--verbose");
+    solutionFileGeneratorDebugConfig.args.push_back("--name");
+    solutionFileGeneratorDebugConfig.args.push_back("$SOLUTION_NAME$");
+    solutionFileGeneratorDebugConfig.args.push_back("--file");
+    solutionFileGeneratorDebugConfig.args.push_back("$SOLUTION_FILE_PATH$");
+    solutionFileGeneratorDebugConfig.args.push_back("$PROJECT_FILE_PATHS$");
+    solutionFileGenerator.configurations.push_back(solutionFileGeneratorDebugConfig);
+
+    Configuration solutionFileGeneratorReleaseConfig;
+    solutionFileGeneratorReleaseConfig.name = "release";
+    solutionFileGeneratorReleaseConfig.args.push_back("--verbose");
+    solutionFileGeneratorReleaseConfig.args.push_back("--name");
+    solutionFileGeneratorReleaseConfig.args.push_back("$SOLUTION_NAME$");
+    solutionFileGeneratorReleaseConfig.args.push_back("--file");
+    solutionFileGeneratorReleaseConfig.args.push_back("$SOLUTION_FILE_PATH$");
+    solutionFileGeneratorReleaseConfig.args.push_back("$PROJECT_FILE_PATHS$");
+    solutionFileGenerator.configurations.push_back(solutionFileGeneratorReleaseConfig);
+
     vs.tools.push_back(solutionFileGenerator);
-    toolChains.toolChains.push_back(vs);
+
+    windows.toolChains.push_back(vs);
+
     if (verbose)
     {
         std::cout << "vs tool chain created" << std::endl;
@@ -177,34 +303,14 @@ void ReadToolChains(bool verbose)
     std::u32string jsonStr = ToUtf32(ReadFile(toolChainConfigFilePath));
     JsonLexer lexer(jsonStr, toolChainConfigFilePath, 0);
     std::unique_ptr<JsonValue> jsonValue = JsonParser::Parse(lexer);
-    sngjson::json::FromJson(jsonValue.get(), toolChains);
+    sngjson::json::FromJson(jsonValue.get(), platforms);
 }
 
 void ShowToolChains()
 {
     CodeFormatter formatter(std::cout);
-    formatter.WriteLine("tool chains:");
-    for (const ToolChain& toolChain : toolChains.toolChains)
-    {
-        formatter.WriteLine(toolChain.name + ":");
-        formatter.IncIndent();
-        for (const Tool& tool : toolChain.tools)
-        {
-            formatter.WriteLine("name: " + tool.name);
-            formatter.WriteLine("commandName: " + tool.commandName);
-            formatter.WriteLine("outputFileExtension: " + tool.outputFileExtension);
-            formatter.WriteLine("outputDirectory: " + tool.outputDirectory);
-            formatter.WriteLine("assemblyFileExtension: " + tool.assemblyFileExtension);
-            formatter.WriteLine("args:");
-            formatter.IncIndent();
-            for (const std::string& arg : tool.args)
-            {
-                formatter.WriteLine(arg);
-            }
-            formatter.DecIndent();
-        }
-        formatter.DecIndent();
-    }
+    std::unique_ptr<JsonValue> jsonValue = platforms.ToJson();
+    jsonValue->Write(formatter);
 }
 
 void WriteToolChains(bool verbose)
@@ -212,9 +318,8 @@ void WriteToolChains(bool verbose)
     std::string toolChainConfigFilePath = GetFullPath(ToolChainConfigFilePath());
     std::ofstream toolChainFile(toolChainConfigFilePath);
     CodeFormatter formatter(toolChainFile);
-    std::unique_ptr<JsonValue> jsonValue = toolChains.ToJson();
-    std::string jsonStr = jsonValue->ToString();
-    formatter.WriteLine(jsonStr);
+    std::unique_ptr<JsonValue> jsonValue = platforms.ToJson();
+    jsonValue->Write(formatter);
     if (verbose)
     {
         std::cout << "==> " << toolChainConfigFilePath << std::endl;
@@ -233,102 +338,149 @@ std::string GetToolChain()
     return toolChain;
 }
 
-const Tool& GetCompilerTool()
+const Configuration& GetToolConfiguration(const Tool& tool, const std::string& config)
 {
-    ToolChains& toolChains = GetToolChains();
-    for (const ToolChain& tc : toolChains.toolChains)
+    for (const Configuration& configuration : tool.configurations)
     {
-        if (tc.name == toolChain)
+        if (configuration.name == config)
         {
-            for (const Tool& tool : tc.tools)
-            {
-                if (tool.name == "compiler")
-                {
-                    return tool;
-                }
-            }
-            throw std::runtime_error("'compiler' tool not found from tool chain '" + toolChain + "'");
+            return configuration;
         }
     }
-    throw std::runtime_error("tool chain '" + toolChain + "' not found");
+    throw std::runtime_error("'" + config + "' configuration not found from tool '" + tool.name + "'");
 }
 
-const Tool& GetLibraryManagerTool()
+const Tool& GetCompilerTool(const std::string& platform, const std::string& toolChain)
 {
-    const ToolChains& toolChains = GetToolChains();
-    for (const ToolChain& tc : toolChains.toolChains)
+    const Platforms& platforms = GetPlatforms();
+    for (const Platform& pl : platforms.platforms)
     {
-        if (tc.name == toolChain)
+        if (pl.name == platform)
         {
-            for (const Tool& tool : tc.tools)
+            for (const ToolChain& tc : pl.toolChains)
             {
-                if (tool.name == "library-manager")
+                if (tc.name == toolChain)
                 {
-                    return tool;
+                    for (const Tool& tool : tc.tools)
+                    {
+                        if (tool.name == "compiler")
+                        {
+                            return tool;
+                        }
+                    }
+                    throw std::runtime_error("'compiler' tool not found from tool chain '" + toolChain + "' for platform '" + platform + "'");
                 }
             }
-            throw std::runtime_error("'library-manager' tool not found from tool chain '" + toolChain + "'");
+            throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
         }
     }
-    throw std::runtime_error("'" + toolChain + "' tool chain not found");
+    throw std::runtime_error("platform  '" + platform + "' not found");
 }
 
-const Tool& GetLinkerTool()
+const Tool& GetLibraryManagerTool(const std::string& platform, const std::string& toolChain)
 {
-    const ToolChains& toolChains = GetToolChains();
-    for (const ToolChain& tc : toolChains.toolChains)
+    const Platforms& platforms = GetPlatforms();
+    for (const Platform& pl : platforms.platforms)
     {
-        if (tc.name == toolChain)
+        if (pl.name == platform)
         {
-            for (const Tool& tool : tc.tools)
+            for (const ToolChain& tc : pl.toolChains)
             {
-                if (tool.name == "linker")
+                if (tc.name == toolChain)
                 {
-                    return tool;
+                    for (const Tool& tool : tc.tools)
+                    {
+                        if (tool.name == "library-manager")
+                        {
+                            return tool;
+                        }
+                    }
+                    throw std::runtime_error("'library-manager' tool not found from tool chain '" + toolChain + "' for platform '" + platform + "'");
                 }
             }
-            throw std::runtime_error("'linker' tool not found from tool chain '" + toolChain + "'");
+            throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
         }
     }
-    throw std::runtime_error("'" + toolChain + "' tool chain not found");
+    throw std::runtime_error("platform  '" + platform + "' not found");
 }
 
-const Tool& GetProjectFileGeneratorTool()
+const Tool& GetLinkerTool(const std::string& platform, const std::string& toolChain)
 {
-    const ToolChains& toolChains = GetToolChains();
-    for (const ToolChain& tc : toolChains.toolChains)
+    const Platforms& platforms = GetPlatforms();
+    for (const Platform& pl : platforms.platforms)
     {
-        if (tc.name == toolChain)
+        if (pl.name == platform)
         {
-            for (const Tool& tool : tc.tools)
+            for (const ToolChain& tc : pl.toolChains)
             {
-                if (tool.name == "project-file-generator")
+                if (tc.name == toolChain)
                 {
-                    return tool;
+                    for (const Tool& tool : tc.tools)
+                    {
+                        if (tool.name == "linker")
+                        {
+                            return tool;
+                        }
+                    }
+                    throw std::runtime_error("'linker' tool not found from tool chain '" + toolChain + "' for platform '" + platform + "'");
                 }
             }
-            throw std::runtime_error("'project-file-generator' tool not found from tool chain '" + toolChain + "'");
+            throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
         }
     }
-    throw std::runtime_error("'" + toolChain + "' tool chain not found");
+    throw std::runtime_error("platform  '" + platform + "' not found");
 }
 
-const Tool& GetSolutionFileGeneratorTool()
+const Tool& GetProjectFileGeneratorTool(const std::string& platform, const std::string& toolChain)
 {
-    const ToolChains& toolChains = GetToolChains();
-    for (const ToolChain& tc : toolChains.toolChains)
+    const Platforms& platforms = GetPlatforms();
+    for (const Platform& pl : platforms.platforms)
     {
-        if (tc.name == toolChain)
+        if (pl.name == platform)
         {
-            for (const Tool& tool : tc.tools)
+            for (const ToolChain& tc : pl.toolChains)
             {
-                if (tool.name == "solution-file-generator")
+                if (tc.name == toolChain)
                 {
-                    return tool;
+                    for (const Tool& tool : tc.tools)
+                    {
+                        if (tool.name == "project-file-generator")
+                        {
+                            return tool;
+                        }
+                    }
+                    throw std::runtime_error("'project-file-generator' tool not found from tool chain '" + toolChain + "' for platform '" + platform + "'");
                 }
             }
-            throw std::runtime_error("'solution-file-generator' tool not found from tool chain '" + toolChain + "'");
+            throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
         }
     }
-    throw std::runtime_error("'" + toolChain + "' tool chain not found");
+    throw std::runtime_error("platform  '" + platform + "' not found");
+}
+
+const Tool& GetSolutionFileGeneratorTool(const std::string& platform, const std::string& toolChain)
+{
+    const Platforms& platforms = GetPlatforms();
+    for (const Platform& pl : platforms.platforms)
+    {
+        if (pl.name == platform)
+        {
+            for (const ToolChain& tc : pl.toolChains)
+            {
+                if (tc.name == toolChain)
+                {
+                    for (const Tool& tool : tc.tools)
+                    {
+                        if (tool.name == "solution-file-generator")
+                        {
+                            return tool;
+                        }
+                    }
+                    throw std::runtime_error("'solution-file-generator' tool not found from tool chain '" + toolChain + "' for platform '" + platform + "'");
+                }
+            }
+            throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
+        }
+    }
+    throw std::runtime_error("platform  '" + platform + "' not found");
 }

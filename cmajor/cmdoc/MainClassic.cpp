@@ -4281,7 +4281,7 @@ void Generate(const std::string& projectXmlFile)
     }
 }
 
-const char* version = "3.5.0";
+const char* version = "3.6.0";
 
 void PrintHelp()
 {

@@ -1,0 +1,57 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/build/BuildApi.hpp>
+[hpp]#include <cmajor/build/BuildOption.hpp>
+[cpp]#include <cmajor/build/BuildLangLexer.hpp>
+[cpp]#include <cmajor/build/BuildLangTokens.hpp>
+[cpp]#include <cmajor/build/BuildLangOptionParser.hpp>
+[hpp]#include <memory>
+
+using namespace BuildLangTokens;
+
+parser api(BUILD_API) BuildLangServerParser
+{
+    uselexer BuildLangLexer;
+    main;
+    using BuildLangOptionParser.Options;
+
+    ServerSentence(cmajor::build::BuildOptionSetter* optionSetter)
+        ::= Options(optionSetter):options?
+            ServerCommandSentence:sentence!
+        ;
+
+    ServerCommandSentence
+        ::=
+        (   AddServerSentence:add
+        |   RemoveServerSentence:remove
+        |   RunServerSentence:run
+        )
+        ;
+
+    AddServerSentence
+        ::= ADD ServerId:server! PORT! INTEGER!
+        (   DEFAULT TOOLCHAIN! ToolChain:toolchain!
+        )?
+        ;
+
+    RemoveServerSentence
+        ::= REMOVE ServerId:server!
+        ;
+
+    RunServerSentence
+        ::= RUN ServerId:server!
+        ;
+
+    ToolChain : std::string
+        ::= CLANG{ return "clang";}
+        |   GCC{ return "gcc"; }
+        |   VS{ return "vs"; }
+        ;
+
+    ServerId : std::string
+        ::= ID{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+        ;
+}

@@ -5,15 +5,21 @@
 
 #include <cmajor/cmtoolchain/ToolChainApi.hpp>
 
+struct api(CMTOOLCHAIN_API) Configuration
+{
+    string name;
+    string outputDirectory;
+    string[] args;
+}
+
 struct api(CMTOOLCHAIN_API) Tool
 {
     string name;
     string commandName;
     string outputFileExtension;
-    string outputDirectory;
     string debugInformationFileExtension;
     string assemblyFileExtension;
-    string[] args; 
+    Configuration[] configurations;
 }
 
 struct api(CMTOOLCHAIN_API) ToolChain
@@ -22,7 +28,13 @@ struct api(CMTOOLCHAIN_API) ToolChain
     Tool[] tools;
 }
 
-struct api(CMTOOLCHAIN_API) ToolChains
+struct api(CMTOOLCHAIN_API) Platform
 {
+    string name;
     ToolChain[] toolChains;
+}
+
+struct api(CMTOOLCHAIN_API) Platforms
+{
+    Platform[] platforms;
 }

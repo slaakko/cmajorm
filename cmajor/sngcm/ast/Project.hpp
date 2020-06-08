@@ -6,12 +6,15 @@
 #ifndef SNGCM_AST_PROJECT_INCLUDED
 #define SNGCM_AST_PROJECT_INCLUDED
 #include <sngcm/ast/AstApi.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
 #include <vector>
 #include <memory>
 
 namespace sngcm { namespace ast {
+
+using namespace soulng::util;
 
 enum class BackEnd
 {
@@ -47,6 +50,7 @@ public:
     ProjectDeclaration& operator=(const ProjectDeclaration&) = delete;
     virtual ~ProjectDeclaration();
     ProjectDeclarationType GetDeclarationType() const { return declarationType; }
+    virtual void Write(CodeFormatter& formatter) = 0;
 private:
     ProjectDeclarationType declarationType;
 };
@@ -56,6 +60,7 @@ class SNGCM_AST_API ReferenceDeclaration : public ProjectDeclaration
 public:
     ReferenceDeclaration(const std::string& filePath_);
     const std::string& FilePath() const { return filePath; }
+    void Write(CodeFormatter& formatter) override;
 private:
     std::string filePath;
 };
@@ -65,6 +70,7 @@ class SNGCM_AST_API SourceFileDeclaration : public ProjectDeclaration
 public:
     SourceFileDeclaration(const std::string& filePath_);
     const std::string& FilePath() const { return filePath; }
+    void Write(CodeFormatter& formatter) override;
 private:
     std::string filePath;
 };
@@ -74,6 +80,7 @@ class SNGCM_AST_API ResourceFileDeclaration : public ProjectDeclaration
 public:
     ResourceFileDeclaration(const std::string& filePath_);
     const std::string& FilePath() const { return filePath; }
+    void Write(CodeFormatter& formatter) override;
 private:
     std::string filePath;
 };
@@ -83,6 +90,7 @@ class SNGCM_AST_API TextFileDeclaration : public ProjectDeclaration
 public:
     TextFileDeclaration(const std::string& filePath_);
     const std::string& FilePath() const { return filePath; }
+    void Write(CodeFormatter& formatter) override;
 private:
     std::string filePath;
 };
@@ -94,11 +102,14 @@ enum class Target
 
 SNGCM_AST_API std::string TargetStr(Target target);
 
+SNGCM_AST_API Target ParseTarget(const std::string& targetStr);
+
 class SNGCM_AST_API TargetDeclaration : public ProjectDeclaration
 {
 public:
     TargetDeclaration(Target target_);
     Target GetTarget() const { return target; }
+    void Write(CodeFormatter& formatter) override;
 private:
     Target target;
 };
@@ -115,6 +126,7 @@ public:
     const boost::filesystem::path& OutdirBasePath() const { return outdirBasePath; }
     void AddDeclaration(ProjectDeclaration* declaration);
     void ResolveDeclarations();
+    void Write(const std::string& projectFilePath);
     const std::string& ModuleFilePath() const { return moduleFilePath; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
     const std::string& ExecutableFilePath() const { return executableFilePath; }
@@ -146,6 +158,11 @@ public:
     void SetBuilt() { built = true; }
     bool Ready() const;
     void SetExcludeSourceFilePath(const std::string& excludeSourceFilePath_);
+    void SetHash(const std::string& hash_) { hash = hash_; }
+    const std::string& Hash() const { return hash; }
+    std::string Id() const;
+    void AddDependsOnId(const std::string& dependsOnId);
+    const std::vector<std::string>& DependsOnIds() const { return dependsOnIds; }
 private:
     BackEnd backend;
     std::string toolChain;
@@ -176,6 +193,8 @@ private:
     bool isSystemProject;
     int logStreamId;
     int index;
+    std::string hash;
+    std::vector<std::string> dependsOnIds;
 };
 
 

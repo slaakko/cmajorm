@@ -517,6 +517,7 @@ const uint8_t endEvent = 1;
 std::unique_ptr<sngxml::dom::Document> AnalyzeProfileData(const std::string& profileDataFileName, Module& module,
     std::unordered_map<boost::uuids::uuid, ProfiledFunction, boost::hash<boost::uuids::uuid>>& functionProfileMap, std::vector<ProfiledFunction*>& profiledFunctions, int64_t& totalInclusive, int64_t& totalExclusive)
 {
+    std::set<std::string> builtProjects;
     std::unique_ptr<sngxml::dom::Document> analyzedProfileDataDoc(new sngxml::dom::Document());
     std::vector<ProfiledFunction*> functionPath;
     std::chrono::high_resolution_clock::time_point prevTimePoint;
@@ -621,6 +622,7 @@ std::unique_ptr<sngxml::dom::Document> AnalyzeProfileData(const std::string& pro
 
 void ReadProject(const std::string& projectFilePath, sngcm::ast::Solution& solution, bool requireProgram, std::set<std::u32string>& readProjects)
 {
+    std::set<std::string> builtProjects;
     MappedInputFile projectFile(projectFilePath);
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
     std::string config = "profile";
@@ -656,6 +658,7 @@ void ReadProject(const std::string& projectFilePath, sngcm::ast::Solution& solut
 
 void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool rebuildApp, int top, Report report, std::string& outFile, const std::string& args, std::unique_ptr<Module>& rootModule)
 {
+    std::set<std::string> builtProjects;
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
         std::cout << "Building projects..." << std::endl;
@@ -674,7 +677,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
             {
                 rebuildSys = true;
                 bool stop = false;
-                BuildProject(project, rootModule, stop, false);
+                BuildProject(project, rootModule, stop, false, builtProjects);
             }
             else if (GetGlobalFlag(GlobalFlags::verbose))
             {
@@ -691,7 +694,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
             {
                 rebuildApp = true;
                 bool stop = false;
-                BuildProject(project, rootModule, stop, false);
+                BuildProject(project, rootModule, stop, false, builtProjects);
             }
             else if (GetGlobalFlag(GlobalFlags::verbose))
             {
@@ -786,7 +789,7 @@ void ProfileProject(const std::string& projectFilePath, bool rebuildSys, bool re
     }
 }
 
-const char* version = "3.5.0";
+const char* version = "3.6.0";
 
 void PrintHelp()
 {
