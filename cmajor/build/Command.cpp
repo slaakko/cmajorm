@@ -12,6 +12,7 @@
 #include <cmajor/build/BuildClient.hpp>
 #include <cmajor/build/BuildServer.hpp>
 #include <cmajor/build/FiberExecutionContext.hpp>
+#include <cmajor/build/LocalExecutionContext.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <soulng/util/Fiber.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -38,9 +39,13 @@ std::unique_ptr<ExecutionContext> CreateExecutionContext(const std::string& serv
     {
         return std::unique_ptr<ExecutionContext>(new FiberExecutionContext());
     }
+    else if (serverName == "$local")
+    {
+        return std::unique_ptr<ExecutionContext>(new LocalExecutionContext());
+    }
     else
     {
-        throw std::runtime_error("server execution context not implemented yet");
+        throw std::runtime_error("client execution context not implemented yet");
     }
 }
 

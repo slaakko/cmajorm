@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_BUILD_EXECUTION_CONTEXT_INCLUDED
 #define CMAJOR_BUILD_EXECUTION_CONTEXT_INCLUDED
+#include <cmajor/build/BuildApi.hpp>
 #include <memory>
 #include <string>
 
@@ -14,7 +15,7 @@ class Log;
 class BuildClient;
 class Connection;
 
-class ExecutionContext
+class BUILD_API ExecutionContext
 {
 public:
     ExecutionContext();

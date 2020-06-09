@@ -13,7 +13,7 @@ class BuildServer;
 class FiberConnection;
 class Connection;
 
-class FiberExecutionContext : public ExecutionContext
+class BUILD_API FiberExecutionContext : public ExecutionContext
 {
 public:
     FiberExecutionContext();

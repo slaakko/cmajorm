@@ -1,0 +1,107 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Threading;
+
+namespace System.Threading.Fibers
+{
+    public delegate void FiberFunction(void* param);
+
+    internal class FiberData
+    {
+        public nothrow FiberData(const FiberFunction& function_, void* param_) : function(function_), param(param_)
+        {
+        }
+        public nothrow inline FiberFunction Function() const
+        {
+            return function;
+        }
+        public nothrow inline void* Param() const
+        {
+            return param;
+        }
+        private FiberFunction function;
+        private void* param;
+    }
+
+    public class Fiber
+    {
+        public nothrow Fiber() : handle(null), main(true)
+        {
+            handle = RtConvertThreadToFiber(null);
+        }
+        public nothrow Fiber(const FiberFunction& function) : this(1024u * 1024u, function, null)
+        {
+        }
+        public nothrow Fiber(const FiberFunction& function, void* param) : this(1024u * 1024u, function, param)
+        {
+        }
+        public nothrow Fiber(ulong stackSize, const FiberFunction& function) : this(stackSize, function, null)
+        {
+        }
+        public nothrow Fiber(ulong stackSize, const FiberFunction& function, void* param) : handle(null), main(false)
+        {
+            FiberRunFunction runFiber = RunFiber;
+            void* startAddress = cast<void*>(runFiber);
+            handle = RtCreateFiber(stackSize, startAddress, new FiberData(function, param));
+        }
+        public void SwitchTo()
+        {
+            if (handle != null)
+            {
+                RtSwitchToFiber(handle);
+            }
+            else
+            {
+                throw ThreadingException("could not switch to this fiber: handle is null");
+            }
+        }
+        public nothrow suppress Fiber(const Fiber&);
+        public nothrow suppress void operator=(const Fiber&);
+        public nothrow Fiber(Fiber&& that) : handle(that.handle), main(that.main)
+        {
+            that.handle = null;
+            that.main = false;
+        }
+        public default nothrow void operator=(Fiber&& that);
+        public ~Fiber()
+        {
+            if (handle != null)
+            {
+                if (!main)
+                {
+                    RtDeleteFiber(handle);
+                }
+            }
+        }
+        public nothrow inline void* Handle() const
+        {
+            return handle;
+        }
+        public static nothrow Fiber FromCurrentThread()
+        {
+            return Fiber();
+        }
+        private void* handle;
+        private bool main;
+    }
+
+    public void SwitchToFiber(const Fiber& fiber)
+    {
+        fiber.SwitchTo();
+    }
+
+    internal delegate void FiberRunFunction();
+
+    internal void RunFiber()
+    {
+        void* data = RtGetFiberData();
+        UniquePtr<FiberData> fiberData(cast<FiberData*>(data));
+        FiberFunction function = fiberData->Function();
+        void* param = fiberData->Param();
+        function(param);
+    }
+}

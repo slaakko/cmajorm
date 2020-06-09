@@ -81,7 +81,7 @@ std::unique_ptr<JsonObject> FiberConnection::DoReceive()
     }
     else
     {
-        throw std::runtime_error("SingleServerConnection: JSON object expected");
+        throw std::runtime_error("FiberConnection: JSON object expected");
     }
 }
 

@@ -149,14 +149,14 @@ void BuildClient::Handle(PushProjectFileResponse& response)
         {
             if (!responseSourceFileInfo.info.empty())
             {
-                if (GetGlobalFlag(GlobalFlags::verbose))
+                if (GetGlobalFlag(GlobalFlags::printDebugMessages))
                 {
                     LogMessage(-1, "buildclient: server requested file '" + responseSourceFileInfo.fileId + "' because " + responseSourceFileInfo.info);
                 }
             }
             else
             {
-                if (GetGlobalFlag(GlobalFlags::verbose))
+                if (GetGlobalFlag(GlobalFlags::printDebugMessages))
                 {
                     LogMessage(-1, "buildclient: server requested file '" + responseSourceFileInfo.fileId + "'");
                 }
@@ -164,6 +164,10 @@ void BuildClient::Handle(PushProjectFileResponse& response)
             const std::string& fileId = responseSourceFileInfo.fileId;
             SourceFileInfo sourceFileInfoWithFileContent = GetSourceFileInfo(fileId);
             pushProjectFileContentRequest.body.fileInfos.push_back(sourceFileInfoWithFileContent);
+        }
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(-1, "buildclient: " + std::to_string(response.body.fileInfos.size()) + " files changed or not found from server");
         }
         if (GetGlobalFlag(GlobalFlags::printDebugMessages))
         {

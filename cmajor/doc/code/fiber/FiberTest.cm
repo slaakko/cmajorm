@@ -1,0 +1,101 @@
+using System;
+using System.Threading.Fibers;
+
+public class Context
+{
+    public nothrow Context() : mainFiber(null), otherFiber(null), runningFiber(null), otherFiberRunning(false)
+    {
+    }
+    public nothrow void SetFibers(Fiber* mainFiber_, Fiber* otherFiber_)
+    {
+        mainFiber = mainFiber_;
+        otherFiber = otherFiber_;
+        runningFiber = mainFiber;
+    }
+    public nothrow void SetOtherFiberRunning(bool running)
+    {
+        otherFiberRunning = running;
+    }
+    public nothrow bool IsOtherFiberRunning() const
+    {
+        return otherFiberRunning;
+    }
+    public nothrow void Switch()
+    {
+        if (runningFiber == mainFiber)
+        {
+            runningFiber = otherFiber;
+            SwitchToFiber(*otherFiber);
+        }
+        else
+        {
+            runningFiber = mainFiber;
+            SwitchToFiber(*mainFiber);
+        }
+    }
+    private Fiber* mainFiber;
+    private Fiber* otherFiber;
+    private Fiber* runningFiber;
+    private bool otherFiberRunning;
+}
+
+public void FiberHelper(Context* context)
+{
+    Console.Out() << "in fiber helper" << endl();
+    int count = 1;
+    while (count <= 3)
+    {
+        Console.Out() << "switching context from fiber helper, count = " << count << endl();
+        context->Switch();
+        Console.Out() << "back in fiber helper, count = " << count << endl();
+        ++count;
+    }
+    Console.Out() << "exiting fiber helper" << endl();
+}
+
+public void FiberFunc(void* data)
+{
+    Console.Out() << "in fiber" << endl();
+    Context* context = cast<Context*>(data);
+    try
+    {
+        context->SetOtherFiberRunning(true);
+        context->Switch();
+        FiberHelper(context);
+        context->SetOtherFiberRunning(false);
+        Console.Out() << "fiber exiting" << endl();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << "fiber got exception: " << ex.Message() << endl();
+        context->SetOtherFiberRunning(false);
+    }
+    context->Switch();
+}
+
+public int main()
+{
+    try
+    {
+        Context context;
+        Fiber mainFiber = Fiber.FromCurrentThread();
+        FiberFunction fiberFunction = FiberFunc;
+        Fiber otherFiber(fiberFunction, &context);
+        context.SetFibers(&mainFiber, &otherFiber);
+        context.Switch();
+        Console.Out() << "back in main fiber" << endl();
+        while (context.IsOtherFiberRunning())
+        {
+            Console.Out() << "switch context from main fiber" << endl();
+            context.Switch();
+            Console.Out() << "back in main fiber" << endl();
+        }
+        Console.Out() << "exiting main" << endl();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << "main got exception: " << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

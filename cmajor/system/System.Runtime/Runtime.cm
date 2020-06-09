@@ -241,3 +241,8 @@ public extern cdecl nothrow void* RtPushUnwindInfo(void* unwindInfo);
 public extern cdecl nothrow void RtPopUnwindInfo(void* prevUnwindInfo);
 public extern cdecl nothrow const char* RtGetCallStack();
 public extern cdecl nothrow void RtDisposeCallStack();
+public extern cdecl nothrow void* RtConvertThreadToFiber(void* param);
+public extern cdecl nothrow void* RtCreateFiber(ulong stackSize, void* startAddress, void* param);
+public extern cdecl nothrow void RtSwitchToFiber(void* fiber);
+public extern cdecl nothrow void* RtGetFiberData();
+public extern cdecl nothrow void RtDeleteFiber(void* fiber);

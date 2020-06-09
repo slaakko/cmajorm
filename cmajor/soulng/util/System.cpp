@@ -138,7 +138,7 @@ void System(const std::string& command, bool ignoreReturnValue)
     else
     {
 #ifdef _WIN32
-        STARTUPINFO si;
+        STARTUPINFOA si;
         PROCESS_INFORMATION pi;
         ZeroMemory(&si, sizeof(si));
         si.cb = sizeof(si);
@@ -150,7 +150,7 @@ void System(const std::string& command, bool ignoreReturnValue)
             c.get()[i] = command[i];
         }
         c.get()[n] = '\0';
-        if (CreateProcess(NULL, c.get(), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+        if (CreateProcessA(NULL, c.get(), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
         {
             WaitForSingleObject(pi.hProcess, INFINITE);
             DWORD exitCode;
@@ -454,7 +454,7 @@ std::string GetPathToExecutable()
 {
     char buf[4096];
 #ifdef _WIN32
-    DWORD result = GetModuleFileName(NULL, buf, sizeof(buf));
+    DWORD result = GetModuleFileNameA(NULL, buf, sizeof(buf));
     if (result == 0)
     {
         throw std::runtime_error("could not get path to current executable: GetModuleFileName failed");

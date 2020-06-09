@@ -11,7 +11,7 @@ namespace cmajor { namespace build {
 
 class BuildServer;
 
-class FiberConnection : public Connection
+class BUILD_API FiberConnection : public Connection
 {
 public:
     FiberConnection(Log* log);

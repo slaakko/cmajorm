@@ -28,7 +28,6 @@ public:
     bool ServerAlive() const { return serverAlive; }
     void SetServerAlive(bool serverAlive_);
     void SetServer(BuildServer* server_) { server = server_; }
-    
 private:
     Log* log;
     BuildServer* server;

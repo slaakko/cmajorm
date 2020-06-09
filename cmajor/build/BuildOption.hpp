@@ -39,7 +39,7 @@ extern std::string buildToolChain;
 
 BUILD_API std::string BoolStr(bool value);
 
-bool GetBuildOption(BuildOptions option);
+BUILD_API bool GetBuildOption(BuildOptions option);
 
 class BUILD_API BuildOptionSetter
 {

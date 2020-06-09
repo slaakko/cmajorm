@@ -5,6 +5,7 @@
 
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/Socket.hpp>
 
 namespace soulng { namespace util {
 

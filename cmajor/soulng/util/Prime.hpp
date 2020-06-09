@@ -17,5 +17,3 @@ UTIL_API void NextPrime(boost::multiprecision::uint128_t& x);
 } } // namespace soulng::util
 
 #endif // SOULNG_UTIL_PRIME_INCLUDED
-
-

@@ -14,7 +14,7 @@ namespace cmajor { namespace build {
 
 class ExecutionContext;
 
-std::unique_ptr<ExecutionContext> CreateExecutionContext(const std::string& serverName);
+BUILD_API std::unique_ptr<ExecutionContext> CreateExecutionContext(const std::string& serverName);
 
 class BUILD_API Command
 {
