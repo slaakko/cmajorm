@@ -13,25 +13,25 @@ namespace cmajor { namespace build {
 using namespace cmajor::symbols;
 using namespace soulng::util;
 
-SocketServer::SocketServer(Log* log_, const std::string& serverName_) : log(log_), serverName(serverName_), socket(), running()
+SocketServer::SocketServer(Log* log_, const std::string& serverName_) : log(log_), serverName(serverName_), socket(), running(), isRunning(false)
 {
     ServerInfo* serverInfo = ServerConfig::Instance().GetServerInfo(serverName, true, true);
     if (serverInfo)
     {
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            LogMessage(-1, "binding server '" + serverName + "' to port " + std::to_string(serverInfo->Port()) + "...");
+            LogMessage(-1, "socket server: binding server '" + serverName + "' to port " + std::to_string(serverInfo->Port()) + "...");
         }
         socket.Bind(serverInfo->Port());
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            LogMessage(-1, "server '" + serverName + "' listening...");
+            LogMessage(-1, "socket server: server '" + serverName + "' listening...");
         }
         socket.Listen(10);
     }
     else
     {
-        throw std::runtime_error("server name '" + serverName + "' not found");
+        throw std::runtime_error("socket server: server name '" + serverName + "' not found");
     }
 }
 
@@ -44,33 +44,36 @@ void SocketServer::WaitForRunning()
 {
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        LogMessage(-1, "server '" + serverName + "' wait for running...");
+        LogMessage(-1, "socket server: '" + serverName + "' wait for running...");
     }
-    std::unique_lock<std::mutex> lock(mtx);
-    running.wait(lock);
+    {
+        std::unique_lock<std::mutex> lock(mtx);
+        running.wait(lock, [this]{ return isRunning; });
+    }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        LogMessage(-1, "server '" + serverName + "' running");
+        LogMessage(-1, "socket server: '" + serverName + "' running");
     }
 }
 
 void SocketServer::Run()
 {
+    isRunning = true;
     running.notify_all();
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        LogMessage(-1, "server '" + serverName + "' waiting for client connection...");
+        LogMessage(-1, "socket server: '" + serverName + "' waiting for client connection...");
     }
     TcpSocket connectedSocket = socket.Accept();
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        LogMessage(-1, "server '" + serverName + "' accepted a client connection...");
+        LogMessage(-1, "socket server: '" + serverName + "' accepted a client connection...");
     }
     connection.reset(new SocketConnection(log, this, std::move(connectedSocket)));
     buildServer.reset(new BuildServer(connection.get()));
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        LogMessage(-1, "server '" + serverName + "' running build server...");
+        LogMessage(-1, "socket server: '" + serverName + "' running build server...");
     }
     buildServer->Run();
 }
@@ -79,12 +82,12 @@ void SocketServer::Exit()
 {
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        LogMessage(-1, "server '" + serverName + "' exiting...");
+        LogMessage(-1, "socket server '" + serverName + "' exiting...");
     }
     buildServer->Exit();
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        LogMessage(-1, "server '" + serverName + "' exited");
+        LogMessage(-1, "socket server '" + serverName + "' exited");
     }
 }
 

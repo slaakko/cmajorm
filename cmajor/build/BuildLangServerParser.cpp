@@ -583,6 +583,19 @@ soulng::parser::Match BuildLangServerParser::ToolChain(BuildLangLexer& lexer)
             }
             break;
         }
+        case ID:
+        {
+            ++lexer;
+            {
+                {
+                    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                    if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ToolChain"));
+                    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                    return soulng::parser::Match(true, new soulng::parser::Value<std::string>(ToUtf8(lexer.GetToken(pos).match.ToString())));
+                }
+            }
+            break;
+        }
     }
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     if (parser_debug_write_to_log)

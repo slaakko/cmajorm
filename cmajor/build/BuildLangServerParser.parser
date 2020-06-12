@@ -49,6 +49,7 @@ parser api(BUILD_API) BuildLangServerParser
         ::= CLANG{ return "clang";}
         |   GCC{ return "gcc"; }
         |   VS{ return "vs"; }
+        |   ID{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
         ;
 
     ServerId : std::string

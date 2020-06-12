@@ -11,11 +11,13 @@
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/Process.hpp>
 #include <soulng/util/System.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Error.hpp>
 #include <soulng/util/Sha1.hpp>
 #include <soulng/util/TextUtils.hpp>
+#include <soulng/util/Log.hpp>
 #include <boost/filesystem.hpp>
 
 namespace cmajor { namespace codegensx {
@@ -88,30 +90,61 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     }
     nativeCompileUnit->Write();
     std::string intermediateCompileCommand;
-    std::string intermediateCompileErrorFilePath = intermediateFilePath + ".error";
-    intermediateCompileCommand.append("cmfileredirector -2 " + intermediateCompileErrorFilePath + " cmsxic ").append(intermediateFilePath);
+    std::string errors;
+    intermediateCompileCommand.append("cmsxic ").append(intermediateFilePath);
     try
     {
-        System(intermediateCompileCommand);
-        boost::filesystem::remove(boost::filesystem::path(intermediateCompileErrorFilePath));
+        Process process(intermediateCompileCommand);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(module->LogStreamId(), line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + intermediateCompileCommand + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(intermediateCompileErrorFilePath);
         throw std::runtime_error("compiling intermediate code '" + intermediateFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     std::string assembleCommand;
     std::string assemblyFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".s");
-    std::string assemblyErrorFilePath = assemblyFilePath + ".error";
-    assembleCommand.append("cmfileredirector -2 " + assemblyErrorFilePath + " cmsxas ").append(assemblyFilePath);
+    assembleCommand.append("cmsxas ").append(assemblyFilePath);
     try
     {
-        System(assembleCommand);
-        boost::filesystem::remove(boost::filesystem::path(assemblyErrorFilePath));
+        Process process(assembleCommand);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(module->LogStreamId(), line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + assembleCommand + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(assemblyErrorFilePath);
         throw std::runtime_error("assembling '" + assemblyFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
 }

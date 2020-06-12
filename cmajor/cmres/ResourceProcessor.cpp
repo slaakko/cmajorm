@@ -13,6 +13,7 @@
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Log.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/Process.hpp>
 #include <soulng/util/System.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -113,18 +114,34 @@ void CompileResourceScriptFile(cmajor::symbols::Module& currentModule, const std
 {
     if (currentModule.GetGlobalResourceTable().Resources().empty()) return;
     std::string resourceFilePath = Path::ChangeExtension(currentModule.LibraryFilePath(), ".res");
-    std::string errorFilePath = Path::Combine(Path::GetDirectoryName(resourceScriptFileName), "llvm-rc.error");
     std::string commandLine;
-    commandLine.append("cmfileredirector -2 ").append(QuotedPath(errorFilePath)).append(" llvm-rc /V /FO ").append(QuotedPath(resourceFilePath));
+    std::string errors;
+    commandLine.append("llvm-rc /V /FO ").append(QuotedPath(resourceFilePath));
     commandLine.append(1, ' ').append(QuotedPath(resourceScriptFileName));
     try
     {
-        System(commandLine);
-        boost::filesystem::remove(boost::filesystem::path(errorFilePath));
+        Process process(commandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(-1, line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + commandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(errorFilePath);
         throw std::runtime_error("compiling resource script '" + resourceScriptFileName + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose))

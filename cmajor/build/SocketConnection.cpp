@@ -47,7 +47,7 @@ void SocketConnection::DoSend(JsonObject* messageObject)
     }
     catch (const std::exception& ex)
     {
-        throw std::runtime_error("SocketConnection: " + host->Name() + ": send: " + ex.what());
+        throw std::runtime_error("socket connection: " + host->Name() + ": send: " + ex.what());
     }
 }
 
@@ -60,11 +60,19 @@ std::unique_ptr<JsonObject> SocketConnection::DoReceive()
         int offset = 0;
         int bytesToReceive = sizeof(size);
         int bytesReceived = socket.Receive(&buffer[offset], bytesToReceive);
+        if (bytesReceived == 0)
+        {
+            return std::unique_ptr<JsonObject>();
+        }
         bytesToReceive = bytesToReceive - bytesReceived;
         offset = offset + bytesReceived;
         while (bytesToReceive > 0)
         {
             bytesReceived = socket.Receive(&buffer[offset], bytesToReceive);
+            if (bytesReceived == 0)
+            {
+                return std::unique_ptr<JsonObject>();
+            }
             bytesToReceive = bytesToReceive - bytesReceived;
             offset = offset + bytesReceived;
         }
@@ -97,7 +105,7 @@ std::unique_ptr<JsonObject> SocketConnection::DoReceive()
     }
     catch (const std::exception& ex)
     {
-        throw std::runtime_error("SocketConnection: " + host->Name() + ": receive: " + ex.what());
+        throw std::runtime_error("socket connection: " + host->Name() + ": receive: " + ex.what());
     }
 }
 
@@ -111,7 +119,7 @@ void SocketConnection::DoClose()
     {
         if (GetGlobalFlag(GlobalFlags::printDebugMessages))
         {
-            LogMessage(-1, "SocketConnection: " + host->Name() + ": socket close failed: " + std::string(ex.what()));
+            LogMessage(-1, "socket connection: " + host->Name() + ": socket close failed: " + std::string(ex.what()));
         }
     }
     host->Exit();

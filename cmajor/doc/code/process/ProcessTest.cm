@@ -1,0 +1,42 @@
+using System;
+using System.Threading;
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        string command;
+        command.Append("testprog");
+        for (int i = 1; i < argc; ++i)
+        {
+            command.Append(' ').Append(argv[i]);
+        }
+        string errors;
+        Process process(command);
+        while (!process.Eof(Process.StdHandle.std_out))
+        {
+            string line = process.ReadLine(Process.StdHandle.std_out);
+            if (!line.IsEmpty())
+            {
+                Console.WriteLine(line);
+            }
+        }
+        errors = process.ReadToEnd(Process.StdHandle.std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw Exception("testprog returned exit code " + ToString(exitCode) + ": " + errors);
+        }
+        else
+        {
+            Console.WriteLine("testprog returned exit code 0");
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

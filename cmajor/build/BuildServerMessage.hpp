@@ -16,6 +16,10 @@ extern const char* pushProjectFileRequestId;
 extern const char* pushProjectFileResponseId;
 extern const char* pushProjectFileContentRequestId;
 extern const char* pushProjectFileContentResponseId;
+extern const char* buildProjectRequestId;
+extern const char* buildProjectResponseId;
+extern const char* showBuildMessageRequestId;
+extern const char* showBuildMessageResponseId;
 extern const char* errorResponseId;
 extern const char* closeConnectionRequestId;
 
@@ -64,6 +68,38 @@ struct BUILD_API PushProjectFileContentResponse : public Message<ProjectUpdated>
     PushProjectFileContentResponse();
     PushProjectFileContentResponse(JsonObject* messageObject);
     const char* Id() const override { return pushProjectFileContentResponseId; }
+    void DispatchTo(MessageHandler& handler) override;
+};
+
+struct BUILD_API BuildProjectRequest : public Message<ProjectToBuild>
+{
+    BuildProjectRequest();
+    BuildProjectRequest(JsonObject* messageObject);
+    const char* Id() const override { return buildProjectRequestId; }
+    void DispatchTo(MessageHandler& handler) override;
+};
+
+struct BUILD_API BuildProjectResponse : public Message<ProjectBuilt>
+{
+    BuildProjectResponse();
+    BuildProjectResponse(JsonObject* messageObject);
+    const char* Id() const override { return buildProjectResponseId; }
+    void DispatchTo(MessageHandler& handler) override;
+};
+
+struct BUILD_API ShowBuildMessageRequest : public Message<MessageLine>
+{
+    ShowBuildMessageRequest();
+    ShowBuildMessageRequest(JsonObject* messageObject);
+    const char* Id() const override { return showBuildMessageRequestId; }
+    void DispatchTo(MessageHandler& handler) override;
+};
+
+struct BUILD_API ShowBuildMessageResponse : public Message<MessageShown>
+{
+    ShowBuildMessageResponse();
+    ShowBuildMessageResponse(JsonObject* messageObject);
+    const char* Id() const override { return showBuildMessageResponseId; }
     void DispatchTo(MessageHandler& handler) override;
 };
 

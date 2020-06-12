@@ -27,10 +27,13 @@ parser api(BUILD_API) BuildLangClientParser
     ClientCommandSentence : cmajor::build::Command*
         ::=
         (   PushProjectSentence:pushCommand{ return pushCommand; }
-        |   RemoveProjectSentence:removeCommand{ return removeCommand; }
+        |   RemoveProjectSentence:removeProjectCommand{ return removeProjectCommand; }
+        |   AddServerSentence:addServerCommand{ return addServerCommand; }
+        |   RemoveServerSentence:removeServerCommand{ return removeServerCommand; }
         |   BuildProjectSentence:buildCommand{ return buildCommand; }
         |   DebugProjectSentence:debugCommand{ return debugCommand; }
         |   InstallProjectSentence:installCommand{ return installCommand; }
+        |   ShowConfigurationSentence:showConfigurationCommand{ return showConfigurationCommand; }
         )
         ;
 
@@ -49,13 +52,24 @@ parser api(BUILD_API) BuildLangClientParser
     RemoveProjectSentence(var std::string serverName) : cmajor::build::Command*
         ::=
         (
-            REMOVE ProjectFilePath:project!
+            REMOVE ProjectFilePath:project
             (   FROM SERVER! ServerName:server!{ serverName = server; }
             )?
         )
         {
             return new cmajor::build::RemoveProjectCommand(project, serverName);
         }
+        ;
+
+    AddServerSentence(var std::string host, var std::string toolChain) : cmajor::build::Command*
+        ::= (ADD SERVER ServerName:server (HOST Host:h!{ host = h; })? PORT Port:port! (DEFAULT TOOLCHAIN! ToolChain:defaultToolChain!{ toolChain = defaultToolChain; })?)
+        {
+            return new cmajor::build::AddServerCommand(server, host, port, toolChain);
+        }
+        ;
+
+    RemoveServerSentence : cmajor::build::Command*
+        ::= REMOVE SERVER ServerName:server{ return new cmajor::build::RemoveServerCommand(server); }
         ;
 
     BuildProjectSentence(var std::string serverName) : cmajor::build::Command*
@@ -95,6 +109,10 @@ parser api(BUILD_API) BuildLangClientParser
         }
         ;
 
+    ShowConfigurationSentence : cmajor::build::Command*
+        ::= SHOW CONFIGURATION{ return new cmajor::build::ShowConfigurationCommand(); }
+        ;
+
     ProjectFilePath : std::string
         ::= FILEPATH{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
         ;
@@ -107,17 +125,62 @@ parser api(BUILD_API) BuildLangClientParser
         ::= ID{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
         ;
 
+    Host : std::string
+        ::= HostName:hostName{ return hostName; }
+        |   IpAddress:ipAddress{ return ipAddress; }
+        ;
+
+    HostName(var std::string hostName) : std::string
+        ::=
+        (
+            ID{ hostName.append(ToUtf8(lexer.GetToken(pos).match.ToString())); } (DOT{ hostName.append(1, '.'); } ID{ hostName.append(ToUtf8(lexer.GetToken(pos).match.ToString())); })*
+        )
+        {
+            return hostName;
+        }
+        ;
+
+    IpAddress(var std::string ip) : std::string
+        ::=
+        (
+            INTEGER{ ip.append(ToUtf8(lexer.GetToken(pos).match.ToString())); }
+            DOT{ ip.append(1, '.'); } INTEGER{ ip.append(ToUtf8(lexer.GetToken(pos).match.ToString())); }
+            DOT{ ip.append(1, '.'); } INTEGER{ ip.append(ToUtf8(lexer.GetToken(pos).match.ToString())); }
+            DOT{ ip.append(1, '.'); } INTEGER{ ip.append(ToUtf8(lexer.GetToken(pos).match.ToString())); }
+        )
+        {
+            return ip;
+        }
+        ;
+
+    Port(var std::string portStr) : int
+        ::= INTEGER{ portStr = ToUtf8(lexer.GetToken(pos).match.ToString()); return std::stoi(portStr); }
+        ;
+
+    ToolChain : std::string
+        ::= CLANG{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+        |   GCC{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+        |   VS{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+        |   ID{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+        ;
+
     ruleinfo
     {
-        (ClientSentence, "cmclient [options] (push | remove | build | debug | install) ..."),
-        (ClientCommandSentence, "cmclient [options] (push | remove | build | debug | install) ..."),
-        (ProjectFilePath, "PROJECT.cmp | SOLUTION.cms"),
+        (ClientSentence, "cmclient [options] (add | remove | show | push | build | debug | install) ..."),
+        (ClientCommandSentence, "cmclient [options] (add | remove | show | push | build | debug | install) ..."),
+        (ProjectFilePath, "PROJECT.cmp"),
         (DirectoryPath, "directory name"),
         (ServerName, "server name"),
-        (PushProjectSentence, "push command"),
-        (RemoveProjectSentence, "remove command"),
-        (BuildProjectSentence, "build command"),
-        (DebugProjectSentence, "debug command"),
-        (InstallProjectSentence, "install command")
+        (Host, "host name or IP-address"),
+        (Port, "port number"),
+        (ToolChain, "tool chain (clang | gcc | vs)"),
+        (PushProjectSentence, "push project command"),
+        (RemoveProjectSentence, "remove project command"),
+        (AddServerSentence, "add server command"),
+        (RemoveServerSentence, "remove server command"),
+        (ShowConfigurationSentence, "show configuration command"),
+        (BuildProjectSentence, "build project command"),
+        (DebugProjectSentence, "debug project command"),
+        (InstallProjectSentence, "install project command")
     }
 }

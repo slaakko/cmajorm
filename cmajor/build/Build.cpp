@@ -64,6 +64,7 @@
 #include <soulng/util/Log.hpp>
 #include <soulng/util/Time.hpp>
 #include <soulng/util/Sha1.hpp>
+#include <soulng/util/Process.hpp>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -400,8 +401,8 @@ void GenerateLibraryCpp(Module* module, const std::vector<std::string>& objectFi
     const Configuration& configuration = GetToolConfiguration(libraryManagerTool, GetConfig());
     module->SetCurrentToolName(ToUtf32(libraryManagerTool.commandName));
     std::string command;
-    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "lib.error");
-    command.append("cmfileredirector -2 ").append(libErrorFilePath).append(" ").append(libraryManagerTool.commandName);
+    std::string errors;
+    command.append(libraryManagerTool.commandName);
     for (const std::string& arg : configuration.args)
     {
         std::string a = arg;
@@ -434,12 +435,28 @@ void GenerateLibraryCpp(Module* module, const std::vector<std::string>& objectFi
     }
     try
     {
-        System(command);
-        boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
+        Process process(command);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(module->LogStreamId(), line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + command + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(libErrorFilePath);
         throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -464,20 +481,36 @@ void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectF
     {
         args.push_back(QuotedPath(objectFilePaths[i]));
     }
-    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "llvm-lib.error");
-    std::string libCommandLine = "cmfileredirector -2 " + libErrorFilePath + " llvm-lib";
+    std::string libCommandLine = "llvm-lib";
+    std::string errors;
     for (const std::string& arg : args)
     {
         libCommandLine.append(1, ' ').append(arg);
     }
     try
     {
-        System(libCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
+        Process process(libCommandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(module->LogStreamId(), line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("generating library '" + libraryFilePath + "' failed with exit code " + std::to_string(exitCode) + ": " + errors);
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(libErrorFilePath);
         throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -505,20 +538,36 @@ void GenerateLibrarySystemX(Module* module, const std::vector<std::string>& obje
             LogMessage(module->LogStreamId(), "> " + QuotedPath(objectFilePaths[i]));
         }
     }
-    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "cmsxar.error");
-    std::string libCommandLine = "cmfileredirector -2 " + libErrorFilePath + " cmsxar";
+    std::string libCommandLine = "cmsxar";
+    std::string errors;
     for (const std::string& arg : args)
     {
         libCommandLine.append(1, ' ').append(arg);
     }
     try
     {
-        System(libCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
+        Process process(libCommandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(module->LogStreamId(), line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + libCommandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(libErrorFilePath);
         throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
@@ -544,20 +593,35 @@ void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectF
     {
         args.push_back(QuotedPath(objectFilePaths[i]));
     }
-    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "ar.error");
-    std::string libCommandLine = "cmfileredirector -2 " + libErrorFilePath + " ar q";
+    std::string libCommandLine = "ar q";
     for (const std::string& arg : args)
     {
         libCommandLine.append(1, ' ').append(arg);
     }
     try
     {
-        System(libCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
+        Process process(libCommandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(module->LogStreamId(), line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + libCommandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(libErrorFilePath);
         throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -609,9 +673,7 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     std::string ehLibFileName = ehLibName;
     std::string cmajorLibDir = QuotedPath(GetFullPath(Path::Combine(CmajorRootDir(), "lib")));
     std::string linkCommandLine;
-    std::string linkErrorFilePath;
-    linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "link.error");
-    linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " " + linkerTool.commandName;
+    linkCommandLine = linkerTool.commandName;
     for (const std::string& arg : configuration.args)
     {
         if (arg.find('$') != std::string::npos)
@@ -702,14 +764,31 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
             linkCommandLine.append(1, ' ').append(arg);
         }
     }
+    std::string errors;
     try
     {
-        System(linkCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
+        Process process(linkCommandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(module.LogStreamId(), line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + linkCommandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(linkErrorFilePath);
         throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -821,8 +900,8 @@ void CreateCppProjectFile(Project* project, Module& module, const std::string& m
     std::string errorFilePath;
     std::string projectFilePath;
     std::string options;
-    errorFilePath = Path::Combine(Path::GetDirectoryName(project->LibraryFilePath()), "project.file.generator.error");
-    commandLine = "cmfileredirector -2 " + errorFilePath + " " + projectFileGeneratorTool.commandName;
+    std::string errors;
+    commandLine = projectFileGeneratorTool.commandName;
     for (const std::string& arg : configuration.args)
     {
         if (arg.find('$') != std::string::npos)
@@ -937,12 +1016,28 @@ void CreateCppProjectFile(Project* project, Module& module, const std::string& m
     }
     try
     {
-        System(commandLine);
-        boost::filesystem::remove(boost::filesystem::path(errorFilePath));
+        Process process(commandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(module.LogStreamId(), line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + commandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(errorFilePath);
         throw std::runtime_error("generating C++ project file '" + projectFilePath + "' for project '" + ToUtf8(project->Name()) + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -961,10 +1056,9 @@ void CreateCppSolutionFile(Solution* solution, const std::vector<Project*>& proj
         LogMessage(-1, "Creating solution file...");
     }
     std::string commandLine;
-    std::string errorFilePath;
     std::string projectFilePath;
-    errorFilePath = Path::Combine(Path::GetDirectoryName(solution->FilePath()), "solution.file.generator.error");
-    commandLine = "cmfileredirector -2 " + errorFilePath + " " + solutionFileGeneratorTool.commandName;
+    std::string errors;
+    commandLine = solutionFileGeneratorTool.commandName;
     std::string config = GetConfig();
     const Configuration& configuration = GetToolConfiguration(solutionFileGeneratorTool, config);
     for (const std::string& arg : configuration.args)
@@ -1002,12 +1096,28 @@ void CreateCppSolutionFile(Solution* solution, const std::vector<Project*>& proj
     }
     try
     {
-        System(commandLine);
-        boost::filesystem::remove(boost::filesystem::path(errorFilePath));
+        Process process(commandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(-1, line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + commandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(errorFilePath);
         throw std::runtime_error("generating C++ solution file '" + solutionFilePath + "' for solution '" + ToUtf8(solution->Name()) + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -1089,17 +1199,15 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
     {
         args.push_back(QuotedPath(module.ResourceFilePath()));
     }
+    std::string errors;
     std::string linkCommandLine;
-    std::string linkErrorFilePath;
     if (GetGlobalFlag(GlobalFlags::linkUsingMsLink))
     {
-        linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "link.error");
-        linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " link";
+        linkCommandLine = "link";
     }
     else
     {
-        linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "lld-link.error");
-        linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " lld-link";
+        linkCommandLine = "lld-link";
     }
     for (const std::string& arg : args)
     {
@@ -1107,12 +1215,28 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
     }
     try
     {
-        System(linkCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
+        Process process(linkCommandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(-1, line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + linkCommandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(linkErrorFilePath);
         throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -1143,21 +1267,36 @@ void LinkSystemX(const std::string& executableFilePath, const std::string& libra
         args.push_back(QuotedPath(libraryFilePaths[i]));
     }
     std::string linkCommandLine;
-    std::string linkErrorFilePath;
-    linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "cmsxlink.error");
-    linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " cmsxlink";
+    std::string errors;
+    linkCommandLine = "cmsxlink";
     for (const std::string& arg : args)
     {
         linkCommandLine.append(1, ' ').append(arg);
     }
     try
     {
-        System(linkCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
+        Process process(linkCommandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(-1, line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + linkCommandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(linkErrorFilePath);
         throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -1235,21 +1374,36 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
     args.push_back("-Xlinker --end-group");
     args.push_back("-o " + QuotedPath(executableFilePath));
     std::string linkCommandLine;
-    std::string linkErrorFilePath;
-    linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "clang++.error");
-    linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " clang++";
+    std::string errors;
+    linkCommandLine = "clang++";
     for (const std::string& arg : args)
     {
         linkCommandLine.append(1, ' ').append(arg);
     }
     try
     {
-        System(linkCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
+        Process process(linkCommandLine);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(-1, line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + linkCommandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(linkErrorFilePath);
         throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))

@@ -1,4 +1,14 @@
 using System;
+using System.Threading;
+
+public int Run(const string& command, string& errorLines)
+{
+    Process process(command);
+    errorLines = process.ReadToEnd(Process.StdHandle.std_err);
+    process.WaitForExit();
+    int exitCode = process.ExitCode();
+    return exitCode;
+}
 
 int main(int argc, const char** argv)
 {
@@ -15,7 +25,12 @@ int main(int argc, const char** argv)
             }
             command.Append(arg);
         }
-        int exitCode = Execute(command);
+        string errorLines;
+        int exitCode = Run(command, errorLines);
+        if (exitCode != 0)
+        {
+            throw Exception("executing command '" + command + "' failed with exit code " + ToString(exitCode) + ": " + errorLines);
+        }
         TimePoint end = Now();
         Duration dur = end - start;
         Console.Out() << "executing command '" + command << "' took " << dur.Milliseconds() << " ms" << endl();

@@ -32,6 +32,7 @@ public:
     void Handle(PushProjectFileResponse& response) override;
     void Handle(PushProjectFileContentResponse& response) override;
     void Handle(ErrorResponse& response) override;
+    void Handle(CloseConnectionRequest& request) override;
     std::string GetStateStr() const override;
     std::string Name() const override { return "buildclient"; }
     SourceFileInfo GetSourceFileInfo(const std::string& fileId) const;

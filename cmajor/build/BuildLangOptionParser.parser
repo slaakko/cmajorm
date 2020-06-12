@@ -24,6 +24,7 @@ parser api(BUILD_API) BuildLangOptionParser
 
     Option(cmajor::build::BuildOptionSetter* optionSetter)
         ::= VERBOSE{ optionSetter->SetOption(cmajor::build::BuildOptions::verbose); }
+        |   MESSAGES{ optionSetter->SetOption(cmajor::build::BuildOptions::messages); }
         |   DEBUG{ optionSetter->SetOption(cmajor::build::BuildOptions::debug); }
         |   FORCE{ optionSetter->SetOption(cmajor::build::BuildOptions::force); }
         |   ONLY{ optionSetter->SetOption(cmajor::build::BuildOptions::only); }
@@ -43,5 +44,6 @@ parser api(BUILD_API) BuildLangOptionParser
         ::= CLANG{ return "clang"; }
         |   GCC{ return "gcc"; }
         |   VS{ return "vs"; }
+        |   ID{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
         ;
 }

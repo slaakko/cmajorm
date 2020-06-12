@@ -1,0 +1,70 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Threading
+{
+    public class Process
+    {
+        public enum StdHandle
+        {
+            std_out = 1, std_err = 2
+        }
+        public Process(const string& command)
+        {
+            int errorStringHandle = -1;
+            nativeProcess = RtCreateProcess(command.Chars(), errorStringHandle);
+            if (nativeProcess == null)
+            {
+                string errorString = RtGetString(errorStringHandle);
+                RtDisposeString(errorStringHandle);
+                throw ThreadingException(errorString);
+            }
+        }
+        public ~Process()
+        {
+            if (nativeProcess != null)
+            {
+                RtDeleteProcess(nativeProcess);
+            }
+        }
+        public bool Running()
+        {
+            return RtProcessRunning(nativeProcess);
+        }
+        public void WaitForExit()
+        {
+            RtProcessWaitForExit(nativeProcess);
+        }
+        public int ExitCode()
+        {
+            return RtProcessExitCode(nativeProcess);
+        }
+        public bool Eof(StdHandle handle)
+        {
+            return RtProcessEof(nativeProcess, cast<int>(handle));
+        }
+        public string ReadLine(StdHandle handle)
+        {
+            int stringHandle = RtProcessReadLine(nativeProcess, cast<int>(handle));
+            string line = RtGetString(stringHandle);
+            RtDisposeString(stringHandle);
+            return line;
+        }
+        public string ReadToEnd(StdHandle handle)
+        {
+            int stringHandle = RtProcessReadToEnd(nativeProcess, cast<int>(handle));
+            string content = RtGetString(stringHandle);
+            RtDisposeString(stringHandle);
+            return content;
+        }
+        public void WriteLine(const string& line)
+        {
+            RtProcessWriteLine(nativeProcess, line.Chars());
+        }
+        private void* nativeProcess;
+    }
+}

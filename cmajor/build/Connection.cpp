@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/build/Connection.hpp>
+#include <cmajor/build/BuildServerMessage.hpp>
 #include <cmajor/build/Message.hpp>
 #include <cmajor/build/BuildOption.hpp>
 #include <cmajor/build/BuildServer.hpp>
@@ -33,13 +34,20 @@ void Connection::Send(soulng::util::JsonObject* messageObject)
 std::unique_ptr<MessageBase> Connection::Receive()
 {
     std::unique_ptr<soulng::util::JsonObject> messageObject = DoReceive();
-    if (log)
+    if (messageObject)
     {
-        const std::string& actor = GetActor();
-        log->Write(actor + ": receive: ", messageObject.get());
+        if (log)
+        {
+            const std::string& actor = GetActor();
+            log->Write(actor + ": receive: ", messageObject.get());
+        }
+        std::unique_ptr<MessageBase> message = MessageFactory::Instance().CreateMessage(messageObject.get());
+        return message;
     }
-    std::unique_ptr<MessageBase> message = MessageFactory::Instance().CreateMessage(messageObject.get());
-    return message;
+    else
+    {
+        return std::unique_ptr<MessageBase>(new CloseConnectionRequest());
+    }
 }
 
 void Connection::Close()
@@ -50,7 +58,10 @@ void Connection::Close()
         log->Write(actor +  ": closing connection\n", nullptr);
     }
     DoClose();
-    server->Exit();
+    if (server)
+    {
+        server->Exit();
+    }
 }
 
 void Connection::SetServerAlive(bool alive)

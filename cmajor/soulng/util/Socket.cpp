@@ -503,7 +503,7 @@ int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& s
             }
         }
     }
-    std::string errorMessage = "could not connect";
+    std::string errorMessage = "could not connect to " + node + ":" + service;
     throw std::runtime_error(errorMessage);
 }
 

@@ -8,6 +8,7 @@
 #include <soulng/util/System.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/MappedInputFile.hpp>
+#include <soulng/util/Process.hpp>
 #include <llvm/Support/raw_os_ostream.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
@@ -301,34 +302,44 @@ void Emitter::EmitIrFile(const std::string& filePath)
 
 void Emitter::Optimize(const std::string& bcFilePath, const std::string& optBCFilePath, const std::string& optimizationFlags)
 {
-    std::string optErrorFilePath = optBCFilePath + ".opt.error";
+    std::string optErrors;
     std::string optCommandLine;
-    optCommandLine.append("cmfileredirector -2 " + optErrorFilePath + " opt ").append(optimizationFlags).append(" -o=").append(QuotedPath(optBCFilePath)).append(" ").append(QuotedPath(bcFilePath));
+    optCommandLine.append("opt ").append(optimizationFlags).append(" -o=").append(QuotedPath(optBCFilePath)).append(" ").append(QuotedPath(bcFilePath));
     try
     {
-        System(optCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(optErrorFilePath));
+        Process process(optCommandLine);
+        optErrors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + optCommandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(optErrorFilePath);
-        throw std::runtime_error("optimization of '" + bcFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+        throw std::runtime_error("optimization of '" + bcFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + optErrors);
     }
 }
 
 void Emitter::Disassemble(const std::string& bcFilePath, const std::string& llFilePath)
 {
-    std::string disErrorFilePath = bcFilePath + ".llvm-dis.error";
     std::string disCommandLine;
-    disCommandLine.append("cmfileredirector -2 " + disErrorFilePath + " llvm-dis -o=").append(QuotedPath(llFilePath)).append(" ").append(QuotedPath(bcFilePath));
+    std::string errors;
+    disCommandLine.append("llvm-dis -o=").append(QuotedPath(llFilePath)).append(" ").append(QuotedPath(bcFilePath));
     try
     {
-        System(disCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(disErrorFilePath));
+        Process process(disCommandLine);
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + disCommandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(disErrorFilePath);
         throw std::runtime_error("disassembly of '" + bcFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
 }
@@ -357,17 +368,22 @@ void Emitter::Compile(const std::string& bcFilePath, const std::string& objectFi
         bcOs.flush();
     }
 */
-    std::string llcErrorFilePath = bcFilePath + ".llc.error";
     std::string llcCommandLine;
-    llcCommandLine.append("cmfileredirector -2 " + llcErrorFilePath + " llc -O=").append(std::to_string(optimizationLevel)).append(" --filetype=obj").append(" -o=").append(QuotedPath(objectFilePath).append(" ").append(QuotedPath(bcFilePath)));
+    std::string errors;
+    llcCommandLine.append("llc -O=").append(std::to_string(optimizationLevel)).append(" --filetype=obj").append(" -o=").append(QuotedPath(objectFilePath).append(" ").append(QuotedPath(bcFilePath)));
     try
     {
-        System(llcCommandLine);
-        boost::filesystem::remove(boost::filesystem::path(llcErrorFilePath));
+        Process process(llcCommandLine);
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + llcCommandLine + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception & ex)
     {
-        std::string errors = ReadFile(llcErrorFilePath);
         throw std::runtime_error("compilation of '" + bcFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
 }

@@ -26,10 +26,10 @@ void RunSocketServer(SocketServer* server)
 
 LocalExecutionContext::LocalExecutionContext() : ExecutionContext()
 {
-    socketServer.reset(new SocketServer(GetLog(), "$local"));
+    socketServer.reset(new SocketServer(GetLog(), "local"));
     serverThread = std::thread{ RunSocketServer, socketServer.get() };
     socketServer->WaitForRunning();
-    socketClient.reset(new SocketClient(GetLog(), "$local"));
+    socketClient.reset(new SocketClient(GetLog(), "local"));
     socketClient->Run();
 }
 

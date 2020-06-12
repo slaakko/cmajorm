@@ -82,10 +82,13 @@ void PrintHelp()
     std::cout << "Cmajor client version " << version << std::endl;
     std::cout << "Usage:" << std::endl;
     std::cout << "cmclient [options] (push | remove | build | debug | install) (PROJECT.cmp | SOLUTION.cms) ..." << std::endl;
+    std::cout << "| cmclient [options] show configuration" << std::endl;
     std::cout << std::endl;
     std::cout << "options:" << std::endl;
     std::cout << "--verbose | -v" << std::endl;
     std::cout << "  Be verbose." << std::endl;
+    std::cout << "--messages | -m" << std::endl;
+    std::cout << "  Show build messages." << std::endl;
     std::cout << "--debug | -d" << std::endl;
     std::cout << "  Print debugging output to console." << std::endl;
     std::cout << std::endl;
@@ -128,6 +131,8 @@ void PrintHelp()
     std::cout << "  Install executable of given configuration. Default: debug." << std::endl;
     std::cout << "--toolchain=TOOLCHAIN | -t=TOOLCHAIN" << std::endl;
     std::cout << "  Install executable of given tool chain TOOLCHAIN where TOOLCHAIN=(clang | gcc | vs)." << std::endl;
+    std::cout << "cmclient [options] show configuration" << std::endl;
+    std::cout << "  Show configuration." << std::endl;
 }
 
 int main(int argc, const char** argv)
@@ -141,7 +146,8 @@ int main(int argc, const char** argv)
         std::string options;
         std::string tokens;
         int tokenIndex = 0;
-        bool installCommand = false;
+        std::string commandName;
+        bool removeServerCommand = false;
         for (int i = 1; i < argc; ++i)
         {
             std::string arg = argv[i];
@@ -214,6 +220,11 @@ int main(int argc, const char** argv)
                                 cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::verbose);
                                 break;
                             }
+                            case 'm':
+                            {
+                                options.append("messages");
+                                break;
+                            }
                             case 'h':
                             {
                                 PrintHelp();
@@ -266,12 +277,14 @@ int main(int argc, const char** argv)
                 }
                 if (tokenIndex == 0)
                 {
-                    if (arg == "install")
-                    {
-                        installCommand = true;
-                    }
+                    commandName = arg;
                 }
-                else if (tokenIndex == 1 || (installCommand && tokenIndex == 3))
+                else if (tokenIndex == 1 && arg == "server")
+                {
+                    removeServerCommand = true;
+                }
+                else if ((tokenIndex == 1 && (commandName == "push" || commandName == "remove" || commandName == "build" || commandName == "debug" || commandName == "install")) ||
+                    (tokenIndex == 3 && commandName == "install"))
                 {
                     arg = "<" + arg + ">";
                 }

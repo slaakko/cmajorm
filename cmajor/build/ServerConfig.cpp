@@ -28,7 +28,7 @@ using namespace cmajor::symbols;
 std::string GetDefaultToolChainForCurrentPlatform()
 {
 #ifdef _WIN32
-    return "gcc";
+    return "vs";
 #else
     return "clang";
 #endif
@@ -39,7 +39,8 @@ int GetDefaultLocalPort()
     return 52360;
 }
 
-ServerInfo::ServerInfo(const std::string& serverName_, int port_, const std::string& defaultToolChain_) : serverName(serverName_), port(port_), defaultToolChain(defaultToolChain_)
+ServerInfo::ServerInfo(const std::string& serverName_, const std::string& host_, int port_, const std::string& defaultToolChain_) :
+    serverName(serverName_), host(host_), port(port_), defaultToolChain(defaultToolChain_)
 {
 }
 
@@ -51,11 +52,16 @@ void ServerInfo::SetDefaultToolChain(const std::string& defaultToolChain_)
 void ServerInfo::Print(CodeFormatter& formatter)
 {
     std::string toolChainStr;
+    std::string hostStr;
     if (!defaultToolChain.empty())
     {
         toolChainStr = ", default tool chain '" + defaultToolChain + "'";
     }
-    formatter.WriteLine("server '" + serverName + "', port " + std::to_string(port) + toolChainStr);
+    if (!host.empty())
+    {
+        hostStr = ", host " + host;
+    }
+    formatter.WriteLine("server '" + serverName + "'" + hostStr + ", port " + std::to_string(port) + toolChainStr);
 }
 
 void ServerConfig::Init()
@@ -89,7 +95,7 @@ void ServerConfig::Read()
         {
             serverInfos.clear();
             serverMap.clear();
-            portMap.clear();
+            hostPortMap.clear();
             std::unique_ptr<sngxml::dom::Document> configDoc = ReadDocument(serverConfigFilePath);
             std::unique_ptr<sngxml::xpath::XPathObject> servers = Evaluate(U"/servers/server", configDoc.get());
             if (servers)
@@ -105,10 +111,11 @@ void ServerConfig::Read()
                         {
                             sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
                             std::string serverName = ToUtf8(element->GetAttribute(U"name"));
+                            std::string serverHost = ToUtf8(element->GetAttribute(U"host"));
                             std::string serverPort = ToUtf8(element->GetAttribute(U"port"));
                             int port = boost::lexical_cast<int>(serverPort);
                             std::string defaultToolChain = ToUtf8(element->GetAttribute(U"defaultToolChain"));
-                            Add(serverName, port, defaultToolChain, true, false);
+                            Add(serverName, serverHost, port, defaultToolChain, true, false, false);
                         }
                     }
                 }
@@ -117,7 +124,7 @@ void ServerConfig::Read()
     }
     catch (const std::exception& ex)
     {
-        LogMessage(-1, "serverconfig: reading server configuration from '" + serverConfigFilePath + "' failed: " + ex.what());
+        LogMessage(-1, "server config: reading server configuration from '" + serverConfigFilePath + "' failed: " + ex.what());
     }
 }
 
@@ -133,6 +140,10 @@ void ServerConfig::Write()
         {
             sngxml::dom::Element* serverElement = new sngxml::dom::Element(U"server");
             serverElement->SetAttribute(U"name", ToUtf32(serverInfo->ServerName()));
+            if (!serverInfo->Host().empty())
+            {
+                serverElement->SetAttribute(U"host", ToUtf32(serverInfo->Host()));
+            }
             serverElement->SetAttribute(U"port", ToUtf32(std::to_string(serverInfo->Port())));
             serverElement->SetAttribute(U"defaultToolChain", ToUtf32(serverInfo->DefaultToolChain()));
             serversElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(serverElement));
@@ -143,15 +154,20 @@ void ServerConfig::Write()
     }
     catch (const std::exception& ex)
     {
-        LogMessage(-1, "serverconfig: writing server configuration to '" + serverConfigFilePath + "' failed: " + ex.what());
+        LogMessage(-1, "server config: writing server configuration to '" + serverConfigFilePath + "' failed: " + ex.what());
     }
 }
 
-void ServerConfig::Add(const std::string& serverName, int port, const std::string& defaultToolChain, bool force, bool read)
+void ServerConfig::Add(const std::string& serverName, const std::string& hostName, int port, const std::string& defaultToolChain, bool force, bool read, bool write)
 {
     if (read)
     {
         Read();
+    }
+    std::string host = hostName;
+    if (host == "localhost" || host == "127.0.0.1")
+    {
+        host.clear();
     }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
@@ -160,43 +176,83 @@ void ServerConfig::Add(const std::string& serverName, int port, const std::strin
         {
             toolChainStr = ", default tool chain '" + defaultToolChain + "'";
         }
-        LogMessage(-1, "serverconfig: server '" + serverName + "', port " + std::to_string(port) + toolChainStr);
+        std::string hostStr;
+        if (!host.empty())
+        {
+            hostStr = ", host " + host;
+        }
     }
     ServerInfo* serverInfo = GetServerInfo(serverName, false, false);
     if (serverInfo != nullptr)
     {
         if (!force)
         {
-            throw std::runtime_error("serverconfig: server '" + serverName + "' already exists, use --force to add anyway");
+            throw std::runtime_error("server config: server '" + serverName + "' already exists, use --force to add anyway");
         }
-        auto it = portMap.find(port);
-        if (it != portMap.cend())
+        auto it = hostPortMap.find(std::make_pair(host, port));
+        if (it != hostPortMap.cend())
         {
             std::string prevServerName = it->second;
             if (prevServerName != serverName)
             {
-                LogMessage(-1, "serverconfig: warning: port " + std::to_string(port) + " already used by server '" + prevServerName + "'");
+                std::string hostPortStr;
+                if (!host.empty())
+                {
+                    hostPortStr = "host " + host + ", port " + std::to_string(port);
+                }
+                else
+                {
+                    hostPortStr = "port " + std::to_string(port);
+                }
+                LogMessage(-1, "server config: warning: " + hostPortStr + " already in use for server '" + prevServerName + "'");
             }
         }
+        serverInfo->SetHost(host);
         serverInfo->SetPort(port);
         serverInfo->SetDefaultToolChain(defaultToolChain);
-        portMap[port] = serverName;
+        hostPortMap[std::make_pair(host, port)] = serverName;
     }
     else
     {
-        auto it = portMap.find(port);
-        if (it != portMap.cend())
+        auto it = hostPortMap.find(std::make_pair(host, port));
+        if (it != hostPortMap.cend())
         {
             std::string prevServerName = it->second;
             if (prevServerName != serverName)
             {
-                throw std::runtime_error("serverconfig: error: port " + std::to_string(port) + " already used by server '" + prevServerName + "'");
+                std::string hostPortStr;
+                if (!host.empty())
+                {
+                    hostPortStr.append("host ").append(host).append(", port ").append(std::to_string(port));
+                }
+                else
+                {
+                    hostPortStr.append("port ").append(std::to_string(port));
+                }
+                throw std::runtime_error("server config: error: " + hostPortStr + " already in use for server '" + prevServerName + "'");
             }
         }
-        std::unique_ptr<ServerInfo> newServerInfo(new ServerInfo(serverName, port, defaultToolChain));
+        std::unique_ptr<ServerInfo> newServerInfo(new ServerInfo(serverName, host, port, defaultToolChain));
         serverMap[serverName] = newServerInfo.get();
         serverInfos.push_back(std::move(newServerInfo));
-        portMap[port] = serverName;
+        hostPortMap[std::make_pair(host, port)] = serverName;
+    }
+    if (write)
+    {
+        Write();
+    }
+}
+
+void ServerConfig::Remove(const std::string& serverName)
+{
+    int n = serverInfos.size();
+    for (int i = 0; i < n; ++i)
+    {
+        if (serverInfos[i]->ServerName() == serverName)
+        {
+            serverInfos.erase(serverInfos.begin() + i);
+            break;
+        }
     }
     Write();
 }
@@ -215,10 +271,10 @@ void ServerConfig::Show()
 ServerConfig::ServerConfig()
 {
     Read();
-    ServerInfo* local = GetServerInfo("$local", false, false);
+    ServerInfo* local = GetServerInfo("local", false, false);
     if (!local)
     {
-        Add("$local", GetDefaultLocalPort(), GetDefaultToolChainForCurrentPlatform(), true, false);
+        Add("local", std::string(), GetDefaultLocalPort(), GetDefaultToolChainForCurrentPlatform(), true, false, true);
     }
 }
 
@@ -237,7 +293,7 @@ ServerInfo* ServerConfig::GetServerInfo(const std::string& serverName, bool fail
     {
         if (failIfNotExist)
         {
-            throw std::runtime_error("serverconfig: error: server name '" + serverName + "' not found from configuration file '" + CmajorServerConfigFilePath() + "'");
+            throw std::runtime_error("server config: error: server name '" + serverName + "' not found from configuration file '" + CmajorServerConfigFilePath() + "'");
         }
         return nullptr;
     }

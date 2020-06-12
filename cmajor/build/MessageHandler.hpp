@@ -16,6 +16,10 @@ struct PushProjectFileRequest;
 struct PushProjectFileResponse;
 struct PushProjectFileContentRequest;
 struct PushProjectFileContentResponse;
+struct BuildProjectRequest;
+struct BuildProjectResponse;
+struct ShowBuildMessageRequest;
+struct ShowBuildMessageResponse;
 struct ErrorResponse;
 struct CloseConnectionRequest;
 
@@ -29,6 +33,10 @@ public:
     virtual void Handle(PushProjectFileResponse& response) {}
     virtual void Handle(PushProjectFileContentRequest& request) {}
     virtual void Handle(PushProjectFileContentResponse& response) {}
+    virtual void Handle(BuildProjectRequest& request) {}
+    virtual void Handle(BuildProjectResponse& response) {}
+    virtual void Handle(ShowBuildMessageRequest& request) {}
+    virtual void Handle(ShowBuildMessageResponse& response) {}
     virtual void Handle(ErrorResponse& response) {}
     virtual void Handle(CloseConnectionRequest& request) {}
 };
@@ -44,6 +52,10 @@ public:
     void Handle(PushProjectFileResponse& response) override;
     void Handle(PushProjectFileContentRequest& request) override;
     void Handle(PushProjectFileContentResponse& response) override;
+    void Handle(BuildProjectRequest& request) override;
+    void Handle(BuildProjectResponse& response) override;
+    void Handle(ShowBuildMessageRequest& request) override;
+    void Handle(ShowBuildMessageResponse& response) override;
     void Handle(ErrorResponse& response) override;
     void Handle(CloseConnectionRequest& request) override;
 };
@@ -58,6 +70,8 @@ public:
     void Handle(PushProjectFileResponse& response) override;
     void Handle(PushProjectFileContentRequest& request) override;
     void Handle(PushProjectFileContentResponse& response) override;
+    void Handle(BuildProjectRequest& request) override;
+    void Handle(ShowBuildMessageResponse& response) override;
     void Handle(ErrorResponse& response) override;
     void Handle(CloseConnectionRequest& request) override;
 };

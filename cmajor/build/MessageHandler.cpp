@@ -43,6 +43,26 @@ void Requester::Handle(PushProjectFileContentResponse& response)
     throw std::runtime_error(Name() + ": unexpected push-project-file-content-response received, requester state=" + GetStateStr());
 }
 
+void Requester::Handle(BuildProjectRequest& request)
+{
+    throw std::runtime_error(Name() + ": unexpected build-project-request receivced, requester state=" + GetStateStr());
+}
+
+void Requester::Handle(BuildProjectResponse& response)
+{
+    throw std::runtime_error(Name() + ": unexpected build-project-response received, requester state=" + GetStateStr());
+}
+
+void Requester::Handle(ShowBuildMessageRequest& request)
+{
+
+}
+
+void Requester::Handle(ShowBuildMessageResponse& response)
+{
+
+}
+
 void Requester::Handle(ErrorResponse& response)
 {
     throw std::runtime_error(Name() + ": unexpected error-response[\"" + response.body.error + "\"] received, requester state=" + GetStateStr());
@@ -81,6 +101,16 @@ void RequestHandler::Handle(PushProjectFileContentRequest& request)
 void RequestHandler::Handle(PushProjectFileContentResponse& response)
 {
     throw std::runtime_error(Name() + ": unexpected push-project-file-content-response received");
+}
+
+void RequestHandler::Handle(BuildProjectRequest& request)
+{
+    throw std::runtime_error(Name() + ": unexpected build-project-request received");
+}
+
+void RequestHandler::Handle(ShowBuildMessageResponse& response)
+{
+    throw std::runtime_error(Name() + ": unexpected show-build-message-response received");
 }
 
 void RequestHandler::Handle(ErrorResponse& response)

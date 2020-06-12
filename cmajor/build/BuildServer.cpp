@@ -17,6 +17,7 @@
 #include <soulng/util/Log.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/MappedInputFile.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 #include <stdexcept>
 
@@ -359,6 +360,65 @@ void BuildServer::Handle(PushProjectFileContentRequest& request)
             ", ok=" + BoolStr(pushProjectFileContentResponse.body.ok) + "]");
     }
     pushProjectFileContentResponse.SendTo(*connection);
+}
+
+void BuildServer::Handle(BuildProjectRequest& request)
+{
+    if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+    {
+        LogMessage(-1, "buildserver: received " + std::string(request.Id()));
+    }
+    BuildProjectResponse buildProjectResponse;
+    buildProjectResponse.body.projectId = request.body.projectId;
+    try
+    {
+        std::string projectDir = Path::Combine(repositoryDir, request.body.projectId);
+        if (!boost::filesystem::exists(projectDir))
+        {
+            throw std::runtime_error("project directory does not exist");
+        }
+        std::string projectInfoFilePath = Path::Combine(projectDir, buildProjectResponse.body.projectId + ".json");
+        if (!boost::filesystem::exists(projectInfoFilePath))
+        {
+            throw std::runtime_error("project info file not found");
+        }
+        ProjectInfo projectInfo = ReadPojectInfo(nullptr, projectInfoFilePath);
+        std::string projectFileName = Path::GetFileName(projectInfo.projectFilePath);
+        std::string projectFilePath = Path::Combine(projectDir, projectFileName);
+        std::string buildCommand;
+        buildCommand.append("cppcmc");
+        if (request.body.sendBuildOutput)
+        {
+            buildCommand.append(" --verbose");
+        }
+        if (!request.body.config.empty())
+        {
+            buildCommand.append(" --config=").append(request.body.config);
+        }
+        if (!request.body.toolChain.empty())
+        {
+            buildCommand.append(" --tool-chain=").append(request.body.toolChain);
+        }
+        buildCommand.append(" --all");
+        buildCommand.append(" ").append(QuotedPath(projectFilePath));
+        buildProcess.reset(new Process(buildCommand));
+        std::string errors;
+        errors = buildProcess->ReadToEnd(soulng::util::Process::StdHandle::std_err);
+        buildProcess->WaitForExit();
+        if (buildProcess->ExitCode() != 0)
+        {
+            throw std::runtime_error("execution of build command '" + buildCommand + "' failed with exit code " + std::to_string(buildProcess->ExitCode()) + ": " + errors);
+        }
+        else
+        {
+            buildProjectResponse.body.info.append("execution of build command '" + buildCommand + "' succeeded");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        buildProjectResponse.body.error = "buildserver: error processing request '" + std::string(request.Id()) + ": exception '" + std::string(ex.what()) + "'";
+    }
+    buildProjectResponse.SendTo(*connection);
 }
 
 void BuildServer::Handle(CloseConnectionRequest& request)

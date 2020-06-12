@@ -231,6 +231,19 @@ void BuildClient::Handle(ErrorResponse& response)
     throw std::runtime_error("buildclient: got error response from buildserver: \"" + response.body.error + "\"");
 }
 
+void BuildClient::Handle(CloseConnectionRequest& request)
+{
+    if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+    {
+        LogMessage(-1, "buildclient: received " + std::string(request.Id()));
+    }
+    connection->Close();
+    if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+    {
+        LogMessage(-1, "buildclient: connection closed");
+    }
+}
+
 SourceFileInfo BuildClient::GetSourceFileInfo(const std::string& fileId) const
 {
     for (const SourceFileInfo& sourceFileInfo : projectInfo.fileInfos)

@@ -11,34 +11,38 @@ namespace BuildLangTokens
     void InitTokenIdMap()
     {
         tokenIdMap[U"ADD"] = 1;
-        tokenIdMap[U"ALL"] = 25;
-        tokenIdMap[U"BUILD"] = 11;
-        tokenIdMap[U"CLANG"] = 7;
-        tokenIdMap[U"CONFIG"] = 26;
-        tokenIdMap[U"DEBUG"] = 12;
-        tokenIdMap[U"DEFAULT"] = 5;
-        tokenIdMap[U"EQ"] = 27;
-        tokenIdMap[U"FILEPATH"] = 20;
-        tokenIdMap[U"FORCE"] = 23;
-        tokenIdMap[U"FROM"] = 16;
-        tokenIdMap[U"GCC"] = 8;
-        tokenIdMap[U"ID"] = 19;
-        tokenIdMap[U"INSTALL"] = 14;
-        tokenIdMap[U"INTEGER"] = 21;
-        tokenIdMap[U"LBRACKET"] = 28;
-        tokenIdMap[U"ONLY"] = 24;
-        tokenIdMap[U"PORT"] = 4;
-        tokenIdMap[U"PUSH"] = 10;
-        tokenIdMap[U"RBRACKET"] = 29;
-        tokenIdMap[U"RELEASE"] = 13;
+        tokenIdMap[U"ALL"] = 28;
+        tokenIdMap[U"BUILD"] = 13;
+        tokenIdMap[U"CLANG"] = 9;
+        tokenIdMap[U"CONFIG"] = 29;
+        tokenIdMap[U"CONFIGURATION"] = 6;
+        tokenIdMap[U"DEBUG"] = 15;
+        tokenIdMap[U"DEFAULT"] = 7;
+        tokenIdMap[U"DOT"] = 33;
+        tokenIdMap[U"EQ"] = 32;
+        tokenIdMap[U"FILEPATH"] = 23;
+        tokenIdMap[U"FORCE"] = 26;
+        tokenIdMap[U"FROM"] = 19;
+        tokenIdMap[U"GCC"] = 10;
+        tokenIdMap[U"HOST"] = 4;
+        tokenIdMap[U"ID"] = 22;
+        tokenIdMap[U"INSTALL"] = 17;
+        tokenIdMap[U"INTEGER"] = 24;
+        tokenIdMap[U"LBRACKET"] = 30;
+        tokenIdMap[U"ONLY"] = 27;
+        tokenIdMap[U"PORT"] = 5;
+        tokenIdMap[U"PUSH"] = 12;
+        tokenIdMap[U"RBRACKET"] = 31;
+        tokenIdMap[U"RELEASE"] = 16;
         tokenIdMap[U"REMOVE"] = 2;
         tokenIdMap[U"RUN"] = 3;
-        tokenIdMap[U"SERVER"] = 18;
-        tokenIdMap[U"TO"] = 15;
-        tokenIdMap[U"TOOLCHAIN"] = 6;
-        tokenIdMap[U"USING"] = 17;
-        tokenIdMap[U"VERBOSE"] = 22;
-        tokenIdMap[U"VS"] = 9;
+        tokenIdMap[U"SERVER"] = 21;
+        tokenIdMap[U"SHOW"] = 14;
+        tokenIdMap[U"TO"] = 18;
+        tokenIdMap[U"TOOLCHAIN"] = 8;
+        tokenIdMap[U"USING"] = 20;
+        tokenIdMap[U"VERBOSE"] = 25;
+        tokenIdMap[U"VS"] = 11;
     }
 
     int GetTokenId(const std::u32string& tokenName)
@@ -60,7 +64,9 @@ namespace BuildLangTokens
         "ADD",
         "REMOVE",
         "RUN",
+        "HOST",
         "PORT",
+        "CONFIGURATION",
         "DEFAULT",
         "TOOLCHAIN",
         "CLANG",
@@ -68,6 +74,7 @@ namespace BuildLangTokens
         "VS",
         "PUSH",
         "BUILD",
+        "SHOW",
         "DEBUG",
         "RELEASE",
         "INSTALL",
@@ -83,9 +90,10 @@ namespace BuildLangTokens
         "ONLY",
         "ALL",
         "CONFIG",
-        "EQ",
         "LBRACKET",
-        "RBRACKET"
+        "RBRACKET",
+        "EQ",
+        "DOT"
     };
 
     const char* GetTokenName(int tokenId)
@@ -99,7 +107,9 @@ namespace BuildLangTokens
         "'add'",
         "'remove'",
         "'run'",
+        "'host'",
         "'port'",
+        "'configuration'",
         "'default'",
         "'toolchain'",
         "'clang'",
@@ -107,6 +117,7 @@ namespace BuildLangTokens
         "'vs'",
         "'push'",
         "'build'",
+        "'show'",
         "'debug'",
         "'release'",
         "'install'",
@@ -122,9 +133,10 @@ namespace BuildLangTokens
         "'only",
         "'all'",
         "'config'",
-        "'='",
         "'['",
-        "']'"
+        "']'",
+        "'='",
+        "'.'"
     };
 
     const char* GetTokenInfo(int tokenId)

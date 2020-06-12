@@ -14,6 +14,10 @@ const char* pushProjectFileRequestId = "push-project-file-request";
 const char* pushProjectFileResponseId = "push-project-file-response";
 const char* pushProjectFileContentRequestId = "push-project-file-content-request";
 const char* pushProjectFileContentResponseId = "push-project-file-content-response";
+const char* buildProjectRequestId = "build-project-request";
+const char* buildProjectResponseId = "build-project-response";
+const char* showBuildMessageRequestId = "show-build-message-request";
+const char* showBuildMessageResponseId = "show-build-message-response";
 const char* errorResponseId = "error-response";
 const char* closeConnectionRequestId = "close-connection-request";
 
@@ -95,6 +99,58 @@ void PushProjectFileContentResponse::DispatchTo(MessageHandler& handler)
     handler.Handle(*this);
 }
 
+BuildProjectRequest::BuildProjectRequest() : Message<ProjectToBuild>()
+{
+}
+
+BuildProjectRequest::BuildProjectRequest(JsonObject* messageObject) : Message<ProjectToBuild>(messageObject)
+{
+}
+
+void BuildProjectRequest::DispatchTo(MessageHandler& handler)
+{
+    handler.Handle(*this);
+}
+
+BuildProjectResponse::BuildProjectResponse() : Message<ProjectBuilt>()
+{
+}
+
+BuildProjectResponse::BuildProjectResponse(JsonObject* messageObject) : Message<ProjectBuilt>(messageObject)
+{
+}
+
+void BuildProjectResponse::DispatchTo(MessageHandler& handler)
+{
+    handler.Handle(*this);
+}
+
+ShowBuildMessageRequest::ShowBuildMessageRequest() : Message<MessageLine>()
+{
+}
+
+ShowBuildMessageRequest::ShowBuildMessageRequest(JsonObject* messageObject) : Message<MessageLine>(messageObject)
+{
+}
+
+void ShowBuildMessageRequest::DispatchTo(MessageHandler& handler)
+{
+    handler.Handle(*this);
+}
+
+ShowBuildMessageResponse::ShowBuildMessageResponse() : Message<MessageShown>()
+{
+}
+
+ShowBuildMessageResponse::ShowBuildMessageResponse(JsonObject* messageObject) : Message<MessageShown>(messageObject)
+{
+}
+
+void ShowBuildMessageResponse::DispatchTo(MessageHandler& handler)
+{
+    handler.Handle(*this);
+}
+
 ErrorResponse::ErrorResponse() : Message<Error>()
 {
 }
@@ -129,6 +185,10 @@ void BuildServerMessageInit()
     MessageFactory::Instance().Register(pushProjectFileResponseId, new ConcreteMessageCreator<PushProjectFileResponse>());
     MessageFactory::Instance().Register(pushProjectFileContentRequestId, new ConcreteMessageCreator<PushProjectFileContentRequest>());
     MessageFactory::Instance().Register(pushProjectFileContentResponseId, new ConcreteMessageCreator<PushProjectFileContentResponse>());
+    MessageFactory::Instance().Register(buildProjectRequestId, new ConcreteMessageCreator<BuildProjectRequest>());
+    MessageFactory::Instance().Register(buildProjectResponseId, new ConcreteMessageCreator<BuildProjectResponse>());
+    MessageFactory::Instance().Register(showBuildMessageRequestId, new ConcreteMessageCreator<ShowBuildMessageRequest>());
+    MessageFactory::Instance().Register(showBuildMessageResponseId, new ConcreteMessageCreator<ShowBuildMessageResponse>());
     MessageFactory::Instance().Register(errorResponseId, new ConcreteMessageCreator<ErrorResponse>());
     MessageFactory::Instance().Register(closeConnectionRequestId, new ConcreteMessageCreator<CloseConnectionRequest>());
 }

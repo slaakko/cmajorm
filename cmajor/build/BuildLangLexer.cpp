@@ -30,9 +30,6 @@ int BuildLangLexer::NextState(int state, char32_t c)
             switch (i)
             {
                 case 0:
-                case 10:
-                case 11:
-                case 12:
                 {
                     return 1;
                 }
@@ -53,27 +50,51 @@ int BuildLangLexer::NextState(int state, char32_t c)
                 {
                     return 5;
                 }
-                case 9:
+                case 7:
                 {
                     return 6;
                 }
-                case 13:
+                case 10:
                 {
                     return 7;
                 }
-                case 14:
+                case 11:
                 {
                     return 8;
                 }
-                case 15:
+                case 12:
                 {
                     return 9;
+                }
+                case 13:
+                {
+                    return 10;
                 }
                 default:
                 {
                     return -1;
                 }
             }
+        }
+        case 10:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(8);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            return -1;
         }
         case 9:
         {
@@ -137,71 +158,25 @@ int BuildLangLexer::NextState(int state, char32_t c)
         }
         case 6:
         {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
             switch (i)
             {
                 case 0:
                 case 1:
-                case 9:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 10:
                 case 11:
                 case 12:
-                {
-                    return 10;
-                }
-                case 10:
+                case 13:
                 {
                     return 11;
                 }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 11:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 1:
                 case 9:
-                case 10:
-                case 12:
-                {
-                    return 10;
-                }
-                case 11:
                 {
                     return 12;
                 }
@@ -215,7 +190,7 @@ int BuildLangLexer::NextState(int state, char32_t c)
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(2);
+            int tokenId = GetTokenId(4);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -229,138 +204,9 @@ int BuildLangLexer::NextState(int state, char32_t c)
             {
                 token.match = prevMatch;
             }
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 9:
-                case 11:
-                case 12:
-                {
-                    return 10;
-                }
-                case 10:
-                {
-                    return 13;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
+            return -1;
         }
-        case 13:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 9:
-                case 10:
-                case 11:
-                {
-                    return 10;
-                }
-                case 12:
-                {
-                    return 14;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 14:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 9:
-                case 10:
-                case 11:
-                {
-                    return 10;
-                }
-                case 12:
-                {
-                    return 14;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 10:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                {
-                    return 10;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 5:
+        case 11:
         {
             switch (i)
             {
@@ -372,19 +218,17 @@ int BuildLangLexer::NextState(int state, char32_t c)
                 case 5:
                 case 6:
                 case 7:
-                case 9:
+                case 8:
                 case 10:
                 case 11:
                 case 12:
                 case 13:
-                case 14:
-                case 15:
                 {
-                    return 15;
+                    return 11;
                 }
-                case 8:
+                case 9:
                 {
-                    return 16;
+                    return 12;
                 }
                 default:
                 {
@@ -392,7 +236,7 @@ int BuildLangLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 16:
+        case 5:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -410,33 +254,11 @@ int BuildLangLexer::NextState(int state, char32_t c)
             {
                 token.match = prevMatch;
             }
-            return -1;
-        }
-        case 15:
-        {
             switch (i)
             {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
                 case 6:
-                case 7:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
                 {
-                    return 15;
-                }
-                case 8:
-                {
-                    return 16;
+                    return 5;
                 }
                 default:
                 {
@@ -486,7 +308,7 @@ int BuildLangLexer::NextState(int state, char32_t c)
             {
                 case 5:
                 {
-                    return 17;
+                    return 13;
                 }
                 default:
                 {
@@ -494,7 +316,7 @@ int BuildLangLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 17:
+        case 13:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -567,12 +389,41 @@ int BuildLangLexer::NextState(int state, char32_t c)
             {
                 case 0:
                 case 1:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
+                case 6:
                 {
-                    return 10;
+                    return 14;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 14:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(2);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 0:
+                case 1:
+                case 6:
+                {
+                    return 14;
                 }
                 default:
                 {
@@ -609,13 +460,13 @@ int BuildLangLexer::GetTokenId(int statementIndex)
         case 3:
         {
             Retract();
-            return FILEPATH;
+            return INTEGER;
             break;
         }
         case 4:
         {
             Retract();
-            return INTEGER;
+            return FILEPATH;
             break;
         }
         case 5:
@@ -634,6 +485,12 @@ int BuildLangLexer::GetTokenId(int statementIndex)
         {
             Retract();
             return EQ;
+            break;
+        }
+        case 8:
+        {
+            Retract();
+            return DOT;
             break;
         }
     }

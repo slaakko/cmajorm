@@ -12,10 +12,12 @@ namespace soulng { namespace util {
 void Init()
 {
     soulng::unicode::UnicodeInit();
+    soulng::util::InitSocket();
 }
 
 void Done()
 {
+    soulng::util::DoneSocket();
     soulng::unicode::UnicodeDone();
 }
 

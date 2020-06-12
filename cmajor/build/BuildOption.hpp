@@ -11,26 +11,27 @@
 
 namespace cmajor { namespace build { 
 
-enum class BuildOptions : int8_t
+enum class BuildOptions : int16_t
 {
     none = 0,
     verbose = 1 << 0,
-    debug = 1 << 1,
-    force = 1 << 2,
-    only = 1 << 3,
-    all = 1 << 4,
-    push = 1 << 5,
-    build = 1 << 6
+    messages = 1 << 1,
+    debug = 1 << 2,
+    force = 1 << 3,
+    only = 1 << 4,
+    all = 1 << 5,
+    push = 1 << 6,
+    build = 1 << 7
 };
 
 inline BuildOptions operator|(BuildOptions left, BuildOptions right)
 {
-    return BuildOptions(int8_t(left) | int8_t(right));
+    return BuildOptions(int16_t(left) | int16_t(right));
 }
 
 inline BuildOptions operator&(BuildOptions left, BuildOptions right)
 {
-    return BuildOptions(int8_t(left) & int8_t(right));
+    return BuildOptions(int16_t(left) & int16_t(right));
 }
 
 extern BuildOptions buildOptions;

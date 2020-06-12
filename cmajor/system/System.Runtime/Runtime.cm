@@ -246,3 +246,14 @@ public extern cdecl nothrow void* RtCreateFiber(ulong stackSize, void* startAddr
 public extern cdecl nothrow void RtSwitchToFiber(void* fiber);
 public extern cdecl nothrow void* RtGetFiberData();
 public extern cdecl nothrow void RtDeleteFiber(void* fiber);
+public extern cdecl nothrow void* RtCreateProcess(const char* command, int& errorStringHandle);
+public extern cdecl nothrow void RtDeleteProcess(void* process);
+public extern cdecl nothrow const char* RtGetString(int stringHandle);
+public extern cdecl nothrow void RtDisposeString(int stringHandle);
+public extern cdecl nothrow bool RtProcessRunning(void* process);
+public extern cdecl nothrow void RtProcessWaitForExit(void* process);
+public extern cdecl nothrow int RtProcessExitCode(void* process);
+public extern cdecl nothrow bool RtProcessEof(void* process, int handle);
+public extern cdecl nothrow int RtProcessReadLine(void* process, int handle);
+public extern cdecl nothrow int RtProcessReadToEnd(void* process, int handle);
+public extern cdecl nothrow void RtProcessWriteLine(void* process, const char* line);

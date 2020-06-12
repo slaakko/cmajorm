@@ -16,6 +16,8 @@
 #include <soulng/util/System.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Error.hpp>
+#include <soulng/util/Log.hpp>
+#include <soulng/util/Process.hpp>
 #include <soulng/util/Sha1.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
@@ -65,8 +67,8 @@ void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
     std::string outputDirectory = GetFullPath(Path::Combine(Path::GetDirectoryName(intermediateCodeFile), configuration.outputDirectory));
     boost::filesystem::create_directories(outputDirectory);
     std::string intermediateCompileCommand;
-    std::string intermediateCompileErrorFilePath = intermediateCodeFile + ".error";
-    intermediateCompileCommand.append("cmfileredirector -2 ").append(intermediateCompileErrorFilePath).append("  ").append(compilerTool.commandName);
+    std::string errors;
+    intermediateCompileCommand.append(compilerTool.commandName);
     for (const std::string& arg : configuration.args)
     {
         if (arg.find('$') != std::string::npos)
@@ -109,12 +111,28 @@ void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
     }
     try
     {
-        System(intermediateCompileCommand); 
-        boost::filesystem::remove(boost::filesystem::path(intermediateCompileErrorFilePath)); 
+        Process process(intermediateCompileCommand);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::std_out))
+            {
+                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                if (!line.empty())
+                {
+                    LogMessage(module->LogStreamId(), line);
+                }
+            }
+        }
+        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        process.WaitForExit();
+        int exitCode = process.ExitCode();
+        if (exitCode != 0)
+        {
+            throw std::runtime_error("executing '" + intermediateCompileCommand + "' failed with exit code: " + std::to_string(exitCode));
+        }
     }
     catch (const std::exception& ex)
     {
-        std::string errors = ReadFile(intermediateCompileErrorFilePath);
         throw std::runtime_error("compiling intermediate code '" + intermediateCodeFile + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
 }

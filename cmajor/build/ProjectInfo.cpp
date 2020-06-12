@@ -125,6 +125,92 @@ ProjectUpdated::ProjectUpdated(soulng::util::JsonValue* value)
     sngjson::json::FromJson(value, "error", error);
 }
 
+ProjectToBuild::ProjectToBuild() : projectId(), sendBuildOutput(), config(), toolChain()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> ProjectToBuild::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(projectId);
+    object->AddField(U"projectId", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(sendBuildOutput);
+    object->AddField(U"sendBuildOutput", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(config);
+    object->AddField(U"config", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(toolChain);
+    object->AddField(U"toolChain", std::move(fieldValue3));
+    return object;
+}
+
+ProjectToBuild::ProjectToBuild(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "projectId", projectId);
+    sngjson::json::FromJson(value, "sendBuildOutput", sendBuildOutput);
+    sngjson::json::FromJson(value, "config", config);
+    sngjson::json::FromJson(value, "toolChain", toolChain);
+}
+
+ProjectBuilt::ProjectBuilt() : projectId(), ok(), info(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> ProjectBuilt::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(projectId);
+    object->AddField(U"projectId", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(ok);
+    object->AddField(U"ok", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(info);
+    object->AddField(U"info", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue3));
+    return object;
+}
+
+ProjectBuilt::ProjectBuilt(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "projectId", projectId);
+    sngjson::json::FromJson(value, "ok", ok);
+    sngjson::json::FromJson(value, "info", info);
+    sngjson::json::FromJson(value, "error", error);
+}
+
+MessageLine::MessageLine() : line()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> MessageLine::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(line);
+    object->AddField(U"line", std::move(fieldValue0));
+    return object;
+}
+
+MessageLine::MessageLine(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "line", line);
+}
+
+MessageShown::MessageShown() : error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> MessageShown::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue0));
+    return object;
+}
+
+MessageShown::MessageShown(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "error", error);
+}
+
 Error::Error() : info(), error()
 {
 }

@@ -56,6 +56,44 @@ struct BUILD_API ProjectUpdated
     std::string error;
 };
 
+struct BUILD_API ProjectToBuild
+{
+    ProjectToBuild();
+    ProjectToBuild(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string projectId;
+    bool sendBuildOutput;
+    std::string config;
+    std::string toolChain;
+};
+
+struct BUILD_API ProjectBuilt
+{
+    ProjectBuilt();
+    ProjectBuilt(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string projectId;
+    bool ok;
+    std::string info;
+    std::string error;
+};
+
+struct BUILD_API MessageLine
+{
+    MessageLine();
+    MessageLine(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string line;
+};
+
+struct BUILD_API MessageShown
+{
+    MessageShown();
+    MessageShown(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string error;
+};
+
 struct BUILD_API Error
 {
     Error();

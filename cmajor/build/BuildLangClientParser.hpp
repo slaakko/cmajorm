@@ -19,12 +19,20 @@ struct BUILD_API BuildLangClientParser
     static soulng::parser::Match ClientCommandSentence(BuildLangLexer& lexer);
     static soulng::parser::Match PushProjectSentence(BuildLangLexer& lexer);
     static soulng::parser::Match RemoveProjectSentence(BuildLangLexer& lexer);
+    static soulng::parser::Match AddServerSentence(BuildLangLexer& lexer);
+    static soulng::parser::Match RemoveServerSentence(BuildLangLexer& lexer);
     static soulng::parser::Match BuildProjectSentence(BuildLangLexer& lexer);
     static soulng::parser::Match DebugProjectSentence(BuildLangLexer& lexer);
     static soulng::parser::Match InstallProjectSentence(BuildLangLexer& lexer);
+    static soulng::parser::Match ShowConfigurationSentence(BuildLangLexer& lexer);
     static soulng::parser::Match ProjectFilePath(BuildLangLexer& lexer);
     static soulng::parser::Match DirectoryPath(BuildLangLexer& lexer);
     static soulng::parser::Match ServerName(BuildLangLexer& lexer);
+    static soulng::parser::Match Host(BuildLangLexer& lexer);
+    static soulng::parser::Match HostName(BuildLangLexer& lexer);
+    static soulng::parser::Match IpAddress(BuildLangLexer& lexer);
+    static soulng::parser::Match Port(BuildLangLexer& lexer);
+    static soulng::parser::Match ToolChain(BuildLangLexer& lexer);
 };
 
 #endif // BUILDLANGCLIENTPARSER_HPP

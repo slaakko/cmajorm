@@ -10,18 +10,26 @@
 
 namespace soulng { namespace util {
 
+class ProcessImpl;
+
 class UTIL_API Process
 {
 public:
-    enum class ProcessIOHandle : int
+    enum class StdHandle : int
     {
-        out = 1, err = 2
+        std_out = 1, std_err = 2
     };
-    Process(const std::string& filePath_);
-    std::string ReadLine(ProcessIOHandle handle);
+    Process(const std::string& command);
+    ~Process();
+    bool Running();
+    void WaitForExit();
+    int ExitCode() const;
+    bool Eof(StdHandle handle);
+    std::string ReadLine(StdHandle handle);
+    std::string ReadToEnd(StdHandle handle);
     void WriteLine(const std::string& line);
 private:
-    std::string filePath;
+    ProcessImpl* impl;
 };
 
 } } // namespace soulng::util

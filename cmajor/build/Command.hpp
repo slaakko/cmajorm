@@ -45,6 +45,27 @@ private:
     std::string serverName;
 };
 
+class BUILD_API RemoveServerCommand : public Command
+{
+public:
+    RemoveServerCommand(const std::string& serverName_);
+    void Execute() override;
+private:
+    std::string serverName;
+};
+
+class BUILD_API AddServerCommand : public Command
+{
+public:
+    AddServerCommand(const std::string& serverName_, const std::string& host_, int port_, const std::string& defaultToolChain_);
+    void Execute() override;
+private:
+    std::string serverName;
+    std::string host;
+    int port;
+    std::string defaultToolChain;
+};
+
 class BUILD_API BuildProjectCommand : public Command
 {
 public:
@@ -74,6 +95,13 @@ private:
     std::string projectFilePath;
     std::string directory;
     std::string serverName;
+};
+
+class BUILD_API ShowConfigurationCommand : public Command
+{
+public:
+    ShowConfigurationCommand();
+    void Execute() override;
 };
 
 BUILD_API std::unique_ptr<Command> ParseCommand(const std::string& command);

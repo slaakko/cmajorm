@@ -500,6 +500,10 @@
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtCreateFiber">RtCreateFiber</a>(<span class="kw">ulong</span>&nbsp;stackSize, <span class="kw">void</span>*&nbsp;startAddress, <span class="kw">void</span>*&nbsp;param)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtCreateProcess">RtCreateProcess</a>(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;command, <span class="kw">int</span>&amp;&nbsp;errorStringHandle)</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtCreateSocket">RtCreateSocket</a>()</td>
    </tr>
@@ -522,6 +526,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtDeleteFiber">RtDeleteFiber</a>(<span class="kw">void</span>*&nbsp;fiber)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtDeleteProcess">RtDeleteProcess</a>(<span class="kw">void</span>*&nbsp;process)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -554,6 +562,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtDisposeStackTrace">RtDisposeStackTrace</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtDisposeString">RtDisposeString</a>(<span class="kw">int</span>&nbsp;stringHandle)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -804,6 +816,10 @@
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtGetStackTrace">RtGetStackTrace</a>()</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span>*</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtGetString">RtGetString</a>(<span class="kw">int</span>&nbsp;stringHandle)</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtGetYX">RtGetYX</a>(<span class="kw">int</span>*&nbsp;row, <span class="kw">int</span>*&nbsp;col)</td>
    </tr>
@@ -954,6 +970,34 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">double</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtPow">RtPow</a>(<span class="kw">double</span>&nbsp;x, <span class="kw">int</span>&nbsp;exponent)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtProcessEof">RtProcessEof</a>(<span class="kw">void</span>*&nbsp;process, <span class="kw">int</span>&nbsp;handle)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtProcessExitCode">RtProcessExitCode</a>(<span class="kw">void</span>*&nbsp;process)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtProcessReadLine">RtProcessReadLine</a>(<span class="kw">void</span>*&nbsp;process, <span class="kw">int</span>&nbsp;handle)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtProcessReadToEnd">RtProcessReadToEnd</a>(<span class="kw">void</span>*&nbsp;process, <span class="kw">int</span>&nbsp;handle)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtProcessRunning">RtProcessRunning</a>(<span class="kw">void</span>*&nbsp;process)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtProcessWaitForExit">RtProcessWaitForExit</a>(<span class="kw">void</span>*&nbsp;process)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtProcessWriteLine">RtProcessWriteLine</a>(<span class="kw">void</span>*&nbsp;process, <span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;line)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -3451,6 +3495,13 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="RtCreateProcess" xml:space="preserve">RtCreateProcess&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;RtCreateProcess(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;command, <span class="kw">int</span>&amp;&nbsp;errorStringHandle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#249">249</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="RtCreateSocket" xml:space="preserve">RtCreateSocket&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtCreateSocket()</h4>
   <h5>Definition</h5>
@@ -3490,6 +3541,13 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtDeleteFiber(<span class="kw">void</span>*&nbsp;fiber)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#248">248</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtDeleteProcess" xml:space="preserve">RtDeleteProcess&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtDeleteProcess(<span class="kw">void</span>*&nbsp;process)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#250">250</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -3546,6 +3604,13 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtDisposeStackTrace()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#31">31</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtDisposeString" xml:space="preserve">RtDisposeString&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtDisposeString(<span class="kw">int</span>&nbsp;stringHandle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#252">252</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -3983,6 +4048,13 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="RtGetString" xml:space="preserve">RtGetString&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;RtGetString(<span class="kw">int</span>&nbsp;stringHandle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#251">251</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="RtGetYX" xml:space="preserve">RtGetYX&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtGetYX(<span class="kw">int</span>*&nbsp;row, <span class="kw">int</span>*&nbsp;col)</h4>
   <h5>Definition</h5>
@@ -4246,6 +4318,55 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">double</span>&nbsp;RtPow(<span class="kw">double</span>&nbsp;x, <span class="kw">int</span>&nbsp;exponent)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#51">51</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtProcessEof" xml:space="preserve">RtProcessEof&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;RtProcessEof(<span class="kw">void</span>*&nbsp;process, <span class="kw">int</span>&nbsp;handle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#256">256</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtProcessExitCode" xml:space="preserve">RtProcessExitCode&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtProcessExitCode(<span class="kw">void</span>*&nbsp;process)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#255">255</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtProcessReadLine" xml:space="preserve">RtProcessReadLine&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtProcessReadLine(<span class="kw">void</span>*&nbsp;process, <span class="kw">int</span>&nbsp;handle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#257">257</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtProcessReadToEnd" xml:space="preserve">RtProcessReadToEnd&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;RtProcessReadToEnd(<span class="kw">void</span>*&nbsp;process, <span class="kw">int</span>&nbsp;handle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#258">258</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtProcessRunning" xml:space="preserve">RtProcessRunning&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;RtProcessRunning(<span class="kw">void</span>*&nbsp;process)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#253">253</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtProcessWaitForExit" xml:space="preserve">RtProcessWaitForExit&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtProcessWaitForExit(<span class="kw">void</span>*&nbsp;process)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#254">254</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="RtProcessWriteLine" xml:space="preserve">RtProcessWriteLine&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RtProcessWriteLine(<span class="kw">void</span>*&nbsp;process, <span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;line)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#259">259</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
   <br/>
   <br/>
   <hr/>

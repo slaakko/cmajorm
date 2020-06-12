@@ -24,6 +24,7 @@ public:
 private:
     std::mutex mtx;
     std::condition_variable running;
+    bool isRunning;
     Log* log;
     std::string serverName;
     TcpSocket socket;

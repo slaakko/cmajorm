@@ -27,21 +27,34 @@ void SocketClient::Run()
     ServerInfo* serverInfo = ServerConfig::Instance().GetServerInfo(serverName, true, true);
     if (serverInfo)
     {
-        if (GetGlobalFlag(GlobalFlags::verbose))
+        std::string node = "localhost";
+        std::string service = std::to_string(serverInfo->Port());
+        std::string hostPortStr;
+        if (!serverInfo->Host().empty() && serverInfo->Host() != "localhost" && serverInfo->Host() != "127.0.0.1")
         {
-            LogMessage(-1, "connecting to server '" + serverName + "' in port " + std::to_string(serverInfo->Port()) + "...");
+            node = serverInfo->Host();
+            hostPortStr = "host " + serverInfo->Host() + " port " + std::to_string(serverInfo->Port());
         }
-        socket.Connect("localhost", std::to_string(serverInfo->Port()));
+        else
+        {
+            hostPortStr = "port " + std::to_string(serverInfo->Port());
+        }
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            LogMessage(-1, "connected");
+            LogMessage(-1, "socket client: connecting to server '" + serverName + "' in " + hostPortStr + "...");
+        }
+        socket.Connect(node, service);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(-1, "socket client: connected");
         }
     }
     else
     {
-        throw std::runtime_error("server name '" + serverName + "' not found");
+        throw std::runtime_error("socket client: server name '" + serverName + "' not found");
     }
     connection.reset(new SocketConnection(log, this, std::move(socket)));
+    connection->SetServerAlive(true);
     buildClient.reset(new BuildClient(connection.get()));
 }
 

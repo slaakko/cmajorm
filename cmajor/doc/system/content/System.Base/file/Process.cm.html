@@ -1,0 +1,153 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Base/Process.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Threading</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html">Process</a></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">enum</span>&nbsp;<a href="../doc/enumerated_type_StdHandle_8998C7B354A442DDB5FB354A8BC699B3B9268AE8.html">StdHandle</a></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std_out</span><span class="other">&nbsp;=&nbsp;</span><span class="number">1</span><span class="other">,&nbsp;</span><span class="identifier">std_err</span><span class="other">&nbsp;=&nbsp;</span><span class="number">2</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#constructor_Process_DA5577C5989AFBA407A25D1E65360585AB21C72E">Process</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">command</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">errorStringHandle</span><span class="other">&nbsp;=&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#RtCreateProcess">RtCreateProcess</a><span class="other">(</span><span class="identifier">command</span><span class="other">.</span><a href="../doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Chars_String_CharT_F23E248DC46A5AA9215CDB25B6779E94681FBAB6">Chars</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">errorStringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">&nbsp;==&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<span class="identifier">errorString</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#RtGetString">RtGetString</a><span class="other">(</span><span class="identifier">errorStringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#RtDisposeString">RtDisposeString</a><span class="other">(</span><span class="identifier">errorStringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_ThreadingException_4952259FBBDB6BDFCF1A52EABE2C1A61BF601670.html#constructor_ThreadingException_2E2A0EC6E92F92EE6A7416C0BEC8FDECBDA99D6E">ThreadingException</a><span class="other">(</span><span class="identifier">errorString</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="other">~</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#destructor_Process_EADD60BBB1CF7FC1CFA8D21071C8259225FEAD6E">Process</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#RtDeleteProcess">RtDeleteProcess</a><span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_function_Running_Process_C91779F357651442E826FAE65D4496A2C9AAF299">Running</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Runtime/index.html#RtProcessRunning">RtProcessRunning</a><span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_function_WaitForExit_Process_67170158281898EC9F2D90D6922D3EECF8B00060">WaitForExit</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#RtProcessWaitForExit">RtProcessWaitForExit</a><span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_function_ExitCode_Process_54489D27CF8D471BEF2936385CBD14A7ABED70C4">ExitCode</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Runtime/index.html#RtProcessExitCode">RtProcessExitCode</a><span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_function_Eof_Process_3305562AB9DD2CE45D5B11F210E7B17C40F0B665">Eof</a><span class="other">(</span><a href="../doc/enumerated_type_StdHandle_8998C7B354A442DDB5FB354A8BC699B3B9268AE8.html">StdHandle</a>&nbsp;<span class="identifier">handle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Runtime/index.html#RtProcessEof">RtProcessEof</a><span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">,&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">handle</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_function_ReadLine_Process_5B51AFF61B03F2899EE03A8463EE253AACFCF64F">ReadLine</a><span class="other">(</span><a href="../doc/enumerated_type_StdHandle_8998C7B354A442DDB5FB354A8BC699B3B9268AE8.html">StdHandle</a>&nbsp;<span class="identifier">handle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">stringHandle</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#RtProcessReadLine">RtProcessReadLine</a><span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">,&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">handle</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<span class="identifier">line</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#RtGetString">RtGetString</a><span class="other">(</span><span class="identifier">stringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#RtDisposeString">RtDisposeString</a><span class="other">(</span><span class="identifier">stringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">line</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_function_ReadToEnd_Process_5B926A5AE3BF765456B793CBAD3FA95BCFFB07A7">ReadToEnd</a><span class="other">(</span><a href="../doc/enumerated_type_StdHandle_8998C7B354A442DDB5FB354A8BC699B3B9268AE8.html">StdHandle</a>&nbsp;<span class="identifier">handle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">stringHandle</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#RtProcessReadToEnd">RtProcessReadToEnd</a><span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">,&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">handle</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<span class="identifier">content</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#RtGetString">RtGetString</a><span class="other">(</span><span class="identifier">stringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#RtDisposeString">RtDisposeString</a><span class="other">(</span><span class="identifier">stringHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">content</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_function_WriteLine_Process_E8C22290CFE87CC5338D6DD94B8AEC9A2A2BB9F4">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">line</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#RtProcessWriteLine">RtProcessWriteLine</a><span class="other">(</span><a href="../doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html#member_variable_nativeProcess_65385EE025A633A5E68D8D82D93EB6C9E765CD92">nativeProcess</a><span class="other">,&nbsp;</span><span class="identifier">line</span><span class="other">.</span><a href="../doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Chars_String_CharT_F23E248DC46A5AA9215CDB25B6779E94681FBAB6">Chars</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">nativeProcess</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

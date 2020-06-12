@@ -11,6 +11,7 @@
 #include <cmajor/build/Log.hpp>
 #include <cmajor/build/BuildClient.hpp>
 #include <cmajor/build/BuildServer.hpp>
+#include <cmajor/build/ServerConfig.hpp>
 #include <cmajor/build/FiberExecutionContext.hpp>
 #include <cmajor/build/LocalExecutionContext.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -39,7 +40,7 @@ std::unique_ptr<ExecutionContext> CreateExecutionContext(const std::string& serv
     {
         return std::unique_ptr<ExecutionContext>(new FiberExecutionContext());
     }
-    else if (serverName == "$local")
+    else if (serverName == "local")
     {
         return std::unique_ptr<ExecutionContext>(new LocalExecutionContext());
     }
@@ -99,6 +100,32 @@ void RemoveProjectCommand::Execute()
 {
 }
 
+RemoveServerCommand::RemoveServerCommand(const std::string& serverName_) : serverName(serverName_)
+{
+}
+
+void RemoveServerCommand::Execute()
+{
+    ServerConfig::Instance().Remove(serverName);
+    LogMessage(-1, "server '" + serverName + "' removed");
+}
+
+AddServerCommand::AddServerCommand(const std::string& serverName_, const std::string& host_, int port_, const std::string& defaultToolChain_) :
+    serverName(serverName_), host(host_), port(port_), defaultToolChain(defaultToolChain_)
+{
+}
+
+void AddServerCommand::Execute()
+{
+    bool force = false;
+    if (GetBuildOption(BuildOptions::force))
+    {
+        force = true;
+    }
+    ServerConfig::Instance().Add(serverName, host, port, defaultToolChain, force, true, true);
+    LogMessage(-1, "server '" + serverName + "' added");
+}
+
 BuildProjectCommand::BuildProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
 {
 }
@@ -122,6 +149,15 @@ InstallProjectCommand::InstallProjectCommand(const std::string& projectFilePath_
 
 void InstallProjectCommand::Execute()
 {
+}
+
+ShowConfigurationCommand::ShowConfigurationCommand() 
+{
+}
+
+void ShowConfigurationCommand::Execute()
+{
+    ServerConfig::Instance().Show();
 }
 
 std::unique_ptr<Command> ParseCommand(const std::string& command)

@@ -43,6 +43,32 @@ struct api(BUILD_API) ProjectUpdated
     string error;
 }
 
+struct api(BUILD_API) ProjectToBuild
+{
+    string projectId;
+    bool sendBuildOutput;
+    string config;
+    string toolChain;
+}
+
+struct api(BUILD_API) ProjectBuilt
+{
+    string projectId;
+    bool ok;
+    string info;
+    string error;
+}
+
+struct api(BUILD_API) MessageLine
+{
+    string line;
+}
+
+struct api(BUILD_API) MessageShown
+{
+    string error;
+}
+
 struct api(BUILD_API) Error
 {
     string info;
