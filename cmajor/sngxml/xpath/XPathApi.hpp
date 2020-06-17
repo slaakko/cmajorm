@@ -6,7 +6,7 @@
 #ifndef SNGXML_XPATH_API_INCLUDED
 #define SNGXML_XPATH_API_INCLUDED
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 
 #ifdef SNGXML_XPATH_EXPORTS
 #define SNGXML_XPATH_API __declspec(dllexport)

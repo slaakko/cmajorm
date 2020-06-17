@@ -11,7 +11,33 @@
 
 namespace cmajor { namespace build {
 
-FiberConnection::FiberConnection(Log* log) : Connection(log), serverFiber(nullptr), clientFiber(nullptr), currentFiber(nullptr), client("client"), server("server")
+FiberClient::FiberClient() : name("fiber client")
+{
+}
+
+const std::string& FiberClient::Name() const
+{
+    return name;
+}
+
+void FiberClient::Exit()
+{
+}
+
+FiberServer::FiberServer() : name("fiber server")
+{
+}
+
+const std::string& FiberServer::Name() const
+{
+    return name;
+}
+
+void FiberServer::Exit()
+{
+}
+
+FiberConnection::FiberConnection(Log* log) : Connection(log), serverFiber(nullptr), clientFiber(nullptr), currentFiber(nullptr), client(), server()
 {
 }
 
@@ -48,11 +74,23 @@ const std::string& FiberConnection::GetActor() const
 {
     if (currentFiber == clientFiber)
     {
-        return client;
+        return client.Name();
     }
     else
     {
-        return server;
+        return server.Name();
+    }
+}
+
+Host* FiberConnection::GetHost() const
+{
+    if (currentFiber == clientFiber)
+    {
+        return const_cast<FiberClient*>(&client);
+    }
+    else
+    {
+        return const_cast<FiberServer*>(&server);
     }
 }
 

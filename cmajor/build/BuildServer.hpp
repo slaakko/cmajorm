@@ -7,7 +7,7 @@
 #define CMAJOR_BUILD_SERVER_INCLUDED
 #include <cmajor/build/Connection.hpp>
 #include <cmajor/build/MessageHandler.hpp>
-#include <cmajor/build/ProjectInfo.hpp>
+#include <cmajor/build/MessageBody.hpp>
 #include <soulng/util/Process.hpp>
 
 namespace cmajor { namespace build {
@@ -24,14 +24,15 @@ public:
     void Handle(PushProjectFileRequest& request) override;
     void Handle(PushProjectFileContentRequest& request) override;
     void Handle(BuildProjectRequest& request) override;
+    void Handle(ShowBuildMessageResponse& response) override;
     void Handle(CloseConnectionRequest& request) override;
     void SetConnection(Connection* connection_) { connection = connection_; }
     Connection* GetConnection() const { return connection; }
+    void SendBuildMessages(Process* buildProcess);
 private:
     std::string repositoryDir;
     Connection* connection;
     bool exiting;
-    std::unique_ptr<soulng::util::Process> buildProcess;
 };
 
 void SetServer(BuildServer* server_);

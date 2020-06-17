@@ -6,7 +6,7 @@
 #ifndef SNGCM_LEXER_API_INCLUDED
 #define SNGCM_LEXER_API_INCLUDED
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 
 #ifdef SNGCM_LEXER_EXPORTS
 #define SNGCM_LEXER_API __declspec(dllexport)

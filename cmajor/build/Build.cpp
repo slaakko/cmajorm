@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/build/Build.hpp>
-#include <cmajor/build/ProjectInfo.hpp>
+#include <cmajor/build/MessageBody.hpp>
 #include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <cmajor/codegen/EmittingContext.hpp>
 #include <cmajor/codegen/Interface.hpp>
@@ -435,19 +435,24 @@ void GenerateLibraryCpp(Module* module, const std::vector<std::string>& objectFi
     }
     try
     {
-        Process process(command);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(command, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(module->LogStreamId(), line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -489,19 +494,24 @@ void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectF
     }
     try
     {
-        Process process(libCommandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(libCommandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(module->LogStreamId(), line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -546,19 +556,24 @@ void GenerateLibrarySystemX(Module* module, const std::vector<std::string>& obje
     }
     try
     {
-        Process process(libCommandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(libCommandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(module->LogStreamId(), line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -600,19 +615,24 @@ void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectF
     }
     try
     {
-        Process process(libCommandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(libCommandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(module->LogStreamId(), line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -672,6 +692,7 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     std::string cmrtLibFileName = cmrtLibName;
     std::string ehLibFileName = ehLibName;
     std::string cmajorLibDir = QuotedPath(GetFullPath(Path::Combine(CmajorRootDir(), "lib")));
+    std::string toolChainDir = QuotedPath(GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), GetToolChain())));
     std::string linkCommandLine;
     linkCommandLine = linkerTool.commandName;
     for (const std::string& arg : configuration.args)
@@ -682,41 +703,47 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
             {
                 linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$CMAJOR_LIBRARY_DIRECTORY$", cmajorLibDir));
             }
+            else if (arg.find("$TOOL_CHAIN_LIBRARY_DIRECTORY$"))
+            {
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$TOOL_CHAIN_LIBRARY_DIRECTORY$", toolChainDir));
+            }
             else if (arg.find("$LIBRARY_FILES$") != std::string::npos)
             {
                 std::string libFilePaths;
-                libFilePaths.append(QuotedPath(cmrtLibFileName));
-                libFilePaths.append(1, ' ').append(QuotedPath(ehLibFileName));
-                libFilePaths.append(1, ' ').append("cmsngxmldomd.lib");
-                libFilePaths.append(1, ' ').append("cmsnglexerd.lib");
-                libFilePaths.append(1, ' ').append("cmsngparserd.lib");
-                libFilePaths.append(1, ' ').append("cmsngutild.lib");
-                libFilePaths.append(1, ' ').append("cmsngxmlxmld.lib");
-                libFilePaths.append(1, ' ').append("cmsngxmlxpathd.lib");
-                libFilePaths.append(1, ' ').append("libbz2.lib");
-                libFilePaths.append(1, ' ').append("zlibstat.lib");
-                libFilePaths.append(1, ' ').append("libgnutls-30.lib");
-                libFilePaths.append(1, ' ').append("pdcurses.lib");
-                libFilePaths.append(1, ' ').append("cmrt360gmp.lib");
-                libFilePaths.append(1, ' ').append("ws2_32.lib");
-                libFilePaths.append(1, ' ').append("kernel32.lib");
-                libFilePaths.append(1, ' ').append("user32.lib");
-                libFilePaths.append(1, ' ').append("gdi32.lib");
-                libFilePaths.append(1, ' ').append("winspool.lib");
-                libFilePaths.append(1, ' ').append("comdlg32.lib");
-                libFilePaths.append(1, ' ').append("advapi32.lib");
-                libFilePaths.append(1, ' ').append("shell32.lib");
-                libFilePaths.append(1, ' ').append("ole32.lib");
-                libFilePaths.append(1, ' ').append("oleaut32.lib");
-                libFilePaths.append(1, ' ').append("uuid.lib");
-                libFilePaths.append(1, ' ').append("odbc32.lib");
-                libFilePaths.append(1, ' ').append("odbccp32.lib");
+                if (GetToolChain() == "vs")
+                {
+                    libFilePaths.append(QuotedPath(cmrtLibFileName));
+                    libFilePaths.append(1, ' ').append(QuotedPath(ehLibFileName));
+                    libFilePaths.append(1, ' ').append("cmsngxmldomd.lib");
+                    libFilePaths.append(1, ' ').append("cmsnglexerd.lib");
+                    libFilePaths.append(1, ' ').append("cmsngparserd.lib");
+                    libFilePaths.append(1, ' ').append("cmsngutild.lib");
+                    libFilePaths.append(1, ' ').append("cmsngxmlxmld.lib");
+                    libFilePaths.append(1, ' ').append("cmsngxmlxpathd.lib");
+                    libFilePaths.append(1, ' ').append("libbz2.lib");
+                    libFilePaths.append(1, ' ').append("zlibstat.lib");
+                    libFilePaths.append(1, ' ').append("libgnutls-30.lib");
+                    libFilePaths.append(1, ' ').append("pdcurses.lib");
+                    libFilePaths.append(1, ' ').append("cmrt360gmp.lib");
+                    libFilePaths.append(1, ' ').append("ws2_32.lib");
+                    libFilePaths.append(1, ' ').append("kernel32.lib");
+                    libFilePaths.append(1, ' ').append("user32.lib");
+                    libFilePaths.append(1, ' ').append("gdi32.lib");
+                    libFilePaths.append(1, ' ').append("winspool.lib");
+                    libFilePaths.append(1, ' ').append("comdlg32.lib");
+                    libFilePaths.append(1, ' ').append("advapi32.lib");
+                    libFilePaths.append(1, ' ').append("shell32.lib");
+                    libFilePaths.append(1, ' ').append("ole32.lib");
+                    libFilePaths.append(1, ' ').append("oleaut32.lib");
+                    libFilePaths.append(1, ' ').append("uuid.lib");
+                    libFilePaths.append(1, ' ').append("odbc32.lib");
+                    libFilePaths.append(1, ' ').append("odbccp32.lib");
 
-                libFilePaths.append(1, ' ').append("msvcrtd.lib");
-                libFilePaths.append(1, ' ').append("msvcprtd.lib");
-                libFilePaths.append(1, ' ').append("vcruntimed.lib");
-                libFilePaths.append(1, ' ').append("ucrtd.lib");
-
+                    libFilePaths.append(1, ' ').append("msvcrtd.lib");
+                    libFilePaths.append(1, ' ').append("msvcprtd.lib");
+                    libFilePaths.append(1, ' ').append("vcruntimed.lib");
+                    libFilePaths.append(1, ' ').append("ucrtd.lib");
+                }
                 for (const std::string& libFilePath : libraryFilePaths)
                 {
                     libFilePaths.append(1, ' ');
@@ -767,19 +794,24 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     std::string errors;
     try
     {
-        Process process(linkCommandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(linkCommandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(module.LogStreamId(), line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -804,7 +836,7 @@ std::string GetBoostLibDirFromCompilerConfigXml()
     if (boost::filesystem::exists(compilerConfigXmlFilePath))
     {
         std::unique_ptr<sngxml::dom::Document> compilerConfigDoc = sngxml::dom::ReadDocument(compilerConfigXmlFilePath);
-        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"/compiler/" + ToUtf32(GetToolChain()) + U"/boost", compilerConfigDoc.get());
+        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"/compiler/" + ToUtf32(GetPlatform()) + U"/" + ToUtf32(GetToolChain()) + U"/boost", compilerConfigDoc.get());
         if (result)
         {
             if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
@@ -866,7 +898,9 @@ void CreateCppProjectFile(Project* project, Module& module, const std::string& m
         libraryDirectories.insert(solutionDir);
     }
     std::string cmajorLibDir = GetFullPath(Path::Combine(CmajorRootDir(), "lib"));
+    std::string toolChainDir = QuotedPath(GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), GetToolChain())));
     libraryDirectories.insert(cmajorLibDir);
+    libraryDirectories.insert(toolChainDir);
 #ifdef _WIN32
     std::string boostLibDir = GetFullPath(GetBoostLibDirFromCompilerConfigXml());
     libraryDirectories.insert(boostLibDir);
@@ -1016,19 +1050,24 @@ void CreateCppProjectFile(Project* project, Module& module, const std::string& m
     }
     try
     {
-        Process process(commandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(commandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(module.LogStreamId(), line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -1096,19 +1135,24 @@ void CreateCppSolutionFile(Solution* solution, const std::vector<Project*>& proj
     }
     try
     {
-        Process process(commandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(commandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(-1, line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -1215,19 +1259,24 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
     }
     try
     {
-        Process process(linkCommandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(linkCommandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(-1, line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -1275,19 +1324,24 @@ void LinkSystemX(const std::string& executableFilePath, const std::string& libra
     }
     try
     {
-        Process process(linkCommandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(linkCommandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(-1, line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -1382,19 +1436,24 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
     }
     try
     {
-        Process process(linkCommandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(linkCommandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(-1, line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)

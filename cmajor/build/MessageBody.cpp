@@ -1,4 +1,4 @@
-#include "D:/work/cmajorm/cmajor/build/ProjectInfo.hpp"
+#include "D:/work/cmajorm/cmajor/build/MessageBody.hpp"
 #include <sngjson/json/JsonImport.hpp>
 #include <sngjson/json/JsonExport.hpp>
 #include <utility>
@@ -125,7 +125,7 @@ ProjectUpdated::ProjectUpdated(soulng::util::JsonValue* value)
     sngjson::json::FromJson(value, "error", error);
 }
 
-ProjectToBuild::ProjectToBuild() : projectId(), sendBuildOutput(), config(), toolChain()
+ProjectToBuild::ProjectToBuild() : projectId(), projectHash(), only(), rebuild(), sendBuildOutput(), config(), toolChain()
 {
 }
 
@@ -134,18 +134,27 @@ std::unique_ptr<soulng::util::JsonValue> ProjectToBuild::ToJson() const
     std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
     std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(projectId);
     object->AddField(U"projectId", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(sendBuildOutput);
-    object->AddField(U"sendBuildOutput", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(config);
-    object->AddField(U"config", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(toolChain);
-    object->AddField(U"toolChain", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(projectHash);
+    object->AddField(U"projectHash", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(only);
+    object->AddField(U"only", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(rebuild);
+    object->AddField(U"rebuild", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(sendBuildOutput);
+    object->AddField(U"sendBuildOutput", std::move(fieldValue4));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(config);
+    object->AddField(U"config", std::move(fieldValue5));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue6 = sngjson::json::ToJson(toolChain);
+    object->AddField(U"toolChain", std::move(fieldValue6));
     return object;
 }
 
 ProjectToBuild::ProjectToBuild(soulng::util::JsonValue* value)
 {
     sngjson::json::FromJson(value, "projectId", projectId);
+    sngjson::json::FromJson(value, "projectHash", projectHash);
+    sngjson::json::FromJson(value, "only", only);
+    sngjson::json::FromJson(value, "rebuild", rebuild);
     sngjson::json::FromJson(value, "sendBuildOutput", sendBuildOutput);
     sngjson::json::FromJson(value, "config", config);
     sngjson::json::FromJson(value, "toolChain", toolChain);

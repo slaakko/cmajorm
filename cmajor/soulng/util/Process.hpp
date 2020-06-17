@@ -15,11 +15,18 @@ class ProcessImpl;
 class UTIL_API Process
 {
 public:
+    enum class Redirections : int
+    {
+        none = 0,
+        processStdIn = 1 << 0,
+        processStdOut = 1 << 1,
+        processStdErr = 1 << 2
+    };
     enum class StdHandle : int
     {
-        std_out = 1, std_err = 2
+        stdOut = 1, stdErr = 2
     };
-    Process(const std::string& command);
+    Process(const std::string& command, Redirections redirections);
     ~Process();
     bool Running();
     void WaitForExit();
@@ -31,6 +38,16 @@ public:
 private:
     ProcessImpl* impl;
 };
+
+constexpr Process::Redirections operator|(Process::Redirections left, Process::Redirections right)
+{
+    return Process::Redirections(int(left) | int(right));
+}
+
+constexpr Process::Redirections operator&(Process::Redirections left, Process::Redirections right)
+{
+    return Process::Redirections(int(left) & int(right));
+}
 
 } } // namespace soulng::util
 

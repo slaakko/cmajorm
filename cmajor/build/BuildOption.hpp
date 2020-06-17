@@ -21,7 +21,8 @@ enum class BuildOptions : int16_t
     only = 1 << 4,
     all = 1 << 5,
     push = 1 << 6,
-    build = 1 << 7
+    build = 1 << 7,
+    rebuild = 1 << 8
 };
 
 inline BuildOptions operator|(BuildOptions left, BuildOptions right)

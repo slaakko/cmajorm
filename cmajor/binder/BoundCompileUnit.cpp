@@ -890,14 +890,6 @@ void BoundCompileUnit::AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs)
     globalNamespaceNodes.push_back(std::move(globalNs));
 }
 
-void BoundCompileUnit::ResetCodeGenerated()
-{
-    for (std::unique_ptr<BoundNode>& node : boundNodes)
-    {
-        node->ResetCodeGenerated();
-    }
-}
-
 void BoundCompileUnit::AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol)
 {
     functionSymbols.push_back(std::move(functionSymbol));
@@ -1022,6 +1014,26 @@ void BoundCompileUnit::GenerateGlobalInitializationFunction()
         symbolTable.SetFunctionIdFor(initFunctionSymbol);
         allCompileUnitInitFunctionSymbols.push_back(std::unique_ptr<FunctionSymbol>(initFunctionSymbol));
     }
+}
+
+bool BoundCompileUnit::CodeGenerated(FunctionSymbol* functionSymbol) const
+{
+    return codeGenerated.find(functionSymbol) != codeGenerated.cend();
+}
+
+void BoundCompileUnit::SetCodeGenerated(FunctionSymbol* functionSymbol)
+{
+    codeGenerated.insert(functionSymbol);
+}
+
+bool BoundCompileUnit::CanReuse(FunctionSymbol* functionSymbol) const
+{
+    return canReuse.find(functionSymbol) != canReuse.cend();
+}
+
+void BoundCompileUnit::SetCanReuse(FunctionSymbol* functionSymbol)
+{
+    canReuse.insert(functionSymbol);
 }
 
 } } // namespace cmajor::binder

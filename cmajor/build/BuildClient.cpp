@@ -221,6 +221,116 @@ void BuildClient::Handle(PushProjectFileContentResponse& response)
     }
 }
 
+void BuildClient::BuildProject(const std::string& projectFilePath, const std::string& config, const std::string& toolChain, bool rebuild, bool only, bool printBuildOutput)
+{
+    state = State::initialized;
+    if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+    {
+        LogMessage(-1, "buildclient: building project '" + projectFilePath + "' using build server...");
+    }
+    std::unique_ptr<Project> project = ReadProject(projectFilePath);
+    if (project->Name() == U"System.Windows" || project->Name() == U"System.Windows.Install")
+    {
+        throw std::runtime_error("'System.Windows' and 'System.Windows.Install' projects not supported (at least yet)");
+    }
+    projectInfoFilePath = Path::ChangeExtension(projectFilePath, ".json");
+    projectInfo = ReadPojectInfo(nullptr, projectInfoFilePath);
+    BuildProjectRequest buildProjectRequest;
+    buildProjectRequest.body.projectId = projectInfo.projectId;
+    buildProjectRequest.body.projectHash = projectInfo.projectHash;
+    buildProjectRequest.body.config = config;
+    if (toolChain.empty())
+    {
+        buildProjectRequest.body.toolChain = defaultToolChain;
+    }
+    else
+    {
+        buildProjectRequest.body.toolChain = toolChain;
+    }
+    buildProjectRequest.body.sendBuildOutput = printBuildOutput;
+    buildProjectRequest.body.rebuild = rebuild;
+    buildProjectRequest.body.only = only;
+    if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+    {
+        LogMessage(-1, "buildclient: sending " + std::string(buildProjectRequest.Id()) + "[projectId=" + buildProjectRequest.body.projectId + "] to build server...");
+    }
+    buildProjectRequest.SendTo(*connection);
+    state = State::buildProjectRequestSent;
+    std::unique_ptr<MessageBase> response = connection->Receive();
+    response->DispatchTo(*this);
+}
+
+void BuildClient::Handle(BuildProjectResponse& response)
+{
+    if (state == State::buildProjectRequestSent)
+    {
+        state = State::buildProjectResponseReceived;
+        if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+        {
+            std::string error;
+            if (!response.body.ok)
+            {
+                error = " with error '" + response.body.error;
+            }
+            LogMessage(-1, "buildclient: received " + std::string(response.Id()) + "[ok=" + BoolStr(response.body.ok) + "] " + error + " from build server");
+        }
+        if (!response.body.info.empty())
+        {
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(-1, response.body.info);
+            }
+        }
+        if (response.body.ok)
+        {
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(-1, "buildclient: project '" + projectInfo.projectFilePath + "' built successfully");
+            }
+        }
+        else
+        {
+            throw std::runtime_error("buildclient: building project '" + projectInfo.projectFilePath + "' using build server failed with error '" + response.body.error + "'");
+        }
+    }
+    else
+    {
+        throw std::runtime_error("buildclient: unexpected " + std::string(response.Id()) + " received: state=" + GetStateStr());
+    }
+}
+
+void BuildClient::Handle(ShowBuildMessageRequest& request)
+{
+    ShowBuildMessageResponse showBuildMessageResponse;
+    try
+    {
+        if (state == State::buildProjectRequestSent)
+        {
+            if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+            {
+                LogMessage(-1, "buildclient: received " + std::string(request.Id()));
+            }
+            LogMessage(-1, request.body.line);
+            showBuildMessageResponse.body.error.clear();
+        }
+        else
+        {
+            throw std::runtime_error("buildclient: unexpected " + std::string(request.Id()) + " received: state=" + GetStateStr());
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        showBuildMessageResponse.body.error = "buildclient: got exception " + std::string(ex.what());
+    }
+    if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+    {
+        LogMessage(-1, "buildclient: sending " + std::string(showBuildMessageResponse.Id()) + " to build server...");
+    }
+    showBuildMessageResponse.SendTo(*connection);
+    std::unique_ptr<MessageBase> response = connection->Receive();
+    response->DispatchTo(*this);
+}
+
 void BuildClient::Handle(ErrorResponse& response)
 {
     state = State::error;
@@ -293,12 +403,25 @@ std::string BuildClient::GetStateStr() const
         {
             return "push-project-file-content-response-received";
         }
+        case State::buildProjectRequestSent:
+        {
+            return "build-project-request-sent";
+        }
+        case State::buildProjectResponseReceived:
+        {
+            return "build-project-response-received";
+        }
         case State::error:
         {
             return "error-received";
         }
     }
     return "unknown state";
+}
+
+void BuildClient::SetDefaultToolChain(const std::string& defaultToolChain_)
+{
+    defaultToolChain = defaultToolChain_;
 }
 
 } } // namespace cmajor::build

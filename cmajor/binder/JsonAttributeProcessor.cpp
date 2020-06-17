@@ -395,7 +395,7 @@ void JsonAttributeProcessor::GenerateJsonCreatorImplementation(Attribute* attrib
             fileScope->AddContainerScope(jsonValue->Ns()->GetContainerScope());
         }
         statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, jsonCreatorFunctionSymbol));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), jsonCreatorFunctionSymbol));
         const Span& span = attribute->GetSpan();
         CompoundStatementNode compoundStatementNode(span);
         compoundStatementNode.SetEndBraceSpan(span);
@@ -447,7 +447,7 @@ void JsonAttributeProcessor::GenerateJsonConstructorImplementation(Attribute* at
             fileScope->AddContainerScope(jsonValue->Ns()->GetContainerScope());
         }
         statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, jsonConstructorSymbol));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), jsonConstructorSymbol));
         const Span& span = attribute->GetSpan();
         ConstructorNode constructorNode(span);
         CompoundStatementNode compoundStatementNode(span);
@@ -545,7 +545,7 @@ void JsonAttributeProcessor::GenerateToJsonJsonObjectImplementation(Attribute* a
             fileScope->AddContainerScope(jsonObject->Ns()->GetContainerScope());
         }
         statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, toJsonJsonObjectMemberFunctionSymbol));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), toJsonJsonObjectMemberFunctionSymbol));
         const Span& span = attribute->GetSpan();
         CompoundStatementNode compoundStatementNode(span);
         compoundStatementNode.SetEndBraceSpan(span);
@@ -643,7 +643,7 @@ void JsonAttributeProcessor::GenerateToJsonImplementation(Attribute* attribute, 
             fileScope->AddContainerScope(jsonObject->Ns()->GetContainerScope());
         }
         statementBinder->GetBoundCompileUnit().AddFileScope(fileScope);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, toJsonMemberFunctionSymbol));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&statementBinder->GetBoundCompileUnit(), toJsonMemberFunctionSymbol));
         const Span& span = attribute->GetSpan();
         CompoundStatementNode compoundStatementNode(span);
         compoundStatementNode.SetEndBraceSpan(span);

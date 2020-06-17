@@ -8,85 +8,141 @@ using System.IO;
 
 namespace System.Numerics.Multiprecision
 {
-    public static class BigFloatDefaultPrecisionSetter
-    {
-        static nothrow BigFloatDefaultPrecisionSetter()
-        {
-            RtBigFloatSetDefaultPrec(256u);
-        }
-        public static nothrow void Init()
-        {
-        }
-    }
-    
-    public nothrow uint GetBigFloatDefaultPrecision()
-    {
-        return RtBigFloatGetDefaultPrec();
-    }
-    
-    public class Precision
-    {
-        public nothrow Precision() : prec(256u)
-        {
-        }
-        public explicit nothrow Precision(uint prec_) : prec(prec_)
-        {
-        }
-        public nothrow uint ToUInt() const
-        {
-            return prec;
-        }
-        private uint prec;
-    }   
-    
     public class BigFloat
     {
-        public nothrow BigFloat() : handle(null)
+        public BigFloat() 
         {
-            BigFloatDefaultPrecisionSetter.Init();
-            handle = RtCreateBigFloat();
+            int errorStrHandle = -1;
+            handle = RtCreateDefaultBigFloat(errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
         }
-        public explicit nothrow BigFloat(const Precision& prec) : handle(RtCreateBitFloatPrec(prec.ToUInt()))
+        public BigFloat(int v)
         {
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromInt(v, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
         }
-        public nothrow BigFloat(const BigFloat& that) : handle(RtCreateBigFloat())
+        public BigFloat(uint v)
         {
-            RtSetBigFloat(handle, that.handle);
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromUInt(v, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigFloat(long v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromLong(v, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigFloat(ulong v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromULong(v, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigFloat(double v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromDouble(v, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
         }
         public nothrow BigFloat(BigFloat&& that) : handle(that.handle)
         {
             that.handle = null;
         }
-        public nothrow BigFloat(int that) : handle(RtCreateBigFloat())
+        public BigFloat(const string& v)
         {
-            RtSetBigFloatInt(handle, that);
-        }
-        public nothrow BigFloat(uint that) : handle(RtCreateBigFloat())
-        {
-            RtSetBigFloatUInt(handle, that);
-        }
-        public nothrow BigFloat(double that) : handle(RtCreateBigFloat())
-        {
-            RtSetBigFloatDouble(handle, that);
-        }
-        public nothrow BigFloat(const BigInt& that) : handle(RtCreateBigFloat())
-        {
-            RtSetBigFloatBigInt(handle, that.Handle());
-        }
-        public nothrow BigFloat(const BigRational& that) : handle(RtCreateBigFloat())
-        {
-            RtSetBigFloatBigRational(handle, that.Handle());
-        }
-        public BigFloat(const string& str) : this(str, 10)
-        {
-        }
-        public BigFloat(const string& str, int base_) : handle(RtCreateBigFloat())
-        {
-            int result = RtSetBigFloatStr(handle, str.Chars(), base_);
-            if (result != 0)
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromStr(v.Chars(), errorStrHandle);
+            if (handle == null)
             {
-                ThrowConversionException("invalid string for initializing BigFloat");
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
             }
+        }
+        public BigFloat(const BigFloat& v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromCopy(v.handle, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public void operator=(const BigFloat& v)
+        {
+            if (handle == v.handle) return;
+            if (handle != null)
+            {
+                RtDestroyBigFloat(handle);
+            }            
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromCopy(v.handle, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigFloat(const BigInt& v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromBigInt(v.Handle(), errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigFloat(const BigRational& v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigFloatFromBigRational(v.Handle(), errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public nothrow default void operator=(BigFloat&&);
+        public nothrow BigFloat(void* handle_) : handle(handle_)
+        {
         }
         public ~BigFloat()
         {
@@ -95,87 +151,55 @@ namespace System.Numerics.Multiprecision
                 RtDestroyBigFloat(handle);
             }        
         }
-        public nothrow void operator=(const BigFloat& that) 
+        public string ToString() const
         {
-            if (handle != null)
+            int errorStrHandle = -1;
+            const char* p = RtBigFloatToCharPtr(handle, errorStrHandle);
+            if (p == null)
             {
-                RtDestroyBigFloat(handle);
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
             }
-            handle = RtCreateBigFloat();
-            RtSetBigFloat(handle, that.handle);
+            string s = p;
+            RtDeleteCharPtr(p);
+            return s;
         }
-        public nothrow void operator=(int that)
+        public double ToDouble() const
         {
-            if (handle != null)
+            int errorStrHandle = -1;
+            double result = RtBigFloatToDouble(handle, errorStrHandle);
+            if (errorStrHandle != -1)
             {
-                RtDestroyBigFloat(handle);
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
             }
-            handle = RtCreateBigFloat();
-            RtSetBigFloatInt(handle, that);
+            return result;
         }
-        public nothrow void operator=(uint that)
+        public BigInt ToBigInt() const
         {
-            if (handle != null)
+            int errorStrHandle = -1;
+            void* bigIntHandle = RtBigFloatToBigInt(handle, errorStrHandle);
+            if (bigIntHandle == null)
             {
-                RtDestroyBigFloat(handle);
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
             }
-            handle = RtCreateBigFloat();
-            RtSetBigFloatUInt(handle, that);
+            return BigInt(bigIntHandle);
         }
-        public nothrow void operator=(double that)
+        public BigRational ToBigRational() const
         {
-            if (handle != null)
+            int errorStrHandle = -1;
+            void* bigRationalHandle = RtBigFloatToBigRational(handle, errorStrHandle);
+            if (bigRationalHandle == null)
             {
-                RtDestroyBigFloat(handle);
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
             }
-            handle = RtCreateBigFloat();
-            RtSetBigFloatDouble(handle, that);
-        }
-        public nothrow void operator=(const BigInt& that)
-        {
-            if (handle != null)
-            {
-                RtDestroyBigFloat(handle);
-            }
-            handle = RtCreateBigFloat();
-            RtSetBigFloatBigInt(handle, that.Handle());
-        }
-        public nothrow void operator=(const BigRational& that)
-        {
-            if (handle != null)
-            {
-                RtDestroyBigFloat(handle);
-            }
-            handle = RtCreateBigFloat();
-            RtSetBigFloatBigRational(handle, that.Handle());
-        }
-        public default nothrow void operator=(BigFloat&&);
-        public nothrow string ToString() const
-        {
-            return this->ToString(10);
-        }
-        public nothrow string ToString(int base_) const
-        {
-            return this->ToString(base_, 0u);
-        }
-        public nothrow string ToString(int base_, uint numDigits) const
-        {
-            long exponent = 0;
-            int strHandle = RtGetBigFloatStrHandle(handle, base_, numDigits, &exponent);
-            string s = RtGetBigFloatStr(strHandle);
-            RtFreeBigFloatStr(strHandle);
-            string t;
-            if (!s.IsEmpty() && s[0] == '-')
-            {
-                t.Append('-');
-                s = s.Substring(1);
-            }
-            t.Append("0.").Append(s).Append("e").Append(System.ToString(exponent));
-            return t;
-        }
-        public nothrow double ToDouble() const
-        {
-            return RtGetBigFloatDouble(handle);
+            return BigRational(bigRationalHandle);
         }
         public nothrow inline void* Handle() const
         {
@@ -184,84 +208,108 @@ namespace System.Numerics.Multiprecision
         private void* handle;
     }
     
-    public nothrow BigFloat operator-(const BigFloat& x)
+    public BigFloat operator-(const BigFloat& x)
     {
-        BigFloat result;
-        RtNegBigFloat(result.Handle(), x.Handle());
-        return result;
-    }
-    
-    public nothrow BigFloat Abs(const BigFloat& x)
-    {
-        BigFloat result;
-        RtAbsBigFloat(result.Handle(), x.Handle());
-        return result;
-    }
-    
-    public nothrow BigFloat operator+(const BigFloat& left, const BigFloat& right)
-    {
-        BigFloat result;
-        RtAddBigFloat(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-    
-    public nothrow BigFloat operator-(const BigFloat& left, const BigFloat& right)
-    {
-        BigFloat result;
-        RtSubBigFloat(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-    
-    public nothrow BigFloat operator*(const BigFloat& left, const BigFloat& right)
-    {
-        BigFloat result;
-        RtMulBigFloat(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-    
-    public nothrow BigFloat operator/(const BigFloat& left, const BigFloat& right)
-    {
-        BigFloat result;
-        RtDivBigFloat(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-    
-    public nothrow bool operator==(const BigFloat& left, const BigFloat& right)
-    {
-        return RtCmpBigFloat(left.Handle(), right.Handle()) == 0;
+        int errorStrHandle = -1;
+        void* handle = RtNegBigFloat(x.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigFloat(handle);
     }
 
-    public nothrow bool operator<(const BigFloat& left, const BigFloat& right)
+    public BigFloat operator+(const BigFloat& x)
     {
-        return RtCmpBigFloat(left.Handle(), right.Handle()) < 0;
+        int errorStrHandle = -1;
+        void* handle = RtPosBigFloat(x.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigFloat(handle);
     }
     
-    public nothrow BigFloat Ceil(const BigFloat& x)
+    public BigFloat operator+(const BigFloat& left, const BigFloat& right)
     {
-        BigFloat target;
-        RtCeilBigFloat(target.Handle(), x.Handle());
-        return target;
+        int errorStrHandle = -1;
+        void* handle = RtAddBigFloat(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigFloat(handle);
     }
     
-    public nothrow BigFloat Floor(const BigFloat& x)
+    public BigFloat operator-(const BigFloat& left, const BigFloat& right)
     {
-        BigFloat target;
-        RtFloorBigFloat(target.Handle(), x.Handle());
-        return target;
+        int errorStrHandle = -1;
+        void* handle = RtSubBigFloat(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigFloat(handle);
+    }
+    
+    public BigFloat operator*(const BigFloat& left, const BigFloat& right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtMulBigFloat(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigFloat(handle);
+    }
+    
+    public BigFloat operator/(const BigFloat& left, const BigFloat& right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtDivBigFloat(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigFloat(handle);
+    }
+    
+    public bool operator==(const BigFloat& left, const BigFloat& right)
+    {
+        int errorStrHandle = -1;
+        bool result = RtEqualBigFloat(left.Handle(), right.Handle(), errorStrHandle);
+        if (errorStrHandle != -1)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return result;
     }
 
-    public nothrow BigFloat Trunc(const BigFloat& x)
+    public bool operator<(const BigFloat& left, const BigFloat& right)
     {
-        BigFloat target;
-        RtTruncBigFloat(target.Handle(), x.Handle());
-        return target;
-    }
-    
-    public nothrow BigFloat Sqrt(const BigFloat& x)
-    {
-        BigFloat target;
-        RtSqrtBigFloat(target.Handle(), x.Handle());
-        return target;
+        int errorStrHandle = -1;
+        bool result = RtLessBigFloat(left.Handle(), right.Handle(), errorStrHandle);
+        if (errorStrHandle != -1)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return result;
     }
     
     public OutputStream& operator<<(OutputStream& s, const BigFloat& x)

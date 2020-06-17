@@ -6,7 +6,7 @@
 #ifndef SOULNG_LEXER_API_INCLUDED
 #define SOULNG_LEXER_API_INCLUDED
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 
 #ifdef SOULNG_LEXER_EXPORTS
 #define SOULNG_LEXER_API __declspec(dllexport)

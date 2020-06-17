@@ -132,6 +132,36 @@ BuildProjectCommand::BuildProjectCommand(const std::string& projectFilePath_, co
 
 void BuildProjectCommand::Execute()
 {
+    std::unique_ptr<ExecutionContext> context = CreateExecutionContext(serverName);
+    std::string config = buildConfig;
+    std::string toolChain = buildToolChain;
+    bool printBuildOutput = GetBuildOption(BuildOptions::messages);
+    bool rebuild = GetBuildOption(BuildOptions::rebuild);
+    bool only = GetBuildOption(BuildOptions::only);
+    context->GetClient()->BuildProject(projectFilePath, config, toolChain, rebuild, only, printBuildOutput);
+    Connection* connection = context->GetConnection();
+    if (connection)
+    {
+        if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+        {
+            LogMessage(-1, "buildclient: closing connection");
+        }
+        if (connection->ServerAlive())
+        {
+            connection->SetServerAlive(false);
+            CloseConnectionRequest closeConnectionRequest;
+            closeConnectionRequest.SendTo(*connection);
+        }
+        connection->Close();
+    }
+    if (serverName.empty())
+    {
+        LogMessage(-1, "project '" + projectFilePath + "' built using local build repository");
+    }
+    else
+    {
+        LogMessage(-1, "project '" + projectFilePath + "' built using server '" + serverName + "'");
+    }
 }
 
 DebugProjectCommand::DebugProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)

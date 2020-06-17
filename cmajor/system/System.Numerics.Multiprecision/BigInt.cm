@@ -10,28 +10,107 @@ namespace System.Numerics.Multiprecision
 {
     public class BigInt
     {
-        public nothrow BigInt() : handle(RtCreateBigInt())
+        public BigInt()
         {
-        }
-        public nothrow BigInt(int that) : handle(RtCreateBigInt())
-        {
-            RtAssignBigIntInt(handle, that);
-        }
-        public nothrow BigInt(uint that) : handle(RtCreateBigInt())
-        {
-            RtAssignBigIntUInt(handle, that);
-        }
-        public BigInt(const string& str) : this(str, 10)
-        {
-        }
-        public BigInt(const string& str, int base_) : handle(RtCreateBigInt())
-        {
-            int result = RtAssignBigIntStr(handle, str.Chars(), base_);
-            if (result != 0)
+            int errorStrHandle = -1;
+            handle = RtCreateDefaultBigInt(errorStrHandle);
+            if (handle == null)
             {
-                ThrowConversionException("invalid digit string for initializing BigInt");
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
             }
         }
+        public BigInt(int v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigIntFromInt(v, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigInt(uint v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigIntFromUInt(v, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigInt(long v) 
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigIntFromLong(v, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigInt(ulong v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigIntFromULong(v, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigInt(const string& v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigIntFromStr(v.Chars(), errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public BigInt(const BigInt& v)
+        {
+            int errorStrHandle = -1;
+            handle = RtCreateBigIntFromCopy(v.handle, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public void operator=(const BigInt& v)
+        {
+            if (handle == v.handle) return;
+            if (handle != null)
+            {
+                RtDestroyBigInt(handle);
+            }            
+            int errorStrHandle = -1;
+            handle = RtCreateBigIntFromCopy(v.handle, errorStrHandle);
+            if (handle == null)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+        }
+        public nothrow BigInt(BigInt&& that) : handle(that.handle)
+        {
+            that.handle = null;
+        }
+        public nothrow BigInt(void* handle_) : handle(handle_)
+        {
+        }
+        public nothrow default void operator=(BigInt&&);
         public ~BigInt()
         {
             if (handle != null)
@@ -39,52 +118,67 @@ namespace System.Numerics.Multiprecision
                 RtDestroyBigInt(handle);
             }        
         }
-        public nothrow BigInt(const BigInt& that) : handle(RtCreateBigInt())
+        public string ToString() const
         {
-            RtAssignBigIntBigInt(handle, that.handle);
-        }
-        public nothrow BigInt(BigInt&& that) : handle(that.handle)
-        {
-            that.handle = null;
-        }
-        public nothrow void operator=(const BigInt& that)
-        {
-            if (handle != null)
+            int errorStrHandle = -1;
+            const char* p = RtBigIntToCharPtr(handle, errorStrHandle);
+            if (p == null)
             {
-                RtDestroyBigInt(handle);
-            }            
-            handle = RtCreateBigInt();
-            RtAssignBigIntBigInt(handle, that.handle);
-        }
-        public default nothrow void operator=(BigInt&& that);
-        public nothrow void operator=(int that)
-        {
-            if (handle != null)
-            {
-                RtDestroyBigInt(handle);
-            }            
-            handle = RtCreateBigInt();
-            RtAssignBigIntInt(handle, that);
-        }
-        public nothrow void operator=(uint that)
-        {
-            if (handle != null)
-            {
-                RtDestroyBigInt(handle);
-            }            
-            handle = RtCreateBigInt();
-            RtAssignBigIntUInt(handle, that);
-        }
-        public nothrow string ToString() const
-        {
-            return this->ToString(10);
-        }
-        public nothrow string ToString(int base_) const
-        {
-            int strHandle = RtGetBigIntStrHandle(handle, base_);
-            string s = RtGetBigIntStr(strHandle);
-            RtFreeBigIntStr(strHandle);
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+            string s = p;
+            RtDeleteCharPtr(p);
             return s;
+        }
+        public int ToInt() const
+        {
+            int errorStrHandle = -1;
+            int v = RtBigIntToInt(handle, errorStrHandle);
+            if (errorStrHandle != -1)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+            return v;
+        }
+        public uint ToUInt() const
+        {
+            int errorStrHandle = -1;
+            uint v = RtBigIntToUInt(handle, errorStrHandle);
+            if (errorStrHandle != -1)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+            return v;
+        }
+        public long ToLong() const
+        {
+            int errorStrHandle = -1;
+            long v = RtBigIntToLong(handle, errorStrHandle);
+            if (errorStrHandle != -1)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+            return v;
+        }
+        public ulong ToULong() const
+        {
+            int errorStrHandle = -1;
+            ulong v = RtBigIntToULong(handle, errorStrHandle);
+            if (errorStrHandle != -1)
+            {
+                string error = RtGetString(errorStrHandle);
+                RtDisposeString(errorStrHandle);
+                throw Exception(error);
+            }
+            return v;
         }
         public nothrow inline void* Handle() const
         {
@@ -93,111 +187,199 @@ namespace System.Numerics.Multiprecision
         private void* handle;
     }
     
-    public nothrow BigInt operator-(const BigInt& x)
+    public BigInt operator-(const BigInt& x)
     {
-        BigInt result;
-        RtNegBigInt(result.Handle(), x.Handle());
-        return result;
+        int errorStrHandle = -1;
+        void* handle = RtNegBigInt(x.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
     }
     
-    public nothrow BigInt Abs(const BigInt& x)
+    public BigInt operator+(const BigInt& x)
     {
-        BigInt result;
-        RtAbsBigInt(result.Handle(), x.Handle());
-        return result;
-    }
-    
-    public nothrow BigInt operator+(const BigInt& left, const BigInt& right)
-    {
-        BigInt result;
-        RtAddBigInt(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-    
-    public nothrow BigInt operator-(const BigInt& left, const BigInt& right)
-    {
-        BigInt result;
-        RtSubBigInt(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-    
-    public nothrow BigInt operator*(const BigInt& left, const BigInt& right)
-    {
-        BigInt result;
-        RtMulBigInt(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-    
-    public nothrow BigInt operator/(const BigInt& left, const BigInt& right)
-    {
-        BigInt result;
-        RtDivBigInt(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-    
-    public nothrow BigInt operator%(const BigInt& left, const BigInt& right)
-    {
-        BigInt result;
-        RtRemBigInt(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-    
-    public nothrow bool operator==(const BigInt& left, const BigInt& right)
-    {
-        return RtCmpBigInt(left.Handle(), right.Handle()) == 0;
+        int errorStrHandle = -1;
+        void* handle = RtPosBigInt(x.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
     }
 
-    public nothrow bool operator<(const BigInt& left, const BigInt& right)
+    public BigInt operator~(const BigInt& x)
     {
-        return RtCmpBigInt(left.Handle(), right.Handle()) < 0;
+        int errorStrHandle = -1;
+        void* handle = RtCplBigInt(x.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
     }
     
-    public nothrow BigInt operator&(const BigInt& left, const BigInt& right)
+    public BigInt operator+(const BigInt& left, const BigInt& right)
     {
-        BigInt result;
-        RtAndBigInt(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-
-    public nothrow BigInt operator|(const BigInt& left, const BigInt& right)
-    {
-        BigInt result;
-        RtOrBigInt(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-
-    public nothrow BigInt operator^(const BigInt& left, const BigInt& right)
-    {
-        BigInt result;
-        RtXorBigInt(result.Handle(), left.Handle(), right.Handle());
-        return result;
-    }
-
-    public nothrow BigInt operator~(const BigInt& x)
-    {
-        BigInt result;
-        RtCplBigInt(result.Handle(), x.Handle());
-        return result;
-    }
-
-    public nothrow void SetBit(BigInt& x, uint bitIndex)
-    {
-        RtSetBitBigInt(x.Handle(), bitIndex);
-    }
-
-    public nothrow void ClearBit(BigInt& x, uint bitIndex)
-    {
-        RtClearBitBigInt(x.Handle(), bitIndex);
-    }
-
-    public nothrow void ToggleBit(BigInt& x, uint bitIndex)
-    {
-        RtToggleBitBigInt(x.Handle(), bitIndex);
+        int errorStrHandle = -1;
+        void* handle = RtAddBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
     }
     
-    public nothrow bool TestBit(BigInt& x, uint bitIndex)
+    public BigInt operator-(const BigInt& left, const BigInt& right)
     {
-        return RtTestBitBigInt(x.Handle(), bitIndex) == 1;
+        int errorStrHandle = -1;
+        void* handle = RtSubBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
+    }
+    
+    public BigInt operator*(const BigInt& left, const BigInt& right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtMulBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
+    }
+    
+    public BigInt operator/(const BigInt& left, const BigInt& right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtDivBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
+    }
+    
+    public BigInt operator%(const BigInt& left, const BigInt& right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtModBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
+    }
+
+    public BigInt operator&(const BigInt& left, const BigInt& right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtAndBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
+    }
+    
+    public BigInt operator|(const BigInt& left, const BigInt& right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtOrBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
+    }
+
+    public BigInt operator^(const BigInt& left, const BigInt& right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtXorBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
+    }
+
+    public BigInt operator<<(const BigInt& left, int right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtShiftLeftBigInt(left.Handle(), right, errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
+    }
+
+    public BigInt operator>>(const BigInt& left, int right)
+    {
+        int errorStrHandle = -1;
+        void* handle = RtShiftRightBigInt(left.Handle(), right, errorStrHandle);
+        if (handle == null)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return BigInt(handle);
+    }
+    
+    public bool operator==(const BigInt& left, const BigInt& right)
+    {
+        int errorStrHandle = -1;
+        bool result = RtEqualBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (errorStrHandle != -1)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return result;
+    }
+
+    public bool operator<(const BigInt& left, const BigInt& right)
+    {
+        int errorStrHandle = -1;
+        bool result = RtLessBigInt(left.Handle(), right.Handle(), errorStrHandle);
+        if (errorStrHandle != -1)
+        {
+            string error = RtGetString(errorStrHandle);
+            RtDisposeString(errorStrHandle);
+            throw Exception(error);
+        }
+        return result;
     }
     
     public OutputStream& operator<<(OutputStream& s, const BigInt& x)

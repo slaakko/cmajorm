@@ -135,6 +135,8 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
         boundCompileUnit.RemoveLastFileScope();
     }
     boundCompileUnit.AddGlobalNs(std::move(globalNs));
+    functionSymbol->SetFlag(FunctionSymbolFlags::dontReuse);
+    boundCompileUnit.SetCanReuse(functionSymbol);
     return functionSymbol;
 }
 

@@ -120,19 +120,24 @@ void CompileResourceScriptFile(cmajor::symbols::Module& currentModule, const std
     commandLine.append(1, ' ').append(QuotedPath(resourceScriptFileName));
     try
     {
-        Process process(commandLine);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(commandLine, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(-1, line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)

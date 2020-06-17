@@ -113,6 +113,9 @@ void PrintHelp()
     std::cout << "  Build given configuration. Default: debug." << std::endl;
     std::cout << "--toolchain=TOOLCHAIN | -t=TOOLCHAIN" << std::endl;
     std::cout << "  Build using tool chain TOOLCHAIN where TOOLCHAIN=(clang | gcc | vs)." << std::endl;
+    std::cout << "--only | -o" << std::endl;
+    std::cout << "  Build only given project. By default builds also dependent projects." << std::endl;
+
     std::cout << std::endl;
     std::cout << "cmclient [options] debug PROJECT.cmp [using server SERVER]" << std::endl;
     std::cout << "  Debug project using local build repository, or using build repository of SERVER." << std::endl;
@@ -239,6 +242,11 @@ int main(int argc, const char** argv)
                             case 'p':
                             {
                                 options.append("push");
+                                break;
+                            }
+                            case 'r':
+                            {
+                                options.append("rebuild");
                                 break;
                             }
                             case 'b':

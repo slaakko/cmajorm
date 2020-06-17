@@ -2136,12 +2136,12 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
     try
     {
         bool nothrow = true;
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(GetModule(), defaultConstructor));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&GetBoundCompileUnit(), defaultConstructor));
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(new BoundCompoundStatement(GetModule(), span)));
         if (classType->StaticConstructor())
         {
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::unique_ptr<BoundExpression>(new BoundFunctionCall(GetModule(), span,
-                classType->StaticConstructor())))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::unique_ptr<BoundExpression>(
+                new BoundFunctionCall(GetModule(), span, classType->StaticConstructor())))));
             if (!classType->StaticConstructor()->DontThrow()) nothrow = false;
         }
         if (classType->BaseClass())
@@ -2343,7 +2343,7 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
     try
     {
         bool nothrow = true;
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(GetModule(), copyConstructor));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&GetBoundCompileUnit(), copyConstructor));
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(new BoundCompoundStatement(GetModule(), span)));
         if (classType->StaticConstructor())
         {
@@ -2555,7 +2555,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
     try
     {
         bool nothrow = true;
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(GetModule(), moveConstructor));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&GetBoundCompileUnit(), moveConstructor));
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(new BoundCompoundStatement(GetModule(), span)));
         if (classType->StaticConstructor())
         {
@@ -2776,7 +2776,7 @@ bool ClassCopyAssignmentOperation::GenerateImplementation(ClassCopyAssignment* c
     try
     {
         bool nothrow = true;
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(GetModule(), copyAssignment));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&GetBoundCompileUnit(), copyAssignment));
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(new BoundCompoundStatement(GetModule(), span)));
         if (classType->BaseClass())
         {
@@ -2963,7 +2963,7 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
     try
     {
         bool nothrow = true;
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(GetModule(), moveAssignment));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&GetBoundCompileUnit(), moveAssignment));
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(new BoundCompoundStatement(GetModule(), span)));
         if (classType->BaseClass())
         {
@@ -3038,7 +3038,7 @@ void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* 
     ClassTypeSymbol* classType = boundClass->GetClassTypeSymbol();
     try
     {
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, destructorSymbol));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, destructorSymbol));
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(new BoundCompoundStatement(module, span)));
         if (classType->IsPolymorphic())
         {

@@ -65,34 +65,6 @@ void CreateVSToolChain(bool verbose)
     compilerDebugConfig.outputDirectory = "x64/Debug";
     compiler.debugInformationFileExtension = ".pdb";
     compiler.assemblyFileExtension = ".asm";
-    compilerDebugConfig.args.push_back("/GS");
-    compilerDebugConfig.args.push_back("/W3");
-    compilerDebugConfig.args.push_back("/Zc:wchar_");
-    compilerDebugConfig.args.push_back("/I\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\include\"");
-    compilerDebugConfig.args.push_back("/Zi");
-    compilerDebugConfig.args.push_back("/Gm-");
-    compilerDebugConfig.args.push_back("/Od");
-    compilerDebugConfig.args.push_back("/sld");
-    compilerDebugConfig.args.push_back("/wd\"4102\"");
-    compilerDebugConfig.args.push_back("/wd\"4146\"");
-    compilerDebugConfig.args.push_back("/wd\"4244\"");
-    compilerDebugConfig.args.push_back("/wd\"4297\"");
-    compilerDebugConfig.args.push_back("/c");
-    compilerDebugConfig.args.push_back("$SOURCE_FILE$");
-    compilerDebugConfig.args.push_back("/Fd:$DEBUG_INFORMATION_FILE$");
-    compilerDebugConfig.args.push_back("$GENERATE_ASSEMBLY_FILE_OPTION$/FAs");
-    compilerDebugConfig.args.push_back("$GENERATE_JUST_MY_CODE_OPTION$/JMC");
-    compilerDebugConfig.args.push_back("$ENABLE_RUNTIME_TYPE_INFORMATION_OPTION$/GR");
-    compilerDebugConfig.args.push_back("/Zc:inline");
-    compilerDebugConfig.args.push_back("/fp:precise");
-    compilerDebugConfig.args.push_back("/RTC1");
-    compilerDebugConfig.args.push_back("/MDd");
-    compilerDebugConfig.args.push_back("/FC");
-    compilerDebugConfig.args.push_back("/Fa$ASSEMBLY_FILE$");
-    compilerDebugConfig.args.push_back("/EHs");
-    compilerDebugConfig.args.push_back("/Fo:$OBJECT_FILE$");
-    compilerDebugConfig.args.push_back("/diagnostics:column ");
-    compilerDebugConfig.args.push_back("/std:c++17");
     compiler.configurations.push_back(compilerDebugConfig);
 
     Configuration compilerReleaseConfig;
@@ -152,6 +124,7 @@ void CreateVSToolChain(bool verbose)
     linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"");
     linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"");
     linkerDebugConfig.args.push_back("/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$");
+    linkerDebugConfig.args.push_back("/LIBPATH:$TOOL_CHAIN_LIBRARY_DIRECTORY$");
     linker.configurations.push_back(linkerDebugConfig);
 
     Configuration linkerReleaseConfig;
@@ -173,6 +146,7 @@ void CreateVSToolChain(bool verbose)
     linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"");
     linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"");
     linkerReleaseConfig.args.push_back("/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$");
+    linkerReleaseConfig.args.push_back("/LIBPATH:$TOOL_CHAIN_LIBRARY_DIRECTORY$");
     linker.configurations.push_back(linkerReleaseConfig);
 
     vs.tools.push_back(linker);

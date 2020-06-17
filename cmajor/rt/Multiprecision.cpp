@@ -5,392 +5,1124 @@
 
 #include <cmajor/rt/Multiprecision.hpp>
 #include <cmajor/rt/String.hpp>
-#define CMRT_IMPORT
-#include <cmajor/system/ext/gmp/gmpintf.h>
+#include <soulng/util/Multiprecision.hpp>
 
-extern "C" RT_API void* RtCreateBigInt()
+void* RtCreateDefaultBigInt(int32_t& errorStrHandle)
 {
-    return create_mpz();
+    try
+    {
+        return new soulng::util::BigInt();
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigIntFromInt(int32_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
 }
 
-extern "C" RT_API void RtDestroyBigInt(void* bigInt)
-{
-    destroy_mpz(bigInt);
-}
-
-extern "C" RT_API void RtAssignBigIntBigInt(void* left, void* right)
-{
-    assign_mpz(left, right);
-}
-
-extern "C" RT_API void RtAssignBigIntInt(void* bigInt, int32_t i)
-{
-    assign_mpz_si(bigInt, i);
-}
-
-extern "C" RT_API void RtAssignBigIntUInt(void* bigInt, uint32_t ui)
-{
-    assign_mpz_ui(bigInt, ui);
-}
-
-extern "C" RT_API int32_t RtAssignBigIntStr(void* bigInt, const char* str, int32_t base)
-{
-    return assign_mpz_str(bigInt, str, base);
-}
-
-extern "C" RT_API int32_t RtGetBigIntStrHandle(void* bigInt, int32_t base)
-{
-    char* str = get_mpz_str(bigInt, base);
-    std::string s = str;
-    free_mpz_str(str);
-    int32_t stringHandle = cmajor::rt::InstallString(s);
-    return stringHandle;
-}
-
-extern "C" RT_API const char* RtGetBigIntStr(int32_t bigIntStrHandle)
-{
-    return cmajor::rt::GetString(bigIntStrHandle);
-}
-
-extern "C" RT_API void RtFreeBigIntStr(int32_t bigIntStrHandle)
-{
-    cmajor::rt::DisposeString(bigIntStrHandle);
-}
-
-extern "C" RT_API void RtNegBigInt(void* result, void* bigInt)
-{
-    neg_mpz(result, bigInt);
-}
-
-extern "C" RT_API void RtAbsBigInt(void* result, void* bigInt)
-{
-    abs_mpz(result, bigInt);
-}
-
-extern "C" RT_API void RtAddBigInt(void* result, void* left, void* right)
-{
-    add_mpz(result, left, right);
-}
-
-extern "C" RT_API void RtSubBigInt(void* result, void* left, void* right)
-{
-    sub_mpz(result, left, right);
-}
-
-extern "C" RT_API void RtMulBigInt(void* result, void* left, void* right)
-{
-    mul_mpz(result, left, right);
-}
-
-extern "C" RT_API void RtDivBigInt(void* result, void* left, void* right)
-{
-    div_mpz(result, left, right);
-}
-
-extern "C" RT_API void RtRemBigInt(void* result, void* left, void* right)
-{
-    rem_mpz(result, left, right);
-}
-
-extern "C" RT_API int32_t RtCmpBigInt(void* left, void* right)
-{
-    return cmp_mpz(left, right);
-}
-
-extern "C" RT_API void RtAndBigInt(void* result, void* left, void* right)
-{
-    and_mpz(result, left, right);
-}
-
-extern "C" RT_API void RtOrBigInt(void* result, void* left, void* right)
-{
-    or_mpz(result, left, right);
-}
-
-extern "C" RT_API void RtXorBigInt(void* result, void* left, void* right)
-{
-    xor_mpz(result, left, right);
-}
-
-extern "C" RT_API void RtCplBigInt(void* result, void* bigInt)
-{
-    cpl_mpz(result, bigInt);
-}
-
-extern "C" RT_API void RtSetBitBigInt(void* bigInt, uint32_t bitIndex)
-{
-    setbit_mpz(bigInt, bitIndex);
-}
-
-extern "C" RT_API void RtClearBitBigInt(void* bigInt, uint32_t bitIndex)
-{
-    clrbit_mpz(bigInt, bitIndex);
-}
-
-extern "C" RT_API void RtToggleBitBigInt(void* bigInt, uint32_t bitIndex)
-{
-    cplbit_mpz(bigInt, bitIndex);
-}
-
-extern "C" RT_API int32_t RtTestBitBigInt(void* bigInt, uint32_t bitIndex)
-{
-    return tstbit_mpz(bigInt, bitIndex);
-}
-
-extern "C" RT_API void* RtCreateBigRational()
-{
-    return create_mpq();
-}
-
-extern "C" RT_API void RtDestroyBigRational(void* bigRational)
-{
-    destroy_mpq(bigRational);
-}
-
-extern "C" RT_API void RtCanonicalizeBigRational(void* bigRational)
-{
-    canonicalize_mpq(bigRational);
-}
-
-extern "C" RT_API void RtAssignBigRational(void* left, void* right)
-{
-    assign_mpq(left, right);
-}
-
-extern "C" RT_API int32_t RtAssignBigRationalStr(void* left, const char* str, int32_t base)
-{
-    return assign_mpq_str(left, str, base);
-}
-
-extern "C" RT_API void RtSetBigRationalInt(void* bigRational, int32_t numerator, int32_t denominator)
-{
-    set_mpq_si(bigRational, numerator, denominator);
-}
-
-extern "C" RT_API void RtSetBigRationalUInt(void* bigRational, uint32_t numerator, uint32_t denominator)
-{
-    set_mpq_ui(bigRational, numerator, denominator);
-}
-
-extern "C" RT_API int32_t RtGetBigRationalStrHandle(void* bigRational, int32_t base)
-{
-    char* str = get_mpq_str(bigRational, base);
-    std::string s = str;
-    free_mpq_str(str);
-    int32_t stringHandle = cmajor::rt::InstallString(s);
-    return stringHandle;
-}
-
-extern "C" RT_API const char* RtGetBigRationalStr(int32_t bigRationalStrHandle)
-{
-    return cmajor::rt::GetString(bigRationalStrHandle);
-}
-
-extern "C" RT_API void RtFreeBigRationalStr(int32_t bigRationalStrHandle)
-{
-    cmajor::rt::DisposeString(bigRationalStrHandle);
-}
-
-extern "C" RT_API void RtSetBigRationalBigInt(void* bigRational, void* bigInt)
-{
-    set_mpq_z(bigRational, bigInt);
-}
-
-extern "C" RT_API void RtAddBigRational(void* target, void* left, void* right)
-{
-    add_mpq(target, left, right);
-}
-
-extern "C" RT_API void RtSubBigRational(void* target, void* left, void* right)
-{
-    sub_mpq(target, left, right);
-}
-
-extern "C" RT_API void RtMulBigRational(void* target, void* left, void* right)
-{
-    mul_mpq(target, left, right);
-}
-
-extern "C" RT_API void RtDivBigRational(void* target, void* left, void* right)
-{
-    div_mpq(target, left, right);
-}
-
-extern "C" RT_API void RtNegBigRational(void* left, void* right)
-{
-    neg_mpq(left, right);
-}
-
-extern "C" RT_API void RtAbsBigRational(void* left, void* right)
-{
-    abs_mpq(left, right);
-}
-
-extern "C" RT_API int32_t RtCmpBigRational(void* left, void* right)
-{
-    return cmp_mpq(left, right);
-}
-
-extern "C" RT_API int32_t RtEqualBigRational(void* left, void* right)
-{
-    return equal_mpq(left, right);
-}
-
-extern "C" RT_API void RtGetNumeratorBigRational(void* numeratorBigInt, void* bigRational)
-{
-    get_numerator_mpq(numeratorBigInt, bigRational);
-}
-
-extern "C" RT_API void RtGetDenominatorBigRational(void* denominatorBigInt, void* bigRational)
-{
-    get_denominator_mpq(denominatorBigInt, bigRational);
-}
-
-extern "C" RT_API void RtBigFloatSetDefaultPrec(uint32_t prec)
-{
-    set_default_prec_mpf(prec);
-}
-
-extern "C" RT_API uint32_t RtBigFloatGetDefaultPrec() 
-{
-    return get_default_prec_mpf();
-}
-
-extern "C" RT_API void* RtCreateBigFloat()
-{
-    return create_mpf();
-}
-
-extern "C" RT_API void* RtCreateBitFloatPrec(uint32_t prec)
-{
-    return create_mpf_prec(prec);
-}
-
-extern "C" RT_API void RtDestroyBigFloat(void* bigFloat)
-{
-    destroy_mpf(bigFloat);
-}
-
-extern "C" RT_API uint32_t RtGetBigFloatPrec(void* bigFloat)
-{
-    return get_prec_mpf(bigFloat);
-}
-
-extern "C" RT_API void RtSetBigFloatPrec(void* bigFloat, uint32_t prec)
-{
-    set_prec_mpf(bigFloat, prec);
-}
-
-extern "C" RT_API void RtSetBigFloat(void* left, void* right)
-{
-    set_mpf(left, right);
-}
-
-extern "C" RT_API void RtSetBigFloatUInt(void* left, uint32_t right)
-{
-    set_mpf_ui(left, right);
-}
-
-extern "C" RT_API void RtSetBigFloatInt(void* left, int32_t right)
-{
-    set_mpf_si(left, right);
-}
-
-extern "C" RT_API void RtSetBigFloatDouble(void* left, double right)
-{
-    set_mpf_d(left, right);
-}
-
-extern "C" RT_API void RtSetBigFloatBigInt(void* left, void* right)
-{
-    set_mpf_z(left, right);
-}
-
-extern "C" RT_API void RtSetBigFloatBigRational(void* left, void* right)
-{
-    set_mpf_q(left, right);
-}
-
-extern "C" RT_API int32_t RtSetBigFloatStr(void* left, const char* str, int32_t base)
-{
-    return set_mpf_str(left, str, base);
-}
-
-extern "C" RT_API int32_t RtGetBigFloatStrHandle(void* bigFloat, int32_t base, uint32_t numDigits, int64_t* exponent)
-{
-    char* str = get_mpf_str(bigFloat, base, numDigits, exponent);
-    std::string s = str;
-    free_mpf_str(str);
-    int32_t stringHandle = cmajor::rt::InstallString(s);
-    return stringHandle;
-}
-
-extern "C" RT_API const char* RtGetBigFloatStr(int32_t bigFloatStrHandle)
-{
-    return cmajor::rt::GetString(bigFloatStrHandle);
-}
-
-extern "C" RT_API void RtFreeBigFloatStr(int32_t bigFloatStrHandle)
-{
-    cmajor::rt::DisposeString(bigFloatStrHandle);
-}
-
-extern "C" RT_API void RtAddBigFloat(void* target, void* left, void* right)
-{
-    add_mpf(target, left, right);
-}
-
-extern "C" RT_API void RtSubBigFloat(void* target, void* left, void* right)
-{
-    sub_mpf(target, left, right);
-}
-
-extern "C" RT_API void RtMulBigFloat(void* target, void* left, void* right)
-{
-    mul_mpf(target, left, right);
-}
-
-extern "C" RT_API void RtDivBigFloat(void* target, void* left, void* right)
-{
-    div_mpf(target, left, right);
-}
-
-extern "C" RT_API void RtSqrtBigFloat(void* target, void* subject)
-{
-    sqrt_mpf(target, subject);
-}
-
-extern "C" RT_API void RtNegBigFloat(void* target, void* subject)
-{
-    neg_mpf(target, subject);
-}
-
-extern "C" RT_API void RtAbsBigFloat(void* target, void* subject)
-{
-    abs_mpf(target, subject);
-}
-
-extern "C" RT_API int32_t RtCmpBigFloat(void* left, void* right)
-{
-    return cmp_mpf(left, right);
-}
-
-extern "C" RT_API void RtCeilBigFloat(void* target, void* subject)
-{
-    ceil_mpf(target, subject);
-}
-
-extern "C" RT_API void RtFloorBigFloat(void* target, void* subject)
-{
-    floor_mpf(target, subject);
+void* RtCreateBigIntFromUInt(uint32_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
 }
 
-extern "C" RT_API void RtTruncBigFloat(void* target, void* subject)
-{
-    trunc_mpf(target, subject);
+void* RtCreateBigIntFromLong(int64_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
 }
-
-extern "C" RT_API double RtGetBigFloatDouble(void* bigFloat)
-{
-    return get_d_mpf(bigFloat);
+
+void* RtCreateBigIntFromULong(uint64_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigIntFromStr(const char* v, int32_t& errorStrHandle)
+{
+    try
+    {
+        std::string s(v);
+        return new soulng::util::BigInt(s);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigIntFromCopy(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void RtDestroyBigInt(void* handle)
+{
+    delete static_cast<soulng::util::BigInt*>(handle);
+}
+
+const char* RtBigIntToCharPtr(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        std::string s = static_cast<soulng::util::BigInt*>(handle)->ToString();
+        int n = s.length() + 1;
+        char* p = new char[n];
+        memcpy(p, s.c_str(), n);
+        return p;
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void RtDeleteCharPtr(const char* ptr)
+{
+    delete[] ptr;
+}
+
+int32_t RtBigIntToInt(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return static_cast<soulng::util::BigInt*>(handle)->ToInt();
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return 0;
+    }
+}
+
+uint32_t RtBigIntToUInt(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return static_cast<soulng::util::BigInt*>(handle)->ToUInt();
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return 0;
+    }
+}
+
+int64_t RtBigIntToLong(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return static_cast<soulng::util::BigInt*>(handle)->ToLong();
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return 0;
+    }
+}
+
+uint64_t RtBigIntToULong(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return static_cast<soulng::util::BigInt*>(handle)->ToULong();
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return 0;
+    }
+}
+
+void* RtNegBigInt(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(-*static_cast<soulng::util::BigInt*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtPosBigInt(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(+*static_cast<soulng::util::BigInt*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCplBigInt(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(~*static_cast<soulng::util::BigInt*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtAddBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) + *static_cast<soulng::util::BigInt*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtSubBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) - *static_cast<soulng::util::BigInt*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtMulBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) * *static_cast<soulng::util::BigInt*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtDivBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) / *static_cast<soulng::util::BigInt*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtModBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) % *static_cast<soulng::util::BigInt*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtAndBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) & *static_cast<soulng::util::BigInt*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtOrBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) | *static_cast<soulng::util::BigInt*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtXorBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) ^ *static_cast<soulng::util::BigInt*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtShiftLeftBigInt(void* left, int32_t right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) << right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtShiftRightBigInt(void* left, int32_t right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(*static_cast<soulng::util::BigInt*>(left) >> right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+bool RtEqualBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigInt*>(left) == *static_cast<soulng::util::BigInt*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtNotEqualBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigInt*>(left) != *static_cast<soulng::util::BigInt*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtLessBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigInt*>(left) < *static_cast<soulng::util::BigInt*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtGreaterBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigInt*>(left) > * static_cast<soulng::util::BigInt*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtLessEqualBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigInt*>(left) <= *static_cast<soulng::util::BigInt*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtGreaterEqualBigInt(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigInt*>(left) >= *static_cast<soulng::util::BigInt*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+void* RtCreateDefaultBigRational(int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational();
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigRationalFromInt(int32_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigRationalFromUInt(uint32_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigRationalFromLong(int64_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigRationalFromULong(uint64_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigRationalFromStr(const char* v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigRationalFromCopy(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(*static_cast<soulng::util::BigRational*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigRationalFromBigInt(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(*static_cast<soulng::util::BigInt*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigRationalFromBigInts(void* numerator, void* denominator, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(*static_cast<soulng::util::BigInt*>(numerator), *static_cast<soulng::util::BigInt*>(denominator));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void RtDestroyBigRational(void* handle)
+{
+    delete static_cast<soulng::util::BigRational*>(handle);
+}
+
+const char* RtBigRationalToCharPtr(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        std::string s = static_cast<soulng::util::BigRational*>(handle)->ToString();
+        int n = s.length() + 1;
+        char* p = new char[n];
+        memcpy(p, s.c_str(), n);
+        return p;
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtBigRationalToBigInt(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(static_cast<soulng::util::BigRational*>(handle)->ToBigInt());
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtNegBigRational(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(-*static_cast<soulng::util::BigRational*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtPosBigRational(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(+*static_cast<soulng::util::BigRational*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtAddBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(*static_cast<soulng::util::BigRational*>(left) + *static_cast<soulng::util::BigRational*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtSubBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(*static_cast<soulng::util::BigRational*>(left) - *static_cast<soulng::util::BigRational*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtMulBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(*static_cast<soulng::util::BigRational*>(left) * *static_cast<soulng::util::BigRational*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtDivBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(*static_cast<soulng::util::BigRational*>(left) / *static_cast<soulng::util::BigRational*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+bool RtEqualBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigRational*>(left) == *static_cast<soulng::util::BigRational*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtNotEqualBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigRational*>(left) != *static_cast<soulng::util::BigRational*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtLessBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigRational*>(left) < *static_cast<soulng::util::BigRational*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtGreaterBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigRational*>(left) > * static_cast<soulng::util::BigRational*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtLessEqualBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigRational*>(left) <= *static_cast<soulng::util::BigRational*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtGreaterEqualBigRational(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigRational*>(left) >= *static_cast<soulng::util::BigRational*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+void* RtNumeratorBigRational(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(soulng::util::Numerator(*static_cast<soulng::util::BigRational*>(handle)));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtDenominatorBigRational(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(soulng::util::Denominator(*static_cast<soulng::util::BigRational*>(handle)));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateDefaultBigFloat(int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat();
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigFloatFromInt(int32_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigFloatFromUInt(uint32_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigFloatFromLong(int64_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigFloatFromULong(uint64_t v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigFloatFromDouble(double v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigFloatFromStr(const char* v, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(v);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigFloatFromCopy(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(*static_cast<soulng::util::BigFloat*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigFloatFromBigInt(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(*static_cast<soulng::util::BigInt*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtCreateBigFloatFromBigRational(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(*static_cast<soulng::util::BigRational*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void RtDestroyBigFloat(void* handle)
+{
+    delete static_cast<soulng::util::BigFloat*>(handle);
+}
+
+const char* RtBigFloatToCharPtr(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        std::string s = static_cast<soulng::util::BigFloat*>(handle)->ToString();
+        int n = s.length() + 1;
+        char* p = new char[n];
+        memcpy(p, s.c_str(), n);
+        return p;
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+double RtBigFloatToDouble(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return static_cast<soulng::util::BigFloat*>(handle)->ToDouble();
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return 0.0;
+    }
+}
+
+void* RtBigFloatToBigInt(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigInt(static_cast<soulng::util::BigFloat*>(handle)->ToBigInt());
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtBigFloatToBigRational(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigRational(static_cast<soulng::util::BigFloat*>(handle)->ToBigRational());
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtNegBigFloat(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(-*static_cast<soulng::util::BigFloat*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtPosBigFloat(void* handle, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(+*static_cast<soulng::util::BigFloat*>(handle));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtAddBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(*static_cast<soulng::util::BigFloat*>(left) + *static_cast<soulng::util::BigFloat*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtSubBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(*static_cast<soulng::util::BigFloat*>(left) - *static_cast<soulng::util::BigFloat*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtMulBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(*static_cast<soulng::util::BigFloat*>(left) * *static_cast<soulng::util::BigFloat*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+void* RtDivBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        return new soulng::util::BigFloat(*static_cast<soulng::util::BigFloat*>(left) / *static_cast<soulng::util::BigFloat*>(right));
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return nullptr;
+    }
+}
+
+bool RtEqualBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigFloat*>(left) == *static_cast<soulng::util::BigFloat*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtNotEqualBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigFloat*>(left) != *static_cast<soulng::util::BigFloat*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtLessBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigFloat*>(left) < *static_cast<soulng::util::BigFloat*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtGreaterBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigFloat*>(left) > * static_cast<soulng::util::BigFloat*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtLessEqualBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigFloat*>(left) <= *static_cast<soulng::util::BigFloat*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+}
+
+bool RtGreaterEqualBigFloat(void* left, void* right, int32_t& errorStrHandle)
+{
+    try
+    {
+        errorStrHandle = -1;
+        return *static_cast<soulng::util::BigFloat*>(left) >= *static_cast<soulng::util::BigFloat*>(right);
+    }
+    catch (const std::exception& ex)
+    {
+        errorStrHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
 }

@@ -20,6 +20,7 @@ public:
     std::unique_ptr<JsonObject> DoReceive() override;
     void DoClose() override;
     const std::string& GetActor() const override;
+    Host* GetHost() const override { return host; }
 private:
     Host* host;
     TcpSocket socket;

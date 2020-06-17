@@ -55,7 +55,6 @@ void LlvmCodeGenerator::GenerateCode(void* boundCompileUnit)
 
 void LlvmCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
-    boundCompileUnit.ResetCodeGenerated();
     symbolTable = &boundCompileUnit.GetSymbolTable();
     symbolsModule = &boundCompileUnit.GetModule();
     compileUnitId = boundCompileUnit.Id();
@@ -299,16 +298,17 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->Parent()->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol && functionSymbol->IsTemplateSpecialization())
-    {
-        functionSymbol->SetFlag(FunctionSymbolFlags::dontReuse);
-    }
-    if (functionSymbol->CodeGenerated()) return;
-    functionSymbol->SetCodeGenerated();
+    if (compileUnit->CodeGenerated(functionSymbol)) return;
+    compileUnit->SetCodeGenerated(functionSymbol);
     void* functionType = functionSymbol->IrType(*emitter);
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType, functionSymbol->DontThrow());
     bool setInline = false;
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
+    {
+        emitter->AddInlineFunctionAttribute(function);
+        functionSymbol->SetLinkOnceOdrLinkage();
+    }
+    else if (functionSymbol->IsGeneratedFunction())
     {
         emitter->AddInlineFunctionAttribute(function);
         functionSymbol->SetLinkOnceOdrLinkage();
@@ -556,7 +556,6 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     }
     if (!lastStatement || lastStatement->GetBoundNodeType() != BoundNodeType::boundReturnStatement || lastStatement->GetBoundNodeType() == BoundNodeType::boundReturnStatement && destructorCallGenerated)
     {
-        //CreateExitFunctionCall();
         GenerateExitFunctionCode(boundFunction);
         if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {

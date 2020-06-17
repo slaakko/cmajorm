@@ -1,0 +1,276 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Numerics.Multiprecision
+{
+    public static class BigFloatDefaultPrecisionSetter
+    {
+        static nothrow BigFloatDefaultPrecisionSetter()
+        {
+            RtBigFloatSetDefaultPrec(256u);
+        }
+        public static nothrow void Init()
+        {
+        }
+    }
+    
+    public nothrow uint GetBigFloatDefaultPrecision()
+    {
+        return RtBigFloatGetDefaultPrec();
+    }
+    
+    public class Precision
+    {
+        public nothrow Precision() : prec(256u)
+        {
+        }
+        public explicit nothrow Precision(uint prec_) : prec(prec_)
+        {
+        }
+        public nothrow uint ToUInt() const
+        {
+            return prec;
+        }
+        private uint prec;
+    }   
+    
+    public class BigFloat
+    {
+        public nothrow BigFloat() : handle(null)
+        {
+            BigFloatDefaultPrecisionSetter.Init();
+            handle = RtCreateBigFloat();
+        }
+        public explicit nothrow BigFloat(const Precision& prec) : handle(RtCreateBitFloatPrec(prec.ToUInt()))
+        {
+        }
+        public nothrow BigFloat(const BigFloat& that) : handle(RtCreateBigFloat())
+        {
+            RtSetBigFloat(handle, that.handle);
+        }
+        public nothrow BigFloat(BigFloat&& that) : handle(that.handle)
+        {
+            that.handle = null;
+        }
+        public nothrow BigFloat(int that) : handle(RtCreateBigFloat())
+        {
+            RtSetBigFloatInt(handle, that);
+        }
+        public nothrow BigFloat(uint that) : handle(RtCreateBigFloat())
+        {
+            RtSetBigFloatUInt(handle, that);
+        }
+        public nothrow BigFloat(double that) : handle(RtCreateBigFloat())
+        {
+            RtSetBigFloatDouble(handle, that);
+        }
+        public nothrow BigFloat(const BigInt& that) : handle(RtCreateBigFloat())
+        {
+            RtSetBigFloatBigInt(handle, that.Handle());
+        }
+        public nothrow BigFloat(const BigRational& that) : handle(RtCreateBigFloat())
+        {
+            RtSetBigFloatBigRational(handle, that.Handle());
+        }
+        public BigFloat(const string& str) : this(str, 10)
+        {
+        }
+        public BigFloat(const string& str, int base_) : handle(RtCreateBigFloat())
+        {
+            int result = RtSetBigFloatStr(handle, str.Chars(), base_);
+            if (result != 0)
+            {
+                ThrowConversionException("invalid string for initializing BigFloat");
+            }
+        }
+        public ~BigFloat()
+        {
+            if (handle != null)
+            {
+                RtDestroyBigFloat(handle);
+            }        
+        }
+        public nothrow void operator=(const BigFloat& that) 
+        {
+            if (handle != null)
+            {
+                RtDestroyBigFloat(handle);
+            }
+            handle = RtCreateBigFloat();
+            RtSetBigFloat(handle, that.handle);
+        }
+        public nothrow void operator=(int that)
+        {
+            if (handle != null)
+            {
+                RtDestroyBigFloat(handle);
+            }
+            handle = RtCreateBigFloat();
+            RtSetBigFloatInt(handle, that);
+        }
+        public nothrow void operator=(uint that)
+        {
+            if (handle != null)
+            {
+                RtDestroyBigFloat(handle);
+            }
+            handle = RtCreateBigFloat();
+            RtSetBigFloatUInt(handle, that);
+        }
+        public nothrow void operator=(double that)
+        {
+            if (handle != null)
+            {
+                RtDestroyBigFloat(handle);
+            }
+            handle = RtCreateBigFloat();
+            RtSetBigFloatDouble(handle, that);
+        }
+        public nothrow void operator=(const BigInt& that)
+        {
+            if (handle != null)
+            {
+                RtDestroyBigFloat(handle);
+            }
+            handle = RtCreateBigFloat();
+            RtSetBigFloatBigInt(handle, that.Handle());
+        }
+        public nothrow void operator=(const BigRational& that)
+        {
+            if (handle != null)
+            {
+                RtDestroyBigFloat(handle);
+            }
+            handle = RtCreateBigFloat();
+            RtSetBigFloatBigRational(handle, that.Handle());
+        }
+        public default nothrow void operator=(BigFloat&&);
+        public nothrow string ToString() const
+        {
+            return this->ToString(10);
+        }
+        public nothrow string ToString(int base_) const
+        {
+            return this->ToString(base_, 0u);
+        }
+        public nothrow string ToString(int base_, uint numDigits) const
+        {
+            long exponent = 0;
+            int strHandle = RtGetBigFloatStrHandle(handle, base_, numDigits, &exponent);
+            string s = RtGetBigFloatStr(strHandle);
+            RtFreeBigFloatStr(strHandle);
+            string t;
+            if (!s.IsEmpty() && s[0] == '-')
+            {
+                t.Append('-');
+                s = s.Substring(1);
+            }
+            t.Append("0.").Append(s).Append("e").Append(System.ToString(exponent));
+            return t;
+        }
+        public nothrow double ToDouble() const
+        {
+            return RtGetBigFloatDouble(handle);
+        }
+        public nothrow inline void* Handle() const
+        {
+            return handle;
+        }
+        private void* handle;
+    }
+    
+    public nothrow BigFloat operator-(const BigFloat& x)
+    {
+        BigFloat result;
+        RtNegBigFloat(result.Handle(), x.Handle());
+        return result;
+    }
+    
+    public nothrow BigFloat Abs(const BigFloat& x)
+    {
+        BigFloat result;
+        RtAbsBigFloat(result.Handle(), x.Handle());
+        return result;
+    }
+    
+    public nothrow BigFloat operator+(const BigFloat& left, const BigFloat& right)
+    {
+        BigFloat result;
+        RtAddBigFloat(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigFloat operator-(const BigFloat& left, const BigFloat& right)
+    {
+        BigFloat result;
+        RtSubBigFloat(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigFloat operator*(const BigFloat& left, const BigFloat& right)
+    {
+        BigFloat result;
+        RtMulBigFloat(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigFloat operator/(const BigFloat& left, const BigFloat& right)
+    {
+        BigFloat result;
+        RtDivBigFloat(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow bool operator==(const BigFloat& left, const BigFloat& right)
+    {
+        return RtCmpBigFloat(left.Handle(), right.Handle()) == 0;
+    }
+
+    public nothrow bool operator<(const BigFloat& left, const BigFloat& right)
+    {
+        return RtCmpBigFloat(left.Handle(), right.Handle()) < 0;
+    }
+    
+    public nothrow BigFloat Ceil(const BigFloat& x)
+    {
+        BigFloat target;
+        RtCeilBigFloat(target.Handle(), x.Handle());
+        return target;
+    }
+    
+    public nothrow BigFloat Floor(const BigFloat& x)
+    {
+        BigFloat target;
+        RtFloorBigFloat(target.Handle(), x.Handle());
+        return target;
+    }
+
+    public nothrow BigFloat Trunc(const BigFloat& x)
+    {
+        BigFloat target;
+        RtTruncBigFloat(target.Handle(), x.Handle());
+        return target;
+    }
+    
+    public nothrow BigFloat Sqrt(const BigFloat& x)
+    {
+        BigFloat target;
+        RtSqrtBigFloat(target.Handle(), x.Handle());
+        return target;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, const BigFloat& x)
+    {
+        return s << x.ToString();
+    }
+    
+    public TextWriter& operator<<(TextWriter& writer, const BigFloat& x)
+    {
+        return writer << x.ToString();
+    }
+}

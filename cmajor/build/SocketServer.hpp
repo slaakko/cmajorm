@@ -27,6 +27,7 @@ private:
     bool isRunning;
     Log* log;
     std::string serverName;
+    std::string name;
     TcpSocket socket;
     std::unique_ptr<SocketConnection> connection;
     std::unique_ptr<BuildServer> buildServer;

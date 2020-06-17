@@ -32,9 +32,11 @@ namespace BuildLangKeywords
         {U"using", USING}, 
         {U"server", SERVER}, 
         {U"verbose", VERBOSE}, 
+        {U"messages", MESSAGES}, 
         {U"force", FORCE}, 
         {U"only", ONLY}, 
         {U"all", ALL}, 
+        {U"rebuild", REBUILD}, 
         {U"config", CONFIG},
         {nullptr, -1}
     };

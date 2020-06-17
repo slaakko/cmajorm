@@ -13,7 +13,7 @@ namespace cmajor { namespace build {
 using namespace cmajor::symbols;
 using namespace soulng::util;
 
-SocketServer::SocketServer(Log* log_, const std::string& serverName_) : log(log_), serverName(serverName_), socket(), running(), isRunning(false)
+SocketServer::SocketServer(Log* log_, const std::string& serverName_) : log(log_), serverName(serverName_), name("socket server: '" + serverName + "'"), socket(), running(), isRunning(false)
 {
     ServerInfo* serverInfo = ServerConfig::Instance().GetServerInfo(serverName, true, true);
     if (serverInfo)
@@ -37,7 +37,7 @@ SocketServer::SocketServer(Log* log_, const std::string& serverName_) : log(log_
 
 const std::string& SocketServer::Name() const
 {
-    return serverName;
+    return name;
 }
 
 void SocketServer::WaitForRunning()

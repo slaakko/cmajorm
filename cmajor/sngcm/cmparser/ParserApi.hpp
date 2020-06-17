@@ -6,7 +6,7 @@
 #ifndef SNGCM_PARSER_API_INCLUDED
 #define SNGCM_PARSER_API_INCLUDED
  
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 
 #ifdef SNGCM_PARSER_EXPORTS
 #define SNGCM_PARSER_API __declspec(dllexport)

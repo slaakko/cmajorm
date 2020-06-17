@@ -16,7 +16,7 @@ using namespace cmajor::symbols;
 class BINDER_API BoundFunction : public BoundNode
 {
 public:
-    BoundFunction(Module* module_, FunctionSymbol* functionSymbol_);
+    BoundFunction(BoundCompileUnit* boundCompileUnit_, FunctionSymbol* functionSymbol_);
     BoundFunction(const BoundFunction&) = delete;
     BoundFunction& operator=(const BoundFunction&) = delete;
     void Load(Emitter& emitter, OperationFlags flags) override;
@@ -28,18 +28,20 @@ public:
     BoundCompoundStatement* Body() const { return body.get(); }
     void SetHasGotos() { hasGotos = true; }
     bool HasGotos() const { return hasGotos; }
-    void AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall);
+    void AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall, BoundFunction* currentFunction, ContainerScope* currentContainerScope,
+        const Span& span);
     void MoveTemporaryDestructorCallsTo(BoundExpression& expression);
     void AddLabeledStatement(BoundStatement* labeledStatement);
     const std::vector<BoundStatement*>& LabeledStatements() const { return labeledStatements; }
-    void ResetCodeGenerated() override;
     void SetEnterCode(std::vector<std::unique_ptr<BoundStatement>>&& enterCode_);
     const std::vector<std::unique_ptr<BoundStatement>>& EnterCode() const { return enterCode; }
     void SetExitCode(std::vector<std::unique_ptr<BoundStatement>>&& exitCode_);
     const std::vector<std::unique_ptr<BoundStatement>>& ExitCode() const { return exitCode; }
     void SetLineCode(std::unique_ptr<BoundStatement>&& lineCode_);
     BoundStatement* GetLineCode() const { return lineCode.get(); }
+    BoundCompileUnit* GetBoundCompileUnit() const { return boundCompileUnit; }
 private:
+    BoundCompileUnit* boundCompileUnit;
     FunctionSymbol* functionSymbol;
     std::unique_ptr<BoundCompoundStatement> body;
     bool hasGotos;

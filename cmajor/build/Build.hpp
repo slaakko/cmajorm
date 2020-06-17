@@ -6,7 +6,7 @@
 #ifndef CMAJOR_BUILD_BUILD_INCLUDED
 #define CMAJOR_BUILD_BUILD_INCLUDED
 #include <cmajor/build/BuildApi.hpp>
-#include <cmajor/build/ProjectInfo.hpp>
+#include <cmajor/build/MessageBody.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <sngcm/ast/Project.hpp>
 #include <set>

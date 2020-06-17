@@ -11,7 +11,7 @@ namespace cmajor { namespace build {
 
 BuildOptions buildOptions = BuildOptions::none;
 std::string buildConfig = "debug";
-std::string buildToolChain = "vs";
+std::string buildToolChain = "";
 
 std::string BoolStr(bool value)
 {

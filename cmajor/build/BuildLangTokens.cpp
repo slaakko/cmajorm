@@ -11,28 +11,30 @@ namespace BuildLangTokens
     void InitTokenIdMap()
     {
         tokenIdMap[U"ADD"] = 1;
-        tokenIdMap[U"ALL"] = 28;
+        tokenIdMap[U"ALL"] = 29;
         tokenIdMap[U"BUILD"] = 13;
         tokenIdMap[U"CLANG"] = 9;
-        tokenIdMap[U"CONFIG"] = 29;
+        tokenIdMap[U"CONFIG"] = 31;
         tokenIdMap[U"CONFIGURATION"] = 6;
         tokenIdMap[U"DEBUG"] = 15;
         tokenIdMap[U"DEFAULT"] = 7;
-        tokenIdMap[U"DOT"] = 33;
-        tokenIdMap[U"EQ"] = 32;
+        tokenIdMap[U"DOT"] = 35;
+        tokenIdMap[U"EQ"] = 34;
         tokenIdMap[U"FILEPATH"] = 23;
-        tokenIdMap[U"FORCE"] = 26;
+        tokenIdMap[U"FORCE"] = 27;
         tokenIdMap[U"FROM"] = 19;
         tokenIdMap[U"GCC"] = 10;
         tokenIdMap[U"HOST"] = 4;
         tokenIdMap[U"ID"] = 22;
         tokenIdMap[U"INSTALL"] = 17;
         tokenIdMap[U"INTEGER"] = 24;
-        tokenIdMap[U"LBRACKET"] = 30;
-        tokenIdMap[U"ONLY"] = 27;
+        tokenIdMap[U"LBRACKET"] = 32;
+        tokenIdMap[U"MESSAGES"] = 26;
+        tokenIdMap[U"ONLY"] = 28;
         tokenIdMap[U"PORT"] = 5;
         tokenIdMap[U"PUSH"] = 12;
-        tokenIdMap[U"RBRACKET"] = 31;
+        tokenIdMap[U"RBRACKET"] = 33;
+        tokenIdMap[U"REBUILD"] = 30;
         tokenIdMap[U"RELEASE"] = 16;
         tokenIdMap[U"REMOVE"] = 2;
         tokenIdMap[U"RUN"] = 3;
@@ -86,9 +88,11 @@ namespace BuildLangTokens
         "FILEPATH",
         "INTEGER",
         "VERBOSE",
+        "MESSAGES",
         "FORCE",
         "ONLY",
         "ALL",
+        "REBUILD",
         "CONFIG",
         "LBRACKET",
         "RBRACKET",
@@ -129,9 +133,11 @@ namespace BuildLangTokens
         "'filepath'",
         "'integer'",
         "'verbose'",
+        "'messages'",
         "'force'",
         "'only",
         "'all'",
+        "'rebuild'",
         "'config'",
         "'['",
         "']'",

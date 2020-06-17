@@ -1,0 +1,212 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Numerics.Multiprecision
+{
+    public class BigInt
+    {
+        public nothrow BigInt() : handle(RtCreateBigInt())
+        {
+        }
+        public nothrow BigInt(int that) : handle(RtCreateBigInt())
+        {
+            RtAssignBigIntInt(handle, that);
+        }
+        public nothrow BigInt(uint that) : handle(RtCreateBigInt())
+        {
+            RtAssignBigIntUInt(handle, that);
+        }
+        public BigInt(const string& str) : this(str, 10)
+        {
+        }
+        public BigInt(const string& str, int base_) : handle(RtCreateBigInt())
+        {
+            int result = RtAssignBigIntStr(handle, str.Chars(), base_);
+            if (result != 0)
+            {
+                ThrowConversionException("invalid digit string for initializing BigInt");
+            }
+        }
+        public ~BigInt()
+        {
+            if (handle != null)
+            {
+                RtDestroyBigInt(handle);
+            }        
+        }
+        public nothrow BigInt(const BigInt& that) : handle(RtCreateBigInt())
+        {
+            RtAssignBigIntBigInt(handle, that.handle);
+        }
+        public nothrow BigInt(BigInt&& that) : handle(that.handle)
+        {
+            that.handle = null;
+        }
+        public nothrow void operator=(const BigInt& that)
+        {
+            if (handle != null)
+            {
+                RtDestroyBigInt(handle);
+            }            
+            handle = RtCreateBigInt();
+            RtAssignBigIntBigInt(handle, that.handle);
+        }
+        public default nothrow void operator=(BigInt&& that);
+        public nothrow void operator=(int that)
+        {
+            if (handle != null)
+            {
+                RtDestroyBigInt(handle);
+            }            
+            handle = RtCreateBigInt();
+            RtAssignBigIntInt(handle, that);
+        }
+        public nothrow void operator=(uint that)
+        {
+            if (handle != null)
+            {
+                RtDestroyBigInt(handle);
+            }            
+            handle = RtCreateBigInt();
+            RtAssignBigIntUInt(handle, that);
+        }
+        public nothrow string ToString() const
+        {
+            return this->ToString(10);
+        }
+        public nothrow string ToString(int base_) const
+        {
+            int strHandle = RtGetBigIntStrHandle(handle, base_);
+            string s = RtGetBigIntStr(strHandle);
+            RtFreeBigIntStr(strHandle);
+            return s;
+        }
+        public nothrow inline void* Handle() const
+        {
+            return handle;
+        }    
+        private void* handle;
+    }
+    
+    public nothrow BigInt operator-(const BigInt& x)
+    {
+        BigInt result;
+        RtNegBigInt(result.Handle(), x.Handle());
+        return result;
+    }
+    
+    public nothrow BigInt Abs(const BigInt& x)
+    {
+        BigInt result;
+        RtAbsBigInt(result.Handle(), x.Handle());
+        return result;
+    }
+    
+    public nothrow BigInt operator+(const BigInt& left, const BigInt& right)
+    {
+        BigInt result;
+        RtAddBigInt(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigInt operator-(const BigInt& left, const BigInt& right)
+    {
+        BigInt result;
+        RtSubBigInt(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigInt operator*(const BigInt& left, const BigInt& right)
+    {
+        BigInt result;
+        RtMulBigInt(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigInt operator/(const BigInt& left, const BigInt& right)
+    {
+        BigInt result;
+        RtDivBigInt(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigInt operator%(const BigInt& left, const BigInt& right)
+    {
+        BigInt result;
+        RtRemBigInt(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow bool operator==(const BigInt& left, const BigInt& right)
+    {
+        return RtCmpBigInt(left.Handle(), right.Handle()) == 0;
+    }
+
+    public nothrow bool operator<(const BigInt& left, const BigInt& right)
+    {
+        return RtCmpBigInt(left.Handle(), right.Handle()) < 0;
+    }
+    
+    public nothrow BigInt operator&(const BigInt& left, const BigInt& right)
+    {
+        BigInt result;
+        RtAndBigInt(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+
+    public nothrow BigInt operator|(const BigInt& left, const BigInt& right)
+    {
+        BigInt result;
+        RtOrBigInt(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+
+    public nothrow BigInt operator^(const BigInt& left, const BigInt& right)
+    {
+        BigInt result;
+        RtXorBigInt(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+
+    public nothrow BigInt operator~(const BigInt& x)
+    {
+        BigInt result;
+        RtCplBigInt(result.Handle(), x.Handle());
+        return result;
+    }
+
+    public nothrow void SetBit(BigInt& x, uint bitIndex)
+    {
+        RtSetBitBigInt(x.Handle(), bitIndex);
+    }
+
+    public nothrow void ClearBit(BigInt& x, uint bitIndex)
+    {
+        RtClearBitBigInt(x.Handle(), bitIndex);
+    }
+
+    public nothrow void ToggleBit(BigInt& x, uint bitIndex)
+    {
+        RtToggleBitBigInt(x.Handle(), bitIndex);
+    }
+    
+    public nothrow bool TestBit(BigInt& x, uint bitIndex)
+    {
+        return RtTestBitBigInt(x.Handle(), bitIndex) == 1;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, const BigInt& x)
+    {
+        return s << x.ToString();
+    }
+
+    public TextWriter& operator<<(TextWriter& s, const BigInt& x)
+    {
+        return s << x.ToString();
+    }
+}

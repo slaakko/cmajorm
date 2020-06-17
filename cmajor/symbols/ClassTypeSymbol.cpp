@@ -186,7 +186,7 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
     writer.GetBinaryWriter().Write(groupName);
-    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags));
+    writer.GetBinaryWriter().Write(static_cast<uint16_t>(flags));
     writer.GetBinaryWriter().Write(static_cast<int32_t>(minArity));
     if (IsClassTemplate())
     {
@@ -282,7 +282,7 @@ void ClassTypeSymbol::Read(SymbolReader& reader)
 {
     TypeSymbol::Read(reader);
     groupName = reader.GetBinaryReader().ReadUtf32String();
-    flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadByte());
+    flags = static_cast<ClassTypeSymbolFlags>(reader.GetBinaryReader().ReadUShort());
     minArity = reader.GetBinaryReader().ReadInt();
     if (IsClassTemplate())
     {

@@ -33,10 +33,10 @@ namespace System.Threading.Fibers
         {
             handle = RtConvertThreadToFiber(null);
         }
-        public nothrow Fiber(const FiberFunction& function) : this(1024u * 1024u, function, null)
+        public nothrow Fiber(const FiberFunction& function) : this(cast<ulong>(1024u) * 1024u, function, null)
         {
         }
-        public nothrow Fiber(const FiberFunction& function, void* param) : this(1024u * 1024u, function, param)
+        public nothrow Fiber(const FiberFunction& function, void* param) : this(cast<ulong>(1024u) * 1024u, function, param)
         {
         }
         public nothrow Fiber(ulong stackSize, const FiberFunction& function) : this(stackSize, function, null)

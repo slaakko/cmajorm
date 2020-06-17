@@ -6,7 +6,7 @@
 #ifndef CMAJOR_RT_RT_API_INCLUDED
 #define CMAJOR_RT_RT_API_INCLUDED
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 
 #ifdef _LIB
 #define RT_API

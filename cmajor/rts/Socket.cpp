@@ -33,7 +33,6 @@
 #define SD_BOTH SHUT_RDWR
 #define INVALID_SOCKET -1
 #endif
-#include <gnutls/gnutls.h>
 
 namespace cmajor { namespace rt {
 
@@ -42,12 +41,9 @@ using namespace soulng::unicode;
 
 struct SocketData
 {
-    SocketData() : socket(INVALID_SOCKET), session(), xcred(), tlsSession(false) {}
-    SocketData(SOCKET socket_) : socket(socket_), session(), xcred(), tlsSession(false) {}
+    SocketData() : socket(INVALID_SOCKET) {}
+    SocketData(SOCKET socket_) : socket(socket_) {}
     SOCKET socket;
-    bool tlsSession;
-    gnutls_session_t session;
-    gnutls_certificate_credentials_t xcred;
 };
 
 class SocketTable
@@ -93,7 +89,7 @@ void SocketTable::Done()
 std::string GetSocketErrorMessage(int errorCode)
 {
     char16_t buf[1024];
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, (LPWSTR)(&buf[0]), sizeof(buf), NULL);
+    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, (LPWSTR)(&buf[0]), sizeof(buf), NULL);
     return ToUtf8(std::u16string(buf));
 }
 
@@ -130,18 +126,10 @@ SocketTable::SocketTable() : nextSocketHandle(1)
         RtExit(exitCodeSocketInitializationFailed);
     }
 #endif
-    int result = gnutls_global_init();
-    if (result < 0)
-    {
-        std::string errorMessage = "gnutls_global_init failed with error code " + std::to_string(result) + ": " + gnutls_strerror(result);
-        RtWrite(2, (const uint8_t*)errorMessage.c_str(), errorMessage.length());
-        RtExit(exitCodeSocketInitializationFailed);
-    }
 }
 
 SocketTable::~SocketTable()
 {
-    gnutls_global_deinit();
 #ifdef _WIN32
     WSACleanup();
 #endif
@@ -370,21 +358,12 @@ int32_t SocketTable::CloseSocket(int32_t socketHandle)
         {
             return InstallError("invalid socket handle " + std::to_string(socketHandle));
         }
-        if (socketData->tlsSession)
-        {
-            gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
-        }
         SOCKET s = socketData->socket;
 #ifdef _WIN32
         result = closesocket(s);
 #else
         result = close(s);
 #endif
-        if (socketData->tlsSession)
-        {
-            gnutls_deinit(socketData->session);
-            gnutls_certificate_free_credentials(socketData->xcred);
-        }
     }
     else
     {
@@ -397,21 +376,12 @@ int32_t SocketTable::CloseSocket(int32_t socketHandle)
             {
                 return InstallError("invalid socket handle " + std::to_string(socketHandle));
             }
-            if (socketData->tlsSession)
-            {
-                gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
-            }
             SOCKET s = socketData->socket;
 #ifdef _WIN32
             result = closesocket(s);
 #else
             result = close(s);
 #endif
-            if (socketData->tlsSession)
-            {
-                gnutls_deinit(socketData->session);
-                gnutls_certificate_free_credentials(socketData->xcred);
-            }
         }
         else
         {
@@ -448,17 +418,6 @@ int32_t SocketTable::ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
         {
             return InstallError("invalid socket handle " + std::to_string(socketHandle));
         }
-        if (socketData->tlsSession)
-        {
-            if (how == SD_BOTH)
-            {
-                gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
-            }
-            else
-            {
-                gnutls_bye(socketData->session, GNUTLS_SHUT_WR);
-            }
-        }
         SOCKET s = socketData->socket;
         result = shutdown(s, how);
     }
@@ -472,17 +431,6 @@ int32_t SocketTable::ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
             if (!socketData)
             {
                 return InstallError("invalid socket handle " + std::to_string(socketHandle));
-            }
-            if (socketData->tlsSession)
-            {
-                if (how == SD_BOTH)
-                {
-                    gnutls_bye(socketData->session, GNUTLS_SHUT_RDWR);
-                }
-                else
-                {
-                    gnutls_bye(socketData->session, GNUTLS_SHUT_WR);
-                }
             }
             SOCKET s = socketData->socket;
             result = shutdown(s, how);
@@ -504,50 +452,6 @@ int32_t SocketTable::ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
 int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& service, ConnectOptions options)
 {
     std::unique_ptr<SocketData> socketData(new SocketData());
-    bool createTlsSession = false;
-    if ((ToLower(service) == "https") || (service == std::to_string(443)) || ((options & ConnectOptions::useTls) != ConnectOptions::none))
-    {
-        createTlsSession = true;
-        int result = gnutls_certificate_allocate_credentials(&socketData->xcred);
-        if (result < 0)
-        {
-            std::string errorMessage = "gnutls_certificate_allocate_credentials failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-            return InstallError(errorMessage);
-        }
-        result = gnutls_certificate_set_x509_system_trust(socketData->xcred);
-        if (result < 0)
-        {
-            std::string errorMessage = "gnutls_certificate_set_x509_system_trust failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-            return InstallError(errorMessage);
-        }
-        result = gnutls_init(&socketData->session, GNUTLS_CLIENT);
-        if (result < 0)
-        {
-            std::string errorMessage = "gnutls_init failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-            return InstallError(errorMessage);
-        }
-        result = gnutls_server_name_set(socketData->session, GNUTLS_NAME_DNS, node.c_str(), node.length());
-        if (result < 0)
-        {
-            std::string errorMessage = "gnutls_server_name_set failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-            return InstallError(errorMessage);
-        }
-        result = gnutls_set_default_priority(socketData->session);
-        if (result < 0)
-        {
-            std::string errorMessage = "gnutls_set_default_priority failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-            return InstallError(errorMessage);
-        }
-        result = gnutls_credentials_set(socketData->session, GNUTLS_CRD_CERTIFICATE, socketData->xcred);
-        if (result < 0)
-        {
-            std::string errorMessage = "gnutls_credentials_set failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-            return InstallError(errorMessage);
-        }
-#if GNUTLS_VERSION_NUMBER >= 0x030600
-        gnutls_session_set_verify_cert(socketData->session, node.c_str(), 0);
-#endif
-    }
     struct addrinfo hint;
     struct addrinfo* rp;
     struct addrinfo* res;
@@ -587,54 +491,12 @@ int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& s
                 int32_t connectedSocketHandle = nextSocketHandle++;
                 if (connectedSocketHandle < maxNoLockSocketHandles)
                 {
-                    if (createTlsSession)
-                    {
-                        socketData->socket = s;
-                        sockets[connectedSocketHandle] = std::move(socketData);
-                        gnutls_transport_set_int(sockets[connectedSocketHandle]->session, s);
-                        gnutls_handshake_set_timeout(sockets[connectedSocketHandle]->session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
-                        do
-                        {
-                            result = gnutls_handshake(sockets[connectedSocketHandle]->session);
-                        } 
-                        while (result < 0 && gnutls_error_is_fatal(result) == 0);
-                        if (result < 0)
-                        {
-                            std::string errorMessage = "gnutls_handshake failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-                            return InstallError(errorMessage);
-                        }
-                        sockets[connectedSocketHandle]->tlsSession = true;
-                    }
-                    else
-                    {
-                        sockets[connectedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
-                    }
+                    sockets[connectedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
                 }
                 else
                 {
                     std::lock_guard<std::mutex> lock(mtx);
-                    if (createTlsSession)
-                    {
-                        socketData->socket = s;
-                        socketMap[connectedSocketHandle] = std::move(socketData);
-                        gnutls_transport_set_int(socketMap[connectedSocketHandle]->session, s);
-                        gnutls_handshake_set_timeout(socketMap[connectedSocketHandle]->session, GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT);
-                        do
-                        {
-                            result = gnutls_handshake(socketMap[connectedSocketHandle]->session);
-                        } 
-                        while (result < 0 && gnutls_error_is_fatal(result) == 0);
-                        if (result < 0)
-                        {
-                            std::string errorMessage = "gnutls_handshake failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-                            return InstallError(errorMessage);
-                        }
-                        socketMap[connectedSocketHandle]->tlsSession = true;
-                    }
-                    else
-                    {
-                        socketMap[connectedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
-                    }
+                    socketMap[connectedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
                 }
                 return connectedSocketHandle;
             }
@@ -665,20 +527,8 @@ int32_t SocketTable::SendSocket(int32_t socketHandle, uint8_t* buf, int32_t len,
         {
             return InstallError("invalid socket handle " + std::to_string(socketHandle));
         }
-        if (socketData->tlsSession)
-        {
-            result = gnutls_record_send(socketData->session, reinterpret_cast<const void*>(buf), len);
-            if (result < 0)
-            {
-                std::string errorMessage = "gnutls_record_send failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-                return InstallError(errorMessage);
-            }
-        }
-        else
-        {
-            SOCKET s = socketData->socket;
-            result = send(s, (const char*)buf, len, flags);
-        }
+        SOCKET s = socketData->socket;
+        result = send(s, (const char*)buf, len, flags);
     }
     else
     {
@@ -691,20 +541,8 @@ int32_t SocketTable::SendSocket(int32_t socketHandle, uint8_t* buf, int32_t len,
             {
                 return InstallError("invalid socket handle " + std::to_string(socketHandle));
             }
-            if (socketData->tlsSession)
-            {
-                result = gnutls_record_send(socketData->session, reinterpret_cast<const void*>(buf), len);
-                if (result < 0)
-                {
-                    std::string errorMessage = "gnutls_record_send failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-                    return InstallError(errorMessage);
-                }
-            }
-            else
-            {
-                SOCKET s = socketData->socket;
-                result = send(s, (const char*)buf, len, flags);
-            }
+            SOCKET s = socketData->socket;
+            result = send(s, (const char*)buf, len, flags);
         }
         else
         {
@@ -734,20 +572,8 @@ int32_t SocketTable::ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t l
         {
             return InstallError("invalid socket handle " + std::to_string(socketHandle));
         }
-        if (socketData->tlsSession)
-        {
-            result = gnutls_record_recv(socketData->session, reinterpret_cast<void*>(buf), len);
-            if (result < 0)
-            {
-                std::string errorMessage = "gnutls_record_recv failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-                return InstallError(errorMessage);
-            }
-        }
-        else
-        {
-            SOCKET s = socketData->socket;
-            result = recv(s, (char*)buf, len, flags);
-        }
+        SOCKET s = socketData->socket;
+        result = recv(s, (char*)buf, len, flags);
     }
     else
     {
@@ -760,20 +586,8 @@ int32_t SocketTable::ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t l
             {
                 return InstallError("invalid socket handle " + std::to_string(socketHandle));
             }
-            if (socketData->tlsSession)
-            {
-                result = gnutls_record_recv(socketData->session, reinterpret_cast<void*>(buf), len);
-                if (result < 0)
-                {
-                    std::string errorMessage = "gnutls_record_recv failed with error code " + ToString(result) + " : " + gnutls_strerror(result);
-                    return InstallError(errorMessage);
-                }
-            }
-            else
-            {
-                SOCKET s = socketData->socket;
-                result = recv(s, (char*)buf, len, flags);
-            }
+            SOCKET s = socketData->socket;
+            result = recv(s, (char*)buf, len, flags);
         }
         else
         {

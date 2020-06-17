@@ -87,10 +87,9 @@ enum class FunctionSymbolFlags : uint32_t
     copy = 1 << 17,
     varArg = 1 << 18,
     winapi = 1 << 19,
-    codeGenerated = 1 << 20,
-    dontReuse = 1 << 21,
-    hasArtificialBody = 1 << 22,
-    hasCleanup = 1 << 23
+    dontReuse = 1 << 20,
+    hasArtificialBody = 1 << 21,
+    hasCleanup = 1 << 22
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -210,9 +209,6 @@ public:
     void SetCopy() { SetFlag(FunctionSymbolFlags::copy); }
     bool IsVarArg() const { return GetFlag(FunctionSymbolFlags::varArg); }
     void SetVarArg() { SetFlag(FunctionSymbolFlags::varArg); }
-    bool CodeGenerated() const { return GetFlag(FunctionSymbolFlags::codeGenerated); }
-    void SetCodeGenerated() { SetFlag(FunctionSymbolFlags::codeGenerated); }
-    void ResetCodeGenerated() { ResetFlag(FunctionSymbolFlags::codeGenerated); }
     void SetHasArtificialBody() { SetFlag(FunctionSymbolFlags::hasArtificialBody); }
     bool HasArtificialBody() const { return GetFlag(FunctionSymbolFlags::hasArtificialBody); }
     bool HasCleanup() const { return GetFlag(FunctionSymbolFlags::hasCleanup); }

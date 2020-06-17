@@ -150,7 +150,11 @@ int32_t Executor::Execute(Exec* exec)
         if (oldHandle != -1)
         {
             toRestore.push_back(std::make_pair(handle, std::move(oldHandle)));
+#if defined(__MINGW32__)
+            int pmode = 0x0100 | 0x0080;
+#else
             int pmode = _S_IREAD | _S_IWRITE;
+#endif
             Handle fd = _creat(file.c_str(), pmode);
             if (fd != -1)
             {

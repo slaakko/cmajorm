@@ -1,5 +1,5 @@
-#ifndef HPP_23BDA85CC3068B14723007EFBFB1E9CAC65E844F
-#define HPP_23BDA85CC3068B14723007EFBFB1E9CAC65E844F
+#ifndef HPP_1B27929682B56C19E1A0F2F27FFA199F4CCA2E2D
+#define HPP_1B27929682B56C19E1A0F2F27FFA199F4CCA2E2D
 #include <soulng/util/Json.hpp>
 #include <cmajor/build/BuildApi.hpp>
 #include <string>
@@ -62,6 +62,9 @@ struct BUILD_API ProjectToBuild
     ProjectToBuild(soulng::util::JsonValue* value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string projectId;
+    std::string projectHash;
+    bool only;
+    bool rebuild;
     bool sendBuildOutput;
     std::string config;
     std::string toolChain;
@@ -112,4 +115,4 @@ struct BUILD_API CloseConnection
     std::string error;
 };
 
-#endif // HPP_23BDA85CC3068B14723007EFBFB1E9CAC65E844F
+#endif // HPP_1B27929682B56C19E1A0F2F27FFA199F4CCA2E2D

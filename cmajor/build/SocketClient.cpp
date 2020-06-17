@@ -13,7 +13,7 @@ namespace cmajor { namespace build {
 using namespace cmajor::symbols;
 using namespace soulng::util;
 
-SocketClient::SocketClient(Log* log_, const std::string& serverName_) : log(log_), name("client"), serverName(serverName_), socket()
+SocketClient::SocketClient(Log* log_, const std::string& serverName_) : log(log_), name("socket client"), serverName(serverName_), socket()
 {
 }
 
@@ -56,6 +56,7 @@ void SocketClient::Run()
     connection.reset(new SocketConnection(log, this, std::move(socket)));
     connection->SetServerAlive(true);
     buildClient.reset(new BuildClient(connection.get()));
+    buildClient->SetDefaultToolChain(serverInfo->DefaultToolChain());
 }
 
 void SocketClient::Exit()

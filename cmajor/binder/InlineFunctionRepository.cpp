@@ -104,7 +104,7 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         typeBinder.SetCurrentFunctionSymbol(functionSymbol.get());
         functionInstanceNode->Accept(typeBinder);
         StatementBinder statementBinder(boundCompileUnit);
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit.GetModule(), functionSymbol.get()));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, functionSymbol.get()));
         statementBinder.SetCurrentFunction(boundFunction.get());
         statementBinder.SetContainerScope(functionSymbol->GetContainerScope());
         functionInstanceNode->Body()->Accept(statementBinder);
@@ -149,7 +149,7 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         std::unique_ptr<BoundClass> boundClass(new BoundClass(&boundCompileUnit.GetModule(), classTypeSymbol));
         boundClass->SetInlineFunctionContainer();
         statementBinder.SetCurrentClass(boundClass.get());
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit.GetModule(), functionSymbol.get()));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, functionSymbol.get()));
         statementBinder.SetCurrentFunction(boundFunction.get());
         statementBinder.SetContainerScope(functionSymbol->GetContainerScope());
         if (functionSymbol->GetSymbolType() == SymbolType::constructorSymbol)

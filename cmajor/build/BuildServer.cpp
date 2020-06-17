@@ -369,6 +369,7 @@ void BuildServer::Handle(BuildProjectRequest& request)
         LogMessage(-1, "buildserver: received " + std::string(request.Id()));
     }
     BuildProjectResponse buildProjectResponse;
+    buildProjectResponse.body.ok = false;
     buildProjectResponse.body.projectId = request.body.projectId;
     try
     {
@@ -383,6 +384,10 @@ void BuildServer::Handle(BuildProjectRequest& request)
             throw std::runtime_error("project info file not found");
         }
         ProjectInfo projectInfo = ReadPojectInfo(nullptr, projectInfoFilePath);
+        if (projectInfo.projectHash != request.body.projectHash)
+        {
+            throw std::runtime_error("project '" + request.body.projectId + "' changed (hash does not match), use 'cmclient push' command to push project to repository");
+        }
         std::string projectFileName = Path::GetFileName(projectInfo.projectFilePath);
         std::string projectFilePath = Path::Combine(projectDir, projectFileName);
         std::string buildCommand;
@@ -399,11 +404,27 @@ void BuildServer::Handle(BuildProjectRequest& request)
         {
             buildCommand.append(" --tool-chain=").append(request.body.toolChain);
         }
-        buildCommand.append(" --all");
+        if (request.body.rebuild)
+        {
+            buildCommand.append(" --rebuild");
+        }
+        if (!request.body.only)
+        {
+            buildCommand.append(" --all");
+        }
         buildCommand.append(" ").append(QuotedPath(projectFilePath));
-        buildProcess.reset(new Process(buildCommand));
+        Process::Redirections redirections = Process::Redirections::processStdErr;
+        if (request.body.sendBuildOutput)
+        {
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        std::unique_ptr<soulng::util::Process> buildProcess(new Process(buildCommand, redirections));
+        if (request.body.sendBuildOutput)
+        {
+            SendBuildMessages(buildProcess.get());
+        }
         std::string errors;
-        errors = buildProcess->ReadToEnd(soulng::util::Process::StdHandle::std_err);
+        errors = buildProcess->ReadToEnd(soulng::util::Process::StdHandle::stdErr);
         buildProcess->WaitForExit();
         if (buildProcess->ExitCode() != 0)
         {
@@ -411,7 +432,8 @@ void BuildServer::Handle(BuildProjectRequest& request)
         }
         else
         {
-            buildProjectResponse.body.info.append("execution of build command '" + buildCommand + "' succeeded");
+            buildProjectResponse.body.ok = true;
+            buildProjectResponse.body.info.append("buildserver: execution of build command '" + buildCommand + "' succeeded");
         }
     }
     catch (const std::exception& ex)
@@ -419,6 +441,34 @@ void BuildServer::Handle(BuildProjectRequest& request)
         buildProjectResponse.body.error = "buildserver: error processing request '" + std::string(request.Id()) + ": exception '" + std::string(ex.what()) + "'";
     }
     buildProjectResponse.SendTo(*connection);
+}
+
+void BuildServer::SendBuildMessages(Process* buildProcess)
+{
+    while (!buildProcess->Eof(Process::StdHandle::stdOut))
+    {
+        std::string line = buildProcess->ReadLine(Process::StdHandle::stdOut);
+        if (!line.empty())
+        {
+            ShowBuildMessageRequest request;
+            request.body.line = "buildserver: " + connection->GetHost()->Name() + ": " + line;
+            request.SendTo(*connection);
+            std::unique_ptr<MessageBase> response = connection->Receive();
+            response->DispatchTo(*this);
+        }
+    }
+}
+
+void BuildServer::Handle(ShowBuildMessageResponse& response)
+{
+    if (GetGlobalFlag(GlobalFlags::printDebugMessages))
+    {
+        LogMessage(-1, "buildserver: received " + std::string(response.Id()));
+    }
+    if (!response.body.error.empty())
+    {
+        throw std::runtime_error("buildserver: error response received from buildclient: " + response.body.error);
+    }
 }
 
 void BuildServer::Handle(CloseConnectionRequest& request)

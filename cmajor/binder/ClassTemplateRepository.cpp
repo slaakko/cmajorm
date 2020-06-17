@@ -354,7 +354,7 @@ bool ClassTemplateRepository::Instantiate(FunctionSymbol* memberFunction, Contai
         StatementBinder statementBinder(boundCompileUnit);
         std::unique_ptr<BoundClass> boundClass(new BoundClass(&boundCompileUnit.GetModule(), classTemplateSpecialization));
         statementBinder.SetCurrentClass(boundClass.get());
-        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit.GetModule(), memberFunction));
+        std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, memberFunction));
         statementBinder.SetCurrentFunction(boundFunction.get());
         statementBinder.SetContainerScope(memberFunction->GetContainerScope());
         if (memberFunction->GetSymbolType() == SymbolType::constructorSymbol)

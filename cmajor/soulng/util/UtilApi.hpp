@@ -6,7 +6,7 @@
 #ifndef SOULNG_UTIL_API_INCLUDED
 #define SOULNG_UTIL_API_INCLUDED
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 
 #ifdef UTIL_EXPORTS
 #define UTIL_API __declspec(dllexport)

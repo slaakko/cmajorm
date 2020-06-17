@@ -51,11 +51,4 @@ bool BoundClass::ContainsSourceFunctions() const
     return false;
 }
 
-void BoundClass::ResetCodeGenerated()
-{
-    for (std::unique_ptr<BoundNode>& member : members)
-    {
-        member->ResetCodeGenerated();
-    }
-}
 } } // namespace cmajor::binder

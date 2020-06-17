@@ -5,15 +5,25 @@ using System;
 namespace BigNumTokens
 {
     public const int END = 0;
+
     public const int PLUS = 1;
+
     public const int MINUS = 2;
+
     public const int MUL = 3;
+
     public const int DIV = 4;
+
     public const int LPAREN = 5;
+
     public const int RPAREN = 6;
+
     public const int FLOAT = 7;
+
     public const int RATIONAL = 8;
+
     public const int INTEGER = 9;
+
     internal class TokenMap
     {
         static TokenMap() :
@@ -85,10 +95,12 @@ namespace BigNumTokens
     {
         return TokenMap.Instance().GetTokenId(tokenName);
     }
+
     public ustring GetTokenName(int tokenId)
     {
         return TokenMap.Instance().GetTokenName(tokenId);
     }
+
     public ustring GetTokenInfo(int tokenId)
     {
         return TokenMap.Instance().GetTokenInfo(tokenId);

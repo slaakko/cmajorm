@@ -4,14 +4,17 @@
 // =================================
 
 #include <cmajor/binder/BoundFunction.hpp>
+#include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
+#include <cmajor/binder/BoundClass.hpp>
 #include <cmajor/symbols/Exception.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 
 namespace cmajor { namespace binder {
 
-BoundFunction::BoundFunction(Module* module_, FunctionSymbol* functionSymbol_) : 
-    BoundNode(module_, functionSymbol_->GetSpan(), BoundNodeType::boundFunction), functionSymbol(functionSymbol_), hasGotos(false)
+BoundFunction::BoundFunction(BoundCompileUnit* boundCompileUnit_, FunctionSymbol* functionSymbol_) : 
+    BoundNode(&boundCompileUnit_->GetModule(), functionSymbol_->GetSpan(), BoundNodeType::boundFunction), boundCompileUnit(boundCompileUnit_), functionSymbol(functionSymbol_), hasGotos(false)
 {
 }
 
@@ -35,8 +38,28 @@ void BoundFunction::SetBody(std::unique_ptr<BoundCompoundStatement>&& body_)
     body = std::move(body_);
 }
 
-void BoundFunction::AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall)
+void BoundFunction::AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall>&& destructorCall,
+    BoundFunction* currentFunction, ContainerScope* currentContainerScope, const Span& span)
 {
+    FunctionSymbol* functionSymbol = destructorCall->GetFunctionSymbol();
+    if (functionSymbol->GetSymbolType() == SymbolType::destructorSymbol)
+    {
+        DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(functionSymbol);
+        if (destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
+        {
+            if (destructorSymbol->Parent()->IsClassTypeSymbol())
+            {
+                ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(destructorSymbol->Parent());
+                if (!boundCompileUnit->IsGeneratedDestructorInstantiated(destructorSymbol))
+                {
+                    boundCompileUnit->SetGeneratedDestructorInstantiated(destructorSymbol);
+                    std::unique_ptr<BoundClass> boundClass(new BoundClass(&boundCompileUnit->GetModule(), classType));
+                    GenerateDestructorImplementation(boundClass.get(), destructorSymbol, *boundCompileUnit, currentContainerScope, currentFunction, span);
+                    boundCompileUnit->AddBoundNode(std::move(boundClass));
+                }
+            }
+        }
+    }
     temporaryDestructorCalls.push_back(std::move(destructorCall));
 }
 
@@ -52,14 +75,6 @@ void BoundFunction::MoveTemporaryDestructorCallsTo(BoundExpression& expression)
 void BoundFunction::AddLabeledStatement(BoundStatement* labeledStatement)
 {
     labeledStatements.push_back(labeledStatement);
-}
-
-void BoundFunction::ResetCodeGenerated()
-{
-    if (functionSymbol)
-    {
-        functionSymbol->ResetCodeGenerated();
-    }
 }
 
 void BoundFunction::SetEnterCode(std::vector<std::unique_ptr<BoundStatement>>&& enterCode_)

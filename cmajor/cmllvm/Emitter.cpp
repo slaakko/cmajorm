@@ -307,8 +307,8 @@ void Emitter::Optimize(const std::string& bcFilePath, const std::string& optBCFi
     optCommandLine.append("opt ").append(optimizationFlags).append(" -o=").append(QuotedPath(optBCFilePath)).append(" ").append(QuotedPath(bcFilePath));
     try
     {
-        Process process(optCommandLine);
-        optErrors = process.ReadToEnd(Process::StdHandle::std_err);
+        Process process(optCommandLine, Process::Redirections::processStdErr);
+        optErrors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -329,8 +329,8 @@ void Emitter::Disassemble(const std::string& bcFilePath, const std::string& llFi
     disCommandLine.append("llvm-dis -o=").append(QuotedPath(llFilePath)).append(" ").append(QuotedPath(bcFilePath));
     try
     {
-        Process process(disCommandLine);
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        Process process(disCommandLine, Process::Redirections::processStdErr);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -373,8 +373,8 @@ void Emitter::Compile(const std::string& bcFilePath, const std::string& objectFi
     llcCommandLine.append("llc -O=").append(std::to_string(optimizationLevel)).append(" --filetype=obj").append(" -o=").append(QuotedPath(objectFilePath).append(" ").append(QuotedPath(bcFilePath)));
     try
     {
-        Process process(llcCommandLine);
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        Process process(llcCommandLine, Process::Redirections::processStdErr);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)

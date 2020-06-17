@@ -14,7 +14,7 @@ using namespace soulng::unicode;
 
 FILE* OpenFile(const char* fileName)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
     return _fsopen(fileName, "wb", _SH_DENYWR);
 #else
     return std::fopen(fileName, "wb");

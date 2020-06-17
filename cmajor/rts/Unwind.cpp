@@ -6,6 +6,7 @@
 #include <cmajor/rts/Unwind.hpp>
 #include <memory>
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 #ifdef _WIN32

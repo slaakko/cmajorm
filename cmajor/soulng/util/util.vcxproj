@@ -160,10 +160,15 @@
     <ClCompile Include="MappedInputFile.cpp" />
     <ClCompile Include="MemoryReader.cpp" />
     <ClCompile Include="MemoryWriter.cpp" />
+    <ClCompile Include="Multiprecision.cpp" />
     <ClCompile Include="Mutex.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="Prime.cpp" />
     <ClCompile Include="Process.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WIN32_WINNT=0x0601;_DEBUG;UTIL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WIN32_WINNT=0x0601;NDEBUG;UTIL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="ProcessImpl.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WIN32_WINNT=0x0601;_DEBUG;UTIL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WIN32_WINNT=0x0601;NDEBUG;UTIL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -190,10 +195,12 @@
     <ClInclude Include="MappedInputFile.hpp" />
     <ClInclude Include="MemoryReader.hpp" />
     <ClInclude Include="MemoryWriter.hpp" />
+    <ClInclude Include="Multiprecision.hpp" />
     <ClInclude Include="Mutex.hpp" />
     <ClInclude Include="Path.hpp" />
     <ClInclude Include="Prime.hpp" />
     <ClInclude Include="Process.hpp" />
+    <ClInclude Include="ProcessImpl.hpp" />
     <ClInclude Include="Random.hpp" />
     <ClInclude Include="Sha1.hpp" />
     <ClInclude Include="Socket.hpp" />

@@ -3,8 +3,17 @@ using System.Threading;
 
 public int Run(const string& command, string& errorLines)
 {
-    Process process(command);
-    errorLines = process.ReadToEnd(Process.StdHandle.std_err);
+    Process.Redirections redirections = cast<Process.Redirections>(Process.Redirections.processStdOut | Process.Redirections.processStdErr);
+    Process process(command, redirections);
+    while (!process.Eof(Process.StdHandle.stdOut))
+    {
+        string line = process.ReadLine(Process.StdHandle.stdOut);
+        Console.WriteLine(line);
+    }
+    if (!process.Eof(Process.StdHandle.stdErr))
+    {
+        errorLines = process.ReadToEnd(Process.StdHandle.stdErr);
+    }
     process.WaitForExit();
     int exitCode = process.ExitCode();
     return exitCode;
@@ -16,6 +25,7 @@ int main(int argc, const char** argv)
     {
         TimePoint start = Now();
         string command;
+        string errors;
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
@@ -25,11 +35,10 @@ int main(int argc, const char** argv)
             }
             command.Append(arg);
         }
-        string errorLines;
-        int exitCode = Run(command, errorLines);
+        int exitCode = Run(command, errors);
         if (exitCode != 0)
         {
-            throw Exception("executing command '" + command + "' failed with exit code " + ToString(exitCode) + ": " + errorLines);
+            throw Exception("executing command '" + command + "' failed with exit code " + ToString(exitCode) + ": " + errors);
         }
         TimePoint end = Now();
         Duration dur = end - start;

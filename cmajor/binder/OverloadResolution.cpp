@@ -999,7 +999,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                     {
                         std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                         destructorCall->AddArgument(std::unique_ptr<BoundExpression>(constructorCall->Arguments()[0]->Clone()));
-                        boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                        boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
                     }
                 }
                 constructorCall->AddArgument(std::move(argument));
@@ -1038,7 +1038,7 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                         std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                         TypeSymbol* type = conversionResult->GetType()->AddPointer(span);
                         destructorCall->AddArgument(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(conversionResult->Clone()), type)));
-                        boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                        boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
                     }
                 }
                 BoundClassOrClassDelegateConversionResult* conversion = new BoundClassOrClassDelegateConversionResult(module, std::unique_ptr<BoundExpression>(conversionResult),
@@ -1145,15 +1145,15 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
     if (functionSymbol->GetSymbolType() == SymbolType::destructorSymbol)
     {
         DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(functionSymbol);
-        if (destructorSymbol->IsProject() && destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
+        if (destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
         {
-            if (destructorSymbol->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+            if (destructorSymbol->Parent()->IsClassTypeSymbol())
             {
-                ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(destructorSymbol->Parent());
+                ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(destructorSymbol->Parent());
                 if (!boundCompileUnit.IsGeneratedDestructorInstantiated(destructorSymbol))
                 {
                     boundCompileUnit.SetGeneratedDestructorInstantiated(destructorSymbol);
-                    std::unique_ptr<BoundClass> boundClass(new BoundClass(module, specialization));
+                    std::unique_ptr<BoundClass> boundClass(new BoundClass(module, classType));
                     GenerateDestructorImplementation(boundClass.get(), destructorSymbol, boundCompileUnit, containerScope, boundFunction, span);
                     boundCompileUnit.AddBoundNode(std::move(boundClass));
                 }
@@ -1176,7 +1176,10 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
     {
         if (viableFunction->GetFlag(FunctionSymbolFlags::dontReuse))
         {
-            continue;
+            if (!boundCompileUnit.CanReuse(viableFunction))
+            {
+                continue;
+            }
         }
         FunctionMatch functionMatch(viableFunction);
         if (viableFunction->IsFunctionTemplate())

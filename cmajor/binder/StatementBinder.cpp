@@ -306,7 +306,7 @@ void StatementBinder::Visit(ClassNode& classNode)
     boundCompileUnit.GetAttributeBinder()->GenerateImplementation(classNode.GetAttributes(), symbol, this);
     boundCompileUnit.AddBoundNode(std::move(boundClass));
     DestructorSymbol* destructorSymbol = classTypeSymbol->Destructor();
-    if (destructorSymbol && destructorSymbol->IsProject() && destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
+    if (destructorSymbol && destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
     {
         if (!boundCompileUnit.IsGeneratedDestructorInstantiated(destructorSymbol))
         {
@@ -324,16 +324,16 @@ void StatementBinder::Visit(MemberVariableNode& memberVariableNode)
     Assert(symbol->GetSymbolType() == SymbolType::memberVariableSymbol, "member variable symbol expected");
     MemberVariableSymbol* memberVariableSymbol = static_cast<MemberVariableSymbol*>(symbol);
     TypeSymbol* typeSymbol = memberVariableSymbol->GetType();
-    if (typeSymbol->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+    if (typeSymbol->IsClassTypeSymbol())
     {
-        ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(typeSymbol);
-        DestructorSymbol* destructorSymbol = specialization->Destructor();
-        if (destructorSymbol && destructorSymbol->IsProject() && destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
+        ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(typeSymbol);
+        DestructorSymbol* destructorSymbol = classType->Destructor();
+        if (destructorSymbol && destructorSymbol->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
         {
             if (!boundCompileUnit.IsGeneratedDestructorInstantiated(destructorSymbol))
             {
                 boundCompileUnit.SetGeneratedDestructorInstantiated(destructorSymbol);
-                std::unique_ptr<BoundClass> boundClass(new BoundClass(module, specialization));
+                std::unique_ptr<BoundClass> boundClass(new BoundClass(module, classType));
                 GenerateDestructorImplementation(boundClass.get(), destructorSymbol, boundCompileUnit, containerScope, currentFunction, memberVariableNode.GetSpan());
                 boundCompileUnit.AddBoundNode(std::move(boundClass));
             }
@@ -356,7 +356,7 @@ void StatementBinder::Visit(FunctionNode& functionNode)
         return;
     }
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, functionSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, functionSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (functionNode.Body())
@@ -389,7 +389,7 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
     StaticConstructorSymbol* prevStaticConstructorSymbol = currentStaticConstructorSymbol;
     currentStaticConstructorSymbol = staticConstructorSymbol;
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, staticConstructorSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, staticConstructorSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (staticConstructorNode.Body())
@@ -521,7 +521,7 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
     ConstructorSymbol* prevConstructorSymbol = currentConstructorSymbol;
     currentConstructorSymbol = constructorSymbol;
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, constructorSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, constructorSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (constructorNode.Body())
@@ -570,7 +570,7 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     DestructorSymbol* prevDestructorSymbol = currentDestructorSymbol;
     currentDestructorSymbol = destructorSymbol;
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, destructorSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, destructorSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (destructorNode.Body())
@@ -619,7 +619,7 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     MemberFunctionSymbol* prevMemberFunctionSymbol = currentMemberFunctionSymbol;
     currentMemberFunctionSymbol = memberFunctionSymbol;
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, memberFunctionSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, memberFunctionSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (memberFunctionNode.Body())
@@ -667,7 +667,7 @@ void StatementBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
         conversionFunctionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
     }
     containerScope = symbol->GetContainerScope();
-    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, conversionFunctionSymbol));
+    std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(&boundCompileUnit, conversionFunctionSymbol));
     BoundFunction* prevFunction = currentFunction;
     currentFunction = boundFunction.get();
     if (conversionFunctionNode.Body())
@@ -1206,10 +1206,26 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
     }
     std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, functionScopeLookups, arguments, boundCompileUnit, currentFunction, 
         constructionStatementNode.GetSpan());
-    CheckAccess(currentFunction->GetFunctionSymbol(), constructorCall->GetFunctionSymbol());
+    FunctionSymbol* functionSymbol = constructorCall->GetFunctionSymbol();
+    CheckAccess(currentFunction->GetFunctionSymbol(), functionSymbol);
     if (exceptionCapture)
     {
         AddReleaseExceptionStatement(constructionStatementNode.GetSpan());
+    }
+    if (functionSymbol->Parent()->IsClassTypeSymbol())
+    {
+        ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(functionSymbol->Parent());
+        if (classType->Destructor() && classType->Destructor()->IsGeneratedFunction() && !GetGlobalFlag(GlobalFlags::info))
+        {
+            if (!boundCompileUnit.IsGeneratedDestructorInstantiated(classType->Destructor()))
+            {
+                boundCompileUnit.SetGeneratedDestructorInstantiated(classType->Destructor());
+                std::unique_ptr<BoundClass> boundClass(new BoundClass(&boundCompileUnit.GetModule(), classType));
+                GenerateDestructorImplementation(boundClass.get(), classType->Destructor(), boundCompileUnit, containerScope, currentFunction,
+                    constructionStatementNode.GetSpan());
+                boundCompileUnit.AddBoundNode(std::move(boundClass));
+            }
+        }
     }
     AddStatement(new BoundConstructionStatement(module, std::move(constructorCall)));
 }

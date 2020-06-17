@@ -10,7 +10,7 @@
 #define SOULNG_PARSER_DEBUG_SUPPORT
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 
 #ifdef SOULNG_PARSER_EXPORTS
 #define SOULNG_PARSER_API __declspec(dllexport)

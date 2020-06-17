@@ -34,14 +34,16 @@ namespace BuildLangTokens
     const int FILEPATH = 23;
     const int INTEGER = 24;
     const int VERBOSE = 25;
-    const int FORCE = 26;
-    const int ONLY = 27;
-    const int ALL = 28;
-    const int CONFIG = 29;
-    const int LBRACKET = 30;
-    const int RBRACKET = 31;
-    const int EQ = 32;
-    const int DOT = 33;
+    const int MESSAGES = 26;
+    const int FORCE = 27;
+    const int ONLY = 28;
+    const int ALL = 29;
+    const int REBUILD = 30;
+    const int CONFIG = 31;
+    const int LBRACKET = 32;
+    const int RBRACKET = 33;
+    const int EQ = 34;
+    const int DOT = 35;
 
     BUILD_API void InitTokenIdMap();
     BUILD_API int GetTokenId(const std::u32string& tokenName);

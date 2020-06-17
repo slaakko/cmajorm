@@ -111,19 +111,24 @@ void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
     }
     try
     {
-        Process process(intermediateCompileCommand);
+        Process::Redirections redirections = Process::Redirections::processStdErr;
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            while (!process.Eof(Process::StdHandle::std_out))
+            redirections = redirections | Process::Redirections::processStdOut;
+        }
+        Process process(intermediateCompileCommand, redirections);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            while (!process.Eof(Process::StdHandle::stdOut))
             {
-                std::string line = process.ReadLine(Process::StdHandle::std_out);
+                std::string line = process.ReadLine(Process::StdHandle::stdOut);
                 if (!line.empty())
                 {
                     LogMessage(module->LogStreamId(), line);
                 }
             }
         }
-        errors = process.ReadToEnd(Process::StdHandle::std_err);
+        errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
         if (exitCode != 0)
@@ -139,12 +144,7 @@ void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
 
 void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
-    boundCompileUnit.ResetCodeGenerated();
     std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.LLFilePath(), ".cpp");
-    if (intermediateFilePath.find("FileStream.cpp") != std::string::npos)
-    {
-        int x = 0;
-    }
     NativeModule nativeModule(emitter, intermediateFilePath);
     compileUnitId = boundCompileUnit.Id();
     symbolTable = &boundCompileUnit.GetSymbolTable();
@@ -218,12 +218,8 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->Parent()->GetSymbolType() != SymbolType::classTemplateSpecializationSymbol && functionSymbol->IsTemplateSpecialization())
-    {
-        functionSymbol->SetFlag(FunctionSymbolFlags::dontReuse);
-    }
-    if (functionSymbol->CodeGenerated()) return;
-    functionSymbol->SetCodeGenerated();
+    if (compileUnit->CodeGenerated(functionSymbol)) return;
+    compileUnit->SetCodeGenerated(functionSymbol);
     void* functionType = functionSymbol->IrType(*emitter);
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -251,6 +247,11 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     }
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType, functionSymbol->DontThrow());
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
+    {
+        emitter->AddInlineFunctionAttribute(function);
+        functionSymbol->SetLinkOnceOdrLinkage();
+    }
+    else if (functionSymbol->IsGeneratedFunction())
     {
         emitter->AddInlineFunctionAttribute(function);
         functionSymbol->SetLinkOnceOdrLinkage();
@@ -465,7 +466,6 @@ void CmCppCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
     BoundFunctionCall* returnFunctionCall = boundReturnStatement.ReturnFunctionCall();
     if (returnFunctionCall)
     {
-        ExitBlocks(nullptr);
         boundReturnStatement.ReturnFunctionCall()->Accept(*this);
         void* returnValue = emitter->Stack().Pop();
         if (sequenceSecond)
@@ -473,6 +473,7 @@ void CmCppCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
             sequenceSecond->SetGenerated();
             sequenceSecond->Accept(*this);
         }
+        ExitBlocks(nullptr);
         GenerateExitFunctionCode(*currentFunction);
         emitter->CreateRet(returnValue);
         lastInstructionWasRet = true;

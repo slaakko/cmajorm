@@ -197,7 +197,7 @@ void ExpressionBinder::BindUnaryOp(BoundExpression* operand, Node& node, const s
             {
                 std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                 destructorCall->AddArgument(std::unique_ptr<BoundExpression>(operatorFunCall->Arguments().back()->Clone()));
-                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
             }
         }
     }
@@ -275,7 +275,7 @@ void ExpressionBinder::BindBinaryOp(BoundExpression* left, BoundExpression* righ
             {
                 std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                 destructorCall->AddArgument(std::unique_ptr<BoundExpression>(operatorFunCall->Arguments().back()->Clone()));
-                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
             }
         }
     }
@@ -1219,7 +1219,7 @@ void ExpressionBinder::BindArrow(Node& node, const std::u32string& name)
             {
                 std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                 destructorCall->AddArgument(std::unique_ptr<BoundExpression>(boundFunctionCall->Arguments().back()->Clone()));
-                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
             }
         }
         expression.reset(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(
@@ -1783,7 +1783,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             {
                 std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                 destructorCall->AddArgument(std::unique_ptr<BoundExpression>(arguments.back()->Clone()));
-                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
             }
         }
     }
@@ -1880,7 +1880,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
                 {
                     std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                     destructorCall->AddArgument(std::unique_ptr<BoundExpression>(delegateCall->Arguments().back()->Clone()));
-                    boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                    boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
                 }
             }
         }
@@ -1969,7 +1969,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
                 {
                     std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                     destructorCall->AddArgument(std::unique_ptr<BoundExpression>(classDelegateCall->Arguments().back()->Clone()));
-                    boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                    boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
                 }
             }
         }
@@ -2121,7 +2121,7 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
             {
                 std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                 destructorCall->AddArgument(std::unique_ptr<BoundExpression>(functionCall->Arguments().back()->Clone()));
-                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
             }
         }
     }
@@ -2406,7 +2406,7 @@ void ExpressionBinder::Visit(CastNode& castNode)
                     {
                         std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, span, classType->Destructor()));
                         destructorCall->AddArgument(std::unique_ptr<BoundExpression>(constructorCall->Arguments()[0]->Clone()));
-                        boundFunction->AddTemporaryDestructorCall(std::move(destructorCall));
+                        boundFunction->AddTemporaryDestructorCall(std::move(destructorCall), boundFunction, containerScope, span);
                     }
                 }
                 constructorCall->AddArgument(std::move(castArguments[0]));

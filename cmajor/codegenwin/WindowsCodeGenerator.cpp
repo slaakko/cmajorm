@@ -42,7 +42,6 @@ void WindowsCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
             sequenceSecond->Accept(*this);
         }
         ExitBlocks(nullptr);
-        //CreateExitFunctionCall();
         GenerateExitFunctionCode(*currentFunction);
         emitter->CreateRet(returnValue);
         lastInstructionWasRet = true;
@@ -50,7 +49,6 @@ void WindowsCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
     else
     {
         ExitBlocks(nullptr);
-        //CreateExitFunctionCall();
         GenerateExitFunctionCode(*currentFunction);
         emitter->CreateRetVoid();
         lastInstructionWasRet = true;

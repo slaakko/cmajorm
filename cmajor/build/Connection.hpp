@@ -11,6 +11,7 @@ namespace cmajor { namespace build {
 
 class MessageBase;
 class BuildServer;
+class Host;
 
 class BUILD_API Connection
 {
@@ -28,6 +29,7 @@ public:
     bool ServerAlive() const { return serverAlive; }
     void SetServerAlive(bool serverAlive_);
     void SetServer(BuildServer* server_) { server = server_; }
+    virtual Host* GetHost() const = 0;
 private:
     Log* log;
     BuildServer* server;

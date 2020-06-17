@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_BUILD_BUILD_SERVER_MESSAGE_INCLUDED
 #define CMAJOR_BUILD_BUILD_SERVER_MESSAGE_INCLUDED
-#include <cmajor/build/ProjectInfo.hpp>
+#include <cmajor/build/MessageBody.hpp>
 #include <cmajor/build/Message.hpp>
 
 namespace cmajor { namespace build {

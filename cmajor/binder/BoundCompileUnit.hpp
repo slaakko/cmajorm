@@ -99,7 +99,6 @@ public:
     void SetImmutable() { immutable = true; }
     void AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs);
     int GetNextExitEntryIndex() { return nextExitEntryIndex++; }
-    void ResetCodeGenerated() override;
     void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
     bool IsGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol) const;
     void SetGeneratedDestructorInstantiated(DestructorSymbol* generatedDestructorSymbol);
@@ -117,6 +116,10 @@ public:
     void GenerateGlobalInitializationFunction();
     FunctionSymbol* GetGlobalInitializationFunctionSymbol() const { return globalInitFunctionSymbol; }
     const std::vector<std::unique_ptr<FunctionSymbol>>& AllCompileUnitInitFunctionSymbols() const { return allCompileUnitInitFunctionSymbols; }
+    bool CodeGenerated(FunctionSymbol* functionSymbol) const;
+    void SetCodeGenerated(FunctionSymbol* functionSymbol);
+    bool CanReuse(FunctionSymbol* functionSymbol) const;
+    void SetCanReuse(FunctionSymbol* functionSymbol);
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -156,6 +159,8 @@ private:
     std::vector<std::unique_ptr<FunctionSymbol>> copyConstructors;
     int nextExitEntryIndex;
     std::set<DestructorSymbol*> instantiatedGeneratedDestructors;
+    std::set<FunctionSymbol*> codeGenerated;
+    std::set<FunctionSymbol*> canReuse;
     TypeSymbol* systemRuntimeUnwindInfoSymbol;
     std::unique_ptr<FunctionSymbol> initUnwindInfoFunctionSymbol;
     std::unique_ptr<FunctionSymbol> initCompileUnitFunctionSymbol;

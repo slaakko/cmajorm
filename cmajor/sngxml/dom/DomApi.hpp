@@ -6,7 +6,7 @@
 #ifndef SNGXML_DOM_API_INCLUDED
 #define SNGXML_DOM_API_INCLUDED
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 
 #ifdef SNGXML_DOM_EXPORTS
 #define SNGXML_DOM_API __declspec(dllexport)
