@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = WindowsCodeGenerator.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmcodegenwin.a: $(OBJECTS)

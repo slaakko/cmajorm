@@ -4,7 +4,7 @@ OBJECTS = Main.o
 
 LIBRARIES = ../lib/libcmsngutil.a
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ifeq ($(config),debug)

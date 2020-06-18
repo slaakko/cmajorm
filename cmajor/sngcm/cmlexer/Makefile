@@ -5,7 +5,7 @@ LexerFileTokenLexer.o LexerFileTokenLexerClassMap.o LexerFileTokenLexerKeywords.
 ParserFileTokenLexerKeywords.o ParserFileTokenLexerTokens.o \
 TokenLexer.o TokenLexerClassMap.o TokenLexerKeywords.o TokenLexerTokens.o TokenValueParsers.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 	
 ../../lib/libcmsngcmcmlexer.a: $(OBJECTS)

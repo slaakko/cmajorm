@@ -6,7 +6,7 @@ ControlFlowAnalyzer.o Evaluator.o ExpressionBinder.o FunctionTemplateRepository.
 JsonAttributeProcessor.o OperationRepository.o OverloadResolution.o StatementBinder.o StringRepository.o TypeBinder.o TypeResolver.o \
 UuidRepository.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmbinder.a: $(OBJECTS)

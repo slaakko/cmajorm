@@ -1,8 +1,8 @@
 include ../Makefile.common
 
-OBJECTS = BackEnd.o InitDone.o Interface.o LlvmBackEnd.o
+OBJECTS = BackEnd.o CmcppBackEnd.o InitDone.o Interface.o LlvmBackEnd.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmmid.a: $(OBJECTS)

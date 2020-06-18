@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = Emitter.o EmittingContext.o GenObject.o ValueStack.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmir.a: $(OBJECTS)

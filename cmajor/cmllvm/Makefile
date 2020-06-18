@@ -8,7 +8,7 @@ endif
 
 OBJECTS = Emitter.o EmittingContext.o Interface.o ValueStack.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmllvm.a: $(OBJECTS)

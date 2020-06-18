@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = XmlApi.o XmlContentHandler.o XmlParser.o XmlParserInterface.o XmlProcessor.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 	
 ../../lib/libcmsngxmlxml.a: $(OBJECTS)

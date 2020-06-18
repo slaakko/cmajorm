@@ -3,7 +3,7 @@ include ../Makefile.common
 OBJECTS = InitDone.o XPathApi.o XPathClassMap.o XPathContext.o XPathDebug.o XPathEvaluate.o XPathExpr.o XPathFunction.o XPathKeywords.o XPathLexer.o XPathObject.o \
 XPathParser.o XPathTokenValueParsers.o XPathTokens.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 	
 ../../lib/libcmsngxmlxpath.a: $(OBJECTS)

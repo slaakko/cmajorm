@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = Match.o Range.o Value.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 	
 ../../lib/libcmsngparser.a: $(OBJECTS)

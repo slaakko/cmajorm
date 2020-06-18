@@ -4,7 +4,7 @@ OBJECTS = AstReader.o AstWriter.o Attribute.o BasicType.o Class.o Clone.o Commen
 GlobalVariable.o Identifier.o InitDone.o Interface.o Literal.o Merge.o Namespace.o Node.o NodeList.o Parameter.o Project.o Solution.o SourceToken.o SourceWriter.o Specifier.o Statement.o \
 SystemFileIndex.o Template.o TypeExpr.o Typedef.o Visitor.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 	
 ../../lib/libcmsngcmast.a: $(OBJECTS)

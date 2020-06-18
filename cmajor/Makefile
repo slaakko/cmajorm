@@ -8,9 +8,14 @@ build:
 	$(MAKE) -C soulng
 	$(MAKE) -C sngxml
 	$(MAKE) -C sngcm
+	$(MAKE) -C sngjson
 	$(MAKE) -C common
 	$(MAKE) -C ir
 	$(MAKE) -C cmllvm
+	$(MAKE) -C cmcppbe
+	$(MAKE) -C cmcppi
+	$(MAKE) -C cmtoolchain
+	$(MAKE) -C cmtoolchainconfig
 	$(MAKE) -C symbols
 	$(MAKE) -C cmmid
 	$(MAKE) -C binder
@@ -18,18 +23,19 @@ build:
 	$(MAKE) -C codegenllvm
 	$(MAKE) -C codegenwin
 	$(MAKE) -C codegenlinux
+	$(MAKE) -C codegencpp
 	$(MAKE) -C codegen
 	$(MAKE) -C cmdoclib
 	$(MAKE) -C ast2dom
 	$(MAKE) -C bdt2dom
 	$(MAKE) -C build
 	$(MAKE) -C compiler
+	$(MAKE) -C cmclient
 	$(MAKE) -C cmupd
 	$(MAKE) -C cm2html
 	$(MAKE) -C cmdoc
 	$(MAKE) -C cmmdump
 	$(MAKE) -C cmfileredirector
-	$(MAKE) -C system/ext/gmp
 	$(MAKE) -C eh
 	$(MAKE) -C rt
 
@@ -45,10 +51,10 @@ install:
 	mkdir -p $(prefix)/bin
 	cp bin/* $(prefix)/bin
 	mkdir -p $(prefix)/lib
-	cp lib/$(cmrtsoname).so.3.4.0 $(prefix)/lib
+	cp lib/$(cmrtsoname).so.3.6.0 $(prefix)/lib
 	cp lib/libgmpintf.a $(prefix)/lib
-	ln -f $(prefix)/lib/$(cmrtsoname).so.3.4.0 $(prefix)/lib/$(cmrtsoname).so.3
-	ln -f $(prefix)/lib/$(cmrtsoname).so.3.4.0 $(prefix)/lib/$(cmrtsoname).so
+	ln -f $(prefix)/lib/$(cmrtsoname).so.3.6.0 $(prefix)/lib/$(cmrtsoname).so.3
+	ln -f $(prefix)/lib/$(cmrtsoname).so.3.6.0 $(prefix)/lib/$(cmrtsoname).so
 
 sys:
 	cmc --verbose system/platform/linux/System.cms
@@ -58,9 +64,14 @@ clean:
 	$(MAKE) -C soulng clean
 	$(MAKE) -C sngxml clean
 	$(MAKE) -C sngcm clean
+	$(MAKE) -C sngjson clean
 	$(MAKE) -C common clean
 	$(MAKE) -C ir clean
 	$(MAKE) -C cmllvm clean
+	$(MAKE) -C cmcppbe clean
+	$(MAKE) -C cmcppi clean
+	$(MAKE) -C cmtoolchain clean
+	$(MAKE) -C cmtoolchainconfig clean
 	$(MAKE) -C symbols clean
 	$(MAKE) -C cmmid clean
 	$(MAKE) -C binder clean
@@ -68,12 +79,14 @@ clean:
 	$(MAKE) -C codegenllvm clean
 	$(MAKE) -C codegenwin clean
 	$(MAKE) -C codegenlinux clean
+	$(MAKE) -C codegencpp clean
 	$(MAKE) -C codegen clean
 	$(MAKE) -C cmdoclib clean
 	$(MAKE) -C ast2dom clean
 	$(MAKE) -C bdt2dom clean
 	$(MAKE) -C build clean
 	$(MAKE) -C compiler clean
+	$(MAKE) -C cmclient clean
 	$(MAKE) -C cmupd clean
 	$(MAKE) -C cm2html clean
 	$(MAKE) -C cmdoc clean

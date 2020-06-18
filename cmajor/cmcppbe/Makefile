@@ -1,13 +1,14 @@
 include ../Makefile.common
 
-OBJECTS = Bdt2Dom.o
+OBJECTS = Emitter.o EmittingContext.o Interface.o ValueStack.o
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/libcmbdt2dom.a: $(OBJECTS)
+../lib/libcmcppbe.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/libcmbdt2dom.a
+	rm -f ../lib/libcmcppbe.a
+

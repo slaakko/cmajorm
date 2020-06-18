@@ -1,13 +1,13 @@
 include ../Makefile.common
 
-OBJECTS = Bdt2Dom.o
+OBJECTS = CmCppCodeGenerator.o
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/libcmbdt2dom.a: $(OBJECTS)
+../lib/libcmcodegencpp.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/libcmbdt2dom.a
+	rm -f ../lib/libcmcodegencpp.a

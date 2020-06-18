@@ -6,9 +6,7 @@ LIBRARIES = ../lib/libutil.a ../lib/libcodedom.a ../lib/libparsing.a ../lib/libx
 ../lib/libast.a ../lib/libsymbols.a ../lib/libparser.a ../lib/libbuild.a ../lib/libbinder.a ../lib/libemitter.a \
 ../lib/libir.a ../lib/libcmproj.a
 
-LLVMLIBS = $(shell llvm-config --libs)
-
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ifeq ($(config),debug)
@@ -20,7 +18,7 @@ endif
 ../bin/$(exename): $(OBJECTS) $(LIBRARIES)
 	$(CXX) $(CXXFLAGS) -o ../bin/$(exename) $(OBJECTS) -lcmproj -lbuild -lbinder -lemitter -lir -lsymbols -lparser -last \
 -lxpath -ldom -lxml -lparsing -lcodedom -lutil \
-$(LLVMLIBS) -lboost_filesystem -lboost_iostreams -lboost_system -ldl -ltinfo -lz
+-lboost_filesystem -lboost_iostreams -lboost_system -ldl -ltinfo -lz
 
 clean:
 	rm -f *.o

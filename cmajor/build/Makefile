@@ -1,8 +1,12 @@
 include ../Makefile.common
 
-OBJECTS = Build.o
+OBJECTS = Build.o BuildClient.o BuildLangClassMap.o BuildLangClientParser.o BuildLangKeywords.o \
+BuildLangLexer.o BuildLangOptionParser.o BuildLangServerParser.o BuildLangTokens.o BuildOption.o \
+BuildServer.o BuildServerMessage.o Command.o Connection.o ExecutionContext.o FiberConnection.o \
+FiberExecutionContext.o Host.o InitDone.o LocalExecutionContext.o Log.o Message.o MessageBody.o \
+MessageHandler.o ServerConfig.o SocketClient.o SocketConnection.o SocketServer.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmbuild.a: $(OBJECTS)

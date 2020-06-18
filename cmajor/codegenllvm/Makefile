@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = LlvmCodeGenerator.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmcodegenllvm.a: $(OBJECTS)

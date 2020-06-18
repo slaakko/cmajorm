@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = Common.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmcommon.a: $(OBJECTS)

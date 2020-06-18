@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = Ast2Dom.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmast2dom.a: $(OBJECTS)

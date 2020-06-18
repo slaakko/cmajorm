@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = LinuxCodeGenerator.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmcodegenlinux.a: $(OBJECTS)

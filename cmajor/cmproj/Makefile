@@ -2,7 +2,7 @@ include ../Makefile.common
 
 OBJECTS = Conversion.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmproj.a: $(OBJECTS)

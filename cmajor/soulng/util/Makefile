@@ -1,9 +1,9 @@
 include ../Makefile.common
 
-OBJECTS = BinaryReader.o BinaryWriter.o CodeFormatter.o InitDone.o Json.o Log.o MappedInputFile.o MemoryReader.o MemoryWriter.o Mutex.o Path.o Prime.o Random.o \
-Sha1.o System.o TextUtils.o Time.o Unicode.o Uuid.o
+OBJECTS = BinaryReader.o BinaryWriter.o CodeFormatter.o Fiber.o InitDone.o Json.o Log.o MappedInputFile.o MemoryReader.o MemoryWriter.o Multiprecision.o Mutex.o Path.o Prime.o \
+Process.o ProcessImpl.o Random.o Sha1.o Socket.o System.o TextUtils.o Time.o Unicode.o Uuid.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 	
 ../../lib/libcmsngutil.a: $(OBJECTS)

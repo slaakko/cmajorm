@@ -6,7 +6,7 @@ GlobalFlags.o InitDone.o InterfaceTypeSymbol.o Meta.o Module.o ModuleCache.o Nam
 SymbolCreatorVisitor.o SymbolReader.o SymbolTable.o SymbolWriter.o TemplateSymbol.o TypeMap.o TypeSymbol.o TypedefSymbol.o Value.o VariableSymbol.o \
 Warning.o
 
-%o: %.cpp
+%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ../lib/libcmsymbols.a: $(OBJECTS)
