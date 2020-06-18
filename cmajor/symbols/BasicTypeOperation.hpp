@@ -757,8 +757,8 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
     ConversionType GetConversionType() const override { return conversionType; }
     uint8_t ConversionDistance() const override { return conversionDistance; }
-    TypeSymbol* ConversionSourceType() const override { return sourceType; }
-    TypeSymbol* ConversionTargetType() const override { return targetType; }
+    TypeSymbol* ConversionSourceType() const override override { return sourceType; }
+    TypeSymbol* ConversionTargetType() const override override { return targetType; }
     const char* ClassName() const override { return "BasicTypeConversion"; }
     int ClassArity() const override { return 1; }
     std::u32string Info() const override;

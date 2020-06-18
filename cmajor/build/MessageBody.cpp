@@ -1,4 +1,4 @@
-#include "D:/work/cmajorm/cmajor/build/MessageBody.hpp"
+#include "MessageBody.hpp"
 #include <sngjson/json/JsonImport.hpp>
 #include <sngjson/json/JsonExport.hpp>
 #include <utility>

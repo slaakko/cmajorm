@@ -35,8 +35,8 @@ public:
     ClassTypeConversion(const std::u32string& name_, ConversionType conversionType_, uint8_t conversionDistance_, TypeSymbol* sourceType_, TypeSymbol* targetType_);
     ConversionType GetConversionType() const override { return conversionType; }
     uint8_t ConversionDistance() const override { return conversionDistance; }
-    TypeSymbol* ConversionSourceType() const { return sourceType; }
-    TypeSymbol* ConversionTargetType() const { return targetType; }
+    TypeSymbol* ConversionSourceType() const override { return sourceType; }
+    TypeSymbol* ConversionTargetType() const override { return targetType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     const char* ClassName() const override { return "ClassTypeConversion"; }
@@ -68,8 +68,8 @@ public:
     NullPtrToPtrConversion(TypeSymbol* nullPtrType_, TypeSymbol* targetPointerType_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
-    TypeSymbol* ConversionSourceType() const { return nullPtrType; }
-    TypeSymbol* ConversionTargetType() const { return targetPointerType; }
+    TypeSymbol* ConversionSourceType() const override { return nullPtrType; }
+    TypeSymbol* ConversionTargetType() const override { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;
@@ -113,8 +113,8 @@ public:
     VoidPtrToPtrConversion(TypeSymbol* voidPtrType_, TypeSymbol* targetPointerType_);
     ConversionType GetConversionType() const override { return ConversionType::explicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const { return voidPtrType; }
-    TypeSymbol* ConversionTargetType() const { return targetPointerType; }
+    TypeSymbol* ConversionSourceType() const override { return voidPtrType; }
+    TypeSymbol* ConversionTargetType() const override { return targetPointerType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     const char* ClassName() const override { return "VoidPtrToPtrConversion"; }
@@ -144,8 +144,8 @@ public:
     PtrToVoidPtrConversion(TypeSymbol* sourcePtrType_, TypeSymbol* voidPtrType_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 10; }
-    TypeSymbol* ConversionSourceType() const { return sourcePtrType; }
-    TypeSymbol* ConversionTargetType() const { return voidPtrType; }
+    TypeSymbol* ConversionSourceType() const override { return sourcePtrType; }
+    TypeSymbol* ConversionTargetType() const override { return voidPtrType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     const char* ClassName() const override { return "PtrToVoidPtrConversion"; }
@@ -175,8 +175,8 @@ public:
     PtrToULongConversion(TypeSymbol* ptrType_, TypeSymbol* ulongType_);
     ConversionType GetConversionType() const override { return ConversionType::explicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const { return ptrType; }
-    TypeSymbol* ConversionTargetType() const { return ulongType; }
+    TypeSymbol* ConversionSourceType() const override { return ptrType; }
+    TypeSymbol* ConversionTargetType() const override { return ulongType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     const char* ClassName() const override { return "PtrToULongConversion"; }
@@ -206,8 +206,8 @@ public:
     ULongToVoidPtrConversion(TypeSymbol* ulongType_, TypeSymbol* voidPtrType_);
     ConversionType GetConversionType() const override { return ConversionType::explicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const { return ulongType; }
-    TypeSymbol* ConversionTargetType() const { return voidPtrType; }
+    TypeSymbol* ConversionSourceType() const override { return ulongType; }
+    TypeSymbol* ConversionTargetType() const override { return voidPtrType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     const char* ClassName() const override { return "ULongToVoidPtrConversion"; }
@@ -237,8 +237,8 @@ public:
     CharacterPointerLiteralToStringFunctionContainerConversion(TypeSymbol* characterPtrType_, TypeSymbol* stringFunctionContainerType_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
-    TypeSymbol* ConversionSourceType() const { return characterPtrType; }
-    TypeSymbol* ConversionTargetType() const { return stringFunctionContainerType; }
+    TypeSymbol* ConversionSourceType() const override { return characterPtrType; }
+    TypeSymbol* ConversionTargetType() const override { return stringFunctionContainerType; }
     bool IsBasicTypeOperation() const override { return true; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;

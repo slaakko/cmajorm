@@ -5,10 +5,13 @@
 
 #include <sngjson/json/JsonSchema.hpp>
 #include <soulng/util/Sha1.hpp>
+#include <soulng/util/Path.hpp>
 #include <fstream>
 #include <stdexcept>
 
 namespace sngjson { namespace json {
+
+using namespace soulng::util;
 
 Type::Type(const std::string& name_, const std::string& nativeName_) : name(name_), nativeName(nativeName_)
 {
@@ -220,7 +223,7 @@ void Context::Write(const std::string& hppFilePath, const std::string& cppFilePa
     hppFormatter.WriteLine("#endif // " + includeGuard);
     std::ofstream cppFile(cppFilePath);
     CodeFormatter cppFormatter(cppFile);
-    cppFormatter.WriteLine("#include \"" + hppFilePath + "\"");
+    cppFormatter.WriteLine("#include \"" + Path::GetFileName(hppFilePath) + "\"");
     cppFormatter.WriteLine("#include <sngjson/json/JsonImport.hpp>");
     cppFormatter.WriteLine("#include <sngjson/json/JsonExport.hpp>");
     cppFormatter.WriteLine("#include <utility>");

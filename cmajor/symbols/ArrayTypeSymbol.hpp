@@ -119,7 +119,7 @@ class SYMBOLS_API ArrayTypeDefaultConstructor : public FunctionSymbol
 {
 public:
     ArrayTypeDefaultConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeDefaultConstructor_, const Span& span_);
-    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flag, const Span& spans) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeDefaultConstructor"; }
@@ -133,7 +133,7 @@ class SYMBOLS_API ArrayTypeCopyConstructor : public FunctionSymbol
 {
 public:
     ArrayTypeCopyConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeCopyConstructor_, const Span& span_);
-    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeCopyConstructor"; }
@@ -147,7 +147,7 @@ class SYMBOLS_API ArrayTypeMoveConstructor : public FunctionSymbol
 {
 public:
     ArrayTypeMoveConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeMoveConstructor_, const Span& span_);
-    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeMoveConstructor"; }
@@ -161,7 +161,7 @@ class SYMBOLS_API ArrayTypeCopyAssignment : public FunctionSymbol
 {
 public:
     ArrayTypeCopyAssignment(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeCopyAssignment_, const Span& span_);
-    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeCopyAssignment"; }
@@ -175,7 +175,7 @@ class SYMBOLS_API ArrayTypeMoveAssignment : public FunctionSymbol
 {
 public:
     ArrayTypeMoveAssignment(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeMoveAssignment_, const Span& span_);
-    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
+    std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "ArrayTypeMoveAssignment"; }

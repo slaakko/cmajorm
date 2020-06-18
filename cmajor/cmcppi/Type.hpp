@@ -9,6 +9,7 @@
 #include <soulng/util/CodeFormatter.hpp>
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 namespace cmcppi {
 
@@ -228,9 +229,9 @@ public:
     StructureType(int id_);
     const std::vector<Type*>& MemberTypes() const { return memberTypes; }
     void SetMemberTypes(const std::vector<Type*>& memberTypes_);
-    void WriteForwardDeclaration(CodeFormatter& formatter);
+    void WriteForwardDeclaration(CodeFormatter& formatter) override;
     void WriteDeclaration(CodeFormatter& formatter) override;
-    bool IsStructureType() const { return true; }
+    bool IsStructureType() const override { return true; }
     Type* GetMemberType(uint64_t index) const;
     int SizeInBytes() const override;
 private:
@@ -252,7 +253,7 @@ class CMCPPI_API ArrayType : public Type
 public:
     ArrayType(int id_, Type* elementType_, uint64_t size_);
     void WriteDeclaration(CodeFormatter& formatter) override;
-    bool IsArrayType() const { return true; }
+    bool IsArrayType() const override { return true; }
     Type* ElementType() const { return elementType; }
     int SizeInBytes() const override;
     uint64_t Size() const { return size; }

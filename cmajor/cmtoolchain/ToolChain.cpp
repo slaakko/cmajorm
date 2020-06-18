@@ -1,4 +1,4 @@
-#include "D:/work/cmajorm/cmajor/cmtoolchain/ToolChain.hpp"
+#include "ToolChain.hpp"
 #include <sngjson/json/JsonImport.hpp>
 #include <sngjson/json/JsonExport.hpp>
 #include <utility>

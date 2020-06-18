@@ -7,6 +7,7 @@
 #define CMAJOR_CMCPPI_BASIC_BLOCK_INCLUDED
 #include <cmajor/cmcppi/Instruction.hpp>
 #include <vector>
+#include <memory>
 
 namespace cmcppi {
 

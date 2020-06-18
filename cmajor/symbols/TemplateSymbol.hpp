@@ -14,8 +14,8 @@ class SYMBOLS_API TemplateParameterSymbol : public TypeSymbol
 public:
     TemplateParameterSymbol(const Span& span_, const std::u32string& name_);
     std::u32string FullName() const override { return Name(); }
-    void Write(SymbolWriter& writer);
-    void Read(SymbolReader& reader);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of template parameter"); return nullptr; }
     void* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create defualt ir value of template parameter"); return nullptr; }

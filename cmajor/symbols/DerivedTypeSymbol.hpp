@@ -58,7 +58,7 @@ public:
     DerivedTypeSymbol(const Span& span_, const std::u32string& name_);
     DerivedTypeSymbol(const Span& span_, const std::u32string& name_, TypeSymbol* baseType_, const TypeDerivationRec& derivationRec_);
     std::string TypeString() const override { return "derived_type"; }
-    std::u32string SimpleName() const;
+    std::u32string SimpleName() const override;
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;

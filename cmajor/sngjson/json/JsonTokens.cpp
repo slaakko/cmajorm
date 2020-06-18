@@ -1,5 +1,5 @@
 
-// this file has been automatically generated from 'D:/work/soulng-project/sngjson/json/JsonLexer.lexer' using soulng lexer generator slg version 3.0.0
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngjson/json/JsonLexer.lexer' using soulng lexer generator slg version 3.0.0
 
 #include <sngjson/json/JsonTokens.hpp>
 #include <map>
