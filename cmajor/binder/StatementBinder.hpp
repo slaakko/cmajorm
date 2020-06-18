@@ -28,7 +28,7 @@ public:
     void Visit(NamespaceNode& namespaceNode) override;
     void Visit(EnumTypeNode& enumTypeNode) override;
     void Visit(ClassNode& classNode) override;
-    void Visit(MemberVariableNode& memberVariableNode);
+    void Visit(MemberVariableNode& memberVariableNode) override;
     void Visit(FunctionNode& functionNode) override;
     void Visit(StaticConstructorNode& staticConstructorNode) override;
     void Visit(ConstructorNode& constructorNode) override;

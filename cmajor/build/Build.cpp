@@ -608,6 +608,7 @@ void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectF
     {
         args.push_back(QuotedPath(objectFilePaths[i]));
     }
+    std::string errors;
     std::string libCommandLine = "ar q";
     for (const std::string& arg : args)
     {

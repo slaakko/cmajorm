@@ -137,8 +137,8 @@ public:
     FunctionToDelegateConversion(TypeSymbol* sourceType_, TypeSymbol* targetType_, FunctionSymbol* function_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
-    TypeSymbol* ConversionSourceType() const override override { return sourceType; }
-    TypeSymbol* ConversionTargetType() const override override { return targetType; }
+    TypeSymbol* ConversionSourceType() const override { return sourceType; }
+    TypeSymbol* ConversionTargetType() const override { return targetType; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
     const char* ClassName() const override { return "FunctionToDelegateConversion"; }
@@ -309,8 +309,8 @@ public:
     MemberFunctionToClassDelegateConversion(const Span& span_, TypeSymbol* sourceType_, ClassDelegateTypeSymbol* targetType_, FunctionSymbol* function_);
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
-    TypeSymbol* ConversionSourceType() const override override { return sourceType; }
-    TypeSymbol* ConversionTargetType() const override override { return targetType; }
+    TypeSymbol* ConversionSourceType() const override { return sourceType; }
+    TypeSymbol* ConversionTargetType() const override { return targetType; }
     bool IsMemberFunctionToClassDelegateConversion() const override { return true; }
     std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction) override;
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;

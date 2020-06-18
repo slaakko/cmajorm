@@ -48,7 +48,7 @@ public:
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override { Assert(false, "scoped value cannot be converted"); return nullptr; }
     void* IrValue(Emitter& emitter) override { Assert(false, "scoped value does not have ir value"); return nullptr; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
-    void SetType(TypeSymbol* type_) { type = type_; }
+    void SetType(TypeSymbol* type_) override { type = type_; }
     Value* GetSubject() override { return subject.get(); }
     void SetSubject(Value* subject_) { subject.reset(subject_); }
 private:

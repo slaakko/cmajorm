@@ -1,4 +1,4 @@
-include ../Makefile.common
+include Makefile.common
 
 OBJECTS = Build.o BuildClient.o BuildLangClassMap.o BuildLangClientParser.o BuildLangKeywords.o \
 BuildLangLexer.o BuildLangOptionParser.o BuildLangServerParser.o BuildLangTokens.o BuildOption.o \

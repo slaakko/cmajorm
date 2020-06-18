@@ -1,4 +1,4 @@
-include ../Makefile.common
+include Makefile.common
 
 OBJECTS = ToolChain.o ToolChains.o
 

@@ -7,6 +7,8 @@ LIBRARIES = ../lib/libcmsngutil.a ../lib/libcmsnglexer.a ../lib/libcmsngparser.a
 ../lib/libcmsngcmast.a ../lib/libcmsngcmcmlexer.a ../lib/libcmsngcmcmparser.a ../lib/libcmcommon.a ../lib/libcmir.a ../lib/libcmllvm.a ../lib/libcmsymbols.a \
 ../lib/libcmeh.a
 
+CXXFLAGS += -L../lib
+
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
 

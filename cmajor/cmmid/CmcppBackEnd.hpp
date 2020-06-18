@@ -18,7 +18,7 @@ public:
     void DestroyEmittingContext(cmajor::ir::EmittingContext* emittingContext) override;
     cmajor::ir::Emitter* CreateEmitter(cmajor::ir::EmittingContext* emittingContext) override;
     void DestroyEmitter(cmajor::ir::Emitter* emitter) override;
-    BackEndKind GetBackEndKind() { return BackEndKind::cmcppBackEnd; }
+    BackEndKind GetBackEndKind() override { return BackEndKind::cmcppBackEnd; }
 };
 
 } } // namespace cmajor::mid

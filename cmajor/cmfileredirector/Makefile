@@ -4,6 +4,8 @@ OBJECTS = Main.o
 
 LIBRARIES = ../lib/libcmsngutil.a
 
+CXXFLAGS += -L../lib
+
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 

@@ -311,8 +311,8 @@ public:
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     void SetSpecifiers(Specifiers specifiers);
     uint8_t ConversionDistance() const override;
-    TypeSymbol* ConversionSourceType() const override override;
-    TypeSymbol* ConversionTargetType() const override override;
+    TypeSymbol* ConversionSourceType() const override;
+    TypeSymbol* ConversionTargetType() const override;
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "ConstructorSymbol"; }
 };
@@ -361,8 +361,8 @@ public:
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return true; }
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const override override;
-    TypeSymbol* ConversionTargetType() const override override;
+    TypeSymbol* ConversionSourceType() const override;
+    TypeSymbol* ConversionTargetType() const override;
     void SetSpecifiers(Specifiers specifiers);
     std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return std::u32string(); }

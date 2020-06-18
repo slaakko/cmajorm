@@ -199,8 +199,8 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
     ConversionType GetConversionType() const override { return ConversionType::implicit_; }
     uint8_t ConversionDistance() const override { return 1; }
-    TypeSymbol* ConversionSourceType() const override override { return sourceType; }
-    TypeSymbol* ConversionTargetType() const override override { return targetType; }
+    TypeSymbol* ConversionSourceType() const override { return sourceType; }
+    TypeSymbol* ConversionTargetType() const override { return targetType; }
     const char* ClassName() const override { return "EnumTypeToUnderlyingTypeConversion"; }
     void Check() override;
 private:
@@ -221,8 +221,8 @@ public:
     bool IsBasicTypeOperation() const override { return true; }
     ConversionType GetConversionType() const override { return ConversionType::explicit_; }
     uint8_t ConversionDistance() const override { return 255; }
-    TypeSymbol* ConversionSourceType() const override override { return sourceType; }
-    TypeSymbol* ConversionTargetType() const override override { return targetType; }
+    TypeSymbol* ConversionSourceType() const override { return sourceType; }
+    TypeSymbol* ConversionTargetType() const override { return targetType; }
     const char* ClassName() const override { return "UnderlyingTypeToEnumTypeConversion"; }
     void Check() override;
 private:

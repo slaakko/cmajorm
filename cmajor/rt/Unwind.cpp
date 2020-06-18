@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #ifdef _WIN32
 __declspec(thread) void* unwindList = nullptr;

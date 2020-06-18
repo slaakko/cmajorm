@@ -23,7 +23,7 @@ FiberExecutionContext::FiberExecutionContext()
     SetServer(server.get());
     void* clientFiber = ConvertThreadToFiber(nullptr);
     runServerFunction = RunServer;
-    void* startAddress = runServerFunction;
+    void* startAddress = reinterpret_cast<void*>(runServerFunction);
     void* serverFiber = CreateFiber(1024 * 1024, startAddress, nullptr);
     connection->SetFibers(serverFiber, clientFiber);
     SwitchToFiber(serverFiber);

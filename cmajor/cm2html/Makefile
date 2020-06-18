@@ -4,7 +4,9 @@ OBJECTS = Main.o
 
 LIBRARIES = ../lib/libcmsngutil.a ../lib/libcmsnglexer.a ../lib/libcmsngparser.a ../lib/libcmsngxmlxml.a \
 ../lib/libcmsngxmldom.a ../lib/libcmsngxmlxpath.a ../lib/libcmsngcmast.a ../lib/libcmsngcmcmlexer.a \
-../lib/libcmsngcmcmparser.a
+../lib/libcmsngcmcmparser.a ../lib/libcmsngjsonjson.a ../lib/libcmtoolchain.a
+
+CXXFLAGS += -L../lib
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
@@ -16,7 +18,8 @@ exename=cm2html
 endif
 
 ../bin/$(exename): $(OBJECTS) $(LIBRARIES)
-	$(CXX) $(CXXFLAGS) -o ../bin/$(exename) $(OBJECTS) -lcmsymbols -lcmllvm -lcmir -lcmcommon -lcmsngcmcmparser -lcmsngcmcmlexer -lcmsngcmast \
+	$(CXX) $(CXXFLAGS) -o ../bin/$(exename) $(OBJECTS) \
+-lcmtoolchain -lcmsngjsonjson -lcmsymbols -lcmllvm -lcmir -lcmcommon -lcmsngcmcmparser -lcmsngcmcmlexer -lcmsngcmast \
 -lcmsngxmlxpath -lcmsngxmldom -lcmsngxmlxml -lcmsngparser -lcmsnglexer -lcmsngutil \
 -lboost_filesystem -lboost_iostreams -lboost_system -ldl -ltinfo -lz
 

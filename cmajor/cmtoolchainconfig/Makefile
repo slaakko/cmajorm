@@ -4,6 +4,8 @@ OBJECTS = Main.o
 
 LIBRARIES = ../lib/libcmsngutil.a ../lib/libcmsngjsonjson.a ../lib/libcmtoolchain.a ../lib/libcmsnglexer.a ../lib/libcmsngparser.a ../lib/libcmsngxmlxml.a
 
+CXXFLAGS += -L../lib
+
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
