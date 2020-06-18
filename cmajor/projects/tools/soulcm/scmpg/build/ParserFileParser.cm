@@ -3657,6 +3657,17 @@ public static class ParserFileParser
                 }
                 break;
             }
+            case ANY: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Primitive");
+                    #endif
+                    return Match(true, new soulcm.scmpg.AnyParser());
+                }
+                break;
+            }
             case ID: 
             {
                 ++lexer;
