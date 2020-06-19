@@ -8,16 +8,19 @@
 <li><p>Support for <a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/ns_System.Threading.Fibers.html">fibers</a> added to system library.</p></li>
 <li><p><a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html">Process</a> class 
 added to system library.</p></li>
+<li><p>Switched to clang++ on WSL / on Linux.
+I have used LLVM 10.0.0 pre-built binaries for Ubuntu 18.04 available on the <a href="https://releases.llvm.org/download.html#10.0.0">LLVM download page</a>.</p></li>
 <li><p>The Cmajor compiler has now a C++ backend.</p>
 
-<p>Requirements to use the Cmajor compiler with the C++ backend (cppcmc):</p>
+<p>Requirements for using the Cmajor compiler with the C++ backend (cppcmc):</p>
 
 <ul>
 <li><p>A C++ compiler:</p>
 
 <ul>
-<li>On Windows this can be Visual Studio C++ compiler or MinGW-w64's g++.</li>
-<li>On Linux this can be clang++ or g++.</li>
+<li>On Windows this can be the C++ compiler of Microsoft Visual Studio 2019, or MinGW-w64's g++.</li>
+<li>On Linux and WSL this can be clang++ 10.0.0 for building the compiler itself, and 
+clang++ 10.0.0 or newer or g++ 7.5.0 or newer for building Cmajor programs with the C++ backend.</li>
 </ul></li>
 <li><p>Boost C++ libraries compiled using the chosen C++ compiler.</p></li>
 </ul>
@@ -25,8 +28,11 @@ added to system library.</p></li>
 <p>I have built Boost libraries on Windows with MinGW-w64 gcc using these instructions:
 <a href="https://gist.github.com/zrsmithson/0b72e0cb58d0cb946fc48b5c88511da8">Installing boost on Windows using MinGW-w64 (gcc 64-bit)</a>.</p>
 
+<p>Limitations for Mingw on Windows:</p>
+
 <ul>
-<li><p>Mingw does support thread local storage, so multithreaded Cmajor programs might not work correctly.</p></li>
+<li>Mingw does support thread local storage, so multithreaded Cmajor programs might not work correctly.</li>
+<li><p>I have not managed to get Unicode console I/O to work with Mingw on Windows, so only ASCII console I/O is supported for gcc tool chain on Windows.</p></li>
 <li><p>I have not been able to compile GNUTls with the C++ backend, so socket connections do not support TLS.</p></li>
 </ul></li>
 <li><p>Changed System.Numerics.Multiprecision library implementation to use C++ boost::multiprecision library.</p></li>

@@ -17,7 +17,7 @@
 #include <cmajor/rts/Thread.hpp>
 #include <cmajor/rts/Memory.hpp>
 #include <cmajor/rts/Screen.hpp>
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 #include <cmajor/rts/CommandLine.hpp>
 #include <Windows.h>
 #endif
@@ -92,7 +92,7 @@ void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassI
     InitEnvironment();
     InitStatics();
     InitClasses(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
     InitCommandLine();
 #endif
     InitUnwind();
@@ -101,7 +101,7 @@ void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassI
 void Done()
 {
     DoneUnwind();
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
     DoneCommandLine();
 #endif
     DoneClasses();

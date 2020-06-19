@@ -671,6 +671,57 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
 #endif
 }
 
+std::string GetBoostLibDirFromCompilerConfigXml()
+{
+    std::string cmajorConfigDir = Path::Combine(CmajorRootDir(), "config");
+    std::string compilerConfigXmlFilePath = Path::Combine(cmajorConfigDir, "compiler-config.xml");
+    if (boost::filesystem::exists(compilerConfigXmlFilePath))
+    {
+        std::unique_ptr<sngxml::dom::Document> compilerConfigDoc = sngxml::dom::ReadDocument(compilerConfigXmlFilePath);
+        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"/compiler/" + ToUtf32(GetPlatform()) + U"/" + ToUtf32(GetToolChain()) + U"/boost", compilerConfigDoc.get());
+        if (result)
+        {
+            if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+            {
+                sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    sngxml::dom::Node* node = (*nodeSet)[i];
+                    if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                    {
+                        sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                        std::u32string libraryDirAttr = element->GetAttribute(U"libraryDir");
+                        if (!libraryDirAttr.empty())
+                        {
+                            return ToUtf8(libraryDirAttr);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return std::string();
+}
+
+std::string MakeWindowsGccPath(const std::string& genericWindowsPath)
+{
+    if (Path::IsAbsolute(genericWindowsPath) && genericWindowsPath.length() >= 2 && std::isalpha(genericWindowsPath[0]) && genericWindowsPath[1] == ':')
+    {
+        return "/" + std::string(1, std::tolower(genericWindowsPath[0])) + genericWindowsPath.substr(2);
+    }
+    return genericWindowsPath;
+}
+
+std::string MakeGccLibraryName(const std::string& libraryFilePath)
+{
+    if (StartsWith(libraryFilePath, "lib") && EndsWith(libraryFilePath, ".a"))
+    {
+        return "-l" + Path::GetFileName(libraryFilePath.substr(3, libraryFilePath.length() - (3 + 2)));
+    }
+    return libraryFilePath;
+}
+
 void LinkCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::disableCodeGen)) return;
@@ -681,8 +732,11 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
-    const Tool& linkerTool = GetLinkerTool(GetPlatform(), GetToolChain());
+    std::string platform = GetPlatform();
+    std::string toolChain = GetToolChain();
+    const Tool& linkerTool = GetLinkerTool(platform, toolChain);
     const Configuration& configuration = GetToolConfiguration(linkerTool, GetConfig());
+/*
     std::string cmrtLibName = "cmrts.lib";
     std::string ehLibName = "eh.lib";
     if (GetConfig() == "debug")
@@ -693,72 +747,99 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     std::string cmrtLibFileName = cmrtLibName;
     std::string ehLibFileName = ehLibName;
     std::string cmajorLibDir = QuotedPath(GetFullPath(Path::Combine(CmajorRootDir(), "lib")));
-    std::string toolChainDir = QuotedPath(GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), GetToolChain())));
+*/
+    std::string toolChainDir = GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), toolChain));
+/*
+    if (platform == "windows" && toolChain == "gcc")
+    {
+        toolChainDir = MakeWindowsGccPath(toolChainDir);
+    }
+*/
     std::string linkCommandLine;
     linkCommandLine = linkerTool.commandName;
+    std::set<std::string> libraryDirectories;
+    libraryDirectories.insert(toolChainDir);
+    std::set<std::string> libraryNames;
+    for (const std::string& libraryFilePath : libraryFilePaths)
+    {
+        std::string libraryDir = GetFullPath(Path::GetDirectoryName(libraryFilePath));
+/*        if (platform == "windows" && toolChain == "gcc")
+        {
+            libraryDir = MakeWindowsGccPath(libraryDir);
+        }
+*/
+        libraryDirectories.insert(libraryDir);
+        std::string libraryName = MakeGccLibraryName(libraryFilePath);
+        libraryNames.insert(libraryName);
+    }
+    std::string boostLibDir = GetFullPath(GetBoostLibDirFromCompilerConfigXml());
+    libraryDirectories.insert(boostLibDir);
+    std::string libraryPathFlag;
     for (const std::string& arg : configuration.args)
     {
         if (arg.find('$') != std::string::npos)
         {
-            if (arg.find("$CMAJOR_LIBRARY_DIRECTORY$") != std::string::npos)
+            if (arg.find("$LIBRARY_PATH_FLAG$") != std::string::npos)
             {
-                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$CMAJOR_LIBRARY_DIRECTORY$", cmajorLibDir));
+                libraryPathFlag = soulng::util::Replace(arg, "$LIBRARY_PATH_FLAG$", "");
             }
-            else if (arg.find("$TOOL_CHAIN_LIBRARY_DIRECTORY$"))
+            else if (arg.find("$LIBRARY_DIRECTORIES$") != std::string::npos)
             {
-                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$TOOL_CHAIN_LIBRARY_DIRECTORY$", toolChainDir));
+                std::string libraryPathArgs;
+                bool first = true;
+                for (const std::string& libraryDir : libraryDirectories)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        libraryPathArgs.append(1, ' ');
+                    }
+                    libraryPathArgs.append(libraryPathFlag).append(QuotedPath(libraryDir));
+                }
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$LIBRARY_DIRECTORIES$", libraryPathArgs));
+            }
+            else if (arg.find("$RUNTIME_LIBS$") != std::string::npos)
+            {
+                std::string libs = soulng::util::Replace(arg, "$RUNTIME_LIBS$", "");
+                std::vector<std::string> runtimeLibs = Split(libs, ';');
+                for (const std::string& runtimeLib : runtimeLibs)
+                {
+                    libraryNames.insert(runtimeLib);
+                }
             }
             else if (arg.find("$LIBRARY_FILES$") != std::string::npos)
             {
-                std::string libFilePaths;
-                if (GetToolChain() == "vs")
+                std::string libFilesArg;
+                for (const std::string& libraryName : libraryNames)
                 {
-                    libFilePaths.append(QuotedPath(cmrtLibFileName));
-                    libFilePaths.append(1, ' ').append(QuotedPath(ehLibFileName));
-                    libFilePaths.append(1, ' ').append("cmsngxmldomd.lib");
-                    libFilePaths.append(1, ' ').append("cmsnglexerd.lib");
-                    libFilePaths.append(1, ' ').append("cmsngparserd.lib");
-                    libFilePaths.append(1, ' ').append("cmsngutild.lib");
-                    libFilePaths.append(1, ' ').append("cmsngxmlxmld.lib");
-                    libFilePaths.append(1, ' ').append("cmsngxmlxpathd.lib");
-                    libFilePaths.append(1, ' ').append("libbz2.lib");
-                    libFilePaths.append(1, ' ').append("zlibstat.lib");
-                    libFilePaths.append(1, ' ').append("libgnutls-30.lib");
-                    libFilePaths.append(1, ' ').append("pdcurses.lib");
-                    libFilePaths.append(1, ' ').append("cmrt360gmp.lib");
-                    libFilePaths.append(1, ' ').append("ws2_32.lib");
-                    libFilePaths.append(1, ' ').append("kernel32.lib");
-                    libFilePaths.append(1, ' ').append("user32.lib");
-                    libFilePaths.append(1, ' ').append("gdi32.lib");
-                    libFilePaths.append(1, ' ').append("winspool.lib");
-                    libFilePaths.append(1, ' ').append("comdlg32.lib");
-                    libFilePaths.append(1, ' ').append("advapi32.lib");
-                    libFilePaths.append(1, ' ').append("shell32.lib");
-                    libFilePaths.append(1, ' ').append("ole32.lib");
-                    libFilePaths.append(1, ' ').append("oleaut32.lib");
-                    libFilePaths.append(1, ' ').append("uuid.lib");
-                    libFilePaths.append(1, ' ').append("odbc32.lib");
-                    libFilePaths.append(1, ' ').append("odbccp32.lib");
-
-                    libFilePaths.append(1, ' ').append("msvcrtd.lib");
-                    libFilePaths.append(1, ' ').append("msvcprtd.lib");
-                    libFilePaths.append(1, ' ').append("vcruntimed.lib");
-                    libFilePaths.append(1, ' ').append("ucrtd.lib");
+                    libFilesArg.append(1, ' ').append(QuotedPath(libraryName));
                 }
-                for (const std::string& libFilePath : libraryFilePaths)
-                {
-                    libFilePaths.append(1, ' ');
-                    libFilePaths.append(QuotedPath(libFilePath));
-                }
-                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$LIBRARY_FILES$", libFilePaths));
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$LIBRARY_FILES$", libFilesArg));
             }
             else if (arg.find("$MAIN_OBJECT_FILE$") != std::string::npos)
             {
-                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$MAIN_OBJECT_FILE$", QuotedPath(mainObjectFilePath)));
+                std::string mainObjectPath = mainObjectFilePath;
+/*
+                if (platform == "windows" && toolChain == "gcc")
+                {
+                    mainObjectPath = MakeWindowsGccPath(mainObjectPath);
+                }
+*/
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$MAIN_OBJECT_FILE$", QuotedPath(mainObjectPath)));
             }
             else if (arg.find("$EXECUTABLE_FILE$") != std::string::npos)
             {
-                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$EXECUTABLE_FILE$", QuotedPath(Path::ChangeExtension(executableFilePath, ""))));
+                std::string exePath = executableFilePath;
+/*
+                if (platform == "windows" && toolChain == "gcc")
+                {
+                    exePath = MakeWindowsGccPath(exePath);
+                }
+*/
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$EXECUTABLE_FILE$", QuotedPath(Path::ChangeExtension(exePath, ""))));
             }
             else if (arg.find("$DEBUG_INFORMATION_FILE$") != std::string::npos)
             {
@@ -796,22 +877,7 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     try
     {
         Process::Redirections redirections = Process::Redirections::processStdErr;
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            redirections = redirections | Process::Redirections::processStdOut;
-        }
         Process process(linkCommandLine, redirections);
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            while (!process.Eof(Process::StdHandle::stdOut))
-            {
-                std::string line = process.ReadLine(Process::StdHandle::stdOut);
-                if (!line.empty())
-                {
-                    LogMessage(module.LogStreamId(), line);
-                }
-            }
-        }
         errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();
@@ -830,39 +896,6 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     }
 }
 
-std::string GetBoostLibDirFromCompilerConfigXml()
-{
-    std::string cmajorConfigDir = Path::Combine(CmajorRootDir(), "config");
-    std::string compilerConfigXmlFilePath = Path::Combine(cmajorConfigDir, "compiler-config.xml");
-    if (boost::filesystem::exists(compilerConfigXmlFilePath))
-    {
-        std::unique_ptr<sngxml::dom::Document> compilerConfigDoc = sngxml::dom::ReadDocument(compilerConfigXmlFilePath);
-        std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"/compiler/" + ToUtf32(GetPlatform()) + U"/" + ToUtf32(GetToolChain()) + U"/boost", compilerConfigDoc.get());
-        if (result)
-        {
-            if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
-            {
-                sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
-                int n = nodeSet->Length();
-                for (int i = 0; i < n; ++i)
-                {
-                    sngxml::dom::Node* node = (*nodeSet)[i];
-                    if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
-                    {
-                        sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
-                        std::u32string libraryDirAttr = element->GetAttribute(U"libraryDir");
-                        if (!libraryDirAttr.empty())
-                        {
-                            return ToUtf8(libraryDirAttr);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return std::string();
-}
-
 std::string GetCppSolutionDirectoryPath(Project* project)
 {
     if (currentSolution == nullptr) return std::string();
@@ -873,11 +906,12 @@ std::string GetCppSolutionDirectoryPath(Project* project)
 
 void CreateCppProjectFile(Project* project, Module& module, const std::string& mainSourceFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths)
 {
+    std::string toolChain = GetToolChain();
+    if (toolChain != "vs") return;
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
         LogMessage(module.LogStreamId(), "Creating project file...");
     }
-    std::string toolChain = GetToolChain();
     const Tool& projectFileGeneratorTool = GetProjectFileGeneratorTool(GetPlatform(), toolChain);
     std::set<std::string> libraryDirectories;
     std::set<std::string> libraryNames;
@@ -887,11 +921,6 @@ void CreateCppProjectFile(Project* project, Module& module, const std::string& m
         libraryDirectories.insert(libraryDir);
         std::string libraryName = QuotedPath(Path::GetFileName(libraryFilePath));
         libraryNames.insert(libraryName);
-    }
-    std::string cmrtLibName = "cmrts.lib";
-    if (GetConfig() == "debug")
-    {
-        cmrtLibName = "cmrtsd.lib";
     }
     std::string solutionDir = GetCppSolutionDirectoryPath(project);
     if (!solutionDir.empty())
@@ -905,15 +934,6 @@ void CreateCppProjectFile(Project* project, Module& module, const std::string& m
 #ifdef _WIN32
     std::string boostLibDir = GetFullPath(GetBoostLibDirFromCompilerConfigXml());
     libraryDirectories.insert(boostLibDir);
-    libraryNames.insert(cmrtLibName);
-    libraryNames.insert("pdcurses.lib");
-    libraryNames.insert("cmrt360gmp.lib");
-    libraryNames.insert("libbz2.lib");
-    libraryNames.insert("libgnutls-30.lib");
-    libraryNames.insert("zlibstat.lib");
-    libraryNames.insert("ws2_32.lib");
-    libraryNames.insert("User32.lib");
-    libraryNames.insert("Advapi32.lib");
 #endif
     for (const std::string& libFilePath : libraryFilePaths)
     {
@@ -957,6 +977,15 @@ void CreateCppProjectFile(Project* project, Module& module, const std::string& m
             else if (arg.find("$PROJECT_CONFIG$") != std::string::npos)
             {
                 commandLine.append(1, ' ').append(soulng::util::Replace(arg, "$PROJECT_CONFIG$", config));
+            }
+            else if (arg.find("$RUNTIME_LIBS$") != std::string::npos)
+            {
+                std::string runtimeLibs = soulng::util::Replace(arg, "$RUNTIME_LIBS$", "");
+                std::vector<std::string> libs = soulng::util::Split(runtimeLibs, ';');
+                for (const std::string& lib : libs)
+                {
+                    libraryNames.insert(lib);
+                }
             }
             else if (arg.find("$LIBRARY_DIRECTORIES$") != std::string::npos)
             {
@@ -1089,6 +1118,7 @@ void CreateCppProjectFile(Project* project, Module& module, const std::string& m
 void CreateCppSolutionFile(Solution* solution, const std::vector<Project*>& projects)
 {
     std::string toolChain = GetToolChain();
+    if (toolChain != "vs") return;
     std::string solutionFilePath;
     const Tool& solutionFileGeneratorTool = GetSolutionFileGeneratorTool(GetPlatform(), toolChain);
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
@@ -1716,6 +1746,7 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
 void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder,
     std::string& mainObjectFilePath, std::string& mainSourceFilePath)
 {
+    bool vsToolChain = GetToolChain() == "vs";
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
     mainCompileUnit.SetProgramMainUnit();
@@ -1723,10 +1754,11 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"__polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"__staticClassArray"));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
-#ifndef _WIN32
-    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
-    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
-#endif
+    if (!vsToolChain)
+    {
+        mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
+        mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
+    }
     mainFunction->SetProgramMain();
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
@@ -1761,14 +1793,15 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
         rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     }
     mainFunctionBody->AddStatement(rtInitCall);
-#ifdef _WIN32
-    ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
-    argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
-    mainFunctionBody->AddStatement(argc);
-    ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
-    argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
-    mainFunctionBody->AddStatement(argv);
-#endif
+    if (vsToolChain)
+    {
+        ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
+        argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
+        mainFunctionBody->AddStatement(argc);
+        ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
+        argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
+        mainFunctionBody->AddStatement(argv);
+    }
     CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
     if (!module.GetSymbolTable().JsonClasses().empty())
     {

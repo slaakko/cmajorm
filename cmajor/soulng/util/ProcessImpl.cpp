@@ -7,7 +7,7 @@
 
 namespace soulng { namespace util {
 
-ProcessImpl::ProcessImpl(const std::string& command, Process::Redirections redirections_) : redirections(redirections_) 
+ProcessImpl::ProcessImpl(const std::string& command, Process::Redirections redirections_) : redirections(redirections_), stdOutEof(false), stdErrEof(false)
 {
     switch (redirections)
     {
@@ -77,7 +77,7 @@ bool ProcessImpl::Eof(Process::StdHandle handle)
         {
             if ((redirections & Process::Redirections::processStdOut) != Process::Redirections::none)
             {
-                if (processStdOut) return false;
+                if (!stdOutEof && processStdOut) return false;
             }
             break;
         }
@@ -85,7 +85,7 @@ bool ProcessImpl::Eof(Process::StdHandle handle)
         {
             if ((redirections & Process::Redirections::processStdErr) != Process::Redirections::none)
             {
-                if (processStdErr) return false;
+                if (!stdErrEof && processStdErr) return false;
             }
             break;
         }
@@ -104,7 +104,10 @@ std::string ProcessImpl::ReadLine(Process::StdHandle handle)
             {
                 if (processStdOut)
                 {
-                    std::getline(processStdOut, line);
+                    if (!std::getline(processStdOut, line))
+                    {
+                        stdOutEof = true;
+                    }
                 }
             }
             break;
@@ -115,7 +118,10 @@ std::string ProcessImpl::ReadLine(Process::StdHandle handle)
             {
                 if (processStdErr)
                 {
-                    std::getline(processStdErr, line);
+                    if (!std::getline(processStdErr, line))
+                    {
+                        stdErrEof = true;
+                    }
                 }
             }
             break;

@@ -279,16 +279,24 @@ BitCastInstruction::BitCastInstruction(Value* arg_, Type* destType_) : UnaryType
 void BitCastInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     WriteResult(formatter, function, context);
-    if (GetType(context)->IsPrimitiveType())
+    if (Arg()->IsNullValue())
     {
-        formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
+        formatter.Write(" = ");
+        WriteArg(formatter, context);
     }
     else
     {
-        formatter.Write(" = reinterpret_cast<" + GetType(context)->Name() + ">(");
+        if (GetType(context)->IsPrimitiveType())
+        {
+            formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
+        }
+        else
+        {
+            formatter.Write(" = reinterpret_cast<" + GetType(context)->Name() + ">(");
+        }
+        WriteArg(formatter, context);
+        formatter.Write(")");
     }
-    WriteArg(formatter, context);
-    formatter.Write(")");
 }
 
 IntToFloatInstruction::IntToFloatInstruction(Value* arg_, Type* destType_) : UnaryTypeInstruction(arg_, destType_)

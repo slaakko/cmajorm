@@ -6,6 +6,7 @@
 #include <cmajor/rts/Multiprecision.hpp>
 #include <cmajor/rts/String.hpp>
 #include <soulng/util/Multiprecision.hpp>
+#include <string.h>
 
 void* RtCreateDefaultBigInt(int32_t& errorStrHandle)
 {

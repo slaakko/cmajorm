@@ -37,6 +37,8 @@ private:
     boost::process::ipstream processStdErr;
     boost::process::opstream processStdIn;
     boost::process::child process;
+    bool stdOutEof;
+    bool stdErrEof;
 };
 
 } } // namespace soulng::util

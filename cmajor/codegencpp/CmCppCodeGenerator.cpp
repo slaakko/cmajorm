@@ -112,22 +112,7 @@ void CmCppCodeGenerator::Compile(const std::string& intermediateCodeFile)
     try
     {
         Process::Redirections redirections = Process::Redirections::processStdErr;
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            redirections = redirections | Process::Redirections::processStdOut;
-        }
         Process process(intermediateCompileCommand, redirections);
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            while (!process.Eof(Process::StdHandle::stdOut))
-            {
-                std::string line = process.ReadLine(Process::StdHandle::stdOut);
-                if (!line.empty())
-                {
-                    LogMessage(module->LogStreamId(), line);
-                }
-            }
-        }
         errors = process.ReadToEnd(Process::StdHandle::stdErr);
         process.WaitForExit();
         int exitCode = process.ExitCode();

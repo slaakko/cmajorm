@@ -31,6 +31,7 @@ build:
 	$(MAKE) -C build
 	$(MAKE) -C compiler
 	$(MAKE) -C cmclient
+	$(MAKE) -C cppcmc
 	$(MAKE) -C cmupd
 	$(MAKE) -C cm2html
 	$(MAKE) -C cmdoc
@@ -52,13 +53,31 @@ install:
 	cp bin/* $(prefix)/bin
 	mkdir -p $(prefix)/lib
 	cp lib/$(cmrtsoname).so.3.6.0 $(prefix)/lib
-	cp lib/libgmpintf.a $(prefix)/lib
 	ln -f $(prefix)/lib/$(cmrtsoname).so.3.6.0 $(prefix)/lib/$(cmrtsoname).so.3
 	ln -f $(prefix)/lib/$(cmrtsoname).so.3.6.0 $(prefix)/lib/$(cmrtsoname).so
 
 sys:
 	cmc --verbose system/platform/linux/System.cms
 	cmc --verbose --config=release system/platform/linux/System.cms
+
+BINDISTDIR = ~/cmajor-3.6.0
+
+bindist:
+	mkdir -p $(BINDISTDIR)
+	mkdir -p $(BINDISTDIR)/bin
+	mkdir -p $(BINDISTDIR)/lib
+	mkdir -p $(BINDISTDIR)/lib/gcc
+	mkdir -p $(BINDISTDIR)/lib/clang
+	mkdir -p $(BINDISTDIR)/doc
+	mkdir -p $(BINDISTDIR)/system
+	mkdir -p $(BINDISTDIR)/unicode
+	mkdir -p $(BINDISTDIR)/projects
+	cp bin/* $(BINDISTDIR)/bin
+	cp -r lib/* $(BINDISTDIR)/lib
+	cp -r doc/* $(BINDISTDIR)/doc
+	cp -r system/* $(BINDISTDIR)/system
+	cp -r projects/* $(BINDISTDIR)/projects
+	cp  unicode/cmajor_ucd.bin $(BINDISTDIR)/unicode
 
 clean:
 	$(MAKE) -C soulng clean
@@ -87,6 +106,7 @@ clean:
 	$(MAKE) -C build clean
 	$(MAKE) -C compiler clean
 	$(MAKE) -C cmclient clean
+	$(MAKE) -C cppcmc clean
 	$(MAKE) -C cmupd clean
 	$(MAKE) -C cm2html clean
 	$(MAKE) -C cmdoc clean

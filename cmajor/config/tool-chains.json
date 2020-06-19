@@ -17,34 +17,6 @@
                                 {
                                     "args" : 
                                     [
-                                        "\/GS", 
-                                        "\/W3", 
-                                        "\/Zc:wchar_", 
-                                        "\/I\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\include\"", 
-                                        "\/Zi", 
-                                        "\/Gm-", 
-                                        "\/Od", 
-                                        "\/sld", 
-                                        "\/wd\"4102\"", 
-                                        "\/wd\"4146\"", 
-                                        "\/wd\"4244\"", 
-                                        "\/wd\"4297\"", 
-                                        "\/c", 
-                                        "$SOURCE_FILE$", 
-                                        "\/Fd:$DEBUG_INFORMATION_FILE$", 
-                                        "$GENERATE_ASSEMBLY_FILE_OPTION$\/FAs", 
-                                        "$GENERATE_JUST_MY_CODE_OPTION$\/JMC", 
-                                        "$ENABLE_RUNTIME_TYPE_INFORMATION_OPTION$\/GR", 
-                                        "\/Zc:inline", 
-                                        "\/fp:precise", 
-                                        "\/RTC1", 
-                                        "\/MDd", 
-                                        "\/FC", 
-                                        "\/Fa$ASSEMBLY_FILE$", 
-                                        "\/EHs", 
-                                        "\/Fo:$OBJECT_FILE$", 
-                                        "\/diagnostics:column ", 
-                                        "\/std:c++17"
                                     ]
                                     , 
                                     "name" : "debug", 
@@ -128,7 +100,8 @@
                                         "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"", 
                                         "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"", 
                                         "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"", 
-                                        "\/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$"
+                                        "\/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$", 
+                                        "\/LIBPATH:$TOOL_CHAIN_LIBRARY_DIRECTORY$"
                                     ]
                                     , 
                                     "name" : "debug", 
@@ -154,7 +127,8 @@
                                         "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"", 
                                         "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"", 
                                         "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"", 
-                                        "\/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$"
+                                        "\/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$", 
+                                        "\/LIBPATH:$TOOL_CHAIN_LIBRARY_DIRECTORY$"
                                     ]
                                     , 
                                     "name" : "release", 
@@ -175,6 +149,7 @@
                                 {
                                     "args" : 
                                     [
+                                        "$RUNTIME_LIBS$pdcurses.lib;libbz2.lib;zlibstat.lib;ws2_32.lib;User32.lib;Advapi32.lib;cmrtsd.lib", 
                                         "--verbose", 
                                         "--name", 
                                         "$PROJECT_NAME$", 
@@ -203,6 +178,7 @@
                                 {
                                     "args" : 
                                     [
+                                        "$RUNTIME_LIBS$pdcurses.lib;libbz2.lib;zlibstat.lib;ws2_32.lib;User32.lib;Advapi32.lib;cmrts.lib", 
                                         "--verbose", 
                                         "--name", 
                                         "$PROJECT_NAME$", 
@@ -273,6 +249,139 @@
                             "debugInformationFileExtension" : "", 
                             "name" : "solution-file-generator", 
                             "outputFileExtension" : ".sln"
+                        }
+                    ]
+                }
+                , 
+                {
+                    "name" : "gcc", 
+                    "tools" : 
+                    [
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "g++", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "-std=c++17", 
+                                        "-fpermissive", 
+                                        "-c", 
+                                        "$SOURCE_FILE$", 
+                                        "-o", 
+                                        "$OBJECT_FILE$", 
+                                        "-g", 
+                                        "-O0"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : "."
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "-std=c++17", 
+                                        "-fpermissive", 
+                                        "-c", 
+                                        "$SOURCE_FILE$", 
+                                        "-o", 
+                                        "$OBJECT_FILE$", 
+                                        "-g", 
+                                        "-O3"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : "."
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "compiler", 
+                            "outputFileExtension" : ".o"
+                        }
+                        , 
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "ar", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "rv", 
+                                        "$LIBRARY_FILE$", 
+                                        "$OBJECT_FILES$"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : "."
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "rv", 
+                                        "$LIBRARY_FILE$", 
+                                        "$OBJECT_FILES$"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : "."
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "library-manager", 
+                            "outputFileExtension" : ".a"
+                        }
+                        , 
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "g++", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "$LIBRARY_PATH_FLAG$-L", 
+                                        "$RUNTIME_LIBS$-lcmrtsd;-lcmsnglexerd;-lcmsngparserd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmsngutild;-lpdcursesd;-lbz2d;-lzd;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-sd-x64-1_73;-lboost_iostreams-mgw8-mt-sd-x64-1_73;-lboost_system-mgw8-mt-sd-x64-1_73", 
+                                        "$LIBRARY_DIRECTORIES$", 
+                                        "$MAIN_OBJECT_FILE$", 
+                                        "-Xlinker --start-group", 
+                                        "$LIBRARY_FILES$", 
+                                        "-Xlinker --end-group", 
+                                        "-o", 
+                                        "$EXECUTABLE_FILE$.exe"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : ""
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "$LIBRARY_PATH_FLAG$-L", 
+                                        "$RUNTIME_LIBS$-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lpdcurses;-lbbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73", 
+                                        "$LIBRARY_DIRECTORIES$", 
+                                        "$MAIN_OBJECT_FILE$", 
+                                        "-Xlinker --start-group", 
+                                        "$LIBRARY_FILES$", 
+                                        "-Xlinker --end-group", 
+                                        "-o", 
+                                        "$EXECUTABLE_FILE$.exe"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : ""
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "linker", 
+                            "outputFileExtension" : ".exe"
                         }
                     ]
                 }

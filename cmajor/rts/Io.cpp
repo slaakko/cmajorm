@@ -83,7 +83,7 @@ FileTable::FileTable() : stdinInUtf16Mode(false), stdoutInUtf16Mode(false), stde
     files[2] = stderr;
     std::fflush(stdout);
     std::fflush(stderr);
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
     if (_isatty(0))
     {
         _setmode(0, _O_U16TEXT);

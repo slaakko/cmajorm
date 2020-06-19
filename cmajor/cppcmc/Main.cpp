@@ -364,7 +364,8 @@ int main(int argc, const char** argv)
             ReadToolChains(GetGlobalFlag(GlobalFlags::verbose));
             if (GetGlobalFlag(GlobalFlags::verbose))
             {
-                std::cout << "current tool chain is '" << GetToolChain() + "'" << std::endl;
+                std::cout << "current platform is '" << GetPlatform() << "'" << std::endl;
+                std::cout << "current tool chain is '" << GetToolChain() << "'" << std::endl;
             }
             if (GetToolChain() == "vs")
             {

@@ -88,7 +88,7 @@ void SocketTable::Done()
 std::string GetSocketErrorMessage(int errorCode)
 {
     char16_t buf[1024];
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, (LPWSTR)(&buf[0]), sizeof(buf), NULL);
+    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, (LPWSTR)(&buf[0]), sizeof(buf), NULL);
     return ToUtf8(std::u16string(buf));
 }
 

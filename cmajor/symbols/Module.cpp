@@ -616,7 +616,7 @@ Module::Module(const std::string& filePath)  :
             libraryFilePath = GetFullPath(
                 boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), configuration.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
                     libraryManagerTool.outputFileExtension).generic_string());
-            if (IsSystemModule())
+            if (IsSystemModule() && GetToolChain() == "vs")
             {
                 libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
                     "system"), "platform"), "windows"), "cpp"), GetToolChain()),
@@ -631,7 +631,7 @@ Module::Module(const std::string& filePath)  :
             libraryFilePath = GetFullPath(
                 boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), configuration.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
                     libraryManagerTool.outputFileExtension).generic_string());
-            if (IsSystemModule())
+            if (IsSystemModule() && GetToolChain() == "vs")
             {
                 libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
                     "system"), "platform"), "linux"), "cpp"), GetToolChain()),
@@ -725,7 +725,7 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
             libraryFilePath = GetFullPath(
                 boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), configuration.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
                     libraryManagerTool.outputFileExtension).generic_string());
-            if (IsSystemModule())
+            if (IsSystemModule() && GetToolChain() == "vs")
             {
                 libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
                     "system"), "platform"), "windows"), "cpp"), GetToolChain()),
@@ -740,7 +740,7 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references, s
             libraryFilePath = GetFullPath(
                 boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), configuration.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
                     libraryManagerTool.outputFileExtension).generic_string());
-            if (IsSystemModule())
+            if (IsSystemModule() && GetToolChain() == "vs")
             {
                 libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
                     "system"), "platform"), "linux"), "cpp"), GetToolChain()),
@@ -1027,13 +1027,13 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
             const Tool& libraryManagerTool = GetLibraryManagerTool(GetPlatform(), GetToolChain());
             const Configuration& configuration = GetToolConfiguration(libraryManagerTool, GetConfig());
             libraryFilePath = GetFullPath(
-                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), configuration.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
+                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(filePathReadFrom), configuration.outputDirectory), Path::GetFileName(filePathReadFrom))).replace_extension(
                     libraryManagerTool.outputFileExtension).generic_string());
-            if (IsSystemModule())
+            if (IsSystemModule() && GetToolChain() == "vs")
             {
                 libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
                     "system"), "platform"), "windows"), "cpp"), GetToolChain()),
-                    GetConfig()), configuration.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+                    GetConfig()), configuration.outputDirectory), Path::GetFileName(filePathReadFrom))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
             }
         }
 #else
@@ -1042,13 +1042,13 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
             const Tool& libraryManagerTool = GetLibraryManagerTool(GetPlatform(), GetToolChain());
             const Configuration& configuration = GetToolConfiguration(libraryManagerTool, GetConfig());
             libraryFilePath = GetFullPath(
-                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(originalFilePath), configuration.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(
+                boost::filesystem::path(Path::Combine(Path::Combine(Path::GetDirectoryName(filePathReadFrom), configuration.outputDirectory), Path::GetFileName(filePathReadFrom))).replace_extension(
                     libraryManagerTool.outputFileExtension).generic_string());
-            if (IsSystemModule())
+            if (IsSystemModule() && GetToolChain() == "vs")
             {
                 libraryFilePath = GetFullPath(boost::filesystem::path(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(),
                     "system"), "platform"), "linux"), "cpp"), GetToolChain()),
-                    GetConfig()), configuration.outputDirectory), Path::GetFileName(originalFilePath))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
+                    GetConfig()), configuration.outputDirectory), Path::GetFileName(filePathReadFrom))).replace_extension(libraryManagerTool.outputFileExtension).generic_string());
             }
         }
         else
