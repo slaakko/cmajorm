@@ -12,7 +12,6 @@ namespace cmcppi {
 Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), nextLocalNumber(0), nextArgumentNumber(0), 
     linkOnce(false), nextBBNumber(0), nothrow(false)
 {
-    context.SetCurrentFunction(this);
     entryBlock.reset(new BasicBlock(nextBBNumber++, "entry"));
     int paramIndex = 0;
     for (Type* paramType : type->ParamTypes())
@@ -149,6 +148,7 @@ void Function::Write(CodeFormatter& formatter, Context& context)
     formatter.IncIndent();
     formatter.WriteLine("// " + fullName);
     formatter.WriteLine();
+    WriteValueDeclarations(formatter, context);
     bool first = true;
     for (const auto& bb : basicBlocks)
     {
@@ -168,6 +168,20 @@ void Function::Write(CodeFormatter& formatter, Context& context)
     }
     formatter.DecIndent();
     formatter.WriteLine("}");
+}
+
+void Function::WriteValueDeclarations(CodeFormatter& formatter, Context& context)
+{
+    for (Instruction* inst : resultInstructions)
+    {
+        inst->ObtainResultId(*this);
+        inst->WriteResultDeclaration(formatter, *this, context);
+    }
+}
+
+void Function::AddResultInstruction(Instruction* instruction)
+{
+    resultInstructions.push_back(instruction);
 }
 
 } // namespace cmcppi

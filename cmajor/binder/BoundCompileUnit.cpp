@@ -274,9 +274,6 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
     systemRuntimeUnwindInfoSymbol(nullptr), systemRuntimeAddCompileUnitFunctionSymbol(nullptr), pushCompileUnitUnwindInfoInitFunctionSymbol(nullptr),
     initUnwindInfoDelegateType(nullptr), globalInitFunctionSymbol(nullptr)
 {
-    std::string platform = GetPlatform();
-    std::string toolChain = GetToolChain();
-    const Tool& compilerTool = GetCompilerTool(platform, toolChain);
     if (compileUnitNode)
     {
         boost::filesystem::path fileName = boost::filesystem::path(compileUnitNode->FilePath()).filename();
@@ -299,6 +296,9 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
         }
         else if (GetBackEnd() == BackEnd::cmcpp)
         {
+            std::string platform = GetPlatform();
+            std::string toolChain = GetToolChain();
+            const Tool& compilerTool = GetCompilerTool(platform, toolChain);
             objfp = (objectFileDirectory / fileName).replace_extension(compilerTool.outputFileExtension);
         }
 #else

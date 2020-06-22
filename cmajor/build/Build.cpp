@@ -704,15 +704,6 @@ std::string GetBoostLibDirFromCompilerConfigXml()
     return std::string();
 }
 
-std::string MakeWindowsGccPath(const std::string& genericWindowsPath)
-{
-    if (Path::IsAbsolute(genericWindowsPath) && genericWindowsPath.length() >= 2 && std::isalpha(genericWindowsPath[0]) && genericWindowsPath[1] == ':')
-    {
-        return "/" + std::string(1, std::tolower(genericWindowsPath[0])) + genericWindowsPath.substr(2);
-    }
-    return genericWindowsPath;
-}
-
 std::string MakeGccLibraryName(const std::string& libraryFilePath)
 {
     if (StartsWith(libraryFilePath, "lib") && EndsWith(libraryFilePath, ".a"))
@@ -736,25 +727,7 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     std::string toolChain = GetToolChain();
     const Tool& linkerTool = GetLinkerTool(platform, toolChain);
     const Configuration& configuration = GetToolConfiguration(linkerTool, GetConfig());
-/*
-    std::string cmrtLibName = "cmrts.lib";
-    std::string ehLibName = "eh.lib";
-    if (GetConfig() == "debug")
-    {
-        cmrtLibName = "cmrtsd.lib";
-        ehLibName = "ehd.lib";
-    }
-    std::string cmrtLibFileName = cmrtLibName;
-    std::string ehLibFileName = ehLibName;
-    std::string cmajorLibDir = QuotedPath(GetFullPath(Path::Combine(CmajorRootDir(), "lib")));
-*/
     std::string toolChainDir = GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), toolChain));
-/*
-    if (platform == "windows" && toolChain == "gcc")
-    {
-        toolChainDir = MakeWindowsGccPath(toolChainDir);
-    }
-*/
     std::string linkCommandLine;
     linkCommandLine = linkerTool.commandName;
     std::set<std::string> libraryDirectories;
@@ -763,11 +736,6 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     for (const std::string& libraryFilePath : libraryFilePaths)
     {
         std::string libraryDir = GetFullPath(Path::GetDirectoryName(libraryFilePath));
-/*        if (platform == "windows" && toolChain == "gcc")
-        {
-            libraryDir = MakeWindowsGccPath(libraryDir);
-        }
-*/
         libraryDirectories.insert(libraryDir);
         std::string libraryName = MakeGccLibraryName(libraryFilePath);
         libraryNames.insert(libraryName);
@@ -822,24 +790,16 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
             else if (arg.find("$MAIN_OBJECT_FILE$") != std::string::npos)
             {
                 std::string mainObjectPath = mainObjectFilePath;
-/*
-                if (platform == "windows" && toolChain == "gcc")
-                {
-                    mainObjectPath = MakeWindowsGccPath(mainObjectPath);
-                }
-*/
                 linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$MAIN_OBJECT_FILE$", QuotedPath(mainObjectPath)));
             }
             else if (arg.find("$EXECUTABLE_FILE$") != std::string::npos)
             {
                 std::string exePath = executableFilePath;
-/*
-                if (platform == "windows" && toolChain == "gcc")
+                if (Path::HasExtension(exePath))
                 {
-                    exePath = MakeWindowsGccPath(exePath);
+                    exePath = Path::ChangeExtension(exePath, "");
                 }
-*/
-                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$EXECUTABLE_FILE$", QuotedPath(Path::ChangeExtension(exePath, ""))));
+                linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$EXECUTABLE_FILE$", QuotedPath(exePath)));
             }
             else if (arg.find("$DEBUG_INFORMATION_FILE$") != std::string::npos)
             {
@@ -2244,7 +2204,12 @@ void InstallSystemLibraries(Module* systemInstallModule)
     {
         backend = sngcm::ast::BackEnd::cppcm;
     }
-    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig(), backend, GetToolChain());
+    SystemDirKind systemDirKind = SystemDirKind::regular;
+    if (GetGlobalFlag(GlobalFlags::repository))
+    {
+        systemDirKind = SystemDirKind::repository;
+    }
+    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig(), backend, GetToolChain(), systemDirKind);
     boost::filesystem::create_directories(systemLibDir);
     for (Module* systemModule : systemInstallModule->AllReferencedModules())
     {
@@ -2295,7 +2260,12 @@ void InstallSystemWindowsLibraries(Module* systemInstallWindowsModule)
     {
         backend = sngcm::ast::BackEnd::cppcm;
     }
-    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig(), backend, GetToolChain());
+    SystemDirKind systemDirKind = SystemDirKind::regular;
+    if (GetGlobalFlag(GlobalFlags::repository))
+    {
+        systemDirKind = SystemDirKind::repository;
+    }
+    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig(), backend, GetToolChain(), systemDirKind);
     boost::filesystem::create_directories(systemLibDir);
     for (Module* systemModule : systemInstallWindowsModule->AllReferencedModules())
     {
@@ -2625,6 +2595,11 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
 
 std::unique_ptr<Project> ReadProject(const std::string& projectFilePath)
 {
+    SystemDirKind systemDirKind = SystemDirKind::regular;
+    if (GetGlobalFlag(GlobalFlags::repository))
+    {
+        systemDirKind = SystemDirKind::repository;
+    }
     std::string config = GetConfig();
     MappedInputFile projectFile(projectFilePath);
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
@@ -2638,7 +2613,7 @@ std::unique_ptr<Project> ReadProject(const std::string& projectFilePath)
         backend = sngcm::ast::BackEnd::cppcm;
     }
     ContainerFileLexer containerFileLexer(p, projectFilePath, 0);
-    std::unique_ptr<Project> project = ProjectFileParser::Parse(containerFileLexer, config, backend, GetToolChain());
+    std::unique_ptr<Project> project = ProjectFileParser::Parse(containerFileLexer, config, backend, GetToolChain(), systemDirKind);
     project->ResolveDeclarations();
     return project;
 }
@@ -2750,6 +2725,11 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         {
             for (const std::string& referencedProjectFilePath : project->ReferencedProjectFilePaths())
             {
+                SystemDirKind systemDirKind = SystemDirKind::regular;
+                if (GetGlobalFlag(GlobalFlags::repository))
+                {
+                    systemDirKind = SystemDirKind::repository;
+                }
                 std::unique_ptr<Project> referencedProject = ReadProject(referencedProjectFilePath);
                 project->AddDependsOnId(referencedProject->Id());
                 if (currentSolution == nullptr && GetGlobalFlag(GlobalFlags::buildAll))
@@ -2789,7 +2769,12 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             {
                 astBackEnd = sngcm::ast::BackEnd::cppcm;
             }
-            upToDate = project->IsUpToDate(CmajorSystemModuleFilePath(config, astBackEnd, GetToolChain()));
+            SystemDirKind systemDirKind = SystemDirKind::regular;
+            if (GetGlobalFlag(GlobalFlags::repository))
+            {
+                systemDirKind = SystemDirKind::repository;
+            }
+            upToDate = project->IsUpToDate(CmajorSystemModuleFilePath(config, astBackEnd, GetToolChain(), systemDirKind));
         }
         if (upToDate)
         {
@@ -3355,7 +3340,7 @@ void BuildMsBuildProject(const std::string& projectName, const std::string& proj
 {
     std::set<std::string> builtProjects;
     std::string projectFilePath = GetFullPath(Path::Combine(projectDirectory, projectName + ".cmproj"));
-    std::unique_ptr<Project> project(new Project(ToUtf32(projectName), projectFilePath, GetConfig(), sngcm::ast::BackEnd::llvm, ""));
+    std::unique_ptr<Project> project(new Project(ToUtf32(projectName), projectFilePath, GetConfig(), sngcm::ast::BackEnd::llvm, "", SystemDirKind::regular));
     if (target == "program")
     {
         project->AddDeclaration(new TargetDeclaration(Target::program));

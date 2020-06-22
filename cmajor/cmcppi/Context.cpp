@@ -176,6 +176,10 @@ Instruction* Context::CreateNot(Value* arg)
     Instruction* inst = new NotInstruction(arg);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -184,6 +188,10 @@ Instruction* Context::CreateNeg(Value* arg)
     Instruction* inst = new NegInstruction(arg);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -192,6 +200,10 @@ Instruction* Context::CreateAdd(Value* left, Value* right)
     Instruction* inst = new AddInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -200,6 +212,10 @@ Instruction* Context::CreateSub(Value* left, Value* right)
     Instruction* inst = new SubInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -208,6 +224,10 @@ Instruction* Context::CreateMul(Value* left, Value* right)
     Instruction* inst = new MulInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -216,6 +236,10 @@ Instruction* Context::CreateDiv(Value* left, Value* right)
     Instruction* inst = new DivInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -224,6 +248,10 @@ Instruction* Context::CreateMod(Value* left, Value* right)
     Instruction* inst = new ModInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -232,6 +260,10 @@ Instruction* Context::CreateAnd(Value* left, Value* right)
     Instruction* inst = new AndInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -240,6 +272,10 @@ Instruction* Context::CreateOr(Value* left, Value* right)
     Instruction* inst = new OrInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -248,6 +284,10 @@ Instruction* Context::CreateXor(Value* left, Value* right)
     Instruction* inst = new XorInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -256,6 +296,10 @@ Instruction* Context::CreateShl(Value* left, Value* right)
     Instruction* inst = new ShlInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -264,6 +308,10 @@ Instruction* Context::CreateShr(Value* left, Value* right)
     Instruction* inst = new ShrInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -272,6 +320,10 @@ Instruction* Context::CreateEqual(Value* left, Value* right)
     Instruction* inst = new EqualInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -280,6 +332,10 @@ Instruction* Context::CreateLess(Value* left, Value* right)
     Instruction* inst = new LessInstruction(left, right);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -288,6 +344,10 @@ Instruction* Context::CreateSignExtend(Value* arg, Type* destType)
     Instruction* inst = new SignExtendInstruction(arg, destType);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -296,6 +356,10 @@ Instruction* Context::CreateZeroExtend(Value* arg, Type* destType)
     Instruction* inst = new ZeroExtendInstruction(arg, destType);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -304,6 +368,10 @@ Instruction* Context::CreateTruncate(Value* arg, Type* destType)
     Instruction* inst = new TruncateInstruction(arg, destType);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -312,6 +380,10 @@ Instruction* Context::CreateBitCast(Value* arg, Type* destType)
     Instruction* inst = new BitCastInstruction(arg, destType);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -320,6 +392,10 @@ Instruction* Context::CreateIntToFloat(Value* arg, Type* destType)
     Instruction* inst = new IntToFloatInstruction(arg, destType);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -328,6 +404,10 @@ Instruction* Context::CreateFloatToInt(Value* arg, Type* destType)
     Instruction* inst = new FloatToIntInstruction(arg, destType);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -336,6 +416,10 @@ Instruction* Context::CreateIntToPtr(Value* arg, Type* destType)
     Instruction* inst = new IntToPtrInstruction(arg, destType);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -344,6 +428,10 @@ Instruction* Context::CreatePtrToInt(Value* arg, Type* destType)
     Instruction* inst = new PtrToIntInstruction(arg, destType);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -352,6 +440,10 @@ Instruction* Context::CreateLocal(Type* type)
     Instruction* inst = new LocalInstruction(type);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -360,6 +452,10 @@ Instruction* Context::CreateLoad(Value* ptr)
     Instruction* inst = new LoadInstruction(ptr);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -368,6 +464,10 @@ Instruction* Context::CreateStore(Value* value, Value* ptr)
     Instruction* inst = new StoreInstruction(value, ptr);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -376,6 +476,10 @@ Instruction* Context::CreateArg(Value* arg)
     Instruction* inst = new ArgInstruction(arg);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -384,6 +488,10 @@ Instruction* Context::CreateElemAddr(Value* ptr, Value* index)
     Instruction* inst = new ElemAddrInstruction(ptr, index);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -392,6 +500,10 @@ Instruction* Context::CreatePtrOffset(Value* ptr, Value* offset)
     Instruction* inst = new PtrOffsetInstruction(ptr, offset);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -400,6 +512,10 @@ Instruction* Context::CreatePtrDiff(Value* leftPtr, Value* rightPtr)
     Instruction* inst = new PtrDiffInstruction(leftPtr, rightPtr);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -408,6 +524,10 @@ Instruction* Context::CreateCall(Value* function, const std::vector<Value*>& arg
     Instruction* inst = new CallInstruction(function, args);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -416,6 +536,10 @@ Instruction* Context::CreateInvoke(Value* function, const std::vector<Value*> ar
     Instruction* inst = new InvokeInstruction(function, args, normalBlockNext, unwindBlockNext);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -424,6 +548,10 @@ Instruction* Context::CreateRet(Value* value)
     Instruction* inst = new RetInstruction(value);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -432,6 +560,10 @@ Instruction* Context::CreateJump(BasicBlock* dest)
     Instruction* inst = new JumpInstruction(dest);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -440,6 +572,10 @@ Instruction* Context::CreateBranch(Value* cond, BasicBlock* trueDest, BasicBlock
     Instruction* inst = new BranchInstruction(cond, trueDest, falseDest);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -448,6 +584,10 @@ Instruction* Context::CreateSwitch(Value* cond, BasicBlock* defaultDest)
     Instruction* inst = new SwitchInstruction(cond, defaultDest);
     AddLineInfo(inst);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -455,6 +595,10 @@ Instruction* Context::CreateNop()
 {
     Instruction* inst = new NoOperationInstruction();
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -462,6 +606,10 @@ Instruction* Context::CreateBeginTry()
 {
     Instruction* inst = new BeginTryInstruction();
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -469,6 +617,10 @@ Instruction* Context::CreateEndTry(BasicBlock* nextDest)
 {
     Instruction* inst = new EndTryInstruction(nextDest);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -476,6 +628,10 @@ Instruction* Context::CreateBeginCatch()
 {
     Instruction* inst = new BeginCatchInstruction();
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -484,6 +640,10 @@ Instruction* Context::CreateEndCatch(BasicBlock* nextDest)
 {
     Instruction* inst = new EndCatchInstruction(nextDest);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -491,6 +651,10 @@ Instruction* Context::CreateResume()
 {
     Instruction* inst = new ResumeInstruction();
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 
@@ -498,6 +662,10 @@ Instruction* Context::CreateIncludeBasicBlockInstruction(BasicBlock* block)
 {
     Instruction* inst = new IncludeBasicBlockInstruction(block);
     currentBasicBlock->AddInstruction(inst);
+    if (inst->IsResultInstruction(*this))
+    {
+        currentFunction->AddResultInstruction(inst);
+    }
     return inst;
 }
 

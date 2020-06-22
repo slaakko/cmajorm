@@ -13,7 +13,8 @@ namespace cmajor { namespace build {
 using namespace cmajor::symbols;
 using namespace soulng::util;
 
-SocketServer::SocketServer(Log* log_, const std::string& serverName_) : log(log_), serverName(serverName_), name("socket server: '" + serverName + "'"), socket(), running(), isRunning(false)
+SocketServer::SocketServer(Log* log_, const std::string& serverName_, bool continuous_) :
+    log(log_), serverName(serverName_), name("socket server: '" + serverName + "'"), socket(), running(), isRunning(false), exiting(false), continuous(continuous_)
 {
     ServerInfo* serverInfo = ServerConfig::Instance().GetServerInfo(serverName, true, true);
     if (serverInfo)
@@ -56,39 +57,66 @@ void SocketServer::WaitForRunning()
     }
 }
 
-void SocketServer::Run()
+void SocketServer::Run(const std::string& prompt)
 {
-    isRunning = true;
-    running.notify_all();
-    if (GetGlobalFlag(GlobalFlags::verbose))
+    while (!exiting)
     {
-        LogMessage(-1, "socket server: '" + serverName + "' waiting for client connection...");
+        if (!prompt.empty())
+        {
+            LogMessage(-1, "socket server: " + prompt);
+        }
+        isRunning = true;
+        running.notify_all();
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(-1, "socket server: '" + serverName + "' waiting for client connection...");
+        }
+        TcpSocket connectedSocket = socket.Accept();
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(-1, "socket server: '" + serverName + "' accepted a client connection...");
+        }
+        connection.reset(new SocketConnection(log, this, std::move(connectedSocket)));
+        buildServer.reset(new BuildServer(connection.get()));
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(-1, "socket server: '" + serverName + "' running build server...");
+        }
+        buildServer->Run();
     }
-    TcpSocket connectedSocket = socket.Accept();
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        LogMessage(-1, "socket server: '" + serverName + "' accepted a client connection...");
-    }
-    connection.reset(new SocketConnection(log, this, std::move(connectedSocket)));
-    buildServer.reset(new BuildServer(connection.get()));
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        LogMessage(-1, "socket server: '" + serverName + "' running build server...");
-    }
-    buildServer->Run();
 }
 
 void SocketServer::Exit()
 {
+    if (continuous)
+    {
+        buildServer->Exit();
+        buildServer->SetConnection(nullptr);
+        connection->SetServer(nullptr);
+        return;
+    }
+    exiting = true;
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        LogMessage(-1, "socket server '" + serverName + "' exiting...");
+        LogMessage(-1, "socket server: '" + serverName + "' exiting...");
     }
-    buildServer->Exit();
+    try
+    {
+        socket.Close();
+    }
+    catch (const std::exception&)
+    {
+    }
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
-        LogMessage(-1, "socket server '" + serverName + "' exited");
+        LogMessage(-1, "socket server: '" + serverName + "' exited");
     }
+}
+
+void SocketServer::ExitContinuous()
+{
+    continuous = false;
+    Exit();
 }
 
 } } // namespace cmajor::build

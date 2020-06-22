@@ -3,13 +3,13 @@
 #include <sngcm/cmlexer/ContainerFileLexer.hpp>
 #include <sngcm/cmlexer/ContainerFileTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/soulng-project/sngcm/cmparser/ProjectFile.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/ProjectFile.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;
 using namespace ContainerFileTokens;
 
-std::unique_ptr<sngcm::ast::Project> ProjectFileParser::Parse(ContainerFileLexer& lexer, std::string config, sngcm::ast::BackEnd backend, std::string toolChain)
+std::unique_ptr<sngcm::ast::Project> ProjectFileParser::Parse(ContainerFileLexer& lexer, std::string config, sngcm::ast::BackEnd backend, std::string toolChain, sngcm::ast::SystemDirKind systemDirKind)
 {
     std::unique_ptr<sngcm::ast::Project> value;
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
@@ -21,7 +21,7 @@ std::unique_ptr<sngcm::ast::Project> ProjectFileParser::Parse(ContainerFileLexer
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     ++lexer;
     soulng::lexer::Span span = lexer.GetSpan();
-    soulng::parser::Match match = ProjectFileParser::ProjectFile(lexer, config, backend, toolChain);
+    soulng::parser::Match match = ProjectFileParser::ProjectFile(lexer, config, backend, toolChain, systemDirKind);
     value.reset(static_cast<sngcm::ast::Project*>(match.value));
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     if (lexer.Log())
@@ -48,7 +48,7 @@ std::unique_ptr<sngcm::ast::Project> ProjectFileParser::Parse(ContainerFileLexer
     return value;
 }
 
-soulng::parser::Match ProjectFileParser::ProjectFile(ContainerFileLexer& lexer, std::string config, sngcm::ast::BackEnd backend, std::string toolChain)
+soulng::parser::Match ProjectFileParser::ProjectFile(ContainerFileLexer& lexer, std::string config, sngcm::ast::BackEnd backend, std::string toolChain, sngcm::ast::SystemDirKind systemDirKind)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -142,7 +142,7 @@ soulng::parser::Match ProjectFileParser::ProjectFile(ContainerFileLexer& lexer, 
                             }
                             if (match.hit)
                             {
-                                project.reset(new Project(name->value, lexer.FileName(), config, backend, toolChain));
+                                project.reset(new Project(name->value, lexer.FileName(), config, backend, toolChain, systemDirKind));
                             }
                             *parentMatch8 = match;
                         }

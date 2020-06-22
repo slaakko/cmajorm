@@ -8,7 +8,7 @@
 [cpp]#include <cmajor/build/BuildLangLexer.hpp>
 [cpp]#include <cmajor/build/BuildLangTokens.hpp>
 [cpp]#include <cmajor/build/BuildLangOptionParser.hpp>
-[hpp]#include <cmajor/build/Command.hpp>
+[hpp]#include <cmajor/build/ClientCommand.hpp>
 [hpp]#include <memory>
 
 using namespace BuildLangTokens;
@@ -19,12 +19,12 @@ parser api(BUILD_API) BuildLangClientParser
     main;
     using BuildLangOptionParser.Options;
 
-    ClientSentence(cmajor::build::BuildOptionSetter* optionSetter) : cmajor::build::Command*
+    ClientSentence(cmajor::build::BuildOptionSetter* optionSetter) : cmajor::build::ClientCommand*
         ::= Options(optionSetter):options?
             ClientCommandSentence:sentence!{ return sentence; }
         ;
 
-    ClientCommandSentence : cmajor::build::Command*
+    ClientCommandSentence : cmajor::build::ClientCommand*
         ::=
         (   PushProjectSentence:pushCommand{ return pushCommand; }
         |   RemoveProjectSentence:removeProjectCommand{ return removeProjectCommand; }
@@ -37,7 +37,7 @@ parser api(BUILD_API) BuildLangClientParser
         )
         ;
 
-    PushProjectSentence(var std::string serverName) : cmajor::build::Command*
+    PushProjectSentence(var std::string serverName) : cmajor::build::ClientCommand*
         ::=
         (
             PUSH ProjectFilePath:project!
@@ -45,11 +45,11 @@ parser api(BUILD_API) BuildLangClientParser
             )?
         )
         {
-            return new cmajor::build::PushProjectCommand(project, serverName);
+            return new cmajor::build::PushProjectClientCommand(project, serverName);
         }
         ;
 
-    RemoveProjectSentence(var std::string serverName) : cmajor::build::Command*
+    RemoveProjectSentence(var std::string serverName) : cmajor::build::ClientCommand*
         ::=
         (
             REMOVE ProjectFilePath:project
@@ -57,22 +57,22 @@ parser api(BUILD_API) BuildLangClientParser
             )?
         )
         {
-            return new cmajor::build::RemoveProjectCommand(project, serverName);
+            return new cmajor::build::RemoveProjectClientCommand(project, serverName);
         }
         ;
 
-    AddServerSentence(var std::string host, var std::string toolChain) : cmajor::build::Command*
+    AddServerSentence(var std::string host, var std::string toolChain) : cmajor::build::ClientCommand*
         ::= (ADD SERVER ServerName:server (HOST Host:h!{ host = h; })? PORT Port:port! (DEFAULT TOOLCHAIN! ToolChain:defaultToolChain!{ toolChain = defaultToolChain; })?)
         {
-            return new cmajor::build::AddServerCommand(server, host, port, toolChain);
+            return new cmajor::build::AddServerClientCommand(server, host, port, toolChain);
         }
         ;
 
-    RemoveServerSentence : cmajor::build::Command*
-        ::= REMOVE SERVER ServerName:server{ return new cmajor::build::RemoveServerCommand(server); }
+    RemoveServerSentence : cmajor::build::ClientCommand*
+        ::= REMOVE SERVER ServerName:server{ return new cmajor::build::RemoveServerClientCommand(server); }
         ;
 
-    BuildProjectSentence(var std::string serverName) : cmajor::build::Command*
+    BuildProjectSentence(var std::string serverName) : cmajor::build::ClientCommand*
         ::=
         (
             BUILD ProjectFilePath:project!
@@ -80,11 +80,11 @@ parser api(BUILD_API) BuildLangClientParser
             )?
         )
         {
-            return new cmajor::build::BuildProjectCommand(project, serverName);
+            return new cmajor::build::BuildProjectClientCommand(project, serverName);
         }
         ;
 
-    DebugProjectSentence(var std::string serverName) : cmajor::build::Command*
+    DebugProjectSentence(var std::string serverName) : cmajor::build::ClientCommand*
         ::=
         (
             DEBUG ProjectFilePath:project!
@@ -92,11 +92,11 @@ parser api(BUILD_API) BuildLangClientParser
             )?
         )
         {
-            return new cmajor::build::DebugProjectCommand(project, serverName);
+            return new cmajor::build::DebugProjectClientCommand(project, serverName);
         }
         ;
 
-    InstallProjectSentence(var std::string serverName) : cmajor::build::Command*
+    InstallProjectSentence(var std::string serverName) : cmajor::build::ClientCommand*
         ::=
         (
             INSTALL ProjectFilePath:project! TO! DirectoryPath:directory!
@@ -105,12 +105,18 @@ parser api(BUILD_API) BuildLangClientParser
             )?
         )
         {
-            return new cmajor::build::InstallProjectCommand(project, directory, serverName);
+            return new cmajor::build::InstallProjectClientCommand(project, directory, serverName);
         }
         ;
 
-    ShowConfigurationSentence : cmajor::build::Command*
-        ::= SHOW CONFIGURATION{ return new cmajor::build::ShowConfigurationCommand(); }
+    ShowConfigurationSentence : cmajor::build::ClientCommand*
+        ::=
+        (
+            SHOW CONFIGURATION
+        )
+        {
+            return new cmajor::build::ShowConfigurationClientCommand();
+        }
         ;
 
     ProjectFilePath : std::string
@@ -168,6 +174,14 @@ parser api(BUILD_API) BuildLangClientParser
     {
         (ClientSentence, "cmclient [options] (add | remove | show | push | build | debug | install) ..."),
         (ClientCommandSentence, "cmclient [options] (add | remove | show | push | build | debug | install) ..."),
+        (PushProjectSentence, "push project command"),
+        (RemoveProjectSentence, "remove project command"),
+        (AddServerSentence, "add server command"),
+        (RemoveServerSentence, "remove server command"),
+        (BuildProjectSentence, "build project command"),
+        (DebugProjectSentence, "debug project command"),
+        (InstallProjectSentence, "install project command"),
+        (ShowConfigurationSentence, "show configuration command"),
         (ProjectFilePath, "PROJECT.cmp"),
         (DirectoryPath, "directory name"),
         (ServerName, "server name"),

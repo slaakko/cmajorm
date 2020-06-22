@@ -391,7 +391,12 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
                 {
                     backend = sngcm::ast::BackEnd::cppcm;
                 }
-                mfp = CmajorSystemLibDir(config, backend, GetToolChain());
+                SystemDirKind systemDirKind = SystemDirKind::regular;
+                if (GetGlobalFlag(GlobalFlags::repository))
+                {
+                    systemDirKind = SystemDirKind::repository;
+                }
+                mfp = CmajorSystemLibDir(config, backend, GetToolChain(), systemDirKind);
                 searchedDirectories.append("\n").append(mfp.generic_string());
                 mfp /= mfn;
                 if (!boost::filesystem::exists(mfp))
@@ -444,7 +449,12 @@ void Import(sngcm::ast::Target target, Module* rootModule, Module* module, const
                 {
                     backend = sngcm::ast::BackEnd::cppcm;
                 }
-                mfp = CmajorSystemLibDir(config, backend, GetToolChain());
+                SystemDirKind systemDirKind = SystemDirKind::regular;
+                if (GetGlobalFlag(GlobalFlags::repository))
+                {
+                    systemDirKind = SystemDirKind::repository;
+                }
+                mfp = CmajorSystemLibDir(config, backend, GetToolChain(), systemDirKind);
                 mfp /= mfn;
                 if (!boost::filesystem::exists(mfp))
                 {
@@ -523,11 +533,21 @@ void ImportModulesWithReferences(sngcm::ast::Target target,
             first = false;
             if (target == sngcm::ast::Target::winguiapp || target == sngcm::ast::Target::winapp || target == sngcm::ast::Target::winlib)
             {
-                allReferences.push_back(CmajorSystemWindowsModuleFilePath(GetConfig(), GetToolChain()));
+                SystemDirKind systemDirKind = SystemDirKind::regular;
+                if (GetGlobalFlag(GlobalFlags::repository))
+                {
+                    systemDirKind = SystemDirKind::repository;
+                }
+                allReferences.push_back(CmajorSystemWindowsModuleFilePath(GetConfig(), GetToolChain(), systemDirKind));
             }
             else
             {
-                allReferences.push_back(CmajorSystemModuleFilePath(GetConfig(), backend, GetToolChain()));
+                SystemDirKind systemDirKind = SystemDirKind::regular;
+                if (GetGlobalFlag(GlobalFlags::repository))
+                {
+                    systemDirKind = SystemDirKind::repository;
+                }
+                allReferences.push_back(CmajorSystemModuleFilePath(GetConfig(), backend, GetToolChain(), systemDirKind));
             }
         }
     }

@@ -13,7 +13,7 @@ void RunSocketServer(SocketServer* server)
 {
     try
     {
-        server->Run();
+        server->Run(std::string());
     }
     catch (const std::exception& ex)
     {
@@ -26,7 +26,7 @@ void RunSocketServer(SocketServer* server)
 
 LocalExecutionContext::LocalExecutionContext() : ExecutionContext()
 {
-    socketServer.reset(new SocketServer(GetLog(), "local"));
+    socketServer.reset(new SocketServer(GetLog(), "local", false));
     serverThread = std::thread{ RunSocketServer, socketServer.get() };
     socketServer->WaitForRunning();
     socketClient.reset(new SocketClient(GetLog(), "local"));

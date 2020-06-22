@@ -223,7 +223,7 @@ void BuildServer::Handle(PushProjectFileRequest& request)
         }
         sngcm::ast::Target target(sngcm::ast::Target::program);
         target = ParseTarget(request.body.target);
-        std::unique_ptr<Project> project(new Project(ToUtf32(request.body.projectName), tempProjectFilePath, GetConfig(), backend, GetToolChain()));
+        std::unique_ptr<Project> project(new Project(ToUtf32(request.body.projectName), tempProjectFilePath, GetConfig(), backend, GetToolChain(), SystemDirKind::repository));
         project->AddDeclaration(new TargetDeclaration(target));
         for (const std::string& dependentProjectId : request.body.dependsOnProjects)
         {
@@ -392,6 +392,7 @@ void BuildServer::Handle(BuildProjectRequest& request)
         std::string projectFilePath = Path::Combine(projectDir, projectFileName);
         std::string buildCommand;
         buildCommand.append("cppcmc");
+        buildCommand.append(" --repository");
         if (request.body.sendBuildOutput)
         {
             buildCommand.append(" --verbose");

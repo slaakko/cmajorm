@@ -1609,6 +1609,7 @@ void Emitter::SetFunctionCallConventionToStdCall(void* function)
 void Emitter::SetFunction(void* function_)
 {
     currentFunction = static_cast<cmcppi::Function*>(function_);
+    context->SetCurrentFunction(currentFunction);
 }
 
 void Emitter::SetFunctionName(const std::string& functionName)

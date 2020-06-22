@@ -46,10 +46,6 @@
                                 {
                                     "args" : 
                                     [
-                                        "\/VERBOSE", 
-                                        "\/MACHINE:X64", 
-                                        "\/OUT:$LIBRARY_FILE$", 
-                                        "$OBJECT_FILES$"
                                     ]
                                     , 
                                     "name" : "debug", 
@@ -59,10 +55,6 @@
                                 {
                                     "args" : 
                                     [
-                                        "\/VERBOSE", 
-                                        "\/MACHINE:X64", 
-                                        "\/OUT:$LIBRARY_FILE$", 
-                                        "$OBJECT_FILES$"
                                     ]
                                     , 
                                     "name" : "release", 
@@ -83,25 +75,6 @@
                                 {
                                     "args" : 
                                     [
-                                        "$MAIN_OBJECT_FILE$", 
-                                        "$LIBRARY_FILES$", 
-                                        "\/link", 
-                                        "\/OUT:$EXECUTABLE_FILE$d.exe", 
-                                        "\/MACHINE:X64", 
-                                        "\/ENTRY:$ENTRY$", 
-                                        "\/DEBUG", 
-                                        "\/SUBSYSTEM:$SUBSYSTEM$", 
-                                        "\/STACK:16777216", 
-                                        "\/PDB:$DEBUG_INFORMATION_FILE$", 
-                                        "\/DYNAMICBASE", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\lib\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\atlmfc\\lib\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\VS\\lib\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"", 
-                                        "\/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$", 
-                                        "\/LIBPATH:$TOOL_CHAIN_LIBRARY_DIRECTORY$"
                                     ]
                                     , 
                                     "name" : "debug", 
@@ -111,24 +84,6 @@
                                 {
                                     "args" : 
                                     [
-                                        "$MAIN_OBJECT_FILE$", 
-                                        "$LIBRARY_FILES$", 
-                                        "\/link", 
-                                        "\/OUT:$EXECUTABLE_FILE$.exe", 
-                                        "\/MACHINE:X64", 
-                                        "\/ENTRY:$ENTRY$", 
-                                        "\/SUBSYSTEM:$SUBSYSTEM$", 
-                                        "\/STACK:16777216", 
-                                        "\/PDB:$DEBUG_INFORMATION_FILE$", 
-                                        "\/DYNAMICBASE", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\lib\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\atlmfc\\lib\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\VS\\lib\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"", 
-                                        "\/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"", 
-                                        "\/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$", 
-                                        "\/LIBPATH:$TOOL_CHAIN_LIBRARY_DIRECTORY$"
                                     ]
                                     , 
                                     "name" : "release", 
@@ -266,7 +221,6 @@
                                     "args" : 
                                     [
                                         "-std=c++17", 
-                                        "-fpermissive", 
                                         "-c", 
                                         "$SOURCE_FILE$", 
                                         "-o", 
@@ -283,13 +237,12 @@
                                     "args" : 
                                     [
                                         "-std=c++17", 
-                                        "-fpermissive", 
                                         "-c", 
                                         "$SOURCE_FILE$", 
                                         "-o", 
                                         "$OBJECT_FILE$", 
                                         "-g", 
-                                        "-O3"
+                                        "-O2"
                                     ]
                                     , 
                                     "name" : "release", 
@@ -353,7 +306,7 @@
                                         "$LIBRARY_FILES$", 
                                         "-Xlinker --end-group", 
                                         "-o", 
-                                        "$EXECUTABLE_FILE$.exe"
+                                        "$EXECUTABLE_FILE$"
                                     ]
                                     , 
                                     "name" : "debug", 
@@ -364,14 +317,14 @@
                                     "args" : 
                                     [
                                         "$LIBRARY_PATH_FLAG$-L", 
-                                        "$RUNTIME_LIBS$-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lpdcurses;-lbbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73", 
+                                        "$RUNTIME_LIBS$-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lpdcurses;-lbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73", 
                                         "$LIBRARY_DIRECTORIES$", 
                                         "$MAIN_OBJECT_FILE$", 
                                         "-Xlinker --start-group", 
                                         "$LIBRARY_FILES$", 
                                         "-Xlinker --end-group", 
                                         "-o", 
-                                        "$EXECUTABLE_FILE$.exe"
+                                        "$EXECUTABLE_FILE$"
                                     ]
                                     , 
                                     "name" : "release", 
@@ -382,6 +335,278 @@
                             "debugInformationFileExtension" : "", 
                             "name" : "linker", 
                             "outputFileExtension" : ".exe"
+                        }
+                    ]
+                }
+            ]
+        }
+        , 
+        {
+            "name" : "linux", 
+            "toolChains" : 
+            [
+                {
+                    "name" : "clang", 
+                    "tools" : 
+                    [
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "clang++", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "-std=c++17", 
+                                        "-c", 
+                                        "$SOURCE_FILE$", 
+                                        "-o", 
+                                        "$OBJECT_FILE$", 
+                                        "-g", 
+                                        "-O0"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : "."
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "-std=c++17", 
+                                        "-c", 
+                                        "$SOURCE_FILE$", 
+                                        "-o", 
+                                        "$OBJECT_FILE$", 
+                                        "-g", 
+                                        "-O2"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : "."
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "compiler", 
+                            "outputFileExtension" : ".o"
+                        }
+                        , 
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "llvm-ar", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "rv", 
+                                        "$LIBRARY_FILE$", 
+                                        "$OBJECT_FILES$"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : "."
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "rv", 
+                                        "$LIBRARY_FILE$", 
+                                        "$OBJECT_FILES$"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : "."
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "library-manager", 
+                            "outputFileExtension" : ".a"
+                        }
+                        , 
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "clang++", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "$LIBRARY_PATH_FLAG$-L", 
+                                        "$RUNTIME_LIBS$-lcmrtsd;-lcmsnglexerd;-lcmsngparserd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmsngutild;-lbz2;-lz;-lboost_filesystem;-lboost_iostreams;-lboost_system;-lncurses", 
+                                        "$LIBRARY_DIRECTORIES$", 
+                                        "$MAIN_OBJECT_FILE$", 
+                                        "-pthread", 
+                                        "-Xlinker --start-group", 
+                                        "$LIBRARY_FILES$", 
+                                        "-Xlinker --end-group", 
+                                        "-o", 
+                                        "$EXECUTABLE_FILE$"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : ""
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "$LIBRARY_PATH_FLAG$-L", 
+                                        "$RUNTIME_LIBS$-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lbz2;-lz;-lboost_filesystem;-lboost_iostreams;-lboost_system;-lncurses", 
+                                        "$LIBRARY_DIRECTORIES$", 
+                                        "$MAIN_OBJECT_FILE$", 
+                                        "-pthread", 
+                                        "-Xlinker --start-group", 
+                                        "$LIBRARY_FILES$", 
+                                        "-Xlinker --end-group", 
+                                        "-o", 
+                                        "$EXECUTABLE_FILE$"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : ""
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "linker", 
+                            "outputFileExtension" : ""
+                        }
+                    ]
+                }
+                , 
+                {
+                    "name" : "gcc", 
+                    "tools" : 
+                    [
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "g++", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "-std=c++17", 
+                                        "-c", 
+                                        "$SOURCE_FILE$", 
+                                        "-o", 
+                                        "$OBJECT_FILE$", 
+                                        "-g", 
+                                        "-O0"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : "."
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "-std=c++17", 
+                                        "-c", 
+                                        "$SOURCE_FILE$", 
+                                        "-o", 
+                                        "$OBJECT_FILE$", 
+                                        "-g", 
+                                        "-O2"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : "."
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "compiler", 
+                            "outputFileExtension" : ".o"
+                        }
+                        , 
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "ar", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "rv", 
+                                        "$LIBRARY_FILE$", 
+                                        "$OBJECT_FILES$"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : "."
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "rv", 
+                                        "$LIBRARY_FILE$", 
+                                        "$OBJECT_FILES$"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : "."
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "library-manager", 
+                            "outputFileExtension" : ".a"
+                        }
+                        , 
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "g++", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "$LIBRARY_PATH_FLAG$-L", 
+                                        "$RUNTIME_LIBS$-lcmrtsd;-lcmsnglexerd;-lcmsngparserd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmsngutild;-lbz2;-lz;-lboost_filesystem;-lboost_iostreams;-lboost_system;-lncurses", 
+                                        "$LIBRARY_DIRECTORIES$", 
+                                        "$MAIN_OBJECT_FILE$", 
+                                        "-pthread", 
+                                        "-Xlinker --start-group", 
+                                        "$LIBRARY_FILES$", 
+                                        "-Xlinker --end-group", 
+                                        "-o", 
+                                        "$EXECUTABLE_FILE$"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : ""
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "$LIBRARY_PATH_FLAG$-L", 
+                                        "$RUNTIME_LIBS$-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lbz2;-lz;-lboost_filesystem;-lboost_iostreams;-lboost_system;-lncurses", 
+                                        "$LIBRARY_DIRECTORIES$", 
+                                        "$MAIN_OBJECT_FILE$", 
+                                        "-pthread", 
+                                        "-Xlinker --start-group", 
+                                        "$LIBRARY_FILES$", 
+                                        "-Xlinker --end-group", 
+                                        "-o", 
+                                        "$EXECUTABLE_FILE$"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : ""
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "linker", 
+                            "outputFileExtension" : ""
                         }
                     ]
                 }

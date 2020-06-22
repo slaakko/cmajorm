@@ -2,7 +2,7 @@
 #define BUILDLANGCLIENTPARSER_HPP
 #include <cmajor/build/BuildApi.hpp>
 #include <cmajor/build/BuildOption.hpp>
-#include <cmajor/build/Command.hpp>
+#include <cmajor/build/ClientCommand.hpp>
 #include <memory>
 #include <soulng/lexer/Token.hpp>
 #include <soulng/parser/Match.hpp>
@@ -14,7 +14,7 @@ class BuildLangLexer;
 
 struct BUILD_API BuildLangClientParser
 {
-    static std::unique_ptr<cmajor::build::Command> Parse(BuildLangLexer& lexer, cmajor::build::BuildOptionSetter* optionSetter);
+    static std::unique_ptr<cmajor::build::ClientCommand> Parse(BuildLangLexer& lexer, cmajor::build::BuildOptionSetter* optionSetter);
     static soulng::parser::Match ClientSentence(BuildLangLexer& lexer, cmajor::build::BuildOptionSetter* optionSetter);
     static soulng::parser::Match ClientCommandSentence(BuildLangLexer& lexer);
     static soulng::parser::Match PushProjectSentence(BuildLangLexer& lexer);

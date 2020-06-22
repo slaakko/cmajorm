@@ -43,7 +43,7 @@ std::unique_ptr<sngcm::ast::Project> ParseProject(const std::string& projectFile
         std::cout << "> " << projectFilePath << std::endl;
     }
     ContainerFileLexer lexer(ToUtf32(ReadFile(projectFilePath)), projectFilePath, 0);
-    return ProjectFileParser::Parse(lexer, "debug", sngcm::ast::BackEnd::llvm, "");
+    return ProjectFileParser::Parse(lexer, "debug", sngcm::ast::BackEnd::llvm, "", SystemDirKind::regular);
 }
 
 std::unique_ptr<sngcm::ast::Solution> ParseSolution(const std::string& solutionFilePath, bool verbose)

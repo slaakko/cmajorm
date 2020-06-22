@@ -438,7 +438,7 @@ bool TestProject(const std::string& projectFileName, const std::string& onlySour
     MappedInputFile projectFile(projectFileName);
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
     ContainerFileLexer containerFileLexer(p, projectFileName, 0);
-    std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(containerFileLexer, config, sngcm::ast::BackEnd::llvm, "");
+    std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(containerFileLexer, config, sngcm::ast::BackEnd::llvm, "", SystemDirKind::regular);
     project->ResolveDeclarations();
     if (project->GetTarget() != Target::unitTest)
     {

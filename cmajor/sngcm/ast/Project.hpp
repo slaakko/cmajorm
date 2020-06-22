@@ -29,11 +29,16 @@ public:
 
 SNGCM_AST_API void SetModuleVersionTagVerifier(ModuleVersionTagVerifier* verifier);
 
+enum class SystemDirKind : int
+{
+    regular = 0, repository = 1
+};
+
 SNGCM_AST_API std::string CmajorRootDir();
-SNGCM_AST_API std::string CmajorSystemLibDir(const std::string& config, BackEnd backend, const std::string& toolChain);
+SNGCM_AST_API std::string CmajorSystemLibDir(const std::string& config, BackEnd backend, const std::string& toolChain, SystemDirKind systemDirKind);
 SNGCM_AST_API std::string CmajorResourceDir();
-SNGCM_AST_API std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend, const std::string& toolChanin);
-SNGCM_AST_API std::string CmajorSystemWindowsModuleFilePath(const std::string& config, const std::string& toolChanin);
+SNGCM_AST_API std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend, const std::string& toolChain, SystemDirKind systemDirKind);
+SNGCM_AST_API std::string CmajorSystemWindowsModuleFilePath(const std::string& config, const std::string& toolChanin, SystemDirKind systemDirKind);
 SNGCM_AST_API void SetOutDir(const std::string& outDir_);
 SNGCM_AST_API const std::string& OutDir();
 
@@ -117,7 +122,8 @@ private:
 class SNGCM_AST_API Project
 {
 public:
-    Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend_, const std::string& toolChain_);
+    Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend_, const std::string& toolChain_,
+        SystemDirKind systemDirKind);
     Project(const Project&) = delete;
     Project& operator=(const Project&) = delete;
     const std::u32string& Name() const { return name; }

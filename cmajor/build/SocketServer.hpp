@@ -15,13 +15,17 @@ namespace cmajor { namespace build {
 class BUILD_API SocketServer : public Host
 {
 public:
-    SocketServer(Log* log_, const std::string& serverName);
+    SocketServer(Log* log_, const std::string& serverName, bool continuous_);
     const std::string& Name() const override;
     Log* GetLog() const { return log; }
     void WaitForRunning();
-    void Run();
+    void Run(const std::string& prompt);
+    bool Exiting() const { return exiting; }
     void Exit() override;
+    void ExitContinuous();
 private:
+    bool exiting;
+    bool continuous;
     std::mutex mtx;
     std::condition_variable running;
     bool isRunning;

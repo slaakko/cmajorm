@@ -9,9 +9,9 @@
 using namespace soulng::unicode;
 using namespace BuildLangTokens;
 
-std::unique_ptr<cmajor::build::Command> BuildLangClientParser::Parse(BuildLangLexer& lexer, cmajor::build::BuildOptionSetter* optionSetter)
+std::unique_ptr<cmajor::build::ClientCommand> BuildLangClientParser::Parse(BuildLangLexer& lexer, cmajor::build::BuildOptionSetter* optionSetter)
 {
-    std::unique_ptr<cmajor::build::Command> value;
+    std::unique_ptr<cmajor::build::ClientCommand> value;
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     if (lexer.Log())
     {
@@ -22,7 +22,7 @@ std::unique_ptr<cmajor::build::Command> BuildLangClientParser::Parse(BuildLangLe
     ++lexer;
     soulng::lexer::Span span = lexer.GetSpan();
     soulng::parser::Match match = BuildLangClientParser::ClientSentence(lexer, optionSetter);
-    value.reset(static_cast<cmajor::build::Command*>(match.value));
+    value.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     if (lexer.Log())
     {
@@ -59,7 +59,7 @@ soulng::parser::Match BuildLangClientParser::ClientSentence(BuildLangLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ClientSentence"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    std::unique_ptr<cmajor::build::Command> sentence;
+    std::unique_ptr<cmajor::build::ClientCommand> sentence;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -93,7 +93,7 @@ soulng::parser::Match BuildLangClientParser::ClientSentence(BuildLangLexer& lexe
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
                     soulng::parser::Match match = BuildLangClientParser::ClientCommandSentence(lexer);
-                    sentence.reset(static_cast<cmajor::build::Command*>(match.value));
+                    sentence.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
                     if (match.hit)
                     {
                         *parentMatch4 = match;
@@ -143,14 +143,14 @@ soulng::parser::Match BuildLangClientParser::ClientCommandSentence(BuildLangLexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ClientCommandSentence"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    std::unique_ptr<cmajor::build::Command> pushCommand;
-    std::unique_ptr<cmajor::build::Command> removeProjectCommand;
-    std::unique_ptr<cmajor::build::Command> addServerCommand;
-    std::unique_ptr<cmajor::build::Command> removeServerCommand;
-    std::unique_ptr<cmajor::build::Command> buildCommand;
-    std::unique_ptr<cmajor::build::Command> debugCommand;
-    std::unique_ptr<cmajor::build::Command> installCommand;
-    std::unique_ptr<cmajor::build::Command> showConfigurationCommand;
+    std::unique_ptr<cmajor::build::ClientCommand> pushCommand;
+    std::unique_ptr<cmajor::build::ClientCommand> removeProjectCommand;
+    std::unique_ptr<cmajor::build::ClientCommand> addServerCommand;
+    std::unique_ptr<cmajor::build::ClientCommand> removeServerCommand;
+    std::unique_ptr<cmajor::build::ClientCommand> buildCommand;
+    std::unique_ptr<cmajor::build::ClientCommand> debugCommand;
+    std::unique_ptr<cmajor::build::ClientCommand> installCommand;
+    std::unique_ptr<cmajor::build::ClientCommand> showConfigurationCommand;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -187,7 +187,7 @@ soulng::parser::Match BuildLangClientParser::ClientCommandSentence(BuildLangLexe
                                     {
                                         int64_t pos = lexer.GetPos();
                                         soulng::parser::Match match = BuildLangClientParser::PushProjectSentence(lexer);
-                                        pushCommand.reset(static_cast<cmajor::build::Command*>(match.value));
+                                        pushCommand.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
                                         if (match.hit)
                                         {
                                             {
@@ -211,7 +211,7 @@ soulng::parser::Match BuildLangClientParser::ClientCommandSentence(BuildLangLexe
                                             {
                                                 int64_t pos = lexer.GetPos();
                                                 soulng::parser::Match match = BuildLangClientParser::RemoveProjectSentence(lexer);
-                                                removeProjectCommand.reset(static_cast<cmajor::build::Command*>(match.value));
+                                                removeProjectCommand.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
                                                 if (match.hit)
                                                 {
                                                     {
@@ -240,7 +240,7 @@ soulng::parser::Match BuildLangClientParser::ClientCommandSentence(BuildLangLexe
                                         {
                                             int64_t pos = lexer.GetPos();
                                             soulng::parser::Match match = BuildLangClientParser::AddServerSentence(lexer);
-                                            addServerCommand.reset(static_cast<cmajor::build::Command*>(match.value));
+                                            addServerCommand.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
                                             if (match.hit)
                                             {
                                                 {
@@ -269,7 +269,7 @@ soulng::parser::Match BuildLangClientParser::ClientCommandSentence(BuildLangLexe
                                     {
                                         int64_t pos = lexer.GetPos();
                                         soulng::parser::Match match = BuildLangClientParser::RemoveServerSentence(lexer);
-                                        removeServerCommand.reset(static_cast<cmajor::build::Command*>(match.value));
+                                        removeServerCommand.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
                                         if (match.hit)
                                         {
                                             {
@@ -298,7 +298,7 @@ soulng::parser::Match BuildLangClientParser::ClientCommandSentence(BuildLangLexe
                                 {
                                     int64_t pos = lexer.GetPos();
                                     soulng::parser::Match match = BuildLangClientParser::BuildProjectSentence(lexer);
-                                    buildCommand.reset(static_cast<cmajor::build::Command*>(match.value));
+                                    buildCommand.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
                                     if (match.hit)
                                     {
                                         {
@@ -327,7 +327,7 @@ soulng::parser::Match BuildLangClientParser::ClientCommandSentence(BuildLangLexe
                             {
                                 int64_t pos = lexer.GetPos();
                                 soulng::parser::Match match = BuildLangClientParser::DebugProjectSentence(lexer);
-                                debugCommand.reset(static_cast<cmajor::build::Command*>(match.value));
+                                debugCommand.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
                                 if (match.hit)
                                 {
                                     {
@@ -356,7 +356,7 @@ soulng::parser::Match BuildLangClientParser::ClientCommandSentence(BuildLangLexe
                         {
                             int64_t pos = lexer.GetPos();
                             soulng::parser::Match match = BuildLangClientParser::InstallProjectSentence(lexer);
-                            installCommand.reset(static_cast<cmajor::build::Command*>(match.value));
+                            installCommand.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
                             if (match.hit)
                             {
                                 {
@@ -385,7 +385,7 @@ soulng::parser::Match BuildLangClientParser::ClientCommandSentence(BuildLangLexe
                     {
                         int64_t pos = lexer.GetPos();
                         soulng::parser::Match match = BuildLangClientParser::ShowConfigurationSentence(lexer);
-                        showConfigurationCommand.reset(static_cast<cmajor::build::Command*>(match.value));
+                        showConfigurationCommand.reset(static_cast<cmajor::build::ClientCommand*>(match.value));
                         if (match.hit)
                         {
                             {
@@ -592,7 +592,7 @@ soulng::parser::Match BuildLangClientParser::PushProjectSentence(BuildLangLexer&
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("PushProjectSentence"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new cmajor::build::PushProjectCommand(project->value, serverName));
+                return soulng::parser::Match(true, new cmajor::build::PushProjectClientCommand(project->value, serverName));
             }
         }
         *parentMatch0 = match;
@@ -772,7 +772,7 @@ soulng::parser::Match BuildLangClientParser::RemoveProjectSentence(BuildLangLexe
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("RemoveProjectSentence"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new cmajor::build::RemoveProjectCommand(project->value, serverName));
+                return soulng::parser::Match(true, new cmajor::build::RemoveProjectClientCommand(project->value, serverName));
             }
         }
         *parentMatch0 = match;
@@ -1101,7 +1101,7 @@ soulng::parser::Match BuildLangClientParser::AddServerSentence(BuildLangLexer& l
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AddServerSentence"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new cmajor::build::AddServerCommand(server->value, host, port->value, toolChain));
+                return soulng::parser::Match(true, new cmajor::build::AddServerClientCommand(server->value, host, port->value, toolChain));
             }
         }
         *parentMatch0 = match;
@@ -1180,7 +1180,7 @@ soulng::parser::Match BuildLangClientParser::RemoveServerSentence(BuildLangLexer
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("RemoveServerSentence"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new cmajor::build::RemoveServerCommand(server->value));
+                        return soulng::parser::Match(true, new cmajor::build::RemoveServerClientCommand(server->value));
                     }
                 }
                 *parentMatch4 = match;
@@ -1377,7 +1377,7 @@ soulng::parser::Match BuildLangClientParser::BuildProjectSentence(BuildLangLexer
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("BuildProjectSentence"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new cmajor::build::BuildProjectCommand(project->value, serverName));
+                return soulng::parser::Match(true, new cmajor::build::BuildProjectClientCommand(project->value, serverName));
             }
         }
         *parentMatch0 = match;
@@ -1570,7 +1570,7 @@ soulng::parser::Match BuildLangClientParser::DebugProjectSentence(BuildLangLexer
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("DebugProjectSentence"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new cmajor::build::DebugProjectCommand(project->value, serverName));
+                return soulng::parser::Match(true, new cmajor::build::DebugProjectClientCommand(project->value, serverName));
             }
         }
         *parentMatch0 = match;
@@ -1826,7 +1826,7 @@ soulng::parser::Match BuildLangClientParser::InstallProjectSentence(BuildLangLex
                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("InstallProjectSentence"));
                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                return soulng::parser::Match(true, new cmajor::build::InstallProjectCommand(project->value, directory->value, serverName));
+                return soulng::parser::Match(true, new cmajor::build::InstallProjectClientCommand(project->value, directory->value, serverName));
             }
         }
         *parentMatch0 = match;
@@ -1859,41 +1859,46 @@ soulng::parser::Match BuildLangClientParser::ShowConfigurationSentence(BuildLang
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
-        soulng::parser::Match match(false);
-        if (*lexer == SHOW)
-        {
-            ++lexer;
-            match.hit = true;
-        }
-        *parentMatch0 = match;
-    }
-    if (match.hit)
-    {
+        int64_t pos = lexer.GetPos();
         soulng::parser::Match match(false);
         soulng::parser::Match* parentMatch1 = &match;
         {
             soulng::parser::Match match(false);
             soulng::parser::Match* parentMatch2 = &match;
             {
-                int64_t pos = lexer.GetPos();
                 soulng::parser::Match match(false);
-                if (*lexer == CONFIGURATION)
+                if (*lexer == SHOW)
                 {
                     ++lexer;
                     match.hit = true;
                 }
-                if (match.hit)
+                *parentMatch2 = match;
+            }
+            if (match.hit)
+            {
+                soulng::parser::Match match(false);
+                soulng::parser::Match* parentMatch3 = &match;
                 {
+                    soulng::parser::Match match(false);
+                    if (*lexer == CONFIGURATION)
                     {
-                        #ifdef SOULNG_PARSER_DEBUG_SUPPORT
-                        if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ShowConfigurationSentence"));
-                        #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new cmajor::build::ShowConfigurationCommand);
+                        ++lexer;
+                        match.hit = true;
                     }
+                    *parentMatch3 = match;
                 }
                 *parentMatch2 = match;
             }
             *parentMatch1 = match;
+        }
+        if (match.hit)
+        {
+            {
+                #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ShowConfigurationSentence"));
+                #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                return soulng::parser::Match(true, new cmajor::build::ShowConfigurationClientCommand);
+            }
         }
         *parentMatch0 = match;
     }

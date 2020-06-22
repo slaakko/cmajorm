@@ -39,7 +39,7 @@ class ScopedValue : public Value
 public:
     ScopedValue(const Span& span_, ContainerSymbol* containerSymbol_);
     bool IsComplete() const override { return false; }
-    bool IsScopedValue() const { return true; }
+    bool IsScopedValue() const override { return true; }
     const ContainerSymbol* GetContainerSymbol() const { return containerSymbol; }
     ContainerSymbol* GetContainerSymbol() { return containerSymbol; }
     Value* Clone() const override { Assert(false, "scoped value cannot be cloned"); return nullptr; }

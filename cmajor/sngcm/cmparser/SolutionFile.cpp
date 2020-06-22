@@ -3,7 +3,7 @@
 #include <sngcm/cmlexer/ContainerFileLexer.hpp>
 #include <sngcm/cmlexer/ContainerFileTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/soulng-project/sngcm/cmparser/SolutionFile.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/SolutionFile.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;

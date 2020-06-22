@@ -7,7 +7,7 @@
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
 
-// this file has been automatically generated from 'D:/work/soulng-project/sngcm/cmparser/GlobalVariable.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/GlobalVariable.parser' using soulng parser generator spg version 3.0.0
 
 using namespace soulng::unicode;
 using namespace sngcm::ast;

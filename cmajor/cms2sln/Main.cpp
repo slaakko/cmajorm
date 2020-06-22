@@ -52,7 +52,7 @@ void ConvertSolution(sngcm::ast::Solution* solution, const std::string& slnFileP
         MappedInputFile projectFile(projectFilePath);
         std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
         ContainerFileLexer containerFileLexer(p, projectFilePath, 0);
-        std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(containerFileLexer, "debug", sngcm::ast::BackEnd::llvm, "");
+        std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(containerFileLexer, "debug", sngcm::ast::BackEnd::llvm, "", SystemDirKind::regular);
         project->ResolveDeclarations();
         std::string cmprojFilePath = Path::ChangeExtension(projectFilePath, ".cmproj");
         boost::uuids::uuid guid = boost::uuids::random_generator()();

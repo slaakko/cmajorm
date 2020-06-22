@@ -8,5 +8,10 @@ clean:
 	$(MAKE) -C debug clean
 	$(MAKE) -C release clean
 	
-install: 
+install: $(PLATFORM)
+
+windows:
+	$(CP) lib\*.a ..\..\..\lib\clang
+	
+linux:
 	$(CP) lib/*.a ../../../lib/clang

@@ -31,6 +31,7 @@ build:
 	$(MAKE) -C build
 	$(MAKE) -C compiler
 	$(MAKE) -C cmclient
+	$(MAKE) -C cmserver
 	$(MAKE) -C cppcmc
 	$(MAKE) -C cmupd
 	$(MAKE) -C cm2html
@@ -67,7 +68,6 @@ bindist:
 	mkdir -p $(BINDISTDIR)/bin
 	mkdir -p $(BINDISTDIR)/lib
 	mkdir -p $(BINDISTDIR)/lib/gcc
-	mkdir -p $(BINDISTDIR)/lib/clang
 	mkdir -p $(BINDISTDIR)/doc
 	mkdir -p $(BINDISTDIR)/system
 	mkdir -p $(BINDISTDIR)/unicode

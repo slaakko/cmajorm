@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/build/Command.hpp>
+#include <cmajor/build/ClientCommand.hpp>
 #include <cmajor/build/InitDone.hpp>
 #include <sngcm/ast/InitDone.hpp>
 #include <sngxml/xpath/InitDone.hpp>
@@ -144,7 +144,8 @@ int main(int argc, const char** argv)
     try
     {
         cmajor::symbols::SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
-        SetToolChain("vs");
+        cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::repository);
+        SetToolChain("gcc");
         bool verbose = false;
         std::string options;
         std::string tokens;
@@ -311,7 +312,7 @@ int main(int argc, const char** argv)
         }
         ReadToolChains(cmajor::symbols::GetGlobalFlag(cmajor::symbols::GlobalFlags::verbose));
         commandStr.append(tokens);
-        std::unique_ptr<cmajor::build::Command> command = cmajor::build::ParseCommand(commandStr);
+        std::unique_ptr<cmajor::build::ClientCommand> command = cmajor::build::ParseClientCommand(commandStr);
         command->Execute();
     }
     catch (const std::exception& ex)

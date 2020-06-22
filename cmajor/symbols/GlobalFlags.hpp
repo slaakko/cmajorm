@@ -45,7 +45,8 @@ enum class GlobalFlags : uint32_t
     disableSystem = 1 << 26,
     justMyCodeDebugging =  1 << 27,
     buildAll = 1 << 28,
-    printDebugMessages = 1 << 29
+    printDebugMessages = 1 << 29,
+    repository = 1 << 30
 };
 
 enum class BackEnd : int

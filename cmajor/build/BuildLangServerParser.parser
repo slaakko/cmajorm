@@ -8,6 +8,7 @@
 [cpp]#include <cmajor/build/BuildLangLexer.hpp>
 [cpp]#include <cmajor/build/BuildLangTokens.hpp>
 [cpp]#include <cmajor/build/BuildLangOptionParser.hpp>
+[hpp]#include <cmajor/build/ServerCommand.hpp>
 [hpp]#include <memory>
 
 using namespace BuildLangTokens;
@@ -18,41 +19,78 @@ parser api(BUILD_API) BuildLangServerParser
     main;
     using BuildLangOptionParser.Options;
 
-    ServerSentence(cmajor::build::BuildOptionSetter* optionSetter)
+    ServerSentence(cmajor::build::BuildOptionSetter* optionSetter) : cmajor::build::ServerCommand*
         ::= Options(optionSetter):options?
-            ServerCommandSentence:sentence!
+            ServerCommandSentence:sentence!{ return sentence; }
         ;
 
-    ServerCommandSentence
+    ServerCommandSentence : cmajor::build::ServerCommand*
         ::=
-        (   AddServerSentence:add
-        |   RemoveServerSentence:remove
-        |   RunServerSentence:run
+        (   AddServerSentence:addServerCommand{ return addServerCommand; }
+        |   RemoveServerSentence:removeServerCommand{ return removeServerCommand; }
+        |   RunServerSentence:runServerCommand{ return runServerCommand; }
+        |   ShowConfigurationSentence:showConfigurationCommand{ return showConfigurationCommand; }
         )
         ;
 
-    AddServerSentence
-        ::= ADD ServerId:server! PORT! INTEGER!
-        (   DEFAULT TOOLCHAIN! ToolChain:toolchain!
-        )?
+    AddServerSentence : cmajor::build::ServerCommand*
+        ::=
+        (
+            ADD SERVER! ServerId:server! PORT! Port:port
+        )
+        {
+            return new cmajor::build::AddServerServerCommand(server, port);
+        }
         ;
 
-    RemoveServerSentence
-        ::= REMOVE ServerId:server!
+    RemoveServerSentence : cmajor::build::ServerCommand*
+        ::=
+        (
+            REMOVE SERVER! ServerId:server!
+        )
+        {
+            return new cmajor::build::RemoveServerServerCommand(server);
+        }
         ;
 
-    RunServerSentence
-        ::= RUN ServerId:server!
+    RunServerSentence : cmajor::build::ServerCommand*
+        ::=
+        (
+            RUN SERVER ServerId:server!
+        )
+        {
+            return new cmajor::build::RunServerServerCommand(server);
+        }
         ;
 
-    ToolChain : std::string
-        ::= CLANG{ return "clang";}
-        |   GCC{ return "gcc"; }
-        |   VS{ return "vs"; }
-        |   ID{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+    ShowConfigurationSentence : cmajor::build::ServerCommand*
+        ::=
+        (
+            SHOW CONFIGURATION
+        )
+        {
+            return new cmajor::build::ShowConfigurationServerCommand();
+        }
         ;
 
     ServerId : std::string
         ::= ID{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
         ;
+
+
+    Port(var std::string portStr) : int
+        ::= INTEGER{ portStr = ToUtf8(lexer.GetToken(pos).match.ToString()); return std::stoi(portStr); }
+        ;
+
+    ruleinfo
+    {
+        (ServerSentence, "cmserver (add server | remove server | run server | show condiguration) ..."),
+        (ServerCommandSentence, "cmserver (add server | remove server | run server | show condiguration) ..."),
+        (AddServerSentence, "add server command"),
+        (RemoveServerSentence, "remove server command"),
+        (RunServerSentence, "run server command"),
+        (ShowConfigurationSentence, "show configuration command"),
+        (ServerId, "server name"),
+        (Port, "port number")
+    }
 }

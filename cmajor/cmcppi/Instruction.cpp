@@ -26,11 +26,20 @@ std::string Instruction::Name(Context& context)
     return "__v" + std::to_string(resultId);
 }
 
-void Instruction::WriteResult(CodeFormatter& formatter, Function& function, Context& context)
+void Instruction::ObtainResultId(Function& function)
+{
+    resultId = function.GetNextResultNumber();
+}
+
+void Instruction::WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context)
 {
     formatter.Write(Format(GetType(context)->Name(), 7, FormatWidth::min));
-    resultId = function.GetNextResultNumber();
-    formatter.Write(" " + Name(context));
+    formatter.WriteLine(" " + Name(context) + ";");
+}
+
+void Instruction::WriteResult(CodeFormatter& formatter, Function& function, Context& context)
+{
+    formatter.Write(Name(context));
 }
 
 void Instruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
@@ -56,7 +65,6 @@ BinaryInstruction::BinaryInstruction(Value* left_, Value* right_) : Instruction(
 
 Type* BinaryInstruction::GetType(Context& context)
 {
-    //Assert(left->GetType(context) == right->GetType(context), "types differ");
     return left->GetType(context);
 }
 
@@ -364,11 +372,21 @@ Type* LocalInstruction::GetType(Context& context)
     return context.GetPtrType(type);
 }
 
-void LocalInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void LocalInstruction::ObtainResultId(Function& function)
 {
+    Instruction::ObtainResultId(function);
     int localNumber = function.GetNextLocalNumber();
     localName = "__local" + std::to_string(localNumber);
+}
+
+void LocalInstruction::WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context)
+{
+    Instruction::WriteResultDeclaration(formatter, function, context);
     formatter.WriteLine(type->Name() + " " + localName + ";");
+}
+
+void LocalInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
     WriteResult(formatter, function, context);
     formatter.Write(" = &" + localName);
 }
@@ -403,10 +421,25 @@ ArgInstruction::ArgInstruction(Value* arg_) : Instruction(), arg(arg_)
 {
 }
 
-void ArgInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void ArgInstruction::ObtainResultId(Function& function)
 {
     argName = "__arg" + std::to_string(function.GetNextArgumentNumber());
-    formatter.Write(arg->GetType(context)->Name() + " " + argName + " = " + arg->Name(context));
+}
+
+void ArgInstruction::WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context)
+{
+    formatter.WriteLine(arg->GetType(context)->Name() + " " + argName + ";");
+}
+
+void ArgInstruction::WriteResult(CodeFormatter& formatter, Function& function, Context& context)
+{
+    formatter.Write(argName);
+}
+
+void ArgInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    WriteResult(formatter, function, context);
+    formatter.Write(" = " + arg->Name(context));
 }
 
 ElemAddrInstruction::ElemAddrInstruction(Value* ptr_, Value* index_) : Instruction(), ptr(ptr_), index(index_)
@@ -536,6 +569,16 @@ Type* CallInstruction::GetType(Context& context)
     }
 }
 
+bool CallInstruction::IsResultInstruction(Context& context)
+{
+    Type* type = GetType(context);
+    if (!type->IsVoidType())
+    {
+        return true;
+    }
+    return false;
+}
+
 void CallInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     if (!GetType(context)->IsVoidType())
@@ -592,6 +635,16 @@ Type* InvokeInstruction::GetType(Context& context)
         Assert(false, "function or function pointer type expected");
         return nullptr;
     }
+}
+
+bool InvokeInstruction::IsResultInstruction(Context& context)
+{
+    Type* type = GetType(context);
+    if (!type->IsVoidType())
+    {
+        return true;
+    }
+    return false;
 }
 
 void InvokeInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)

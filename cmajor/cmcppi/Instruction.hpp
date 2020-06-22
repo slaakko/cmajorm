@@ -28,7 +28,10 @@ public:
     Type* GetType(Context& context) override;
     virtual void Write(CodeFormatter& formatter, Function& function, Context& context) = 0;
     std::string Name(Context& context) override;
-    void WriteResult(CodeFormatter& formatter, Function& function, Context& context);
+    virtual void ObtainResultId(Function& function);
+    virtual void WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context);
+    virtual void WriteResult(CodeFormatter& formatter, Function& function, Context& context);
+    virtual bool IsResultInstruction(Context& context) { return false; }
     virtual bool IsNoOperation() const { return false; }
     virtual std::string IrName() const = 0;
     void SetSourceLineNumber(int sourceLineNumber_) { sourceLineNumber = sourceLineNumber_; }
@@ -47,6 +50,7 @@ class CMCPPI_API UnaryInstruction : public Instruction
 {
 public:
     UnaryInstruction(Value* arg_);
+    bool IsResultInstruction(Context& context) override { return true; }
     Type* GetType(Context& context) override { return arg->GetType(context); }
     void WriteArg(CodeFormatter& formatter, Context& context);
     Value* Arg() const { return arg; }
@@ -67,6 +71,7 @@ class CMCPPI_API BinaryInstruction : public Instruction
 {
 public:
     BinaryInstruction(Value* left_, Value* right_);
+    bool IsResultInstruction(Context& context) override { return true; }
     Type* GetType(Context& context) override;
     void WriteArgs(CodeFormatter& formatter, Context& context, const std::string& op);
 private:
@@ -270,6 +275,9 @@ class CMCPPI_API LocalInstruction : public Instruction
 public:
     LocalInstruction(Type* type_);
     Type* GetType(Context& context) override;
+    bool IsResultInstruction(Context& context) override { return true; }
+    void ObtainResultId(Function& function) override;
+    void WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context) override;
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "local"; }
     const std::string& LocalName() const { return localName; }
@@ -283,6 +291,7 @@ class CMCPPI_API LoadInstruction : public Instruction
 public:
     LoadInstruction(Value* ptr_);
     Type* GetType(Context& context) override;
+    bool IsResultInstruction(Context& context) override { return true; }
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "load"; }
 private:
@@ -304,6 +313,10 @@ class CMCPPI_API ArgInstruction : public Instruction
 {
 public:
     ArgInstruction(Value* arg_);
+    void ObtainResultId(Function& function) override;
+    void WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context) override;
+    void WriteResult(CodeFormatter& formatter, Function& function, Context& context) override;
+    bool IsResultInstruction(Context& context) override { return true; }
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "arg"; }
     std::string Name(Context& context) override { return argName; }
@@ -317,6 +330,7 @@ class CMCPPI_API ElemAddrInstruction : public Instruction
 public:
     ElemAddrInstruction(Value* ptr_, Value* index_);
     Type* GetType(Context& context) override;
+    bool IsResultInstruction(Context& context) override { return true; }
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "elemaddr"; }
 private:
@@ -329,6 +343,7 @@ class CMCPPI_API PtrOffsetInstruction : public Instruction
 public:
     PtrOffsetInstruction(Value* ptr_, Value* offset_);
     Type* GetType(Context& context) override { return ptr->GetType(context); }
+    bool IsResultInstruction(Context& context) override { return true; }
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "ptroffset"; }
 private:
@@ -341,6 +356,7 @@ class CMCPPI_API PtrDiffInstruction : public Instruction
 public:
     PtrDiffInstruction(Value* leftPtr_, Value* rightPtr_);
     Type* GetType(Context& context) override;
+    bool IsResultInstruction(Context& context) override { return true; }
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "ptrdiff"; }
 private:
@@ -353,6 +369,7 @@ class CMCPPI_API CallInstruction : public Instruction
 public:
     CallInstruction(Value* function_, const std::vector<Value*>& args_);
     Type* GetType(Context& context) override;
+    bool IsResultInstruction(Context& context) override;
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "call"; }
 private:
@@ -365,6 +382,7 @@ class CMCPPI_API InvokeInstruction : public Instruction
 public:
     InvokeInstruction(Value* function_, const std::vector<Value*> args_, BasicBlock* normalBlockNext_, BasicBlock* unwindBlockNext_);
     Type* GetType(Context& context) override;
+    bool IsResultInstruction(Context& context) override;
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
     std::string IrName() const override { return "invoke"; }
     void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;

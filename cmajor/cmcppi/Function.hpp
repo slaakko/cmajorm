@@ -31,10 +31,12 @@ public:
     void SetFullName(const std::string& functionName);
     void WriteDeclaration(CodeFormatter& formatter, Context& context);
     void Write(CodeFormatter& formatter, Context& context);
+    void WriteValueDeclarations(CodeFormatter& formatter, Context& context);
     void SetLinkOnce() { linkOnce = true; }
     void RemoveUnreferencedBasicBlocks();
     void SetNothrow() { nothrow = true; }
     void RemoveNothrow() { nothrow = false; }
+    void AddResultInstruction(Instruction* instruction);
 private:
     std::string name;
     std::string fullName;
@@ -43,6 +45,7 @@ private:
     std::unique_ptr<BasicBlock> entryBlock;
     std::vector<std::unique_ptr<BasicBlock>> basicBlocks;
     std::vector<std::unique_ptr<BasicBlock>> cleanupBasicBlocks;
+    std::vector<Instruction*> resultInstructions;
     uint64_t nextResultNumber;
     uint64_t nextLocalNumber;
     uint64_t nextArgumentNumber;

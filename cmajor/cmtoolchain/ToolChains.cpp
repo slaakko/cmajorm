@@ -81,19 +81,11 @@ void CreateVSToolChain(bool verbose)
     Configuration libraryManagerDebugConfig;
     libraryManagerDebugConfig.name = "debug";
     libraryManagerDebugConfig.outputDirectory = "x64/Debug";
-    libraryManagerDebugConfig.args.push_back("/VERBOSE");
-    libraryManagerDebugConfig.args.push_back("/MACHINE:X64");
-    libraryManagerDebugConfig.args.push_back("/OUT:$LIBRARY_FILE$");
-    libraryManagerDebugConfig.args.push_back("$OBJECT_FILES$");
     libraryManager.configurations.push_back(libraryManagerDebugConfig);
 
     Configuration libraryManagerReleaseConfig;
     libraryManagerReleaseConfig.name = "release";
     libraryManagerReleaseConfig.outputDirectory = "x64/Release";
-    libraryManagerReleaseConfig.args.push_back("/VERBOSE");
-    libraryManagerReleaseConfig.args.push_back("/MACHINE:X64");
-    libraryManagerReleaseConfig.args.push_back("/OUT:$LIBRARY_FILE$");
-    libraryManagerReleaseConfig.args.push_back("$OBJECT_FILES$");
     libraryManager.configurations.push_back(libraryManagerReleaseConfig);
 
     vs.tools.push_back(libraryManager);
@@ -106,47 +98,10 @@ void CreateVSToolChain(bool verbose)
 
     Configuration linkerDebugConfig;
     linkerDebugConfig.name = "debug";
-    linkerDebugConfig.args.push_back("$MAIN_OBJECT_FILE$");
-    linkerDebugConfig.args.push_back("$LIBRARY_FILES$");
-    linkerDebugConfig.args.push_back("/link");
-    linkerDebugConfig.args.push_back("/OUT:$EXECUTABLE_FILE$d.exe");
-    linkerDebugConfig.args.push_back("/MACHINE:X64");
-    linkerDebugConfig.args.push_back("/ENTRY:$ENTRY$");
-    linkerDebugConfig.args.push_back("/DEBUG");
-    linkerDebugConfig.args.push_back("/SUBSYSTEM:$SUBSYSTEM$");
-    linkerDebugConfig.args.push_back("/STACK:16777216");
-    linkerDebugConfig.args.push_back("/PDB:$DEBUG_INFORMATION_FILE$");
-    linkerDebugConfig.args.push_back("/DYNAMICBASE");
-    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\lib\\x64\"");
-    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\atlmfc\\lib\\x64\"");
-    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\VS\\lib\\x64\"");
-    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"");
-    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"");
-    linkerDebugConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"");
-    linkerDebugConfig.args.push_back("/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$");
-    linkerDebugConfig.args.push_back("/LIBPATH:$TOOL_CHAIN_LIBRARY_DIRECTORY$");
     linker.configurations.push_back(linkerDebugConfig);
 
     Configuration linkerReleaseConfig;
     linkerReleaseConfig.name = "release";
-    linkerReleaseConfig.args.push_back("$MAIN_OBJECT_FILE$");
-    linkerReleaseConfig.args.push_back("$LIBRARY_FILES$");
-    linkerReleaseConfig.args.push_back("/link");
-    linkerReleaseConfig.args.push_back("/OUT:$EXECUTABLE_FILE$.exe");
-    linkerReleaseConfig.args.push_back("/MACHINE:X64");
-    linkerReleaseConfig.args.push_back("/ENTRY:$ENTRY$");
-    linkerReleaseConfig.args.push_back("/SUBSYSTEM:$SUBSYSTEM$");
-    linkerReleaseConfig.args.push_back("/STACK:16777216");
-    linkerReleaseConfig.args.push_back("/PDB:$DEBUG_INFORMATION_FILE$");
-    linkerReleaseConfig.args.push_back("/DYNAMICBASE");
-    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\lib\\x64\"");
-    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.25.28610\\atlmfc\\lib\\x64\"");
-    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\VS\\lib\\x64\"");
-    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\ucrt\\x64\"");
-    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.18362.0\\um\\x64\"");
-    linkerReleaseConfig.args.push_back("/LIBPATH:\"C:\\Program Files (x86)\\Windows Kits\\NETFXSDK\\4.7.2\\lib\\um\\x64\"");
-    linkerReleaseConfig.args.push_back("/LIBPATH:$CMAJOR_LIBRARY_DIRECTORY$");
-    linkerReleaseConfig.args.push_back("/LIBPATH:$TOOL_CHAIN_LIBRARY_DIRECTORY$");
     linker.configurations.push_back(linkerReleaseConfig);
 
     vs.tools.push_back(linker);
@@ -258,7 +213,6 @@ void CreateWindowsGccToolChain(bool verbose)
     compilerDebugConfig.name = "debug";
     compilerDebugConfig.outputDirectory = ".";
     compilerDebugConfig.args.push_back("-std=c++17");
-    compilerDebugConfig.args.push_back("-fpermissive");
     compilerDebugConfig.args.push_back("-c");
     compilerDebugConfig.args.push_back("$SOURCE_FILE$");
     compilerDebugConfig.args.push_back("-o");
@@ -271,13 +225,12 @@ void CreateWindowsGccToolChain(bool verbose)
     compilerReleaseConfig.name = "release";
     compilerReleaseConfig.outputDirectory = ".";
     compilerReleaseConfig.args.push_back("-std=c++17");
-    compilerReleaseConfig.args.push_back("-fpermissive");
     compilerReleaseConfig.args.push_back("-c");
     compilerReleaseConfig.args.push_back("$SOURCE_FILE$");
     compilerReleaseConfig.args.push_back("-o");
     compilerReleaseConfig.args.push_back("$OBJECT_FILE$");
     compilerReleaseConfig.args.push_back("-g");
-    compilerReleaseConfig.args.push_back("-O3");
+    compilerReleaseConfig.args.push_back("-O2");
     compiler.configurations.push_back(compilerReleaseConfig);
 
     gcc.tools.push_back(compiler);
@@ -322,7 +275,7 @@ void CreateWindowsGccToolChain(bool verbose)
     linkerDebugConfig.args.push_back("$LIBRARY_FILES$");
     linkerDebugConfig.args.push_back("-Xlinker --end-group");
     linkerDebugConfig.args.push_back("-o");
-    linkerDebugConfig.args.push_back("$EXECUTABLE_FILE$.exe");
+    linkerDebugConfig.args.push_back("$EXECUTABLE_FILE$");
     linker.configurations.push_back(linkerDebugConfig);
 
     Configuration linkerReleaseConfig;
@@ -330,14 +283,14 @@ void CreateWindowsGccToolChain(bool verbose)
     linkerReleaseConfig.args.push_back("$LIBRARY_PATH_FLAG$-L");
     linkerReleaseConfig.args.push_back(std::string("$RUNTIME_LIBS$") +
         "-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lpdcurses;" +
-        "-lbbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73");
+        "-lbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73");
     linkerReleaseConfig.args.push_back("$LIBRARY_DIRECTORIES$");
     linkerReleaseConfig.args.push_back("$MAIN_OBJECT_FILE$");
     linkerReleaseConfig.args.push_back("-Xlinker --start-group");
     linkerReleaseConfig.args.push_back("$LIBRARY_FILES$");
     linkerReleaseConfig.args.push_back("-Xlinker --end-group");
     linkerReleaseConfig.args.push_back("-o");
-    linkerReleaseConfig.args.push_back("$EXECUTABLE_FILE$.exe");
+    linkerReleaseConfig.args.push_back("$EXECUTABLE_FILE$");
     linker.configurations.push_back(linkerReleaseConfig);
 
     gcc.tools.push_back(linker);
@@ -350,10 +303,226 @@ void CreateWindowsGccToolChain(bool verbose)
     }
 }
 
+void CreateLinuxClangToolChain(bool verbose)
+{
+    Platform& linux = GetOrInsertPlatform("linux");
+
+    ToolChain clang;
+    clang.name = "clang";
+
+    Tool compiler;
+    compiler.name = "compiler";
+    compiler.commandName = "clang++";
+    compiler.outputFileExtension = ".o";
+
+    Configuration compilerDebugConfig;
+    compilerDebugConfig.name = "debug";
+    compilerDebugConfig.outputDirectory = ".";
+    compilerDebugConfig.args.push_back("-std=c++17");
+    compilerDebugConfig.args.push_back("-c");
+    compilerDebugConfig.args.push_back("$SOURCE_FILE$");
+    compilerDebugConfig.args.push_back("-o");
+    compilerDebugConfig.args.push_back("$OBJECT_FILE$");
+    compilerDebugConfig.args.push_back("-g");
+    compilerDebugConfig.args.push_back("-O0");
+    compiler.configurations.push_back(compilerDebugConfig);
+
+    Configuration compilerReleaseConfig;
+    compilerReleaseConfig.name = "release";
+    compilerReleaseConfig.outputDirectory = ".";
+    compilerReleaseConfig.args.push_back("-std=c++17");
+    compilerReleaseConfig.args.push_back("-c");
+    compilerReleaseConfig.args.push_back("$SOURCE_FILE$");
+    compilerReleaseConfig.args.push_back("-o");
+    compilerReleaseConfig.args.push_back("$OBJECT_FILE$");
+    compilerReleaseConfig.args.push_back("-g");
+    compilerReleaseConfig.args.push_back("-O2");
+    compiler.configurations.push_back(compilerReleaseConfig);
+
+    clang.tools.push_back(compiler);
+
+    Tool libraryManager;
+    libraryManager.name = "library-manager";
+    libraryManager.commandName = "llvm-ar";
+    libraryManager.outputFileExtension = ".a";
+
+    Configuration libraryManagerDebugConfig;
+    libraryManagerDebugConfig.name = "debug";
+    libraryManagerDebugConfig.outputDirectory = ".";
+    libraryManagerDebugConfig.args.push_back("rv");
+    libraryManagerDebugConfig.args.push_back("$LIBRARY_FILE$");
+    libraryManagerDebugConfig.args.push_back("$OBJECT_FILES$");
+    libraryManager.configurations.push_back(libraryManagerDebugConfig);
+
+    Configuration libraryManagerReleaseConfig;
+    libraryManagerReleaseConfig.name = "release";
+    libraryManagerReleaseConfig.outputDirectory = ".";
+    libraryManagerReleaseConfig.args.push_back("rv");
+    libraryManagerReleaseConfig.args.push_back("$LIBRARY_FILE$");
+    libraryManagerReleaseConfig.args.push_back("$OBJECT_FILES$");
+    libraryManager.configurations.push_back(libraryManagerReleaseConfig);
+
+    clang.tools.push_back(libraryManager);
+
+    Tool linker;
+    linker.name = "linker";
+    linker.commandName = "clang++";
+
+    Configuration linkerDebugConfig;
+    linkerDebugConfig.name = "debug";
+    linkerDebugConfig.args.push_back("$LIBRARY_PATH_FLAG$-L");
+    linkerDebugConfig.args.push_back(std::string("$RUNTIME_LIBS$") +
+        "-lcmrtsd;-lcmsnglexerd;-lcmsngparserd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmsngutild;" +
+        "-lbz2;-lz;-lboost_filesystem;-lboost_iostreams;-lboost_system;-lncurses");
+    linkerDebugConfig.args.push_back("$LIBRARY_DIRECTORIES$");
+    linkerDebugConfig.args.push_back("$MAIN_OBJECT_FILE$");
+    linkerDebugConfig.args.push_back("-pthread");
+    linkerDebugConfig.args.push_back("-Xlinker --start-group");
+    linkerDebugConfig.args.push_back("$LIBRARY_FILES$");
+    linkerDebugConfig.args.push_back("-Xlinker --end-group");
+    linkerDebugConfig.args.push_back("-o");
+    linkerDebugConfig.args.push_back("$EXECUTABLE_FILE$");
+    linker.configurations.push_back(linkerDebugConfig);
+
+    Configuration linkerReleaseConfig;
+    linkerReleaseConfig.name = "release";
+    linkerReleaseConfig.args.push_back("$LIBRARY_PATH_FLAG$-L");
+    linkerReleaseConfig.args.push_back(std::string("$RUNTIME_LIBS$") +
+        "-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;" +
+        "-lbz2;-lz;-lboost_filesystem;-lboost_iostreams;-lboost_system;-lncurses");
+    linkerReleaseConfig.args.push_back("$LIBRARY_DIRECTORIES$");
+    linkerReleaseConfig.args.push_back("$MAIN_OBJECT_FILE$");
+    linkerReleaseConfig.args.push_back("-pthread");
+    linkerReleaseConfig.args.push_back("-Xlinker --start-group");
+    linkerReleaseConfig.args.push_back("$LIBRARY_FILES$");
+    linkerReleaseConfig.args.push_back("-Xlinker --end-group");
+    linkerReleaseConfig.args.push_back("-o");
+    linkerReleaseConfig.args.push_back("$EXECUTABLE_FILE$");
+    linker.configurations.push_back(linkerReleaseConfig);
+
+    clang.tools.push_back(linker);
+
+    linux.toolChains.push_back(clang);
+
+    if (verbose)
+    {
+        std::cout << "Linux clang tool chain created" << std::endl;
+    }
+}
+
+void CreateLinuxGccToolChain(bool verbose)
+{
+    Platform& linux = GetOrInsertPlatform("linux");
+
+    ToolChain gcc;
+    gcc.name = "gcc";
+
+    Tool compiler;
+    compiler.name = "compiler";
+    compiler.commandName = "g++";
+    compiler.outputFileExtension = ".o";
+
+    Configuration compilerDebugConfig;
+    compilerDebugConfig.name = "debug";
+    compilerDebugConfig.outputDirectory = ".";
+    compilerDebugConfig.args.push_back("-std=c++17");
+    compilerDebugConfig.args.push_back("-c");
+    compilerDebugConfig.args.push_back("$SOURCE_FILE$");
+    compilerDebugConfig.args.push_back("-o");
+    compilerDebugConfig.args.push_back("$OBJECT_FILE$");
+    compilerDebugConfig.args.push_back("-g");
+    compilerDebugConfig.args.push_back("-O0");
+    compiler.configurations.push_back(compilerDebugConfig);
+
+    Configuration compilerReleaseConfig;
+    compilerReleaseConfig.name = "release";
+    compilerReleaseConfig.outputDirectory = ".";
+    compilerReleaseConfig.args.push_back("-std=c++17");
+    compilerReleaseConfig.args.push_back("-c");
+    compilerReleaseConfig.args.push_back("$SOURCE_FILE$");
+    compilerReleaseConfig.args.push_back("-o");
+    compilerReleaseConfig.args.push_back("$OBJECT_FILE$");
+    compilerReleaseConfig.args.push_back("-g");
+    compilerReleaseConfig.args.push_back("-O2");
+    compiler.configurations.push_back(compilerReleaseConfig);
+
+    gcc.tools.push_back(compiler);
+
+    Tool libraryManager;
+    libraryManager.name = "library-manager";
+    libraryManager.commandName = "ar";
+    libraryManager.outputFileExtension = ".a";
+
+    Configuration libraryManagerDebugConfig;
+    libraryManagerDebugConfig.name = "debug";
+    libraryManagerDebugConfig.outputDirectory = ".";
+    libraryManagerDebugConfig.args.push_back("rv");
+    libraryManagerDebugConfig.args.push_back("$LIBRARY_FILE$");
+    libraryManagerDebugConfig.args.push_back("$OBJECT_FILES$");
+    libraryManager.configurations.push_back(libraryManagerDebugConfig);
+
+    Configuration libraryManagerReleaseConfig;
+    libraryManagerReleaseConfig.name = "release";
+    libraryManagerReleaseConfig.outputDirectory = ".";
+    libraryManagerReleaseConfig.args.push_back("rv");
+    libraryManagerReleaseConfig.args.push_back("$LIBRARY_FILE$");
+    libraryManagerReleaseConfig.args.push_back("$OBJECT_FILES$");
+    libraryManager.configurations.push_back(libraryManagerReleaseConfig);
+
+    gcc.tools.push_back(libraryManager);
+
+    Tool linker;
+    linker.name = "linker";
+    linker.commandName = "g++";
+
+    Configuration linkerDebugConfig;
+    linkerDebugConfig.name = "debug";
+    linkerDebugConfig.args.push_back("$LIBRARY_PATH_FLAG$-L");
+    linkerDebugConfig.args.push_back(std::string("$RUNTIME_LIBS$") +
+        "-lcmrtsd;-lcmsnglexerd;-lcmsngparserd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmsngutild;" +
+        "-lbz2;-lz;-lboost_filesystem;-lboost_iostreams;-lboost_system;-lncurses");
+    linkerDebugConfig.args.push_back("$LIBRARY_DIRECTORIES$");
+    linkerDebugConfig.args.push_back("$MAIN_OBJECT_FILE$");
+    linkerDebugConfig.args.push_back("-pthread");
+    linkerDebugConfig.args.push_back("-Xlinker --start-group");
+    linkerDebugConfig.args.push_back("$LIBRARY_FILES$");
+    linkerDebugConfig.args.push_back("-Xlinker --end-group");
+    linkerDebugConfig.args.push_back("-o");
+    linkerDebugConfig.args.push_back("$EXECUTABLE_FILE$");
+    linker.configurations.push_back(linkerDebugConfig);
+
+    Configuration linkerReleaseConfig;
+    linkerReleaseConfig.name = "release";
+    linkerReleaseConfig.args.push_back("$LIBRARY_PATH_FLAG$-L");
+    linkerReleaseConfig.args.push_back(std::string("$RUNTIME_LIBS$") +
+        "-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;" +
+        "-lbz2;-lz;-lboost_filesystem;-lboost_iostreams;-lboost_system;-lncurses");
+    linkerReleaseConfig.args.push_back("$LIBRARY_DIRECTORIES$");
+    linkerReleaseConfig.args.push_back("$MAIN_OBJECT_FILE$");
+    linkerReleaseConfig.args.push_back("-pthread");
+    linkerReleaseConfig.args.push_back("-Xlinker --start-group");
+    linkerReleaseConfig.args.push_back("$LIBRARY_FILES$");
+    linkerReleaseConfig.args.push_back("-Xlinker --end-group");
+    linkerReleaseConfig.args.push_back("-o");
+    linkerReleaseConfig.args.push_back("$EXECUTABLE_FILE$");
+    linker.configurations.push_back(linkerReleaseConfig);
+
+    gcc.tools.push_back(linker);
+
+    linux.toolChains.push_back(gcc);
+
+    if (verbose)
+    {
+        std::cout << "Linux gcc tool chain created" << std::endl;
+    }
+}
+
 void CreateToolChains(bool verbose)
 {
     CreateVSToolChain(verbose);
     CreateWindowsGccToolChain(verbose);
+    CreateLinuxClangToolChain(verbose);
+    CreateLinuxGccToolChain(verbose);
 }
 
 std::string CmajorRootDir()
@@ -459,7 +628,7 @@ const Tool& GetCompilerTool(const std::string& platform, const std::string& tool
             throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
         }
     }
-    throw std::runtime_error("platform  '" + platform + "' not found");
+    throw std::runtime_error("platform '" + platform + "' not found");
 }
 
 const Tool& GetLibraryManagerTool(const std::string& platform, const std::string& toolChain)
@@ -486,7 +655,7 @@ const Tool& GetLibraryManagerTool(const std::string& platform, const std::string
             throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
         }
     }
-    throw std::runtime_error("platform  '" + platform + "' not found");
+    throw std::runtime_error("platform '" + platform + "' not found");
 }
 
 const Tool& GetLinkerTool(const std::string& platform, const std::string& toolChain)
@@ -513,7 +682,7 @@ const Tool& GetLinkerTool(const std::string& platform, const std::string& toolCh
             throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
         }
     }
-    throw std::runtime_error("platform  '" + platform + "' not found");
+    throw std::runtime_error("platform '" + platform + "' not found");
 }
 
 const Tool& GetProjectFileGeneratorTool(const std::string& platform, const std::string& toolChain)
@@ -540,7 +709,7 @@ const Tool& GetProjectFileGeneratorTool(const std::string& platform, const std::
             throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
         }
     }
-    throw std::runtime_error("platform  '" + platform + "' not found");
+    throw std::runtime_error("platform '" + platform + "' not found");
 }
 
 const Tool& GetSolutionFileGeneratorTool(const std::string& platform, const std::string& toolChain)
@@ -567,5 +736,5 @@ const Tool& GetSolutionFileGeneratorTool(const std::string& platform, const std:
             throw std::runtime_error("tool chain '" + toolChain + "' not found for platform '" + platform + "'");
         }
     }
-    throw std::runtime_error("platform  '" + platform + "' not found");
+    throw std::runtime_error("platform '" + platform + "' not found");
 }

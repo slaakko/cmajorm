@@ -3,7 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/build/Command.hpp>
+#include <cmajor/build/ClientCommand.hpp>
 #include <cmajor/build/BuildLangLexer.hpp>
 #include <cmajor/build/BuildLangClientParser.hpp>
 #include <cmajor/build/BuildOption.hpp>
@@ -14,7 +14,9 @@
 #include <cmajor/build/ServerConfig.hpp>
 #include <cmajor/build/FiberExecutionContext.hpp>
 #include <cmajor/build/LocalExecutionContext.hpp>
+#include <cmajor/build/ClientExecutionContext.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <sngcm/ast/Project.hpp>
 #include <soulng/util/Fiber.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Error.hpp>
@@ -25,12 +27,17 @@ namespace cmajor { namespace build {
 
 using namespace soulng::unicode;
 using namespace cmajor::symbols;
+using namespace sngcm::ast;
 
 std::string GetFilePath(const std::string& path)
 {
     Assert(path.size() >= 2, "invalid path");
     Assert(path[0] == '<' && path[path.size() - 1] == '>', "invalid path");
     std::string p = path.substr(1, path.size() - 2);
+    if (p == "system")
+    {
+        return GetFullPath(Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(), "system"), "System.Install"), "System.Install.cmp"));
+    }
     return GetFullPath(p);
 }
 
@@ -46,23 +53,24 @@ std::unique_ptr<ExecutionContext> CreateExecutionContext(const std::string& serv
     }
     else
     {
-        throw std::runtime_error("client execution context not implemented yet");
+        return std::unique_ptr<ExecutionContext>(new ClientExecutionContext(serverName));
     }
 }
 
-Command::Command()
+ClientCommand::ClientCommand()
 {
 }
 
-Command::~Command()
+ClientCommand::~ClientCommand()
 {
 }
 
-PushProjectCommand::PushProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
+PushProjectClientCommand::PushProjectClientCommand(const std::string& projectFilePath_, const std::string& serverName_) :
+    projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
 {
 }
 
-void PushProjectCommand::Execute()
+void PushProjectClientCommand::Execute()
 {
     std::set<std::string> pushedProjects;
     std::unique_ptr<ExecutionContext> context = CreateExecutionContext(serverName);
@@ -92,30 +100,31 @@ void PushProjectCommand::Execute()
     }
 }
 
-RemoveProjectCommand::RemoveProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
+RemoveProjectClientCommand::RemoveProjectClientCommand(const std::string& projectFilePath_, const std::string& serverName_) :
+    projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
 {
 }
 
-void RemoveProjectCommand::Execute()
+void RemoveProjectClientCommand::Execute()
 {
 }
 
-RemoveServerCommand::RemoveServerCommand(const std::string& serverName_) : serverName(serverName_)
+RemoveServerClientCommand::RemoveServerClientCommand(const std::string& serverName_) : serverName(serverName_)
 {
 }
 
-void RemoveServerCommand::Execute()
+void RemoveServerClientCommand::Execute()
 {
     ServerConfig::Instance().Remove(serverName);
     LogMessage(-1, "server '" + serverName + "' removed");
 }
 
-AddServerCommand::AddServerCommand(const std::string& serverName_, const std::string& host_, int port_, const std::string& defaultToolChain_) :
+AddServerClientCommand::AddServerClientCommand(const std::string& serverName_, const std::string& host_, int port_, const std::string& defaultToolChain_) :
     serverName(serverName_), host(host_), port(port_), defaultToolChain(defaultToolChain_)
 {
 }
 
-void AddServerCommand::Execute()
+void AddServerClientCommand::Execute()
 {
     bool force = false;
     if (GetBuildOption(BuildOptions::force))
@@ -126,11 +135,12 @@ void AddServerCommand::Execute()
     LogMessage(-1, "server '" + serverName + "' added");
 }
 
-BuildProjectCommand::BuildProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
+BuildProjectClientCommand::BuildProjectClientCommand(const std::string& projectFilePath_, const std::string& serverName_) :
+    projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
 {
 }
 
-void BuildProjectCommand::Execute()
+void BuildProjectClientCommand::Execute()
 {
     std::unique_ptr<ExecutionContext> context = CreateExecutionContext(serverName);
     std::string config = buildConfig;
@@ -164,33 +174,34 @@ void BuildProjectCommand::Execute()
     }
 }
 
-DebugProjectCommand::DebugProjectCommand(const std::string& projectFilePath_, const std::string& serverName_) : projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
+DebugProjectClientCommand::DebugProjectClientCommand(const std::string& projectFilePath_, const std::string& serverName_) :
+    projectFilePath(GetFilePath(projectFilePath_)), serverName(serverName_)
 {
 }
 
-void DebugProjectCommand::Execute()
+void DebugProjectClientCommand::Execute()
 {
 }
 
-InstallProjectCommand::InstallProjectCommand(const std::string& projectFilePath_, const std::string& directory_, const std::string& serverName_) :
+InstallProjectClientCommand::InstallProjectClientCommand(const std::string& projectFilePath_, const std::string& directory_, const std::string& serverName_) :
     projectFilePath(GetFilePath(projectFilePath_)), directory(GetFilePath(directory_)), serverName(serverName_)
 {
 }
 
-void InstallProjectCommand::Execute()
+void InstallProjectClientCommand::Execute()
 {
 }
 
-ShowConfigurationCommand::ShowConfigurationCommand() 
+ShowConfigurationClientCommand::ShowConfigurationClientCommand()
 {
 }
 
-void ShowConfigurationCommand::Execute()
+void ShowConfigurationClientCommand::Execute()
 {
     ServerConfig::Instance().Show();
 }
 
-std::unique_ptr<Command> ParseCommand(const std::string& command)
+std::unique_ptr<ClientCommand> ParseClientCommand(const std::string& command)
 {
     BuildLangLexer lexer(ToUtf32(command), "", 0);
     BuildOptionSetter optionSetter;

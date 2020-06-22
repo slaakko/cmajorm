@@ -28,9 +28,9 @@ using namespace cmajor::symbols;
 std::string GetDefaultToolChainForCurrentPlatform()
 {
 #ifdef _WIN32
-    return "vs";
+    return "gcc";
 #else
-    return "clang";
+    return "gcc";
 #endif
 }
 
@@ -245,16 +245,25 @@ void ServerConfig::Add(const std::string& serverName, const std::string& hostNam
 
 void ServerConfig::Remove(const std::string& serverName)
 {
+    bool found = false;
     int n = serverInfos.size();
     for (int i = 0; i < n; ++i)
     {
         if (serverInfos[i]->ServerName() == serverName)
         {
             serverInfos.erase(serverInfos.begin() + i);
+            found = true;
             break;
         }
     }
-    Write();
+    if (found)
+    {
+        Write();
+    }
+    else
+    {
+        throw std::runtime_error("server '" + serverName + "' not found");
+    }
 }
 
 void ServerConfig::Show()

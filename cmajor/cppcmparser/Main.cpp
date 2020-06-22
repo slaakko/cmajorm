@@ -62,7 +62,7 @@ void ParseProject(const std::string& projectFileName, int index, bool verbose)
     }
     std::u32string content = ToUtf32(ReadFile(projectFileName));
     ContainerFileLexer lexer(content, projectFileName, index);
-    std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(lexer, "debug", BackEnd::llvm, "");
+    std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(lexer, "debug", BackEnd::llvm, "", SystemDirKind::regular);
     project->ResolveDeclarations();
     int n = project->SourceFilePaths().size();
     for (int i = 0; i < n; ++i)

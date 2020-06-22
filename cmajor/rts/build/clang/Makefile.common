@@ -1,7 +1,17 @@
 CXX=clang++
 CC=clang
 AR=llvm-ar
+
+BOOST_INCLUDE_DIR=C:/mingw-boost/include/boost-1_73
+
+ifeq ($(MAKE),mingw32-make)
+RM=del
+CP=copy /Y
+CXXFLAGS += -I$(BOOST_INCLUDE_DIR)
+PLATFORM=windows
+else
+CXXFLAGS += -pthread
 RM=rm
 CP=cp
 PLATFORM=linux
-
+endif

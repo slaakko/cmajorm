@@ -3,7 +3,7 @@
 #include <soulng/lexer/TrivialLexer.hpp>
 #include <soulng/parser/Range.hpp>
 
-// this file has been automatically generated from 'D:/work/soulng-project/sngcm/cmparser/CommandLine.parser' using soulng parser generator spg version 3.0.0
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/sngcm/cmparser/CommandLine.parser' using soulng parser generator spg version 3.0.0
 
 static const soulng::parser::Range s0[] = {{9, 9}, {32, 32}};
 

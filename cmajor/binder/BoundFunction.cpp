@@ -10,8 +10,11 @@
 #include <cmajor/binder/BoundClass.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
+
+using namespace soulng::unicode;
 
 BoundFunction::BoundFunction(BoundCompileUnit* boundCompileUnit_, FunctionSymbol* functionSymbol_) : 
     BoundNode(&boundCompileUnit_->GetModule(), functionSymbol_->GetSpan(), BoundNodeType::boundFunction), boundCompileUnit(boundCompileUnit_), functionSymbol(functionSymbol_), hasGotos(false)
@@ -57,6 +60,26 @@ void BoundFunction::AddTemporaryDestructorCall(std::unique_ptr<BoundFunctionCall
                     GenerateDestructorImplementation(boundClass.get(), destructorSymbol, *boundCompileUnit, currentContainerScope, currentFunction, span);
                     boundCompileUnit->AddBoundNode(std::move(boundClass));
                 }
+            }
+        }
+        else if (destructorSymbol->Parent()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
+        {
+            bool firstTry = GetBoundCompileUnit()->GetClassTemplateRepository().Instantiate(destructorSymbol, currentContainerScope, currentFunction, span);
+            if (!firstTry)
+            {
+                ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(destructorSymbol->Parent());
+                ClassTemplateSpecializationSymbol* copy = GetBoundCompileUnit()->GetSymbolTable().CopyClassTemplateSpecialization(specialization);
+                GetBoundCompileUnit()->GetClassTemplateRepository().BindClassTemplateSpecialization(copy, currentContainerScope, span);
+                int index = destructorSymbol->GetIndex();
+                FunctionSymbol* functionSymbol = copy->GetFunctionByIndex(index);
+                bool secondTry = GetBoundCompileUnit()->InstantiateClassTemplateMemberFunction(functionSymbol, currentContainerScope, currentFunction, span);
+                if (!secondTry)
+                {
+                    throw Exception(GetRootModuleForCurrentThread(),
+                        "internal error: could not instantiate destructor of a class template specialization '" + ToUtf8(specialization->FullName()) + "'",
+                        specialization->GetSpan());
+                }
+
             }
         }
     }

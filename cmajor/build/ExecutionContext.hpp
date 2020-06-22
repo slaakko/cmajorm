@@ -21,8 +21,9 @@ public:
     ExecutionContext();
     virtual ~ExecutionContext();
     Log* GetLog() const { return log.get(); }
-    virtual BuildClient* GetClient() = 0;
-    virtual Connection* GetConnection() = 0;
+    virtual BuildClient* GetClient() { return nullptr; }
+    virtual void ExitServer() {}
+    virtual Connection* GetConnection() { return nullptr; }
 private:
     std::unique_ptr<Log> log;
 };

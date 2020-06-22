@@ -93,7 +93,7 @@ void PrintHelp()
         "--quiet (-q)\n" <<
         "   print no messages\n" <<
         "--tool-chain=TOOL_CHAIN (-tc=TOOL_CHAIN)\n" <<
-        "   use tool chain TOOL_CHAIN (default vs)\n" << 
+        "   use tool chain TOOL_CHAIN (default is 'gcc')\n" << 
         "--strict-nothrow (-s)\n" <<
         "   treat nothrow violation as an error\n" <<
         "--time (-t)\n" <<
@@ -127,7 +127,9 @@ void PrintHelp()
         "--just-my-code (-j)\n" <<
         "   enable Just My Code debugging\n" <<
         "--all (-a)\n" <<
-        "   build all dependencies\n" << 
+        "   build all dependencies\n" <<
+        "--repository (-rp)\n" <<
+        "   build repository project\n" <<
         std::endl;
 }
 
@@ -139,7 +141,7 @@ using namespace cmajor::build;
 int main(int argc, const char** argv)
 {
     SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
-    SetToolChain("vs");
+    SetToolChain("gcc");
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
     std::set<std::string> builtProjects;
@@ -204,6 +206,10 @@ int main(int argc, const char** argv)
                     else if (arg == "--all" || arg == "-a")
                     {
                         SetGlobalFlag(GlobalFlags::buildAll);
+                    }
+                    else if (arg == "--repository" || arg == "-rp")
+                    {
+                        SetGlobalFlag(GlobalFlags::repository);
                     }
                     else if (arg == "--define" || arg == "-D")
                     {
@@ -345,7 +351,7 @@ int main(int argc, const char** argv)
 #ifdef _WIN32
                 std::cout << "Cmajor with C++ backend compiler version " << version << " for Windows x64" << std::endl;
 #else
-                std::cout << "Cmajor with C++ backend C++ compiler version " << version << std::endl;
+                std::cout << "Cmajor with C++ backend compiler version " << version << std::endl;
 #endif
             }
 #ifndef _WIN32
