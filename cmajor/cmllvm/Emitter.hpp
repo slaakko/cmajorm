@@ -244,7 +244,7 @@ public:
     void SaveObjectPointer(void* objectPointer_) override;
     void SetObjectPointer(void* objectPointer_) override { objectPointer = static_cast<llvm::Value*>(objectPointer_); }
     void* GetObjectPointer() override { return objectPointer; }
-    void SetFunction(void* function_) override { function = static_cast<llvm::Function*>(function_); }
+    void SetFunction(void* function_, int32_t fileIndex) override { function = static_cast<llvm::Function*>(function_); }
     void SetFunctionName(const std::string& functionName) override;
     llvm::Function* Function() { return function; }
     void* CurrentBasicBlock() const override { return currentBasicBlock; }

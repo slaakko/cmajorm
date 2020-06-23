@@ -324,7 +324,7 @@ public:
     virtual void SetFunctionLinkage(void* function, bool setInline) = 0;
     virtual void SetFunctionLinkageToLinkOnceODRLinkage(void* function) = 0;
     virtual void SetFunctionCallConventionToStdCall(void* function) = 0;
-    virtual void SetFunction(void* function_) = 0;
+    virtual void SetFunction(void* function_, int32_t fileIndex) = 0;
     virtual void SetFunctionName(const std::string& functionName) = 0;
     virtual void SetInPrologue(bool inPrologue_) = 0;
     virtual void* CreateSubroutineType(const std::vector<void*>& elementTypes) = 0;

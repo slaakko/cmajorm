@@ -10,7 +10,7 @@
 namespace cmcppi {
 
 Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), nextLocalNumber(0), nextArgumentNumber(0), 
-    linkOnce(false), nextBBNumber(0), nothrow(false)
+    linkOnce(false), nextBBNumber(0), nothrow(false), fileIndex(-1)
 {
     entryBlock.reset(new BasicBlock(nextBBNumber++, "entry"));
     int paramIndex = 0;
@@ -182,6 +182,11 @@ void Function::WriteValueDeclarations(CodeFormatter& formatter, Context& context
 void Function::AddResultInstruction(Instruction* instruction)
 {
     resultInstructions.push_back(instruction);
+}
+
+void Function::SetFileIndex(int32_t fileIndex_)
+{
+    fileIndex = fileIndex_;
 }
 
 } // namespace cmcppi

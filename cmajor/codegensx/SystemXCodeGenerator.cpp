@@ -235,7 +235,12 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
         void* comdat = emitter->GetOrInsertAnyFunctionComdat(ToUtf8(functionSymbol->MangledName()), function);
         emitter->SetFunctionLinkageToLinkOnceODRLinkage(function);
     }
-    emitter->SetFunction(function);
+    int32_t fileIndex = -1;
+    if (functionSymbol->HasSource())
+    {
+        fileIndex = functionSymbol->GetSpan().fileIndex;
+    }
+    emitter->SetFunction(function, fileIndex);
     void* entryBlock = emitter->CreateBasicBlock("entry");
     entryBasicBlock = entryBlock;
     emitter->SetCurrentBasicBlock(entryBlock);

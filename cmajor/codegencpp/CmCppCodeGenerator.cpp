@@ -246,7 +246,12 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         void* comdat = emitter->GetOrInsertAnyFunctionComdat(ToUtf8(functionSymbol->MangledName()), function);
         emitter->SetFunctionLinkageToLinkOnceODRLinkage(function);
     }
-    emitter->SetFunction(function);
+    int32_t fileIndex = -1;
+    if (functionSymbol->HasSource())
+    {
+        fileIndex = functionSymbol->GetSpan().fileIndex;
+    }
+    emitter->SetFunction(function, fileIndex);
     emitter->SetFunctionName(ToUtf8(functionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     entryBasicBlock = entryBlock;
@@ -1603,7 +1608,7 @@ void CmCppCodeGenerator::GenerateInitUnwindInfoFunction(BoundCompileUnit& boundC
     if (!addCompileUnitFunctionSymbol) return;
     void* functionType = initUnwindInfoFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initUnwindInfoFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function);
+    emitter->SetFunction(function, -1);
     emitter->SetFunctionName(ToUtf8(initUnwindInfoFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -1638,7 +1643,7 @@ void CmCppCodeGenerator::GenerateInitCompileUnitFunction(BoundCompileUnit& bound
     Span span = initCompileUnitFunctionSymbol->GetSpan();
     void* functionType = initCompileUnitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initCompileUnitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function);
+    emitter->SetFunction(function, -1);
     emitter->SetFunctionName(ToUtf8(initCompileUnitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -1671,7 +1676,7 @@ void CmCppCodeGenerator::GenerateGlobalInitFuncion(BoundCompileUnit& boundCompil
     Span span = globalInitFunctionSymbol->GetSpan();
     void* functionType = globalInitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(globalInitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function);
+    emitter->SetFunction(function, -1);
     emitter->SetFunctionName(ToUtf8(globalInitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);

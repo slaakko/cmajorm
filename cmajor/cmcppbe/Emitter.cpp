@@ -1606,9 +1606,10 @@ void Emitter::SetFunctionCallConventionToStdCall(void* function)
     // todo
 }
 
-void Emitter::SetFunction(void* function_)
+void Emitter::SetFunction(void* function_, int32_t fileIndex)
 {
     currentFunction = static_cast<cmcppi::Function*>(function_);
+    currentFunction->SetFileIndex(fileIndex);
     context->SetCurrentFunction(currentFunction);
 }
 

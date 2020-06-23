@@ -37,6 +37,7 @@ public:
     void SetNothrow() { nothrow = true; }
     void RemoveNothrow() { nothrow = false; }
     void AddResultInstruction(Instruction* instruction);
+    void SetFileIndex(int32_t fileIndex_);
 private:
     std::string name;
     std::string fullName;
@@ -52,6 +53,7 @@ private:
     bool linkOnce;
     int nextBBNumber;
     bool nothrow;
+    int32_t fileIndex;
 };
 
 } // namespace cmcppi

@@ -323,7 +323,12 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
         emitter->SetFunctionCallConventionToStdCall(function);
     }
     emitter->SetFunctionLinkage(function, setInline);
-    emitter->SetFunction(function);
+    int32_t fileIndex = -1;
+    if (functionSymbol->HasSource())
+    {
+        fileIndex = functionSymbol->GetSpan().fileIndex;
+    }
+    emitter->SetFunction(function, fileIndex);
     bool hasSource = functionSymbol->HasSource();
     bool prevDebugInfo = debugInfo;
     void* prevDIBuilder = emitter->DIBuilder();
@@ -1395,7 +1400,7 @@ void LlvmCodeGenerator::GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCo
     }
     void* functionType = initUnwindInfoFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initUnwindInfoFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function);
+    emitter->SetFunction(function, -1);
     emitter->SetFunctionName(ToUtf8(initUnwindInfoFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -1454,7 +1459,7 @@ void LlvmCodeGenerator::GenerateInitCompileUnitFunction(BoundCompileUnit& boundC
     Span span = initCompileUnitFunctionSymbol->GetSpan();
     void* functionType = initCompileUnitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initCompileUnitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function);
+    emitter->SetFunction(function, -1);
     emitter->SetFunctionName(ToUtf8(initCompileUnitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -1514,7 +1519,7 @@ void LlvmCodeGenerator::GenerateGlobalInitFuncion(BoundCompileUnit& boundCompile
     Span span = globalInitFunctionSymbol->GetSpan();
     void* functionType = globalInitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(globalInitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function);
+    emitter->SetFunction(function, -1);
     emitter->SetFunctionName(ToUtf8(globalInitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
