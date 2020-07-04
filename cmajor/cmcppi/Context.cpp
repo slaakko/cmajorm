@@ -7,10 +7,14 @@
 #include <cmajor/cmcppi/Instruction.hpp>
 #include <cmajor/cmcppi/BasicBlock.hpp>
 #include <cmajor/cmcppi/Function.hpp>
+#include <cmajor/cmdebug/DebugInfo.hpp>
+#include <cmajor/cmdebug/DIVariable.hpp>
 
 namespace cmcppi {
 
-Context::Context() : currentLineNumber(0), currentFunction(nullptr), currentBasicBlock(nullptr), currentParentBlock(nullptr)
+Context::Context() :
+    currentLineNumber(0), currentFunction(nullptr), currentBasicBlock(nullptr), currentParentBlock(nullptr), sourceLineNumber(0), cppLineIndex(0),
+    currentScopeId(-1), currentInstructionFlags(0)
 {
 }
 
@@ -174,7 +178,7 @@ ClsIdValue* Context::GetClsIdValue(const std::string& typeId)
 Instruction* Context::CreateNot(Value* arg)
 {
     Instruction* inst = new NotInstruction(arg);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -186,7 +190,7 @@ Instruction* Context::CreateNot(Value* arg)
 Instruction* Context::CreateNeg(Value* arg)
 {
     Instruction* inst = new NegInstruction(arg);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -198,7 +202,7 @@ Instruction* Context::CreateNeg(Value* arg)
 Instruction* Context::CreateAdd(Value* left, Value* right)
 {
     Instruction* inst = new AddInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -210,7 +214,7 @@ Instruction* Context::CreateAdd(Value* left, Value* right)
 Instruction* Context::CreateSub(Value* left, Value* right)
 {
     Instruction* inst = new SubInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -222,7 +226,7 @@ Instruction* Context::CreateSub(Value* left, Value* right)
 Instruction* Context::CreateMul(Value* left, Value* right)
 {
     Instruction* inst = new MulInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -234,7 +238,7 @@ Instruction* Context::CreateMul(Value* left, Value* right)
 Instruction* Context::CreateDiv(Value* left, Value* right)
 {
     Instruction* inst = new DivInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -246,7 +250,7 @@ Instruction* Context::CreateDiv(Value* left, Value* right)
 Instruction* Context::CreateMod(Value* left, Value* right)
 {
     Instruction* inst = new ModInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -258,7 +262,7 @@ Instruction* Context::CreateMod(Value* left, Value* right)
 Instruction* Context::CreateAnd(Value* left, Value* right)
 {
     Instruction* inst = new AndInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -270,7 +274,7 @@ Instruction* Context::CreateAnd(Value* left, Value* right)
 Instruction* Context::CreateOr(Value* left, Value* right)
 {
     Instruction* inst = new OrInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -282,7 +286,7 @@ Instruction* Context::CreateOr(Value* left, Value* right)
 Instruction* Context::CreateXor(Value* left, Value* right)
 {
     Instruction* inst = new XorInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -294,7 +298,7 @@ Instruction* Context::CreateXor(Value* left, Value* right)
 Instruction* Context::CreateShl(Value* left, Value* right)
 {
     Instruction* inst = new ShlInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -306,7 +310,7 @@ Instruction* Context::CreateShl(Value* left, Value* right)
 Instruction* Context::CreateShr(Value* left, Value* right)
 {
     Instruction* inst = new ShrInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -318,7 +322,7 @@ Instruction* Context::CreateShr(Value* left, Value* right)
 Instruction* Context::CreateEqual(Value* left, Value* right)
 {
     Instruction* inst = new EqualInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -330,7 +334,7 @@ Instruction* Context::CreateEqual(Value* left, Value* right)
 Instruction* Context::CreateLess(Value* left, Value* right)
 {
     Instruction* inst = new LessInstruction(left, right);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -342,7 +346,7 @@ Instruction* Context::CreateLess(Value* left, Value* right)
 Instruction* Context::CreateSignExtend(Value* arg, Type* destType)
 {
     Instruction* inst = new SignExtendInstruction(arg, destType);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -354,7 +358,7 @@ Instruction* Context::CreateSignExtend(Value* arg, Type* destType)
 Instruction* Context::CreateZeroExtend(Value* arg, Type* destType)
 {
     Instruction* inst = new ZeroExtendInstruction(arg, destType);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -366,7 +370,7 @@ Instruction* Context::CreateZeroExtend(Value* arg, Type* destType)
 Instruction* Context::CreateTruncate(Value* arg, Type* destType)
 {
     Instruction* inst = new TruncateInstruction(arg, destType);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -378,7 +382,7 @@ Instruction* Context::CreateTruncate(Value* arg, Type* destType)
 Instruction* Context::CreateBitCast(Value* arg, Type* destType)
 {
     Instruction* inst = new BitCastInstruction(arg, destType);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -390,7 +394,7 @@ Instruction* Context::CreateBitCast(Value* arg, Type* destType)
 Instruction* Context::CreateIntToFloat(Value* arg, Type* destType)
 {
     Instruction* inst = new IntToFloatInstruction(arg, destType);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -402,7 +406,7 @@ Instruction* Context::CreateIntToFloat(Value* arg, Type* destType)
 Instruction* Context::CreateFloatToInt(Value* arg, Type* destType)
 {
     Instruction* inst = new FloatToIntInstruction(arg, destType);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -414,7 +418,7 @@ Instruction* Context::CreateFloatToInt(Value* arg, Type* destType)
 Instruction* Context::CreateIntToPtr(Value* arg, Type* destType)
 {
     Instruction* inst = new IntToPtrInstruction(arg, destType);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -426,7 +430,7 @@ Instruction* Context::CreateIntToPtr(Value* arg, Type* destType)
 Instruction* Context::CreatePtrToInt(Value* arg, Type* destType)
 {
     Instruction* inst = new PtrToIntInstruction(arg, destType);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -437,8 +441,9 @@ Instruction* Context::CreatePtrToInt(Value* arg, Type* destType)
 
 Instruction* Context::CreateLocal(Type* type)
 {
-    Instruction* inst = new LocalInstruction(type);
-    AddLineInfo(inst);
+    LocalInstruction* inst = new LocalInstruction(type);
+    inst->ObtainLocalName(*currentFunction);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -450,7 +455,7 @@ Instruction* Context::CreateLocal(Type* type)
 Instruction* Context::CreateLoad(Value* ptr)
 {
     Instruction* inst = new LoadInstruction(ptr);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -462,7 +467,7 @@ Instruction* Context::CreateLoad(Value* ptr)
 Instruction* Context::CreateStore(Value* value, Value* ptr)
 {
     Instruction* inst = new StoreInstruction(value, ptr);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -474,7 +479,7 @@ Instruction* Context::CreateStore(Value* value, Value* ptr)
 Instruction* Context::CreateArg(Value* arg)
 {
     Instruction* inst = new ArgInstruction(arg);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -486,7 +491,7 @@ Instruction* Context::CreateArg(Value* arg)
 Instruction* Context::CreateElemAddr(Value* ptr, Value* index)
 {
     Instruction* inst = new ElemAddrInstruction(ptr, index);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -498,7 +503,7 @@ Instruction* Context::CreateElemAddr(Value* ptr, Value* index)
 Instruction* Context::CreatePtrOffset(Value* ptr, Value* offset)
 {
     Instruction* inst = new PtrOffsetInstruction(ptr, offset);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -510,7 +515,7 @@ Instruction* Context::CreatePtrOffset(Value* ptr, Value* offset)
 Instruction* Context::CreatePtrDiff(Value* leftPtr, Value* rightPtr)
 {
     Instruction* inst = new PtrDiffInstruction(leftPtr, rightPtr);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -522,7 +527,7 @@ Instruction* Context::CreatePtrDiff(Value* leftPtr, Value* rightPtr)
 Instruction* Context::CreateCall(Value* function, const std::vector<Value*>& args)
 {
     Instruction* inst = new CallInstruction(function, args);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -534,7 +539,7 @@ Instruction* Context::CreateCall(Value* function, const std::vector<Value*>& arg
 Instruction* Context::CreateInvoke(Value* function, const std::vector<Value*> args, BasicBlock* normalBlockNext, BasicBlock* unwindBlockNext)
 {
     Instruction* inst = new InvokeInstruction(function, args, normalBlockNext, unwindBlockNext);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -546,7 +551,7 @@ Instruction* Context::CreateInvoke(Value* function, const std::vector<Value*> ar
 Instruction* Context::CreateRet(Value* value)
 {
     Instruction* inst = new RetInstruction(value);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -558,7 +563,7 @@ Instruction* Context::CreateRet(Value* value)
 Instruction* Context::CreateJump(BasicBlock* dest)
 {
     Instruction* inst = new JumpInstruction(dest);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -570,7 +575,7 @@ Instruction* Context::CreateJump(BasicBlock* dest)
 Instruction* Context::CreateBranch(Value* cond, BasicBlock* trueDest, BasicBlock* falseDest)
 {
     Instruction* inst = new BranchInstruction(cond, trueDest, falseDest);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -582,7 +587,7 @@ Instruction* Context::CreateBranch(Value* cond, BasicBlock* trueDest, BasicBlock
 Instruction* Context::CreateSwitch(Value* cond, BasicBlock* defaultDest)
 {
     Instruction* inst = new SwitchInstruction(cond, defaultDest);
-    AddLineInfo(inst);
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -594,6 +599,7 @@ Instruction* Context::CreateSwitch(Value* cond, BasicBlock* defaultDest)
 Instruction* Context::CreateNop()
 {
     Instruction* inst = new NoOperationInstruction();
+    AddLineInfoScopeIdAndFlags(inst);
     currentBasicBlock->AddInstruction(inst);
     if (inst->IsResultInstruction(*this))
     {
@@ -697,9 +703,35 @@ void Context::SetCurrentLineNumber(int lineNumber)
     }
 }
 
-void Context::AddLineInfo(Instruction* inst)
+void Context::BeginScope()
+{
+    int16_t scopeId = currentFunction->Scopes().size();
+    std::unique_ptr<Scope> scope(new Scope(scopeId, currentScopeId));
+    currentFunction->AddScope(scope.release());
+    currentScopeId = scopeId;
+}
+
+void Context::EndScope()
+{
+    const std::unique_ptr<Scope>& currentScope = currentFunction->Scopes()[currentScopeId];
+    currentScopeId = currentScope->ParentScopeId();
+}
+
+void Context::BeginInstructionFlag(int16_t instructionFlag)
+{
+    currentInstructionFlags = currentInstructionFlags | instructionFlag;
+}
+
+void Context::EndInstructionFlag(int16_t instructionFlag)
+{
+    currentInstructionFlags = currentInstructionFlags & ~instructionFlag;
+}
+
+void Context::AddLineInfoScopeIdAndFlags(Instruction* inst)
 {
     inst->SetSourceLineNumber(currentLineNumber);
+    inst->SetScopeId(currentScopeId);
+    inst->SetFlags(currentInstructionFlags);
 }
 
 void Context::SetCompileUnitId(const std::string& compileUnitId)
@@ -728,6 +760,17 @@ void Context::SetCleanupBlock(BasicBlock* cleanupBlock)
 {
     cleanupBlock->SetAsCleanupBlock();
     currentBasicBlock->SetCleanupBlock(cleanupBlock);
+}
+
+void Context::AddLocalVariable(const std::string& name, const boost::uuids::uuid& typeId, LocalInstruction* inst)
+{
+    Scope* scope = currentFunction->GetScope(currentScopeId);
+    cmajor::debug::DIVariable* localVariable = new cmajor::debug::DIVariable();
+    localVariable->SetName(name);
+    inst->ObtainLocalName(*currentFunction);
+    localVariable->SetIrName(inst->LocalName());
+    localVariable->SetTypeId(typeId);
+    scope->AddLocalVariable(localVariable);
 }
 
 } // namespace cmcppi

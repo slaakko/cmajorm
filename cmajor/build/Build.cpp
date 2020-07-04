@@ -2952,9 +2952,38 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 {
                     LogMessage(project->LogStreamId(), "==> " + project->ModuleFilePath());
                 }
+                if (GetBackEnd() == BackEnd::cmcpp)
+                {
+                    if (GetGlobalFlag(GlobalFlags::verbose))
+                    {
+                        LogMessage(project->LogStreamId(), "Writing project debug info file...");
+                    }
+                    std::string pdiFilePath = Path::ChangeExtension(project->ModuleFilePath(), ".pdi");
+                    rootModule->WriteProjectDebugInfoFile(pdiFilePath);
+                    if (GetGlobalFlag(GlobalFlags::verbose))
+                    {
+                        LogMessage(project->LogStreamId(), "==> " + pdiFilePath);
+                    }
+                }
                 if (!GetGlobalFlag(GlobalFlags::msbuild))
                 {
                     WriteProjectInfo(project, compileUnits);
+                }
+                if (GetBackEnd() == BackEnd::cmcpp)
+                {
+                    if (project->GetTarget() == Target::program || project->GetTarget() == Target::winguiapp || project->GetTarget() == Target::winapp)
+                    {
+                        if (GetGlobalFlag(GlobalFlags::verbose))
+                        {
+                            LogMessage(project->LogStreamId(), "Writing debug information file...");
+                        }
+                        std::string cmdbFilePath = Path::ChangeExtension(project->ExecutableFilePath(), ".cmdb");
+                        rootModule->WriteCmdbFile(cmdbFilePath);
+                        if (GetGlobalFlag(GlobalFlags::verbose))
+                        {
+                            LogMessage(project->LogStreamId(), "==> " + cmdbFilePath);
+                        }
+                    }
                 }
                 if (GetGlobalFlag(GlobalFlags::verbose))
                 {

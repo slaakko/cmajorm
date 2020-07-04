@@ -7,6 +7,7 @@
 #define CMAJOR_CMCPPI_INSTRUCTION_INCLUDED
 #include <cmajor/cmcppi/Value.hpp>
 #include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/BinaryWriter.hpp>
 #include <vector>
 #include <utility>
 #include <set>
@@ -26,7 +27,7 @@ class CMCPPI_API Instruction : public Value
 public:
     Instruction();
     Type* GetType(Context& context) override;
-    virtual void Write(CodeFormatter& formatter, Function& function, Context& context) = 0;
+    virtual void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) = 0;
     std::string Name(Context& context) override;
     virtual void ObtainResultId(Function& function);
     virtual void WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context);
@@ -40,9 +41,23 @@ public:
     void SetNoSemicolon() { noSemicolon = true; }
     bool NoSemicolon() const { return noSemicolon; }
     virtual void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks);
+    void WriteDebugInfoRecord(BinaryWriter& writer, int32_t& numInsts);
+    int32_t CppLineNumber() const { return cppLineNumber; }
+    void SetCppLineNumber(int32_t cppLineNumber_) { cppLineNumber = cppLineNumber_;  }
+    int32_t CppLineIndex() const { return cppLineIndex; }
+    void SetCppLineIndex(int32_t cppLineIndex_) { cppLineIndex = cppLineIndex_; }
+    void SetLineNumbers(CodeFormatter& formatter, Context& context);
+    int16_t ScopeId() const { return scopeId; }
+    void SetScopeId(int16_t scopeId_) { scopeId = scopeId_; }
+    int16_t Flags() const { return flags; }
+    void SetFlags(int16_t flags_) { flags = flags_; }
 private:
     int resultId;
-    int sourceLineNumber;
+    int32_t sourceLineNumber;
+    int32_t cppLineNumber;
+    int32_t cppLineIndex;
+    int16_t flags;
+    int16_t scopeId;
     bool noSemicolon;
 };
 
@@ -83,7 +98,7 @@ class CMCPPI_API NotInstruction : public UnaryInstruction
 {
 public:
     NotInstruction(Value* arg_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "not"; }
 };
 
@@ -91,7 +106,7 @@ class CMCPPI_API NegInstruction : public UnaryInstruction
 {
 public:
     NegInstruction(Value* arg_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "neg"; }
 };
 
@@ -99,7 +114,7 @@ class CMCPPI_API AddInstruction : public BinaryInstruction
 {
 public:
     AddInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "add"; }
 };
 
@@ -107,7 +122,7 @@ class CMCPPI_API SubInstruction : public BinaryInstruction
 {
 public:
     SubInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "sub"; }
 };
 
@@ -115,7 +130,7 @@ class CMCPPI_API MulInstruction : public BinaryInstruction
 {
 public:
     MulInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "mul"; }
 };
 
@@ -123,7 +138,7 @@ class CMCPPI_API DivInstruction : public BinaryInstruction
 {
 public:
     DivInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "div"; }
 };
 
@@ -131,7 +146,7 @@ class CMCPPI_API ModInstruction : public BinaryInstruction
 {
 public:
     ModInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "mod"; }
 };
 
@@ -139,7 +154,7 @@ class CMCPPI_API AndInstruction : public BinaryInstruction
 {
 public:
     AndInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "and"; }
 };
 
@@ -147,7 +162,7 @@ class CMCPPI_API OrInstruction : public BinaryInstruction
 {
 public:
     OrInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "or"; }
 };
 
@@ -155,7 +170,7 @@ class CMCPPI_API XorInstruction : public BinaryInstruction
 {
 public:
     XorInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "xor"; }
 };
 
@@ -163,7 +178,7 @@ class CMCPPI_API ShlInstruction : public BinaryInstruction
 {
 public:
     ShlInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "shl"; }
 };
 
@@ -171,7 +186,7 @@ class CMCPPI_API ShrInstruction : public BinaryInstruction
 {
 public:
     ShrInstruction(Value* left_, Value* right_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "shr"; }
 };
 
@@ -180,7 +195,7 @@ class CMCPPI_API EqualInstruction : public BinaryInstruction
 public:
     EqualInstruction(Value* left_, Value* right_);
     Type* GetType(Context& context) override;
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "equal"; }
 };
 
@@ -189,7 +204,7 @@ class CMCPPI_API LessInstruction : public BinaryInstruction
 public:
     LessInstruction(Value* left_, Value* right_);
     Type* GetType(Context& context) override;
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "less"; }
 };
 
@@ -197,7 +212,7 @@ class CMCPPI_API SignExtendInstruction : public UnaryTypeInstruction
 {
 public:
     SignExtendInstruction(Value* arg_, Type* destType_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "signextend"; }
 };
 
@@ -205,7 +220,7 @@ class CMCPPI_API ZeroExtendInstruction : public UnaryTypeInstruction
 {
 public:
     ZeroExtendInstruction(Value* arg_, Type* destType_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "zeroextend"; }
 };
 
@@ -213,7 +228,7 @@ class CMCPPI_API TruncateInstruction : public UnaryTypeInstruction
 {
 public:
     TruncateInstruction(Value* arg_, Type* destType_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "truncate"; }
 };
 
@@ -221,7 +236,7 @@ class CMCPPI_API BitCastInstruction : public UnaryTypeInstruction
 {
 public:
     BitCastInstruction(Value* arg_, Type* destType_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "bitcast"; }
 };
 
@@ -229,7 +244,7 @@ class CMCPPI_API IntToFloatInstruction : public UnaryTypeInstruction
 {
 public:
     IntToFloatInstruction(Value* arg_, Type* destType_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "inttofloat"; }
 };
 
@@ -237,7 +252,7 @@ class CMCPPI_API FloatToIntInstruction : public UnaryTypeInstruction
 {
 public:
     FloatToIntInstruction(Value* arg_, Type* destType_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "floattoint"; }
 };
 
@@ -245,7 +260,7 @@ class CMCPPI_API IntToPtrInstruction : public UnaryTypeInstruction
 {
 public:
     IntToPtrInstruction(Value* arg_, Type* destType_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "inttoptr"; }
 };
 
@@ -253,7 +268,7 @@ class CMCPPI_API PtrToIntInstruction : public UnaryTypeInstruction
 {
 public:
     PtrToIntInstruction(Value* arg_, Type* destType_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "ptrtoint"; }
 };
 
@@ -262,7 +277,7 @@ class CMCPPI_API ParamInstruction : public Instruction
 public:
     ParamInstruction(Type* type_, const std::string& paramName_);
     Type* GetType(Context& context) override { return type; }
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string Name(Context& context) override { return paramName; }
     std::string IrName() const override { return "param"; }
 private:
@@ -278,9 +293,10 @@ public:
     bool IsResultInstruction(Context& context) override { return true; }
     void ObtainResultId(Function& function) override;
     void WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context) override;
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "local"; }
     const std::string& LocalName() const { return localName; }
+    void ObtainLocalName(Function& function);
 private:
     Type* type;
     std::string localName;
@@ -292,7 +308,7 @@ public:
     LoadInstruction(Value* ptr_);
     Type* GetType(Context& context) override;
     bool IsResultInstruction(Context& context) override { return true; }
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "load"; }
 private:
     Value* ptr;
@@ -302,7 +318,7 @@ class CMCPPI_API StoreInstruction : public Instruction
 {
 public:
     StoreInstruction(Value* value_, Value* ptr_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "store"; }
 private:
     Value* value;
@@ -317,7 +333,7 @@ public:
     void WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context) override;
     void WriteResult(CodeFormatter& formatter, Function& function, Context& context) override;
     bool IsResultInstruction(Context& context) override { return true; }
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "arg"; }
     std::string Name(Context& context) override { return argName; }
 private:
@@ -331,7 +347,7 @@ public:
     ElemAddrInstruction(Value* ptr_, Value* index_);
     Type* GetType(Context& context) override;
     bool IsResultInstruction(Context& context) override { return true; }
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "elemaddr"; }
 private:
     Value* ptr;
@@ -344,7 +360,7 @@ public:
     PtrOffsetInstruction(Value* ptr_, Value* offset_);
     Type* GetType(Context& context) override { return ptr->GetType(context); }
     bool IsResultInstruction(Context& context) override { return true; }
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "ptroffset"; }
 private:
     Value* ptr;
@@ -357,7 +373,7 @@ public:
     PtrDiffInstruction(Value* leftPtr_, Value* rightPtr_);
     Type* GetType(Context& context) override;
     bool IsResultInstruction(Context& context) override { return true; }
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "ptrdiff"; }
 private:
     Value* leftPtr;
@@ -370,7 +386,7 @@ public:
     CallInstruction(Value* function_, const std::vector<Value*>& args_);
     Type* GetType(Context& context) override;
     bool IsResultInstruction(Context& context) override;
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "call"; }
 private:
     Value* function;
@@ -383,7 +399,7 @@ public:
     InvokeInstruction(Value* function_, const std::vector<Value*> args_, BasicBlock* normalBlockNext_, BasicBlock* unwindBlockNext_);
     Type* GetType(Context& context) override;
     bool IsResultInstruction(Context& context) override;
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "invoke"; }
     void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
@@ -397,7 +413,7 @@ class CMCPPI_API RetInstruction : public Instruction
 {
 public:
     RetInstruction(Value* value_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "ret"; }
 private:
     Value* value;
@@ -407,7 +423,7 @@ class CMCPPI_API JumpInstruction : public Instruction
 {
 public:
     JumpInstruction(BasicBlock* dest_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "jmp"; }
     void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
@@ -418,7 +434,7 @@ class CMCPPI_API BranchInstruction : public Instruction
 {
 public:
     BranchInstruction(Value* cond_, BasicBlock* trueDest_, BasicBlock* falseDest_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "branch"; }
     void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
@@ -432,7 +448,7 @@ class CMCPPI_API SwitchInstruction : public Instruction
 public:
     SwitchInstruction(Value* cond_, BasicBlock* defaultDest_);
     void AddCase(Value* caseValue, BasicBlock* dest);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "switch"; }
     void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
@@ -445,7 +461,9 @@ class CMCPPI_API NoOperationInstruction : public Instruction
 {
 public:
     NoOperationInstruction();
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    bool IsResultInstruction(Context& context) override { return true; }
+    void WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     bool IsNoOperation() const override { return true; }
     std::string IrName() const override { return "nop"; }
 };
@@ -454,7 +472,7 @@ class CMCPPI_API BeginTryInstruction : public Instruction
 {
 public:
     BeginTryInstruction();
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "beginTry"; }
 };
 
@@ -462,7 +480,7 @@ class CMCPPI_API EndTryInstruction : public Instruction
 {
 public:
     EndTryInstruction(BasicBlock* nextDest_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "endTry"; }
     void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
@@ -473,7 +491,7 @@ class CMCPPI_API BeginCatchInstruction : public Instruction
 {
 public:
     BeginCatchInstruction();
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "beginCatch"; }
     void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 };
@@ -482,7 +500,7 @@ class CMCPPI_API EndCatchInstruction : public Instruction
 {
 public:
     EndCatchInstruction(BasicBlock* nextDest_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "endCatch"; }
     void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:
@@ -493,7 +511,7 @@ class CMCPPI_API ResumeInstruction : public Instruction
 {
 public:
     ResumeInstruction();
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "resume"; }
 };
 
@@ -501,7 +519,7 @@ class CMCPPI_API IncludeBasicBlockInstruction : public Instruction
 {
 public:
     IncludeBasicBlockInstruction(BasicBlock* block_);
-    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
     std::string IrName() const override { return "include"; }
     void CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks) override;
 private:

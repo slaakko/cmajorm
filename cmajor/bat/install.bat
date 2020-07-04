@@ -5,6 +5,10 @@ xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmclientd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmclient.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmserverd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmserver.exe ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmdbd.exe ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmdb.exe ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmdb2xmld.exe ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmdb2xml.exe ..\bin
 
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmupdd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmupd.exe ..\bin
@@ -13,6 +17,13 @@ xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gmp\cmrt360gmp.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gmp\cmrt360gmp.lib ..\lib
 xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gnutls\bin\*.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gnutls\libgnutls-30.lib ..\lib
+
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmdebugd.dll ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmdebugd.lib ..\lib
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmdebug.dll ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmdebug.lib ..\lib
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmdb2xmld.exe ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmdb2xml.exe ..\bin
 
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmsngcmastd.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmsngcmastd.lib ..\lib

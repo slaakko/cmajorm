@@ -1,0 +1,59 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/cmdebug/DebugApi.hpp>
+
+classmap GdbReplyClassMap;
+
+prefix "cmajor/cmdebug";
+
+tokens GdbReplyTokens
+{
+    (GDB, "'gdb'"), (DONE, "'done'"), (RUNNING, "'running'"), (CONNECTED, "'connected'"), (ERROR, "'error'"), (EXIT, "'exit'"), (STOPPED, "'stopped'"), 
+    (IDENTIFIER, "identifier"), (STRING, "'string'"),
+    (LPAREN, "'('"), (RPAREN, "')'"), (EQ, "'='"), (COMMA, "','"), (TILDE, "'~'"), (AT, "'@'"), (AMP, "'&'"), (AST, "'*'"), (CARET, "'^'"),
+    (LBRACE, "'{'"), (RBRACE, "'}'"), (LBRACKET, "'['"), (RBRACKET, "']'")
+}
+
+keywords GdbReplyKeywords
+{
+    ("gdb", GDB), ("done", DONE), ("running", RUNNING), ("connected", CONNECTED), ("error", ERROR), ("exit", EXIT), ("stopped", STOPPED)
+}
+
+expressions
+{
+    ws = "[\t ]+";
+    newline = "\r\n|\n|\r";
+    identifier = "[a-zA-Z_][a-zA-Z0-9_-]*";
+    decdigits = "[0-9]+";
+    hexdigit = "[0-9a-fA-F]";
+    hexdigits = "{hexdigit}+";
+    hex4 = "{hexdigit}{hexdigit}{hexdigit}{hexdigit}";
+    hex8 = "{hex4}{hex4}";
+    octaldigits = "[0-7]+";
+    escape = "\\((x|X){hexdigits}|(d|D){decdigits}|{octaldigits}|u{hex4}|U{hex8}|[abfnrtv\"'\\])";
+    string = "\"([^\\\r\n\"]|{escape})*\"";
+}
+
+lexer api(DEBUG_API) GdbReplyLexer
+{
+    "{ws}" { }
+    "{newline}" { }
+    "{identifier}"{ int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return IDENTIFIER; else return kw; }
+    "{string}"{ return STRING; }
+    "\("{ return LPAREN; }
+    "\)"{ return RPAREN; }
+    "="{ return EQ; }
+    ","{ return COMMA; }
+    "~"{ return TILDE; }
+    "@"{ return AT; }
+    "&"{ return AMP; }
+    "\*"{ return AST; }
+    "\^"{ return CARET; }
+    "\{"{ return LBRACE; }
+    "\}"{ return RBRACE; }
+    "\["{ return LBRACKET; }
+    "\]"{ return RBRACKET; }
+}

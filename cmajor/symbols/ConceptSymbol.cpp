@@ -86,7 +86,7 @@ void ConceptGroupSymbol::Check()
 }
 
 ConceptSymbol::ConceptSymbol(const Span& span_, const std::u32string& name_) : ContainerSymbol(SymbolType::conceptSymbol, span_, name_), refinedConcept(nullptr), 
-    typeId(boost::uuids::nil_generator()()), hasSource(false)
+    typeId(boost::uuids::nil_uuid()), hasSource(false)
 {
 }
 
@@ -96,7 +96,7 @@ void ConceptSymbol::Write(SymbolWriter& writer)
     Assert(!typeId.is_nil(), "type id not initialized");
     writer.GetBinaryWriter().Write(typeId);
     writer.GetBinaryWriter().Write(groupName);
-    boost::uuids::uuid refineConceptId = boost::uuids::nil_generator()();
+    boost::uuids::uuid refineConceptId = boost::uuids::nil_uuid();
     if (refinedConcept)
     {
         refineConceptId = refinedConcept->TypeId();

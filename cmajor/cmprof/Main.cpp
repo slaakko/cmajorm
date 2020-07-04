@@ -24,6 +24,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/nil_generator.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -77,7 +78,7 @@ inline Report operator&(Report left, Report right)
 
 struct ProfiledFunction
 {
-    ProfiledFunction() : functionId(boost::uuids::nil_generator()()), functionName(), recursionCount(0), count(0), elapsedInclusive(0), elapsedExclusive(0), start(), childCalled(false) {}
+    ProfiledFunction() : functionId(boost::uuids::nil_uuid()), functionName(), recursionCount(0), count(0), elapsedInclusive(0), elapsedExclusive(0), start(), childCalled(false) {}
     boost::uuids::uuid functionId;
     std::u32string functionName;
     int recursionCount;

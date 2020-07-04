@@ -236,11 +236,13 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
         emitter->SetFunctionLinkageToLinkOnceODRLinkage(function);
     }
     int32_t fileIndex = -1;
+    boost::uuids::uuid functionId;
     if (functionSymbol->HasSource())
     {
         fileIndex = functionSymbol->GetSpan().fileIndex;
+        functionId = functionSymbol->FunctionId();
     }
-    emitter->SetFunction(function, fileIndex);
+    emitter->SetFunction(function, fileIndex, functionId);
     void* entryBlock = emitter->CreateBasicBlock("entry");
     entryBasicBlock = entryBlock;
     emitter->SetCurrentBasicBlock(entryBlock);

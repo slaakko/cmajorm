@@ -7,12 +7,13 @@
 #include <cmajor/cmcppi/Type.hpp>
 #include <cmajor/cmcppi/Context.hpp>
 #include <cmajor/cmcppi/Function.hpp>
+#include <cmajor/cmdebug/DebugInfoIo.hpp>
 #include <soulng/util/Error.hpp>
 #include <soulng/util/TextUtils.hpp>
 
 namespace cmcppi {
 
-Instruction::Instruction() : resultId(-1), sourceLineNumber(0), noSemicolon(false)
+Instruction::Instruction() : resultId(-1), sourceLineNumber(0), cppLineNumber(0), cppLineIndex(0), scopeId(-1), flags(0), noSemicolon(false)
 {
 }
 
@@ -44,6 +45,30 @@ void Instruction::WriteResult(CodeFormatter& formatter, Function& function, Cont
 
 void Instruction::CollectReferencedBasicBlocks(BasicBlock* parent, std::set<BasicBlock*>& basicBlocks)
 {
+}
+
+void Instruction::SetLineNumbers(CodeFormatter& formatter, Context& context)
+{
+    cppLineNumber = formatter.Line() + 1; // formatter.Line() is a comment, formatter.Line() + 1 is the line number of the instruction itself
+    if (sourceLineNumber != 0 && context.SourceLineNumber() == sourceLineNumber)
+    {
+        context.SetCppLineIndex(context.CppLineIndex() + 1);
+    }
+    else
+    {
+        context.SetCppLineIndex(0);
+    }
+    cppLineIndex = context.CppLineIndex();
+    context.SetSourceLineNumber(sourceLineNumber);
+}
+
+void Instruction::WriteDebugInfoRecord(BinaryWriter& writer, int32_t& numInsts)
+{
+    if (sourceLineNumber != 0)
+    {
+        cmajor::debug::WriteInstructionRecord(writer, cppLineNumber, sourceLineNumber, cppLineIndex, scopeId, flags);
+        ++numInsts;
+    }
 }
 
 UnaryInstruction::UnaryInstruction(Value* arg_) : Instruction(), arg(arg_)
@@ -79,7 +104,7 @@ NotInstruction::NotInstruction(Value* arg_) : UnaryInstruction(arg_)
 {
 }
 
-void NotInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void NotInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     if (Arg()->GetType(context)->Id() == boolTypeId)
@@ -97,7 +122,7 @@ NegInstruction::NegInstruction(Value* arg_) : UnaryInstruction(arg_)
 {
 }
 
-void NegInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void NegInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = -");
@@ -108,7 +133,7 @@ AddInstruction::AddInstruction(Value* left_, Value* right_) : BinaryInstruction(
 {
 }
 
-void AddInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void AddInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -119,7 +144,7 @@ SubInstruction::SubInstruction(Value* left_, Value* right_) : BinaryInstruction(
 {
 }
 
-void SubInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void SubInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -130,7 +155,7 @@ MulInstruction::MulInstruction(Value* left_, Value* right_) : BinaryInstruction(
 {
 }
 
-void MulInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void MulInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -141,7 +166,7 @@ DivInstruction::DivInstruction(Value* left_, Value* right_) : BinaryInstruction(
 {
 }
 
-void DivInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void DivInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -152,7 +177,7 @@ ModInstruction::ModInstruction(Value* left_, Value* right_) : BinaryInstruction(
 {
 }
 
-void ModInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void ModInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -163,7 +188,7 @@ AndInstruction::AndInstruction(Value* left_, Value* right_) : BinaryInstruction(
 {
 }
 
-void AndInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void AndInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -174,7 +199,7 @@ OrInstruction::OrInstruction(Value* left_, Value* right_) : BinaryInstruction(le
 {
 }
 
-void OrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void OrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -185,7 +210,7 @@ XorInstruction::XorInstruction(Value* left_, Value* right_) : BinaryInstruction(
 {
 }
 
-void XorInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void XorInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -196,7 +221,7 @@ ShlInstruction::ShlInstruction(Value* left_, Value* right_) : BinaryInstruction(
 {
 }
 
-void ShlInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void ShlInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -207,7 +232,7 @@ ShrInstruction::ShrInstruction(Value* left_, Value* right_) : BinaryInstruction(
 {
 }
 
-void ShrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void ShrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" =  ");
@@ -223,7 +248,7 @@ Type* EqualInstruction::GetType(Context& context)
     return context.GetBoolType();
 }
 
-void EqualInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void EqualInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -239,7 +264,7 @@ Type* LessInstruction::GetType(Context& context)
     return context.GetBoolType();
 }
 
-void LessInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void LessInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -250,7 +275,7 @@ SignExtendInstruction::SignExtendInstruction(Value* arg_, Type* destType_) : Una
 {
 }
 
-void SignExtendInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void SignExtendInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -261,7 +286,7 @@ ZeroExtendInstruction::ZeroExtendInstruction(Value* arg_, Type* destType_) : Una
 {
 }
 
-void ZeroExtendInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void ZeroExtendInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ");
@@ -272,7 +297,7 @@ TruncateInstruction::TruncateInstruction(Value* arg_, Type* destType_) : UnaryTy
 {
 }
 
-void TruncateInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void TruncateInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
@@ -284,7 +309,7 @@ BitCastInstruction::BitCastInstruction(Value* arg_, Type* destType_) : UnaryType
 {
 }
 
-void BitCastInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void BitCastInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     if (Arg()->IsNullValue())
@@ -311,7 +336,7 @@ IntToFloatInstruction::IntToFloatInstruction(Value* arg_, Type* destType_) : Una
 {
 }
 
-void IntToFloatInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void IntToFloatInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
@@ -323,7 +348,7 @@ FloatToIntInstruction::FloatToIntInstruction(Value* arg_, Type* destType_) : Una
 {
 }
 
-void FloatToIntInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void FloatToIntInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = static_cast<" + GetType(context)->Name() + ">(");
@@ -335,7 +360,7 @@ IntToPtrInstruction::IntToPtrInstruction(Value* arg_, Type* destType_) : UnaryTy
 {
 }
 
-void IntToPtrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void IntToPtrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = reinterpret_cast<" + GetType(context)->Name() + ">(");
@@ -347,7 +372,7 @@ PtrToIntInstruction::PtrToIntInstruction(Value* arg_, Type* destType_) : UnaryTy
 {
 }
 
-void PtrToIntInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void PtrToIntInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = *reinterpret_cast<" + GetType(context)->Name() + "*>(&");
@@ -359,7 +384,7 @@ ParamInstruction::ParamInstruction(Type* type_, const std::string& paramName_) :
 {
 }
 
-void ParamInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void ParamInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
 }
 
@@ -375,8 +400,16 @@ Type* LocalInstruction::GetType(Context& context)
 void LocalInstruction::ObtainResultId(Function& function)
 {
     Instruction::ObtainResultId(function);
-    int localNumber = function.GetNextLocalNumber();
-    localName = "__local" + std::to_string(localNumber);
+    ObtainLocalName(function);
+}
+
+void LocalInstruction::ObtainLocalName(Function& function)
+{
+    if (localName.empty())
+    {
+        int localNumber = function.GetNextLocalNumber();
+        localName = "__local" + std::to_string(localNumber);
+    }
 }
 
 void LocalInstruction::WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context)
@@ -385,7 +418,7 @@ void LocalInstruction::WriteResultDeclaration(CodeFormatter& formatter, Function
     formatter.WriteLine(type->Name() + " " + localName + ";");
 }
 
-void LocalInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void LocalInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = &" + localName);
@@ -402,7 +435,7 @@ Type* LoadInstruction::GetType(Context& context)
     return ptrType->BaseType();
 }
 
-void LoadInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void LoadInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = *" + ptr->Name(context));
@@ -412,7 +445,7 @@ StoreInstruction::StoreInstruction(Value* value_, Value* ptr_) : Instruction(), 
 {
 }
 
-void StoreInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void StoreInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     formatter.Write("*" + ptr->Name(context) + " = " + value->Name(context));
 }
@@ -436,7 +469,7 @@ void ArgInstruction::WriteResult(CodeFormatter& formatter, Function& function, C
     formatter.Write(argName);
 }
 
-void ArgInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void ArgInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = " + arg->Name(context));
@@ -478,7 +511,7 @@ Type* ElemAddrInstruction::GetType(Context& context)
     }
 }
 
-void ElemAddrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void ElemAddrInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     Type* type = ptr->GetType(context);
     Assert(type->IsPtrType(), "pointer type expected");
@@ -512,7 +545,7 @@ PtrOffsetInstruction::PtrOffsetInstruction(Value* ptr_, Value* offset_) : Instru
 {
 }
 
-void PtrOffsetInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void PtrOffsetInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = (");
@@ -532,7 +565,7 @@ Type* PtrDiffInstruction::GetType(Context& context)
     return context.GetLongType();
 }
 
-void PtrDiffInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void PtrDiffInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = (");
@@ -579,7 +612,7 @@ bool CallInstruction::IsResultInstruction(Context& context)
     return false;
 }
 
-void CallInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void CallInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     if (!GetType(context)->IsVoidType())
     {
@@ -647,7 +680,7 @@ bool InvokeInstruction::IsResultInstruction(Context& context)
     return false;
 }
 
-void InvokeInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void InvokeInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     if (!GetType(context)->IsVoidType())
     {
@@ -697,7 +730,7 @@ RetInstruction::RetInstruction(Value* value_) : Instruction(), value(value_)
 {
 }
 
-void RetInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void RetInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     formatter.Write(Format("return", 8));
     if (value)
@@ -710,7 +743,7 @@ JumpInstruction::JumpInstruction(BasicBlock* dest_) : Instruction(), dest(dest_)
 {
 }
 
-void JumpInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void JumpInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     formatter.Write(Format("goto ", 8));
     formatter.Write("__bb" + std::to_string(dest->Id()));
@@ -725,7 +758,7 @@ BranchInstruction::BranchInstruction(Value* cond_, BasicBlock* trueDest_, BasicB
 {
 }
 
-void BranchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void BranchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     formatter.Write("if (");
     formatter.Write(cond->Name(context));
@@ -750,7 +783,7 @@ void SwitchInstruction::AddCase(Value* caseValue, BasicBlock* dest)
     destinations.push_back(std::make_pair(caseValue, dest));
 }
 
-void SwitchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void SwitchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     formatter.Write("switch (");
     formatter.Write(cond->Name(context));
@@ -787,16 +820,23 @@ NoOperationInstruction::NoOperationInstruction() : Instruction()
 {
 }
 
-void NoOperationInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void NoOperationInstruction::WriteResultDeclaration(CodeFormatter& formatter, Function& function, Context& context)
 {
-    formatter.Write(";");
+    if (function.NopResultDeclarationWritten()) return;
+    function.SetNopResultDeclarationWritten();
+    formatter.WriteLine("int __nop;");
+}
+
+void NoOperationInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
+{
+    formatter.Write("__nop = 0");
 }
 
 BeginTryInstruction::BeginTryInstruction() : Instruction()
 {
 }
 
-void BeginTryInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void BeginTryInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     formatter.WriteLine("try");
     formatter.WriteLine("{");
@@ -808,7 +848,7 @@ EndTryInstruction::EndTryInstruction(BasicBlock* nextDest_) : Instruction(), nex
 {
 }
 
-void EndTryInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void EndTryInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     if (nextDest)
     {
@@ -828,7 +868,7 @@ void EndTryInstruction::Write(CodeFormatter& formatter, Function& function, Cont
         {
             child->SetIncluded();
             formatter.WriteLine();
-            child->Write(formatter, function, context);
+            child->Write(formatter, function, context, writer, numInsts);
             SetNoSemicolon();
         }
     }
@@ -854,7 +894,7 @@ BeginCatchInstruction::BeginCatchInstruction() : Instruction()
 {
 }
 
-void BeginCatchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void BeginCatchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     formatter.WriteLine("catch (...)");
     formatter.WriteLine("{");
@@ -871,7 +911,7 @@ EndCatchInstruction::EndCatchInstruction(BasicBlock* nextDest_) : Instruction(),
 {
 }
 
-void EndCatchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void EndCatchInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     for (BasicBlock* child : context.GetCurrentBasicBlock()->Children())
     {
@@ -882,7 +922,7 @@ void EndCatchInstruction::Write(CodeFormatter& formatter, Function& function, Co
         if (!child->Included())
         {
             child->SetIncluded();
-            child->Write(formatter, function, context);
+            child->Write(formatter, function, context, writer, numInsts);
             formatter.WriteLine();
             SetNoSemicolon();
         }
@@ -912,7 +952,7 @@ ResumeInstruction::ResumeInstruction() : Instruction()
 {
 }
 
-void ResumeInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void ResumeInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     formatter.Write("throw");
 }
@@ -921,12 +961,12 @@ IncludeBasicBlockInstruction::IncludeBasicBlockInstruction(BasicBlock* block_) :
 {
 }
 
-void IncludeBasicBlockInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+void IncludeBasicBlockInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
 {
     if (!block->Included())
     {
         block->SetIncluded();
-        block->Write(formatter, function, context);
+        block->Write(formatter, function, context, writer, numInsts);
         formatter.WriteLine();
         SetNoSemicolon();
     }

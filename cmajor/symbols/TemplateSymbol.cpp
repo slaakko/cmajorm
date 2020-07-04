@@ -28,7 +28,7 @@ void TemplateParameterSymbol::Write(SymbolWriter& writer)
     writer.GetBinaryWriter().Write(hasDefault);
     if (hasDefault)
     {
-        boost::uuids::uuid defaultTypeId = boost::uuids::nil_generator()();
+        boost::uuids::uuid defaultTypeId = boost::uuids::nil_uuid();
         if (defaultType != nullptr)
         {
             defaultTypeId = defaultType->TypeId();

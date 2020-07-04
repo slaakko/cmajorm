@@ -7,6 +7,9 @@
 #define CMAJOR_SYMBOLS_MODULE_INCLUDED
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Warning.hpp>
+#include <cmajor/symbols/FileIndex.hpp>
+#include <cmajor/symbols/FunctionIndex.hpp>
+#include <cmajor/symbols/TypeIndex.hpp>
 #ifdef _WIN32
 #include <cmajor/symbols/ResourceTable.hpp>
 #endif
@@ -184,6 +187,12 @@ public:
     void SetPreparing(bool preparing_) { preparing = preparing_; }
     void AddCompileUnitId(const std::string& compileUnitId);
     const std::set<std::string>& AllCompileUnitIds() const { return allCompileUnitIds; }
+    FileIndex& GetFileIndex() { return fileIndex; }
+    FunctionIndex& GetFunctionIndex() { return functionIndex; }
+    TypeIndex& GetTypeIndex() { return typeIndex; }
+    void WriteProjectDebugInfoFile(const std::string& projectDebufInfoFilePath);
+    void WriteCmdbFile(const std::string& cmdbFilePath);
+    void WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Module* rootModule);
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -229,6 +238,9 @@ private:
     std::recursive_mutex lock;
     int64_t buildStartMs;
     int64_t buildStopMs;
+    FileIndex fileIndex;
+    FunctionIndex functionIndex;
+    TypeIndex typeIndex;
     void CheckUpToDate();
 };
 

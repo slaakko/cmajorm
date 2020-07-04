@@ -386,7 +386,7 @@ std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 
 FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) : 
     ContainerSymbol(SymbolType::functionSymbol, span_, name_), functionTemplate(nullptr), master(nullptr),
-    functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
+    functionId(boost::uuids::nil_uuid()), groupName(), parameters(), localVariables(),
     returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
     nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false), unwindInfoVar(nullptr)
 {
@@ -394,7 +394,7 @@ FunctionSymbol::FunctionSymbol(const Span& span_, const std::u32string& name_) :
 
 FunctionSymbol::FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
     ContainerSymbol(symbolType_, span_, name_), functionTemplate(nullptr), master(nullptr),
-    functionId(boost::uuids::nil_generator()()), groupName(), parameters(), localVariables(), 
+    functionId(boost::uuids::nil_uuid()), groupName(), parameters(), localVariables(),
     returnType(), flags(FunctionSymbolFlags::none), index(-1), vmtIndex(-1), imtIndex(-1),
     nextTemporaryIndex(0), functionGroup(nullptr), isProgramMain(false), unwindInfoVar(nullptr)
 {
@@ -408,7 +408,7 @@ void FunctionSymbol::Write(SymbolWriter& writer)
     writer.GetBinaryWriter().Write(index);
     writer.GetBinaryWriter().Write(groupName);
     writer.GetBinaryWriter().Write(static_cast<uint32_t>(flags));
-    boost::uuids::uuid functionTemplateId = boost::uuids::nil_generator()();
+    boost::uuids::uuid functionTemplateId = boost::uuids::nil_uuid();
     if (functionTemplate)
     {
         functionTemplateId = functionTemplate->FunctionId();
@@ -420,7 +420,7 @@ void FunctionSymbol::Write(SymbolWriter& writer)
         Node* node = GetRootModuleForCurrentThread()->GetSymbolTable().GetNode(this);
         writer.GetAstWriter().Write(node);
     }
-    boost::uuids::uuid returnTypeId = boost::uuids::nil_generator()();
+    boost::uuids::uuid returnTypeId = boost::uuids::nil_uuid();
     if (returnType)
     {
         returnTypeId = returnType->TypeId();

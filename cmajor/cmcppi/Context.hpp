@@ -7,6 +7,7 @@
 #define CMAJOR_CMCPPI_CONTEXT_INCLUDED
 #include <cmajor/cmcppi/Type.hpp>
 #include <cmajor/cmcppi/Data.hpp>
+#include <boost/uuid/uuid.hpp>
 #include <stack>
 
 namespace cmcppi {
@@ -14,6 +15,7 @@ namespace cmcppi {
 class Function;
 class Instruction;
 class BasicBlock;
+class LocalInstruction;
 
 class CMCPPI_API Context
 {
@@ -129,13 +131,22 @@ public:
     GlobalVariable* CreateGlobalWStringPtr(const std::u16string& stringValue);
     GlobalVariable* CreateGlobalUStringPtr(const std::u32string& stringValue);
     void SetCurrentLineNumber(int lineNumber);
-    void AddLineInfo(Instruction* inst);
+    void BeginScope();
+    void EndScope();
+    void BeginInstructionFlag(int16_t instructionFlag);
+    void EndInstructionFlag(int16_t instructionFlag);
+    void AddLineInfoScopeIdAndFlags(Instruction* inst);
     void SetCompileUnitId(const std::string& compileUnitId);
     void PushParent();
     void PopParent();
     void SetHandlerBlock(BasicBlock* tryBlock, BasicBlock* catchBlock);
     void SetCleanupBlock(BasicBlock* cleanupBlock);
     BasicBlock* CurrentParent() const { return currentParentBlock; }
+    int32_t SourceLineNumber() const { return sourceLineNumber; }
+    void SetSourceLineNumber(int32_t sourceLineNumber_) { sourceLineNumber = sourceLineNumber_; }
+    int32_t CppLineIndex() const { return cppLineIndex; }
+    void SetCppLineIndex(int32_t cppLineIndex_) { cppLineIndex = cppLineIndex_; }
+    void AddLocalVariable(const std::string& name, const boost::uuids::uuid& typeId, LocalInstruction* inst);
 private:
     TypeRepository typeRepository;
     DataRepository dataRepository;
@@ -143,8 +154,12 @@ private:
     Function* currentFunction;
     BasicBlock* currentBasicBlock;
     BasicBlock* currentParentBlock;
+    int16_t currentScopeId;
+    int16_t currentInstructionFlags;
     std::stack<BasicBlock*> blockStack;
     int currentLineNumber;
+    int32_t sourceLineNumber;
+    int32_t cppLineIndex;
 };
 
 } // namespace cmcppi

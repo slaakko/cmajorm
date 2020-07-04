@@ -798,7 +798,7 @@ void StructuredLiteralNode::AddMember(Node* member)
     members.Add(member);
 }
 
-UuidLiteralNode::UuidLiteralNode(const Span& span_) : LiteralNode(NodeType::uuidLiteralNode, span_), uuid(boost::uuids::nil_generator()())
+UuidLiteralNode::UuidLiteralNode(const Span& span_) : LiteralNode(NodeType::uuidLiteralNode, span_), uuid(boost::uuids::nil_uuid())
 {
 }
 

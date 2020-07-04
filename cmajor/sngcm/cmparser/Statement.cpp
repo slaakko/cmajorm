@@ -4289,8 +4289,9 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("AssignmentStatementExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    std::unique_ptr<Node> target = std::unique_ptr<Node>();
     Span s = Span();
-    std::unique_ptr<Node> target;
+    std::unique_ptr<Node> tgt;
     std::unique_ptr<Node> source;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
@@ -4305,12 +4306,10 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
                 soulng::parser::Match* parentMatch3 = &match;
                 {
                     int64_t pos = lexer.GetPos();
-                    soulng::lexer::Span span = lexer.GetSpan();
                     soulng::parser::Match match(true);
                     if (match.hit)
                     {
                         ctx->PushParsingLvalue(true);
-                        s = span;
                     }
                     *parentMatch3 = match;
                 }
@@ -4326,9 +4325,10 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
                     {
                         int64_t pos = lexer.GetPos();
                         soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
-                        target.reset(static_cast<Node*>(match.value));
+                        tgt.reset(static_cast<Node*>(match.value));
                         if (match.hit)
                         {
+                            target.reset(tgt.release());
                             ctx->PopParsingLvalue();
                         }
                         else
@@ -4349,10 +4349,21 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
             soulng::parser::Match* parentMatch6 = &match;
             {
                 soulng::parser::Match match(false);
-                if (*lexer == ASSIGN)
+                soulng::parser::Match* parentMatch7 = &match;
                 {
-                    ++lexer;
-                    match.hit = true;
+                    int64_t pos = lexer.GetPos();
+                    soulng::lexer::Span span = lexer.GetSpan();
+                    soulng::parser::Match match(false);
+                    if (*lexer == ASSIGN)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        s = span;
+                    }
+                    *parentMatch7 = match;
                 }
                 *parentMatch6 = match;
             }
@@ -4363,10 +4374,10 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch7 = &match;
+        soulng::parser::Match* parentMatch8 = &match;
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch8 = &match;
+            soulng::parser::Match* parentMatch9 = &match;
             {
                 int64_t pos = lexer.GetPos();
                 soulng::lexer::Span span = lexer.GetSpan();
@@ -4382,9 +4393,9 @@ soulng::parser::Match StatementParser::AssignmentStatementExpr(CmajorLexer& lexe
                         return soulng::parser::Match(true, new AssignmentStatementNode(s, target.release(), source.release()));
                     }
                 }
-                *parentMatch8 = match;
+                *parentMatch9 = match;
             }
-            *parentMatch7 = match;
+            *parentMatch8 = match;
         }
         *parentMatch0 = match;
     }

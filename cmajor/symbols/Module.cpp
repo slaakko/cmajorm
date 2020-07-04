@@ -11,6 +11,9 @@
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
+#include <cmajor/symbols/FunctionIndex.hpp>
+#include <cmajor/cmdebug/DebugInfoIo.hpp>
+#include <cmajor/cmdebug/DIVariable.hpp>
 #include <sngcm/ast/Project.hpp>
 #include <sngcm/ast/AstReader.hpp>
 #include <soulng/util/CodeFormatter.hpp>
@@ -1511,6 +1514,130 @@ void Module::AddCompileUnitId(const std::string& compileUnitId)
 {
     compileUnitIds.insert(compileUnitId);
     allCompileUnitIds.insert(compileUnitId);
+}
+
+void Module::WriteProjectDebugInfoFile(const std::string& projectDebufInfoFilePath)
+{
+    BinaryWriter writer(projectDebufInfoFilePath);
+    int32_t numCompileUnits = fileTable.NumFilePaths();
+    cmajor::debug::WriteProjectTableHeader(writer, ToUtf8(name), Path::GetDirectoryName(originalFilePath), numCompileUnits, functionIndex.GetMainFunctionId());
+    for (int32_t i = 0; i < numCompileUnits; ++i)
+    {
+        std::string compileUnitBaseName = Path::GetFileNameWithoutExtension(fileTable.GetFilePath(i));
+        cmajor::debug::WriteProjectTableRecord(writer, compileUnitBaseName);
+    }
+    fileIndex.Write(writer);
+    functionIndex.Write(writer);
+    typeIndex.Write(writer);
+}
+
+void Module::WriteCmdbFile(const std::string& cmdbFilePath)
+{
+    BinaryWriter cmdbWriter(cmdbFilePath);
+    cmajor::debug::WriteCmdbFileTag(cmdbWriter);
+    std::string mainProjectName = ToUtf8(name);
+    cmajor::debug::WriteMainProjectName(cmdbWriter, mainProjectName);
+    int32_t numProjects = 0;
+    uint32_t numProjectsPos = cmdbWriter.Pos();
+    cmajor::debug::WriteNumberOfProjects(cmdbWriter, numProjects);
+    for (Module* referencedModule : referencedModules)
+    {
+        referencedModule->WriteDebugInfo(cmdbWriter, numProjects, this);
+    }
+    WriteDebugInfo(cmdbWriter, numProjects, this);
+    uint32_t currentPos = cmdbWriter.Pos();
+    cmdbWriter.Seek(numProjectsPos);
+    cmajor::debug::WriteNumberOfProjects(cmdbWriter, numProjects);
+    cmdbWriter.Seek(currentPos);
+}
+
+void Module::WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Module* rootModule)
+{
+    std::string pdiFilePath = Path::ChangeExtension(originalFilePath, ".pdi");
+    BinaryReader pdiReader(pdiFilePath);
+    std::string projectName;
+    std::string projectDirectoryPath;
+    int32_t numCompileUnits;
+    boost::uuids::uuid mainFunctionId;
+    cmajor::debug::ReadProjectTableHeader(pdiReader, projectName, projectDirectoryPath, numCompileUnits, mainFunctionId);
+    cmajor::debug::WriteProjectTableHeader(cmdbWriter, projectName, projectDirectoryPath, numCompileUnits, mainFunctionId);
+    for (int32_t i = 0; i < numCompileUnits; ++i)
+    {
+        std::string compileUnitBaseName;
+        cmajor::debug::ReadProjectTableRecord(pdiReader, compileUnitBaseName);
+        cmajor::debug::WriteProjectTableRecord(cmdbWriter, compileUnitBaseName);
+        std::string cudiFilePath = Path::Combine(projectDirectoryPath, compileUnitBaseName + ".cudi");
+        BinaryReader cudiReader(cudiFilePath);
+        int32_t numFunctionRecords;
+        cmajor::debug::ReadNumberOfCompileUnitFunctionRecords(cudiReader, numFunctionRecords);
+        cmajor::debug::WriteNumberOfCompileUnitFunctionRecords(cmdbWriter, numFunctionRecords);
+        for (int32_t i = 0; i < numFunctionRecords; ++i)
+        {
+            int32_t fileIndex;
+            boost::uuids::uuid functionId;
+            cmajor::debug::ReadCompileUnitFunctionRecord(cudiReader, fileIndex, functionId);
+            cmajor::debug::WriteCompileUnitFunctionRecord(cmdbWriter, fileIndex, functionId);
+            int32_t numInstructionRecords;
+            cmajor::debug::ReadNumberOfInstructionRecords(cudiReader, numInstructionRecords);
+            cmajor::debug::WriteNumberOfInstructionRecords(cmdbWriter, numInstructionRecords);
+            for (int32_t i = 0; i < numInstructionRecords; ++i)
+            {
+                int32_t cppLineNumber;
+                int32_t sourceLineNumber;
+                int32_t cppLineIndex;
+                int16_t scopeId;
+                int16_t flags;
+                cmajor::debug::ReadInstructionRecord(cudiReader, cppLineNumber, sourceLineNumber, cppLineIndex, scopeId, flags);
+                cmajor::debug::WriteInstructionRecord(cmdbWriter, cppLineNumber, sourceLineNumber, cppLineIndex, scopeId, flags);
+            }
+            int32_t numScopes;
+            cmajor::debug::ReadNumberOfScopes(cudiReader, numScopes);
+            cmajor::debug::WriteNumberOfScopes(cmdbWriter, numScopes);
+            for (int32_t i = 0; i < numScopes; ++i)
+            {
+                int16_t scopeId;
+                int16_t parentScopeId;
+                int32_t numLocalVariables;
+                cmajor::debug::ReadScopeRecord(cudiReader, scopeId, parentScopeId, numLocalVariables);
+                cmajor::debug::WriteScopeRecord(cmdbWriter, scopeId, parentScopeId, numLocalVariables);
+                for (int32_t i = 0; i < numLocalVariables; ++i)
+                {
+                    cmajor::debug::DIVariable variable;
+                    variable.Read(cudiReader);
+                    variable.Write(cmdbWriter);
+                }
+            }
+        }
+    }
+    int32_t numFileIndexRecords;
+    cmajor::debug::ReadNumberOfFileIndexRecords(pdiReader, numFileIndexRecords);
+    cmajor::debug::WriteNumberOfFileIndexRecords(cmdbWriter, numFileIndexRecords);
+    for (int32_t i = 0; i < numFileIndexRecords; ++i)
+    {
+        int32_t fileIndex;
+        std::string sourceFilePath;
+        cmajor::debug::ReadFileIndexRecord(pdiReader, fileIndex, sourceFilePath);
+        cmajor::debug::WriteFileIndexRecord(cmdbWriter, fileIndex, sourceFilePath);
+    }
+    int32_t numFunctionIndexRecords;
+    cmajor::debug::ReadNumberOfFunctionIndexFunctionRecords(pdiReader, numFunctionIndexRecords);
+    cmajor::debug::WriteNumberOfFunctionIndexFunctionRecords(cmdbWriter, numFunctionIndexRecords);
+    for (int32_t i = 0; i < numFunctionIndexRecords; ++i)
+    {
+        boost::uuids::uuid functionId;
+        std::string fullFunctionName;
+        std::string mangledFunctionName;
+        cmajor::debug::ReadFunctionIndexFunctionRecord(pdiReader, functionId, fullFunctionName, mangledFunctionName);
+        cmajor::debug::WriteFunctionIndexFunctionRecord(cmdbWriter, functionId, fullFunctionName, mangledFunctionName);
+    }
+    int32_t numTypeIndexRecords = pdiReader.ReadInt();
+    cmdbWriter.Write(numTypeIndexRecords);
+    for (int32_t i = 0; i < numTypeIndexRecords; ++i)
+    {
+        std::unique_ptr<cmajor::debug::DIType> diType = cmajor::debug::ReadType(pdiReader);
+        cmajor::debug::WriteType(cmdbWriter, diType.get());
+    }
+    ++numProjects;
 }
 
 #ifdef _WIN32

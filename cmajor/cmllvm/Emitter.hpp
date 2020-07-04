@@ -12,6 +12,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/DIBuilder.h>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/nil_generator.hpp>
 #include <boost/functional/hash.hpp>
 #include <unordered_map>
 #include <unordered_set>
@@ -244,8 +245,13 @@ public:
     void SaveObjectPointer(void* objectPointer_) override;
     void SetObjectPointer(void* objectPointer_) override { objectPointer = static_cast<llvm::Value*>(objectPointer_); }
     void* GetObjectPointer() override { return objectPointer; }
-    void SetFunction(void* function_, int32_t fileIndex) override { function = static_cast<llvm::Function*>(function_); }
+    void SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& functionId) override { function = static_cast<llvm::Function*>(function_); }
     void SetFunctionName(const std::string& functionName) override;
+    void BeginScope() override;
+    void EndScope() override;
+    void AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject) override;
+    void BeginInstructionFlag(int16_t flag) override;
+    void EndInstructionFlag(int16_t flag) override;
     llvm::Function* Function() { return function; }
     void* CurrentBasicBlock() const override { return currentBasicBlock; }
     void SetCurrentBasicBlock(void* currentBasicBlock_) override { currentBasicBlock = static_cast<llvm::BasicBlock*>(currentBasicBlock_); builder.SetInsertPoint(currentBasicBlock); }

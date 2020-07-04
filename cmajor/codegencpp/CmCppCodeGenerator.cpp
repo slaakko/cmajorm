@@ -6,6 +6,7 @@
 #include <cmajor/codegencpp/CmCppCodeGenerator.hpp>
 #include <cmajor/cmcppbe/EmittingContext.hpp>
 #include <cmajor/cmcppi/CompileUnit.hpp>
+#include <cmajor/cmdebug/DebugInfo.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundNamespace.hpp>
 #include <cmajor/binder/BoundFunction.hpp>
@@ -247,16 +248,35 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         emitter->SetFunctionLinkageToLinkOnceODRLinkage(function);
     }
     int32_t fileIndex = -1;
+    boost::uuids::uuid functionId;
     if (functionSymbol->HasSource())
     {
         fileIndex = functionSymbol->GetSpan().fileIndex;
+        functionId = functionSymbol->FunctionId();
+        module->GetFileIndex().AddFile(fileIndex, module);
+        module->GetFunctionIndex().AddFunction(functionId, functionSymbol);
+        if (functionSymbol == module->GetSymbolTable().MainFunctionSymbol())
+        {
+            module->GetFunctionIndex().SetMainFunctionId(functionId);
+        }
     }
-    emitter->SetFunction(function, fileIndex);
+    emitter->SetFunction(function, fileIndex, functionId);
     emitter->SetFunctionName(ToUtf8(functionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
+    if (functionSymbol->HasSource())
+    {
+        emitter->BeginScope();
+    }
     entryBasicBlock = entryBlock;
     emitter->SetCurrentBasicBlock(entryBlock);
     emitter->PushParentBlock();
+    if (functionSymbol->HasSource())
+    {
+        emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::beginBrace));
+        emitter->CreateNop();
+        emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::beginBrace));
+    }
+    emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::entryCode));
     if (currentClass && !currentClass->IsInlineFunctionContainer())
     {
         ClassTypeSymbol* classTypeSymbol = currentClass->GetClassTypeSymbol();
@@ -275,6 +295,12 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         ParameterSymbol* parameter = functionSymbol->Parameters()[i];
         void* allocaInst = emitter->CreateAlloca(parameter->GetType()->IrType(*emitter));
         emitter->SetIrObject(parameter, allocaInst);
+        if (functionSymbol->HasSource())
+        {
+            const boost::uuids::uuid& typeId = parameter->GetType()->TypeId();
+            module->GetTypeIndex().AddType(typeId, parameter->GetType());
+            emitter->AddLocalVariable(ToUtf8(parameter->Name()), typeId, parameter->IrObject(*emitter));
+        }
         lastAlloca = allocaInst;
     }
     if (functionSymbol->ReturnParam())
@@ -282,6 +308,12 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         ParameterSymbol* parameter = functionSymbol->ReturnParam();
         void* allocaInst = emitter->CreateAlloca(parameter->GetType()->IrType(*emitter));
         emitter->SetIrObject(parameter, allocaInst);
+        if (functionSymbol->HasSource())
+        {
+            const boost::uuids::uuid& typeId = parameter->GetType()->TypeId();
+            module->GetTypeIndex().AddType(typeId, parameter->GetType());
+            emitter->AddLocalVariable(ToUtf8(parameter->Name()), typeId, parameter->IrObject(*emitter));
+        }
         lastAlloca = allocaInst;
     }
     int nlv = functionSymbol->LocalVariables().size();
@@ -362,6 +394,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         void* target = emitter->CreateBasicBlock(ToUtf8(labeledStatement->Label()));
         labeledStatementMap[labeledStatement] = target;
     }
+    emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::entryCode));
     BoundCompoundStatement* body = boundFunction.Body();
     body->Accept(*this);
     BoundStatement* lastStatement = nullptr;
@@ -376,17 +409,33 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         if (functionSymbol->ReturnType() && functionSymbol->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !functionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
         {
             void* defaultValue = functionSymbol->ReturnType()->CreateDefaultIrValue(*emitter);
+            if (generateLineNumbers)
+            {
+                emitter->SetCurrentLineNumber(body->EndSpan().line);
+            }
+            emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
             emitter->CreateRet(defaultValue);
+            emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
             lastInstructionWasRet = true;
         }
         else
         {
+            if (generateLineNumbers)
+            {
+                emitter->SetCurrentLineNumber(body->EndSpan().line);
+            }
+            emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
             emitter->CreateRetVoid();
+            emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
             lastInstructionWasRet = true;
         }
     }
     emitter->PopParentBlock();
     emitter->FinalizeFunction(function, functionSymbol->HasCleanup());
+    if (functionSymbol->HasSource())
+    {
+        emitter->EndScope();
+    }
 }
 
 void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
@@ -394,6 +443,14 @@ void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
     if (generateLineNumbers)
     {
         emitter->SetCurrentLineNumber(boundCompoundStatement.GetSpan().line);
+        emitter->BeginScope();
+        if (&boundCompoundStatement != currentFunction->Body())
+        {
+            emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::beginBrace));
+            emitter->SetCurrentLineNumber(boundCompoundStatement.GetSpan().line);
+            emitter->CreateNop();
+            emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::beginBrace));
+        }
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -417,6 +474,17 @@ void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
     for (int i = 0; i < numTriesInCurrentBlock; ++i)
     {
         emitter->PopParentBlock();
+    }
+    if (generateLineNumbers)
+    {
+        if (&boundCompoundStatement != currentFunction->Body())
+        {
+            emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+            emitter->SetCurrentLineNumber(boundCompoundStatement.EndSpan().line);
+            emitter->CreateNop();
+            emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+        }
+        emitter->EndScope();
     }
     blocks.pop_back();
     currentBlock = prevBlock;
@@ -465,14 +533,32 @@ void CmCppCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
         }
         ExitBlocks(nullptr);
         GenerateExitFunctionCode(*currentFunction);
+        if (generateLineNumbers)
+        {
+            emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+            emitter->SetCurrentLineNumber(currentBlock->EndSpan().line);
+        }
         emitter->CreateRet(returnValue);
+        if (generateLineNumbers)
+        {
+            emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+        }
         lastInstructionWasRet = true;
     }
     else
     {
         ExitBlocks(nullptr);
         GenerateExitFunctionCode(*currentFunction);
+        if (generateLineNumbers)
+        {
+            emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+            emitter->SetCurrentLineNumber(currentBlock->EndSpan().line);
+        }
         emitter->CreateRetVoid();
+        if (generateLineNumbers)
+        {
+            emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+        }
         lastInstructionWasRet = true;
     }
     BoundCompoundStatement* body = currentFunction->Body();
@@ -912,6 +998,13 @@ void CmCppCodeGenerator::Visit(BoundConstructionStatement& boundConstructionStat
     if (generateLineNumbers)
     {
         emitter->SetCurrentLineNumber(boundConstructionStatement.GetSpan().line);
+        LocalVariableSymbol* localVariable = boundConstructionStatement.GetLocalVariable();
+        if (localVariable)
+        {
+            const boost::uuids::uuid& typeId = localVariable->GetType()->TypeId();
+            module->GetTypeIndex().AddType(typeId, localVariable->GetType());
+            emitter->AddLocalVariable(ToUtf8(localVariable->Name()), typeId, localVariable->IrObject(*emitter));
+        }
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -1593,10 +1686,12 @@ void CmCppCodeGenerator::GenerateExitFunctionCode(BoundFunction& boundFunction)
 {
     const std::vector<std::unique_ptr<BoundStatement>>& exitCode = boundFunction.ExitCode();
     if (exitCode.empty()) return;
+    emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::exitCode));
     for (const auto& statement : exitCode)
     {
         statement->Accept(*this);
     }
+    emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::exitCode));
 }
 
 void CmCppCodeGenerator::GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCompileUnit)
@@ -1608,7 +1703,7 @@ void CmCppCodeGenerator::GenerateInitUnwindInfoFunction(BoundCompileUnit& boundC
     if (!addCompileUnitFunctionSymbol) return;
     void* functionType = initUnwindInfoFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initUnwindInfoFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function, -1);
+    emitter->SetFunction(function, -1, boost::uuids::nil_uuid());
     emitter->SetFunctionName(ToUtf8(initUnwindInfoFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -1643,7 +1738,7 @@ void CmCppCodeGenerator::GenerateInitCompileUnitFunction(BoundCompileUnit& bound
     Span span = initCompileUnitFunctionSymbol->GetSpan();
     void* functionType = initCompileUnitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initCompileUnitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function, -1);
+    emitter->SetFunction(function, -1, boost::uuids::nil_uuid());
     emitter->SetFunctionName(ToUtf8(initCompileUnitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -1676,7 +1771,7 @@ void CmCppCodeGenerator::GenerateGlobalInitFuncion(BoundCompileUnit& boundCompil
     Span span = globalInitFunctionSymbol->GetSpan();
     void* functionType = globalInitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(globalInitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function, -1);
+    emitter->SetFunction(function, -1, boost::uuids::nil_uuid());
     emitter->SetFunctionName(ToUtf8(globalInitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);

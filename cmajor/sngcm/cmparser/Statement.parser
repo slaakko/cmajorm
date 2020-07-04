@@ -208,10 +208,11 @@ parser api(SNGCM_PARSER_API) StatementParser
         ::= GOTO{ s = span; } DEFAULT SEMICOLON!{ s.end = span.end; return new GotoDefaultStatementNode(s); }
         ;
 
-    AssignmentStatementExpr(ParsingContext* ctx, var Span s) : StatementNode*
-        ::= empty{ ctx->PushParsingLvalue(true); s = span; } Expression(ctx):target{ ctx->PopParsingLvalue(); } / { ctx->PopParsingLvalue(); } ASSIGN Expression(ctx):source
+    AssignmentStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> target, var Span s) : StatementNode*
+        ::= empty{ ctx->PushParsingLvalue(true); }
+            Expression(ctx):tgt{ target.reset(tgt); ctx->PopParsingLvalue(); } / { ctx->PopParsingLvalue(); } ASSIGN{ s = span; } Expression(ctx):source
         {
-            s.end = span.end; return new AssignmentStatementNode(s, target, source);
+            s.end = span.end; return new AssignmentStatementNode(s, target.release(), source);
         }
         ;
 

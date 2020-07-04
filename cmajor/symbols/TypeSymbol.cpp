@@ -18,7 +18,7 @@ namespace cmajor { namespace symbols {
 using namespace soulng::unicode;
 
 TypeSymbol::TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
-    ContainerSymbol(symbolType_, span_, name_), typeId(boost::uuids::nil_generator()())
+    ContainerSymbol(symbolType_, span_, name_), typeId(boost::uuids::nil_uuid())
 {
 }
 

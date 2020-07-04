@@ -1607,12 +1607,32 @@ void Emitter::SetFunctionCallConventionToStdCall(void* function)
     // todo
 }
 
-void Emitter::SetFunction(void* function_, int32_t fileIndex)
+void Emitter::SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& functionId)
 {
     currentFunction = static_cast<cmsxi::Function*>(function_);
 }
 
 void Emitter::SetFunctionName(const std::string& functionName)
+{
+}
+
+void Emitter::BeginScope()
+{
+}
+
+void Emitter::EndScope()
+{
+}
+
+void Emitter::AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject)
+{
+}
+
+void Emitter::BeginInstructionFlag(int16_t flag)
+{
+}
+
+void Emitter::EndInstructionFlag(int16_t flag)
 {
 }
 
@@ -1667,6 +1687,7 @@ void* Emitter::CreateAlloca(void* irType)
 {
     return context->CreateLocal(static_cast<cmsxi::Type*>(irType));
 }
+
 void* Emitter::NewAllocaInst(void* irType)
 {
     return nullptr;

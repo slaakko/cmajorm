@@ -1,0 +1,182 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/cmdebug/DebugApi.hpp>
+[cpp]#include <cmajor/cmdebug/GdbReplyLexer.hpp>
+[cpp]#include <cmajor/cmdebug/GdbReplyTokens.hpp>
+[cpp]#include <cmajor/cmdebug/TokenValueParsers.hpp>
+[hpp]#include <cmajor/cmdebug/Gdb.hpp>
+[hpp]#include <memory>
+
+using namespace GdbReplyTokens;
+
+parser api(DEBUG_API) GdbReplyLineParser
+{
+    uselexer GdbReplyLexer;
+    main;
+
+    GdbReplyRecord : cmajor::debug::GdbReplyRecord*
+        ::= GdbPrompt:prompt{ return prompt; }
+        |   GdbResultRecord:resultRecord{ return resultRecord; }
+        |   GdbAsyncRecord:asyncRecord{ return asyncRecord; }
+        |   GdbStreamRecord:streamRecord{ return streamRecord; }
+        ;
+
+    GdbResultRecord : cmajor::debug::GdbReplyRecord*
+        ::= GdbDoneRecord:done{ return done; }
+        |   GdbRunningRecord:running{ return running; }
+        |   GdbConnectedRecord:connected{ return connected; }
+        |   GdbErrorRecord:error{ return error; }
+        |   GdbExitRecord:exit{ return exit; }
+        ;
+
+    GdbDoneRecord : cmajor::debug::GdbReplyRecord*
+        ::=
+        (
+            CARET DONE GdbResults:results
+        )
+        {
+            return new cmajor::debug::GdbDoneRecord(results);
+        }
+        ;
+
+    GdbRunningRecord : cmajor::debug::GdbReplyRecord*
+        ::=
+        (
+            CARET RUNNING GdbResults:results
+        )
+        {
+            return new cmajor::debug::GdbRunningRecord(results);
+        }
+        ;
+
+    GdbConnectedRecord : cmajor::debug::GdbReplyRecord*
+        ::=
+        (
+            CARET CONNECTED GdbResults:results
+        )
+        {
+            return new cmajor::debug::GdbConnectedRecord(results);
+        }
+        ;
+
+    GdbErrorRecord(var std::string msg, var std::string code) : cmajor::debug::GdbReplyRecord*
+        ::=
+        (
+            CARET ERROR GdbResults:results
+        )
+        {
+            return new cmajor::debug::GdbErrorRecord(results);
+        }
+        ;
+
+    GdbExitRecord : cmajor::debug::GdbReplyRecord*
+        ::=
+        (
+            CARET EXIT GdbResults:results
+        )
+        {
+            return new cmajor::debug::GdbExitRecord(results);
+        }
+        ;
+
+    GdbAsyncRecord : cmajor::debug::GdbReplyRecord*
+        ::= GdbExecAsyncRecord:execRecord{ return execRecord; }
+        |   GdbNotifyAsyncRecord:notifyRecord{ return notifyRecord; }
+        ;
+
+    GdbExecAsyncRecord : cmajor::debug::GdbReplyRecord*
+        ::= GdbExecRunningRecord:runningRecord{ return runningRecord; }
+        |   GdbExecStoppedRecord:stoppedRecord{ return stoppedRecord; }
+        ;
+
+    GdbExecRunningRecord : cmajor::debug::GdbReplyRecord*
+        ::=
+        (
+            AST RUNNING GdbResults:results
+        )
+        {
+            return new cmajor::debug::GdbExecRunningRecord(results);
+        }
+        ;
+
+    GdbExecStoppedRecord : cmajor::debug::GdbReplyRecord*
+        ::=
+        (
+            AST STOPPED GdbResults:results
+        )
+        {
+            return new cmajor::debug::GdbExecStoppedRecord(results);
+        }
+        ;
+
+    GdbNotifyAsyncRecord(var std::string notification) : cmajor::debug::GdbReplyRecord*
+        ::=
+        (
+            EQ IDENTIFIER{ notification = ToUtf8(lexer.GetToken(pos).match.ToString()); } GdbResults:results
+        )
+        {
+            return new cmajor::debug::GdbNotifyAsyncRecord(notification, results);
+        }
+        ;
+
+    GdbStreamRecord(var std::string text) : cmajor::debug::GdbReplyRecord*
+        ::= TILDE STRING{ text = cmajor::debug::ParseString(lexer.GetToken(pos)); return new cmajor::debug::GdbConsoleOutputRecord(text); }
+        |   AT STRING{ text = cmajor::debug::ParseString(lexer.GetToken(pos)); return new cmajor::debug::GdbTargetOutputRecord(text); }
+        |   AMP STRING{ text = cmajor::debug::ParseString(lexer.GetToken(pos));  return new cmajor::debug::GdbLogOutputRecord(text); }
+        ;
+
+    GdbPrompt : cmajor::debug::GdbReplyRecord*
+        ::= LPAREN GDB RPAREN{ return new cmajor::debug::GdbPrompt(); }
+        ;
+
+    GdbResults(var std::unique_ptr<cmajor::debug::GdbResults> results) : cmajor::debug::GdbResults*
+        ::= empty{ results.reset(new cmajor::debug::GdbResults()); }
+        (
+            (COMMA GdbResult:result{ results->Add(result); })*
+        )
+        {
+            return results.release();
+        }
+        ;
+
+    GdbResult : cmajor::debug::GdbResult*
+        ::=
+        (
+            GdbVariable:variable EQ GdbValue:value
+        )
+        {
+            return new cmajor::debug::GdbResult(variable, value);
+        }
+        ;
+
+    GdbVariable : std::string
+        ::= IDENTIFIER{ return ToUtf8(lexer.GetToken(pos).match.ToString()); }
+        ;
+
+    GdbValue : cmajor::debug::GdbValue*
+        ::= GdbStringValue:string{ return string; }
+        |   GdbTupleValue:tuple{ return tuple; }
+        |   GdbListValue:list{ return list; }
+        ;
+
+    GdbStringValue : cmajor::debug::GdbValue*
+        ::= STRING{ return new cmajor::debug::GdbStringValue(cmajor::debug::ParseString(lexer.GetToken(pos))); }
+        ;
+
+    GdbTupleValue(var std::unique_ptr<cmajor::debug::GdbTupleValue> tuple) : cmajor::debug::GdbValue*
+        ::= LBRACE{ tuple.reset(new cmajor::debug::GdbTupleValue()); }
+            (GdbResult:result{ tuple->AddResult(result); } % COMMA)?
+            RBRACE{ return tuple.release(); }
+        ;
+
+    GdbListValue(var std::unique_ptr<cmajor::debug::GdbListValue> list) : cmajor::debug::GdbValue*
+        ::= LBRACKET{ list.reset(new cmajor::debug::GdbListValue()); }
+            (   (GdbResult:result{ list->AddValue(result); } % COMMA)
+            |   (GdbValue:value{ list->AddValue(value); } % COMMA)
+            )?
+            RBRACKET{ return list.release(); }
+        ;
+}

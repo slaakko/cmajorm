@@ -220,6 +220,26 @@ void Emitter::SetFunctionName(const std::string& functionName)
 {
 }
 
+void Emitter::BeginScope()
+{
+}
+
+void Emitter::EndScope()
+{
+}
+
+void Emitter::AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject)
+{
+}
+
+void Emitter::BeginInstructionFlag(int16_t flag)
+{
+}
+
+void Emitter::EndInstructionFlag(int16_t flag)
+{
+}
+
 void Emitter::PushScope(void* scope)
 {
     scopes.push_back(static_cast<llvm::DIScope*>(scope));

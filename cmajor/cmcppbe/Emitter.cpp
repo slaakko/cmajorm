@@ -1606,16 +1606,42 @@ void Emitter::SetFunctionCallConventionToStdCall(void* function)
     // todo
 }
 
-void Emitter::SetFunction(void* function_, int32_t fileIndex)
+void Emitter::SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& functionId)
 {
     currentFunction = static_cast<cmcppi::Function*>(function_);
     currentFunction->SetFileIndex(fileIndex);
+    currentFunction->SetFunctionId(functionId);
     context->SetCurrentFunction(currentFunction);
 }
 
 void Emitter::SetFunctionName(const std::string& functionName)
 {
     currentFunction->SetFullName(functionName);
+}
+
+void Emitter::BeginScope()
+{
+    context->BeginScope();
+}
+
+void Emitter::EndScope()
+{
+    context->EndScope();
+}
+
+void Emitter::AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject)
+{
+    context->AddLocalVariable(localVariableName, typeId, static_cast<cmcppi::LocalInstruction*>(irObject));
+}
+
+void Emitter::BeginInstructionFlag(int16_t flag)
+{
+    context->BeginInstructionFlag(flag);
+}
+
+void Emitter::EndInstructionFlag(int16_t flag)
+{
+    context->EndInstructionFlag(flag);
 }
 
 void Emitter::SetInPrologue(bool inPrologue_)
@@ -1669,6 +1695,7 @@ void* Emitter::CreateAlloca(void* irType)
 {
     return context->CreateLocal(static_cast<cmcppi::Type*>(irType));
 }
+
 void* Emitter::NewAllocaInst(void* irType)
 {
     return nullptr;
@@ -1682,7 +1709,6 @@ void* Emitter::CreateDIParameterVariable(const std::string& name, int index, con
 
 void* Emitter::CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst)
 {
-    // todo
     return nullptr;
 }
 

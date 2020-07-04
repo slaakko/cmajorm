@@ -5,6 +5,9 @@
 
 #include <cmajor/cmcppi/CompileUnit.hpp>
 #include <cmajor/cmcppi/Function.hpp>
+#include <cmajor/cmdebug/DebugInfoIo.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/BinaryWriter.hpp>
 #include <fstream>
 
 namespace cmcppi {
@@ -26,7 +29,13 @@ void CompileUnit::SetSourceFilePath(const std::string& sourceFilePath_)
 void CompileUnit::Write()
 {
     std::ofstream file(filePath);
+    std::string cudiFilePath = Path::ChangeExtension(filePath, ".cudi");
+    int32_t numFunctions = 0;
+    BinaryWriter binaryWriter(cudiFilePath);
+    uint32_t numFunctionsPos = binaryWriter.Pos();
+    cmajor::debug::WriteNumberOfCompileUnitFunctionRecords(binaryWriter, numFunctions);
     CodeFormatter formatter(file);
+    formatter.SetLine(1);
     formatter.SetIndentSize(4);
     formatter.WriteLine("// " + sourceFilePath);
     formatter.WriteLine();
@@ -61,11 +70,15 @@ void CompileUnit::Write()
                 formatter.WriteLine();
                 first = false;
             }
-            f->Write(formatter, context);
+            f->Write(formatter, context, binaryWriter, numFunctions);
         }
         formatter.WriteLine();
         formatter.WriteLine("} // extern \"C\"");
     }
+    uint32_t currentPos = binaryWriter.Pos();
+    binaryWriter.Seek(numFunctionsPos);
+    cmajor::debug::WriteNumberOfCompileUnitFunctionRecords(binaryWriter, numFunctions);
+    binaryWriter.Seek(currentPos);
 }
 
 Function* CompileUnit::GetOrInsertFunction(const std::string& name, FunctionType* type)

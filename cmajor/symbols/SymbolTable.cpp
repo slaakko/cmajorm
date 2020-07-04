@@ -1889,7 +1889,7 @@ void CreateClassFile(const std::string& executableFilePath, SymbolTable& symbolT
         const boost::uuids::uuid& typeId = p.first;
         ClassTypeSymbol* cls = p.second;
         std::string vmtObjectName = cls->VmtObjectNameStr();
-        boost::uuids::uuid baseClassTypeId = boost::uuids::nil_generator()();
+        boost::uuids::uuid baseClassTypeId = boost::uuids::nil_uuid();
         if (cls->BaseClass())
         {
             baseClassTypeId = cls->BaseClass()->TypeId();

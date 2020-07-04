@@ -5,19 +5,20 @@
 
 #include <cmajor/cmcppi/Function.hpp>
 #include <cmajor/cmcppi/Context.hpp>
+#include <cmajor/cmdebug/DebugInfoIo.hpp>
 #include <soulng/util/Error.hpp>
 
 namespace cmcppi {
 
 Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), nextLocalNumber(0), nextArgumentNumber(0), 
-    linkOnce(false), nextBBNumber(0), nothrow(false), fileIndex(-1)
+    linkOnce(false), nextBBNumber(0), nothrow(false), fileIndex(-1), functionId(), nopResultDeclarationWritten(false)
 {
     entryBlock.reset(new BasicBlock(nextBBNumber++, "entry"));
     int paramIndex = 0;
     for (Type* paramType : type->ParamTypes())
     {
         ParamInstruction* paramInst = new ParamInstruction(paramType, "__param" + std::to_string(paramIndex));
-        context.AddLineInfo(paramInst);
+        context.AddLineInfoScopeIdAndFlags(paramInst);
         params.push_back(std::unique_ptr<ParamInstruction>(paramInst));
         ++paramIndex;
     }
@@ -119,7 +120,7 @@ void Function::RemoveUnreferencedBasicBlocks()
     }
 }
 
-void Function::Write(CodeFormatter& formatter, Context& context)
+void Function::Write(CodeFormatter& formatter, Context& context, BinaryWriter& writer, int32_t& numFunctions)
 {
     if (basicBlocks.empty()) return;
     context.SetCurrentBasicBlock(nullptr);
@@ -149,6 +150,14 @@ void Function::Write(CodeFormatter& formatter, Context& context)
     formatter.WriteLine("// " + fullName);
     formatter.WriteLine();
     WriteValueDeclarations(formatter, context);
+    int32_t numInsts = 0;
+    uint32_t numInstsPos = 0;
+    if (fileIndex != -1 && !functionId.is_nil())
+    {
+        cmajor::debug::WriteCompileUnitFunctionRecord(writer, fileIndex, functionId);
+        numInstsPos = writer.Pos();
+        cmajor::debug::WriteNumberOfInstructionRecords(writer, numInsts);
+    }
     bool first = true;
     for (const auto& bb : basicBlocks)
     {
@@ -164,10 +173,30 @@ void Function::Write(CodeFormatter& formatter, Context& context)
         {
             formatter.WriteLine();
         }
-        bb->Write(formatter, *this, context);
+        bb->Write(formatter, *this, context, writer, numInsts);
     }
     formatter.DecIndent();
     formatter.WriteLine("}");
+    if (fileIndex != -1 && !functionId.is_nil())
+    {
+        uint32_t currentPos = writer.Pos();
+        writer.Seek(numInstsPos);
+        cmajor::debug::WriteNumberOfInstructionRecords(writer, numInsts);
+        writer.Seek(currentPos);
+        int32_t numScopes = scopes.size();
+        cmajor::debug::WriteNumberOfScopes(writer, numScopes);
+        for (const std::unique_ptr<Scope>& scope : scopes)
+        {
+            int32_t numLocalVariables = scope->LocalVariables().size();
+            cmajor::debug::WriteScopeRecord(writer, scope->Id(), scope->ParentScopeId(), numLocalVariables);
+            for (int32_t i = 0; i < numLocalVariables; ++i)
+            {
+                cmajor::debug::DIVariable* localVariable = scope->GetLocalVariable(i);
+                localVariable->Write(writer);
+            }
+        }
+        ++numFunctions;
+    }
 }
 
 void Function::WriteValueDeclarations(CodeFormatter& formatter, Context& context)
@@ -176,6 +205,7 @@ void Function::WriteValueDeclarations(CodeFormatter& formatter, Context& context
     {
         inst->ObtainResultId(*this);
         inst->WriteResultDeclaration(formatter, *this, context);
+        inst->SetLineNumbers(formatter, context);
     }
 }
 
@@ -187,6 +217,21 @@ void Function::AddResultInstruction(Instruction* instruction)
 void Function::SetFileIndex(int32_t fileIndex_)
 {
     fileIndex = fileIndex_;
+}
+
+void Function::SetFunctionId(const boost::uuids::uuid& functionId_)
+{
+    functionId = functionId_;
+}
+
+void Function::AddScope(Scope* scope)
+{
+    scopes.push_back(std::unique_ptr<Scope>(scope));
+}
+
+Scope* Function::GetScope(int16_t scopeId)
+{
+    return scopes[scopeId].get();
 }
 
 } // namespace cmcppi

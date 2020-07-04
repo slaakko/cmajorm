@@ -269,8 +269,14 @@ void BoundGotoStatement::Accept(BoundNodeVisitor& visitor)
 }
 
 BoundConstructionStatement::BoundConstructionStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& constructorCall_) :
-    BoundStatement(module_, constructorCall_->GetSpan(), BoundNodeType::boundConstructionStatement), constructorCall(std::move(constructorCall_))
+    BoundStatement(module_, constructorCall_->GetSpan(), BoundNodeType::boundConstructionStatement), constructorCall(std::move(constructorCall_)),
+    localVariable(nullptr)
 {
+}
+
+void BoundConstructionStatement::SetLocalVariable(LocalVariableSymbol* localVariable_)
+{
+    localVariable = localVariable_;
 }
 
 void BoundConstructionStatement::Accept(BoundNodeVisitor& visitor)

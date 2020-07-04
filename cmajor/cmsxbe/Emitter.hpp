@@ -10,6 +10,7 @@
 #include <cmajor/cmsxi/CompileUnit.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/nil_generator.hpp>
 #include <boost/functional/hash.hpp>
 
 namespace cmsxbe {
@@ -293,8 +294,13 @@ public:
     void SetFunctionLinkage(void* function, bool setInline) override;
     void SetFunctionLinkageToLinkOnceODRLinkage(void* function) override;
     void SetFunctionCallConventionToStdCall(void* function) override;
-    void SetFunction(void* function_, int32_t fileIndex) override;
+    void SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& functionId) override;
     void SetFunctionName(const std::string& functionName) override;
+    void BeginScope() override;
+    void EndScope() override;
+    void AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject) override;
+    void BeginInstructionFlag(int16_t flag) override;
+    void EndInstructionFlag(int16_t flag) override;
     void SetInPrologue(bool inPrologue_) override;
     void* CreateSubroutineType(const std::vector<void*>& elementTypes) override;
     unsigned GetPureVirtualVirtuality() override;

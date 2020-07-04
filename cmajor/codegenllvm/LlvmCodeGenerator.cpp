@@ -324,11 +324,13 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     }
     emitter->SetFunctionLinkage(function, setInline);
     int32_t fileIndex = -1;
+    boost::uuids::uuid functionId;
     if (functionSymbol->HasSource())
     {
         fileIndex = functionSymbol->GetSpan().fileIndex;
+        functionId = functionSymbol->FunctionId();
     }
-    emitter->SetFunction(function, fileIndex);
+    emitter->SetFunction(function, fileIndex, functionId);
     bool hasSource = functionSymbol->HasSource();
     bool prevDebugInfo = debugInfo;
     void* prevDIBuilder = emitter->DIBuilder();
@@ -1400,7 +1402,7 @@ void LlvmCodeGenerator::GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCo
     }
     void* functionType = initUnwindInfoFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initUnwindInfoFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function, -1);
+    emitter->SetFunction(function, -1, boost::uuids::nil_uuid());
     emitter->SetFunctionName(ToUtf8(initUnwindInfoFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -1459,7 +1461,7 @@ void LlvmCodeGenerator::GenerateInitCompileUnitFunction(BoundCompileUnit& boundC
     Span span = initCompileUnitFunctionSymbol->GetSpan();
     void* functionType = initCompileUnitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(initCompileUnitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function, -1);
+    emitter->SetFunction(function, -1, boost::uuids::nil_uuid());
     emitter->SetFunctionName(ToUtf8(initCompileUnitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);
@@ -1519,7 +1521,7 @@ void LlvmCodeGenerator::GenerateGlobalInitFuncion(BoundCompileUnit& boundCompile
     Span span = globalInitFunctionSymbol->GetSpan();
     void* functionType = globalInitFunctionSymbol->IrType(*emitter);
     void* function = emitter->GetOrInsertFunction(ToUtf8(globalInitFunctionSymbol->MangledName()), functionType, true);
-    emitter->SetFunction(function, -1);
+    emitter->SetFunction(function, -1, boost::uuids::nil_uuid());
     emitter->SetFunctionName(ToUtf8(globalInitFunctionSymbol->FullName()));
     void* entryBlock = emitter->CreateBasicBlock("entry");
     emitter->SetCurrentBasicBlock(entryBlock);

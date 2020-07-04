@@ -256,8 +256,11 @@ public:
     BoundConstructionStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& constructorCall_);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundFunctionCall* ConstructorCall() { return constructorCall.get(); }
+    void SetLocalVariable(LocalVariableSymbol* localVariable_);
+    LocalVariableSymbol* GetLocalVariable() const { return localVariable; }
 private:
     std::unique_ptr<BoundFunctionCall> constructorCall;
+    LocalVariableSymbol* localVariable;
 };
 
 class BINDER_API BoundAssignmentStatement : public BoundStatement

@@ -361,7 +361,7 @@ void StatementBinder::Visit(FunctionNode& functionNode)
     currentFunction = boundFunction.get();
     if (functionNode.Body())
     {
-        GenerateEnterAndExitFunctionCode(currentFunction, functionSymbol->GetSpan());
+        GenerateEnterAndExitFunctionCode(currentFunction);
         compoundLevel = 0;
         functionNode.Body()->Accept(*this);
         BoundStatement* boundStatement = statement.release();
@@ -394,7 +394,7 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
     currentFunction = boundFunction.get();
     if (staticConstructorNode.Body())
     {
-        GenerateEnterAndExitFunctionCode(currentFunction, staticConstructorSymbol->GetSpan());
+        GenerateEnterAndExitFunctionCode(currentFunction);
         StaticConstructorNode* prevStaticConstructorNode = currentStaticConstructorNode;
         currentStaticConstructorNode = &staticConstructorNode;
         compoundLevel = 0;
@@ -413,8 +413,9 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
     currentStaticConstructorSymbol = prevStaticConstructorSymbol;
 }
 
-void StatementBinder::GenerateEnterAndExitFunctionCode(BoundFunction* boundFunction, const Span& span)
+void StatementBinder::GenerateEnterAndExitFunctionCode(BoundFunction* boundFunction)
 {
+    Span span;
     if (boundFunction->GetFunctionSymbol()->DontThrow()) return;
     TypeSymbol* systemRuntimeUnwindInfoSymbol = boundCompileUnit.GetSystemRuntimeUnwindInfoSymbol();
     if (systemRuntimeUnwindInfoSymbol == nullptr)
@@ -526,7 +527,7 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
     currentFunction = boundFunction.get();
     if (constructorNode.Body())
     {
-        GenerateEnterAndExitFunctionCode(currentFunction, constructorSymbol->GetSpan());
+        GenerateEnterAndExitFunctionCode(currentFunction);
         ConstructorNode* prevConstructorNode = currentConstructorNode;
         currentConstructorNode = &constructorNode;
         compoundLevel = 0;
@@ -575,7 +576,7 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     currentFunction = boundFunction.get();
     if (destructorNode.Body())
     {
-        GenerateEnterAndExitFunctionCode(currentFunction, destructorSymbol->GetSpan());
+        GenerateEnterAndExitFunctionCode(currentFunction);
         DestructorNode* prevDestructorNode = currentDestructorNode;
         currentDestructorNode = &destructorNode;
         compoundLevel = 0;
@@ -624,7 +625,7 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     currentFunction = boundFunction.get();
     if (memberFunctionNode.Body())
     {
-        GenerateEnterAndExitFunctionCode(currentFunction, memberFunctionSymbol->GetSpan());
+        GenerateEnterAndExitFunctionCode(currentFunction);
         MemberFunctionNode* prevMemberFunctionNode = currentMemberFunctionNode;
         currentMemberFunctionNode = &memberFunctionNode;
         compoundLevel = 0;
@@ -672,7 +673,7 @@ void StatementBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     currentFunction = boundFunction.get();
     if (conversionFunctionNode.Body())
     {
-        GenerateEnterAndExitFunctionCode(currentFunction, conversionFunctionSymbol->GetSpan());
+        GenerateEnterAndExitFunctionCode(currentFunction);
         compoundLevel = 0;
         conversionFunctionNode.Body()->Accept(*this);
         BoundStatement* boundStatement = statement.release();
@@ -1227,7 +1228,9 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
             }
         }
     }
-    AddStatement(new BoundConstructionStatement(module, std::move(constructorCall)));
+    BoundConstructionStatement* boundConstructionStatement = new BoundConstructionStatement(module, std::move(constructorCall));
+    boundConstructionStatement->SetLocalVariable(localVariableSymbol);
+    AddStatement(boundConstructionStatement);
 }
 
 void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)

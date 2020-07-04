@@ -200,7 +200,7 @@ void ClassTypeSymbol::Write(SymbolWriter& writer)
             writer.GetBinaryWriter().Write(prototype->TypeId());
         }
     }
-    boost::uuids::uuid baseClassId = boost::uuids::nil_generator()();
+    boost::uuids::uuid baseClassId = boost::uuids::nil_uuid();
     if (baseClass)
     {
         baseClassId = baseClass->TypeId();

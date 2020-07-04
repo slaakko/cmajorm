@@ -6,6 +6,7 @@
 #ifndef CMAJOR_CMCPPI_BASIC_BLOCK_INCLUDED
 #define CMAJOR_CMCPPI_BASIC_BLOCK_INCLUDED
 #include <cmajor/cmcppi/Instruction.hpp>
+#include <soulng/util/BinaryWriter.hpp>
 #include <vector>
 #include <memory>
 
@@ -27,13 +28,14 @@ public:
     void SetId(int id_) { id = id_; }
     int Included() const { return included; }
     void SetIncluded() { included = true; }
+    void ResetIncluded() { included = false; }
     bool IsCleanupBlock() const { return isCleanupBlock; }
     void SetAsCleanupBlock() { isCleanupBlock = true; }
     void SetHandlerBlock(BasicBlock* handlerBlock_) { handlerBlock = handlerBlock_; }
     BasicBlock* HandlerBlock() const { return handlerBlock; }
     void SetCleanupBlock(BasicBlock* cleanupBlock_) { cleanupBlock = cleanupBlock_; }
     BasicBlock* CleanupBlock() const { return cleanupBlock; }
-    void Write(CodeFormatter& formatter, Function& function, Context& context);
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts);
     void CollectReferencedBasicBlocks(std::set<BasicBlock*>& basicBlocks);
     void SetReferenced() { referenced = true; }
     bool Referenced() const { return referenced; }

@@ -10,6 +10,7 @@
 #include <cmajor/common/Common.hpp>
 #include <soulng/lexer/Span.hpp>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/nil_generator.hpp>
 #include <vector>
 #include <string>
 
@@ -324,8 +325,13 @@ public:
     virtual void SetFunctionLinkage(void* function, bool setInline) = 0;
     virtual void SetFunctionLinkageToLinkOnceODRLinkage(void* function) = 0;
     virtual void SetFunctionCallConventionToStdCall(void* function) = 0;
-    virtual void SetFunction(void* function_, int32_t fileIndex) = 0;
+    virtual void SetFunction(void* function_, int32_t fileIndex, const boost::uuids::uuid& functionId) = 0;
     virtual void SetFunctionName(const std::string& functionName) = 0;
+    virtual void BeginScope() = 0;
+    virtual void EndScope() = 0;
+    virtual void AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject) = 0;
+    virtual void BeginInstructionFlag(int16_t flag) = 0;
+    virtual void EndInstructionFlag(int16_t flag) = 0;
     virtual void SetInPrologue(bool inPrologue_) = 0;
     virtual void* CreateSubroutineType(const std::vector<void*>& elementTypes) = 0;
     virtual unsigned GetPureVirtualVirtuality() = 0;

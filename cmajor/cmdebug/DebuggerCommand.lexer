@@ -1,0 +1,72 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/cmdebug/DebugApi.hpp>
+
+classmap DebuggerCommandClassMap;
+
+prefix "cmajor/cmdebug";
+
+tokens DebuggerCommandTokens
+{
+    (NL, "'newline'"),
+    (EXIT, "'exit'"), (E, "'e'"), (QUIT, "'quit'"), (Q, "'q'"),
+    (HELP, "'help'"), (H, "'h"),
+    (NEXT, "'next'"), (N, "'n'"),
+    (STEP, "'step'"), (S, "'s'"),
+    (CONTINUE, "'continue'"), (C, "'c'"),
+    (FINISH, "'finish'"), (F, "'f'"),
+    (UNTIL, "'until'"), (U, "'u'"),
+    (BREAK, "'break'"), (B, "'b'"),
+    (DELETE, "'delete'"), (D, "'d'"),
+    (DEPTH, "'depth'"), 
+    (FRAMES, "'frames'"),
+    (SHOW, "'show'"),
+    (BREAKPOINTS, "'breakpoints'"),
+    (LIST, "'list'"), (L, "'l'"),
+    (ID, "id"),
+    (PATH, "'path'"),
+    (INTEGER, "'integer'"),
+    (COLON, "':'")
+}
+
+keywords DebuggerCommandKeywords
+{
+    ("exit", EXIT), ("e", EXIT), ("quit", EXIT), ("q", EXIT),
+    ("help", HELP), ("h", HELP),
+    ("next", NEXT), ("n", NEXT),
+    ("step", STEP), ("s", STEP),
+    ("continue", CONTINUE), ("c", CONTINUE),
+    ("finish", FINISH), ("f", FINISH),
+    ("until", UNTIL), ("u", UNTIL),
+    ("break", BREAK), ("b", BREAK),
+    ("delete", DELETE), ("d", DELETE),
+    ("depth", DEPTH), 
+    ("frames", FRAMES), 
+    ("list", LIST), ("l", LIST),
+    ("show", SHOW),
+    ("breakpoints", BREAKPOINTS)
+}
+
+expressions
+{
+    ws = "[\t ]+";
+    newline = "\r\n|\n|\r";
+    id = "{idstart}{idcont}*";
+    drive = "[a-zA-Z]";
+    comp = "[a-zA-Z_.+][a-zA-Z_0-9.+-]*";
+    path = "({drive}:)?(/?({comp}/)*)?{comp}";
+    integer = "[0-9]+";
+}
+
+lexer api(DEBUG_API) DebuggerCommandLexer
+{
+    "{ws}" { }
+    "{newline}"{ return NL; }
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "{path}"{ return PATH; }
+    "{integer}"{ return INTEGER; }
+    ":"{ return COLON; }
+}

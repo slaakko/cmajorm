@@ -27,43 +27,43 @@ BasicTypeSymbol::BasicTypeSymbol(SymbolType symbolType_, const Span& span_, cons
 void BasicTypeSymbol::Write(SymbolWriter& writer)
 {
     TypeSymbol::Write(writer);
-    boost::uuids::uuid defaultConstructorId = boost::uuids::nil_generator()();
+    boost::uuids::uuid defaultConstructorId = boost::uuids::nil_uuid();
     if (defaultConstructor)
     {
         defaultConstructorId = defaultConstructor->FunctionId();
     }
     writer.GetBinaryWriter().Write(defaultConstructorId);
-    boost::uuids::uuid copyConstructorId = boost::uuids::nil_generator()();
+    boost::uuids::uuid copyConstructorId = boost::uuids::nil_uuid();
     if (copyConstructor)
     {
         copyConstructorId = copyConstructor->FunctionId();
     }
     writer.GetBinaryWriter().Write(copyConstructorId);
-    boost::uuids::uuid moveConstructorId = boost::uuids::nil_generator()();
+    boost::uuids::uuid moveConstructorId = boost::uuids::nil_uuid();
     if (moveConstructor)
     {
         moveConstructorId = moveConstructor->FunctionId();
     }
     writer.GetBinaryWriter().Write(moveConstructorId);
-    boost::uuids::uuid copyAssignmentId = boost::uuids::nil_generator()();
+    boost::uuids::uuid copyAssignmentId = boost::uuids::nil_uuid();
     if (copyAssignment)
     {
         copyAssignmentId = copyAssignment->FunctionId();
     }
     writer.GetBinaryWriter().Write(copyAssignmentId);
-    boost::uuids::uuid moveAssignmentId = boost::uuids::nil_generator()();
+    boost::uuids::uuid moveAssignmentId = boost::uuids::nil_uuid();
     if (moveAssignment)
     {
         moveAssignmentId = moveAssignment->FunctionId();
     }
     writer.GetBinaryWriter().Write(moveAssignmentId);
-    boost::uuids::uuid returnId = boost::uuids::nil_generator()();
+    boost::uuids::uuid returnId = boost::uuids::nil_uuid();
     if (returnFun)
     {
         returnId = returnFun->FunctionId();
     }
     writer.GetBinaryWriter().Write(returnId);
-    boost::uuids::uuid equalityOpId = boost::uuids::nil_generator()();
+    boost::uuids::uuid equalityOpId = boost::uuids::nil_uuid();
     if (equalityOp)
     {
         equalityOpId = equalityOp->FunctionId();
