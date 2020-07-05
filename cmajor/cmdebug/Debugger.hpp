@@ -11,7 +11,9 @@
 #include <soulng/util/CodeFormatter.hpp>
 #include <string>
 #include <vector>
+#include <list>
 #include <memory>
+#include <condition_variable>
 
 namespace cmajor { namespace debug {
 
@@ -21,6 +23,33 @@ class DebugInfo;
 class Instruction;
 class DebuggerCommand;
 struct SourceLocation;
+
+class DEBUG_API Console
+{
+public:
+    Console();
+    void SetDriver(DebuggerDriver* driver_);
+    void Run();
+    void SetActive();
+    std::unique_ptr<DebuggerCommand> GetCommand();
+    void SetTargetRunning();
+    void Proceed();
+    bool Terminated() const { return terminated; }
+private:
+    DebuggerDriver* driver;
+    std::mutex mtx;
+    std::condition_variable commandAvailableVar;
+    std::condition_variable commandReceivedVar;
+    std::condition_variable targetRunningVar;
+    std::condition_variable proceed;
+    std::list<std::unique_ptr<DebuggerCommand>> commands;
+    bool terminated;
+    bool commandAvailable;
+    bool commandReceived;
+    bool targetRunning;
+    bool canProceeed;
+    std::chrono::steady_clock::time_point activeTimeStamp;
+};
 
 class DEBUG_API GdbBreakpoint
 {
@@ -60,17 +89,27 @@ struct DEBUG_API StopRecord
     Frame cmajorFrame;
 };
 
-class DEBUG_API Debugger
+class DEBUG_API Debugger : public DebuggerDriver
 {
 public:
-    Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_);
+    Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_);
     ~Debugger();
     enum class State
     {
         initializing, programStarted, running, stopped, programExitedNormally, exitingDebugger
     };
-    void Exit();
-    bool Exiting() const { return state == State::exitingDebugger; }
+    void ResetRunningFlag() { wasRunning = false; }
+    void ResetTargetOutputFlag() { targetOutput = false; }
+    bool TargetWasRunning() const override { return wasRunning; }
+    bool TargetOutput() const override { return targetOutput; }
+    void ProcessReplyRecord(GdbReplyRecord* record) override;
+    std::string& CurrentSourceFilePath() override { return currentSourceFilePath; }
+    bool TargetRunning() const override { return state == State::running; }
+    void Proceed() override;
+    bool Exiting() const override { return state == State::exitingDebugger; }
+    void Exit() override;
+    void Prompt() override;
+    bool LatestCommandWasRunningCommand() override;
     bool Run();
     void Help();
     void Next();
@@ -89,7 +128,6 @@ public:
     bool IsStopInstruction(Instruction* instruction) const;
     bool ExecuteGDBCommand(const GdbCommand& command);
     void ProcessReply(GdbCommand::Kind commandKind, GdbReply* reply);
-    void ProcessReplyRecord(GdbReplyRecord* record);
     void ProcessConsoleOutput(GdbConsoleOutputRecord* record);
     void ProcessTargetOutput(GdbTargetOutputRecord* record);
     void ProcessLogOutput(GdbLogOutputRecord* record);
@@ -115,9 +153,10 @@ public:
     std::string StateStr(State state) const;
     int GetNextBreakpointNumber() { return nextBreakpointNumber++; }
     std::string GetNextTemporaryBreakpointId();
-    std::string& CurrentSourceFilePath() { return currentSourceFilePath; }
 private:
     State state;
+    bool wasRunning;
+    bool targetOutput;
     Instruction* stoppedInstruction;
     StopRecord stopRecord;
     int stackDepth;
@@ -134,6 +173,8 @@ private:
     int nextTempBreakpointNumber;
     SourceLocation listLocation;
     std::string currentSourceFilePath;
+    Console& console;
+    std::recursive_mutex outputMutex;
 };
 
 class DEBUG_API DebuggerCommand
@@ -145,6 +186,7 @@ public:
     };
     DebuggerCommand(Kind kind_);
     virtual ~DebuggerCommand();
+    virtual bool IsRunningCommand(DebuggerDriver& driver) const { return false; }
     virtual void Execute(Debugger& debugger) = 0;
     virtual DebuggerCommand* Clone() = 0;
     Kind GetKind() const { return kind; }
@@ -172,6 +214,7 @@ class DEBUG_API DebuggerNextCommand : public DebuggerCommand
 {
 public:
     DebuggerNextCommand();
+    bool IsRunningCommand(DebuggerDriver& driver) const override { return true; }
     void Execute(Debugger& debugger) override;
     DebuggerCommand* Clone() override;
 };
@@ -180,6 +223,7 @@ class DEBUG_API DebuggerStepCommand : public DebuggerCommand
 {
 public:
     DebuggerStepCommand();
+    bool IsRunningCommand(DebuggerDriver& driver) const override { return true; }
     void Execute(Debugger& debugger) override;
     DebuggerCommand* Clone() override;
 };
@@ -188,6 +232,7 @@ class DEBUG_API DebuggerContinueCommand : public DebuggerCommand
 {
 public:
     DebuggerContinueCommand();
+    bool IsRunningCommand(DebuggerDriver& driver) const override { return true; }
     void Execute(Debugger& debugger) override;
     DebuggerCommand* Clone() override;
 };
@@ -196,6 +241,7 @@ class DEBUG_API DebuggerFinishCommand : public DebuggerCommand
 {
 public:
     DebuggerFinishCommand();
+    bool IsRunningCommand(DebuggerDriver& driver) const override { return true; }
     void Execute(Debugger& debugger) override;
     DebuggerCommand* Clone() override;
 };
@@ -204,6 +250,7 @@ class DEBUG_API DebuggerUntilCommand : public DebuggerCommand
 {
 public:
     DebuggerUntilCommand(const SourceLocation& location_);
+    bool IsRunningCommand(DebuggerDriver& driver) const override { return true; }
     void Execute(Debugger& debugger) override;
     DebuggerCommand* Clone() override;
 private:
@@ -271,6 +318,7 @@ class DEBUG_API DebuggerRepeatLatestCommand : public DebuggerCommand
 {
 public:
     DebuggerRepeatLatestCommand();
+    bool IsRunningCommand(DebuggerDriver& driver) const override;
     void Execute(Debugger& debugger) override;
     DebuggerCommand* Clone() override;
 };

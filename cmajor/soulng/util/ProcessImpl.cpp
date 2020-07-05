@@ -69,6 +69,11 @@ int ProcessImpl::ExitCode() const
     return process.exit_code();
 }
 
+void ProcessImpl::Terminate()
+{
+    process.terminate();
+}
+
 bool ProcessImpl::Eof(Process::StdHandle handle)
 {
     switch (handle)
@@ -165,6 +170,26 @@ void ProcessImpl::WriteLine(const std::string& line)
     else
     {
         throw std::runtime_error("process stdin not redirected");
+    }
+}
+
+void ProcessImpl::CloseHandles()
+{
+    if ((redirections & Process::Redirections::processStdIn) != Process::Redirections::none)
+    {
+        processStdIn.close();
+    }
+    else
+    {
+        throw std::runtime_error("process stdin not redirected");
+    }
+    if ((redirections & Process::Redirections::processStdOut) != Process::Redirections::none)
+    {
+        processStdOut.close();
+    }
+    if ((redirections & Process::Redirections::processStdErr) != Process::Redirections::none)
+    {
+        processStdErr.close();
     }
 }
 

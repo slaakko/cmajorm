@@ -27,10 +27,12 @@ public:
     bool Running();
     void WaitForExit();
     int ExitCode() const;
+    void Terminate();
     bool Eof(Process::StdHandle handle);
     std::string ReadLine(Process::StdHandle handle);
     std::string ReadToEnd(Process::StdHandle handle);
     void WriteLine(const std::string& line);
+    void CloseHandles();
 private:
     Process::Redirections redirections;
     boost::process::ipstream processStdOut;

@@ -31,10 +31,12 @@ public:
     bool Running();
     void WaitForExit();
     int ExitCode() const;
+    void Terminate();
     bool Eof(StdHandle handle);
     std::string ReadLine(StdHandle handle);
     std::string ReadToEnd(StdHandle handle);
     void WriteLine(const std::string& line);
+    void CloseHandles();
 private:
     ProcessImpl* impl;
 };

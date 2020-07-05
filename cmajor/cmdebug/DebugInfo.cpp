@@ -563,7 +563,8 @@ std::string SourceFileMap::GetSourceFilePath(const SourceLocation& location) con
     std::string locationPath;
     if (project)
     {
-        locationPath = Path::Combine(project->DirectoryPath(), Path::GetFileName(location.path));
+        locationPath = GetFullPath(Path::Combine(Path::Combine(Path::Combine(Path::Combine(Path::Combine(project->DirectoryPath(), ".."), ".."), ".."), ".."),
+            Path::GetFileName(location.path)));
     }
     else
     {

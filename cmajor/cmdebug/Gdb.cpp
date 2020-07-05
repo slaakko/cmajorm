@@ -482,11 +482,14 @@ public:
     static void Done();
     static Gdb& Instance() { return *instance; }
     void SetDebugFlag() { debug = true; }
-    void Start(const std::string& executable, const std::vector<std::string>& args);
+    void Start(const std::string& executable, const std::vector<std::string>& args, DebuggerDriver& driver);
     void Run(const std::string& startCommand);
-    void Stop();
-    std::unique_ptr<GdbReply> Execute(const GdbCommand& commmand);
-    std::unique_ptr<GdbReply> ReadReply();
+    void Stop(DebuggerDriver& driver);
+    void Terminate();
+    std::unique_ptr<GdbReply> Execute(const GdbCommand& commmand, DebuggerDriver& driver);
+    std::unique_ptr<GdbReply> ReadReply(DebuggerDriver& driver);
+    void WriteTargetInputLine(const std::string& line);
+    void CloseTargetHandles();
     GdbReply* GetStartReply() { return startReply.get(); }
 private:
     Gdb();
@@ -497,6 +500,7 @@ private:
     std::thread gdbThread;
     std::exception_ptr gdbException;
     int gdbExitCode;
+    bool exited;
 };
 
 void RunGDB(Gdb* gdb, const std::string& startCommand)
@@ -516,11 +520,11 @@ void Gdb::Done()
     instance.reset();
 }
 
-Gdb::Gdb() : debug(false), gdbExitCode(-1)
+Gdb::Gdb() : debug(false), gdbExitCode(-1), exited(false)
 {
 }
 
-void Gdb::Start(const std::string& executable, const std::vector<std::string>& args)
+void Gdb::Start(const std::string& executable, const std::vector<std::string>& args, DebuggerDriver& driver)
 {
     std::string startCommand;
     startCommand.append("gdb");
@@ -540,7 +544,7 @@ void Gdb::Start(const std::string& executable, const std::vector<std::string>& a
     }
     gdbThread = std::thread{ RunGDB, this, startCommand };
     std::this_thread::sleep_for(std::chrono::seconds{ 1 });
-    startReply = ReadReply();
+    startReply = ReadReply(driver);
 }
 
 void Gdb::Run(const std::string& startCommand)
@@ -558,16 +562,36 @@ void Gdb::Run(const std::string& startCommand)
     }
 }
 
-void Gdb::Stop()
+void Gdb::Stop(DebuggerDriver& driver)
 {
+    if (exited) return;
+    exited = true;
     GdbExitCommand exitCommand;
-    Execute(exitCommand);
+    Execute(exitCommand, driver);
     gdb->WaitForExit();
     gdbThread.join();
     gdbExitCode = gdb->ExitCode();
 }
 
-std::unique_ptr<GdbReply> Gdb::Execute(const GdbCommand& command)
+void Gdb::Terminate()
+{
+    try
+    {
+        gdb->Terminate();
+    }
+    catch (const std::exception&)
+    {
+    }
+    try
+    {
+        gdbThread.join();
+    }
+    catch (const std::exception&)
+    {
+    }
+}
+
+std::unique_ptr<GdbReply> Gdb::Execute(const GdbCommand& command, DebuggerDriver& driver)
 {
     if (gdbException)
     {
@@ -581,7 +605,7 @@ std::unique_ptr<GdbReply> Gdb::Execute(const GdbCommand& command)
     std::unique_ptr<GdbReply> reply;
     if (command.GetKind() != GdbCommand::Kind::exit)
     {
-        reply = ReadReply();
+        reply = ReadReply(driver);
     }
     if (gdbException)
     {
@@ -606,35 +630,45 @@ std::unique_ptr<GdbReplyRecord> ParseGdbReplyRecord(const std::string& line)
     }
 }
 
-std::unique_ptr<GdbReply> Gdb::ReadReply()
+std::string PreparedLine(const std::string& line)
 {
-    std::unique_ptr<GdbReply> reply(new GdbReply());
-    std::vector<std::string> textLines;
-    std::string line = gdb->ReadLine(soulng::util::Process::StdHandle::stdOut);
-    while (line.empty())
-    {
-        line = gdb->ReadLine(soulng::util::Process::StdHandle::stdOut);
-    }
-    if (debug)
-    {
-        LogMessage(-1, "<- " + line);
-    }
     if (!line.empty())
     {
         switch (line[0])
         {
-            case '=': case '~': case '^': case '*': case '&':
+            case '=': case '~': case '^': case '*': case '&': 
             {
-                break;
+                return line;
             }
             default:
             {
-                line = "@\"" + soulng::util::StringStr(line) + "\"";
-                break;
+                if (StartsWith(line, "(gdb)"))
+                {
+                    return line;
+                }
+                return "@\"" + soulng::util::StringStr(line) + "\"";
             }
         }
     }
-    std::unique_ptr<GdbReplyRecord> replyRecord = ParseGdbReplyRecord(line);
+    return line;
+}
+
+std::unique_ptr<GdbReply> Gdb::ReadReply(DebuggerDriver& driver)
+{
+    std::unique_ptr<GdbReply> reply(new GdbReply());
+    std::vector<std::string> textLines;
+    std::string line = gdb->ReadLine(soulng::util::Process::StdHandle::stdOut);
+    if (debug)
+    {
+        LogMessage(-1, "<- " + line);
+    }
+    std::string preparedLine = PreparedLine(line);
+    if (preparedLine.empty())
+    {
+        return std::unique_ptr<GdbReply>();
+    }
+    std::unique_ptr<GdbReplyRecord> replyRecord = ParseGdbReplyRecord(preparedLine);
+    driver.ProcessReplyRecord(replyRecord.get());
     while (replyRecord->GetKind() != GdbReplyRecord::Kind::prompt)
     {
         if (replyRecord->GetKind() == GdbReplyRecord::Kind::parsingError)
@@ -649,10 +683,26 @@ std::unique_ptr<GdbReply> Gdb::ReadReply()
         {
             LogMessage(-1, "<- " + line);
         }
-        replyRecord = ParseGdbReplyRecord(line);
+        std::string preparedLine = PreparedLine(line);
+        if (preparedLine.empty())
+        {
+            break;
+        }
+        replyRecord = ParseGdbReplyRecord(preparedLine);
+        driver.ProcessReplyRecord(replyRecord.get());
     }
     reply->SetTextLines(textLines);
     return reply;
+}
+
+void Gdb::WriteTargetInputLine(const std::string& line)
+{
+    gdb->WriteLine(line);
+}
+
+void Gdb::CloseTargetHandles()
+{
+    gdb->CloseHandles();
 }
 
 void SetDebugFlag()
@@ -660,9 +710,9 @@ void SetDebugFlag()
     Gdb::Instance().SetDebugFlag();
 }
 
-void StartGDB(const std::string& executable, const std::vector<std::string>& args)
+void StartGDB(const std::string& executable, const std::vector<std::string>& args, DebuggerDriver& driver)
 {
-    Gdb::Instance().Start(executable, args);
+    Gdb::Instance().Start(executable, args, driver);
 }
 
 GdbReply* GetGDBStartReply()
@@ -670,19 +720,34 @@ GdbReply* GetGDBStartReply()
     return Gdb::Instance().GetStartReply();
 }
 
-std::unique_ptr<GdbReply> ExecuteGDBCommand(const GdbCommand& command)
+std::unique_ptr<GdbReply> ExecuteGDBCommand(const GdbCommand& command, DebuggerDriver& driver)
 {
-    return Gdb::Instance().Execute(command);
+    return Gdb::Instance().Execute(command, driver);
 }
 
-std::unique_ptr<GdbReply> ReadGDBReply()
+std::unique_ptr<GdbReply> ReadGDBReply(DebuggerDriver& driver)
 {
-    return Gdb::Instance().ReadReply();
+    return Gdb::Instance().ReadReply(driver);
 }
 
-void StopGDB()
+void StopGDB(DebuggerDriver& driver)
 {
-    Gdb::Instance().Stop();
+    Gdb::Instance().Stop(driver);
+}
+
+void TerminateGDB()
+{
+    Gdb::Instance().Terminate();
+}
+
+void WriteTargetInputLine(const std::string& line)
+{
+    Gdb::Instance().WriteTargetInputLine(line);
+}
+
+void CloseTargetHandles()
+{
+    Gdb::Instance().CloseTargetHandles();
 }
 
 void InitGDB()

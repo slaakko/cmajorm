@@ -16,6 +16,23 @@ namespace cmajor { namespace debug {
 
 using namespace soulng::util;
 
+class GdbReplyRecord;
+
+class DebuggerDriver
+{
+public:
+    virtual void ProcessReplyRecord(GdbReplyRecord* record) = 0;
+    virtual bool TargetRunning() const = 0;
+    virtual bool TargetWasRunning() const = 0;
+    virtual bool TargetOutput() const = 0;
+    virtual void Proceed() = 0;
+    virtual bool Exiting() const = 0;
+    virtual void Exit() = 0;
+    virtual void Prompt() = 0;
+    virtual bool LatestCommandWasRunningCommand() = 0;
+    virtual std::string& CurrentSourceFilePath() = 0;
+};
+
 class DEBUG_API GdbCommand
 {
 public:
@@ -383,11 +400,14 @@ private:
 };
 
 DEBUG_API void SetDebugFlag();
-DEBUG_API void StartGDB(const std::string& executable, const std::vector<std::string>& args);
+DEBUG_API void StartGDB(const std::string& executable, const std::vector<std::string>& args, DebuggerDriver& driver);
 DEBUG_API GdbReply* GetGDBStartReply();
-DEBUG_API std::unique_ptr<GdbReply> ExecuteGDBCommand(const GdbCommand& command);
-DEBUG_API std::unique_ptr<GdbReply> ReadGDBReply();
-DEBUG_API void StopGDB();
+DEBUG_API std::unique_ptr<GdbReply> ExecuteGDBCommand(const GdbCommand& command, DebuggerDriver& driver);
+DEBUG_API std::unique_ptr<GdbReply> ReadGDBReply(DebuggerDriver& driver);
+DEBUG_API void WriteTargetInputLine(const std::string& line);
+DEBUG_API void CloseTargetHandles();
+DEBUG_API void StopGDB(DebuggerDriver& driver);
+DEBUG_API void TerminateGDB();
 DEBUG_API void InitGDB();
 DEBUG_API void DoneGDB();
 

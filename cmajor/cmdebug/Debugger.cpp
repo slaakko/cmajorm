@@ -18,6 +18,132 @@ namespace cmajor { namespace debug {
 
 using namespace soulng::unicode;
 
+std::unique_ptr<DebuggerCommand> ParseDebuggerCommand(std::string& currentSourceFilePath, const std::string& line)
+{
+    std::string commandLine = line;
+    commandLine.append("\r\n");
+    DebuggerCommandLexer lexer(ToUtf32(commandLine), "", 0);
+    std::unique_ptr<DebuggerCommand> command = DebuggerCommandParser::Parse(lexer, &currentSourceFilePath);
+    return command;
+}
+
+Console::Console() : driver(nullptr), terminated(false), commandAvailable(false), commandReceived(false), targetRunning(false), canProceeed(false)
+{
+}
+
+void Console::SetDriver(DebuggerDriver* driver_)
+{
+    driver = driver_;
+}
+
+void Console::Run()
+{
+    std::string line;
+    while (std::getline(std::cin, line))
+    {
+        canProceeed = false;
+        bool commandIsRunningCommand = false;
+        if (driver->TargetRunning())
+        {
+            WriteTargetInputLine(line);
+        }
+        else
+        {
+            std::unique_ptr<DebuggerCommand> command = ParseDebuggerCommand(driver->CurrentSourceFilePath(), line);
+            commandIsRunningCommand = command->IsRunningCommand(*driver);
+            if (command->GetKind() == DebuggerCommand::Kind::exit)
+            {
+                break;
+            }
+            else
+            {
+                std::unique_lock<std::mutex> lock(mtx);
+                commandReceived = false;
+                targetRunning = false;
+                commands.push_back(std::move(command));
+                commandAvailableVar.notify_one();
+                commandAvailable = true;
+                commandReceivedVar.wait(lock, [this]{ return commandReceived; });
+            }
+        }
+        if (commandIsRunningCommand)
+        {
+            std::unique_lock<std::mutex> lock(mtx);
+            targetRunningVar.wait(lock, [this] { return targetRunning; });
+        }
+        commandAvailable = false;
+        bool wait = true;
+        while (wait)
+        {
+            std::unique_lock<std::mutex> lock(mtx);
+            std::cv_status status = proceed.wait_for(lock, std::chrono::milliseconds{ 500 });
+            if (status == std::cv_status::timeout)
+            {
+                if (driver->TargetRunning())
+                {
+                    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+                    std::chrono::steady_clock::duration idlePeriod = now - activeTimeStamp;
+                    if (std::chrono::duration_cast<std::chrono::milliseconds>(idlePeriod).count() > 3000)
+                    {
+                        wait = false;
+                    }
+                }
+            }
+            else if (status == std::cv_status::no_timeout && canProceeed)
+            {
+                wait = false;
+            }
+        }
+        if (!driver->TargetRunning())
+        {
+            driver->Prompt();
+        }
+    }
+    terminated = true;
+    CloseTargetHandles();
+    TerminateGDB();
+    std::unique_lock<std::mutex> lock(mtx);
+    commands.push_back(std::unique_ptr<DebuggerCommand>(new DebuggerExitCommand()));
+    commandAvailable = true;
+    commandAvailableVar.notify_one();
+}
+
+void Console::SetActive()
+{
+    activeTimeStamp = std::chrono::steady_clock::now();
+}
+
+std::unique_ptr<DebuggerCommand> Console::GetCommand()
+{
+    if (terminated) return std::unique_ptr<DebuggerCommand>();
+    std::unique_lock<std::mutex> lock(mtx);
+    commandAvailableVar.wait(lock, [this] { return commandAvailable; });
+    std::unique_ptr<DebuggerCommand> command = std::move(commands.front());
+    commands.pop_front();
+    commandReceived = true;
+    commandReceivedVar.notify_one();
+    return command;
+}
+
+void Console::SetTargetRunning()
+{
+    std::unique_lock<std::mutex> lock(mtx);
+    targetRunning = true;
+    targetRunningVar.notify_one();
+}
+
+void Console::Proceed()
+{
+    std::unique_lock<std::mutex> lock(mtx);
+    canProceeed = true;
+    proceed.notify_one();
+}
+
+void RunConsole(Console* console)
+{
+    console->Run();
+}
+
 GdbBreakpoint::GdbBreakpoint(Instruction* instruction_) : instruction(instruction_), number(-1)
 {
 }
@@ -232,9 +358,9 @@ bool GetStackListFramesResult(GdbResults* results, std::vector<Frame>& frames, C
     return false;
 }
 
-Debugger::Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_) :
-    verbose(verbose_), formatter(formatter_), state(State::initializing), nextBreakpointNumber(1), nextTempBreakpointNumber(1),
-    stackDepth(-1)
+Debugger::Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_) :
+    verbose(verbose_), formatter(formatter_), state(State::initializing), wasRunning(false), targetOutput(false), nextBreakpointNumber(1), nextTempBreakpointNumber(1),
+    stackDepth(-1), console(console_)
 {
     std::string cmdbFilePath = Path::ChangeExtension(executable, ".cmdb");
     if (boost::filesystem::exists(cmdbFilePath))
@@ -253,7 +379,7 @@ Debugger::Debugger(const std::string& executable, const std::vector<std::string>
     {
         formatter.WriteLine("starting GDB...");
     }
-    StartGDB(executable, args);
+    StartGDB(executable, args, *this);
     if (verbose)
     {
         GdbReply* startReply = GetGDBStartReply();
@@ -266,11 +392,15 @@ Debugger::~Debugger()
 {
     try
     {
-        if (verbose)
+        if (!console.Terminated())
         {
-            formatter.WriteLine("stopping GDB...");
+            if (verbose)
+            {
+                std::lock_guard<std::recursive_mutex> lock(outputMutex);
+                formatter.WriteLine("stopping GDB...");
+            }
+            StopGDB(*this);
         }
-        StopGDB();
     }
     catch (...)
     {
@@ -282,8 +412,15 @@ void Debugger::Exit()
     SetState(State::exitingDebugger);
 }
 
+void Debugger::Prompt()
+{
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
+    formatter.Write("cmdb> ");
+}
+
 void Debugger::StartProgram()
 {
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
     Instruction* mainFunctionEntryInstruction = debugInfo->GetMainFunctionEntryInstruction();
     GdbBreakpoint* bp = SetBreakpoint(mainFunctionEntryInstruction);
     if (bp != nullptr)
@@ -307,6 +444,7 @@ void Debugger::StartProgram()
             }
         }
     }
+    Prompt();
 }
 
 GdbBreakpoint* Debugger::SetBreakpoint(Instruction* instruction)
@@ -394,6 +532,7 @@ Instruction* Debugger::GetInstructionForCppLocation(const std::string& cppFile, 
     }
     catch (const std::exception& ex)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.WriteLine("error getting C++ instruction for frame : cppFile=" + cppFile + ", cppLine=" + std::to_string(cppLine) + ": " + ex.what());
     }
     return nullptr;
@@ -402,6 +541,12 @@ Instruction* Debugger::GetInstructionForCppLocation(const std::string& cppFile, 
 void Debugger::SetLatestCommand(DebuggerCommand* latestCommand_)
 {
     latestCommand.reset(latestCommand_);
+}
+
+bool Debugger::LatestCommandWasRunningCommand() 
+{
+    if (!latestCommand) return false;
+    return latestCommand->IsRunningCommand(*this);
 }
 
 void Debugger::SetState(State state_)
@@ -468,6 +613,7 @@ void Debugger::Next()
                         {
                             if (IsStopInstruction(stoppedInstruction))
                             {
+                                std::lock_guard<std::recursive_mutex> lock(outputMutex);
                                 stopRecord.Print(formatter);
                                 stoppedInstruction->PrintSource(formatter);
                                 stop = true;
@@ -481,6 +627,7 @@ void Debugger::Next()
                         {
                             if (IsStopInstruction(stoppedInstruction))
                             {
+                                std::lock_guard<std::recursive_mutex> lock(outputMutex);
                                 stopRecord.Print(formatter);
                                 stoppedInstruction->PrintSource(formatter);
                                 stop = true;
@@ -491,6 +638,7 @@ void Debugger::Next()
             }
             else
             {
+                std::lock_guard<std::recursive_mutex> lock(outputMutex);
                 stopRecord.Print(formatter);
                 if (stoppedInstruction != nullptr)
                 {
@@ -540,6 +688,7 @@ void Debugger::Step()
                         {
                             if (IsStopInstruction(stoppedInstruction))
                             {
+                                std::lock_guard<std::recursive_mutex> lock(outputMutex);
                                 stopRecord.Print(formatter);
                                 stoppedInstruction->PrintSource(formatter);
                                 stop = true;
@@ -553,6 +702,7 @@ void Debugger::Step()
                         {
                             if (IsStopInstruction(stoppedInstruction))
                             {
+                                std::lock_guard<std::recursive_mutex> lock(outputMutex);
                                 stopRecord.Print(formatter);
                                 stoppedInstruction->PrintSource(formatter);
                                 stop = true;
@@ -572,6 +722,7 @@ void Debugger::Step()
             }
             else
             {
+                std::lock_guard<std::recursive_mutex> lock(outputMutex);
                 stopRecord.Print(formatter);
                 if (stoppedInstruction != nullptr)
                 {
@@ -599,6 +750,7 @@ void Debugger::Continue()
             {
                 if (stoppedInstruction->CppLineIndex() == 0 && IsStopInstruction(stoppedInstruction))
                 {
+                    std::lock_guard<std::recursive_mutex> lock(outputMutex);
                     stopRecord.Print(formatter);
                     stoppedInstruction->PrintSource(formatter);
                 }
@@ -623,6 +775,7 @@ void Debugger::Finish()
             {
                 if (stoppedInstruction->CppLineIndex() == 0 && IsStopInstruction(stoppedInstruction))
                 {
+                    std::lock_guard<std::recursive_mutex> lock(outputMutex);
                     stopRecord.Print(formatter);
                     stoppedInstruction->PrintSource(formatter);
                 }
@@ -641,6 +794,7 @@ void Debugger::Finish()
 
 void Debugger::Until(const SourceLocation& location)
 {
+
     if (state != State::stopped && state != State::programStarted)
     {
         throw std::runtime_error("error: state is '" + StateStr(state) + "'");
@@ -659,6 +813,7 @@ void Debugger::Until(const SourceLocation& location)
                 {
                     if (stoppedInstruction->CppLineIndex() == 0 && IsStopInstruction(stoppedInstruction))
                     {
+                        std::lock_guard<std::recursive_mutex> lock(outputMutex);
                         stopRecord.Print(formatter);
                         stoppedInstruction->PrintSource(formatter);
                     }
@@ -718,6 +873,7 @@ void Debugger::Break(const SourceLocation& location)
     std::vector<Instruction*> instructions = debugInfo->GetSourceFileMap().GetInstructions(location);
     if (Break(std::move(bp), instructions))
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.WriteLine("breakpoint " + std::to_string(breakpointNumber) + " set to " + std::to_string(instructions.size()) +
             " instructions at '" + instructions[0]->GetCmajorFrame().ToString(false) + "'");
     }
@@ -749,6 +905,7 @@ void Debugger::Delete(const std::string& breakpointId)
         {
             delete bp;
             debuggerBreakpointMap.erase(breakpointId);
+            std::lock_guard<std::recursive_mutex> lock(outputMutex);
             formatter.WriteLine("breakpoint " + breakpointId + " deleted");
         }
         else
@@ -768,6 +925,7 @@ void Debugger::Depth()
     bool succeeded = ExecuteGDBCommand(stackInfoDepthCommand);
     if (succeeded)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.WriteLine("depth=" + std::to_string(stackDepth));
     }
 }
@@ -778,6 +936,7 @@ void Debugger::Frames(int low, int high)
     bool succeeded = ExecuteGDBCommand(stackListFrames);
     if (succeeded)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         int n = cppFrames.size();
         for (int i = 0; i < n; ++i)
         {
@@ -790,6 +949,7 @@ void Debugger::Frames(int low, int high)
 
 void Debugger::ShowBreakpoints()
 {
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
     for (const auto& p : debuggerBreakpointMap)
     {
         DebuggerBreakpoint* bp = p.second;
@@ -815,6 +975,7 @@ void Debugger::List(const SourceLocation& location)
     }
     std::string sourceFilePath = debugInfo->GetSourceFileMap().GetSourceFilePath(listLocation);
     SourceFile& sourceFile = debugInfo->GetSourceFileCache().GetSourceFile(sourceFilePath);
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
     sourceFile.Print(formatter, listLocation.line, stoppedInstruction, false);
     listLocation.line = std::min(listLocation.line + 2 * debugInfo->GetSourceFileWindowSize(), int(sourceFile.Lines().size() + 1));
     currentSourceFilePath = listLocation.path;
@@ -848,12 +1009,15 @@ bool Debugger::IsStopInstruction(Instruction* instruction) const
 
 bool Debugger::ExecuteGDBCommand(const GdbCommand& command)
 {
-    std::unique_ptr<GdbReply> reply = cmajor::debug::ExecuteGDBCommand(command);
+    std::unique_ptr<GdbReply> reply = cmajor::debug::ExecuteGDBCommand(command, *this);
+    if (!reply) return false;
     GdbReplyRecord* stoppedRecord = reply->GetStoppedRecord();
     while (stoppedRecord == nullptr)
     {
         ProcessReply(command.GetKind(), reply.get());
-        reply = ReadGDBReply();
+        ResetTargetOutputFlag();
+        reply = ReadGDBReply(*this);
+        if (!reply) return false;
         stoppedRecord = reply->GetStoppedRecord();
     }
     ProcessReply(command.GetKind(), reply.get());
@@ -865,6 +1029,7 @@ bool Debugger::ExecuteGDBCommand(const GdbCommand& command)
     }
     if (!succeeded)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("error executing GDB command '" + command.Str() + "': ");
         resultRecord->Print(formatter);
     }
@@ -873,10 +1038,6 @@ bool Debugger::ExecuteGDBCommand(const GdbCommand& command)
 
 void Debugger::ProcessReply(GdbCommand::Kind commandKind, GdbReply* reply)
 {
-    for (const auto& replyRecord : reply->ReplyRecords())
-    {
-        ProcessReplyRecord(replyRecord.get());
-    }
     switch (commandKind)
     {
         case GdbCommand::Kind::breakInsert:
@@ -939,6 +1100,9 @@ void Debugger::ProcessReplyRecord(GdbReplyRecord* record)
         case GdbReplyRecord::Kind::execRunning:
         {
             SetState(State::running);
+            wasRunning = true;
+            console.SetActive();
+            console.SetTargetRunning();
             break;
         }
         case GdbReplyRecord::Kind::execStopped:
@@ -959,6 +1123,7 @@ void Debugger::ProcessReplyRecord(GdbReplyRecord* record)
         case GdbReplyRecord::Kind::targetOutput:
         {
             ProcessTargetOutput(static_cast<GdbTargetOutputRecord*>(record));
+            targetOutput = true;
             break;
         }
         case GdbReplyRecord::Kind::logOutput:
@@ -970,17 +1135,23 @@ void Debugger::ProcessReplyRecord(GdbReplyRecord* record)
 
 void Debugger::ProcessConsoleOutput(GdbConsoleOutputRecord* record)
 {
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
     formatter.WriteLine("console output: " + record->Text());
+    console.SetActive();
 }
 
 void Debugger::ProcessTargetOutput(GdbTargetOutputRecord* record)
 {
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
     formatter.WriteLine("target output: " + record->Text());
+    console.SetActive();
 }
 
 void Debugger::ProcessLogOutput(GdbLogOutputRecord* record)
 {
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
     formatter.WriteLine("log output: " + record->Text());
+    console.SetActive();
 }
 
 void Debugger::ProcessBreakInsertReply(GdbReply* reply)
@@ -1016,6 +1187,7 @@ void Debugger::ProcessBreakInsertReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful break-insert command, reply: ");
         reply->Print(formatter);
     }
@@ -1034,6 +1206,7 @@ void Debugger::ProcessBreakDeleteReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful break-delete command, reply: ");
         reply->Print(formatter);
     }
@@ -1064,6 +1237,7 @@ void Debugger::ProcessExecRunReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful exec-run command, reply: ");
         reply->Print(formatter);
     }
@@ -1094,6 +1268,7 @@ void Debugger::ProcessExecContinueReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful exec-continue command, reply: ");
         reply->Print(formatter);
     }
@@ -1124,6 +1299,7 @@ void Debugger::ProcessExecNextReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful exec-next command, reply: ");
         reply->Print(formatter);
     }
@@ -1154,6 +1330,7 @@ void Debugger::ProcessExecStepReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful exec-step command, reply: ");
         reply->Print(formatter);
     }
@@ -1184,6 +1361,7 @@ void Debugger::ProcessExecFinishReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful exec-finish command, reply: ");
         reply->Print(formatter);
     }
@@ -1214,6 +1392,7 @@ void Debugger::ProcessExecUntilReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful exec-until command, reply: ");
         reply->Print(formatter);
     }
@@ -1232,6 +1411,7 @@ void Debugger::ProcessStackInfoDepthReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful stack-info-depth command, reply: ");
         reply->Print(formatter);
     }
@@ -1280,6 +1460,7 @@ void Debugger::ProcessStackListFramesReply(GdbReply* reply)
     }
     if (!success)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         formatter.Write("unsuccessful stack-list-frames command, reply: ");
         reply->Print(formatter);
     }
@@ -1319,6 +1500,11 @@ bool Debugger::ProcessExecStoppedRecord(GdbExecStoppedRecord* execStoppedRecord)
         }
     }
     return success;
+}
+
+void Debugger::Proceed()
+{
+    console.Proceed();
 }
 
 DebuggerCommand::DebuggerCommand(Kind kind_) : kind(kind_)
@@ -1515,6 +1701,11 @@ DebuggerRepeatLatestCommand::DebuggerRepeatLatestCommand() : DebuggerCommand(Kin
 {
 }
 
+bool DebuggerRepeatLatestCommand::IsRunningCommand(DebuggerDriver& driver) const
+{
+    return driver.LatestCommandWasRunningCommand();
+}
+
 void DebuggerRepeatLatestCommand::Execute(Debugger& debugger)
 {
     debugger.RepeatLatestCommand();
@@ -1525,41 +1716,44 @@ DebuggerCommand* DebuggerRepeatLatestCommand::Clone()
     return new DebuggerRepeatLatestCommand();
 }
 
-std::unique_ptr<DebuggerCommand> ParseDebuggerCommand(std::string& currentSourceFilePath, const std::string& line)
-{
-    std::string commandLine = line;
-    commandLine.append("\r\n");
-    DebuggerCommandLexer lexer(ToUtf32(commandLine), "", 0);
-    std::unique_ptr<DebuggerCommand> command = DebuggerCommandParser::Parse(lexer, &currentSourceFilePath);
-    return command;
-}
-
 void RunDebuggerInteractive(const std::string& executable, const std::vector<std::string>& args, bool verbose)
 {
     CodeFormatter formatter(std::cout);
-    Debugger debugger(executable, args, verbose, formatter);
-    std::string line;
-    formatter.Write("cmdb> ");
-    while (std::getline(std::cin, line))
+    Console console;
+    Debugger debugger(executable, args, verbose, formatter, console);
+    console.SetDriver(&debugger);
+    std::thread consoleThread{ RunConsole, &console };
+    try
     {
-        try
+        while (!debugger.Exiting())
         {
-            std::unique_ptr<DebuggerCommand> command = ParseDebuggerCommand(debugger.CurrentSourceFilePath(), line);
-            command->Execute(debugger);
-            if (command->GetKind() != DebuggerCommand::Kind::repeatLatest)
+            try
             {
-                debugger.SetLatestCommand(command->Clone());
+                debugger.ResetRunningFlag();
+                debugger.ResetTargetOutputFlag();
+                std::unique_ptr<DebuggerCommand> command = console.GetCommand();
+                if (!command || console.Terminated())
+                {
+                    break;
+                }
+                command->Execute(debugger);
+                debugger.Proceed();
+                if (command->GetKind() != DebuggerCommand::Kind::repeatLatest)
+                {
+                    debugger.SetLatestCommand(command->Clone());
+                }
+            }
+            catch (const std::exception& ex)
+            {
+                formatter.WriteLine(ex.what());
             }
         }
-        catch (const std::exception& ex)
-        {
-            formatter.WriteLine(ex.what());
-        }
-        if (debugger.Exiting())
-        {
-            break;
-        }
-        formatter.Write("cmdb> ");
+        consoleThread.join();
+    }
+    catch (const std::exception&)
+    {
+        consoleThread.join();
+        throw;
     }
 }
 

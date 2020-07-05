@@ -32,6 +32,11 @@ int Process::ExitCode() const
     return impl->ExitCode();
 }
 
+void Process::Terminate()
+{
+    impl->Terminate();
+}
+
 bool Process::Eof(StdHandle handle)
 {
     return impl->Eof(handle);
@@ -50,6 +55,11 @@ std::string Process::ReadToEnd(StdHandle handle)
 void Process::WriteLine(const std::string& line)
 {
     impl->WriteLine(line);
+}
+
+void Process::CloseHandles()
+{
+    impl->CloseHandles();
 }
 
 } } // namespace soulng::util
