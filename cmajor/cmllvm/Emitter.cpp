@@ -1288,6 +1288,16 @@ void* Emitter::GetIrTypeForPtrType(void* baseIrType)
     return llvm::PointerType::get(static_cast<llvm::Type*>(baseIrType), 0);
 }
 
+std::string Emitter::GetIrTypeName(void* irType)
+{
+    return std::string();
+}
+
+std::string Emitter::MakeVmtVariableName(const std::string& vmtObjectName)
+{
+    return std::string();
+}
+
 void* Emitter::CreateDefaultIrValueForArrayType(void* arrayIrType, const std::vector<void*>& arrayOfDefaults)
 {
     std::vector<llvm::Constant*> arrayOfConstants;

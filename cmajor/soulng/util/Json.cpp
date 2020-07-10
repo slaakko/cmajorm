@@ -33,6 +33,11 @@ JsonString::JsonString(const std::u32string& value_) : JsonValue(JsonValueType::
 {
 }
 
+JsonValue* JsonString::Clone() const
+{
+    return new JsonString(value);
+}
+
 void JsonString::Append(char32_t c)
 {
     value.append(1, c);
@@ -89,6 +94,11 @@ JsonNumber::JsonNumber(double value_) : JsonValue(JsonValueType::number), value(
 {
 }
 
+JsonValue* JsonNumber::Clone() const
+{
+    return new JsonNumber(value);
+}
+
 std::string JsonNumber::ToString() const
 {
     return std::to_string(value);
@@ -100,6 +110,11 @@ JsonBool::JsonBool() : JsonValue(JsonValueType::boolean), value(false)
 
 JsonBool::JsonBool(bool value_) : JsonValue(JsonValueType::boolean), value(value_)
 {
+}
+
+JsonValue* JsonBool::Clone() const
+{
+    return new JsonBool(value);
 }
 
 std::string JsonBool::ToString() const
@@ -148,6 +163,16 @@ std::string JsonObject::GetStringField(const std::u32string& fieldName)
     {
         return std::string();
     }
+}
+
+JsonValue* JsonObject::Clone() const
+{
+    JsonObject* clone = new JsonObject();
+    for (const auto& p : fieldMap)
+    {
+        clone->AddField(p.first, std::unique_ptr<JsonValue>(p.second->Clone()));
+    }
+    return clone;
 }
 
 std::string JsonObject::ToString() const
@@ -224,6 +249,16 @@ void JsonArray::AddItem(std::unique_ptr<JsonValue>&& item)
     items.push_back(std::move(item));
 }
 
+JsonValue* JsonArray::Clone() const
+{
+    JsonArray* clone = new JsonArray();
+    for (const std::unique_ptr<JsonValue>& item : items)
+    {
+        clone->AddItem(std::unique_ptr<JsonValue>(item->Clone()));
+    }
+    return clone;
+}
+
 JsonValue* JsonArray::operator[](int index) const
 {
     return items[index].get();
@@ -278,6 +313,11 @@ void JsonArray::Write(CodeFormatter& formatter)
 
 JsonNull::JsonNull() : JsonValue(JsonValueType::null)
 {
+}
+
+JsonValue* JsonNull::Clone() const
+{
+    return new JsonNull();
 }
 
 std::string JsonNull::ToString() const

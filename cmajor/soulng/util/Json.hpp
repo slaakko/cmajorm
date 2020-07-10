@@ -27,6 +27,7 @@ public:
     JsonValue(const JsonValue&) = delete;
     JsonValue& operator=(const JsonValue&) = delete;
     virtual ~JsonValue();
+    virtual JsonValue* Clone() const = 0;
     JsonValueType Type() const { return type; }
     virtual std::string ToString() const = 0;
     virtual void Write(CodeFormatter& formatter);
@@ -40,6 +41,7 @@ public:
     JsonString();
     JsonString(const std::u32string& value_);
     void Append(char32_t c);
+    JsonValue* Clone() const override;
     const std::u32string& Value() const { return value; }
     std::u16string JsonCharStr(char32_t c) const;
     std::string ToString() const override;
@@ -52,6 +54,7 @@ class UTIL_API JsonNumber : public JsonValue
 public:
     JsonNumber();
     JsonNumber(double value_);
+    JsonValue* Clone() const override;
     double Value() const { return value; }
     std::string ToString() const override;
 private:
@@ -63,6 +66,7 @@ class UTIL_API JsonBool : public JsonValue
 public:
     JsonBool();
     JsonBool(bool value_);
+    JsonValue* Clone() const override;
     bool Value() const { return value; }
     std::string ToString() const override;
 private:
@@ -76,6 +80,7 @@ public:
     void AddField(const std::u32string& fieldName, std::unique_ptr<JsonValue>&& fieldValue);
     JsonValue* GetField(const std::u32string& fieldName);
     std::string GetStringField(const std::u32string& fieldName);
+    JsonValue* Clone() const override;
     std::string ToString() const override;
     void Write(CodeFormatter& formatter) override;
 private:
@@ -90,6 +95,7 @@ public:
     void AddItem(std::unique_ptr<JsonValue>&& item);
     int Count() const { return items.size(); }
     JsonValue* operator[](int index) const;
+    JsonValue* Clone() const override;
     std::string ToString() const override;
     void Write(CodeFormatter& formatter) override;
 private:
@@ -100,6 +106,7 @@ class UTIL_API JsonNull : public JsonValue
 {
 public:
     JsonNull();
+    JsonValue* Clone() const override;
     std::string ToString() const override;
 };
 

@@ -1,0 +1,63 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/cmdebug/DebugExpr.hpp>
+[cpp]#include <cmajor/cmdebug/DebugExprLexer.hpp>
+[cpp]#include <cmajor/cmdebug/DebugExprTokens.hpp>
+[cpp]#include <cmajor/cmdebug/TokenValueParsers.hpp>
+
+using namespace DebugExprTokens;
+
+parser api(DEBUG_API) DebugExprParser
+{
+    uselexer DebugExprLexer;
+    main;
+
+    DebugExpr : cmajor::debug::DebugExprNode*
+        ::= PrefixDebugExpr:expr{ return expr; }
+        ;
+
+    PrefixDebugExpr : cmajor::debug::DebugExprNode*
+        ::= AST PrefixDebugExpr:derefOperand{ return new cmajor::debug::DerefDebugExprNode(derefOperand); }
+        |   AMP PrefixDebugExpr: addrOfOperand{ return new cmajor::debug::AddrOfDebugExprNode(addrOfOperand); }
+        |   MINUS PrefixDebugExpr:unaryMinusOperand{ return new cmajor::debug::UnaryMinusDebugExprNode(unaryMinusOperand);  }
+        |   PLUS PrefixDebugExpr:unaryPlusOperand{ return new cmajor::debug::UnaryPlusDebugExprNode(unaryPlusOperand); }
+        |   PostfixDebugExpr:postfix{ return postfix; }
+        ;
+
+    PostfixDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr) : cmajor::debug::DebugExprNode*
+        ::=
+        (   PrimaryDebugExpr:primary{ expr.reset(primary); }
+            (   DOT ID{ expr.reset(new cmajor::debug::DotDebugExprNode(expr.release(), ToUtf8(lexer.GetToken(pos).match.ToString()))); }
+            |   DOT BASE{ expr.reset(new cmajor::debug::DotDebugExprNode(expr.release(), "base")); }
+            |   LBRACKET DebugExpr:index RBRACKET{ expr.reset(new cmajor::debug::SubscriptDebugExprNode(expr.release(), index)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    PrimaryDebugExpr : cmajor::debug::DebugExprNode*
+        ::= ID{ return new cmajor::debug::VariableNameDebugExprNode(ToUtf8(lexer.GetToken(pos).match.ToString())); }
+        |   INTEGER{ return new cmajor::debug::IntegerDebugExprNode(cmajor::debug::ParseLong(ToUtf8(lexer.GetToken(pos).match.ToString()))); }
+        |   LPAREN DebugExpr:expr RPAREN{ return new cmajor::debug::ParenthesizedDebugExprNode(expr); }
+        |   TypeIdExpr:typeExpr{ return typeExpr; }
+        |   CastDebugExpr:castExpr{ return castExpr; }
+        ;
+
+    CastDebugExpr : cmajor::debug::DebugExprNode*
+        ::= CAST LANGLE TypeIdExpr:typeIdExpr RANGLE LPAREN DebugExpr:expr RPAREN{ return new cmajor::debug::CastDebugExprNode(typeIdExpr, expr); }
+        ;
+
+    TypeIdExpr(var std::string typeId) : cmajor::debug::TypeIdDebugExprNode*
+        ::= (TYPEID LPAREN STRING{ typeId = cmajor::debug::ParseString(lexer.GetToken(pos)); } RPAREN)
+        {
+            return new cmajor::debug::TypeIdDebugExprNode(typeId);
+        }
+        ;
+}
+
+

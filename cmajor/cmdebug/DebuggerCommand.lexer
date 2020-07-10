@@ -21,15 +21,33 @@ tokens DebuggerCommandTokens
     (UNTIL, "'until'"), (U, "'u'"),
     (BREAK, "'break'"), (B, "'b'"),
     (DELETE, "'delete'"), (D, "'d'"),
+    (PRINT, "'print'"), (P, "'p'"),
     (DEPTH, "'depth'"), 
     (FRAMES, "'frames'"),
+    (LIST, "'list'"), (L, "'l'"),
     (SHOW, "'show'"),
     (BREAKPOINTS, "'breakpoints'"),
-    (LIST, "'list'"), (L, "'l'"),
+    (RANGE, "'range'"),
+    (CAST, "'cast'"),
+    (TYPEID, "'typeid'"),
+    (BASE, "'base'"),
     (ID, "id"),
     (PATH, "'path'"),
     (INTEGER, "'integer'"),
-    (COLON, "':'")
+    (STRING, "'string'"),
+    (COLON, "':'"),
+    (AST, "'*'"),
+    (AMP, "'&'"),
+    (LPAREN, "'('"),
+    (RPAREN, "')'"),
+    (LANGLE, "'<'"),
+    (RANGLE, "'>'"),
+    (LBRACKET, "'['"),
+    (RBRACKET, "']'"),
+    (DOT, "'.'"),
+    (COMMA, "','"),
+    (PLUS, "'+'"),
+    (MINUS, "'-'")
 }
 
 keywords DebuggerCommandKeywords
@@ -43,11 +61,16 @@ keywords DebuggerCommandKeywords
     ("until", UNTIL), ("u", UNTIL),
     ("break", BREAK), ("b", BREAK),
     ("delete", DELETE), ("d", DELETE),
+    ("print", PRINT), ("p", PRINT),
     ("depth", DEPTH), 
     ("frames", FRAMES), 
     ("list", LIST), ("l", LIST),
     ("show", SHOW),
-    ("breakpoints", BREAKPOINTS)
+    ("breakpoints", BREAKPOINTS),
+    ("range", RANGE),
+    ("cast", CAST),
+    ("typeid", TYPEID),
+    ("base", BASE)
 }
 
 expressions
@@ -59,6 +82,14 @@ expressions
     comp = "[a-zA-Z_.+][a-zA-Z_0-9.+-]*";
     path = "({drive}:)?(/?({comp}/)*)?{comp}";
     integer = "[0-9]+";
+    decdigits = "{integer}";
+    hexdigit = "[0-9a-fA-F]";
+    hexdigits = "{hexdigit}+";
+    hex4 = "{hexdigit}{hexdigit}{hexdigit}{hexdigit}";
+    hex8 = "{hex4}{hex4}";
+    octaldigits = "[0-7]+";
+    escape = "\\((x|X){hexdigits}|(d|D){decdigits}|{octaldigits}|u{hex4}|U{hex8}|[abfnrtv\"'\\])";
+    string = "\"([^\\\r\n\"]|{escape})*\"";
 }
 
 lexer api(DEBUG_API) DebuggerCommandLexer
@@ -68,5 +99,18 @@ lexer api(DEBUG_API) DebuggerCommandLexer
     "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
     "{path}"{ return PATH; }
     "{integer}"{ return INTEGER; }
+    "{string}"{ return STRING; }
     ":"{ return COLON; }
+    "\*"{ return AST; }
+    "\&"{ return AMP; }
+    "\("{ return LPAREN; }
+    "\)"{ return RPAREN; }
+    "<"{ return LANGLE; }
+    ">"{ return RANGLE; }
+    "\["{ return LBRACKET; }
+    "\]"{ return RBRACKET; }
+    "\."{ return DOT; }
+    ","{ return COMMA; }
+    "\+"{ return PLUS; }
+    "\-"{ return MINUS; }
 }

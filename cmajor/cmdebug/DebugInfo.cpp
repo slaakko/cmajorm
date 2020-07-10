@@ -10,6 +10,7 @@
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <stdexcept>
 #include <iostream>
@@ -17,6 +18,7 @@
 namespace cmajor { namespace debug {
 
 using namespace soulng::util;
+using namespace soulng::unicode;
 
 Frame::Frame() : level(0), func(), file(), line(0)
 {
@@ -40,6 +42,22 @@ std::string Frame::ToString(bool printLevel) const
         s.append(file).append(":").append(std::to_string(line));
     }
     return s;
+}
+
+std::unique_ptr<JsonValue> Frame::ToJson(bool includeLevel) const
+{
+    JsonObject* jsonObject = new JsonObject();
+    if (includeLevel)
+    {
+        jsonObject->AddField(U"level", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(level)))));
+    }
+    if (!IsEmpty())
+    {
+        jsonObject->AddField(U"func", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(func))));
+        jsonObject->AddField(U"file", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(file))));
+        jsonObject->AddField(U"line", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(line)))));
+    }
+    return std::unique_ptr<JsonValue>(jsonObject);
 }
 
 InstructionLocation::InstructionLocation() : sourceLineNumber(0), projectIndex(-1), compileUnitIndex(-1), cppLineNumber(-1)
@@ -144,12 +162,22 @@ Scope* Instruction::GetScope() const
     }
 }
 
-Scope::Scope(CompileUnitFunction* compileUnitFunction_, int16_t id_, int16_t parentScopeId_) :
+Scope::~Scope()
+{
+}
+
+FunctionScope::FunctionScope(CompileUnitFunction* compileUnitFunction_, int16_t id_, int16_t parentScopeId_) :
     compileUnitFunction(compileUnitFunction_), id(id_), parentScopeId(parentScopeId_)
 {
 }
 
-Scope* Scope::GetParentScope() const
+std::string FunctionScope::Name() const
+{
+    std::string name = compileUnitFunction->GetFunction()->FullName() + "." + std::to_string(id);
+    return name;
+}
+
+Scope* FunctionScope::GetParentScope() const
 {
     if (parentScopeId != -1)
     {
@@ -161,9 +189,31 @@ Scope* Scope::GetParentScope() const
     }
 }
 
-void Scope::AddLocalVariable(DIVariable* localVariable)
+void FunctionScope::AddLocalVariable(DIVariable* localVariable)
 {
     localVariables.push_back(std::unique_ptr<DIVariable>(localVariable));
+    localVariableMap[localVariable->Name()] = localVariable;
+}
+
+DIVariable* FunctionScope::GetVariable(const std::string& name) const
+{
+    auto it = localVariableMap.find(name);
+    if (it != localVariableMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        Scope* parentScope = GetParentScope();
+        if (parentScope)
+        {
+            return parentScope->GetVariable(name);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
 }
 
 CompileUnitFunction::CompileUnitFunction(CompileUnit* compileUnit_, int32_t fileIndex_, const boost::uuids::uuid& functionId_) :
@@ -206,9 +256,9 @@ Instruction* CompileUnitFunction::GetInstruction(int index) const
     }
 }
 
-void CompileUnitFunction::AddScope(Scope* scope)
+void CompileUnitFunction::AddScope(FunctionScope* scope)
 {
-    scopes.push_back(std::unique_ptr<Scope>(scope));
+    scopes.push_back(std::unique_ptr<FunctionScope>(scope));
 }
 
 CompileUnit::CompileUnit(Project* project_, const std::string& baseName_) : project(project_), baseName(baseName_)
@@ -247,7 +297,7 @@ Function::Function(const boost::uuids::uuid& id_, const std::string& fullName_, 
 }
 
 Project::Project(DebugInfo* debugInfo_, const std::string& name_, const std::string& directoryPath_) :
-    debugInfo(debugInfo_), name(name_), directoryPath(directoryPath_), mainFunction(nullptr)
+    debugInfo(debugInfo_), name(name_), directoryPath(directoryPath_), mainFunction(nullptr), longType(nullptr)
 {
 }
 
@@ -341,8 +391,17 @@ CompileUnitFunction* Project::GetMainFunction() const
 
 void Project::AddType(DIType* type)
 {
+    if (type->GetKind() == DIType::Kind::primitiveType)
+    {
+        DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(type);
+        if (primitiveType->GetPrimitiveTypeKind() == DIPrimitiveType::Kind::longType)
+        {
+            longType = primitiveType;
+        }
+    }
     typeMap[type->Id()] = type;
     types.push_back(std::unique_ptr<DIType>(type));
+    debugInfo->AddType(type);
 }
 
 DIType* Project::GetType(const boost::uuids::uuid& typeId) const
@@ -631,7 +690,7 @@ std::string SourceFileMap::GetSourceFilePath(const SourceLocation& location) con
                     matchingSourceFiles.append(", project name='").append(project->Name() + "'");
                 }
             }
-            throw std::runtime_error("More that one source file matched source location '" + location.ToString() + "'\n:" + matchingSourceFiles + "\n" +
+            throw std::runtime_error("More that one source file matched source location '" + location.ToString() + "':\n" + matchingSourceFiles + "\n" +
                 "Give source location with project name '/' prefix to disambiguate.");
         }
     }
@@ -793,6 +852,42 @@ Instruction* DebugInfo::GetInstruction(const InstructionLocation& location) cons
     return instruction;
 }
 
+DIType* DebugInfo::GetPolymorphicType(const std::string& vmtVarName) const
+{
+    auto it = polymorphicTypeMap.find(vmtVarName);
+    if (it != polymorphicTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void DebugInfo::AddPolymorphicType(DIClassType* polymorphicType)
+{
+    polymorphicTypeMap[polymorphicType->VmtVariableName()] = polymorphicType;
+}
+
+DIType* DebugInfo::GetType(const std::string& typeId) const
+{
+    auto it = typeMap.find(typeId);
+    if (it != typeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void DebugInfo::AddType(DIType* type)
+{
+    typeMap[boost::uuids::to_string(type->Id())] = type;
+}
+
 std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
 {
     std::unique_ptr<DebugInfo> debugInfo(new DebugInfo(cmdbFilePath));
@@ -871,12 +966,13 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
                     int16_t parentScopeId;
                     int32_t numLocalVariables;
                     ReadScopeRecord(reader, scopeId, parentScopeId, numLocalVariables);
-                    std::unique_ptr<Scope> scope(new Scope(compileUnitFunction.get(), scopeId, parentScopeId));
+                    std::unique_ptr<FunctionScope> scope(new FunctionScope(compileUnitFunction.get(), scopeId, parentScopeId));
                     for (int32_t i = 0; i < numLocalVariables; ++i)
                     {
                         DIVariable* localVariable = new DIVariable();
                         localVariable->Read(reader);
                         scope->AddLocalVariable(localVariable);
+                        localVariable->SetProject(project.get());
                     }
                     compileUnitFunction->AddScope(scope.release());
                 }
@@ -910,7 +1006,15 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
         int32_t numTypeIndexRecords = reader.ReadInt();
         for (int32_t i = 0; i < numTypeIndexRecords; ++i)
         {
-            std::unique_ptr<DIType> type = ReadType(reader);
+            std::unique_ptr<DIType> type = ReadType(reader, project.get());
+            if (type->GetKind() == DIType::Kind::classType || type->GetKind() == DIType::Kind::specializationType)
+            {
+                DIClassType* classType = static_cast<DIClassType*>(type.get());
+                if (classType->IsPolymorphic())
+                {
+                    debugInfo->AddPolymorphicType(classType);
+                }
+            }
             project->AddType(type.release());
         }
         debugInfo->AddProject(project.release());

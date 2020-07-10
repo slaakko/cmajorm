@@ -191,6 +191,16 @@ void* Emitter::GetIrTypeForPtrType(void* baseIrType)
     return context->GetPtrType(static_cast<cmcppi::Type*>(baseIrType));
 }
 
+std::string Emitter::GetIrTypeName(void* irType)
+{
+    return static_cast<cmcppi::Type*>(irType)->Name();
+}
+
+std::string Emitter::MakeVmtVariableName(const std::string& vmtObjectName)
+{
+    return "__global_" + vmtObjectName;
+}
+
 void* Emitter::CreateDefaultIrValueForArrayType(void* arrayIrType, const std::vector<void*>& arrayOfDefaults)
 {
     std::vector<cmcppi::Value*> arrayOfConstants;

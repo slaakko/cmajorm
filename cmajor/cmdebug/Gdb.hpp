@@ -3,10 +3,11 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_DEBUG_INFO_GDB_INCLUDED
-#define CMAJOR_DEBUG_INFO_GDB_INCLUDED
+#ifndef CMAJOR_DEBUG_GDB_INCLUDED
+#define CMAJOR_DEBUG_GDB_INCLUDED
 #include <cmajor/cmdebug/DebugApi.hpp>
 #include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/Json.hpp>
 #include <vector>
 #include <string>
 #include <memory>
@@ -18,7 +19,7 @@ using namespace soulng::util;
 
 class GdbReplyRecord;
 
-class DebuggerDriver
+class GdbDriver
 {
 public:
     virtual void ProcessReplyRecord(GdbReplyRecord* record) = 0;
@@ -29,8 +30,14 @@ public:
     virtual bool Exiting() const = 0;
     virtual void Exit() = 0;
     virtual void Prompt() = 0;
+    virtual void Error(const std::string& msg) = 0;
     virtual bool LatestCommandWasRunningCommand() = 0;
     virtual std::string& CurrentSourceFilePath() = 0;
+};
+
+enum class Format
+{
+    default_, binary, decimal, hexadecimal, octal, natural, zeroHexadecimal
 };
 
 class DEBUG_API GdbCommand
@@ -38,7 +45,10 @@ class DEBUG_API GdbCommand
 public:
     enum class Kind
     {
-        exit, breakInsert, breakDelete, execContinue, execFinish, execNext, execStep, execUntil, execRun, stackInfoDepth, stackListFrames
+        exit, breakInsert, breakDelete, execContinue, execFinish, execNext, execStep, execUntil, execRun, stackInfoDepth, stackListFrames,
+        varCreate, varDelete, varSetFormat, varShowFormat, varInfoNumChildren, varListChildren, varInfoType, varInfoExpression,
+        varInfoPathExpression, varShowAttributes, varEvaluateExpression, varAssign, varUpdate, varSetFrozen, varSetUpdateRange,
+        varSetVisualizer
     };
     GdbCommand(Kind kind_, const std::string& str_);
     GdbCommand(const GdbCommand&) = delete;
@@ -119,6 +129,102 @@ public:
     GdbStackListFramesCommand(int lowFrame, int highFrame);
 };
 
+class DEBUG_API GdbVarCreateCommand : public GdbCommand
+{
+public:
+    GdbVarCreateCommand(const std::string& name, const std::string& frame, const std::string& expression);
+};
+
+class DEBUG_API GdbVarDeleteCommand : public GdbCommand
+{
+public:
+    GdbVarDeleteCommand(const std::string& name, bool justChildren);
+};
+
+class DEBUG_API GdbVarSetFormatCommand : public GdbCommand
+{
+public:
+    GdbVarSetFormatCommand(const std::string& name, Format format);
+};
+
+class DEBUG_API GdbVarShowFormatCommand : public GdbCommand
+{
+public:
+    GdbVarShowFormatCommand(const std::string& name);
+};
+
+class DEBUG_API GdbVarInfoNumChildrenCommand : public GdbCommand
+{
+public:
+    GdbVarInfoNumChildrenCommand(const std::string& name);
+};
+
+class DEBUG_API GdbVarListChildrenCommand : public GdbCommand
+{
+public:
+    GdbVarListChildrenCommand(const std::string& name, bool printValues, int from, int to);
+};
+
+class DEBUG_API GdbVarInfoTypeCommand : public GdbCommand
+{
+public:
+    GdbVarInfoTypeCommand(const std::string& name);
+};
+
+class DEBUG_API GdbVarInfoExpressionCommand : public GdbCommand
+{
+public:
+    GdbVarInfoExpressionCommand(const std::string& name);
+};
+
+class DEBUG_API GdbVarInfoPathExpressionCommand : public GdbCommand
+{
+public:
+    GdbVarInfoPathExpressionCommand(const std::string& name);
+};
+
+class DEBUG_API GdbVarShowAttributesCommand : public GdbCommand
+{
+public:
+    GdbVarShowAttributesCommand(const std::string& name);
+};
+
+class DEBUG_API GdbVarEvaluateExpressionCommand : public GdbCommand
+{
+public:
+    GdbVarEvaluateExpressionCommand(const std::string& name, Format format);
+};
+
+class DEBUG_API GdbVarAssignCommand : public GdbCommand
+{
+public:
+    GdbVarAssignCommand(const std::string& name, const std::string& expression);
+};
+
+class DEBUG_API GdbVarUpdateCommand : public GdbCommand
+{
+public:
+    GdbVarUpdateCommand(const std::string& name);
+};
+
+class DEBUG_API GdbVarSetFrozenCommand : public GdbCommand
+{
+public:
+    GdbVarSetFrozenCommand(const std::string& name, bool frozen);
+};
+
+class DEBUG_API GdbVarSetUpdateRangeCommand : public GdbCommand
+{
+public:
+    GdbVarSetUpdateRangeCommand(const std::string& name, int from, int to);
+};
+
+class DEBUG_API GdbVarSetVisualizerCommand : public GdbCommand
+{
+public:
+    GdbVarSetVisualizerCommand(const std::string& name, const std::string& visualizer);
+};
+
 class DEBUG_API GdbValue
 {
 public:
@@ -135,6 +241,7 @@ public:
     Kind GetKind() const { return kind; }
     virtual void Print(CodeFormatter& formatter) = 0;
     virtual std::string ToString() const = 0;
+    virtual JsonValue* ToJson() const = 0;
 private:
     Kind kind;
 };
@@ -146,6 +253,7 @@ public:
     const std::string& Value() const { return value; }
     void Print(CodeFormatter& formatter) override;
     std::string ToString() const override;
+    JsonValue* ToJson() const override;
 private:
     std::string value;
 };
@@ -164,6 +272,7 @@ public:
     const std::vector<std::unique_ptr<GdbResult>>& Results() const { return results; }
     void Print(CodeFormatter& formatter) override;
     std::string ToString() const override;
+    JsonValue* ToJson() const override;
     GdbValue* GetField(const std::string& fieldName) const;
 private:
     std::vector<std::unique_ptr<GdbResult>> results;
@@ -182,6 +291,7 @@ public:
     const std::vector<std::unique_ptr<GdbValue>>& Values() const { return values; }
     void Print(CodeFormatter& formatter) override;
     std::string ToString() const override;
+    JsonValue* ToJson() const override;
     int Count() const { return values.size(); }
     GdbValue* GetValue(int index) const;
 private:
@@ -200,6 +310,8 @@ public:
     const std::string& Name() const { return name; }
     GdbValue* Value() const { return value.get(); }
     std::string ToString() const override;
+    JsonValue* ToJson() const override;
+    void AddJsonValueTo(JsonObject* jsonObject);
 private:
     std::string name;
     std::unique_ptr<GdbValue> value;
@@ -218,6 +330,7 @@ public:
     int Count() const { return results.size(); }
     GdbResult* operator[](int index) const { return results[index].get(); }
     GdbValue* GetField(const std::string& fieldName) const;
+    JsonValue* ToJson() const;
 private:
     std::vector<std::unique_ptr<GdbResult>> results;
     std::unordered_map<std::string, GdbValue*> fieldMap;
@@ -400,17 +513,17 @@ private:
 };
 
 DEBUG_API void SetDebugFlag();
-DEBUG_API void StartGDB(const std::string& executable, const std::vector<std::string>& args, DebuggerDriver& driver);
+DEBUG_API void StartGDB(const std::string& executable, const std::vector<std::string>& args, GdbDriver& driver);
 DEBUG_API GdbReply* GetGDBStartReply();
-DEBUG_API std::unique_ptr<GdbReply> ExecuteGDBCommand(const GdbCommand& command, DebuggerDriver& driver);
-DEBUG_API std::unique_ptr<GdbReply> ReadGDBReply(DebuggerDriver& driver);
+DEBUG_API std::unique_ptr<GdbReply> ExecuteGDBCommand(const GdbCommand& command, GdbDriver& driver);
+DEBUG_API std::unique_ptr<GdbReply> ReadGDBReply(GdbDriver& driver);
 DEBUG_API void WriteTargetInputLine(const std::string& line);
 DEBUG_API void CloseTargetHandles();
-DEBUG_API void StopGDB(DebuggerDriver& driver);
+DEBUG_API void StopGDB(GdbDriver& driver);
 DEBUG_API void TerminateGDB();
 DEBUG_API void InitGDB();
 DEBUG_API void DoneGDB();
 
 } } // namespace cmajor::debug
 
-#endif // CMAJOR_DEBUG_INFO_GDB_INCLUDED
+#endif // CMAJOR_DEBUG_GDB_INCLUDED

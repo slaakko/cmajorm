@@ -103,6 +103,14 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
                 }
                 typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(memberVariablesElement));
             }
+            if (classType->IsPolymorphic())
+            {
+                typeElement->SetAttribute(U"polymorphic", U"true");
+                int32_t vmtPtrIndex = classType->VmtPtrIndex();
+                typeElement->SetAttribute(U"vmtPtrIndex", ToUtf32(std::to_string(vmtPtrIndex)));
+                typeElement->SetAttribute(U"irName", ToUtf32(classType->IrName()));
+                typeElement->SetAttribute(U"vmtVariableName", ToUtf32(classType->VmtVariableName()));
+            }
             break;
         }
         case DIType::Kind::specializationType:
@@ -128,6 +136,14 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
                     memberVariablesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(memberVariableElement));
                 }
                 typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(memberVariablesElement));
+            }
+            if (specializationType->IsPolymorphic())
+            {
+                typeElement->SetAttribute(U"polymorphic", U"true");
+                int32_t vmtPtrIndex = specializationType->VmtPtrIndex();
+                typeElement->SetAttribute(U"vmtPtrIndex", ToUtf32(std::to_string(vmtPtrIndex)));
+                typeElement->SetAttribute(U"irName", ToUtf32(specializationType->IrName()));
+                typeElement->SetAttribute(U"vmtVariableName", ToUtf32(specializationType->VmtVariableName()));
             }
             break;
         }
@@ -329,7 +345,7 @@ std::unique_ptr<sngxml::dom::Document> GetDebugInfoAsXml(const std::string& cmdb
         int32_t numTypeIndexRecords = reader.ReadInt();
         for (int32_t i = 0; i < numTypeIndexRecords; ++i)
         {
-            std::unique_ptr<DIType> type = ReadType(reader);
+            std::unique_ptr<DIType> type = ReadType(reader, nullptr);
             sngxml::dom::Element* typeElement = TypeToXmlElement(type.get());
             typesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement));
         }

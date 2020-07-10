@@ -31,6 +31,7 @@ parser api(DEBUG_API) DebuggerCommandParser
         |   DebuggerFramesCommand:framesCommand{ return framesCommand; }
         |   DebuggerShowBreakpointsCommand:showBreakpointsCommand{ return showBreakpointsCommand; }
         |   DebuggerListCommand(currentSourceFilePath):listCommand{ return listCommand; }
+        |   DebuggerPrintCommand:printCommand{ return printCommand; }
         |   DebuggerRepeatLatestCommand:latestCommand{ return latestCommand; }
         ;
 
@@ -95,6 +96,30 @@ parser api(DEBUG_API) DebuggerCommandParser
 
     DebuggerListCommand(std::string* currentSourceFilePath, var cmajor::debug::SourceLocation location) : cmajor::debug::DebuggerCommand*
         ::= LIST (SourceLocation(currentSourceFilePath):loc{ location = loc; })? NL{ return new cmajor::debug::DebuggerListCommand(location); }
+        ;
+
+    DebuggerPrintCommand(var bool first, var std::string expression) : cmajor::debug::DebuggerCommand*
+        ::=
+        (   PRINT{ first = true; }
+            (
+                (any - NL)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        expression.append(1, ' ');
+                    }
+                    expression.append(ToUtf8(lexer.GetToken(pos).match.ToString()));
+                }
+            )+
+            NL
+        )
+        {
+            return new cmajor::debug::DebuggerPrintCommand(expression);
+        }
         ;
 
     DebuggerRepeatLatestCommand : cmajor::debug::DebuggerCommand*

@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_DEBUG_INFO_DIENUMCONSTANT_INCLUDED
-#define CMAJOR_DEBUG_INFO_DIENUMCONSTANT_INCLUDED
+#ifndef CMAJOR_DEBUG_DIENUMCONSTANT_INCLUDED
+#define CMAJOR_DEBUG_DIENUMCONSTANT_INCLUDED
 #include <cmajor/cmdebug/DebugApi.hpp>
 #include <soulng/util/BinaryWriter.hpp>
 #include <soulng/util/BinaryReader.hpp>
@@ -31,4 +31,4 @@ private:
 
 } } // namespace cmajor::debug
 
-#endif // CMAJOR_DEBUG_INFO_DIENUMCONSTANT_INCLUDED
+#endif // CMAJOR_DEBUG_DIENUMCONSTANT_INCLUDED

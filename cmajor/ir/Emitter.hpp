@@ -81,6 +81,8 @@ public:
     virtual void* GetIrTypeForVoidPtrType() = 0;
     virtual void* GetIrTypeForStructType(const std::vector<void*>& elementTypes) = 0;
     virtual void* GetIrTypeForPtrType(void* baseIrType) = 0;
+    virtual std::string GetIrTypeName(void* irType) = 0;
+    virtual std::string MakeVmtVariableName(const std::string& vmtObjectName) = 0;
     virtual void* CreateDefaultIrValueForArrayType(void* arrayIrType, const std::vector<void*>& arrayOfDefaults) = 0;
     virtual void* CreateDefaultIrValueForBool() = 0;
     virtual void* CreateDefaultIrValueForSByte() = 0;

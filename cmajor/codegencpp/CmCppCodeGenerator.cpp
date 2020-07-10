@@ -140,6 +140,8 @@ void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     {
         module->AddCompileUnitId(compileUnitId);
     }
+    TypeSymbol* longType = module->GetSymbolTable().GetTypeByName(U"long");
+    module->GetTypeIndex().AddType(longType->TypeId(), longType, *emitter);
     emitter->SetCompileUnitId(compileUnitId);
     emitter->SetCurrentLineNumber(0);
     generateLineNumbers = false;
@@ -298,7 +300,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         if (functionSymbol->HasSource())
         {
             const boost::uuids::uuid& typeId = parameter->GetType()->TypeId();
-            module->GetTypeIndex().AddType(typeId, parameter->GetType());
+            module->GetTypeIndex().AddType(typeId, parameter->GetType(), *emitter);
             emitter->AddLocalVariable(ToUtf8(parameter->Name()), typeId, parameter->IrObject(*emitter));
         }
         lastAlloca = allocaInst;
@@ -311,7 +313,7 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
         if (functionSymbol->HasSource())
         {
             const boost::uuids::uuid& typeId = parameter->GetType()->TypeId();
-            module->GetTypeIndex().AddType(typeId, parameter->GetType());
+            module->GetTypeIndex().AddType(typeId, parameter->GetType(), *emitter);
             emitter->AddLocalVariable(ToUtf8(parameter->Name()), typeId, parameter->IrObject(*emitter));
         }
         lastAlloca = allocaInst;
@@ -1002,7 +1004,7 @@ void CmCppCodeGenerator::Visit(BoundConstructionStatement& boundConstructionStat
         if (localVariable)
         {
             const boost::uuids::uuid& typeId = localVariable->GetType()->TypeId();
-            module->GetTypeIndex().AddType(typeId, localVariable->GetType());
+            module->GetTypeIndex().AddType(typeId, localVariable->GetType(), *emitter);
             emitter->AddLocalVariable(ToUtf8(localVariable->Name()), typeId, localVariable->IrObject(*emitter));
         }
     }

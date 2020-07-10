@@ -32,12 +32,14 @@ const int wcharTypeId = -14;
 const int ucharTypeId = -15;
 const int ptrTypeId = -16;
 
-std::string TypeName(int typeId);
+std::string TypeName(int typeId, const std::string& compileUnitId);
+
+class Context;
 
 class CMCPPI_API Type
 {
 public:
-    Type(int id_);
+    Type(int id_, Context& context_);
     virtual ~Type();
     virtual std::string Name() const;
     virtual ConstantValue* DefaultValue();
@@ -52,28 +54,30 @@ public:
     bool IsVoidType() const { return id == voidTypeId; }
     int Id() const { return id; }
     void Write(CodeFormatter& formatter);
+    Context& GetContext() { return context; }
 private:
+    Context& context;
     int id;
 };
 
 class CMCPPI_API PrimitiveType : public Type
 {
 public:
-    PrimitiveType(int id);
+    PrimitiveType(int id, Context& context);
     bool IsPrimitiveType() const override { return true; }
 };
 
 class CMCPPI_API VoidType : public PrimitiveType
 {
 public:
-    VoidType();
+    VoidType(Context& context);
     int SizeInBytes() const override { return 0; }
 };
 
 class CMCPPI_API BoolType : public PrimitiveType
 {
 public:
-    BoolType();
+    BoolType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 1; }
 private:
@@ -83,7 +87,7 @@ private:
 class CMCPPI_API SByteType : public PrimitiveType
 {
 public:
-    SByteType();
+    SByteType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 1; }
 private:
@@ -93,7 +97,7 @@ private:
 class CMCPPI_API ByteType : public PrimitiveType
 {
 public:
-    ByteType();
+    ByteType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 1; }
 private:
@@ -103,7 +107,7 @@ private:
 class CMCPPI_API ShortType : public PrimitiveType
 {
 public:
-    ShortType();
+    ShortType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 2; }
 private:
@@ -113,7 +117,7 @@ private:
 class CMCPPI_API UShortType : public PrimitiveType
 {
 public:
-    UShortType();
+    UShortType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 2; }
 private:
@@ -123,7 +127,7 @@ private:
 class CMCPPI_API IntType : public PrimitiveType
 {
 public:
-    IntType();
+    IntType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 4; }
 private:
@@ -133,7 +137,7 @@ private:
 class CMCPPI_API UIntType : public PrimitiveType
 {
 public:
-    UIntType();
+    UIntType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 4; }
 private:
@@ -143,7 +147,7 @@ private:
 class CMCPPI_API LongType : public PrimitiveType
 {
 public:
-    LongType();
+    LongType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 8; }
 private:
@@ -153,7 +157,7 @@ private:
 class CMCPPI_API ULongType : public PrimitiveType
 {
 public:
-    ULongType();
+    ULongType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 8; }
 private:
@@ -163,7 +167,7 @@ private:
 class CMCPPI_API FloatType : public PrimitiveType
 {
 public:
-    FloatType();
+    FloatType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 4; }
 private:
@@ -173,7 +177,7 @@ private:
 class CMCPPI_API DoubleType : public PrimitiveType
 {
 public:
-    DoubleType();
+    DoubleType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 8; }
 private:
@@ -183,7 +187,7 @@ private:
 class CMCPPI_API CharType : public PrimitiveType
 {
 public:
-    CharType();
+    CharType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 8; }
 private:
@@ -193,7 +197,7 @@ private:
 class CMCPPI_API WCharType : public PrimitiveType
 {
 public:
-    WCharType();
+    WCharType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 16; }
 private:
@@ -203,7 +207,7 @@ private:
 class CMCPPI_API UCharType : public PrimitiveType
 {
 public:
-    UCharType();
+    UCharType(Context& context);
     ConstantValue* DefaultValue() override { return &defaultValue; }
     int SizeInBytes() const override { return 32; }
 private:
@@ -213,7 +217,7 @@ private:
 class CMCPPI_API PtrType : public Type
 {
 public:
-    PtrType(Type* baseType_);
+    PtrType(Type* baseType_, Context& context);
     std::string Name() const override;
     ConstantValue* DefaultValue() override { return &defaultValue; }
     Type* BaseType() const { return baseType; }
@@ -226,7 +230,7 @@ private:
 class CMCPPI_API StructureType : public Type
 {
 public:
-    StructureType(int id_);
+    StructureType(int id_, Context& context);
     const std::vector<Type*>& MemberTypes() const { return memberTypes; }
     void SetMemberTypes(const std::vector<Type*>& memberTypes_);
     void WriteForwardDeclaration(CodeFormatter& formatter) override;
@@ -251,7 +255,7 @@ struct CMCPPI_API StructureTypeEqual
 class CMCPPI_API ArrayType : public Type
 {
 public:
-    ArrayType(int id_, Type* elementType_, uint64_t size_);
+    ArrayType(int id_, Type* elementType_, uint64_t size_, Context& context);
     void WriteDeclaration(CodeFormatter& formatter) override;
     bool IsArrayType() const override { return true; }
     Type* ElementType() const { return elementType; }
@@ -282,7 +286,7 @@ struct CMCPPI_API ArrayTypeKeyEqual
 class CMCPPI_API FunctionType : public Type
 {
 public:
-    FunctionType(int id_, Type* returnType_, const std::vector<Type*>& paramTypes_);
+    FunctionType(int id_, Type* returnType_, const std::vector<Type*>& paramTypes_, Context& context);
     void WriteDeclaration(CodeFormatter& formatter) override;
     bool IsFunctionType() const override { return true; }
     Type* ReturnType() const { return returnType; }
@@ -313,7 +317,7 @@ struct CMCPPI_API FunctionTypeKeyEqual
 class CMCPPI_API TypeRepository
 {
 public:
-    TypeRepository();
+    TypeRepository(Context& context_);
     TypeRepository(const TypeRepository&) = delete;
     TypeRepository& operator=(const TypeRepository&) = delete;
     void Write(CodeFormatter& formatter);
@@ -338,6 +342,7 @@ public:
     Type* GetArrayType(Type* elementType, uint64_t size);
     Type* GetFunctionType(Type* returnType, const std::vector<Type*>& paramTypes);
 private:
+    Context& context;
     VoidType voidType;
     BoolType boolType;
     SByteType sbyteType;

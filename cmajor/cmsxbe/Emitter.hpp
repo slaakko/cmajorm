@@ -50,6 +50,8 @@ public:
     void* GetIrTypeForVoidPtrType() override;
     void* GetIrTypeForStructType(const std::vector<void*>& elementTypes) override;
     void* GetIrTypeForPtrType(void* baseIrType) override;
+    std::string GetIrTypeName(void* irType) override;
+    std::string MakeVmtVariableName(const std::string& vmtObjectName) override;
     void* CreateDefaultIrValueForArrayType(void* arrayIrType, const std::vector<void*>& arrayOfDefaults) override;
     void* CreateDefaultIrValueForBool() override;
     void* CreateDefaultIrValueForSByte() override;

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Cmajor with C++ backend</title>
+    <link href="../style/backend.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>Cmajor with C++ backend</h1>
+    
+    <p>
+        Before version 3.6.0 the Cmajor series 3 compiler had two backends: an LLVM backend and a "System X" backend.
+        The LLVM backend is the main one. The Cmajor compiler with the LLVM backend (cmc.exe) generates LLVM intermediate 
+        code that is then compiled to native code using LLVM tools and libraries.
+        The Cmajor compiler with the System X backend (sxcmc.exe) is a toy one for my own experimentation. 
+        It is under construction perhaps permanently.
+    </p>
+    
+    <p>
+        Starting from version 3.6.0 there's now also an option to use a C++ backend.
+        The Cmajor compiler with the C++ backend (cppcmc.exe) generates very primitive C++ from Cmajor programs and libraries,
+        that are then compiled to native code using the configured C++ compiler. 
+        I ended up creating a new C++ backend for the compiler for at least two reasons.
+        Primary reason is debugging support. The cmc.exe generates debug information but only on Windows.
+        The debugging support is not complete though: you cannot see values of container elements, for example. 
+        It is also usable only with the Cmajor Visual Studio extension and only on Windows. 
+        On Linux and WSL platforms there was no debug info in series 3 compiler.
+        In theory I could try to complete the Visual Studio extension, but in practice it is hard.
+        It also provides only a partial solution, when trying to support Linux also.
+        The second reason for compiling to C++ is that it allows utilising optimizations of the C++ compiler
+        that I'm not able to provide myself. 
+        Cmajor code compiled to C++ has performance characteristics of the same order of magnitude than Cmajor code compiled using LLVM.
+    </p>
+        
+    <p>
+        So, in this scheme the Cmajor compiler with the C++ backend, cppcmc.exe, generates primitive C++, 
+        compiles that with debug info enabled (-g option) using a C++ compiler, and then
+        generates information that glues the Cmajor code and metadata with the generated C++ code.
+        In the first phase I have created a command line debugging tool, cmdb.exe, that reads the generated Cmajor debug info, a .cmdb file, 
+        and drives the GNU debugger, GDB, with a Cmajor executable to debug. The cmdb.exe reads debugging commands from the user, translates them to the corresponding GDB commands,
+        executes them using GDB, translates the results back to Cmajor world, and shows them to the user.
+        I have plans to integrate the cppcmc.exe with a graphical tool. Maybe to the Cmajor development environment that is a C# program,
+        or more likely to a new graphical Cmajor Windows program with source code editing and compiling capabilities, 
+        now that Cmajor has also basic Windows GUI support starting from version 3.5.0. Maybe both.
+    </p>
+    
+</body>
+

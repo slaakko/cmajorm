@@ -1,0 +1,77 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/cmdebug/DebugApi.hpp>
+
+classmap DebugExprClassMap;
+
+prefix "cmajor/cmdebug";
+
+tokens DebugExprTokens
+{
+    (RANGE, "'range'"),
+    (CAST, "'cast'"),
+    (TYPEID, "'typeid'"),
+    (BASE, "'base'"),
+    (ID, "id"),
+    (INTEGER, "'integer'"),
+    (STRING, "'string'"),
+    (AST, "'*'"),
+    (AMP, "'&'"),
+    (LPAREN, "'('"),
+    (RPAREN, "')'"),
+    (LANGLE, "'<'"),
+    (RANGLE, "'>'"),
+    (LBRACKET, "'['"),
+    (RBRACKET, "']'"),
+    (DOT, "'.'"),
+    (COMMA, "','"),
+    (PLUS, "'+'"),
+    (MINUS, "'-'")
+}
+
+keywords DebugExprKeywords
+{
+    ("range", RANGE),
+    ("cast", CAST),
+    ("typeid", TYPEID),
+    ("base", BASE)
+}
+
+expressions
+{
+    ws = "[\t ]+";
+    newline = "\r\n|\n|\r";
+    id = "{idstart}{idcont}*";
+    integer = "[0-9]+";
+    decdigits = "{integer}";
+    hexdigit = "[0-9a-fA-F]";
+    hexdigits = "{hexdigit}+";
+    hex4 = "{hexdigit}{hexdigit}{hexdigit}{hexdigit}";
+    hex8 = "{hex4}{hex4}";
+    octaldigits = "[0-7]+";
+    escape = "\\((x|X){hexdigits}|(d|D){decdigits}|{octaldigits}|u{hex4}|U{hex8}|[abfnrtv\"'\\])";
+    string = "\"([^\\\r\n\"]|{escape})*\"";
+}
+
+lexer api(DEBUG_API) DebugExprLexer
+{
+    "{ws}" { }
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "{integer}"{ return INTEGER; }
+    "{string}"{ return STRING; }
+    "\*"{ return AST; }
+    "\&"{ return AMP; }
+    "\("{ return LPAREN; }
+    "\)"{ return RPAREN; }
+    "<"{ return LANGLE; }
+    ">"{ return RANGLE; }
+    "\["{ return LBRACKET; }
+    "\]"{ return RBRACKET; }
+    "\."{ return DOT; }
+    ","{ return COMMA; }
+    "\+"{ return PLUS; }
+    "\-"{ return MINUS; }
+}

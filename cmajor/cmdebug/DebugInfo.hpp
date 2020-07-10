@@ -9,6 +9,7 @@
 #include <cmajor/cmdebug/DIVariable.hpp>
 #include <cmajor/cmdebug/DIType.hpp>
 #include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/Json.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/functional/hash.hpp>
 #include <vector>
@@ -20,6 +21,7 @@
 namespace cmajor { namespace debug {
 
 using soulng::util::CodeFormatter;
+using soulng::util::JsonValue;
 
 class CompileUnitFunction;
 class Scope;
@@ -29,6 +31,7 @@ struct DEBUG_API Frame
 {
     Frame();
     std::string ToString(bool printLevel) const;
+    std::unique_ptr<JsonValue> ToJson(bool includeLevel) const;
     bool IsEmpty() const { return func.empty() && file.empty() && line == 0; }
     int level;
     std::string func;
@@ -99,25 +102,28 @@ private:
     Instruction* next;
 };
 
-class DEBUG_API Scope
+class DEBUG_API FunctionScope : public Scope
 {
 public:
-    Scope(CompileUnitFunction* compileUnitFunction_, int16_t id_, int16_t parentScopeId_);
-    Scope(const Scope&) = delete;
-    Scope(Scope&&) = delete;
-    Scope& operator=(const Scope&) = delete;
-    Scope& operator=(Scope&&) = delete;
+    FunctionScope(CompileUnitFunction* compileUnitFunction_, int16_t id_, int16_t parentScopeId_);
+    FunctionScope(const FunctionScope&) = delete;
+    FunctionScope(FunctionScope&&) = delete;
+    FunctionScope& operator=(const FunctionScope&) = delete;
+    FunctionScope& operator=(FunctionScope&&) = delete;
+    std::string Name() const override;
     int16_t Id() const { return id; }
     int16_t ParentScopeId() const { return parentScopeId; }
     CompileUnitFunction* GetCompileUnitFunction() const { return compileUnitFunction; }
     Scope* GetParentScope() const;
     void AddLocalVariable(DIVariable* localVariable);
+    DIVariable* GetVariable(const std::string& name) const override;
     const std::vector<std::unique_ptr<DIVariable>>& LocalVariables() const { return localVariables; }
 private:
     CompileUnitFunction* compileUnitFunction;
     int16_t id;
     int16_t parentScopeId;
     std::vector<std::unique_ptr<DIVariable>> localVariables;
+    std::unordered_map<std::string, DIVariable*> localVariableMap;
 };
 
 class CompileUnit;
@@ -141,15 +147,15 @@ public:
     const boost::uuids::uuid& FunctionId() const { return functionId; }
     void AddInstruction(Instruction* instruction);
     Instruction* GetInstruction(int index) const;
-    void AddScope(Scope* scope);
+    void AddScope(FunctionScope* scope);
     const std::vector<std::unique_ptr<Instruction>>& Instructions() const { return instructions; }
-    const std::vector<std::unique_ptr<Scope>>& Scopes() const { return scopes; }
+    const std::vector<std::unique_ptr<FunctionScope>>& Scopes() const { return scopes; }
 private:
     CompileUnit* compileUnit;
     int32_t fileIndex;
     boost::uuids::uuid functionId;
     std::vector<std::unique_ptr<Instruction>> instructions;
-    std::vector<std::unique_ptr<Scope>> scopes;
+    std::vector<std::unique_ptr<FunctionScope>> scopes;
 };
 
 class Project;
@@ -223,6 +229,7 @@ public:
     CompileUnitFunction* GetMainFunction() const;
     void AddType(DIType* type);
     DIType* GetType(const boost::uuids::uuid& typeId) const;
+    DIType* GetLongType() const { return longType; }
 private:
     DebugInfo* debugInfo;
     std::string name;
@@ -234,8 +241,9 @@ private:
     std::vector<std::unique_ptr<Function>> functions;
     std::unordered_map<boost::uuids::uuid, Function*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<DIType>> types;
-    std::unordered_map < boost::uuids::uuid, DIType*, boost::hash<boost::uuids::uuid>> typeMap;
+    std::unordered_map<boost::uuids::uuid, DIType*, boost::hash<boost::uuids::uuid>> typeMap;
     CompileUnitFunction* mainFunction;
+    DIType* longType;
 };
 
 class DEBUG_API SourceFile
@@ -328,12 +336,18 @@ public:
     Instruction* GetMainFunctionEntryInstruction() const;
     Instruction* GetInstruction(const Frame& frame, CodeFormatter& formatter) const;
     Instruction* GetInstruction(const InstructionLocation& location) const;
+    DIType* GetPolymorphicType(const std::string& vmtVarName) const;
+    void AddPolymorphicType(DIClassType* polymorphicType);
     const std::string& FilePath() const { return filePath; }
+    DIType* GetType(const std::string& typeId) const;
+    void AddType(DIType* type);
 private:
     std::string filePath;
     std::vector<std::unique_ptr<Project>> projects;
     std::unordered_map<std::string, Project*> projectPathMap;
     std::unordered_map<std::string, Project*> projectNameMap;
+    std::unordered_map<std::string, DIType*> polymorphicTypeMap;
+    std::unordered_map<std::string, DIType*> typeMap;
     Project* mainProject;
     SourceFileCache sourceFileCache;
     SourceFileMap sourceFileMap;

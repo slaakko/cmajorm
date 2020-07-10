@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_DEBUG_INFO_INIT_DONE_INCLUDED
-#define CMAJOR_DEBUG_INFO_INIT_DONE_INCLUDED
+#ifndef CMAJOR_DEBUG_INIT_DONE_INCLUDED
+#define CMAJOR_DEBUG_INIT_DONE_INCLUDED
 #include <cmajor/cmdebug/DebugApi.hpp>
 
 namespace cmajor { namespace debug {
@@ -14,4 +14,4 @@ DEBUG_API void Done();
 
 } } // namespace cmajor::debug
 
-#endif // CMAJOR_DEBUG_INFO_INIT_DONE_INCLUDED
+#endif // CMAJOR_DEBUG_INIT_DONE_INCLUDED

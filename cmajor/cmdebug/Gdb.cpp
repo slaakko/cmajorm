@@ -82,6 +82,162 @@ GdbStackListFramesCommand::GdbStackListFramesCommand(int lowFrame, int highFrame
 {
 }
 
+GdbVarCreateCommand::GdbVarCreateCommand(const std::string& name, const std::string& frame, const std::string& expression) :
+    GdbCommand(Kind::varCreate, "-var-create " + name + " " + frame + " " + expression)
+{
+}
+
+std::string ChildrenOpt(bool justChildren)
+{
+    if (justChildren)
+    {
+        return "-c ";
+    }
+    else
+    {
+        return "";
+    }
+}
+
+GdbVarDeleteCommand::GdbVarDeleteCommand(const std::string& name, bool justChildren) :
+    GdbCommand(Kind::varDelete, "-var-delete " + ChildrenOpt(justChildren) + name)
+{
+}
+
+std::string FormatStr(Format format)
+{
+    switch (format)
+    {
+        case Format::binary: return "binary";
+        case Format::decimal: return "decimal";
+        case Format::hexadecimal: return "hexdecimal";
+        case Format::octal: return "octal";
+        case Format::natural: return "natural";
+        case Format::zeroHexadecimal: return "zero-hexadecimal";
+    }
+    return "";
+}
+
+GdbVarSetFormatCommand::GdbVarSetFormatCommand(const std::string& name, Format format) :
+    GdbCommand(Kind::varSetFormat, "-var-set-format " + name + " " + FormatStr(format))
+{
+}
+
+GdbVarShowFormatCommand::GdbVarShowFormatCommand(const std::string& name) :
+    GdbCommand(Kind::varShowFormat, "-var-show-format " + name)
+{
+}
+
+GdbVarInfoNumChildrenCommand::GdbVarInfoNumChildrenCommand(const std::string& name) :
+    GdbCommand(Kind::varInfoNumChildren, "-var-info-num-children " + name)
+{
+}
+
+std::string PrintValuesStr(bool printValues)
+{
+    if (printValues)
+    {
+        return " 1";
+    }
+    else
+    {
+        return " 0";
+    }
+}
+
+std::string FromToStr(int from, int to)
+{
+    if (from != -1 && to != -1)
+    {
+        return " " + std::to_string(from) + " " + std::to_string(to);
+    }
+    else
+    {
+        return "";
+    }
+}
+
+GdbVarListChildrenCommand::GdbVarListChildrenCommand(const std::string& name, bool printValues, int from, int to) :
+    GdbCommand(Kind::varListChildren, "-var-list-children " + name + FromToStr(from, to))
+{
+}
+
+GdbVarInfoTypeCommand::GdbVarInfoTypeCommand(const std::string& name) :
+    GdbCommand(Kind::varInfoType, "-var-info-type " + name)
+{
+}
+
+GdbVarInfoExpressionCommand::GdbVarInfoExpressionCommand(const std::string& name) :
+    GdbCommand(Kind::varInfoExpression, "-var-info-expression " + name)
+{
+}
+
+GdbVarInfoPathExpressionCommand::GdbVarInfoPathExpressionCommand(const std::string& name) :
+    GdbCommand(Kind::varInfoPathExpression, "-var-info-path-expression " + name)
+{
+}
+
+GdbVarShowAttributesCommand::GdbVarShowAttributesCommand(const std::string& name) :
+    GdbCommand(Kind::varShowAttributes, "-var-show-attributes " + name)
+{
+}
+
+std::string FormatExprStr(Format format)
+{
+    switch (format)
+    {
+        case Format::binary: return "-f binary ";
+        case Format::decimal: return "-f decimal ";
+        case Format::hexadecimal: return "-f hexadecimal ";
+        case Format::octal: return "-f octal ";
+        case Format::natural: return "-f natural ";
+        case Format::zeroHexadecimal: return "-f zero-hexadecimal ";
+    }
+    return "";
+}
+
+GdbVarEvaluateExpressionCommand::GdbVarEvaluateExpressionCommand(const std::string& name, Format format) :
+    GdbCommand(Kind::varEvaluateExpression, "-var-evaluate-expression " + FormatExprStr(format) + name)
+{
+}
+
+GdbVarAssignCommand::GdbVarAssignCommand(const std::string& name, const std::string& expression) :
+    GdbCommand(Kind::varAssign, "-var-assign " + name + " " + expression)
+{
+}
+
+GdbVarUpdateCommand::GdbVarUpdateCommand(const std::string& name) :
+    GdbCommand(Kind::varUpdate, "-var-update " + name)
+{
+}
+
+std::string FrozenStr(bool frozen)
+{
+    if (frozen)
+    {
+        return "1";
+    }
+    else
+    {
+        return "0";
+    }
+}
+
+GdbVarSetFrozenCommand::GdbVarSetFrozenCommand(const std::string& name, bool frozen) :
+    GdbCommand(Kind::varSetFrozen, "-var-set-frozen " + name + " " + FrozenStr(frozen))
+{
+}
+
+GdbVarSetUpdateRangeCommand::GdbVarSetUpdateRangeCommand(const std::string& name, int from, int to) :
+    GdbCommand(Kind::varSetUpdateRange, "-var-set-update-range " + name + FromToStr(from, to))
+{
+}
+
+GdbVarSetVisualizerCommand::GdbVarSetVisualizerCommand(const std::string& name, const std::string& visualizer) :
+    GdbCommand(Kind::varSetVisualizer, "-var-set-visualizer " + name + " " + visualizer)
+{
+}
+
 GdbValue::GdbValue(Kind kind_) : kind(kind_)
 {
 }
@@ -102,6 +258,11 @@ void GdbStringValue::Print(CodeFormatter& formatter)
 std::string GdbStringValue::ToString() const
 {
     return "\"" + soulng::util::StringStr(value) + "\"";
+}
+
+JsonValue* GdbStringValue::ToJson() const
+{
+    return new JsonString(ToUtf32(value));
 }
 
 GdbTupleValue::GdbTupleValue() : GdbValue(Kind::tuple), results()
@@ -167,6 +328,16 @@ std::string GdbTupleValue::ToString() const
     return s;
 }
 
+JsonValue* GdbTupleValue::ToJson() const
+{
+    JsonObject* jsonObject = new JsonObject();
+    for (const auto& result : results)
+    {
+        result->AddJsonValueTo(jsonObject);
+    }
+    return jsonObject;
+}
+
 GdbListValue::GdbListValue() : GdbValue(Kind::list)
 {
 }
@@ -215,6 +386,16 @@ std::string GdbListValue::ToString() const
     return s;
 }
 
+JsonValue* GdbListValue::ToJson() const
+{
+    JsonArray* jsonArray = new JsonArray();
+    for (const auto& result : values)
+    {
+        jsonArray->AddItem(std::unique_ptr<JsonValue>(result->ToJson()));
+    }
+    return jsonArray;
+}
+
 GdbValue* GdbListValue::GetValue(int index) const
 {
     if (index >= 0 && index < Count())
@@ -243,6 +424,19 @@ std::string GdbResult::ToString() const
     std::string s = name;
     s.append("=").append(value->ToString());
     return s;
+}
+
+JsonValue* GdbResult::ToJson() const
+{
+    JsonObject* jsonObject = new JsonObject();
+    jsonObject->AddField(U"name", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(name))));
+    jsonObject->AddField(U"value", std::unique_ptr<JsonValue>(value->ToJson()));
+    return jsonObject;
+}
+
+void GdbResult::AddJsonValueTo(JsonObject* jsonObject)
+{
+    jsonObject->AddField(ToUtf32(name), std::unique_ptr<JsonValue>(value->ToJson()));
 }
 
 GdbResults::GdbResults()
@@ -282,6 +476,16 @@ GdbValue* GdbResults::GetField(const std::string& fieldName) const
     {
         return nullptr;
     }
+}
+
+JsonValue* GdbResults::ToJson() const
+{
+    JsonObject* jsonObject = new JsonObject();
+    for (const auto& r : results)
+    {
+        r->AddJsonValueTo(jsonObject);
+    }
+    return jsonObject;
 }
 
 GdbReplyRecord::GdbReplyRecord(Kind kind_, GdbResults* results_) : kind(kind_), results(results_)
@@ -482,12 +686,12 @@ public:
     static void Done();
     static Gdb& Instance() { return *instance; }
     void SetDebugFlag() { debug = true; }
-    void Start(const std::string& executable, const std::vector<std::string>& args, DebuggerDriver& driver);
+    void Start(const std::string& executable, const std::vector<std::string>& args, GdbDriver& driver);
     void Run(const std::string& startCommand);
-    void Stop(DebuggerDriver& driver);
+    void Stop(GdbDriver& driver);
     void Terminate();
-    std::unique_ptr<GdbReply> Execute(const GdbCommand& commmand, DebuggerDriver& driver);
-    std::unique_ptr<GdbReply> ReadReply(DebuggerDriver& driver);
+    std::unique_ptr<GdbReply> Execute(const GdbCommand& commmand, GdbDriver& driver);
+    std::unique_ptr<GdbReply> ReadReply(GdbDriver& driver);
     void WriteTargetInputLine(const std::string& line);
     void CloseTargetHandles();
     GdbReply* GetStartReply() { return startReply.get(); }
@@ -524,7 +728,7 @@ Gdb::Gdb() : debug(false), gdbExitCode(-1), exited(false)
 {
 }
 
-void Gdb::Start(const std::string& executable, const std::vector<std::string>& args, DebuggerDriver& driver)
+void Gdb::Start(const std::string& executable, const std::vector<std::string>& args, GdbDriver& driver)
 {
     std::string startCommand;
     startCommand.append("gdb");
@@ -562,7 +766,7 @@ void Gdb::Run(const std::string& startCommand)
     }
 }
 
-void Gdb::Stop(DebuggerDriver& driver)
+void Gdb::Stop(GdbDriver& driver)
 {
     if (exited) return;
     exited = true;
@@ -591,7 +795,7 @@ void Gdb::Terminate()
     }
 }
 
-std::unique_ptr<GdbReply> Gdb::Execute(const GdbCommand& command, DebuggerDriver& driver)
+std::unique_ptr<GdbReply> Gdb::Execute(const GdbCommand& command, GdbDriver& driver)
 {
     if (gdbException)
     {
@@ -653,7 +857,7 @@ std::string PreparedLine(const std::string& line)
     return line;
 }
 
-std::unique_ptr<GdbReply> Gdb::ReadReply(DebuggerDriver& driver)
+std::unique_ptr<GdbReply> Gdb::ReadReply(GdbDriver& driver)
 {
     std::unique_ptr<GdbReply> reply(new GdbReply());
     std::vector<std::string> textLines;
@@ -710,7 +914,7 @@ void SetDebugFlag()
     Gdb::Instance().SetDebugFlag();
 }
 
-void StartGDB(const std::string& executable, const std::vector<std::string>& args, DebuggerDriver& driver)
+void StartGDB(const std::string& executable, const std::vector<std::string>& args, GdbDriver& driver)
 {
     Gdb::Instance().Start(executable, args, driver);
 }
@@ -720,17 +924,17 @@ GdbReply* GetGDBStartReply()
     return Gdb::Instance().GetStartReply();
 }
 
-std::unique_ptr<GdbReply> ExecuteGDBCommand(const GdbCommand& command, DebuggerDriver& driver)
+std::unique_ptr<GdbReply> ExecuteGDBCommand(const GdbCommand& command, GdbDriver& driver)
 {
     return Gdb::Instance().Execute(command, driver);
 }
 
-std::unique_ptr<GdbReply> ReadGDBReply(DebuggerDriver& driver)
+std::unique_ptr<GdbReply> ReadGDBReply(GdbDriver& driver)
 {
     return Gdb::Instance().ReadReply(driver);
 }
 
-void StopGDB(DebuggerDriver& driver)
+void StopGDB(GdbDriver& driver)
 {
     Gdb::Instance().Stop(driver);
 }

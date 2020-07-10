@@ -40,6 +40,7 @@ public:
     GlobalVariable* CreateGlobalUStringPtr(Context& context, const std::u32string& stringValue);
     void Write(Context& context, CodeFormatter& formatter);
     void SetCompileUnitId(const std::string& compileUnitId_);
+    const std::string& CompileUnitId() const { return compileUnitId; }
 private:
     std::vector<std::unique_ptr<GlobalVariable>> globalVariableDefinitions;
     std::unordered_map<std::string, GlobalVariable*> globalVariableMap;

@@ -30,12 +30,18 @@ namespace DebuggerCommandKeywords
         {U"b", BREAK}, 
         {U"delete", DELETE}, 
         {U"d", DELETE}, 
+        {U"print", PRINT}, 
+        {U"p", PRINT}, 
         {U"depth", DEPTH}, 
         {U"frames", FRAMES}, 
         {U"list", LIST}, 
         {U"l", LIST}, 
         {U"show", SHOW}, 
-        {U"breakpoints", BREAKPOINTS},
+        {U"breakpoints", BREAKPOINTS}, 
+        {U"range", RANGE}, 
+        {U"cast", CAST}, 
+        {U"typeid", TYPEID}, 
+        {U"base", BASE},
         {nullptr, -1}
     };
 

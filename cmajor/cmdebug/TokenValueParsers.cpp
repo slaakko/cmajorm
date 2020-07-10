@@ -207,4 +207,23 @@ int ParseInt(const std::string& str)
     return boost::lexical_cast<int>(str);
 }
 
+int64_t ParseLong(const std::string& str)
+{
+    return boost::lexical_cast<int64_t>(str);
+}
+
+std::string ParseVmtVariableName(const std::string& str)
+{
+    std::string::size_type leftAnglePos = str.find('<');
+    if (leftAnglePos != std::string::npos)
+    {
+        std::string::size_type rightAnglePos = str.find('>', leftAnglePos + 1);
+        if (rightAnglePos != std::string::npos)
+        {
+            return str.substr(leftAnglePos + 1, rightAnglePos - (leftAnglePos + 1));
+        }
+    }
+    return std::string();
+}
+
 } } // namespace cmajor::debug

@@ -190,6 +190,16 @@ void* Emitter::GetIrTypeForPtrType(void* baseIrType)
     return context->GetPtrType(static_cast<cmsxi::Type*>(baseIrType));
 }
 
+std::string Emitter::GetIrTypeName(void* irType)
+{
+    return std::string();
+}
+
+std::string Emitter::MakeVmtVariableName(const std::string& vmtObjectName)
+{
+    return std::string();
+}
+
 void* Emitter::CreateDefaultIrValueForArrayType(void* arrayIrType, const std::vector<void*>& arrayOfDefaults)
 {
     std::vector<cmsxi::ConstantValue*> arrayOfConstants;

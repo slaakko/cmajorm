@@ -137,6 +137,7 @@ public:
     void EndInstructionFlag(int16_t instructionFlag);
     void AddLineInfoScopeIdAndFlags(Instruction* inst);
     void SetCompileUnitId(const std::string& compileUnitId);
+    const std::string& CompileUnitId() const { return dataRepository.CompileUnitId(); }
     void PushParent();
     void PopParent();
     void SetHandlerBlock(BasicBlock* tryBlock, BasicBlock* catchBlock);

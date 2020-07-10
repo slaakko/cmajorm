@@ -14,7 +14,7 @@ namespace cmcppi {
 
 Context::Context() :
     currentLineNumber(0), currentFunction(nullptr), currentBasicBlock(nullptr), currentParentBlock(nullptr), sourceLineNumber(0), cppLineIndex(0),
-    currentScopeId(-1), currentInstructionFlags(0)
+    currentScopeId(-1), currentInstructionFlags(0), typeRepository(*this)
 {
 }
 

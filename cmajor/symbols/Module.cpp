@@ -1634,7 +1634,7 @@ void Module::WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Modu
     cmdbWriter.Write(numTypeIndexRecords);
     for (int32_t i = 0; i < numTypeIndexRecords; ++i)
     {
-        std::unique_ptr<cmajor::debug::DIType> diType = cmajor::debug::ReadType(pdiReader);
+        std::unique_ptr<cmajor::debug::DIType> diType = cmajor::debug::ReadType(pdiReader, nullptr);
         cmajor::debug::WriteType(cmdbWriter, diType.get());
     }
     ++numProjects;
