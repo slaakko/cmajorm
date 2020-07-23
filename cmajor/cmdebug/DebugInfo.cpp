@@ -12,6 +12,7 @@
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/random_generator.hpp>
 #include <stdexcept>
 #include <iostream>
 
@@ -401,6 +402,27 @@ void Project::AddType(DIType* type)
     }
     typeMap[type->Id()] = type;
     types.push_back(std::unique_ptr<DIType>(type));
+    switch (type->GetKind())
+    {
+        case DIType::Kind::pointerType:
+        {
+            DIPointerType* pointerType = static_cast<DIPointerType*>(type);
+            pointerTypeMap[pointerType->PointedTypeId()] = pointerType;
+            break;
+        }
+        case DIType::Kind::referenceType:
+        {
+            DIReferenceType* referenceType = static_cast<DIReferenceType*>(type);
+            referenceTypeMap[referenceType->BaseTypeId()] = referenceType;
+            break;
+        }
+        case DIType::Kind::constType:
+        {
+            DIConstType* constType = static_cast<DIConstType*>(type);
+            constTypeMap[constType->BaseTypeId()] = constType;
+            break;
+        }
+    }
     debugInfo->AddType(type);
 }
 
@@ -414,6 +436,66 @@ DIType* Project::GetType(const boost::uuids::uuid& typeId) const
     else
     {
         throw std::runtime_error("type with id '" + boost::uuids::to_string(typeId) + "' not found from project '" + name + "'");
+    }
+}
+
+DIPointerType* Project::GetPointerType(DIType* pointedToType) 
+{
+    auto it = pointerTypeMap.find(pointedToType->Id());
+    if (it != pointerTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        DIPointerType* pointerType = new DIPointerType();
+        pointerType->SetId(boost::uuids::random_generator()());
+        pointerType->SetPointedTypeId(pointedToType->Id());
+        pointerType->SetName(pointedToType->Name() + "*");
+        pointerType->SetIrName(pointedToType->IrName() + "*");
+        pointerType->SetProject(pointedToType->GetProject());
+        AddType(pointerType);
+        return pointerType;
+    }
+}
+
+DIReferenceType* Project::GetReferenceType(DIType* referredToType)
+{
+    auto it = referenceTypeMap.find(referredToType->Id());
+    if (it != referenceTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        DIReferenceType* referenceType = new DIReferenceType();
+        referenceType->SetId(boost::uuids::random_generator()());
+        referenceType->SetBaseTypeId(referredToType->Id());
+        referenceType->SetName(referredToType->Name() + "&");
+        referenceType->SetIrName(referredToType->IrName() + "*");
+        referenceType->SetProject(referredToType->GetProject());
+        AddType(referenceType);
+        return referenceType;
+    }
+}
+
+DIConstType* Project::GetConstType(DIType* baseType)
+{
+    auto it = constTypeMap.find(baseType->Id());
+    if (it != constTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        DIConstType* constType = new DIConstType();
+        constType->SetId(boost::uuids::random_generator()());
+        constType->SetBaseTypeId(baseType->Id());
+        constType->SetName("const " + baseType->Name());
+        constType->SetIrName(baseType->IrName());
+        constType->SetProject(baseType->GetProject());
+        AddType(constType);
+        return constType;
     }
 }
 
@@ -969,7 +1051,7 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
                     std::unique_ptr<FunctionScope> scope(new FunctionScope(compileUnitFunction.get(), scopeId, parentScopeId));
                     for (int32_t i = 0; i < numLocalVariables; ++i)
                     {
-                        DIVariable* localVariable = new DIVariable();
+                        DIVariable* localVariable = new DIVariable(DIVariable::Kind::localVariable);
                         localVariable->Read(reader);
                         scope->AddLocalVariable(localVariable);
                         localVariable->SetProject(project.get());

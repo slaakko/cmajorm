@@ -26,8 +26,8 @@ tokens DebuggerCommandTokens
     (FRAMES, "'frames'"),
     (LIST, "'list'"), (L, "'l'"),
     (SHOW, "'show'"),
+    (BREAKPOINT, "'breakpoint'"),
     (BREAKPOINTS, "'breakpoints'"),
-    (RANGE, "'range'"),
     (CAST, "'cast'"),
     (TYPEID, "'typeid'"),
     (BASE, "'base'"),
@@ -35,9 +35,11 @@ tokens DebuggerCommandTokens
     (PATH, "'path'"),
     (INTEGER, "'integer'"),
     (STRING, "'string'"),
+    (ADDRESS, "'address'"),
     (COLON, "':'"),
     (AST, "'*'"),
     (AMP, "'&'"),
+    (DOLLAR, "'$'"),
     (LPAREN, "'('"),
     (RPAREN, "')'"),
     (LANGLE, "'<'"),
@@ -66,8 +68,8 @@ keywords DebuggerCommandKeywords
     ("frames", FRAMES), 
     ("list", LIST), ("l", LIST),
     ("show", SHOW),
+    ("breakpoint", BREAKPOINT),
     ("breakpoints", BREAKPOINTS),
-    ("range", RANGE),
     ("cast", CAST),
     ("typeid", TYPEID),
     ("base", BASE)
@@ -81,8 +83,7 @@ expressions
     drive = "[a-zA-Z]";
     comp = "[a-zA-Z_.+][a-zA-Z_0-9.+-]*";
     path = "({drive}:)?(/?({comp}/)*)?{comp}";
-    integer = "[0-9]+";
-    decdigits = "{integer}";
+    decdigits = "[0-9]+";
     hexdigit = "[0-9a-fA-F]";
     hexdigits = "{hexdigit}+";
     hex4 = "{hexdigit}{hexdigit}{hexdigit}{hexdigit}";
@@ -90,6 +91,8 @@ expressions
     octaldigits = "[0-7]+";
     escape = "\\((x|X){hexdigits}|(d|D){decdigits}|{octaldigits}|u{hex4}|U{hex8}|[abfnrtv\"'\\])";
     string = "\"([^\\\r\n\"]|{escape})*\"";
+    address = "0(x|X){hexdigits}";
+    integer = "[0-9]+";
 }
 
 lexer api(DEBUG_API) DebuggerCommandLexer
@@ -98,11 +101,13 @@ lexer api(DEBUG_API) DebuggerCommandLexer
     "{newline}"{ return NL; }
     "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
     "{path}"{ return PATH; }
+    "{address}"{ return ADDRESS; }
     "{integer}"{ return INTEGER; }
     "{string}"{ return STRING; }
     ":"{ return COLON; }
     "\*"{ return AST; }
     "\&"{ return AMP; }
+    "$"{ return DOLLAR; }
     "\("{ return LPAREN; }
     "\)"{ return RPAREN; }
     "<"{ return LANGLE; }

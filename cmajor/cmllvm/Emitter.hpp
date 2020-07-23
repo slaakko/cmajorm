@@ -251,6 +251,8 @@ public:
     void SetFunctionName(const std::string& functionName) override;
     void BeginScope() override;
     void EndScope() override;
+    int16_t GetCurrentScopeId() const override;
+    void SetCurrentScopeId(int16_t scopeId) override;
     void AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject) override;
     void BeginInstructionFlag(int16_t flag) override;
     void EndInstructionFlag(int16_t flag) override;

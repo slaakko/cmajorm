@@ -238,6 +238,10 @@ GdbVarSetVisualizerCommand::GdbVarSetVisualizerCommand(const std::string& name, 
 {
 }
 
+GdbPrintCommand::GdbPrintCommand(const std::string& expression) : GdbCommand(Kind::print, "print " + expression)
+{
+}
+
 GdbValue::GdbValue(Kind kind_) : kind(kind_)
 {
 }
@@ -248,16 +252,6 @@ GdbValue::~GdbValue()
 
 GdbStringValue::GdbStringValue(const std::string& value_) : GdbValue(Kind::string), value(value_)
 {
-}
-
-void GdbStringValue::Print(CodeFormatter& formatter)
-{
-    formatter.Write("\"" + soulng::util::StringStr(value) + "\"");
-}
-
-std::string GdbStringValue::ToString() const
-{
-    return "\"" + soulng::util::StringStr(value) + "\"";
 }
 
 JsonValue* GdbStringValue::ToJson() const
@@ -289,45 +283,6 @@ GdbValue* GdbTupleValue::GetField(const std::string& fieldName) const
     }
 }
 
-void GdbTupleValue::Print(CodeFormatter& formatter)
-{
-    formatter.Write("{ ");
-    bool first = true;
-    for (const auto& result : results)
-    {
-        if (first)
-        {
-            first = false;
-        }
-        else
-        {
-            formatter.Write(", ");
-        }
-        result->Print(formatter);
-    }
-    formatter.Write(" }");
-}
-
-std::string GdbTupleValue::ToString() const
-{
-    std::string s = "{ ";
-    bool first = true;
-    for (const auto& result : results)
-    {
-        if (first)
-        {
-            first = false;
-        }
-        else
-        {
-            s.append(", ");
-        }
-        s.append(result->ToString());
-    }
-    s.append(" }");
-    return s;
-}
-
 JsonValue* GdbTupleValue::ToJson() const
 {
     JsonObject* jsonObject = new JsonObject();
@@ -345,45 +300,6 @@ GdbListValue::GdbListValue() : GdbValue(Kind::list)
 void GdbListValue::AddValue(GdbValue* value)
 {
     values.push_back(std::unique_ptr<GdbValue>(value));
-}
-
-void GdbListValue::Print(CodeFormatter& formatter)
-{
-    formatter.Write("[ ");
-    bool first = true;
-    for (const auto& value : values)
-    {
-        if (first)
-        {
-            first = false;
-        }
-        else
-        {
-            formatter.Write(", ");
-        }
-        value->Print(formatter);
-    }
-    formatter.Write(" ]");
-}
-
-std::string GdbListValue::ToString() const
-{
-    std::string s = "[ ";
-    bool first = true;
-    for (const auto& result : values)
-    {
-        if (first)
-        {
-            first = false;
-        }
-        else
-        {
-            s.append(", ");
-        }
-        s.append(result->ToString());
-    }
-    s.append(" ]");
-    return s;
 }
 
 JsonValue* GdbListValue::ToJson() const
@@ -412,20 +328,6 @@ GdbResult::GdbResult(const std::string& name_, GdbValue* value_) : GdbValue(Kind
 {
 }
 
-void GdbResult::Print(CodeFormatter& formatter)
-{
-    formatter.Write(name);
-    formatter.Write("=");
-    value->Print(formatter);
-}
-
-std::string GdbResult::ToString() const
-{
-    std::string s = name;
-    s.append("=").append(value->ToString());
-    return s;
-}
-
 JsonValue* GdbResult::ToJson() const
 {
     JsonObject* jsonObject = new JsonObject();
@@ -441,22 +343,6 @@ void GdbResult::AddJsonValueTo(JsonObject* jsonObject)
 
 GdbResults::GdbResults()
 {
-}
-
-void GdbResults::Print(CodeFormatter& formatter)
-{
-    int n = Count();
-    if (n == 0) return;
-    formatter.Write(",results=[");
-    for (int i = 0; i < n; ++i)
-    {
-        if (i > 0)
-        {
-            formatter.Write(", ");
-        }
-        results[i]->Print(formatter);
-    }
-    formatter.Write("]");
 }
 
 void GdbResults::Add(GdbResult* result)
@@ -478,14 +364,14 @@ GdbValue* GdbResults::GetField(const std::string& fieldName) const
     }
 }
 
-JsonValue* GdbResults::ToJson() const
+std::unique_ptr<JsonValue> GdbResults::ToJson() const
 {
     JsonObject* jsonObject = new JsonObject();
     for (const auto& r : results)
     {
         r->AddJsonValueTo(jsonObject);
     }
-    return jsonObject;
+    return std::unique_ptr<JsonValue>(jsonObject);
 }
 
 GdbReplyRecord::GdbReplyRecord(Kind kind_, GdbResults* results_) : kind(kind_), results(results_)
@@ -500,24 +386,28 @@ const char* GdbReplyRecord::KindStr() const
 {
     switch (kind)
     {
-        case Kind::result: return "result: ";
+        case Kind::result: return "result";
         case Kind::execRunning: return "execRunning";
         case Kind::execStopped: return "execStopped";
         case Kind::notification: return "notification";
-        case Kind::consoleOutput: return "console output: ";
-        case Kind::targetOutput: return "target output: ";
-        case Kind::logOutput: return "log output: ";
+        case Kind::consoleOutput: return "consoleOutput";
+        case Kind::targetOutput: return "targetOutput";
+        case Kind::logOutput: return "logOutput";
         case Kind::prompt: return "prompt";
-        case Kind::parsingError: return "parsing error: ";
+        case Kind::parsingError: return "parsingError";
     }
     return "";
 }
 
-void GdbReplyRecord::Print(CodeFormatter& formatter)
+std::unique_ptr<JsonValue> GdbReplyRecord::ToJson() const
 {
-    formatter.Write(KindStr());
-    results->Print(formatter);
-    formatter.WriteLine();
+    std::unique_ptr<JsonValue> value = results->ToJson();
+    if (value->Type() == JsonValueType::object)
+    {
+        JsonObject* jsonObject = static_cast<JsonObject*>(value.get());
+        jsonObject->AddField(U"record", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(KindStr()))));
+    }
+    return value;
 }
 
 GdbResultRecord::GdbResultRecord(Class cls_, GdbResults* results) : GdbReplyRecord(Kind::result, results), cls(cls_)
@@ -537,10 +427,15 @@ const char* GdbResultRecord::ClassStr() const
     return "";
 }
 
-void GdbResultRecord::Print(CodeFormatter& formatter)
+std::unique_ptr<JsonValue> GdbResultRecord::ToJson() const
 {
-    GdbReplyRecord::Print(formatter);
-    formatter.Write(ClassStr());
+    std::unique_ptr<JsonValue> value = GdbReplyRecord::ToJson();
+    if (value->Type() == JsonValueType::object)
+    {
+        JsonObject* jsonObject = static_cast<JsonObject*>(value.get());
+        jsonObject->AddField(U"class", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ClassStr()))));
+    }
+    return value;
 }
 
 GdbDoneRecord::GdbDoneRecord(GdbResults* results) : GdbResultRecord(Class::done, results)
@@ -557,26 +452,6 @@ GdbConnectedRecord::GdbConnectedRecord(GdbResults* results) : GdbResultRecord(Cl
 
 GdbErrorRecord::GdbErrorRecord(GdbResults* results) : GdbResultRecord(Class::error, results)
 {
-}
-
-std::string GdbErrorRecord::Msg() const
-{
-    GdbValue* value = Results()->GetField("msg");
-    if (value != nullptr)
-    {
-        return value->ToString();
-    }
-    return std::string();
-}
-
-std::string GdbErrorRecord::Code() const
-{
-    GdbValue* value = Results()->GetField("code");
-    if (value != nullptr)
-    {
-        return value->ToString();
-    }
-    return std::string();
 }
 
 GdbExitRecord::GdbExitRecord(GdbResults* results) : GdbResultRecord(Class::exit, results)
@@ -603,20 +478,30 @@ GdbNotifyAsyncRecord::GdbNotifyAsyncRecord(const std::string& notification_, Gdb
 {
 }
 
-void GdbNotifyAsyncRecord::Print(CodeFormatter& formatter)
+std::unique_ptr<JsonValue> GdbNotifyAsyncRecord::ToJson() const
 {
-    GdbAsyncRecord::Print(formatter);
-    formatter.WriteLine(notification);
+    std::unique_ptr<JsonValue> value = GdbAsyncRecord::ToJson();
+    if (value->Type() == JsonValueType::object)
+    {
+        JsonObject* jsonObject = static_cast<JsonObject*>(value.get());
+        jsonObject->AddField(U"notification", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(notification))));
+    }
+    return value;
 }
 
 GdbStreamRecord::GdbStreamRecord(Kind kind, const std::string& text_) : GdbReplyRecord(kind, new GdbResults()), text(text_)
 {
 }
 
-void GdbStreamRecord::Print(CodeFormatter& formatter)
+std::unique_ptr<JsonValue> GdbStreamRecord::ToJson() const
 {
-    GdbReplyRecord::Print(formatter);
-    formatter.WriteLine("\"" + StringStr(text) + "\"");
+    std::unique_ptr<JsonValue> value = GdbReplyRecord::ToJson();
+    if (value->Type() == JsonValueType::object)
+    {
+        JsonObject* jsonObject = static_cast<JsonObject*>(value.get());
+        jsonObject->AddField(U"text", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(text))));
+    }
+    return value;
 }
 
 GdbConsoleOutputRecord::GdbConsoleOutputRecord(const std::string& text) : GdbStreamRecord(Kind::consoleOutput, text)
@@ -637,12 +522,6 @@ GdbPrompt::GdbPrompt() : GdbReplyRecord(Kind::prompt, new GdbResults())
 
 GdbParsingError::GdbParsingError(const std::string& parsingError_) : GdbReplyRecord(Kind::parsingError, new GdbResults()), parsingError(parsingError_)
 {
-}
-
-void GdbParsingError::Print(CodeFormatter& formatter)
-{
-    GdbReplyRecord::Print(formatter);
-    formatter.WriteLine(parsingError);
 }
 
 GdbReply::GdbReply() : resultRecord(nullptr), stoppedRecord(nullptr)
@@ -667,16 +546,40 @@ void GdbReply::AddReplyRecord(std::unique_ptr<GdbReplyRecord>&& replyRecord)
     replyRecords.push_back(std::move(replyRecord));
 }
 
-void GdbReply::Print(CodeFormatter& formatter)
-{
-    for (const auto& replyRecord : replyRecords)
-    {
-        replyRecord->Print(formatter);
-    }
-}
-
 GdbReply::~GdbReply()
 {
+}
+
+std::unique_ptr<JsonValue> GdbReply::ToJson() const
+{
+    JsonObject* object = new JsonObject();
+    JsonArray* array = new JsonArray();
+    int resultIndex = -1;
+    int stoppedIndex = -1;
+    int n = replyRecords.size();
+    for (int i = 0; i < n; ++i)
+    {
+        const std::unique_ptr<GdbReplyRecord>& record = replyRecords[i];
+        if (record->GetKind() == GdbReplyRecord::Kind::result)
+        {
+            resultIndex = i;
+        }
+        if (record->Stopped())
+        {
+            stoppedIndex = i;
+        }
+        array->AddItem(record->ToJson());
+    }
+    object->AddField(U"records", std::unique_ptr<JsonValue>(array));
+    if (resultIndex != -1)
+    {
+        object->AddField(U"resultIndex", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(resultIndex)))));
+    }
+    if (stoppedIndex != -1)
+    {
+        object->AddField(U"stoppedIndex", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(stoppedIndex)))));
+    }
+    return std::unique_ptr<JsonValue>(object);
 }
 
 class Gdb

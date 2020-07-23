@@ -20,7 +20,7 @@ namespace cmajor { namespace debug {
 using namespace soulng::util;
 
 class DebugInfo;
-class DINode;
+class BoundDebugNode;
 class Instruction;
 class DebuggerCommand;
 struct SourceLocation;
@@ -35,6 +35,7 @@ public:
     std::unique_ptr<DebuggerCommand> GetCommand();
     void SetTargetRunning();
     void Proceed();
+    void Reset();
     bool Terminated() const { return terminated; }
 private:
     GdbDriver* driver;
@@ -59,9 +60,12 @@ public:
     void SetNumber(int number_) { number = number_; }
     int Number() const { return number; }
     Instruction* GetInstruction() const { return instruction; }
+    void SetDebuggerBreakpointId(const std::string& debuggerBreakpoinId_);
+    const std::string& DebuggerBreakpointId() const { return debuggerBreakpointId; }
 private:
     Instruction* instruction;
     int number;
+    std::string debuggerBreakpointId;
 };
 
 class DEBUG_API DebuggerBreakpoint
@@ -73,10 +77,23 @@ public:
     void AddGdbBreakpointNumber(int gdbBreakpointNumber);
     void SetFrame(const Frame& frame_);
     const Frame& GetFrame() const { return frame; }
+    std::unique_ptr<JsonValue> ToJson() const;
 private:
     std::string id;
     std::vector<int> gdbBreakpointNumbers;
     Frame frame;
+};
+
+class DEBUG_API DebuggerVariable
+{
+public:
+    DebuggerVariable();
+    DebuggerVariable(int index_, const std::string& gdbVarName_);
+    const std::string& GdbVarName() const { return gdbVarName; }
+    int Index() const { return index; }
+private:
+    int index;
+    std::string gdbVarName;
 };
 
 class DEBUG_API Debugger : public GdbDriver
@@ -86,7 +103,7 @@ public:
     ~Debugger();
     enum class State
     {
-        initializing, programStarted, running, stopped, programExitedNormally, exitingDebugger
+        initializing, programStarted, running, stopped, programExitedNormally, programExited, signalReceived, exitingDebugger
     };
     void ResetRunningFlag() { wasRunning = false; }
     void ResetTargetOutputFlag() { targetOutput = false; }
@@ -96,6 +113,7 @@ public:
     std::string& CurrentSourceFilePath() override { return currentSourceFilePath; }
     bool TargetRunning() const override { return state == State::running; }
     void Proceed() override;
+    void ResetConsole() override;
     bool Exiting() const override { return state == State::exitingDebugger; }
     void Exit() override;
     void Prompt() override;
@@ -113,11 +131,14 @@ public:
     void Delete(const std::string& breakpointId);
     void Depth();
     void Frames(int low, int high);
+    void ShowBreakpoint(int breakpointId);
     void ShowBreakpoints();
     void List(const SourceLocation& location);
     void Print(const std::string& expression);
     void RepeatLatestCommand();
     bool IsStopInstruction(Instruction* instruction) const;
+    void Evaluate(const std::string& expression);
+    DIType* GetType(const std::string& expression);
     bool ExecuteGDBCommand(const GdbCommand& command);
     void ProcessReply(GdbCommand::Kind commandKind, GdbReply* reply);
     void ProcessConsoleOutput(GdbConsoleOutputRecord* record);
@@ -135,7 +156,6 @@ public:
     void ProcessStackListFramesReply(GdbReply* reply);
     void ProcessVarCreateReply(GdbReply* reply);
     void ProcessVarEvaluateReply(GdbReply* reply);
-    void ProcessVarListChildrenReply(GdbReply* reply);
     bool ProcessExecStoppedRecord(GdbExecStoppedRecord* execStoppedRecord);
     void StartProgram();
     GdbBreakpoint* SetBreakpoint(Instruction* instruction);
@@ -145,12 +165,19 @@ public:
     Instruction* GetInstructionForCppLocation(const std::string& cppFile, int cppLine);
     void SetLatestCommand(DebuggerCommand* latestCommand_);
     void SetState(State state_);
-    std::string StateStr(State state) const;
+    static std::string StateStr(State state);
     int GetNextBreakpointNumber() { return nextBreakpointNumber++; }
     std::string GetNextTemporaryBreakpointId();
-    std::string GetNextGdbVariableName();
+    DebuggerVariable GetNextDebuggerVariable();
     void AddStopResultToResult();
-    DIType* GetDynamicType(DIType* diType, DINode* diNode);
+    DIType* GetDynamicType(DIType* diType, BoundDebugNode* node);
+    void AddDebuggerVariable(const DebuggerVariable& debuggerVariable);
+    const DebuggerVariable* GetDebuggerVariable(int index) const;
+    void ResetResult(JsonValue* result_) { result.reset(result_); }
+    JsonValue* ReleaseResult() { return result.release(); }
+    Instruction* StoppedInstruction() const { return stoppedInstruction; }
+    Container* GetContainer(ContainerClassTemplateKind containerKind, const std::string& containerVarExpr);
+    void ClearBrowsingData();
 private:
     State state;
     bool wasRunning;
@@ -168,8 +195,12 @@ private:
     int nextBreakpointNumber;
     int nextTempBreakpointNumber;
     int nextGdbVariableIndex;
+    std::unordered_map<int, DebuggerVariable> debuggerVariableMap;
+    std::unordered_map<uint64_t, Container*> containerMap;
+    std::vector<std::unique_ptr<Container>> containers;
     SourceLocation listLocation;
     std::string currentSourceFilePath;
+    std::string debuggerBreakpointId;
     Console& console;
     std::recursive_mutex outputMutex;
 };
@@ -179,7 +210,7 @@ class DEBUG_API DebuggerCommand
 public:
     enum class Kind
     {
-        exit, help, next, step, continue_, finish, until, break_, delete_, depth, frames, showBreakpoints, list, print, repeatLatest
+        exit, help, next, step, continue_, finish, until, break_, delete_, depth, frames, showBreakpoint, showBreakpoints, list, print, repeatLatest
     };
     DebuggerCommand(Kind kind_);
     virtual ~DebuggerCommand();
@@ -291,6 +322,16 @@ public:
 private:
     int low;
     int high;
+};
+
+class DEBUG_API DebuggerShowBreakpointCommand : public DebuggerCommand
+{
+public:
+    DebuggerShowBreakpointCommand(int breakpointId_);
+    void Execute(Debugger& debugger) override;
+    DebuggerCommand* Clone() override;
+private:
+    int breakpointId;
 };
 
 class DEBUG_API DebuggerShowBreakpointsCommand : public DebuggerCommand

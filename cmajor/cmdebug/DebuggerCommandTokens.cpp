@@ -10,21 +10,24 @@ namespace DebuggerCommandTokens
 
     void InitTokenIdMap()
     {
-        tokenIdMap[U"AMP"] = 40;
-        tokenIdMap[U"AST"] = 39;
+        tokenIdMap[U"ADDRESS"] = 38;
+        tokenIdMap[U"AMP"] = 41;
+        tokenIdMap[U"AST"] = 40;
         tokenIdMap[U"B"] = 19;
         tokenIdMap[U"BASE"] = 33;
         tokenIdMap[U"BREAK"] = 18;
-        tokenIdMap[U"BREAKPOINTS"] = 29;
+        tokenIdMap[U"BREAKPOINT"] = 29;
+        tokenIdMap[U"BREAKPOINTS"] = 30;
         tokenIdMap[U"C"] = 13;
         tokenIdMap[U"CAST"] = 31;
-        tokenIdMap[U"COLON"] = 38;
-        tokenIdMap[U"COMMA"] = 48;
+        tokenIdMap[U"COLON"] = 39;
+        tokenIdMap[U"COMMA"] = 50;
         tokenIdMap[U"CONTINUE"] = 12;
         tokenIdMap[U"D"] = 21;
         tokenIdMap[U"DELETE"] = 20;
         tokenIdMap[U"DEPTH"] = 24;
-        tokenIdMap[U"DOT"] = 47;
+        tokenIdMap[U"DOLLAR"] = 42;
+        tokenIdMap[U"DOT"] = 49;
         tokenIdMap[U"E"] = 3;
         tokenIdMap[U"EXIT"] = 2;
         tokenIdMap[U"F"] = 15;
@@ -35,24 +38,23 @@ namespace DebuggerCommandTokens
         tokenIdMap[U"ID"] = 34;
         tokenIdMap[U"INTEGER"] = 36;
         tokenIdMap[U"L"] = 27;
-        tokenIdMap[U"LANGLE"] = 43;
-        tokenIdMap[U"LBRACKET"] = 45;
+        tokenIdMap[U"LANGLE"] = 45;
+        tokenIdMap[U"LBRACKET"] = 47;
         tokenIdMap[U"LIST"] = 26;
-        tokenIdMap[U"LPAREN"] = 41;
-        tokenIdMap[U"MINUS"] = 50;
+        tokenIdMap[U"LPAREN"] = 43;
+        tokenIdMap[U"MINUS"] = 52;
         tokenIdMap[U"N"] = 9;
         tokenIdMap[U"NEXT"] = 8;
         tokenIdMap[U"NL"] = 1;
         tokenIdMap[U"P"] = 23;
         tokenIdMap[U"PATH"] = 35;
-        tokenIdMap[U"PLUS"] = 49;
+        tokenIdMap[U"PLUS"] = 51;
         tokenIdMap[U"PRINT"] = 22;
         tokenIdMap[U"Q"] = 5;
         tokenIdMap[U"QUIT"] = 4;
-        tokenIdMap[U"RANGE"] = 30;
-        tokenIdMap[U"RANGLE"] = 44;
-        tokenIdMap[U"RBRACKET"] = 46;
-        tokenIdMap[U"RPAREN"] = 42;
+        tokenIdMap[U"RANGLE"] = 46;
+        tokenIdMap[U"RBRACKET"] = 48;
+        tokenIdMap[U"RPAREN"] = 44;
         tokenIdMap[U"S"] = 11;
         tokenIdMap[U"SHOW"] = 28;
         tokenIdMap[U"STEP"] = 10;
@@ -106,8 +108,8 @@ namespace DebuggerCommandTokens
         "LIST",
         "L",
         "SHOW",
+        "BREAKPOINT",
         "BREAKPOINTS",
-        "RANGE",
         "CAST",
         "TYPEID",
         "BASE",
@@ -115,9 +117,11 @@ namespace DebuggerCommandTokens
         "PATH",
         "INTEGER",
         "STRING",
+        "ADDRESS",
         "COLON",
         "AST",
         "AMP",
+        "DOLLAR",
         "LPAREN",
         "RPAREN",
         "LANGLE",
@@ -166,8 +170,8 @@ namespace DebuggerCommandTokens
         "'list'",
         "'l'",
         "'show'",
+        "'breakpoint'",
         "'breakpoints'",
-        "'range'",
         "'cast'",
         "'typeid'",
         "'base'",
@@ -175,9 +179,11 @@ namespace DebuggerCommandTokens
         "'path'",
         "'integer'",
         "'string'",
+        "'address'",
         "':'",
         "'*'",
         "'&'",
+        "'$'",
         "'('",
         "')'",
         "'<'",

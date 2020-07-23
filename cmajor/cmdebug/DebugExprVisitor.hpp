@@ -9,34 +9,43 @@
 
 namespace cmajor { namespace debug {
 
-class VariableNameDebugExprNode;
+class DebugExpression;
+class AddressDebugExprNode;
+class IdentifierDebugExprNode;
 class IntegerDebugExprNode;
+class AddDebugExprNode;
+class SubDebugExprNode;
 class ParenthesizedDebugExprNode;
 class DerefDebugExprNode;
 class AddrOfDebugExprNode;
-class UnaryMinusDebugExprNode;
-class UnaryPlusDebugExprNode;
 class DotDebugExprNode;
 class SubscriptDebugExprNode;
+class RangeDebugExprNode;
 class TypeIdDebugExprNode;
 class CastDebugExprNode;
 class BaseDebugExprNode;
+class DebuggerVarExprNode;
 
 class DEBUG_API DebugExprVisitor
 {
 public:
-    virtual void Visit(VariableNameDebugExprNode& node) {}
+    virtual ~DebugExprVisitor();
+    virtual void Visit(DebugExpression& expr) {}
+    virtual void Visit(AddressDebugExprNode& node) {}
+    virtual void Visit(IdentifierDebugExprNode& node) {}
     virtual void Visit(IntegerDebugExprNode& node) {}
+    virtual void Visit(AddDebugExprNode& node) {}
+    virtual void Visit(SubDebugExprNode& node) {}
     virtual void Visit(ParenthesizedDebugExprNode& node) {}
     virtual void Visit(DerefDebugExprNode& node) {}
     virtual void Visit(AddrOfDebugExprNode& node) {}
-    virtual void Visit(UnaryMinusDebugExprNode& node) {}
-    virtual void Visit(UnaryPlusDebugExprNode& node) {}
     virtual void Visit(DotDebugExprNode& node) {}
     virtual void Visit(SubscriptDebugExprNode& node) {}
+    virtual void Visit(RangeDebugExprNode& node) {}
     virtual void Visit(TypeIdDebugExprNode& node) {}
     virtual void Visit(CastDebugExprNode& node) {}
     virtual void Visit(BaseDebugExprNode& node) {}
+    virtual void Visit(DebuggerVarExprNode& node) {}
 };
 
 } } // namespace cmajor::debug

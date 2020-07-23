@@ -13,6 +13,8 @@
 #include <cmajor/symbols/DelegateSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/symbols/ArrayTypeSymbol.hpp>
+#include <cmajor/symbols/TypedefSymbol.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
@@ -54,6 +56,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
             type->SetPrimitiveTypeKind(ToPrimitiveTypeKind(typeSymbol->GetSymbolType()));
             type->SetId(typeSymbol->TypeId());
             type->SetName(ToUtf8(typeSymbol->Name()));
+            type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
             typeMap[type->Id()] = type;
             diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
         }
@@ -67,6 +70,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     cmajor::debug::DIEnumType* type = new cmajor::debug::DIEnumType();
                     type->SetId(typeSymbol->TypeId());
                     type->SetName(ToUtf8(typeSymbol->FullName()));
+                    type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                     typeMap[type->Id()] = type;
                     type->SetUnderlyingTypeId(enumType->UnderlyingType()->TypeId());
                     diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
@@ -88,13 +92,13 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     cmajor::debug::DIClassType* type = new cmajor::debug::DIClassType();
                     type->SetId(typeSymbol->TypeId());
                     type->SetName(ToUtf8(typeSymbol->FullName()));
+                    type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                     typeMap[type->Id()] = type;
                     diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
                     if (classType->IsPolymorphic())
                     {
                         type->SetPolymorphic();
                         type->SetVmtPtrIndex(classType->VmtPtrIndex());
-                        type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                         type->SetVmtVariableName(emitter.MakeVmtVariableName(classType->VmtObjectName(emitter)));
                     }
                     if (classType->BaseClass())
@@ -112,7 +116,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     }
                     for (MemberVariableSymbol* memberVariable : classType->MemberVariables())
                     {
-                        cmajor::debug::DIVariable* variable = new cmajor::debug::DIVariable();
+                        cmajor::debug::DIVariable* variable = new cmajor::debug::DIVariable(cmajor::debug::DIVariable::Kind::memberVariable);
                         variable->SetName(ToUtf8(memberVariable->Name()));
                         variable->SetIrName("m" + std::to_string(memberVariable->LayoutIndex()));
                         variable->SetTypeId(memberVariable->GetType()->TypeId());
@@ -126,10 +130,29 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(typeSymbol);
                     cmajor::debug::DIClassTemplateSpecializationType* type = new cmajor::debug::DIClassTemplateSpecializationType();
                     ClassTypeSymbol* classTemplateType = specialization->GetClassTemplate();
-                    type->SetPrimaryTypeId(classTemplateType->TypeId());
                     AddType(classTemplateType->TypeId(), classTemplateType, emitter);
+                    type->SetPrimaryTypeId(classTemplateType->TypeId());
+                    for (TypeSymbol* templateArgumentType : specialization->TemplateArgumentTypes())
+                    {
+                        type->AddTemplateArgumentTypeId(templateArgumentType->TypeId());
+                        AddType(templateArgumentType->TypeId(), templateArgumentType, emitter);
+                    }
+                    cmajor::debug::ContainerClassTemplateKind containerKind = GetContainerClassTemplateKind(classTemplateType->FullName());
+                    type->SetContainerClassTemplateKind(containerKind);
+                    if (containerKind != cmajor::debug::ContainerClassTemplateKind::notContainerClassTemplate)
+                    {
+                        Symbol* valueTypeSymbol = specialization->GetContainerScope()->Lookup(U"ValueType", ScopeLookup::this_and_base_and_parent);
+                        if (valueTypeSymbol && valueTypeSymbol->GetSymbolType() == SymbolType::typedefSymbol)
+                        {
+                            TypedefSymbol* valueTypeTypedef = static_cast<TypedefSymbol*>(valueTypeSymbol);
+                            TypeSymbol* valueType = valueTypeTypedef->GetType();
+                            type->SetValueTypeId(valueType->TypeId());
+                            AddType(valueType->TypeId(), valueType, emitter);
+                        }
+                    }
                     type->SetId(typeSymbol->TypeId());
                     type->SetName(ToUtf8(typeSymbol->FullName()));
+                    type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                     typeMap[type->Id()] = type;
                     diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
                     if (specialization->IsPolymorphic())
@@ -146,7 +169,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     }
                     for (MemberVariableSymbol* memberVariable : specialization->MemberVariables())
                     {
-                        cmajor::debug::DIVariable* variable = new cmajor::debug::DIVariable();
+                        cmajor::debug::DIVariable* variable = new cmajor::debug::DIVariable(cmajor::debug::DIVariable::Kind::memberVariable);
                         variable->SetName(ToUtf8(memberVariable->Name()));
                         variable->SetIrName("m" + std::to_string(memberVariable->LayoutIndex()));
                         variable->SetTypeId(memberVariable->GetType()->TypeId());
@@ -161,6 +184,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     cmajor::debug::DIDelegateType* type = new cmajor::debug::DIDelegateType();
                     type->SetId(typeSymbol->TypeId());
                     type->SetName(ToUtf8(typeSymbol->FullName()));
+                    type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                     typeMap[type->Id()] = type;
                     diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
                     break;
@@ -171,6 +195,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     cmajor::debug::DIClassDelegateType* type = new cmajor::debug::DIClassDelegateType();
                     type->SetId(typeSymbol->TypeId());
                     type->SetName(ToUtf8(typeSymbol->FullName()));
+                    type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                     typeMap[type->Id()] = type;
                     diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
                     break;
@@ -181,6 +206,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     cmajor::debug::DIInterfaceType* type = new cmajor::debug::DIInterfaceType();
                     type->SetId(typeSymbol->TypeId());
                     type->SetName(ToUtf8(typeSymbol->FullName()));
+                    type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                     typeMap[type->Id()] = type;
                     diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
                     break;
@@ -194,6 +220,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                         cmajor::debug::DIConstType* type = new cmajor::debug::DIConstType();
                         type->SetId(typeSymbol->TypeId());
                         type->SetName(ToUtf8(typeSymbol->FullName()));
+                        type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                         type->SetBaseTypeId(nonConstType->TypeId());
                         typeMap[type->Id()] = type;
                         diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
@@ -205,6 +232,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                         cmajor::debug::DIReferenceType* type = new cmajor::debug::DIReferenceType();
                         type->SetId(typeSymbol->TypeId());
                         type->SetName(ToUtf8(typeSymbol->FullName()));
+                        type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                         type->SetBaseTypeId(nonReferenceType->TypeId());
                         typeMap[type->Id()] = type;
                         diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
@@ -217,6 +245,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                         pointerType->SetPointedTypeId(pointedToType->TypeId());
                         pointerType->SetId(typeSymbol->TypeId());
                         pointerType->SetName(ToUtf8(pointedToType->FullName() + U"*"));
+                        pointerType->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                         typeMap[pointerType->Id()] = pointerType;
                         diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(pointerType));
                         AddType(pointedToType->TypeId(), pointedToType, emitter);
@@ -229,6 +258,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                     cmajor::debug::DIArrayType* type = new cmajor::debug::DIArrayType();
                     type->SetId(typeSymbol->TypeId());
                     type->SetName(ToUtf8(typeSymbol->FullName()));
+                    type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                     typeMap[type->Id()] = type;
                     TypeSymbol* elementType = arrayTypeSymbol->ElementType();
                     type->SetElementTypeId(elementType->TypeId());

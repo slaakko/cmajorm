@@ -26,12 +26,14 @@ void DIType::Write(soulng::util::BinaryWriter& writer)
 {
     writer.Write(id);
     writer.Write(name);
+    writer.Write(irName);
 }
 
 void DIType::Read(soulng::util::BinaryReader& reader)
 {
     reader.ReadUuid(id);
     name = reader.ReadUtf8String();
+    irName = reader.ReadUtf8String();
 }
 
 void DIType::SetId(const boost::uuids::uuid& id_)
@@ -42,6 +44,11 @@ void DIType::SetId(const boost::uuids::uuid& id_)
 void DIType::SetName(const std::string& name_)
 {
     name = name_;
+}
+
+void DIType::SetIrName(const std::string& irName_)
+{
+    irName = irName_;
 }
 
 std::string DIType::KindStr(Kind kind)
@@ -111,6 +118,7 @@ std::unique_ptr<JsonValue> DIType::ToJson() const
     jsonObject->AddField(U"kind", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(KindStr(kind)))));
     jsonObject->AddField(U"id", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(boost::uuids::to_string(id)))));
     jsonObject->AddField(U"name", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(name))));
+    jsonObject->AddField(U"irName", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(irName))));
     return std::unique_ptr<JsonValue>(jsonObject);
 }
 
@@ -122,6 +130,7 @@ std::unique_ptr<JsonValue> DITypeRef::ToJson()
 {
     JsonObject* jsonObject = new JsonObject();
     jsonObject->AddField(U"name", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(type->Name()))));
+    jsonObject->AddField(U"irName", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(type->IrName()))));
     jsonObject->AddField(U"id", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(boost::uuids::to_string(type->Id())))));
     return std::unique_ptr<JsonValue>(jsonObject);
 }
@@ -174,6 +183,28 @@ std::unique_ptr<JsonValue> DIPrimitiveType::ToJson() const
         jsonObject->AddField(U"primitiveType", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(PrimitiveTypeKindStr(kind)))));
     }
     return value;
+}
+
+bool DIPrimitiveType::IsIntegerType() const
+{
+    switch (kind)
+    {
+        case Kind::byteType:
+        case Kind::sbyteType:
+        case Kind::shortType:
+        case Kind::ushortType:
+        case Kind::intType:
+        case Kind::uintType:
+        case Kind::longType:
+        case Kind::ulongType:
+        {
+            return true;
+        }
+        default:
+        {
+            return false;
+        }
+    }
 }
 
 DIEnumType::DIEnumType() : DIType(Kind::enumType), underlyingTypeId(boost::uuids::nil_uuid())
@@ -287,11 +318,6 @@ void DIClassType::AddMemberVariable(DIVariable* memberVariable)
     memberVariables.push_back(std::unique_ptr<DIVariable>(memberVariable));
 }
 
-void DIClassType::SetIrName(const std::string& irName_)
-{
-    irName = irName_;
-}
-
 void DIClassType::SetVmtVariableName(const std::string& vmtVariableName_)
 {
     vmtVariableName = vmtVariableName_;
@@ -319,7 +345,6 @@ void DIClassType::Write(soulng::util::BinaryWriter& writer)
     if (polymorphic)
     {
         writer.Write(vmtPtrIndex);
-        writer.Write(irName);
         writer.Write(vmtVariableName);
     }
 }
@@ -339,7 +364,7 @@ void DIClassType::Read(soulng::util::BinaryReader& reader)
     int32_t nmv = reader.ReadInt();
     for (int32_t i = 0; i < nmv; ++i)
     {
-        DIVariable* memberVariable = new DIVariable();
+        DIVariable* memberVariable = new DIVariable(DIVariable::Kind::memberVariable);
         memberVariable->SetProject(GetProject());
         memberVariable->Read(reader);
         AddMemberVariable(memberVariable);
@@ -348,7 +373,6 @@ void DIClassType::Read(soulng::util::BinaryReader& reader)
     if (polymorphic)
     {
         vmtPtrIndex = reader.ReadInt();
-        irName = reader.ReadUtf8String();
         vmtVariableName = reader.ReadUtf8String();
     }
 }
@@ -376,14 +400,15 @@ std::unique_ptr<JsonValue> DIClassType::ToJson() const
         if (polymorphic)
         {
             jsonObject->AddField(U"vmtPtrIndex", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(vmtPtrIndex)))));
-            jsonObject->AddField(U"irName", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(irName))));
             jsonObject->AddField(U"vmtVariableName", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(vmtVariableName))));
         }
     }
     return value;
 }
 
-DIClassTemplateSpecializationType::DIClassTemplateSpecializationType() : DIClassType(Kind::specializationType), primaryTypeId(boost::uuids::nil_uuid())
+DIClassTemplateSpecializationType::DIClassTemplateSpecializationType() :
+    DIClassType(Kind::specializationType), containerKind(ContainerClassTemplateKind::notContainerClassTemplate),
+    primaryTypeId(boost::uuids::nil_uuid()), valueTypeId(boost::uuids::nil_uuid())
 {
 }
 
@@ -392,16 +417,49 @@ void DIClassTemplateSpecializationType::SetPrimaryTypeId(const boost::uuids::uui
     primaryTypeId = primaryTypeId_;
 }
 
+void DIClassTemplateSpecializationType::SetValueTypeId(const boost::uuids::uuid& valueTypeId_)
+{
+    valueTypeId = valueTypeId_;
+}
+
+void DIClassTemplateSpecializationType::AddTemplateArgumentTypeId(const boost::uuids::uuid& templateArgumentTypeId)
+{
+    templateArgumentTypeIds.push_back(templateArgumentTypeId);
+}
+
 void DIClassTemplateSpecializationType::Write(soulng::util::BinaryWriter& writer)
 {
     DIClassType::Write(writer);
     writer.Write(primaryTypeId);
+    int32_t n = templateArgumentTypeIds.size();
+    writer.Write(n);
+    for (int32_t i = 0; i < n; ++i)
+    {
+        writer.Write(templateArgumentTypeIds[i]);
+    }
+    writer.Write(static_cast<int8_t>(containerKind));
+    if (containerKind != ContainerClassTemplateKind::notContainerClassTemplate)
+    {
+        writer.Write(valueTypeId);
+    }
 }
 
 void DIClassTemplateSpecializationType::Read(soulng::util::BinaryReader& reader)
 {
     DIClassType::Read(reader);
     reader.ReadUuid(primaryTypeId);
+    int32_t n = reader.ReadInt();
+    for (int32_t i = 0; i < n; ++i)
+    {
+        boost::uuids::uuid templateArgumentTypeId;
+        reader.ReadUuid(templateArgumentTypeId);
+        AddTemplateArgumentTypeId(templateArgumentTypeId);
+    }
+    containerKind = static_cast<ContainerClassTemplateKind>(reader.ReadSByte());
+    if (containerKind != ContainerClassTemplateKind::notContainerClassTemplate)
+    {
+        reader.ReadUuid(valueTypeId);
+    }
 }
 
 std::unique_ptr<JsonValue> DIClassTemplateSpecializationType::ToJson() const
@@ -411,6 +469,17 @@ std::unique_ptr<JsonValue> DIClassTemplateSpecializationType::ToJson() const
     {
         JsonObject* jsonObject = static_cast<JsonObject*>(value.get());
         jsonObject->AddField(U"primaryTypeId", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(boost::uuids::to_string(primaryTypeId)))));
+        if (containerKind != ContainerClassTemplateKind::notContainerClassTemplate)
+        {
+            jsonObject->AddField(U"container", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ContainerName(containerKind)))));
+            jsonObject->AddField(U"valueTypeId", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(boost::uuids::to_string(valueTypeId)))));
+        }
+        JsonArray* templateArgumentTypeIdArray = new JsonArray();
+        for (const boost::uuids::uuid& templateArgumentTypeId : templateArgumentTypeIds)
+        {
+            templateArgumentTypeIdArray->AddItem(std::unique_ptr<JsonValue>(new JsonString(ToUtf32(boost::uuids::to_string(templateArgumentTypeId)))));
+        }
+        jsonObject->AddField(U"templateArgumentTypeIds", std::unique_ptr<JsonValue>(templateArgumentTypeIdArray));
     }
     return value;
 }
@@ -580,35 +649,20 @@ std::unique_ptr<JsonValue> DIArrayType::ToJson() const
 
 DIType* MakePointerType(DIType* pointedToType)
 {
-    DIPointerType* pointerType = new DIPointerType();
-    pointerType->SetId(boost::uuids::random_generator()());
-    pointerType->SetPointedTypeId(pointedToType->Id());
-    pointerType->SetName(pointedToType->Name() + "*");
-    pointerType->SetProject(pointedToType->GetProject());
-    pointedToType->GetProject()->AddType(pointerType);
-    return pointerType;
+    Project* project = pointedToType->GetProject();
+    return project->GetPointerType(pointedToType);
 }
 
 DIType* MakeReferenceType(DIType* referredToType)
 {
-    DIReferenceType* referenceType = new DIReferenceType();
-    referenceType->SetId(boost::uuids::random_generator()());
-    referenceType->SetBaseTypeId(referredToType->Id());
-    referenceType->SetName(referredToType->Name() + "&");
-    referenceType->SetProject(referredToType->GetProject());
-    referredToType->GetProject()->AddType(referenceType);
-    return referenceType;
+    Project* project = referredToType->GetProject();
+    return project->GetReferenceType(referredToType);
 }
 
 DIType* MakeConstType(DIType* baseType)
 {
-    DIConstType* constType = new DIConstType();
-    constType->SetId(boost::uuids::random_generator()());
-    constType->SetBaseTypeId(baseType->Id());
-    constType->SetName("const " + baseType->Name());
-    constType->SetProject(baseType->GetProject());
-    baseType->GetProject()->AddType(constType);
-    return constType;
+    Project* project = baseType->GetProject();
+    return project->GetConstType(baseType);
 }
 
 void WriteType(soulng::util::BinaryWriter& writer, DIType* type)

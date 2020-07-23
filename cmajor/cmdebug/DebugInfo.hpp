@@ -229,6 +229,9 @@ public:
     CompileUnitFunction* GetMainFunction() const;
     void AddType(DIType* type);
     DIType* GetType(const boost::uuids::uuid& typeId) const;
+    DIPointerType* GetPointerType(DIType* pointedToType);
+    DIReferenceType* GetReferenceType(DIType* referredToType);
+    DIConstType* GetConstType(DIType* baseType);
     DIType* GetLongType() const { return longType; }
 private:
     DebugInfo* debugInfo;
@@ -242,6 +245,9 @@ private:
     std::unordered_map<boost::uuids::uuid, Function*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<DIType>> types;
     std::unordered_map<boost::uuids::uuid, DIType*, boost::hash<boost::uuids::uuid>> typeMap;
+    std::unordered_map<boost::uuids::uuid, DIPointerType*, boost::hash<boost::uuids::uuid>> pointerTypeMap;
+    std::unordered_map<boost::uuids::uuid, DIReferenceType*, boost::hash<boost::uuids::uuid>> referenceTypeMap;
+    std::unordered_map<boost::uuids::uuid, DIConstType*, boost::hash<boost::uuids::uuid>> constTypeMap;
     CompileUnitFunction* mainFunction;
     DIType* longType;
 };

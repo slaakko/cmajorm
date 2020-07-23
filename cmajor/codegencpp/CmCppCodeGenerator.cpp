@@ -415,9 +415,12 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
             {
                 emitter->SetCurrentLineNumber(body->EndSpan().line);
             }
+            int16_t functionScopeId = emitter->GetCurrentScopeId();
+            emitter->SetCurrentScopeId(scopeIdMap[body]);
             emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
             emitter->CreateRet(defaultValue);
             emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+            emitter->SetCurrentScopeId(functionScopeId);
             lastInstructionWasRet = true;
         }
         else
@@ -426,9 +429,12 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
             {
                 emitter->SetCurrentLineNumber(body->EndSpan().line);
             }
+            int16_t functionScopeId = emitter->GetCurrentScopeId();
+            emitter->SetCurrentScopeId(scopeIdMap[body]);
             emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
             emitter->CreateRetVoid();
             emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+            emitter->SetCurrentScopeId(functionScopeId);
             lastInstructionWasRet = true;
         }
     }
@@ -446,6 +452,7 @@ void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
     {
         emitter->SetCurrentLineNumber(boundCompoundStatement.GetSpan().line);
         emitter->BeginScope();
+        scopeIdMap[&boundCompoundStatement] = emitter->GetCurrentScopeId();
         if (&boundCompoundStatement != currentFunction->Body())
         {
             emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::beginBrace));
@@ -471,6 +478,13 @@ void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
         BoundStatement* statement = boundCompoundStatement.Statements()[i].get();
         statement->Accept(*this);
     }
+    if (generateLineNumbers)
+    {
+        emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+        emitter->SetCurrentLineNumber(boundCompoundStatement.EndSpan().line);
+        emitter->CreateNop();
+        emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
+    }
     ExitBlocks(prevBlock);
     GenerateCodeForCleanups();
     for (int i = 0; i < numTriesInCurrentBlock; ++i)
@@ -479,13 +493,6 @@ void CmCppCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
     }
     if (generateLineNumbers)
     {
-        if (&boundCompoundStatement != currentFunction->Body())
-        {
-            emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
-            emitter->SetCurrentLineNumber(boundCompoundStatement.EndSpan().line);
-            emitter->CreateNop();
-            emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
-        }
         emitter->EndScope();
     }
     blocks.pop_back();
@@ -1318,12 +1325,16 @@ void CmCppCodeGenerator::Visit(BoundConversion& boundConversion)
 void CmCppCodeGenerator::Visit(BoundConstructExpression& boundConstructExpression)
 {
     boundConstructExpression.Load(*emitter, OperationFlags::none);
+    TypeSymbol* type = boundConstructExpression.GetType();
+    module->GetTypeIndex().AddType(type->TypeId(), type, *emitter);
     GenJumpingBoolCode();
 }
 
 void CmCppCodeGenerator::Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression)
 {
     boundConstructAndReturnTemporaryExpression.Load(*emitter, OperationFlags::none);
+    TypeSymbol* type = boundConstructAndReturnTemporaryExpression.GetType();
+    module->GetTypeIndex().AddType(type->TypeId(), type, *emitter);
     GenJumpingBoolCode();
 }
 
@@ -1336,22 +1347,36 @@ void CmCppCodeGenerator::Visit(BoundClassOrClassDelegateConversionResult& boundC
 void CmCppCodeGenerator::Visit(BoundIsExpression& boundIsExpression)
 {
     boundIsExpression.Load(*emitter, OperationFlags::none);
+    TypeSymbol* exprType = boundIsExpression.Expr()->GetType();
+    module->GetTypeIndex().AddType(exprType->TypeId(), exprType, *emitter);
+    TypeSymbol* rightType = boundIsExpression.RightClassType();
+    module->GetTypeIndex().AddType(rightType->TypeId(), rightType, *emitter);
     GenJumpingBoolCode();
 }
 
 void CmCppCodeGenerator::Visit(BoundAsExpression& boundAsExpression)
 {
     boundAsExpression.Load(*emitter, OperationFlags::none);
+    TypeSymbol* exprType = boundAsExpression.Expr()->GetType();
+    module->GetTypeIndex().AddType(exprType->TypeId(), exprType, *emitter);
+    TypeSymbol* rightType = boundAsExpression.RightClassType();
+    module->GetTypeIndex().AddType(rightType->TypeId(), rightType, *emitter);
 }
 
 void CmCppCodeGenerator::Visit(BoundTypeNameExpression& boundTypeNameExpression)
 {
     boundTypeNameExpression.Load(*emitter, OperationFlags::none);
+    TypeSymbol* classPtrType = boundTypeNameExpression.ClassPtr()->GetType();
+    module->GetTypeIndex().AddType(classPtrType->TypeId(), classPtrType, *emitter);
 }
 
 void CmCppCodeGenerator::Visit(BoundBitCast& boundBitCast)
 {
     boundBitCast.Load(*emitter, OperationFlags::none);
+    TypeSymbol* exprType = boundBitCast.Expr()->GetType();
+    module->GetTypeIndex().AddType(exprType->TypeId(), exprType, *emitter);
+    TypeSymbol* type = boundBitCast.GetType();
+    module->GetTypeIndex().AddType(type->TypeId(), type, *emitter);
 }
 
 void CmCppCodeGenerator::Visit(BoundFunctionPtr& boundFunctionPtr)

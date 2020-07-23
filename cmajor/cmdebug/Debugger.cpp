@@ -8,8 +8,9 @@
 #include <cmajor/cmdebug/DebuggerCommandLexer.hpp>
 #include <cmajor/cmdebug/DebugExprLexer.hpp>
 #include <cmajor/cmdebug/DebugExprParser.hpp>
-#include <cmajor/cmdebug/DIExpr.hpp>
-#include <cmajor/cmdebug/DebugExprTranslatorVisitor.hpp>
+#include <cmajor/cmdebug/BoundDebugExpr.hpp>
+#include <cmajor/cmdebug/DebugExprBinder.hpp>
+#include <cmajor/cmdebug/DebugExpressionEvaluator.hpp>
 #include <cmajor/cmdebug/Gdb.hpp>
 #include <cmajor/cmdebug/TokenValueParsers.hpp>
 #include <soulng/util/Path.hpp>
@@ -147,6 +148,15 @@ void Console::SetTargetRunning()
     targetRunningVar.notify_one();
 }
 
+void Console::Reset()
+{
+    std::unique_lock<std::mutex> lock(mtx);
+    commandAvailable = false;
+    commandReceived = false;
+    targetRunning = true;
+    targetRunningVar.notify_one();
+}
+
 void Console::Proceed()
 {
     std::unique_lock<std::mutex> lock(mtx);
@@ -163,6 +173,11 @@ GdbBreakpoint::GdbBreakpoint(Instruction* instruction_) : instruction(instructio
 {
 }
 
+void GdbBreakpoint::SetDebuggerBreakpointId(const std::string& debuggerBreakpoinId_)
+{
+    debuggerBreakpointId = debuggerBreakpoinId_;
+}
+
 DebuggerBreakpoint::DebuggerBreakpoint(const std::string& id_) : id(id_), frame()
 {
 }
@@ -175,6 +190,14 @@ void DebuggerBreakpoint::AddGdbBreakpointNumber(int gdbBreakpointNumber)
 void DebuggerBreakpoint::SetFrame(const Frame& frame_)
 {
     frame = frame_;
+}
+
+std::unique_ptr<JsonValue> DebuggerBreakpoint::ToJson() const
+{
+    JsonObject* jsonObject = new JsonObject();
+    jsonObject->AddField(U"id", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(id))));
+    jsonObject->AddField(U"frame", frame.ToJson(false));
+    return std::unique_ptr<JsonValue>(jsonObject);
 }
 
 Frame GetFrame(GdbTupleValue* frameValue)
@@ -210,7 +233,7 @@ Frame GetFrame(GdbTupleValue* frameValue)
     return frame;
 }
 
-bool GetBreakpointResults(GdbResults* results, std::string& file, int& line, int& number, CodeFormatter& formatter)
+bool GetBreakpointResults(GdbResults* results, std::string& file, int& line, int& number, std::unique_ptr<JsonValue>& result)
 {
     file.clear();
     line = 0;
@@ -238,34 +261,82 @@ bool GetBreakpointResults(GdbResults* results, std::string& file, int& line, int
                 {
                     number = boost::lexical_cast<int>(static_cast<GdbStringValue*>(numberValue)->Value());
                 }
+                if (result && result->Type() == JsonValueType::object)
+                {
+                    JsonObject* resultObject = static_cast<JsonObject*>(result.get());
+                    resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+                }
             }
         }
     }
     catch (const std::exception& ex)
     {
-        formatter.WriteLine("error getting breakpoint results: " + std::string(ex.what()));
+        if (result && result->Type() == JsonValueType::object)
+        {
+            JsonObject* resultObject = static_cast<JsonObject*>(result.get());
+            resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
+            resultObject->AddField(U"error", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
+        }
     }
     return !file.empty() && line != 0 && number != -1;
 }
 
-bool GetStoppedResults(GdbResults* results, std::unique_ptr<JsonObject>& stopObject, Frame& frame)
+bool GetStoppedResults(GdbResults* results, std::unique_ptr<JsonValue>& result, std::unique_ptr<JsonObject>& stopObject, Frame& frame, Debugger& debugger)
 {
+    JsonObject* resultObject = nullptr;
+    if (result && result->Type() == JsonValueType::object)
+    {
+        resultObject = static_cast<JsonObject*>(result.get());
+    }
     stopObject.reset(new JsonObject());
     try
     {
         GdbValue* reasonValue = results->GetField("reason");
-        stopObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonString(U"true")));
+        if (resultObject)
+        {
+            resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+        }
         if (reasonValue && reasonValue->GetKind() == GdbValue::Kind::string)
         {
             std::string reason = static_cast<GdbStringValue*>(reasonValue)->Value();
             stopObject->AddField(U"reason", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(reason))));
-            if (reason == "breakpoint-hit")
+            if (reason == "exited")
+            {
+                GdbValue* exitCodeValue = results->GetField("exit-code");
+                if (exitCodeValue && exitCodeValue->GetKind() == GdbValue::Kind::string)
+                {
+                    std::string exitCode = static_cast<GdbStringValue*>(exitCodeValue)->Value();
+                    stopObject->AddField(U"exitCode", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(exitCode))));
+                }
+            }
+            else if (reason == "breakpoint-hit")
             {
                 GdbValue* breakpointNumberValue = results->GetField("bkptno");
                 if (breakpointNumberValue && breakpointNumberValue->GetKind() == GdbValue::Kind::string)
                 {
-                    stopObject->AddField(U"breakpointNumber",
-                        std::unique_ptr<JsonValue>(new JsonString(ToUtf32(static_cast<GdbStringValue*>(breakpointNumberValue)->Value()))));
+                    std::string breakpointNumberStr = static_cast<GdbStringValue*>(breakpointNumberValue)->Value();
+                    stopObject->AddField(U"gdbBreakpointNumber", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(breakpointNumberStr))));
+                    int gdbBreakpointNumber = boost::lexical_cast<int>(breakpointNumberStr);
+                    GdbBreakpoint* gdbBreakpoint = debugger.GetBreakpoint(gdbBreakpointNumber);
+                    if (gdbBreakpoint && !gdbBreakpoint->DebuggerBreakpointId().empty())
+                    {
+                        stopObject->AddField(U"breakpointId", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(gdbBreakpoint->DebuggerBreakpointId()))));
+                    }
+                }
+            }
+            else if (reason == "signal-received")
+            {
+                GdbValue* signalNameValue = results->GetField("signal-name");
+                if (signalNameValue && signalNameValue->GetKind() == GdbValue::Kind::string)
+                {
+                    std::string signalName = static_cast<GdbStringValue*>(signalNameValue)->Value();
+                    stopObject->AddField(U"signalName", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(signalName))));
+                }
+                GdbValue* signalMeaningValue = results->GetField("signal-meaning");
+                if (signalMeaningValue && signalMeaningValue->GetKind() == GdbValue::Kind::string)
+                {
+                    std::string signalMeaning = static_cast<GdbStringValue*>(signalMeaningValue)->Value();
+                    stopObject->AddField(U"signalMeaning", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(signalMeaning))));
                 }
             }
         }
@@ -284,8 +355,11 @@ bool GetStoppedResults(GdbResults* results, std::unique_ptr<JsonObject>& stopObj
     }
     catch (const std::exception& ex)
     {
-        stopObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonString(U"false")));
-        stopObject->AddField(U"error", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
+        if (resultObject)
+        {
+            resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
+            resultObject->AddField(U"error", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
+        }
         return false;
     }
     return true;
@@ -300,13 +374,14 @@ bool GetStackDepthResult(GdbResults* results, std::unique_ptr<JsonValue>& depthR
         if (depthValue && depthValue->GetKind() == GdbValue::Kind::string)
         {
             jsonObject->AddField(U"depth", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(static_cast<GdbStringValue*>(depthValue)->Value()))));
-            jsonObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonString(U"true")));
+            jsonObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
         }
+        depthResult.reset(jsonObject);
         return true;
     }
     catch (const std::exception& ex)
     {
-        jsonObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonString(U"false")));
+        jsonObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
         jsonObject->AddField(U"error", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
     }
     depthResult.reset(jsonObject);
@@ -340,62 +415,67 @@ bool GetStackListFramesResult(GdbResults* results, std::unique_ptr<JsonValue>& c
                 }
             }
         }
-        jsonObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonString(U"true")));
+        jsonObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
         jsonObject->AddField(U"cppFrames", std::unique_ptr<JsonValue>(framesArray));
         cppStackResult.reset(jsonObject);
         return true;
     }
     catch (const std::exception& ex)
     {
-        jsonObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonString(U"false")));
+        jsonObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
         jsonObject->AddField(U"error", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
     }
     cppStackResult.reset(jsonObject);
     return false;
 }
 
-bool GetVarCreateResult(GdbResults* results, std::unique_ptr<JsonValue>& result, CodeFormatter& formatter)
+bool GetVarCreateResult(GdbResults* results, std::unique_ptr<JsonValue>& result)
 {
     try
     {
-        result.reset(results->ToJson());
+        JsonObject* resultObject = new JsonObject();
+        resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+        resultObject->AddField(U"variable", std::unique_ptr<JsonValue>(results->ToJson()));
+        result.reset(resultObject); 
         return true;
     }
     catch (const std::exception& ex)
     {
-        formatter.WriteLine("error getting var create results: " + std::string(ex.what()));
+        JsonObject* resultObject = new JsonObject();
+        resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
+        resultObject->AddField(U"error", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
+        result.reset(resultObject);
     }
     return false;
 }
 
-bool GetVarEvaluateResult(GdbResults* results, std::unique_ptr<JsonValue>& result, CodeFormatter& formatter)
+bool GetVarEvaluateResult(GdbResults* results, std::unique_ptr<JsonValue>& result)
 {
     try
     {
-        result.reset(results->ToJson());
+        JsonObject* resultObject = new JsonObject();
+        resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+        resultObject->AddField(U"variable", std::unique_ptr<JsonValue>(results->ToJson()));
+        result.reset(resultObject);
         return true;
     }
     catch (const std::exception& ex)
     {
-        formatter.WriteLine("error getting var evaluate results: " + std::string(ex.what()));
+        JsonObject* resultObject = new JsonObject();
+        resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
+        resultObject->AddField(U"error", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
+        result.reset(resultObject);
     }
     return false;
 }
 
-bool GetVarListChildrenResult(GdbResults* results, std::unique_ptr<JsonValue>& result, CodeFormatter& formatter)
+DebuggerVariable::DebuggerVariable() : index(-1)
 {
-    try
-    {
-        result.reset(results->ToJson());
-        return true;
-    }
-    catch (const std::exception& ex)
-    {
-        formatter.WriteLine("error getting var list children results: " + std::string(ex.what()));
-    }
-    return false;
 }
 
+DebuggerVariable::DebuggerVariable(int index_, const std::string& gdbVarName_) : index(index_), gdbVarName(gdbVarName_)
+{
+}
 
 Debugger::Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_) :
     verbose(verbose_), formatter(formatter_), state(State::initializing), wasRunning(false), targetOutput(false), nextBreakpointNumber(1), nextTempBreakpointNumber(1),
@@ -422,7 +502,8 @@ Debugger::Debugger(const std::string& executable, const std::vector<std::string>
     if (verbose)
     {
         GdbReply* startReply = GetGDBStartReply();
-        startReply->Print(formatter);
+        std::unique_ptr<JsonValue> value = startReply->ToJson();
+        value->Write(formatter);
     }
     StartProgram();
 }
@@ -468,6 +549,7 @@ void Debugger::StartProgram()
     result.reset(new JsonObject());
     std::lock_guard<std::recursive_mutex> lock(outputMutex);
     Instruction* mainFunctionEntryInstruction = debugInfo->GetMainFunctionEntryInstruction();
+    debuggerBreakpointId.clear();
     GdbBreakpoint* bp = SetBreakpoint(mainFunctionEntryInstruction);
     if (bp != nullptr)
     {
@@ -579,8 +661,11 @@ Instruction* Debugger::GetInstructionForCppLocation(const std::string& cppFile, 
     }
     catch (const std::exception& ex)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.WriteLine("error getting C++ instruction for frame : cppFile=" + cppFile + ", cppLine=" + std::to_string(cppLine) + ": " + ex.what());
+        if (result && result->Type() == JsonValueType::object)
+        {
+            JsonObject* resultObject = static_cast<JsonObject*>(result.get());
+            resultObject->AddField(U"instGetError", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
+        }
     }
     return nullptr;
 }
@@ -601,7 +686,7 @@ void Debugger::SetState(State state_)
     state = state_;
 }
 
-std::string Debugger::StateStr(State state) const
+std::string Debugger::StateStr(State state) 
 {
     switch (state)
     {
@@ -610,6 +695,8 @@ std::string Debugger::StateStr(State state) const
         case State::running: return "running";
         case State::stopped: return "stopped";
         case State::programExitedNormally: return "program exited normally";
+        case State::programExited: return "program exited ";
+        case State::signalReceived: return "signal received";
         case State::exitingDebugger: return "exiting debugger";
     }
     return std::string();
@@ -621,10 +708,11 @@ std::string Debugger::GetNextTemporaryBreakpointId()
     return "t" + std::to_string(tempBpNumber);
 }
 
-std::string Debugger::GetNextGdbVariableName()
+DebuggerVariable Debugger::GetNextDebuggerVariable()
 {
     int index = nextGdbVariableIndex++;
-    return "v" + std::to_string(index);
+    std::string variableName = "v" + std::to_string(index);
+    return DebuggerVariable(index, variableName);
 }
 
 void Debugger::AddStopResultToResult()
@@ -634,13 +722,14 @@ void Debugger::AddStopResultToResult()
         if (result->Type() == JsonValueType::object)
         {
             JsonObject* resultObject = static_cast<JsonObject*>(result.get());
-            resultObject->AddField(U"state", std::move(stopResult));
+            resultObject->AddField(U"stopped", std::move(stopResult));
         }
     }
 }
 
 bool Debugger::Run()
 {
+    ClearBrowsingData();
     GdbExecRunCommand execRunCommand;
     bool succeeded = ExecuteGDBCommand(execRunCommand);
     return succeeded;
@@ -653,6 +742,7 @@ void Debugger::Help()
 
 void Debugger::Next()
 {
+    ClearBrowsingData();
     result.reset(new JsonObject());
     if (state != State::stopped && state != State::programStarted)
     {
@@ -718,8 +808,10 @@ void Debugger::Next()
         }
         else
         {
+            AddStopResultToResult();
             if (result)
             {
+                std::lock_guard<std::recursive_mutex> lock(outputMutex);
                 result->Write(formatter);
             }
         }
@@ -728,6 +820,7 @@ void Debugger::Next()
 
 void Debugger::Step()
 {
+    ClearBrowsingData();
     result.reset(new JsonObject());
     if (state != State::stopped && state != State::programStarted)
     {
@@ -813,6 +906,9 @@ void Debugger::Step()
         }
         else if (result)
         {
+            console.Reset();
+            Proceed();
+            std::lock_guard<std::recursive_mutex> lock(outputMutex);
             result->Write(formatter);
         }
     }
@@ -820,6 +916,7 @@ void Debugger::Step()
 
 void Debugger::Continue()
 {
+    ClearBrowsingData();
     result.reset(new JsonObject());
     if (state != State::stopped && state != State::programStarted)
     {
@@ -842,15 +939,27 @@ void Debugger::Continue()
                 }
             }
         }
+        else
+        {
+            std::lock_guard<std::recursive_mutex> lock(outputMutex);
+            AddStopResultToResult();
+            result->Write(formatter);
+            if (stoppedInstruction != nullptr)
+            {
+                stoppedInstruction->PrintSource(formatter);
+            }
+        }
     }
     else if (result)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         result->Write(formatter);
     }
 }
 
 void Debugger::Finish()
 {
+    ClearBrowsingData();
     result.reset(new JsonObject());
     if (state != State::stopped && state != State::programStarted)
     {
@@ -884,12 +993,14 @@ void Debugger::Finish()
     }
     else if (result)
     {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
         result->Write(formatter);
     }
 }
 
 void Debugger::Until(const SourceLocation& location)
 {
+    ClearBrowsingData();
     result.reset(new JsonObject());
     if (state != State::stopped && state != State::programStarted)
     {
@@ -965,19 +1076,30 @@ bool Debugger::Break(std::unique_ptr<DebuggerBreakpoint>&& bp, const std::vector
 
 void Debugger::Break(const SourceLocation& location) 
 {
+    JsonObject* resultObject = new JsonObject();
+    result.reset(resultObject);
     int breakpointNumber = GetNextBreakpointNumber();
+    debuggerBreakpointId = std::to_string(breakpointNumber);
     std::unique_ptr<DebuggerBreakpoint> bp(new DebuggerBreakpoint(std::to_string(breakpointNumber)));
     std::vector<Instruction*> instructions = debugInfo->GetSourceFileMap().GetInstructions(location);
     if (Break(std::move(bp), instructions))
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.WriteLine("breakpoint " + std::to_string(breakpointNumber) + " set to " + std::to_string(instructions.size()) +
-            " instructions at '" + instructions[0]->GetCmajorFrame().ToString(false) + "'");
+        JsonObject* breakpointObject = new JsonObject();
+        resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+        resultObject->AddField(U"breakpoint", std::unique_ptr<JsonValue>(breakpointObject));
+        breakpointObject->AddField(U"id", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(breakpointNumber)))));
+        breakpointObject->AddField(U"numInsts", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(instructions.size())))));
+        breakpointObject->AddField(U"location", std::unique_ptr<JsonValue>(instructions[0]->GetCmajorFrame().ToJson(false)));
     }
+    currentSourceFilePath = instructions[0]->GetCmajorFrame().file;
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
+    result->Write(formatter);
 }
 
 void Debugger::Delete(const std::string& breakpointId)
 {
+    JsonObject* resultObject = new JsonObject();
+    result.reset(resultObject);
     auto it = debuggerBreakpointMap.find(breakpointId);
     if (it != debuggerBreakpointMap.cend())
     {
@@ -1002,8 +1124,7 @@ void Debugger::Delete(const std::string& breakpointId)
         {
             delete bp;
             debuggerBreakpointMap.erase(breakpointId);
-            std::lock_guard<std::recursive_mutex> lock(outputMutex);
-            formatter.WriteLine("breakpoint " + breakpointId + " deleted");
+            resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
         }
         else
         {
@@ -1014,6 +1135,8 @@ void Debugger::Delete(const std::string& breakpointId)
     {
         throw std::runtime_error("error: breakpoint " + breakpointId + " not found");
     }
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
+    result->Write(formatter);
 }
 
 void Debugger::Depth()
@@ -1033,6 +1156,36 @@ void Debugger::Frames(int low, int high)
     result.reset(new JsonObject());
     GdbStackListFramesCommand stackListFrames(low, high);
     bool succeeded = ExecuteGDBCommand(stackListFrames);
+    if (succeeded)
+    {
+        if (result && result->Type() == JsonValueType::object)
+        {
+            JsonObject* resultObject = static_cast<JsonObject*>(result.get());
+            resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+        }
+    }
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
+    if (result)
+    {
+        result->Write(formatter);
+    }
+}
+
+void Debugger::ShowBreakpoint(int breakpointId)
+{
+    JsonObject* resultObject = new JsonObject();
+    result.reset(resultObject);
+    auto it = debuggerBreakpointMap.find(std::to_string(breakpointId));
+    if (it != debuggerBreakpointMap.cend())
+    {
+        resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+        DebuggerBreakpoint* bp = it->second;
+        resultObject->AddField(U"breakpoint", bp->ToJson());
+    }
+    else
+    {
+        throw std::runtime_error("breakpoint id '" + std::to_string(breakpointId) + "' not found");
+    }
     std::lock_guard<std::recursive_mutex> lock(outputMutex);
     if (result)
     {
@@ -1042,34 +1195,39 @@ void Debugger::Frames(int low, int high)
 
 void Debugger::ShowBreakpoints()
 {
-    std::lock_guard<std::recursive_mutex> lock(outputMutex);
+    JsonObject* resultObject = new JsonObject();
+    result.reset(resultObject);
+    JsonArray* breakpointsArray = new JsonArray();
     for (const auto& p : debuggerBreakpointMap)
     {
         DebuggerBreakpoint* bp = p.second;
-        formatter.WriteLine("breakpoint " + bp->Id() + ": " + std::to_string(bp->GdbBreakpointNumbers().size()) + " instructions at " + bp->GetFrame().ToString(false));
+        breakpointsArray->AddItem(bp->ToJson());
+    }
+    resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+    resultObject->AddField(U"breakpoints", std::unique_ptr<JsonValue>(breakpointsArray));
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
+    if (result)
+    {
+        result->Write(formatter);
     }
 }
 
 void Debugger::List(const SourceLocation& location)
 {
-    if (!location.IsEmpty() && (location.path != listLocation.path || location.line != 0))
+    SourceLocation loc = location;
+    if (loc.IsEmpty())
     {
-        if (!location.path.empty())
-        {
-            if (location.path != listLocation.path)
-            {
-                listLocation = location;
-            }
-        }
-        else if (location.line != 0)
-        {
-            listLocation.line = location.line;
-        }
+        loc = listLocation;
     }
-    std::string sourceFilePath = debugInfo->GetSourceFileMap().GetSourceFilePath(listLocation);
+    else if (loc.path == "*")
+    {
+        loc = SourceLocation(stoppedInstruction->GetCmajorFrame().file, std::max(1, stoppedInstruction->SourceLineNumber() - debugInfo->GetSourceFileWindowSize()));
+    }
+    std::string sourceFilePath = debugInfo->GetSourceFileMap().GetSourceFilePath(loc);
     SourceFile& sourceFile = debugInfo->GetSourceFileCache().GetSourceFile(sourceFilePath);
     std::lock_guard<std::recursive_mutex> lock(outputMutex);
-    sourceFile.Print(formatter, listLocation.line, stoppedInstruction, false);
+    sourceFile.Print(formatter, loc.line, stoppedInstruction, false);
+    listLocation = loc;
     listLocation.line = std::min(listLocation.line + 2 * debugInfo->GetSourceFileWindowSize(), int(sourceFile.Lines().size() + 1));
     currentSourceFilePath = listLocation.path;
 }
@@ -1080,50 +1238,7 @@ void Debugger::Print(const std::string& expression)
     {
         throw std::runtime_error("error: not stopped");
     }
-    DebugExprLexer lexer(ToUtf32(expression), "", 0);
-    std::unique_ptr<DebugExprNode> node = DebugExprParser::Parse(lexer);
-    DebugExprTranslatorVisitor translatorVisitor(debugInfo.get(), stoppedInstruction->GetScope());
-    node->Accept(translatorVisitor);
-    DINode* translatedNode = translatorVisitor.TranslatedNode();
-    if (translatedNode->IsTypeIdNode())
-    {
-        DIType* type = translatedNode->Type();
-        JsonObject* object = new JsonObject();
-        object->AddField(U"type", type->ToJson());
-        result.reset(object);
-    }
-    else
-    {
-        std::string gdbVariableName = GetNextGdbVariableName();
-        GdbVarCreateCommand varCreateCommand(gdbVariableName, "*", translatedNode->GdbExprString());
-        bool succeeded = ExecuteGDBCommand(varCreateCommand);
-        if (succeeded)
-        {
-            if (result)
-            {
-                DIType* type = translatedNode->Type();
-                if (result->Type() == JsonValueType::object)
-                {
-                    JsonObject* object = static_cast<JsonObject*>(result.get());
-                    DITypeRef typeRef(type);
-                    object->AddField(U"static_type", typeRef.ToJson());
-                }
-                if (type->GetKind() == DIType::Kind::pointerType || type->GetKind() == DIType::Kind::referenceType)
-                {
-                    if (result->Type() == JsonValueType::object)
-                    {
-                        DIType* dynamicType = GetDynamicType(type, translatedNode);
-                        if (dynamicType)
-                        {
-                            DITypeRef typeRef(dynamicType);
-                            JsonObject* object = static_cast<JsonObject*>(result.get());
-                            object->AddField(U"dynamic_type", typeRef.ToJson());
-                        }
-                    }
-                }
-            }
-        }
-    }
+    Evaluate(expression);
     std::lock_guard<std::recursive_mutex> lock(outputMutex);
     if (result)
     {
@@ -1131,13 +1246,13 @@ void Debugger::Print(const std::string& expression)
     }
 }
 
-DIType* Debugger::GetDynamicType(DIType* diType, DINode* diNode)
+DIType* Debugger::GetDynamicType(DIType* diType, BoundDebugNode* node)
 {
     if (diType->GetKind() == DIType::Kind::pointerType)
     {
         DIPointerType* pointerType = static_cast<DIPointerType*>(diType);
         DIType* pointedType = pointerType->PointedToType();
-        DIDerefNode derefNode(pointedType, diNode->Clone());
+        BoundDerefNode derefNode(pointedType, node->Clone(), nullptr);
         DIType* dynamicType = GetDynamicType(pointedType, &derefNode);
         if (dynamicType)
         {
@@ -1149,7 +1264,7 @@ DIType* Debugger::GetDynamicType(DIType* diType, DINode* diNode)
     {
         DIReferenceType* referenceType = static_cast<DIReferenceType*>(diType);
         DIType* referredType = referenceType->BaseType();
-        DIDerefNode derefNode(referredType, diNode->Clone());
+        BoundDerefNode derefNode(referredType, node->Clone(), nullptr);
         DIType* dynamicType = GetDynamicType(referredType, &derefNode);
         if (dynamicType)
         {
@@ -1161,7 +1276,7 @@ DIType* Debugger::GetDynamicType(DIType* diType, DINode* diNode)
     {
         DIConstType* constType = static_cast<DIConstType*>(diType);
         DIType* baseType = constType->BaseType();
-        DIType* dynamicType = GetDynamicType(baseType, diNode);
+        DIType* dynamicType = GetDynamicType(baseType, node);
         if (dynamicType)
         {
             DIType* cnstType = MakeConstType(dynamicType);
@@ -1177,27 +1292,36 @@ DIType* Debugger::GetDynamicType(DIType* diType, DINode* diNode)
             {
                 if (classType->VmtPtrIndex() != -1)
                 {
-                    DIDotNode vmtPtrMember(classType, diNode->Clone(), "m" + std::to_string(classType->VmtPtrIndex()), false);
-                    DIAddrOfNode vmtPtrAddr(classType, vmtPtrMember.Clone());
-                    std::string gdbVariableName = GetNextGdbVariableName();
-                    GdbVarCreateCommand varCreateCommand(gdbVariableName, "*", vmtPtrAddr.GdbExprString());
+                    std::string member = "m" + std::to_string(classType->VmtPtrIndex());
+                    std::string gdbExprString = node->GdbExprString() + "." + member;
+                    BoundDotNode vmtPtrMember(classType, node->Clone(), member, gdbExprString, nullptr);
+                    BoundAddrOfNode vmtPtrAddr(classType, vmtPtrMember.Clone(), nullptr);
+                    DebuggerVariable variable = GetNextDebuggerVariable();
+                    GdbVarCreateCommand varCreateCommand(variable.GdbVarName(), "*", vmtPtrAddr.GdbExprString());
                     std::unique_ptr<JsonValue> mainResult(result.release());
+                    result.reset(new JsonObject());
                     bool succeeded = ExecuteGDBCommand(varCreateCommand);
                     if (succeeded)
                     {
+                        AddDebuggerVariable(variable);
                         if (result->Type() == JsonValueType::object)
                         {
-                            JsonObject* resultObject = static_cast<JsonObject*>(result.get());
-                            JsonValue* value = resultObject->GetField(U"value");
-                            if (value && value->Type() == JsonValueType::string)
+                            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+                            JsonValue* variableValue = jsonObject->GetField(U"variable");
+                            if (variableValue && variableValue->Type() == JsonValueType::object)
                             {
-                                std::string vmtVarFieldStr = ToUtf8(static_cast<JsonString*>(value)->Value());
-                                std::string vmtVarName = ParseVmtVariableName(vmtVarFieldStr);
-                                if (!vmtVarName.empty())
+                                JsonObject* variableObject = static_cast<JsonObject*>(variableValue);
+                                JsonValue* value = variableObject->GetField(U"value");
+                                if (value && value->Type() == JsonValueType::string)
                                 {
-                                    DIType* dynamicType = debugInfo->GetPolymorphicType(vmtVarName);
-                                    result.reset(mainResult.release());
-                                    return dynamicType;
+                                    std::string vmtVarFieldStr = ToUtf8(static_cast<JsonString*>(value)->Value());
+                                    std::string vmtVarName = ParseVmtVariableName(vmtVarFieldStr);
+                                    if (!vmtVarName.empty())
+                                    {
+                                        DIType* dynamicType = debugInfo->GetPolymorphicType(vmtVarName);
+                                        result.reset(mainResult.release());
+                                        return dynamicType;
+                                    }
                                 }
                             }
                         }
@@ -1206,7 +1330,7 @@ DIType* Debugger::GetDynamicType(DIType* diType, DINode* diNode)
                 }
                 else if (!classType->BaseClassId().is_nil())
                 {
-                    return GetDynamicType(classType->BaseClassType(), diNode);
+                    return GetDynamicType(classType->BaseClassType(), node);
                 }
             }
         }
@@ -1214,11 +1338,68 @@ DIType* Debugger::GetDynamicType(DIType* diType, DINode* diNode)
     return nullptr;
 }
 
+void Debugger::AddDebuggerVariable(const DebuggerVariable& debuggerVariable)
+{
+    debuggerVariableMap[debuggerVariable.Index()] = debuggerVariable;
+}
+
+const DebuggerVariable* Debugger::GetDebuggerVariable(int index) const
+{
+    auto it = debuggerVariableMap.find(index);
+    if (it != debuggerVariableMap.cend())
+    {
+        return &it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+Container* Debugger::GetContainer(ContainerClassTemplateKind containerKind, const std::string& containerVarExpr)
+{
+    uint64_t address = GetContainerAddress(*this, containerKind, containerVarExpr);
+    if (address != 0)
+    {
+        auto it = containerMap.find(address);
+        if (it != containerMap.cend())
+        {
+            Container* container = it->second;
+            if (container->GetKind() == containerKind)
+            {
+                return container;
+            }
+        }
+    }
+    Container* container = CreateContainer(*this, containerKind, address);
+    if (address != 0)
+    {
+        containerMap[address] = container;
+    }
+    containers.push_back(std::unique_ptr<Container>(container));
+    return container;
+}
+
+void Debugger::ClearBrowsingData()
+{
+    for (auto& container : containers)
+    {
+        container->ClearBrowsingData();
+    }
+}
+
 void Debugger::RepeatLatestCommand()
 {
     if (latestCommand)
     {
-        latestCommand->Execute(*this);
+        if (latestCommand->GetKind() == DebuggerCommand::Kind::list)
+        {
+            List(SourceLocation());
+        }
+        else
+        {
+            latestCommand->Execute(*this);
+        }
     }
     else
     {
@@ -1240,6 +1421,29 @@ bool Debugger::IsStopInstruction(Instruction* instruction) const
     return true;
 }
 
+void Debugger::Evaluate(const std::string& expression)
+{
+    result.reset(new JsonObject());
+    DebugExprLexer lexer(ToUtf32(expression), "", 0);
+    std::unique_ptr<DebugExprNode> node = DebugExprParser::Parse(lexer);
+    DebugExprBinder binder(*this, debugInfo.get(), stoppedInstruction->GetScope());
+    node->Accept(binder);
+    BoundDebugExpression* boundExpression = binder.BoundExpression(node.get());
+    DebugExpressionEvaluator evaluator(*this, expression);
+    boundExpression->Accept(evaluator);
+    result.reset(evaluator.ReleaseResult());
+}
+
+DIType* Debugger::GetType(const std::string& expression)
+{
+    DebugExprLexer lexer(ToUtf32(expression), "", 0);
+    std::unique_ptr<DebugExprNode> node = DebugExprParser::Parse(lexer);
+    DebugExprBinder binder(*this, debugInfo.get(), stoppedInstruction->GetScope());
+    node->Accept(binder);
+    BoundDebugExpression* boundExpression = binder.BoundExpression(node.get());
+    return boundExpression->Type();
+}
+
 bool Debugger::ExecuteGDBCommand(const GdbCommand& command)
 {
     std::unique_ptr<GdbReply> reply = cmajor::debug::ExecuteGDBCommand(command, *this);
@@ -1259,12 +1463,6 @@ bool Debugger::ExecuteGDBCommand(const GdbCommand& command)
     if (resultRecord != nullptr)
     {
         succeeded = resultRecord->CommandSucceeded();
-    }
-    if (!succeeded)
-    {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("error executing GDB command '" + command.Str() + "': ");
-        resultRecord->Print(formatter);
     }
     return succeeded;
 }
@@ -1333,11 +1531,6 @@ void Debugger::ProcessReply(GdbCommand::Kind commandKind, GdbReply* reply)
             ProcessVarEvaluateReply(reply);
             break;
         }
-        case GdbCommand::Kind::varListChildren:
-        {
-            ProcessVarListChildrenReply(reply);
-            break;
-        }
     }
 }
 
@@ -1383,22 +1576,18 @@ void Debugger::ProcessReplyRecord(GdbReplyRecord* record)
 
 void Debugger::ProcessConsoleOutput(GdbConsoleOutputRecord* record)
 {
-    std::lock_guard<std::recursive_mutex> lock(outputMutex);
-    formatter.WriteLine("console output: " + record->Text());
     console.SetActive();
 }
 
 void Debugger::ProcessTargetOutput(GdbTargetOutputRecord* record)
 {
     std::lock_guard<std::recursive_mutex> lock(outputMutex);
-    formatter.WriteLine("target output: " + record->Text());
+    formatter.WriteLine(record->Text());
     console.SetActive();
 }
 
 void Debugger::ProcessLogOutput(GdbLogOutputRecord* record)
 {
-    std::lock_guard<std::recursive_mutex> lock(outputMutex);
-    formatter.WriteLine("log output: " + record->Text());
     console.SetActive();
 }
 
@@ -1416,7 +1605,7 @@ void Debugger::ProcessBreakInsertReply(GdbReply* reply)
                 std::string breakpointFile;
                 int breakpointLine = 0;
                 int breakpointNumber = -1;
-                if (GetBreakpointResults(results, breakpointFile, breakpointLine, breakpointNumber, formatter))
+                if (GetBreakpointResults(results, breakpointFile, breakpointLine, breakpointNumber, result))
                 {
                     Instruction* instruction = GetInstructionForCppLocation(breakpointFile, breakpointLine);
                     if (instruction)
@@ -1425,6 +1614,7 @@ void Debugger::ProcessBreakInsertReply(GdbReply* reply)
                         if (breakpoint)
                         {
                             breakpoint->SetNumber(breakpointNumber);
+                            breakpoint->SetDebuggerBreakpointId(debuggerBreakpointId);
                             gdbBreakpointsByNumber[breakpointNumber] = breakpoint;
                             success = true;
                         }
@@ -1435,9 +1625,12 @@ void Debugger::ProcessBreakInsertReply(GdbReply* reply)
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful break-insert command, reply: ");
-        reply->Print(formatter);
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-break-insert")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1454,9 +1647,12 @@ void Debugger::ProcessBreakDeleteReply(GdbReply* reply)
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful break-delete command, reply: ");
-        reply->Print(formatter);
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-break-delete")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1485,9 +1681,12 @@ void Debugger::ProcessExecRunReply(GdbReply* reply)
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful exec-run command, reply: ");
-        reply->Print(formatter);
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-exec-run")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1516,9 +1715,12 @@ void Debugger::ProcessExecContinueReply(GdbReply* reply)
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful exec-continue command, reply: ");
-        reply->Print(formatter);
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-exec-continue")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1547,9 +1749,12 @@ void Debugger::ProcessExecNextReply(GdbReply* reply)
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful exec-next command, reply: ");
-        reply->Print(formatter);
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-exec-next")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1578,9 +1783,12 @@ void Debugger::ProcessExecStepReply(GdbReply* reply)
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful exec-step command, reply: ");
-        reply->Print(formatter);
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-exec-step")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1609,9 +1817,12 @@ void Debugger::ProcessExecFinishReply(GdbReply* reply)
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful exec-finish command, reply: ");
-        reply->Print(formatter);
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-exec-finish")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1640,9 +1851,12 @@ void Debugger::ProcessExecUntilReply(GdbReply* reply)
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful exec-until command, reply: ");
-        reply->Print(formatter);
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-exec-until")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1659,9 +1873,12 @@ void Debugger::ProcessStackInfoDepthReply(GdbReply* reply)
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful stack-info-depth command, reply: ");
-        reply->Print(formatter);
+        if (result && result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-stack-info-depth")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1724,6 +1941,7 @@ void Debugger::ProcessStackListFramesReply(GdbReply* reply)
         result.reset(cppStackResult.release());
     }
 }
+
 void Debugger::ProcessVarCreateReply(GdbReply* reply)
 {
     bool success = false;
@@ -1732,14 +1950,17 @@ void Debugger::ProcessVarCreateReply(GdbReply* reply)
     {
         if (resultRecord->GetClass() == GdbResultRecord::Class::done)
         {
-            success = GetVarCreateResult(resultRecord->Results(), result, formatter);
+            success = GetVarCreateResult(resultRecord->Results(), result);
         }
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful var-create command, reply: ");
-        reply->Print(formatter);
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-var-create")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
     }
 }
 
@@ -1751,33 +1972,17 @@ void Debugger::ProcessVarEvaluateReply(GdbReply* reply)
     {
         if (resultRecord->GetClass() == GdbResultRecord::Class::done)
         {
-            success = GetVarEvaluateResult(resultRecord->Results(), result, formatter);
+            success = GetVarEvaluateResult(resultRecord->Results(), result);
         }
     }
     if (!success)
     {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful var-evaluate command, reply: ");
-        reply->Print(formatter);
-    }
-}
-
-void Debugger::ProcessVarListChildrenReply(GdbReply* reply)
-{
-    bool success = false;
-    cmajor::debug::GdbResultRecord* resultRecord = reply->GetResultRecord();
-    if (resultRecord)
-    {
-        if (resultRecord->GetClass() == GdbResultRecord::Class::done)
+        if (result->Type() == JsonValueType::object)
         {
-            success = GetVarListChildrenResult(resultRecord->Results(), result, formatter);
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-var-evaluate")));
+            jsonObject->AddField(U"reply", reply->ToJson());
         }
-    }
-    if (!success)
-    {
-        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-        formatter.Write("unsuccessful var-list-children command, reply: ");
-        reply->Print(formatter);
     }
 }
 
@@ -1789,7 +1994,7 @@ bool Debugger::ProcessExecStoppedRecord(GdbExecStoppedRecord* execStoppedRecord)
     if (results)
     {
         Frame cppFrame;
-        success = GetStoppedResults(results, stopObject, cppFrame);
+        success = GetStoppedResults(results, result, stopObject, cppFrame, *this);
         if (success)
         {
             JsonValue* reasonField = stopObject->GetField(U"reason");
@@ -1802,8 +2007,16 @@ bool Debugger::ProcessExecStoppedRecord(GdbExecStoppedRecord* execStoppedRecord)
             {
                 SetState(State::programExitedNormally);
             }
+            else if (reason == U"exited")
+            {
+                SetState(State::programExited);
+            }
             else
             {
+                if (reason == U"signal-received")
+                {
+                    SetState(State::signalReceived);
+                }
                 Instruction* instruction = debugInfo->GetInstruction(cppFrame, formatter);
                 if (instruction)
                 {
@@ -1828,6 +2041,11 @@ bool Debugger::ProcessExecStoppedRecord(GdbExecStoppedRecord* execStoppedRecord)
 void Debugger::Proceed()
 {
     console.Proceed();
+}
+
+void Debugger::ResetConsole()
+{
+    console.Reset();
 }
 
 DebuggerCommand::DebuggerCommand(Kind kind_) : kind(kind_)
@@ -1992,6 +2210,20 @@ DebuggerCommand* DebuggerDepthCommand::Clone()
     return new DebuggerDepthCommand();
 }
 
+DebuggerShowBreakpointCommand::DebuggerShowBreakpointCommand(int breakpointId_) : DebuggerCommand(Kind::showBreakpoint), breakpointId(breakpointId_)
+{
+}
+
+void DebuggerShowBreakpointCommand::Execute(Debugger& debugger)
+{
+    debugger.ShowBreakpoint(breakpointId);
+}
+
+DebuggerCommand* DebuggerShowBreakpointCommand::Clone()
+{
+    return new DebuggerShowBreakpointCommand(breakpointId);
+}
+
 DebuggerShowBreakpointsCommand::DebuggerShowBreakpointsCommand() : DebuggerCommand(Kind::showBreakpoints)
 {
 }
@@ -2082,7 +2314,11 @@ void RunDebuggerInteractive(const std::string& executable, const std::vector<std
             }
             catch (const std::exception& ex)
             {
-                formatter.WriteLine(ex.what());
+                JsonObject* result = new JsonObject();
+                result->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
+                result->AddField(U"error", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
+                result->Write(formatter);
+                debugger.ResetConsole();
                 debugger.Proceed();
             }
         }

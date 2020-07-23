@@ -765,7 +765,8 @@ void Context::SetCleanupBlock(BasicBlock* cleanupBlock)
 void Context::AddLocalVariable(const std::string& name, const boost::uuids::uuid& typeId, LocalInstruction* inst)
 {
     Scope* scope = currentFunction->GetScope(currentScopeId);
-    cmajor::debug::DIVariable* localVariable = new cmajor::debug::DIVariable();
+    cmajor::debug::DIVariable* localVariable = new cmajor::debug::DIVariable(cmajor::debug::DIVariable::Kind::localVariable);
+    localVariable->SetInitLineNumber(currentLineNumber);
     localVariable->SetName(name);
     inst->ObtainLocalName(*currentFunction);
     localVariable->SetIrName(inst->LocalName());

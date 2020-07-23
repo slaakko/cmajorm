@@ -10,6 +10,7 @@
 #include <cmajor/symbols/FileIndex.hpp>
 #include <cmajor/symbols/FunctionIndex.hpp>
 #include <cmajor/symbols/TypeIndex.hpp>
+#include <cmajor/cmdebug/Container.hpp>
 #ifdef _WIN32
 #include <cmajor/symbols/ResourceTable.hpp>
 #endif
@@ -23,6 +24,7 @@
 namespace cmajor { namespace symbols {
 
 SYMBOLS_API bool IsSystemModule(const std::u32string& moduleName);
+SYMBOLS_API cmajor::debug::ContainerClassTemplateKind GetContainerClassTemplateKind(const std::u32string& fullClassName);
 
 extern const char* cmajorModuleTag;
 

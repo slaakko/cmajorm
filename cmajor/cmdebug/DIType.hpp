@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_DEBUG_DITYPE_INCLUDED
 #define CMAJOR_DEBUG_DITYPE_INCLUDED
+#include <cmajor/cmdebug/Container.hpp>
 #include <cmajor/cmdebug/DIEnumConstant.hpp>
 #include <cmajor/cmdebug/DIVariable.hpp>
 #include <soulng/util/Json.hpp>
@@ -14,6 +15,8 @@
 namespace cmajor { namespace debug {
 
 using namespace soulng::util;
+
+class DebugInfo;
 
 class DEBUG_API Scope
 {
@@ -50,6 +53,8 @@ public:
     void SetId(const boost::uuids::uuid& id_);
     const std::string& Name() const { return name; }
     void SetName(const std::string& name_);
+    const std::string& IrName() const { return irName; }
+    void SetIrName(const std::string& irName_);
     static std::string KindStr(Kind kind);
     virtual Scope* GetScope();
     Project* GetProject() const { return project; }
@@ -59,6 +64,7 @@ private:
     Kind kind;
     boost::uuids::uuid id;
     std::string name;
+    std::string irName;
     Project* project;
 };
 
@@ -85,6 +91,7 @@ public:
     Kind GetPrimitiveTypeKind() const { return kind; }
     static std::string PrimitiveTypeKindStr(Kind kind);
     std::unique_ptr<JsonValue> ToJson() const override;
+    bool IsIntegerType() const;
 private:
     Kind kind;
 };
@@ -149,8 +156,6 @@ public:
     bool IsPolymorphic() const { return polymorphic; }
     void SetVmtPtrIndex(int32_t vmtPtrIndex_) { vmtPtrIndex = vmtPtrIndex_; }
     int32_t VmtPtrIndex() const { return vmtPtrIndex; }
-    void SetIrName(const std::string& irName_);
-    const std::string& IrName() const { return irName; }
     void SetVmtVariableName(const std::string& vmtVariableName_);
     const std::string& VmtVariableName() const { return vmtVariableName; }
     void Write(soulng::util::BinaryWriter& writer) override;
@@ -164,7 +169,6 @@ private:
     std::vector<std::unique_ptr<DIVariable>> memberVariables;
     bool polymorphic;
     int32_t vmtPtrIndex;
-    std::string irName;
     std::string vmtVariableName;
 };
 
@@ -174,11 +178,20 @@ public:
     DIClassTemplateSpecializationType();
     void SetPrimaryTypeId(const boost::uuids::uuid& primaryTypeId_);
     const boost::uuids::uuid& PrimaryTypeId() const { return primaryTypeId; }
+    void SetContainerClassTemplateKind(ContainerClassTemplateKind containerKind_) { containerKind = containerKind_; }
+    ContainerClassTemplateKind GetContainerClassTemplateKind() const { return containerKind; }
+    const boost::uuids::uuid& ValueTypeId() const { return valueTypeId; }
+    void SetValueTypeId(const boost::uuids::uuid& valueTypeId_);
+    void AddTemplateArgumentTypeId(const boost::uuids::uuid& templateArgumentTypeId);
+    const std::vector< boost::uuids::uuid>& TemplateArgumentTypeIds() const { return templateArgumentTypeIds; }
     void Write(soulng::util::BinaryWriter& writer) override;
     void Read(soulng::util::BinaryReader& reader) override;
     std::unique_ptr<JsonValue> ToJson() const override;
 private:
+    ContainerClassTemplateKind containerKind;
     boost::uuids::uuid primaryTypeId;
+    boost::uuids::uuid valueTypeId;
+    std::vector<boost::uuids::uuid> templateArgumentTypeIds;
 };
 
 class DEBUG_API DIDelegateType : public DIType

@@ -202,10 +202,6 @@ void ParseSourceFile(ParserData* parserData)
             }
             else
             {
-                if (Path::GetFileName(sourceFilePath) == "ustring.cm")
-                {
-                    int x = 0;
-                }
                 MappedInputFile sourceFile(sourceFilePath);
                 ParsingContext parsingContext;
                 int fileIndex = parserData->fileIndeces[index];
@@ -740,8 +736,11 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
         std::string libraryName = MakeGccLibraryName(libraryFilePath);
         libraryNames.insert(libraryName);
     }
-    std::string boostLibDir = GetFullPath(GetBoostLibDirFromCompilerConfigXml());
-    libraryDirectories.insert(boostLibDir);
+    std::string boostLibDir = GetBoostLibDirFromCompilerConfigXml();
+    if (!boostLibDir.empty())
+    {
+        libraryDirectories.insert(GetFullPath(boostLibDir));
+    }
     std::string libraryPathFlag;
     for (const std::string& arg : configuration.args)
     {

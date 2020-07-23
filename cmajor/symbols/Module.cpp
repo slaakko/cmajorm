@@ -95,6 +95,62 @@ bool IsSystemModule(const std::u32string& moduleName)
     return SystemModuleSet::Instance().IsSystemModule(moduleName);
 }
 
+class ContainerClassTemplateMap
+{
+public:
+    static void Init();
+    static void Done();
+    static ContainerClassTemplateMap& Instance() { Assert(instance, "container class template map not initialized"); return *instance; }
+    cmajor::debug::ContainerClassTemplateKind GetContainerClassTemplateKind(const std::u32string& fullClassName) const;
+private:
+    static std::unique_ptr<ContainerClassTemplateMap> instance;
+    std::unordered_map<std::u32string, cmajor::debug::ContainerClassTemplateKind> containerClassTemplateMap;
+    ContainerClassTemplateMap();
+};
+
+void ContainerClassTemplateMap::Init()
+{
+    instance.reset(new ContainerClassTemplateMap());
+}
+
+void ContainerClassTemplateMap::Done()
+{
+    instance.reset();
+}
+
+std::unique_ptr<ContainerClassTemplateMap> ContainerClassTemplateMap::instance;
+
+ContainerClassTemplateMap::ContainerClassTemplateMap()
+{
+    containerClassTemplateMap[U"System.Collections.ForwardList<T>"] = cmajor::debug::ContainerClassTemplateKind::forwardList;
+    containerClassTemplateMap[U"System.Collections.HashMap<K, T, H, C>"] = cmajor::debug::ContainerClassTemplateKind::hashMap;
+    containerClassTemplateMap[U"System.Collections.HashSet<T, H, C>"] = cmajor::debug::ContainerClassTemplateKind::hashSet;
+    containerClassTemplateMap[U"System.Collections.LinkedList<T>"] = cmajor::debug::ContainerClassTemplateKind::linkedList;
+    containerClassTemplateMap[U"System.Collections.List<T>"] = cmajor::debug::ContainerClassTemplateKind::list;
+    containerClassTemplateMap[U"System.Collections.Map<Key, Value, KeyCompare>"] = cmajor::debug::ContainerClassTemplateKind::map;
+    containerClassTemplateMap[U"System.Collections.Queue<T>"] = cmajor::debug::ContainerClassTemplateKind::queue;
+    containerClassTemplateMap[U"System.Collections.Set<T, C>"] = cmajor::debug::ContainerClassTemplateKind::set;
+    containerClassTemplateMap[U"System.Collections.Stack<T>"] = cmajor::debug::ContainerClassTemplateKind::stack;
+}
+
+cmajor::debug::ContainerClassTemplateKind ContainerClassTemplateMap::GetContainerClassTemplateKind(const std::u32string& fullClassName) const
+{
+    auto it = containerClassTemplateMap.find(fullClassName);
+    if (it != containerClassTemplateMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return cmajor::debug::ContainerClassTemplateKind::notContainerClassTemplate;
+    }
+}
+
+cmajor::debug::ContainerClassTemplateKind GetContainerClassTemplateKind(const std::u32string& fullClassName)
+{
+    return ContainerClassTemplateMap::Instance().GetContainerClassTemplateKind(fullClassName);
+}
+
 const char* cmajorModuleTag = "CMM";
 
 ModuleTag::ModuleTag()
@@ -1602,7 +1658,7 @@ void Module::WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Modu
                 cmajor::debug::WriteScopeRecord(cmdbWriter, scopeId, parentScopeId, numLocalVariables);
                 for (int32_t i = 0; i < numLocalVariables; ++i)
                 {
-                    cmajor::debug::DIVariable variable;
+                    cmajor::debug::DIVariable variable(cmajor::debug::DIVariable::Kind::localVariable);
                     variable.Read(cudiReader);
                     variable.Write(cmdbWriter);
                 }
@@ -1692,10 +1748,12 @@ void InitModule()
 {
     sngcm::ast::SetModuleVersionTagVerifier(&verifier);
     SystemModuleSet::Init();
+    ContainerClassTemplateMap::Init();
 }
 
 void DoneModule()
 {
+    ContainerClassTemplateMap::Done();
     SystemModuleSet::Done();
 }
 

@@ -10,25 +10,26 @@ namespace DebugExprTokens
 
     void InitTokenIdMap()
     {
+        tokenIdMap[U"ADDRESS"] = 7;
         tokenIdMap[U"AMP"] = 9;
         tokenIdMap[U"AST"] = 8;
-        tokenIdMap[U"BASE"] = 4;
-        tokenIdMap[U"CAST"] = 2;
-        tokenIdMap[U"COMMA"] = 17;
-        tokenIdMap[U"DOT"] = 16;
-        tokenIdMap[U"ID"] = 5;
-        tokenIdMap[U"INTEGER"] = 6;
-        tokenIdMap[U"LANGLE"] = 12;
-        tokenIdMap[U"LBRACKET"] = 14;
-        tokenIdMap[U"LPAREN"] = 10;
-        tokenIdMap[U"MINUS"] = 19;
-        tokenIdMap[U"PLUS"] = 18;
-        tokenIdMap[U"RANGE"] = 1;
-        tokenIdMap[U"RANGLE"] = 13;
-        tokenIdMap[U"RBRACKET"] = 15;
-        tokenIdMap[U"RPAREN"] = 11;
-        tokenIdMap[U"STRING"] = 7;
-        tokenIdMap[U"TYPEID"] = 3;
+        tokenIdMap[U"BASE"] = 3;
+        tokenIdMap[U"CAST"] = 1;
+        tokenIdMap[U"COMMA"] = 18;
+        tokenIdMap[U"DOLLAR"] = 10;
+        tokenIdMap[U"DOT"] = 17;
+        tokenIdMap[U"ID"] = 4;
+        tokenIdMap[U"INTEGER"] = 5;
+        tokenIdMap[U"LANGLE"] = 13;
+        tokenIdMap[U"LBRACKET"] = 15;
+        tokenIdMap[U"LPAREN"] = 11;
+        tokenIdMap[U"MINUS"] = 20;
+        tokenIdMap[U"PLUS"] = 19;
+        tokenIdMap[U"RANGLE"] = 14;
+        tokenIdMap[U"RBRACKET"] = 16;
+        tokenIdMap[U"RPAREN"] = 12;
+        tokenIdMap[U"STRING"] = 6;
+        tokenIdMap[U"TYPEID"] = 2;
     }
 
     int GetTokenId(const std::u32string& tokenName)
@@ -47,15 +48,16 @@ namespace DebugExprTokens
     const char* tokenName[] =
     {
         "END",
-        "RANGE",
         "CAST",
         "TYPEID",
         "BASE",
         "ID",
         "INTEGER",
         "STRING",
+        "ADDRESS",
         "AST",
         "AMP",
+        "DOLLAR",
         "LPAREN",
         "RPAREN",
         "LANGLE",
@@ -76,15 +78,16 @@ namespace DebugExprTokens
     const char* tokenInfo[] =
     {
         "end of file",
-        "'range'",
         "'cast'",
         "'typeid'",
         "'base'",
         "id",
         "'integer'",
         "'string'",
+        "'address'",
         "'*'",
         "'&'",
+        "'$'",
         "'('",
         "')'",
         "'<'",

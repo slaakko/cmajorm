@@ -1639,6 +1639,16 @@ void Emitter::EndScope()
     context->EndScope();
 }
 
+int16_t Emitter::GetCurrentScopeId() const
+{
+    return context->CurrentScopeId();
+}
+
+void Emitter::SetCurrentScopeId(int16_t scopeId)
+{
+    context->SetCurrentScopeId(scopeId);
+}
+
 void Emitter::AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject)
 {
     context->AddLocalVariable(localVariableName, typeId, static_cast<cmcppi::LocalInstruction*>(irObject));

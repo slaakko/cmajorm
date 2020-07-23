@@ -10,7 +10,6 @@ namespace DebugExprKeywords
 
     Keyword keywords[] =
     {
-        {U"range", RANGE}, 
         {U"cast", CAST}, 
         {U"typeid", TYPEID}, 
         {U"base", BASE},

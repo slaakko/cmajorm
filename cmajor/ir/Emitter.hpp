@@ -331,6 +331,8 @@ public:
     virtual void SetFunctionName(const std::string& functionName) = 0;
     virtual void BeginScope() = 0;
     virtual void EndScope() = 0;
+    virtual int16_t GetCurrentScopeId() const = 0;
+    virtual void SetCurrentScopeId(int16_t scopeId) = 0;
     virtual void AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject) = 0;
     virtual void BeginInstructionFlag(int16_t flag) = 0;
     virtual void EndInstructionFlag(int16_t flag) = 0;

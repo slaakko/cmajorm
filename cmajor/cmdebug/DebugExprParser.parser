@@ -19,11 +19,28 @@ parser api(DEBUG_API) DebugExprParser
         ::= PrefixDebugExpr:expr{ return expr; }
         ;
 
+    AdditiveDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr, var cmajor::debug::Operator op) : cmajor::debug::DebugExprNode*
+        ::=
+        (   PrefixDebugExpr:left{ expr.reset(left); }
+            (   (PLUS{ op = cmajor::debug::Operator::plus; } | MINUS{ op = cmajor::debug::Operator::minus; })
+                PrefixDebugExpr:right
+                {
+                    switch (op)
+                    {
+                        case cmajor::debug::Operator::plus: expr.reset(new cmajor::debug::AddDebugExprNode(expr.release(), right); break;
+                        case cmajor::debug::Operator::minus: expr.reset(new cmajor::debug::SubDebugExprNode(expr.release(), right); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
     PrefixDebugExpr : cmajor::debug::DebugExprNode*
         ::= AST PrefixDebugExpr:derefOperand{ return new cmajor::debug::DerefDebugExprNode(derefOperand); }
         |   AMP PrefixDebugExpr: addrOfOperand{ return new cmajor::debug::AddrOfDebugExprNode(addrOfOperand); }
-        |   MINUS PrefixDebugExpr:unaryMinusOperand{ return new cmajor::debug::UnaryMinusDebugExprNode(unaryMinusOperand);  }
-        |   PLUS PrefixDebugExpr:unaryPlusOperand{ return new cmajor::debug::UnaryPlusDebugExprNode(unaryPlusOperand); }
         |   PostfixDebugExpr:postfix{ return postfix; }
         ;
 
@@ -32,6 +49,7 @@ parser api(DEBUG_API) DebugExprParser
         (   PrimaryDebugExpr:primary{ expr.reset(primary); }
             (   DOT ID{ expr.reset(new cmajor::debug::DotDebugExprNode(expr.release(), ToUtf8(lexer.GetToken(pos).match.ToString()))); }
             |   DOT BASE{ expr.reset(new cmajor::debug::DotDebugExprNode(expr.release(), "base")); }
+            |   LBRACKET DebugExpr:rangeStart COMMA DebugExpr:rangeEnd RBRACKET{ expr.reset(new cmajor::debug::RangeDebugExprNode(expr.release(), rangeStart, rangeEnd)); }
             |   LBRACKET DebugExpr:index RBRACKET{ expr.reset(new cmajor::debug::SubscriptDebugExprNode(expr.release(), index)); }
             )*
         )
@@ -41,11 +59,13 @@ parser api(DEBUG_API) DebugExprParser
         ;
 
     PrimaryDebugExpr : cmajor::debug::DebugExprNode*
-        ::= ID{ return new cmajor::debug::VariableNameDebugExprNode(ToUtf8(lexer.GetToken(pos).match.ToString())); }
+        ::= ID{ return new cmajor::debug::IdentifierDebugExprNode(ToUtf8(lexer.GetToken(pos).match.ToString())); }
         |   INTEGER{ return new cmajor::debug::IntegerDebugExprNode(cmajor::debug::ParseLong(ToUtf8(lexer.GetToken(pos).match.ToString()))); }
+        |   ADDRESS{ return new cmajor::debug::AddressDebugExprNode(ToUtf8(lexer.GetToken(pos).match.ToString())); }
         |   LPAREN DebugExpr:expr RPAREN{ return new cmajor::debug::ParenthesizedDebugExprNode(expr); }
         |   TypeIdExpr:typeExpr{ return typeExpr; }
         |   CastDebugExpr:castExpr{ return castExpr; }
+        |   DebuggerVarExpr:debuggerVarExpr{ return debuggerVarExpr; }
         ;
 
     CastDebugExpr : cmajor::debug::DebugExprNode*
@@ -57,6 +77,10 @@ parser api(DEBUG_API) DebugExprParser
         {
             return new cmajor::debug::TypeIdDebugExprNode(typeId);
         }
+        ;
+
+    DebuggerVarExpr : cmajor::debug::DebugExprNode*
+        ::= DOLLAR INTEGER{ std::string indexStr = ToUtf8(lexer.GetToken(pos).match.ToString()); return new cmajor::debug::DebuggerVarExprNode(cmajor::debug::ParseInt(indexStr)); }
         ;
 }
 

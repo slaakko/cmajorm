@@ -27,6 +27,7 @@ public:
     virtual bool TargetWasRunning() const = 0;
     virtual bool TargetOutput() const = 0;
     virtual void Proceed() = 0;
+    virtual void ResetConsole() = 0;
     virtual bool Exiting() const = 0;
     virtual void Exit() = 0;
     virtual void Prompt() = 0;
@@ -48,7 +49,7 @@ public:
         exit, breakInsert, breakDelete, execContinue, execFinish, execNext, execStep, execUntil, execRun, stackInfoDepth, stackListFrames,
         varCreate, varDelete, varSetFormat, varShowFormat, varInfoNumChildren, varListChildren, varInfoType, varInfoExpression,
         varInfoPathExpression, varShowAttributes, varEvaluateExpression, varAssign, varUpdate, varSetFrozen, varSetUpdateRange,
-        varSetVisualizer
+        varSetVisualizer, print
     };
     GdbCommand(Kind kind_, const std::string& str_);
     GdbCommand(const GdbCommand&) = delete;
@@ -225,6 +226,12 @@ public:
     GdbVarSetVisualizerCommand(const std::string& name, const std::string& visualizer);
 };
 
+class DEBUG_API GdbPrintCommand : public GdbCommand
+{
+public:
+    GdbPrintCommand(const std::string& expression);
+};
+
 class DEBUG_API GdbValue
 {
 public:
@@ -239,8 +246,6 @@ public:
     GdbValue& operator=(GdbValue&&) = delete;
     virtual ~GdbValue();
     Kind GetKind() const { return kind; }
-    virtual void Print(CodeFormatter& formatter) = 0;
-    virtual std::string ToString() const = 0;
     virtual JsonValue* ToJson() const = 0;
 private:
     Kind kind;
@@ -251,8 +256,6 @@ class DEBUG_API GdbStringValue : public GdbValue
 public:
     GdbStringValue(const std::string& value_);
     const std::string& Value() const { return value; }
-    void Print(CodeFormatter& formatter) override;
-    std::string ToString() const override;
     JsonValue* ToJson() const override;
 private:
     std::string value;
@@ -270,8 +273,6 @@ public:
     GdbTupleValue& operator=(GdbTupleValue&&) = delete;
     void AddResult(GdbResult* result);
     const std::vector<std::unique_ptr<GdbResult>>& Results() const { return results; }
-    void Print(CodeFormatter& formatter) override;
-    std::string ToString() const override;
     JsonValue* ToJson() const override;
     GdbValue* GetField(const std::string& fieldName) const;
 private:
@@ -289,8 +290,6 @@ public:
     GdbListValue& operator=(GdbListValue&&) = delete;
     void AddValue(GdbValue* value);
     const std::vector<std::unique_ptr<GdbValue>>& Values() const { return values; }
-    void Print(CodeFormatter& formatter) override;
-    std::string ToString() const override;
     JsonValue* ToJson() const override;
     int Count() const { return values.size(); }
     GdbValue* GetValue(int index) const;
@@ -306,10 +305,8 @@ public:
     GdbResult(GdbResult&&) = delete;
     GdbResult& operator=(const GdbResult&) = delete;
     GdbResult& operator=(GdbResult&&) = delete;
-    void Print(CodeFormatter& formatter);
     const std::string& Name() const { return name; }
     GdbValue* Value() const { return value.get(); }
-    std::string ToString() const override;
     JsonValue* ToJson() const override;
     void AddJsonValueTo(JsonObject* jsonObject);
 private:
@@ -326,11 +323,10 @@ public:
     GdbResults& operator=(const GdbResults&) = delete;
     GdbResults& operator=(GdbResults&&) = delete;
     void Add(GdbResult* result);
-    void Print(CodeFormatter& formatter);
     int Count() const { return results.size(); }
     GdbResult* operator[](int index) const { return results[index].get(); }
     GdbValue* GetField(const std::string& fieldName) const;
-    JsonValue* ToJson() const;
+    std::unique_ptr<JsonValue> ToJson() const;
 private:
     std::vector<std::unique_ptr<GdbResult>> results;
     std::unordered_map<std::string, GdbValue*> fieldMap;
@@ -351,9 +347,9 @@ public:
     GdbReplyRecord& operator=(GdbReplyRecord&&) = delete;
     virtual ~GdbReplyRecord();
     Kind GetKind() const { return kind; }
-    virtual void Print(CodeFormatter& formatter);
     virtual bool Stopped() const { return false; }
     virtual bool CommandSucceeded() const { return kind != Kind::parsingError; }
+    virtual std::unique_ptr<JsonValue> ToJson() const;
     GdbResults* Results() const { return results.get(); }
 private:
     Kind kind;
@@ -369,9 +365,9 @@ public:
     };
     GdbResultRecord(Class cls, GdbResults* results);
     const char* ClassStr() const;
-    void Print(CodeFormatter& formatter) override;
     bool CommandSucceeded() const override { return cls != Class::error; }
     Class GetClass() const { return cls; }
+    std::unique_ptr<JsonValue> ToJson() const override;
 private:
     Class cls;
 };
@@ -400,8 +396,6 @@ class DEBUG_API GdbErrorRecord : public GdbResultRecord
 public:
     GdbErrorRecord(GdbResults* results);
     bool Stopped() const override { return true; }
-    std::string Msg() const;
-    std::string Code() const;
 };
 
 class DEBUG_API GdbExitRecord : public GdbResultRecord
@@ -440,7 +434,7 @@ class DEBUG_API GdbNotifyAsyncRecord : public GdbAsyncRecord
 {
 public:
     GdbNotifyAsyncRecord(const std::string& notification_, GdbResults* results);
-    void Print(CodeFormatter& formatter);
+    std::unique_ptr<JsonValue> ToJson() const override;
 private:
     std::string notification;
 };
@@ -450,7 +444,7 @@ class DEBUG_API GdbStreamRecord : public GdbReplyRecord
 public:
     GdbStreamRecord(Kind kind, const std::string& text_);
     const std::string& Text() const { return text; }
-    void Print(CodeFormatter& formatter) override;
+    std::unique_ptr<JsonValue> ToJson() const override;
 private:
     std::string text;
 };
@@ -484,7 +478,6 @@ class DEBUG_API GdbParsingError : public GdbReplyRecord
 public:
     GdbParsingError(const std::string& parsingError_);
     const std::string& ParsingError() const { return parsingError; }
-    void Print(CodeFormatter& formatter) override;
 private:
     std::string parsingError;
 };
@@ -502,7 +495,7 @@ public:
     const std::vector<std::string>& TextLines() const { return textLines; }
     void AddReplyRecord(std::unique_ptr<GdbReplyRecord>&& replyRecord);
     const std::vector<std::unique_ptr<GdbReplyRecord>>& ReplyRecords() const { return replyRecords; }
-    void Print(CodeFormatter& formatter);
+    std::unique_ptr<JsonValue> ToJson() const;
     GdbResultRecord* GetResultRecord() const { return resultRecord; }
     GdbReplyRecord* GetStoppedRecord() const { return stoppedRecord; }
 private:

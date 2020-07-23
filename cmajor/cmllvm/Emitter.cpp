@@ -228,6 +228,15 @@ void Emitter::EndScope()
 {
 }
 
+int16_t Emitter::GetCurrentScopeId() const
+{
+    return 0;
+}
+
+void Emitter::SetCurrentScopeId(int16_t scopeId)
+{
+}
+
 void Emitter::AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject)
 {
 }

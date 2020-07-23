@@ -170,6 +170,7 @@ private:
     int tryIndex;
     int32_t prevLineNumber;
     std::set<FunctionSymbol*> compileUnitFunctions;
+    std::unordered_map<BoundCompoundStatement*, int16_t> scopeIdMap;
 };
 
 } } // namespace cmajor::codegencpp

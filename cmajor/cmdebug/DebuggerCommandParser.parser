@@ -29,6 +29,7 @@ parser api(DEBUG_API) DebuggerCommandParser
         |   DebuggerDeleteCommand:deleteCommand{ return deleteCommand; }
         |   DebuggerDepthCommand:depthCommand{ return depthCommand; }
         |   DebuggerFramesCommand:framesCommand{ return framesCommand; }
+        |   DebuggerShowBreakpointCommand:showBreakpointCommand{ return showBreakpointCommand; }
         |   DebuggerShowBreakpointsCommand:showBreakpointsCommand{ return showBreakpointsCommand; }
         |   DebuggerListCommand(currentSourceFilePath):listCommand{ return listCommand; }
         |   DebuggerPrintCommand:printCommand{ return printCommand; }
@@ -90,12 +91,22 @@ parser api(DEBUG_API) DebuggerCommandParser
         }
         ;
 
+    DebuggerShowBreakpointCommand(var int breakpointId) : cmajor::debug::DebuggerCommand*
+        ::= SHOW BREAKPOINT INTEGER{ std::string idStr = ToUtf8(lexer.GetToken(pos).match.ToString()); breakpointId = cmajor::debug::ParseInt(idStr); } NL
+        {
+            return new cmajor::debug::DebuggerShowBreakpointCommand(breakpointId);
+        }
+        ;
+
     DebuggerShowBreakpointsCommand : cmajor::debug::DebuggerCommand*
         ::= SHOW BREAKPOINTS NL{ return new cmajor::debug::DebuggerShowBreakpointsCommand(); }
         ;
 
     DebuggerListCommand(std::string* currentSourceFilePath, var cmajor::debug::SourceLocation location) : cmajor::debug::DebuggerCommand*
-        ::= LIST (SourceLocation(currentSourceFilePath):loc{ location = loc; })? NL{ return new cmajor::debug::DebuggerListCommand(location); }
+        ::= LIST (SourceLocation(currentSourceFilePath):loc{ location = loc; } | AST{ location = cmajor::debug::SourceLocation("*", 0); } | empty) NL
+        {
+            return new cmajor::debug::DebuggerListCommand(location);
+        }
         ;
 
     DebuggerPrintCommand(var bool first, var std::string expression) : cmajor::debug::DebuggerCommand*
@@ -130,7 +141,7 @@ parser api(DEBUG_API) DebuggerCommandParser
         ::=
         (
             (   PATH{ path = ToUtf8(lexer.GetToken(pos).match.ToString()); }
-                (COLON Line:ln{ line = ln; })?
+                (COLON Line:ln{ line = ln; } | empty{ line = 1; })
             )
         |   Line:lineNo{ path = *currentSourceFilePath; line = lineNo; }
         )

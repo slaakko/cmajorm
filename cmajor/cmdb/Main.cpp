@@ -24,12 +24,19 @@ struct InitDone
 
 using namespace soulng::util;
 
+const char* version = "3.6.0";
+
 void PrintHelp()
 {
-
+    std::cout << "Usage: cmdb [options] EXECUTABLE[.exe] [ ARGS... ]" << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "--help | -h" << std::endl;
+    std::cout << "  Print help and exit." << std::endl;
+    std::cout << "--verbose | -v" << std::endl;
+    std::cout << "  Be verbose." << std::endl;
+    std::cout << "--debug | -d" << std::endl;
+    std::cout << "  Debug the debugger." << std::endl;
 }
-
-const char* version = "3.6.0";
 
 int main(int argc, const char** argv)
 {

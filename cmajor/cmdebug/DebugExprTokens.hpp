@@ -9,25 +9,26 @@
 namespace DebugExprTokens
 {
     const int END = 0;
-    const int RANGE = 1;
-    const int CAST = 2;
-    const int TYPEID = 3;
-    const int BASE = 4;
-    const int ID = 5;
-    const int INTEGER = 6;
-    const int STRING = 7;
+    const int CAST = 1;
+    const int TYPEID = 2;
+    const int BASE = 3;
+    const int ID = 4;
+    const int INTEGER = 5;
+    const int STRING = 6;
+    const int ADDRESS = 7;
     const int AST = 8;
     const int AMP = 9;
-    const int LPAREN = 10;
-    const int RPAREN = 11;
-    const int LANGLE = 12;
-    const int RANGLE = 13;
-    const int LBRACKET = 14;
-    const int RBRACKET = 15;
-    const int DOT = 16;
-    const int COMMA = 17;
-    const int PLUS = 18;
-    const int MINUS = 19;
+    const int DOLLAR = 10;
+    const int LPAREN = 11;
+    const int RPAREN = 12;
+    const int LANGLE = 13;
+    const int RANGLE = 14;
+    const int LBRACKET = 15;
+    const int RBRACKET = 16;
+    const int DOT = 17;
+    const int COMMA = 18;
+    const int PLUS = 19;
+    const int MINUS = 20;
 
     DEBUG_API void InitTokenIdMap();
     DEBUG_API int GetTokenId(const std::u32string& tokenName);

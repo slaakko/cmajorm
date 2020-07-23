@@ -133,6 +133,8 @@ public:
     void SetCurrentLineNumber(int lineNumber);
     void BeginScope();
     void EndScope();
+    int16_t CurrentScopeId() const { return currentScopeId; }
+    void SetCurrentScopeId(int16_t scopeId) { currentScopeId = scopeId; }
     void BeginInstructionFlag(int16_t instructionFlag);
     void EndInstructionFlag(int16_t instructionFlag);
     void AddLineInfoScopeIdAndFlags(Instruction* inst);

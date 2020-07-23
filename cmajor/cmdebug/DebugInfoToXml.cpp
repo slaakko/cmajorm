@@ -37,6 +37,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(primitiveType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(primitiveType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(primitiveType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(primitiveType->Id())));
             break;
         }
@@ -45,6 +46,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIEnumType* enumType = static_cast<DIEnumType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(enumType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(enumType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(enumType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(enumType->Id())));
             typeElement->SetAttribute(U"underlyingTypeId", ToUtf32(boost::uuids::to_string(enumType->UnderlyingTypeId())));
             sngxml::dom::Element* enumConstantsElement = new sngxml::dom::Element(U"enumConstants");
@@ -74,6 +76,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIClassType* classType = static_cast<DIClassType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(classType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(classType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(classType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(classType->Id())));
             if (!classType->BaseClassId().is_nil())
             {
@@ -108,7 +111,6 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
                 typeElement->SetAttribute(U"polymorphic", U"true");
                 int32_t vmtPtrIndex = classType->VmtPtrIndex();
                 typeElement->SetAttribute(U"vmtPtrIndex", ToUtf32(std::to_string(vmtPtrIndex)));
-                typeElement->SetAttribute(U"irName", ToUtf32(classType->IrName()));
                 typeElement->SetAttribute(U"vmtVariableName", ToUtf32(classType->VmtVariableName()));
             }
             break;
@@ -118,6 +120,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIClassTemplateSpecializationType* specializationType = static_cast<DIClassTemplateSpecializationType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(specializationType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(specializationType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(specializationType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(specializationType->Id())));
             boost::uuids::uuid primaryTypeId = specializationType->PrimaryTypeId();
             typeElement->SetAttribute(U"primaryTypeId", ToUtf32(boost::uuids::to_string(primaryTypeId)));
@@ -137,12 +140,25 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
                 }
                 typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(memberVariablesElement));
             }
+            if (specializationType->GetContainerClassTemplateKind() != ContainerClassTemplateKind::notContainerClassTemplate)
+            {
+                typeElement->SetAttribute(U"container", ToUtf32(ContainerName(specializationType->GetContainerClassTemplateKind())));
+                typeElement->SetAttribute(U"valueTypeId", ToUtf32(boost::uuids::to_string(specializationType->ValueTypeId())));
+            }
+            sngxml::dom::Element* templateArgumentTypesElement = new sngxml::dom::Element(U"templateArgumentTypes");
+            int32_t n = specializationType->TemplateArgumentTypeIds().size();
+            for (int32_t i = 0; i < n; ++i)
+            {
+                sngxml::dom::Element* templateArgumentTypeElement = new sngxml::dom::Element(U"templateArgumentType");
+                templateArgumentTypeElement->SetAttribute(U"templateArgumentTypeId", ToUtf32(boost::uuids::to_string(specializationType->TemplateArgumentTypeIds()[i])));
+                templateArgumentTypesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(templateArgumentTypeElement));
+            }
+            typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(templateArgumentTypesElement));
             if (specializationType->IsPolymorphic())
             {
                 typeElement->SetAttribute(U"polymorphic", U"true");
                 int32_t vmtPtrIndex = specializationType->VmtPtrIndex();
                 typeElement->SetAttribute(U"vmtPtrIndex", ToUtf32(std::to_string(vmtPtrIndex)));
-                typeElement->SetAttribute(U"irName", ToUtf32(specializationType->IrName()));
                 typeElement->SetAttribute(U"vmtVariableName", ToUtf32(specializationType->VmtVariableName()));
             }
             break;
@@ -152,6 +168,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIDelegateType* delegateType = static_cast<DIDelegateType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(delegateType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(delegateType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(delegateType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(delegateType->Id())));
             break;
         }
@@ -160,6 +177,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIClassDelegateType* classDelegateType = static_cast<DIClassDelegateType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(classDelegateType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(classDelegateType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(classDelegateType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(classDelegateType->Id())));
             break;
         }
@@ -168,6 +186,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIInterfaceType* interfaceType = static_cast<DIInterfaceType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(interfaceType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(interfaceType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(interfaceType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(interfaceType->Id())));
             break;
         }
@@ -176,6 +195,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIConstType* constType = static_cast<DIConstType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(constType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(constType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(constType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(constType->Id())));
             typeElement->SetAttribute(U"baseTypeId", ToUtf32(boost::uuids::to_string(constType->BaseTypeId())));
             break;
@@ -185,6 +205,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIReferenceType* referenceType = static_cast<DIReferenceType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(referenceType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(referenceType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(referenceType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(referenceType->Id())));
             typeElement->SetAttribute(U"baseTypeId", ToUtf32(boost::uuids::to_string(referenceType->BaseTypeId())));
             break;
@@ -194,6 +215,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIPointerType* pointerType = static_cast<DIPointerType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(pointerType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(pointerType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(pointerType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(pointerType->Id())));
             typeElement->SetAttribute(U"pointedTypeId", ToUtf32(boost::uuids::to_string(pointerType->PointedTypeId())));
             break;
@@ -203,6 +225,7 @@ sngxml::dom::Element* TypeToXmlElement(DIType* type)
             DIArrayType* arrayType = static_cast<DIArrayType*>(type);
             typeElement->SetAttribute(U"kind", ToUtf32(DIType::KindStr(arrayType->GetKind())));
             typeElement->SetAttribute(U"name", ToUtf32(arrayType->Name()));
+            typeElement->SetAttribute(U"irName", ToUtf32(arrayType->IrName()));
             typeElement->SetAttribute(U"id", ToUtf32(boost::uuids::to_string(arrayType->Id())));
             typeElement->SetAttribute(U"elementTypeId", ToUtf32(boost::uuids::to_string(arrayType->ElementTypeId())));
             typeElement->SetAttribute(U"size", ToUtf32(std::to_string(arrayType->Size())));
@@ -293,7 +316,7 @@ std::unique_ptr<sngxml::dom::Document> GetDebugInfoAsXml(const std::string& cmdb
                     scopeElement->SetAttribute(U"parentScopeId", ToUtf32(std::to_string(parentScopeId)));
                     for (int32_t i = 0; i < numLocalVariables; ++i)
                     {
-                        DIVariable localVariable;
+                        DIVariable localVariable(DIVariable::Kind::localVariable);
                         localVariable.Read(reader);
                         sngxml::dom::Element* localVariableElement = new sngxml::dom::Element(U"localVar");
                         localVariableElement->SetAttribute(U"name", ToUtf32(localVariable.Name()));

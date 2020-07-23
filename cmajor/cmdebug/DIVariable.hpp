@@ -23,8 +23,16 @@ class DIType;
 class DEBUG_API DIVariable
 {
 public:
-    DIVariable();
+    enum class Kind : int8_t
+    {
+        localVariable, memberVariable
+    };
+    DIVariable(Kind kind_);
     virtual ~DIVariable();
+    void SetInitLineNumber(int32_t initLineNumber_);
+    int32_t GetInitLineNumber() const { return initLineNumber; }
+    Kind GetKind() const { return kind; }
+    static std::string KindStr(Kind kind);
     void SetProject(Project* project_) { project = project_; }
     void Write(soulng::util::BinaryWriter& writer);
     void Read(soulng::util::BinaryReader& reader);
@@ -37,6 +45,8 @@ public:
     DIType* GetType() const;
     std::unique_ptr<JsonValue> ToJson() const;
 private:
+    Kind kind;
+    int32_t initLineNumber;
     std::string name;
     std::string irName;
     boost::uuids::uuid typeId;

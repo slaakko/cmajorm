@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Cmajor compiler with C++ backend</title>
+    <link rel="stylesheet" type="text/css" href="../../style/tool.css" />
+</head>
+<body>
+    <h1>Cmajor compiler with C++ backend</h1>
+    
+    <p>
+        The Cmajor compiler with C++ backend, cppcmc, is a command-line Cmajor compiler for Windows, Linux and Windows subsystem for Linux.
+        It compiles Cmajor code to very primitive C++ and then launches the configured C++ compiler to compile to native machine code.
+        The compiler also generates a debug information file, x.cmdb, associated with the executable x. 
+        The cmdb file is read by the Cmajor command-line debugger, <a href="../cmdb/cmdb.html">cmdb</a>.
+        The compiler and the debugger are not yet integrated to any graphical editor or development environment, 
+        but as of this writing it is planned to do so on Windows platform.
+    </p>
+    
+    <h2>1. Requirements</h2>
+    
+    <ul>
+        <li>
+            GNU C++ compiler and tools installed. 
+            <strong>cppcmc</strong> uses g++ and ar that are expected to be found from PATH.
+            <ul>
+                <li>
+                    Windows:
+                    I have used <a href="http://mingw-w64.org/doku.php/download">MinGW-W64-builds</a> toolchain:
+                    g++ version 8.1.0.
+                    After installing insert the <strong>bin</strong> subdirectory of the <strong>mingw64</strong> directory to PATH.
+                </li>
+                <li>
+                    Linux/WSL: I have used g++ version 7.5.0 installed using Ubuntu package manager (sudo apt-get install g++).
+                </li>
+            </ul>
+        <li>
+            <a href="https://www.boost.org/">Boost</a> libraries built using g++. <strong>cppcmc</strong> is not very picky about the exact Boost version. I would say version 1.65 or later.
+            <ul>
+                <li>
+                    Windows:
+                    I have built Boost version 1.73 libraries with MinGW-w64 using these instructions:
+                    <a href="https://gist.github.com/zrsmithson/0b72e0cb58d0cb946fc48b5c88511da8">Installing boost on Windows using MinGW-w64 (gcc 64-bit)</a>.
+                    After installing Boost, you will need to configure the path to the Boost library directory for cppcmc.
+                    It is in <strong>C:\cmajor\config\compiler&#8209;config.xml</strong> (or %CMAJOR_ROOT%\config\compiler&#8209;config.xml),
+                    as the value of <strong>libraryDir</strong> attribute of the <strong>/compiler/windows/gcc/boost</strong> element. 
+                    I have Boost libraries installed to <strong>C:\mingw-boost\lib</strong> directory 
+                    that is the default value of the <strong>libraryDir</strong> attribute.
+                    This is the contents of the default <strong>compiler-config.xml</strong>:
+                    <pre>
+&lt;?xml version="1.0" encoding="utf-8"?>
+&lt;compiler>
+  &lt;windows>
+    &lt;vs>
+      &lt;boost libraryDir="C:\Boost\lib"/>
+    &lt;/vs>
+    &lt;gcc>
+      &lt;boost libraryDir="C:\mingw-boost\lib"/>
+    &lt;/gcc>
+  &lt;/windows>
+&lt;/compiler>
+</pre>
+                    You will also need to set the Boost version number in a couple of places to the toolchain configuration file <strong>C:\cmajor\config\tool-chains.json</strong>.
+                    First find JSON array named 'args' whose path in the JSON file is 
+                    <pre>
+                    $platforms[?(@.name=='windows')].toolChains[?(@.name=='gcc')].tools[?(@.commandName=='g++')].configurations[?(@.name=='debug')].args
+                    </pre>
+                    I have Boost version 1.73, so replace "1_73" suffix of the boost_filesystem, boost_iostreams, boost_system library file names with your Boost version number (1_xx)
+                    in the following line:
+                    <pre>
+                    "$RUNTIME_LIBS$-lcmrtsd;-lcmsnglexerd;-lcmsngparserd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmsngutild;-lpdcursesd;-lbz2d;-lzd;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-sd-x64-1_73;-lboost_iostreams-mgw8-mt-sd-x64-1_73;-lboost_system-mgw8-mt-sd-x64-1_73"
+                    </pre>
+                    
+                    The second place is the corresponding 'args' JSON array for the release configuration whose path in the JSON file is
+                    <pre>
+                    $platforms[?(@.name=='windows')].toolChains[?(@.name=='gcc')].tools[?(@.commandName=='g++')].configurations[?(@.name=='release')].args
+                    </pre>
+
+                    The line to change is:
+                    <pre>
+                    "$RUNTIME_LIBS$-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lpdcurses;-lbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73"
+                    </pre>
+                </li>
+                <li>
+                    Linux/WSL: I have used Boost version 1.65.1 libraries installed using Ubuntu package manager (sudo apt-get install libboost-all-dev).
+                </li>
+            </ul>
+        </li>
+    </ul>
+    
+    <p>
+        Next you will need to build static version of the Cmajor runtime libraries using gcc, and then compile the Cmajor system libraries.
+    <p>
+
+    <h2>2. Building static versions of the Cmajor runtime libraries using gcc</h2>
+    
+    <ul>
+        <li>
+            Windows:
+            Change to <strong>C:\cmajor\rts\build\gcc</strong> directory.
+            
+            The <strong>Makefile.common</strong> file in that directory contains a path to Boost include directory, that you may need to change.
+            The include directory is in the following line:
+            <pre>
+            BOOST_INCLUDE_DIR=C:/mingw-boost/include/boost-1_73
+            </pre>
+            
+            The static debug and release versions of the Cmajor runtime libraries are built by entering the following command:
+            <pre>
+            C:\cmajor\rts\build\gcc>mingw32-make
+            </pre>
+            
+            The runtime libraries are installed by entering the following command:
+            <pre>
+            C:\cmajor\rts\build\gcc>mingw32-make install
+            </pre>
+            
+            The runtime libraries are installed to the <strong>C:\cmajor\lib\gcc</strong> directory.
+        </li>
+        <li>
+            Linux/WSL:
+            
+        </li>
+    </ul>
+    
+    <h2>3. Compiling Cmajor system libraries</h2>
+    
+    <ul>
+        <li>
+            Windows:
+            <ol>
+                <li>
+                    Debug configuration:
+                    Change to <strong>C:\cmajor\system\platform\windows</strong> directory and enter the following command:
+                    <pre>
+                    C:\cmajor\system\platform\windows>cppcmc -u -v System.cms
+                    </pre>
+                    The <strong>-u</strong> flag tells the compiler to rebuild everything, strictly not necessary.
+                    The <strong>-v</strong> flag tells the compiler to be verbose, so you will see what's going on.
+                    If everything went fine, the last lines will say:
+                    <pre>
+                    System libraries installed.
+                    Solution 'System' built successfully.
+                    </pre>
+                    The debug-mode libraries are installed to <strong>C:\cmajor\system\lib\cpp\gcc\debug</strong> directory.
+                </li>
+                <li>
+                    Release configuration:
+                    Enter the following command:
+                    <pre>
+                    C:\cmajor\system\platform\windows>cppcmc -u -v -c=release System.cms
+                    </pre>
+                    The <strong>-c=release</strong> option tells the compiler to build for release configuration (optimizations enabled).
+                    Again the last lines should say:
+                    <pre>
+                    System libraries installed.
+                    Solution 'System' built successfully.
+                    </pre>
+                    The release-mode libraries are installed to <strong>C:\cmajor\system\lib\cpp\gcc\release</strong> directory.
+                </li>
+             </ol>
+        </li>
+        <li>
+            Linux/WSL:
+        </li>
+    </ul>
+    
+    <h2>4. Compiling and running a Hello world program</h2>
+    
+    <p>
+        To test that everything works, you may now compile a Hello world program using cppcmc:
+        
+        <ul>
+            <li>
+                Windows: 
+                <ol>
+                    <li>
+                        Debug mode:
+                        Change to <strong>C:\cmajor\projects\examples\Hello</strong> directory and enter the following command:
+                        <pre>
+                        C:\cmajor\projects\examples\Hello>cppcmc -u -v Hello.cmp
+                        </pre>
+                        If everything went fine, the last line will say:
+                        <pre>
+                        Project 'Hello' built successfully.
+                        </pre>
+                        The executable and the debug information file are generated to the 
+                        <strong>bin\cpp\gcc\debug</strong> subdirectory.
+                        
+                        Now run it:
+                        <pre>
+                        C:\cmajor\projects\examples\Hello>bin\cpp\gcc\debug\Hello
+                        </pre>
+                        
+                        The program should print:
+                        <pre>
+                        Hello, world!
+                        </pre>
+                    </li>
+                    <li>
+                        Release mode:
+                        Enter the following command:
+                        <pre>
+                        C:\cmajor\projects\examples\Hello>cppcmc -u -v -c=release Hello.cmp
+                        </pre>
+                        The executable and the debug information file are generated to the 
+                        <strong>bin\cpp\gcc\release</strong> subdirectory.
+                        
+                        Now run it:
+                        <pre>
+                        C:\cmajor\projects\examples\Hello>bin\cpp\gcc\release\Hello
+                        </pre>
+                        
+                        Again the program should say:
+                        <pre>
+                        Hello, world!
+                        </pre>
+                    </li>
+                </ol>
+                
+            </li>
+            <li>
+                Linux/WSL:
+                
+            </li>
+        </ul>
+    </p>
+    
+    <p>
+        All libraries are linked statically to the compiled Cmajor program, including Boost and Cmajor runtime libraries,
+        so linking times can be quite long, and the executables can be considerably big (about 50 MB or more).
+    </p>
+
+</body>

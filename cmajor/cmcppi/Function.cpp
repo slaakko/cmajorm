@@ -49,10 +49,6 @@ BasicBlock* Function::CreateCleanupBasicBlock(Context& context)
 
 void Function::Finalize(bool hasCleanup)
 {
-    if (name == "member_function_GetCharacterClass_CharClassTable_D91526434C6ADFC48B69D37DFC2CBBCC79B1C10E")
-    {
-        int x = 0;
-    }
     nextBBNumber = 0;
     for (std::unique_ptr<BasicBlock>& cubb : cleanupBasicBlocks)
     {
