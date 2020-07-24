@@ -136,6 +136,10 @@ FunctionSymbol* FunctionTemplateRepository::Instantiate(FunctionSymbol* function
     }
     boundCompileUnit.AddGlobalNs(std::move(globalNs));
     functionSymbol->SetFlag(FunctionSymbolFlags::dontReuse);
+    if (functionTemplate->IsSystemDefault())
+    {
+        functionSymbol->SetSystemDefault();
+    }
     boundCompileUnit.SetCanReuse(functionSymbol);
     return functionSymbol;
 }

@@ -173,24 +173,4 @@ void ProcessImpl::WriteLine(const std::string& line)
     }
 }
 
-void ProcessImpl::CloseHandles()
-{
-    if ((redirections & Process::Redirections::processStdIn) != Process::Redirections::none)
-    {
-        processStdIn.close();
-    }
-    else
-    {
-        throw std::runtime_error("process stdin not redirected");
-    }
-    if ((redirections & Process::Redirections::processStdOut) != Process::Redirections::none)
-    {
-        processStdOut.close();
-    }
-    if ((redirections & Process::Redirections::processStdErr) != Process::Redirections::none)
-    {
-        processStdErr.close();
-    }
-}
-
 } } // namespace soulng::util

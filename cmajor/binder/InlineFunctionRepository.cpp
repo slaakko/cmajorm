@@ -99,6 +99,10 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         }
         functionSymbol->SetParent(inlineFunction->Parent());
         functionSymbol->SetLinkOnceOdrLinkage();
+        if (inlineFunction->IsSystemDefault())
+        {
+            functionSymbol->SetSystemDefault();
+        }
         TypeBinder typeBinder(boundCompileUnit);
         typeBinder.SetContainerScope(functionSymbol->GetContainerScope());
         typeBinder.SetCurrentFunctionSymbol(functionSymbol.get());
@@ -142,6 +146,10 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         }
         functionSymbol->SetParent(classTypeSymbol);
         functionSymbol->SetLinkOnceOdrLinkage();
+        if (inlineFunction->IsSystemDefault())
+        {
+            functionSymbol->SetSystemDefault();
+        }
         TypeBinder typeBinder(boundCompileUnit);
         typeBinder.SetContainerScope(functionSymbol->GetContainerScope());
         functionInstanceNode->Accept(typeBinder);

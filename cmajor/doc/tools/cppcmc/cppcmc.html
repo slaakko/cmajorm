@@ -10,7 +10,7 @@
     <h1>Cmajor compiler with C++ backend</h1>
     
     <p>
-        The Cmajor compiler with C++ backend, cppcmc, is a command-line Cmajor compiler for Windows, Linux and Windows subsystem for Linux.
+        The Cmajor compiler with C++ backend, cppcmc, is a command-line compiler for Windows, Linux and Windows subsystem for Linux.
         It compiles Cmajor code to very primitive C++ and then launches the configured C++ compiler to compile to native machine code.
         The compiler also generates a debug information file, x.cmdb, associated with the executable x. 
         The cmdb file is read by the Cmajor command-line debugger, <a href="../cmdb/cmdb.html">cmdb</a>.
@@ -29,7 +29,7 @@
                     Windows:
                     I have used <a href="http://mingw-w64.org/doku.php/download">MinGW-W64-builds</a> toolchain:
                     g++ version 8.1.0.
-                    After installing insert the <strong>bin</strong> subdirectory of the <strong>mingw64</strong> directory to PATH.
+                    After installing insert the <strong>bin</strong> subdirectory of the <strong>mingw64</strong> directory to PATH environment variable.
                 </li>
                 <li>
                     Linux/WSL: I have used g++ version 7.5.0 installed using Ubuntu package manager (sudo apt-get install g++).
@@ -87,6 +87,9 @@
                 </li>
             </ul>
         </li>
+        <li>
+            Cmajor installed. Cmajor installation is described in this <a href="../../installation/installation.html">document</a>.
+        </li>
     </ul>
     
     <p>
@@ -120,11 +123,26 @@
         </li>
         <li>
             Linux/WSL:
-            
+            <ul>
+                <li>Change to <strong>cmajor/rts/build/gcc</strong> directory.</li>
+                <pre>
+                slaakko@pluto:~/cmajor-3.6.0-src$ cd cmajor/rts/build/gcc
+                </pre>
+                The static debug and release versions of the Cmajor runtime libraries are built by entering the following command:
+                <pre>
+                slaakko@pluto:~/cmajor-3.6.0-src/cmajor/rts/build/gcc$ make
+                </pre>
+                The runtime libraries are installed by entering the following command:
+                <pre>
+                slaakko@pluto:~/cmajor-3.6.0-src/cmajor/rts/build/gcc$ make install
+                </pre>
+                
+                The runtime libraries are installed to the <strong>cmajor/lib/gcc</strong> directory.
+            </ul>
         </li>
     </ul>
     
-    <h2>3. Compiling Cmajor system libraries</h2>
+    <h2>3. Compiling Cmajor system libraries using cppcmc and gcc</h2>
     
     <ul>
         <li>
@@ -163,6 +181,37 @@
         </li>
         <li>
             Linux/WSL:
+            <ol>
+                <li>
+                    Debug configuration:
+                    Change to <strong>cmajor/system/platform/linux</strong> directory and enter the following command:
+                    <pre>
+                    slaakko@pluto:~/cmajor-3.6.0-src/cmajor/system/platform/linux$ cppcmc -u -v System.cms
+                    </pre>
+                    The <strong>-u</strong> flag tells the compiler to rebuild everything, strictly not necessary.
+                    The <strong>-v</strong> flag tells the compiler to be verbose, so you will see what's going on.
+                    If everything went fine, the last lines will say:
+                    <pre>
+                    System libraries installed.
+                    Solution 'System' built successfully.
+                    </pre>
+                    The debug-mode libraries are installed to <strong>cmajor/system/lib/cpp/gcc/debug</strong> directory.
+                </li>
+                <li>
+                    Release configuration:
+                    Enter the following command:
+                    <pre>
+                    slaakko@pluto:~/cmajor-3.6.0-src/cmajor/system/platform/linux$ cppcmc -u -v -c=release System.cms
+                    </pre>
+                    The <strong>-c=release</strong> option tells the compiler to build for release configuration (optimizations enabled).
+                    Again the last lines should say:
+                    <pre>
+                    System libraries installed.
+                    Solution 'System' built successfully.
+                    </pre>
+                    The release-mode libraries are installed to <strong>cmajor/system/lib/cpp/gcc/release</strong> directory.
+                </li>
+            </ol>
         </li>
     </ul>
     
@@ -193,7 +242,7 @@
                         C:\cmajor\projects\examples\Hello>bin\cpp\gcc\debug\Hello
                         </pre>
                         
-                        The program should print:
+                        And the program prints:
                         <pre>
                         Hello, world!
                         </pre>
@@ -212,7 +261,7 @@
                         C:\cmajor\projects\examples\Hello>bin\cpp\gcc\release\Hello
                         </pre>
                         
-                        Again the program should say:
+                        And the program says:
                         <pre>
                         Hello, world!
                         </pre>
@@ -222,14 +271,73 @@
             </li>
             <li>
                 Linux/WSL:
-                
+                <ol>
+                    <li>
+                        Debug mode:
+                        Change to <strong>cmajor/projects/examples/Hello</strong> directory:
+                        <pre>
+                        slaakko@pluto:~/cmajor-3.6.0-src/cmajor$ cd projects/examples/Hello
+                        </pre>
+                        Enter the following command:
+                        <pre>
+                        slaakko@pluto:~/cmajor-3.6.0-src/cmajor/projects/examples/Hello$ cppcmc -u -v Hello.cmp
+                        </pre>
+                        If everything went fine, the last line will say:
+                        <pre>
+                        Project 'Hello' built successfully.
+                        </pre>
+                        The executable and the debug information file are generated to the 
+                        <strong>bin/cpp/gcc/debug</strong> subdirectory.
+                        
+                        Now run it:
+                        <pre>
+                        slaakko@pluto:~/cmajor-3.6.0-src/cmajor/projects/examples/Hello$ bin/cpp/gcc/debug/Hello
+                        </pre>
+                        And the program prints:
+                        <pre>
+                        Hello, world!
+                        </pre>
+                    </li>
+                    <li>
+                        Release mode:
+                        Enter the following command:
+                        <pre>
+                        slaakko@pluto:~/cmajor-3.6.0-src/cmajor/projects/examples/Hello$ cppcmc -u -v -c=release Hello.cmp
+                        </pre>
+                        The executable and the debug information file are generated to the 
+                        <strong>bin/cpp/gcc/release</strong> subdirectory.
+                        
+                        Now run it:
+                        <pre>
+                        slaakko@pluto:~/cmajor-3.6.0-src/cmajor/projects/examples/Hello$ bin/cpp/gcc/release/Hello
+                        </pre>
+                        
+                        And the program says:
+                        <pre>
+                        Hello, world!
+                        </pre>
+                    </li>
+                </ol>
             </li>
         </ul>
     </p>
     
-    <p>
-        All libraries are linked statically to the compiled Cmajor program, including Boost and Cmajor runtime libraries,
-        so linking times can be quite long, and the executables can be considerably big (about 50 MB or more).
-    </p>
+    <h2>5. Known bugs and limitations</h2>
+    
+    <ul>
+        <li>
+            All libraries are linked statically to the compiled Cmajor program, including Boost and Cmajor runtime libraries,
+            so linking times can be quite long, and the executables can be considerably big (about 50 MB or more).
+        </li>
+        <li>
+            Mingw does support thread local storage, so multithreaded Cmajor programs might not work correctly.
+        </li>
+        <li>
+            I have not managed to get Unicode console I/O to work with Mingw, so only ASCII console I/O is supported for gcc tool chain on Windows.
+        </li>
+        <li>
+            I have not been able to compile GNUTls with the C++ backend, so socket connections do not support TLS.
+        </li>
+    </ul>
 
 </body>

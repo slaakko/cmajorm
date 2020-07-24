@@ -116,6 +116,7 @@ namespace System
         return left.Get() < right.Get();
     }
 
+    [system_default]
     public TextWriter& operator<<<T>(TextWriter& writer, const UniquePtr<T>& ptr)
     {
         if (ptr.IsNull())

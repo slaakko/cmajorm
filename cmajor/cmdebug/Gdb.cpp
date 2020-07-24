@@ -596,7 +596,6 @@ public:
     std::unique_ptr<GdbReply> Execute(const GdbCommand& commmand, GdbDriver& driver);
     std::unique_ptr<GdbReply> ReadReply(GdbDriver& driver);
     void WriteTargetInputLine(const std::string& line);
-    void CloseTargetHandles();
     GdbReply* GetStartReply() { return startReply.get(); }
 private:
     Gdb();
@@ -807,11 +806,6 @@ void Gdb::WriteTargetInputLine(const std::string& line)
     gdb->WriteLine(line);
 }
 
-void Gdb::CloseTargetHandles()
-{
-    gdb->CloseHandles();
-}
-
 void SetDebugFlag()
 {
     Gdb::Instance().SetDebugFlag();
@@ -850,11 +844,6 @@ void TerminateGDB()
 void WriteTargetInputLine(const std::string& line)
 {
     Gdb::Instance().WriteTargetInputLine(line);
-}
-
-void CloseTargetHandles()
-{
-    Gdb::Instance().CloseTargetHandles();
 }
 
 void InitGDB()

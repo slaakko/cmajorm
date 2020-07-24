@@ -139,7 +139,8 @@
         &nbsp;&nbsp;&nbsp;&nbsp;10.8 <a href="#functions-throw">Throw Specifier</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;10.9 <a href="#functions-template">Function Templates</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;10.10 <a href="#intrinsic-function">Intrinsic Functions</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;10.11 <a href="#overload-resolution">Function Overload Resolution</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;10.11 <a href="#functions-system-default">System-default Functions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;10.12 <a href="#overload-resolution">Function Overload Resolution</a><br />
         11 <a href="#typedefs">Typedefs</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;11.1 <a href="#typedefs-syntax">Syntax</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;11.2 <a href="#typedefs-examples">Examples</a><br />
@@ -3406,7 +3407,21 @@
         They can be used in the <a href="#predicate-constraint-expression">predicate constraint expressions</a>.
     </p>
 
-    <h3 id="overload-resolution">10.11 Function Overload Resolution</h3>
+    <h3 id="functions-system-default">10.11 System-default Functions</h3>
+    
+    <p>
+        A function marked with a <b>system_default</b> <a href="#attributes">attribute</a> is called a <em>system-default function</em>.
+        The function overload resolution as described in the <a href="#overload-resolution">next</a> section, is 
+        done in two phases: In the first phase the compiler ignores functions marked with the <b>system_default</b> attribute.
+        If the set of viable functions is not empty, a best-matching function is chosen as described in the next section.
+        Only if the set of viable functions is empty, the compiler proceeds to the second phase. 
+        In the second phase the compiler includes also functions marked with the <b>system_default</b> attribute as viable functions, 
+        and selects the best-matching function as described in the next section.
+        This feature is used in the system library to provide default implementations of output operators for container types.
+        Those default implementations can be overridden by user-defined output operators.
+    </p>
+
+    <h3 id="overload-resolution">10.12 Function Overload Resolution</h3>
 
     <p>
         Overload resolution is done in three stages:
@@ -5015,6 +5030,11 @@
 
     <h3 id="attributes-syntax">17.1 Syntax</h3>
 
+    <p>
+        Attributes are name-value pairs declared between brackets. 
+        The attribute declaration precedes syntactically the associated function, class, variable or interface.
+    </p>
+
     <table class="grammar">
         <tr>
             <td class="rule" id="rule.attributes">attributes</td>
@@ -5069,7 +5089,7 @@
     </p>
 
     <p>
-        Currently Cmajor compiler recognizes two attributes:
+        Currently Cmajor compiler recognizes three attributes:
         <ul>
             <li>
                 <b>json</b> attribute can have value "true" or "false".
@@ -5083,8 +5103,12 @@
                 If the serialization field name is not explitly given, it will be
                 implicitly equal to the name of the member variable.
             </li>
+            <li>
+                <b>system_default</b> attribute with a value "true" or without an explicit value 
+                marks a function as a <a href="#functions-system-default"><em>system-default function</em></a>.
+            </li>
         </ul>
-        See <a href="../system/content/System.Json/index.html">System.Json</a> library for an example of using these attributes.
+        See <a href="../system/content/System.Json/index.html">System.Json</a> library for an example of using the <b>json</b> and <b>jsonFieldName</b> attributes.
     </p>
 
     <h2 id="compile-units">18 Compile Units</h2>

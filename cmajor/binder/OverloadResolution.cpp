@@ -1181,6 +1181,13 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
                 continue;
             }
         }
+        if (viableFunction->IsSystemDefault())
+        {
+            if ((flags & OverloadResolutionFlags::includeSystemDefaultFunctions) == OverloadResolutionFlags::none)
+            {
+                continue;
+            }
+        }
         FunctionMatch functionMatch(viableFunction);
         if (viableFunction->IsFunctionTemplate())
         {
@@ -1283,6 +1290,11 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
     }
     if (functionMatches.empty())
     {
+        if ((flags & OverloadResolutionFlags::includeSystemDefaultFunctions) == OverloadResolutionFlags::none)
+        {
+            return SelectViableFunction(viableFunctions, groupName, arguments, containerScope, boundCompileUnit, boundFunction, span,
+                (flags | OverloadResolutionFlags::includeSystemDefaultFunctions), templateArgumentTypes, exception);
+        }
         return FailWithOverloadNotFound(module, viableFunctions, groupName, arguments, failedFunctionMatches, span, flags, exception);
     }
     else if (functionMatches.size() > 1)

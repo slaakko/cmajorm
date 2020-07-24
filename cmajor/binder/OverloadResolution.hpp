@@ -26,7 +26,8 @@ enum class OverloadResolutionFlags : uint8_t
     dontThrow = 1 << 0,
     dontInstantiate = 1 << 1,
     noTemplates = 1 << 2,
-    noRvalueRef = 1 << 3
+    noRvalueRef = 1 << 3,
+    includeSystemDefaultFunctions = 1 << 4
 };
 
 inline OverloadResolutionFlags operator&(OverloadResolutionFlags left, OverloadResolutionFlags right)

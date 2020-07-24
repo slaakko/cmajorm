@@ -32,7 +32,6 @@ public:
     std::string ReadLine(Process::StdHandle handle);
     std::string ReadToEnd(Process::StdHandle handle);
     void WriteLine(const std::string& line);
-    void CloseHandles();
 private:
     Process::Redirections redirections;
     boost::process::ipstream processStdOut;

@@ -9,32 +9,25 @@
 <li><p><a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html">Process</a> class 
 added to system library.</p></li>
 <li><p>Switched to clang++ on WSL / on Linux.
-I have used LLVM 10.0.0 pre-built binaries for Ubuntu 18.04 available on the <a href="https://releases.llvm.org/download.html#10.0.0">LLVM download page</a>.</p></li>
-<li><p>The Cmajor compiler has now a C++ backend.</p>
+I have used LLVM 10.0.0 pre-built binaries for Ubuntu 18.04 available on the <a href="https://releases.llvm.org/download.html#10.0.0">LLVM download page</a> for building the compiler on Linux/WSL.</p></li>
+<li><p>Default TextWriter output operators for containers revisited.</p>
 
-<p>Requirements for using the Cmajor compiler with the C++ backend (cppcmc):</p>
+<p>The 3.5.0 version included default output operators, <em>operator&lt;&lt;</em>, for container types.
+However it required the programmer to derive her own container type from the standard one, if she wanted to define her own output operator for that container type.
+In this version this limitation has been removed.</p>
 
-<ul>
-<li><p>A C++ compiler:</p>
+<p>The default output operators are now declared with the new <strong>system_default</strong> <a href="https://slaakko.github.io/cmajor/langref/langref.html#attributes">attribute</a> 
+and the overload resolution process has been changed to take that attribute into account.
+It works as follows:
+The overload resolution has been changed to be a two-phase process.
+In the first phase the compiler ignores functions that have a <strong>system_default</strong> attribute, as if they did not exist at all.
+Now if the user has defined her own ouput operator for a container, the compiler finds it and uses it without resorting to <strong>system_default</strong> functions.
+Only if the set of viable functions is empty, the compiler does a phase two lookup.
+This time the compiler considers also functions that have been declared with the <strong>system_default</strong> attribute and if there is now viable functions, the compiler will use the best match.
+Thus the compiler will use a system-defined default output operator only if the programmer has not defined her own version.</p></li>
+<li><p>New tools:</p>
 
-<ul>
-<li>On Windows this can be the C++ compiler of Microsoft Visual Studio 2019, or MinGW-w64's g++.</li>
-<li>On Linux and WSL this can be clang++ 10.0.0 for building the compiler itself, and 
-clang++ 10.0.0 or newer or g++ 7.5.0 or newer for building Cmajor programs with the C++ backend.</li>
-</ul></li>
-<li><p>Boost C++ libraries compiled using the chosen C++ compiler.</p></li>
-</ul>
-
-<p>I have built Boost libraries on Windows with MinGW-w64 gcc using these instructions:
-<a href="https://gist.github.com/zrsmithson/0b72e0cb58d0cb946fc48b5c88511da8">Installing boost on Windows using MinGW-w64 (gcc 64-bit)</a>.</p>
-
-<p>Limitations for Mingw on Windows:</p>
-
-<ul>
-<li>Mingw does support thread local storage, so multithreaded Cmajor programs might not work correctly.</li>
-<li><p>I have not managed to get Unicode console I/O to work with Mingw on Windows, so only ASCII console I/O is supported for gcc tool chain on Windows.</p></li>
-<li><p>I have not been able to compile GNUTls with the C++ backend, so socket connections do not support TLS.</p></li>
-</ul></li>
+<p><a href="https://slaakko.github.io/cmajor/tools/cppcmc/cppcmc.html">cppcmc</a>, <a href="https://slaakko.github.io/cmajor/tools/cmdb/cmdb.html">cmdb</a> and <a href="https://slaakko.github.io/cmajor/tools/cmdb2xml/cmdb2xml.html">cmdb2xml</a>.</p></li>
 <li><p>Changed System.Numerics.Multiprecision library implementation to use C++ boost::multiprecision library.</p></li>
 <li><p>Sometimes compilation of the system library from the command line may fail with the following error:</p>
 
@@ -43,6 +36,6 @@ clang++ 10.0.0 or newer or g++ 7.5.0 or newer for building Cmajor programs with 
 
 <p>In this case you may turn off threaded compilation by using the -st and -bt=1 options, that is:</p>
 
-<pre><code>D:\work\cmajorm\cmajor\system\platform\windows&gt;cmc -st -bt=1 -u -v -c=release System.cms
+<pre><code>cmc -st -bt=1 -u -v -c=release System.cms
 </code></pre></li>
 </ul>

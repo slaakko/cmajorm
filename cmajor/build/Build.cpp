@@ -2976,7 +2976,11 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                         {
                             LogMessage(project->LogStreamId(), "Writing debug information file...");
                         }
+#ifdef _WIN32
                         std::string cmdbFilePath = Path::ChangeExtension(project->ExecutableFilePath(), ".cmdb");
+#else
+                        std::string cmdbFilePath = project->ExecutableFilePath() + ".cmdb";
+#endif
                         rootModule->WriteCmdbFile(cmdbFilePath);
                         if (GetGlobalFlag(GlobalFlags::verbose))
                         {

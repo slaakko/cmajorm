@@ -30,9 +30,18 @@ struct InitDone
 
 using namespace soulng::util;
 
+const char* version = "3.6.0";
+
 void PrintHelp()
 {
-
+    std::cout << "Cmajor debug information file conversion utility version " << version << std::endl;
+    std::cout << "Convert FILE.cmdb to FILE.xml for inspection." << std::endl;
+    std::cout << "Usage: cmdb2xml [options] FILE.cmdb" << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "--help | -h" << std::endl;
+    std::cout << "  Print this help and exit." << std::endl;
+    std::cout << "--verbose | -v" << std::endl;
+    std::cout << "  Be verbose." << std::endl;
 }
 
 int main(int argc, const char** argv)

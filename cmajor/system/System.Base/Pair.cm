@@ -48,7 +48,8 @@ namespace System
             return p.second;
         }
     }
-    
+
+    [system_default]
     public TextWriter& operator<<<T, U>(TextWriter& writer, const Pair<T, U>& pair)
     {
         return writer << "(" << pair.first << ", " << pair.second << ")";

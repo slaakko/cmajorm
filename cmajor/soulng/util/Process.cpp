@@ -57,9 +57,4 @@ void Process::WriteLine(const std::string& line)
     impl->WriteLine(line);
 }
 
-void Process::CloseHandles()
-{
-    impl->CloseHandles();
-}
-
 } } // namespace soulng::util

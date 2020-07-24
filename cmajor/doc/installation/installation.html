@@ -18,7 +18,7 @@
     </h3>
 
     <p>
-        <a href="https://sourceforge.net/projects/cmajor/files/3.4.0/cmajor-3.4.0-win-x64-setup.exe">Download</a> the setup program and run it.
+        <a href="https://sourceforge.net/projects/cmajor/files/3.6.0/cmajor-3.6.0-win-x64-setup.exe">Download</a> the setup program and run it.
         You can specify installation directory that is by default <b>C:\cmajor</b>.
         Note: the compiler needs write access to installation directory and its subdirectories,
         so C:\Program Files\ is not a good place to install.
@@ -204,7 +204,6 @@
         <li><a href="http://www.sourceware.org/bzip2//">BZip2</a> (libbz2-dev package)</li>
         <li><a href="https://www.gnutls.org/">GnuTLS</a> (libgnutls28-dev package)</li>
         <li><a href="http://www.boost.org/">Boost</a> (libboost-all-dev package) (actually only <b>filesystem</b> and <b>iostreams</b> libraries need to be installed)</li>
-        <li><a href="https://releases.llvm.org/download.html#10.0.0">LLVM and Clang version 10.0.0 or newer</a></li>
         <li>libtinfo-dev package also may be needed</li>
     </ul>
 
@@ -212,31 +211,57 @@
         These libraries can be installed by using the package manager of your distro (for example <b>apt-get</b> on Ubuntu) or built and installed from sources.
     </p>
 
+    <h2>
+        2.1 Installing LLVM and Clang version 10.0.0
+    </h2>
+
     <p>
-        Sections 2.1, 2.2 and 2.3 describe alternative ways of installing Cmajor under Linux.
+        The Cmajor compiler is now built using clang++ (cmajor/build library requires -std=c++20), so you need to install 
+        <a href="https://releases.llvm.org/download.html#10.0.0">LLVM and Clang 10.0.0</a> to compile the compiler.
+    </p>
+
+    <p>
+        I have Ubuntu 18.04, so I downloaded the <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz">Pre-Built Binaries</a> package.
+        I extracted the package to the <strong>~/llvm-10.0.0</strong> directory and inserted <strong>~/llvm-10.0.0/bin</strong> directory to the front of my PATH environment variable.
+        After that, to be sure, run the following command:
+        <pre>
+            which clang++
+        </pre>
+        
+        It prints 
+        
+        <pre>
+        /home/slaakko/llvm-10.0.0/bin/clang++
+        </pre>
+        
+        so it is found from the right place.
+    </p>
+
+    <p>
+        Sections 2.2, 2.3 and 2.4 describe alternative ways of installing Cmajor under Linux.
     </p>
 
     <h3>
-        2.1 Installation on x86_64 Ubuntu Linux 18.04 using prebuilt binaries
+        2.2 Installation on x86_64 Ubuntu Linux 18.04 using prebuilt binaries
     </h3>
 
     <ul>
-        <li><a href="https://sourceforge.net/projects/cmajor/files/3.4.0/cmajor-3.4.0-ubuntu-18.04-x86_64-binaries.tar.bz2">Download</a> pre-built binaries for x86_64 Ubuntu 18.04.</li>
-        <li>Extract the package to the directory of your choice here called <em>cmajor-3.4.0</em>.</li>
-        <li>Create an environment variable named 'CMAJOR_ROOT' and set it to point to <em>/path/to/cmajor-3.4.0</em> directory. You need to add it to your shell script to make it permanent.</li>
-        <li>Insert <em>/path/to/cmajor-3.4.0/<b>bin</b></em> directory to your PATH environment variable.</li>
-        <li>Insert <em>/path/to/cmajor-3.4.0/<b>lib</b></em> directory to your LD_LIBRARY_PATH environment variable.</li>
+        <li><a href="https://sourceforge.net/projects/cmajor/files/3.6.0/cmajor-3.6.0-ubuntu-18.04-x86_64-binaries.tar.bz2">Download</a> pre-built binaries for x86_64 Ubuntu 18.04.</li>
+        <li>Extract the package to the directory of your choice here called <em>cmajor-3.6.0</em>.</li>
+        <li>Create an environment variable named 'CMAJOR_ROOT' and set it to point to <em>/path/to/cmajor-3.6.0</em> directory. You need to add it to your shell script to make it permanent.</li>
+        <li>Insert <em>/path/to/cmajor-3.6.0/<b>bin</b></em> directory to your PATH environment variable.</li>
+        <li>Insert <em>/path/to/cmajor-3.6.0/<b>lib</b></em> directory to your LD_LIBRARY_PATH environment variable.</li>
     </ul>
 
     <h3>
-        2.2 Installation from sources
+        2.3 Installation from sources
     </h3>
 
     <ul>
-        <li><a href="https://sourceforge.net/projects/cmajor/files/3.4.0/cmajor-3.4.0-src.tar.bz2">Download</a> Cmajor source code with unicode db.</li>
-        <li>Extract the package to the directory of your choice here called <em>cmajor-3.4.0</em>.</li>
-        <li>Create an environment variable named 'CMAJOR_ROOT' and set it to point to <em>/path/to/cmajor-3.4.0/cmajor</em> directory. You need to add it to your shell script to make it permanent.</li>
-        <li>Change to <em>cmajor-3.4.0/cmajor</em> directory and run <b>make</b> from there.</li>
+        <li><a href="https://sourceforge.net/projects/cmajor/files/3.6.0/cmajor-3.6.0-src.tar.bz2">Download</a> Cmajor source code with unicode db.</li>
+        <li>Extract the package to the directory of your choice here called <em>cmajor-3.6.0-src</em>.</li>
+        <li>Create an environment variable named 'CMAJOR_ROOT' and set it to point to <em>/path/to/cmajor-3.6.0-src/cmajor</em> directory. You need to add it to your shell script to make it permanent.</li>
+        <li>Change to <em>cmajor-3.6.0-src/cmajor</em> directory and run <b>make</b> from there.</li>
         <li>
             Install the binaries and libraries by running <b>sudo make install</b>. By default binaries are installed to <em>/usr/local/bin</em> and the libraries to <em>/usr/local/lib</em>.
             You can install to a different location by giving command <b>sudo make prefix=/where/to/install install</b> instead.
@@ -246,7 +271,7 @@
     </ul>
 
     <h3>
-        2.3 Installation on x86_64 Ubuntu Linux 18.04 running on Windows Subsystem for Linux
+        2.4 Installation on x86_64 Ubuntu Linux 18.04 running on Windows Subsystem for Linux
     </h3>
 
     <ul>
@@ -270,7 +295,7 @@
     </ul>
 
     <h4>
-        2.3.1 Installing LLVM, LLD and Clang
+        2.4.1 Installing LLVM, LLD and Clang
     </h4>
 
     <ul>
@@ -281,37 +306,37 @@
             </pre>
         </li>
         <li>
-            Retrieve and extract LLVM 9.0 sources (I used my home directory for this):
+            Retrieve and extract LLVM 10.0.0 sources (I used my home directory for this):
             <pre>
                 # LLVM:
-                wget http://releases.llvm.org/9.0.0/llvm-9.0.0.src.tar.xz
-                tar --extract --xz -f llvm-9.0.0.src.tar.xz
+                wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/llvm-10.0.0.src.tar.xz
+                tar --extract --xz -f llvm-10.0.0.src.tar.xz
                 # Clang:
-                wget http://releases.llvm.org/9.0.0/cfe-9.0.0.src.tar.xz
-                tar --extract --xz -f cfe-9.0.0.src.tar.xz
-                # move cfe-9.0.0.src directory under llvm-9.0.0.src/tools with name 'clang'
-                mv cfe-9.0.0.src llvm-9.0.0.src/tools/clang
+                wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang-10.0.0.src.tar.xz
+                tar --extract --xz -f clang-10.0.0.src.tar.xz
+                # move clang-10.0.0.src directory under llvm-10.0.0.src/tools with name 'clang'
+                mv clang-10.0.0.src llvm-10.0.0.src/tools/clang
                 # libcxx
-                wget http://releases.llvm.org/9.0.0/libcxx-9.0.0.src.tar.xz
-                tar --extract --xz -f libcxx-9.0.0.src.tar.xz
-                # move libcxx-9.0.0.src directory under llvm-9.0.0.src/tools with name 'libcxx'
-                mv libcxx-9.0.0.src llvm-9.0.0.src/tools/libxx
+                wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/libcxx-10.0.0.src.tar.xz
+                tar --extract --xz -f libcxx-10.0.0.src.tar.xz
+                # move libcxx-10.0.0.src directory under llvm-10.0.0.src/tools with name 'libcxx'
+                mv libcxx-10.0.0.src llvm-10.0.0.src/tools/libcxx
                 # libcxxabi
-                wget http://releases.llvm.org/9.0.0/libcxxabi-9.0.0.src.tar.xz
-                tar --extract --xz -f libcxxabi-9.0.0.src.tar.xz
-                # move libcxxabi-9.0.0.src directory under llvm-9.0.0.src/tools with name 'libcxxabi'
-                mv libcxxabi-9.0.0.src llvm-9.0.0.src/tools/libcxxabi
+                wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/libcxxabi-10.0.0.src.tar.xz
+                tar --extract --xz -f libcxxabi-10.0.0.src.tar.xz
+                # move libcxxabi-10.0.0.src directory under llvm-10.0.0.src/tools with name 'libcxxabi'
+                mv libcxxabi-10.0.0.src llvm-10.0.0.src/tools/libcxxabi
                 # lld:
-                wget http://releases.llvm.org/9.0.0/lld-9.0.0.src.tar.xz
-                tar --extract --xz -f lld-9.0.0.src.tar.xz
-                # move lld-9.0.0.src directory under llvm-9.0.0.src/tools with name 'lld'
-                mv lld-9.0.0.src llvm-9.0.0.src/tools/lld
+                wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/lld-10.0.0.src.tar.xz
+                tar --extract --xz -f lld-10.0.0.src.tar.xz
+                # move lld-10.0.0.src directory under llvm-10.0.0.src/tools with name 'lld'
+                mv lld-10.0.0.src llvm-10.0.0.src/tools/lld
             </pre>
         </li>
         <li>
-            Move to llvm-9.0.0.src directory, create a build directory under it and change to the build directory:
+            Move to llvm-10.0.0.src directory, create a build directory under it and change to the build directory:
             <pre>
-                cd llvm-9.0.0.src
+                cd llvm-10.0.0.src
                 mkdir build
                 cd build
             </pre>
@@ -337,7 +362,7 @@
     </ul>
 
     <h4>
-        2.3.2 Installing Cmajor prerequisites
+        2.4.2 Installing Cmajor prerequisites
     </h4>
 
     <pre>
@@ -345,22 +370,22 @@
     </pre>    
 
     <h4>
-        2.3.3 Installing Cmajor
+        2.4.3 Installing Cmajor
     </h4>
 
     <ul>
         <li>
             Download and extract Cmajor sources:
             <pre>
-                wget https://sourceforge.net/projects/cmajor/files/3.4.0/cmajor-3.4.0-src.tar.bz2
-                tar xjf cmajor-3.4.0-src.tar.bz2
+                wget https://sourceforge.net/projects/cmajor/files/3.6.0/cmajor-3.6.0-src.tar.bz2
+                tar xjf cmajor-3.6.0-src.tar.bz2
             </pre>
         </li>
         <li>
-            Set CMAJOR_ROOT environment variable to point to cmajor-3.4.0/cmajor directory.
+            Set CMAJOR_ROOT environment variable to point to <strong>cmajor-3.6.0-src/cmajor</strong> directory.
             It must be inserted to .bashrc to make it permanent.
             <pre>
-                export CMAJOR_ROOT=~/cmajor-3.4.0/cmajor
+                export CMAJOR_ROOT=~/cmajor-3.6.0-src/cmajor
             </pre>
         </li>
         <li>
@@ -371,9 +396,9 @@
             </pre>
         </li>
         <li>
-            Change to ~/cmajor-3.4.0/cmajor directory and run make:
+            Change to ~/cmajor-3.6.0-src/cmajor directory and run make:
             <pre>
-                cd ~/cmajor-3.4.0/cmajor
+                cd ~/cmajor-3.6.0-src/cmajor
                 make
             </pre>
         </li>
@@ -395,7 +420,7 @@
             <pre>
                 cd projects/examples/Hello
                 cmc -v Hello.cmp
-                slaakko@ACER:~/cmajor-3.4.0/cmajor/projects/examples/Hello$ bin/debug/Hello
+                slaakko@ACER:~/cmajor-3.6.0-src/cmajor/projects/examples/Hello$ bin/debug/Hello
                 Hello, world!
             </pre>
         </li>

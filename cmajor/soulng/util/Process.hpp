@@ -36,7 +36,6 @@ public:
     std::string ReadLine(StdHandle handle);
     std::string ReadToEnd(StdHandle handle);
     void WriteLine(const std::string& line);
-    void CloseHandles();
 private:
     ProcessImpl* impl;
 };

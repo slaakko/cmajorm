@@ -15,10 +15,12 @@
 #include <cmajor/cmdebug/TokenValueParsers.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <iostream>
+#include <thread>
 
 namespace cmajor { namespace debug {
 
@@ -116,7 +118,6 @@ void Console::Run()
         }
     }
     terminated = true;
-    CloseTargetHandles();
     TerminateGDB();
     std::unique_lock<std::mutex> lock(mtx);
     commands.push_back(std::unique_ptr<DebuggerCommand>(new DebuggerExitCommand()));
@@ -481,7 +482,15 @@ Debugger::Debugger(const std::string& executable, const std::vector<std::string>
     verbose(verbose_), formatter(formatter_), state(State::initializing), wasRunning(false), targetOutput(false), nextBreakpointNumber(1), nextTempBreakpointNumber(1),
     nextGdbVariableIndex(1), console(console_)
 {
-    std::string cmdbFilePath = Path::ChangeExtension(executable, ".cmdb");
+    std::string cmdbFilePath;
+    if (soulng::util::EndsWith(executable, ".exe") )
+    {
+        cmdbFilePath = Path::ChangeExtension(executable, ".cmdb");
+    }
+    else
+    {
+        cmdbFilePath = executable + ".cmdb";
+    }
     if (boost::filesystem::exists(cmdbFilePath))
     {
         if (verbose)

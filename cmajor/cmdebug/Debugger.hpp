@@ -13,6 +13,7 @@
 #include <vector>
 #include <list>
 #include <memory>
+#include <mutex>
 #include <condition_variable>
 
 namespace cmajor { namespace debug {

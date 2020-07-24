@@ -511,7 +511,6 @@ DEBUG_API GdbReply* GetGDBStartReply();
 DEBUG_API std::unique_ptr<GdbReply> ExecuteGDBCommand(const GdbCommand& command, GdbDriver& driver);
 DEBUG_API std::unique_ptr<GdbReply> ReadGDBReply(GdbDriver& driver);
 DEBUG_API void WriteTargetInputLine(const std::string& line);
-DEBUG_API void CloseTargetHandles();
 DEBUG_API void StopGDB(GdbDriver& driver);
 DEBUG_API void TerminateGDB();
 DEBUG_API void InitGDB();

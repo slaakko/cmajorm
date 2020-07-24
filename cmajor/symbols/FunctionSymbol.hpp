@@ -89,7 +89,8 @@ enum class FunctionSymbolFlags : uint32_t
     winapi = 1 << 19,
     dontReuse = 1 << 20,
     hasArtificialBody = 1 << 21,
-    hasCleanup = 1 << 22
+    hasCleanup = 1 << 22,
+    systemDefault = 1 << 23
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -213,6 +214,8 @@ public:
     bool HasArtificialBody() const { return GetFlag(FunctionSymbolFlags::hasArtificialBody); }
     bool HasCleanup() const { return GetFlag(FunctionSymbolFlags::hasCleanup); }
     void SetHasCleanup() { SetFlag(FunctionSymbolFlags::hasCleanup); }
+    bool IsSystemDefault() const { return GetFlag(FunctionSymbolFlags::systemDefault); }
+    void SetSystemDefault() { SetFlag(FunctionSymbolFlags::systemDefault); }
     virtual bool DontThrow() const { return (IsNothrow() || IsBasicTypeOperation()) && !HasCleanup(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }

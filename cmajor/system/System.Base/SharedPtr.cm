@@ -471,7 +471,8 @@ namespace System
             left->GetWeakThis().Assign(cast<T*>(right), SharedCountCast<T>(count));
         }
     }
-    
+
+    [system_default]
     public TextWriter& operator<<<T>(TextWriter& writer, const SharedPtr<T>& ptr)
     {
         if (ptr.IsNull())
