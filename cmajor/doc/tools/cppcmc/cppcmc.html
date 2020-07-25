@@ -218,7 +218,7 @@
     <h2>4. Compiling and running a Hello world program</h2>
     
     <p>
-        To test that everything works, you may now compile a Hello world program using cppcmc:
+        To test that the system basically works, you may now compile a Hello world program using cppcmc:
         
         <ul>
             <li>
@@ -322,7 +322,120 @@
         </ul>
     </p>
     
-    <h2>5. Known bugs and limitations</h2>
+    <h2>5. Command-line arguments</h2>
+
+    <p>
+        Usage: <b>cppcmc [options] { project.cmp | solution.cms }</b>
+    </p>
+    
+    <table class="opt">
+        <tr>
+            <th class="opt">Long option</th>
+            <th class="opt">Short option</th>
+            <th class="opt">Description</th>
+        </tr>
+        <tr>
+            <td class="opt">--help</td>
+            <td class="opt">-h</td>
+            <td class="opt">Print help and exit.</td>
+        </tr>
+        <tr>
+            <td class="opt">--verbose</td>
+            <td class="opt">-v</td>
+            <td class="opt">Be verbose.</td>
+        </tr>
+        <tr>
+            <td class="opt">--quiet</td>
+            <td class="opt">-q</td>
+            <td class="opt">Be quite, only return exit code.</td>
+        </tr>
+        <tr>
+            <td class="opt">--config=CONFIG</td>
+            <td class="opt">-c=CONFIG</td>
+            <td class="opt">Build usig CONFIG configuration. CONFIG can be "debug" or "release".
+            Default optimization level for debug build is 0 and for release build is 2.
+            </td>
+        </tr>
+        <tr>
+            <td class="opt">&#8209;&#8209;optimization&#8209;level=LEVEL</td>
+            <td class="opt">-O=LEVEL</td>
+            <td class="opt">Set optimization level to LEVEL (0-3).</td>
+        </tr>
+        <tr>
+            <td class="opt">--clean</td>
+            <td class="opt">-e</td>
+            <td class="opt">Clean given projects and solutions.</td>
+        </tr>
+        <tr>
+            <td class="opt">&#8209;&#8209;tool&#8209;chain=TOOL_CHAIN</td>
+            <td class="opt">&#8209;tc=TOOL_CHAIN</td>
+            <td class="opt">Use tool chain TOOL_CHAIN.
+            Default is 'gcc'.
+            Tool chains:
+            <ul>
+                <li>'vs' for Visual Studio on Windows</li>
+                <li>'gcc' for GNU C++ on Windows, Linux and WSL.</li>
+                <li>'clang' for Clang++ on Windows, Linux and WSL.</li>
+            </td>
+        </tr>
+        <tr>
+            <td class="opt">--strict-nothrow</td>
+            <td class="opt">-s</td>
+            <td class="opt">Treat a nothrow violation as an error.</td>
+        </tr>
+        <tr>
+            <td class="opt">--emit-asm</td>
+            <td class="opt">-f</td>
+            <td class="opt">Emit assembly code to .asm files while compiling.</td>
+        </tr>
+        <tr>
+            <td class="opt">--gen-debug-info</td>
+            <td class="opt">-g</td>
+            <td class="opt">Generate debug info (on by default on debug configuration)</td>
+        </tr>
+        <tr>
+            <td class="opt">--no-debug-info</td>
+            <td class="opt">-n</td>
+            <td class="opt">Don't generate debug info even for debug build</td>
+        </tr>
+        <tr>
+            <td class="opt">--build-threads=N</td>
+            <td class="opt">-bt=N</td>
+            <td class="opt">Use N threads for building a solution. Default is 2 x C, where C is the number of cores.</td>
+        </tr>
+        <tr>
+            <td class="opt">--disable-module-cache</td>
+            <td class="opt">-dm</td>
+            <td class="opt">Do not cache recently built modules.</td>
+        </tr>
+        <tr>
+            <td class="opt">--single-threaded-compile</td>
+            <td class="opt">-st</td>
+            <td class="opt">Compile source files in a project using a single thread.</td>
+        </tr>
+        <tr>
+            <td class="opt">--disable-codegen</td>
+            <td class="opt">-dg</td>
+            <td class="opt">Disable code generation. On by default for 'vs' tool-chain.</td>
+        </tr>
+        <tr>
+            <td class="opt">--just-my-code</td>
+            <td class="opt">-j</td>
+            <td class="opt">Enable Just My Code debugging. Effective for 'vs' tool-chain.</td>
+        </tr>
+        <tr>
+            <td class="opt">--all</td>
+            <td class="opt">-a</td>
+            <td class="opt">Build all dependencies.</td>
+        </tr>
+        <tr>
+            <td class="opt">--repository</td>
+            <td class="opt">-rp</td>
+            <td class="opt">Build repository project.</td>
+        </tr>
+    </table>
+    
+    <h2>6. Known bugs and limitations</h2>
     
     <ul>
         <li>
@@ -333,10 +446,10 @@
             Mingw does support thread local storage, so multithreaded Cmajor programs might not work correctly.
         </li>
         <li>
-            I have not managed to get Unicode console I/O to work with Mingw, so only ASCII console I/O is supported for gcc tool chain on Windows.
+            Unicode console I/O not supported for the gcc tool chain on Windows (Mingw). Non-ASCII Unicode characters show cluttered.
         </li>
         <li>
-            I have not been able to compile GNUTls with the C++ backend, so socket connections do not support TLS.
+             TLS socket connections not supported for the C++ backend.
         </li>
     </ul>
 

@@ -3,7 +3,7 @@
 <h2>Release notes</h2>
 
 <ul>
-<li><p>Bug fix: a character literal with any non-ASCII Unicode letter caused an error 'invalid UTF-8 sequence'. Fixed.</p></li>
+<li><p>Bug fix: a character literal with any non-ASCII Unicode letter, for example <strong>'ö'</strong>, caused an error 'invalid UTF-8 sequence'. Fixed.</p></li>
 <li><p>Faster function entry and exit code for functions that can throw or contain a cleanup block.</p></li>
 <li><p>Support for <a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/ns_System.Threading.Fibers.html">fibers</a> added to system library.</p></li>
 <li><p><a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_Process_6FDB48284B5FF1E26D28956730DFB867F0A83291.html">Process</a> class 
@@ -27,7 +27,13 @@ This time the compiler considers also functions that have been declared with the
 Thus the compiler will use a system-defined default output operator only if the programmer has not defined her own version.</p></li>
 <li><p>New tools:</p>
 
-<p><a href="https://slaakko.github.io/cmajor/tools/cppcmc/cppcmc.html">cppcmc</a>, <a href="https://slaakko.github.io/cmajor/tools/cmdb/cmdb.html">cmdb</a> and <a href="https://slaakko.github.io/cmajor/tools/cmdb2xml/cmdb2xml.html">cmdb2xml</a>.</p></li>
+<p><a href="https://slaakko.github.io/cmajor/tools/cppcmc/cppcmc.html">cppcmc</a>, <a href="https://slaakko.github.io/cmajor/tools/cmdb/cmdb.html">cmdb</a> and <a href="https://slaakko.github.io/cmajor/tools/cmdb2xml/cmdb2xml.html">cmdb2xml</a>.</p>
+
+<ul>
+<li><strong>cppcmc</strong> is a command-line Cmajor compiler that generates primitive C++ that is then compiled to native code using the configured C++ compiler.</li>
+<li><strong>cmdb</strong> is a command-line debugger.</li>
+<li><strong>cmdb2xml</strong> converts a binary debug information file to XML for inspection.</li>
+</ul></li>
 <li><p>Changed System.Numerics.Multiprecision library implementation to use C++ boost::multiprecision library.</p></li>
 <li><p>Sometimes compilation of the system library from the command line may fail with the following error:</p>
 
