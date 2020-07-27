@@ -24,8 +24,8 @@ class DEBUG_API BoundDebugNode
 public:
     enum class Kind : int8_t
     {
-        addressNode, variableReferenceNode, integerLiteralNode, addNode, subNode, derefNode, addrOfNode, dotNode, subscriptNode, rangeNode, parenExprNode,
-        typeNode, castNode, debuggerVarNode, debugExpression
+        variableReferenceNode, integerLiteralNode, addNode, subNode, derefNode, addrOfNode, dotNode, subscriptNode, rangeNode, parenExprNode,
+        typeNode, castNode, debugExpression
     };
     BoundDebugNode(Kind kind_, DIType* type_, DebugExprNode* sourceNode_);
     Kind GetKind() const { return kind; }
@@ -43,19 +43,6 @@ private:
     Kind kind;
     DIType* type;
     DebugExprNode* sourceNode;
-};
-
-class DEBUG_API BoundAddressNode : public BoundDebugNode
-{
-public:
-    BoundAddressNode(DIType* type, const std::string& value_, DebugExprNode* sourceNode);
-    void Accept(BoundDebugNodeVisitor& visitor) override;
-    std::string ToString() const override;
-    BoundDebugNode* Clone() const override;
-    std::string GdbExprString() const override;
-    const std::string& Value() const { return value; }
-private:
-    std::string value;
 };
 
 class DEBUG_API BoundVariableReferenceNode : public BoundDebugNode
@@ -148,6 +135,7 @@ public:
     std::string ToString() const override;
     BoundDebugNode* Clone() const override;
     BoundDebugNode* Subject() const { return subject.get(); }
+    const std::string& Member() const { return member; }
     std::string GdbExprString() const override { return gdbExprString; }
 private:
     DIType* type;
@@ -220,29 +208,19 @@ public:
     std::string ToString() const override;
     BoundDebugNode* Clone() const override;
     std::string GdbExprString() const override;
+    BoundDebugNode* TypeIdNode() const { return typeIdNode.get(); }
+    BoundDebugNode* ExprNode() const { return exprNode.get(); }
 private:
     std::unique_ptr<BoundDebugNode> typeIdNode;
     std::unique_ptr<BoundDebugNode> exprNode;
     std::string gdbExprString;
 };
 
-class DEBUG_API BoundDebuggerVarNode : public BoundDebugNode
-{
-public:
-    BoundDebuggerVarNode(DIType* type, const DebuggerVariable* variable_, DebugExprNode* sourceNode);
-    void Accept(BoundDebugNodeVisitor& visitor) override;
-    bool IsDebuggerVarNode() const override { return true; }
-    std::string ToString() const override;
-    BoundDebugNode* Clone() const override;
-    std::string GdbExprString() const override;
-private:
-    const DebuggerVariable* variable;
-};
-
 class DEBUG_API BoundDebugExpression : public BoundDebugNode
 {
 public:
-    BoundDebugExpression(BoundDebugNode* node_, DebugExprNode* sourceNode);
+    BoundDebugExpression(BoundDebugNode* node_, DebugExprNode* sourceNode, bool hasContainerSubscript_);
+    bool HasContainerSubscript() const { return hasContainerSubscript; }
     void Accept(BoundDebugNodeVisitor& visitor) override;
     std::string ToString() const override;
     BoundDebugNode* Clone() const override;
@@ -250,6 +228,7 @@ public:
     BoundDebugNode* Node() const { return node.get(); }
 private:
     std::unique_ptr<BoundDebugNode> node;
+    bool hasContainerSubscript;
 };
 
 } } // namespace cmajor::debug

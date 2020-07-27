@@ -10,7 +10,6 @@
 namespace cmajor { namespace debug {
 
 class BoundDebugExpression;
-class BoundAddressNode;
 class BoundVariableReferenceNode;
 class BoundIntegerLiteralNode;
 class BoundAddNode;
@@ -23,14 +22,12 @@ class BoundRangeNode;
 class BoundParenExprNode;
 class BoundTypeNode;
 class BoundCastNode;
-class BoundDebuggerVarNode;
 
 class DEBUG_API BoundDebugNodeVisitor
 {
 public:
     virtual ~BoundDebugNodeVisitor();
     virtual void Visit(BoundDebugExpression& expr) {}
-    virtual void Visit(BoundAddressNode& node) {}
     virtual void Visit(BoundVariableReferenceNode& node) {}
     virtual void Visit(BoundIntegerLiteralNode& node) {}
     virtual void Visit(BoundAddNode& node) {}
@@ -43,7 +40,6 @@ public:
     virtual void Visit(BoundParenExprNode& node) {}
     virtual void Visit(BoundTypeNode& node) {}
     virtual void Visit(BoundCastNode& node) {}
-    virtual void Visit(BoundDebuggerVarNode& node) {}
 };
 
 } } // namespace cmajor::debug

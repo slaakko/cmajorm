@@ -23,7 +23,7 @@ class DEBUG_API DebugExprNode
 public:
     enum class Kind : int8_t
     {
-        address, identifier, integer, parenExpr, add, sub, deref, addrOf, dot, subscript, range, typeId, cast_, var
+        identifier, integer, parenExpr, add, sub, deref, addrOf, dot, subscript, range, typeId, cast_
     };
     DebugExprNode(Kind kind_);
     virtual ~DebugExprNode();
@@ -32,17 +32,6 @@ public:
     Kind GetKind() const { return kind; }
 private:
     Kind kind;
-};
-
-class DEBUG_API AddressDebugExprNode : public DebugExprNode
-{
-public:
-    AddressDebugExprNode(const std::string& value_);
-    void Accept(DebugExprVisitor& visitor) override;
-    std::string ToString() const override;
-    const std::string& Value() const { return value; }
-private:
-    std::string value;
 };
 
 class DEBUG_API IdentifierDebugExprNode : public DebugExprNode
@@ -73,6 +62,8 @@ public:
     AddDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
     DebugExprNode* Left() const { return left.get(); }
     DebugExprNode* Right() const { return right.get(); }
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
 private:
     std::unique_ptr<DebugExprNode> left;
     std::unique_ptr<DebugExprNode> right;
@@ -84,6 +75,8 @@ public:
     SubDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
     DebugExprNode* Left() const { return left.get(); }
     DebugExprNode* Right() const { return right.get(); }
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
 private:
     std::unique_ptr<DebugExprNode> left;
     std::unique_ptr<DebugExprNode> right;
@@ -185,17 +178,6 @@ public:
 private:
     std::unique_ptr<TypeIdDebugExprNode> typeIdNode;
     std::unique_ptr<DebugExprNode> exprNode;
-};
-
-class DEBUG_API DebuggerVarExprNode : public DebugExprNode
-{
-public:
-    DebuggerVarExprNode(int variableIndex_);
-    int VariableIndex() const { return variableIndex; }
-    void Accept(DebugExprVisitor& visitor) override;
-    std::string ToString() const override;
-private:
-    int variableIndex;
 };
 
 } } // namespace cmajor::debug

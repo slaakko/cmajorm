@@ -20,9 +20,9 @@ class DIType;
 class DebugExpressionEvaluator : public BoundDebugNodeVisitor
 {
 public:
-    DebugExpressionEvaluator(Debugger& debugger_, const std::string& expression_);
-    void Visit(BoundIntegerLiteralNode& node) override;
+    DebugExpressionEvaluator(Debugger& debugger_);
     void Visit(BoundDebugExpression& expr) override;
+    void Visit(BoundIntegerLiteralNode& node) override;
     void Visit(BoundSubscriptNode& node) override;
     void Visit(BoundRangeNode& node) override;
     JsonValue* ReleaseResult() { return result.release(); }
@@ -31,7 +31,6 @@ public:
     void AddTypes(BoundDebugNode* node);
 private:
     Debugger& debugger;
-    std::string expression;
     std::unique_ptr<JsonValue> result;
     int64_t integer;
     int64_t rangeStart;

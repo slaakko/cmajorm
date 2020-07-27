@@ -16,20 +16,6 @@ DebugExprNode::~DebugExprNode()
 {
 }
 
-AddressDebugExprNode::AddressDebugExprNode(const std::string& value_) : DebugExprNode(Kind::address), value(value_)
-{
-}
-
-void AddressDebugExprNode::Accept(DebugExprVisitor& visitor)
-{
-    visitor.Visit(*this);
-}
-
-std::string AddressDebugExprNode::ToString() const
-{
-    return value;
-}
-
 IdentifierDebugExprNode::IdentifierDebugExprNode(const std::string& identifier_) : DebugExprNode(Kind::identifier), identifier(identifier_)
 {
 }
@@ -62,8 +48,28 @@ AddDebugExprNode::AddDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) 
 {
 }
 
+void AddDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string AddDebugExprNode::ToString() const
+{
+    return left->ToString() + "+" + right->ToString();
+}
+
 SubDebugExprNode::SubDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::sub), left(left_), right(right_)
 {
+}
+
+void SubDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string SubDebugExprNode::ToString() const
+{
+    return left->ToString() + "-" + right->ToString();
 }
 
 ParenthesizedDebugExprNode::ParenthesizedDebugExprNode(DebugExprNode* exprNode_) : DebugExprNode(Kind::parenExpr), exprNode(exprNode_)
@@ -177,20 +183,6 @@ void CastDebugExprNode::Accept(DebugExprVisitor& visitor)
 std::string CastDebugExprNode::ToString() const
 {
     return "cast<" + typeIdNode->ToString() + ">(" + exprNode->ToString() + ")";
-}
-
-DebuggerVarExprNode::DebuggerVarExprNode(int variableIndex_) : DebugExprNode(Kind::var), variableIndex(variableIndex_)
-{
-}
-
-void DebuggerVarExprNode::Accept(DebugExprVisitor& visitor)
-{
-    visitor.Visit(*this);
-}
-
-std::string DebuggerVarExprNode::ToString() const
-{
-    return "$" + std::to_string(variableIndex);
 }
 
 } } // namespace cmajor::debug

@@ -10,7 +10,6 @@
 namespace cmajor { namespace debug {
 
 class DebugExpression;
-class AddressDebugExprNode;
 class IdentifierDebugExprNode;
 class IntegerDebugExprNode;
 class AddDebugExprNode;
@@ -24,14 +23,12 @@ class RangeDebugExprNode;
 class TypeIdDebugExprNode;
 class CastDebugExprNode;
 class BaseDebugExprNode;
-class DebuggerVarExprNode;
 
 class DEBUG_API DebugExprVisitor
 {
 public:
     virtual ~DebugExprVisitor();
     virtual void Visit(DebugExpression& expr) {}
-    virtual void Visit(AddressDebugExprNode& node) {}
     virtual void Visit(IdentifierDebugExprNode& node) {}
     virtual void Visit(IntegerDebugExprNode& node) {}
     virtual void Visit(AddDebugExprNode& node) {}
@@ -45,7 +42,6 @@ public:
     virtual void Visit(TypeIdDebugExprNode& node) {}
     virtual void Visit(CastDebugExprNode& node) {}
     virtual void Visit(BaseDebugExprNode& node) {}
-    virtual void Visit(DebuggerVarExprNode& node) {}
 };
 
 } } // namespace cmajor::debug

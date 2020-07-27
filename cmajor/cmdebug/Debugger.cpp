@@ -11,6 +11,7 @@
 #include <cmajor/cmdebug/BoundDebugExpr.hpp>
 #include <cmajor/cmdebug/DebugExprBinder.hpp>
 #include <cmajor/cmdebug/DebugExpressionEvaluator.hpp>
+#include <cmajor/cmdebug/ContainerSubscriptTranslator.hpp>
 #include <cmajor/cmdebug/Gdb.hpp>
 #include <cmajor/cmdebug/TokenValueParsers.hpp>
 #include <soulng/util/Path.hpp>
@@ -1438,9 +1439,18 @@ void Debugger::Evaluate(const std::string& expression)
     DebugExprBinder binder(*this, debugInfo.get(), stoppedInstruction->GetScope());
     node->Accept(binder);
     BoundDebugExpression* boundExpression = binder.BoundExpression(node.get());
-    DebugExpressionEvaluator evaluator(*this, expression);
-    boundExpression->Accept(evaluator);
-    result.reset(evaluator.ReleaseResult());
+    if (boundExpression->HasContainerSubscript())
+    {
+        ContainerSubscriptTranslator translator(*this);
+        boundExpression->Accept(translator);
+        Evaluate(translator.Expression());
+    }
+    else
+    {
+        DebugExpressionEvaluator evaluator(*this);
+        boundExpression->Accept(evaluator);
+        result.reset(evaluator.ReleaseResult());
+    }
 }
 
 DIType* Debugger::GetType(const std::string& expression)

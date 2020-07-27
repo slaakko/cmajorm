@@ -16,8 +16,7 @@ namespace cmajor { namespace debug {
 
 using namespace soulng::unicode;
 
-DebugExpressionEvaluator::DebugExpressionEvaluator(Debugger& debugger_, const std::string& expression_) : debugger(debugger_), expression(expression_),
-    integer(-1), rangeStart(-1), rangeEnd(-1)
+DebugExpressionEvaluator::DebugExpressionEvaluator(Debugger& debugger_) : debugger(debugger_), integer(-1), rangeStart(-1), rangeEnd(-1)
 {
 }
 
@@ -33,29 +32,6 @@ void DebugExpressionEvaluator::Visit(BoundDebugExpression& expr)
             JsonObject* object = new JsonObject();
             object->AddField(U"type", type->ToJson());
             result.reset(object);
-            break;
-        }
-        case BoundDebugNode::Kind::debuggerVarNode:
-        {
-            GdbVarEvaluateExpressionCommand command(node->GdbExprString(), Format::default_);
-            debugger.ExecuteGDBCommand(command);
-            result.reset(debugger.ReleaseResult());
-            AddTypes(node);
-            ContainerClassTemplateKind containerKind = GetContainerKind(node->Type());
-            if (containerKind != ContainerClassTemplateKind::notContainerClassTemplate)
-            {
-                Container* container = debugger.GetContainer(containerKind, node->SourceNode()->ToString());
-                if (result && result->Type() == JsonValueType::object)
-                {
-                    JsonObject* resultObject = static_cast<JsonObject*>(result.get());
-                    resultObject->AddField(U"container", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ContainerName(container->GetKind())))));
-                    int64_t count = container->Count(node->SourceNode()->ToString());
-                    if (count != -1)
-                    {
-                        resultObject->AddField(U"count", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(count)))));
-                    }
-                }
-            }
             break;
         }
         case BoundDebugNode::Kind::subscriptNode:
@@ -130,13 +106,12 @@ void DebugExpressionEvaluator::Visit(BoundRangeNode& node)
     switch (subjectType->GetKind())
     {
         case DIType::Kind::pointerType:
-        {
-
-            break;
-        }
         case DIType::Kind::arrayType:
         {
+            for (int64_t index = rangeStart; index < rangeEnd; ++index)
+            {
 
+            }
             break;
         }
         case DIType::Kind::specializationType:
@@ -177,7 +152,6 @@ void DebugExpressionEvaluator::Evaluate(BoundDebugNode* node)
             if (variableValue && variableValue->Type() == JsonValueType::object)
             {
                 JsonObject* variableObject = static_cast<JsonObject*>(variableValue);
-                variableObject->AddField(U"varIndex", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(variable.Index())))));
                 if (node->GetKind() == BoundDebugNode::Kind::variableReferenceNode)
                 {
                     BoundVariableReferenceNode* variableReferenceNode = static_cast<BoundVariableReferenceNode*>(node);

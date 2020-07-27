@@ -159,6 +159,12 @@ std::unique_ptr<JsonValue> Pointer::ValueMember(const std::string& name)
     return memberPtr->Value();
 }
 
+std::string Pointer::ValueMemberStr(const std::string& name)
+{
+    std::unique_ptr<Pointer> memberPtr(new Pointer(container, "(*" + expression + ")." + name));
+    return memberPtr->Expression();
+}
+
 Iterator::Iterator(Container& container_, int64_t index_) : container(container_), index(index_)
 {
 }
@@ -176,30 +182,30 @@ uint64_t GetContainerAddress(Debugger& debugger, ContainerClassTemplateKind cont
         case ContainerClassTemplateKind::forwardList:
         case ContainerClassTemplateKind::linkedList:
         {
-            addressExpr = "&" + containerVarExpr + ".head";
+            addressExpr = "&(" + containerVarExpr + ").head";
             break;
         }
         case ContainerClassTemplateKind::hashMap:
         case ContainerClassTemplateKind::hashSet:
         {
-            addressExpr = "&" + containerVarExpr + ".table";
+            addressExpr = "&(" + containerVarExpr + ").table";
             break;
         }
         case ContainerClassTemplateKind::list:
         {
-            addressExpr = "&" + containerVarExpr + ".items";
+            addressExpr = "&(" + containerVarExpr + ").items";
             break;
         }
         case ContainerClassTemplateKind::set:
         case ContainerClassTemplateKind::map:
         {
-            addressExpr = "&" + containerVarExpr + ".tree";
+            addressExpr = "&(" + containerVarExpr + ").tree";
             break;
         }
         case ContainerClassTemplateKind::queue:
         case ContainerClassTemplateKind::stack:
         {
-            addressExpr = "&" + containerVarExpr + ".items";
+            addressExpr = "&(" + containerVarExpr + ").items";
             break;
         }
     }
@@ -291,6 +297,11 @@ std::unique_ptr<JsonValue> ForwardListIterator::Current()
     return nodePtr->ValueMember("value");
 }
 
+std::string ForwardListIterator::CurrentStr()
+{
+    return nodePtr->ValueMemberStr("value");
+}
+
 Iterator* ForwardListIterator::Next()
 {
     if (IsEnd()) return this;
@@ -326,6 +337,11 @@ LinkedListIterator::LinkedListIterator(Container& container, int64_t index, Poin
 std::unique_ptr<JsonValue> LinkedListIterator::Current()
 {
     return nodePtr->ValueMember("value");
+}
+
+std::string LinkedListIterator::CurrentStr()
+{
+    return nodePtr->ValueMemberStr("value");
 }
 
 Iterator* LinkedListIterator::Next()
@@ -364,6 +380,11 @@ HashtableIterator::HashtableIterator(Container& container, int64_t index, Pointe
 std::unique_ptr<JsonValue> HashtableIterator::Current()
 {
     return bucketPtr->ValueMember("value");
+}
+
+std::string HashtableIterator::CurrentStr()
+{
+    return bucketPtr->ValueMemberStr("value");
 }
 
 Iterator* HashtableIterator::Next()
@@ -465,6 +486,15 @@ std::unique_ptr<JsonValue> TreeIterator::Current()
     return valueNodePtr->ValueMember("value");
 }
 
+std::string TreeIterator::CurrentStr()
+{
+    Container& container = GetContainer();
+    std::string valueNodeTypeIdStr = boost::uuids::to_string(container.ValueNodePtrType()->Id());
+    Pointer* valueNodePtr = new Pointer(container, "cast<typeid(\"" + valueNodeTypeIdStr + "\")>(" + nodePtr->Expression() + ")");
+    container.AddPointer(valueNodePtr);
+    return valueNodePtr->ValueMemberStr("value");
+}
+
 Iterator* TreeIterator::Next() 
 {
     if (IsEnd()) return this;
@@ -492,14 +522,20 @@ Iterator* TreeIterator::Next()
     return nextIterator;
 }
 
-ListIterator::ListIterator(Container& container, int64_t index, Pointer* itemsPtr_) : Iterator(container, index), itemsPtr(itemsPtr_)
+ListIterator::ListIterator(Container& container, int64_t index, int64_t count_, Pointer* itemsPtr_) : Iterator(container, index), itemsPtr(itemsPtr_), count(count_)
 {
 }
 
 std::unique_ptr<JsonValue> ListIterator::Current()
 {
-    Pointer* itemPtr = new Pointer(GetContainer(), itemsPtr->Expression() + " + " + std::to_string(Index()));
+    Pointer* itemPtr = new Pointer(GetContainer(), itemsPtr->Expression() + "+" + std::to_string(Index()));
     return itemPtr->Deref();
+}
+
+std::string ListIterator::CurrentStr()
+{
+    Pointer* itemPtr = new Pointer(GetContainer(), itemsPtr->Expression() + "+" + std::to_string(Index()));
+    return "*(" + itemPtr->Expression() + ")";
 }
 
 Iterator* ListIterator::Next()
@@ -512,9 +548,23 @@ Iterator* ListIterator::Next()
     {
         return next;
     }
-    ListIterator* listNext = new ListIterator(container, index, itemsPtr);
-    container.AddIterator(listNext);
-    return listNext;
+    if (index < count)
+    {
+        ListIterator* listNext = new ListIterator(container, index, count, itemsPtr);
+        container.AddIterator(listNext);
+        return listNext;
+    }
+    else
+    {
+        Iterator* endIterator = container.GetIterator(-1);
+        if (endIterator)
+        {
+            return endIterator;
+        }
+        ListIterator* endIter = new ListIterator(container, -1, count, itemsPtr);
+        container.AddIterator(endIter);
+        return endIter;
+    }
 }
 
 Container::Container(ContainerClassTemplateKind kind_, Debugger& debugger_, uint64_t address_) :
@@ -673,13 +723,45 @@ std::unique_ptr<JsonValue> ForwardContainer::Subscript(const std::string& contai
     return iterator->Current();
 }
 
+std::string ForwardContainer::SubscriptExpressionString(const std::string& containerVarExpr, int64_t index)
+{
+    if (index < 0)
+    {
+        throw std::runtime_error("invalid subscript expression: " + containerVarExpr + "[" + std::to_string(index) + "]");
+    }
+    int64_t i = index;
+    Iterator* iterator = GetIterator(i);
+    while (i > 0 && !iterator)
+    {
+        --i;
+        iterator = GetIterator(i);
+    }
+    if (!iterator && i == 0)
+    {
+        iterator = Begin(containerVarExpr);
+    }
+    if (!iterator || iterator->IsEnd())
+    {
+        throw std::runtime_error("invalid subscript expression: " + containerVarExpr + "[" + std::to_string(index) + "]");
+    }
+    while (iterator->Index() < index)
+    {
+        if (iterator->IsEnd())
+        {
+            throw std::runtime_error("invalid subscript expression: " + containerVarExpr + "[" + std::to_string(index) + "]");
+        }
+        iterator = iterator->Next();
+    }
+    return iterator->CurrentStr();
+}
+
 ListContainer::ListContainer(Debugger& debugger, ContainerClassTemplateKind kind, uint64_t address) : ForwardContainer(debugger, kind, address)
 {
 }
 
 int64_t ListContainer::Count(const std::string& containerVarExpr)
 {
-    return Container::Count(containerVarExpr + ".count");
+    return Container::Count("(" + containerVarExpr + ").count");
 }
 
 HashtableContainer::HashtableContainer(Debugger& debugger, ContainerClassTemplateKind kind, uint64_t address) :
@@ -703,7 +785,7 @@ void HashtableContainer::Init()
 
 int64_t HashtableContainer::Count(const std::string& containerVarExpr)
 {
-    return Container::Count(containerVarExpr + ".table.count");
+    return Container::Count("(" + containerVarExpr + ").table.count");
 }
 
 struct CountGuard
@@ -735,7 +817,7 @@ Iterator* HashtableContainer::Begin(const std::string& containerVarExpr)
     if (bucketCount == -1)
     {
         CountGuard guard(*this);
-        bucketCount = Container::Count(containerVarExpr + ".table.buckets.count");
+        bucketCount = Container::Count("(" + containerVarExpr + ").table.buckets.count");
     }
     int64_t bucketIndex = 0;
     std::unique_ptr<Pointer> bucketPtr(new Pointer(*this, containerVarExpr + ".table.buckets.items[" + std::to_string(bucketIndex) + "]"));
@@ -785,7 +867,7 @@ void TreeContainer::Init(const std::string& containerVarExpr)
 
 int64_t TreeContainer::Count(const std::string& containerVarExpr)
 {
-    return Container::Count(containerVarExpr + ".tree.count");
+    return Container::Count("(" + containerVarExpr + ").tree.count");
 }
 
 Iterator* TreeContainer::Begin(const std::string& containerVarExpr)
@@ -969,7 +1051,8 @@ Iterator* List::Begin(const std::string& containerVarExpr)
     }
     else
     {
-        Iterator* beginIterator = new ListIterator(*this, 0, itemsPtr.get());
+        int64_t count = Count(containerVarExpr);
+        Iterator* beginIterator = new ListIterator(*this, 0, count, itemsPtr.get());
         AddIterator(beginIterator);
         return beginIterator;
     }
@@ -986,15 +1069,16 @@ Iterator* List::End(const std::string& containerVarExpr)
     {
         return end;
     }
+    int64_t count = Count(containerVarExpr);
     if (itemsPtr->IsNull())
     {
-        Iterator* endIterator = new ListIterator(*this, -1, itemsPtr.get());
+        Iterator* endIterator = new ListIterator(*this, -1, count, itemsPtr.get());
         AddIterator(endIterator);
         return endIterator;
     }
     else
     {
-        Iterator* endIterator = new ListIterator(*this, Count(containerVarExpr), itemsPtr.get());
+        Iterator* endIterator = new ListIterator(*this, -1, count, itemsPtr.get());
         AddIterator(endIterator);
         return endIterator;
     }
@@ -1013,11 +1097,33 @@ std::unique_ptr<JsonValue> List::Subscript(const std::string& containerVarExpr, 
     }
     if (!itemsPtr)
     {
-        itemsPtr.reset(new Pointer(*this, containerVarExpr + ".items"));
+        itemsPtr.reset(new Pointer(*this, "(" + containerVarExpr + ").items"));
     }
-    ListIterator* indexIterator = new ListIterator(*this, index, itemsPtr.get());
+    int64_t count = Count(containerVarExpr);
+    ListIterator* indexIterator = new ListIterator(*this, index, count, itemsPtr.get());
     AddIterator(indexIterator);
     return indexIterator->Current();
+}
+
+std::string List::SubscriptExpressionString(const std::string& containerVarExpr, int64_t index)
+{
+    if (index < 0)
+    {
+        throw std::runtime_error("invalid subscript expression: " + containerVarExpr + "[" + std::to_string(index) + "]");
+    }
+    Iterator* iterator = GetIterator(index);
+    if (iterator)
+    {
+        return iterator->CurrentStr();
+    }
+    if (!itemsPtr)
+    {
+        itemsPtr.reset(new Pointer(*this, "(" + containerVarExpr + ").items"));
+    }
+    int64_t count = Count(containerVarExpr);
+    ListIterator* indexIterator = new ListIterator(*this, index, count, itemsPtr.get());
+    AddIterator(indexIterator);
+    return indexIterator->CurrentStr();
 }
 
 ListRepContainer::ListRepContainer(Debugger& debugger, ContainerClassTemplateKind kind, uint64_t address) : Container(kind, debugger, address),
@@ -1027,22 +1133,27 @@ ListRepContainer::ListRepContainer(Debugger& debugger, ContainerClassTemplateKin
 
 int64_t ListRepContainer::Count(const std::string& containerVarExpr)
 {
-    return rep.Count(containerVarExpr + ".items");
+    return rep.Count("(" + containerVarExpr + ").items");
 }
 
 Iterator* ListRepContainer::Begin(const std::string& containerVarExpr)
 {
-    return rep.Begin(containerVarExpr + ".items");
+    return rep.Begin("(" + containerVarExpr + ").items");
 }
 
 Iterator* ListRepContainer::End(const std::string& containerVarExpr)
 {
-    return rep.End(containerVarExpr + ".items");
+    return rep.End("(" + containerVarExpr + ").items");
 }
 
 std::unique_ptr<JsonValue> ListRepContainer::Subscript(const std::string& containerVarExpr, int64_t index)
 {
-    return rep.Subscript(containerVarExpr + ".items", index);
+    return rep.Subscript("(" + containerVarExpr + ").items", index);
+}
+
+std::string ListRepContainer::SubscriptExpressionString(const std::string& containerVarExpr, int64_t index)
+{
+    return rep.SubscriptExpressionString("(" + containerVarExpr + ").items", index);
 }
 
 Map::Map(Debugger& debugger, uint64_t address) : TreeContainer(debugger, ContainerClassTemplateKind::map, address)

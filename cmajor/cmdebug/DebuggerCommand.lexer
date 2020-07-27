@@ -35,11 +35,9 @@ tokens DebuggerCommandTokens
     (PATH, "'path'"),
     (INTEGER, "'integer'"),
     (STRING, "'string'"),
-    (ADDRESS, "'address'"),
     (COLON, "':'"),
     (AST, "'*'"),
     (AMP, "'&'"),
-    (DOLLAR, "'$'"),
     (LPAREN, "'('"),
     (RPAREN, "')'"),
     (LANGLE, "'<'"),
@@ -91,7 +89,6 @@ expressions
     octaldigits = "[0-7]+";
     escape = "\\((x|X){hexdigits}|(d|D){decdigits}|{octaldigits}|u{hex4}|U{hex8}|[abfnrtv\"'\\])";
     string = "\"([^\\\r\n\"]|{escape})*\"";
-    address = "0(x|X){hexdigits}";
     integer = "[0-9]+";
 }
 
@@ -101,13 +98,11 @@ lexer api(DEBUG_API) DebuggerCommandLexer
     "{newline}"{ return NL; }
     "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
     "{path}"{ return PATH; }
-    "{address}"{ return ADDRESS; }
     "{integer}"{ return INTEGER; }
     "{string}"{ return STRING; }
     ":"{ return COLON; }
     "\*"{ return AST; }
     "\&"{ return AMP; }
-    "$"{ return DOLLAR; }
     "\("{ return LPAREN; }
     "\)"{ return RPAREN; }
     "<"{ return LANGLE; }

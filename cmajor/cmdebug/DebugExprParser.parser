@@ -16,7 +16,7 @@ parser api(DEBUG_API) DebugExprParser
     main;
 
     DebugExpr : cmajor::debug::DebugExprNode*
-        ::= PrefixDebugExpr:expr{ return expr; }
+        ::= AdditiveDebugExpr:expr{ return expr; }
         ;
 
     AdditiveDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr, var cmajor::debug::Operator op) : cmajor::debug::DebugExprNode*
@@ -27,8 +27,8 @@ parser api(DEBUG_API) DebugExprParser
                 {
                     switch (op)
                     {
-                        case cmajor::debug::Operator::plus: expr.reset(new cmajor::debug::AddDebugExprNode(expr.release(), right); break;
-                        case cmajor::debug::Operator::minus: expr.reset(new cmajor::debug::SubDebugExprNode(expr.release(), right); break;
+                        case cmajor::debug::Operator::plus: expr.reset(new cmajor::debug::AddDebugExprNode(expr.release(), right)); break;
+                        case cmajor::debug::Operator::minus: expr.reset(new cmajor::debug::SubDebugExprNode(expr.release(), right)); break;
                     }
                 }
             )*
@@ -40,7 +40,7 @@ parser api(DEBUG_API) DebugExprParser
 
     PrefixDebugExpr : cmajor::debug::DebugExprNode*
         ::= AST PrefixDebugExpr:derefOperand{ return new cmajor::debug::DerefDebugExprNode(derefOperand); }
-        |   AMP PrefixDebugExpr: addrOfOperand{ return new cmajor::debug::AddrOfDebugExprNode(addrOfOperand); }
+        |   AMP PrefixDebugExpr:addrOfOperand{ return new cmajor::debug::AddrOfDebugExprNode(addrOfOperand); }
         |   PostfixDebugExpr:postfix{ return postfix; }
         ;
 
@@ -61,11 +61,9 @@ parser api(DEBUG_API) DebugExprParser
     PrimaryDebugExpr : cmajor::debug::DebugExprNode*
         ::= ID{ return new cmajor::debug::IdentifierDebugExprNode(ToUtf8(lexer.GetToken(pos).match.ToString())); }
         |   INTEGER{ return new cmajor::debug::IntegerDebugExprNode(cmajor::debug::ParseLong(ToUtf8(lexer.GetToken(pos).match.ToString()))); }
-        |   ADDRESS{ return new cmajor::debug::AddressDebugExprNode(ToUtf8(lexer.GetToken(pos).match.ToString())); }
         |   LPAREN DebugExpr:expr RPAREN{ return new cmajor::debug::ParenthesizedDebugExprNode(expr); }
         |   TypeIdExpr:typeExpr{ return typeExpr; }
         |   CastDebugExpr:castExpr{ return castExpr; }
-        |   DebuggerVarExpr:debuggerVarExpr{ return debuggerVarExpr; }
         ;
 
     CastDebugExpr : cmajor::debug::DebugExprNode*
@@ -77,10 +75,6 @@ parser api(DEBUG_API) DebugExprParser
         {
             return new cmajor::debug::TypeIdDebugExprNode(typeId);
         }
-        ;
-
-    DebuggerVarExpr : cmajor::debug::DebugExprNode*
-        ::= DOLLAR INTEGER{ std::string indexStr = ToUtf8(lexer.GetToken(pos).match.ToString()); return new cmajor::debug::DebuggerVarExprNode(cmajor::debug::ParseInt(indexStr)); }
         ;
 }
 

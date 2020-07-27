@@ -50,6 +50,7 @@ public:
     std::unique_ptr<JsonValue> Deref();
     Pointer* PtrMember(const std::string& name);
     std::unique_ptr<JsonValue> ValueMember(const std::string& name);
+    std::string ValueMemberStr(const std::string& name);
 private:
     Container& container;
     std::string expression;
@@ -67,6 +68,7 @@ public:
     bool IsEnd() const { return index == -1; }
     bool Equals(Iterator* that) const { return index == that->index; }
     virtual std::unique_ptr<JsonValue> Current() = 0;
+    virtual std::string CurrentStr() = 0;
     virtual Iterator* Next() = 0;
 private:
     Container& container;
@@ -78,6 +80,7 @@ class ForwardListIterator : public Iterator
 public:
     ForwardListIterator(Container& container, int64_t index, Pointer* nodePtr_);
     std::unique_ptr<JsonValue> Current() override;
+    std::string CurrentStr() override;
     Iterator* Next() override;
 private:
     Pointer* nodePtr;
@@ -88,6 +91,7 @@ class LinkedListIterator : public Iterator
 public:
     LinkedListIterator(Container& container, int64_t index, Pointer* nodePtr_);
     std::unique_ptr<JsonValue> Current() override;
+    std::string CurrentStr() override;
     Iterator* Next() override;
 private:
     Pointer* nodePtr;
@@ -98,6 +102,7 @@ class HashtableIterator : public Iterator
 public:
     HashtableIterator(Container& container, int64_t index, Pointer* bucketPtr_, int64_t bucketIndex_, int64_t bucketCount_, const std::string& bucketsExpr_);
     std::unique_ptr<JsonValue> Current() override;
+    std::string CurrentStr() override;
     Iterator* Next() override;
 private:
     Pointer* bucketPtr;
@@ -111,6 +116,7 @@ class TreeIterator : public Iterator
 public:
     TreeIterator(Container& container, int64_t index, Pointer* nodePtr_);
     std::unique_ptr<JsonValue> Current() override;
+    std::string CurrentStr() override;
     Iterator* Next() override;
 private:
     Pointer* nodePtr;
@@ -119,11 +125,13 @@ private:
 class ListIterator : public Iterator
 {
 public:
-    ListIterator(Container& container, int64_t index, Pointer* itemsPtr_);
+    ListIterator(Container& container, int64_t index, int64_t count, Pointer* itemsPtr_);
     std::unique_ptr<JsonValue> Current() override;
+    std::string CurrentStr() override;
     Iterator* Next() override;
 private:
     Pointer* itemsPtr;
+    int64_t count;
 };
 
 uint64_t GetContainerAddress(Debugger& debugger, ContainerClassTemplateKind containerKind, const std::string& containerVarExpr);
@@ -139,6 +147,7 @@ public:
     virtual Iterator* Begin(const std::string& containerVarExpr) = 0;
     virtual Iterator* End(const std::string& containerVarExpr) = 0;
     virtual std::unique_ptr<JsonValue> Subscript(const std::string& containerVarExpr, int64_t index) = 0;
+    virtual std::string SubscriptExpressionString(const std::string& containerVarExpr, int64_t index) = 0;
     std::unique_ptr<JsonValue> Range(const std::string& containerVarExpr, int64_t rangeStart, int64_t rangeEnd);
     ContainerClassTemplateKind GetKind() const { return kind; }
     uint64_t Address() const { return address; }
@@ -171,6 +180,7 @@ class ForwardContainer : public Container
 public:
     ForwardContainer(Debugger& debugger, ContainerClassTemplateKind kind, uint64_t address);
     std::unique_ptr<JsonValue> Subscript(const std::string& containerVarExpr, int64_t index) override;
+    std::string SubscriptExpressionString(const std::string& containerVarExpr, int64_t index) override;
 };
 
 class ListContainer : public ForwardContainer
@@ -254,6 +264,7 @@ public:
     Iterator* Begin(const std::string& containerVarExpr) override;
     Iterator* End(const std::string& containerVarExpr) override;
     std::unique_ptr<JsonValue> Subscript(const std::string& containerVarExpr, int64_t index) override;
+    std::string SubscriptExpressionString(const std::string& containerVarExpr, int64_t index) override;
 private:
     std::unique_ptr<Pointer> itemsPtr;
 };
@@ -266,6 +277,7 @@ public:
     Iterator* Begin(const std::string& containerVarExpr) override;
     Iterator* End(const std::string& containerVarExpr) override;
     std::unique_ptr<JsonValue> Subscript(const std::string& containerVarExpr, int64_t index) override;
+    std::string SubscriptExpressionString(const std::string& containerVarExpr, int64_t index) override;
 private:
     List rep;
 };

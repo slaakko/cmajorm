@@ -10,24 +10,22 @@ namespace DebugExprTokens
 
     void InitTokenIdMap()
     {
-        tokenIdMap[U"ADDRESS"] = 7;
-        tokenIdMap[U"AMP"] = 9;
-        tokenIdMap[U"AST"] = 8;
+        tokenIdMap[U"AMP"] = 8;
+        tokenIdMap[U"AST"] = 7;
         tokenIdMap[U"BASE"] = 3;
         tokenIdMap[U"CAST"] = 1;
-        tokenIdMap[U"COMMA"] = 18;
-        tokenIdMap[U"DOLLAR"] = 10;
-        tokenIdMap[U"DOT"] = 17;
+        tokenIdMap[U"COMMA"] = 16;
+        tokenIdMap[U"DOT"] = 15;
         tokenIdMap[U"ID"] = 4;
         tokenIdMap[U"INTEGER"] = 5;
-        tokenIdMap[U"LANGLE"] = 13;
-        tokenIdMap[U"LBRACKET"] = 15;
-        tokenIdMap[U"LPAREN"] = 11;
-        tokenIdMap[U"MINUS"] = 20;
-        tokenIdMap[U"PLUS"] = 19;
-        tokenIdMap[U"RANGLE"] = 14;
-        tokenIdMap[U"RBRACKET"] = 16;
-        tokenIdMap[U"RPAREN"] = 12;
+        tokenIdMap[U"LANGLE"] = 11;
+        tokenIdMap[U"LBRACKET"] = 13;
+        tokenIdMap[U"LPAREN"] = 9;
+        tokenIdMap[U"MINUS"] = 18;
+        tokenIdMap[U"PLUS"] = 17;
+        tokenIdMap[U"RANGLE"] = 12;
+        tokenIdMap[U"RBRACKET"] = 14;
+        tokenIdMap[U"RPAREN"] = 10;
         tokenIdMap[U"STRING"] = 6;
         tokenIdMap[U"TYPEID"] = 2;
     }
@@ -54,10 +52,8 @@ namespace DebugExprTokens
         "ID",
         "INTEGER",
         "STRING",
-        "ADDRESS",
         "AST",
         "AMP",
-        "DOLLAR",
         "LPAREN",
         "RPAREN",
         "LANGLE",
@@ -84,10 +80,8 @@ namespace DebugExprTokens
         "id",
         "'integer'",
         "'string'",
-        "'address'",
         "'*'",
         "'&'",
-        "'$'",
         "'('",
         "')'",
         "'<'",

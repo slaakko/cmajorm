@@ -11,13 +11,9 @@
 
 namespace cmajor { namespace debug {
 
-DebugExprBinder::DebugExprBinder(Debugger& debugger_, DebugInfo* debugInfo_, Scope* scope_) : debugger(debugger_), debugInfo(debugInfo_), scope(scope_)
+DebugExprBinder::DebugExprBinder(Debugger& debugger_, DebugInfo* debugInfo_, Scope* scope_) :
+    debugger(debugger_), debugInfo(debugInfo_), scope(scope_), hasContainerSubscript(false)
 {
-}
-
-void DebugExprBinder::Visit(AddressDebugExprNode& node)
-{
-    currentNode.reset(new BoundAddressNode(debugInfo->GetMainProject()->GetLongType(), node.Value(), &node));
 }
 
 void DebugExprBinder::Visit(IdentifierDebugExprNode& node)
@@ -64,7 +60,8 @@ void DebugExprBinder::Visit(AddDebugExprNode& node)
             DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(right->Type());
             if (primitiveType->IsIntegerType())
             {
-                currentNode.reset(new BoundAddNode(left->Type(), left.release(), right.release(), &node));
+                DIType* type = left->Type();
+                currentNode.reset(new BoundAddNode(type, left.release(), right.release(), &node));
                 valid = true;
             }
         }
@@ -99,7 +96,8 @@ void DebugExprBinder::Visit(SubDebugExprNode& node)
             DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(right->Type());
             if (primitiveType->IsIntegerType())
             {
-                currentNode.reset(new BoundSubNode(left->Type(), left.release(), right.release(), &node));
+                DIType* type = left->Type();
+                currentNode.reset(new BoundSubNode(type, left.release(), right.release(), &node));
                 valid = true;
             }
         }
@@ -235,6 +233,10 @@ void DebugExprBinder::Visit(SubscriptDebugExprNode& node)
         {
             DIClassTemplateSpecializationType* specializationType = static_cast<DIClassTemplateSpecializationType*>(subjectType);
             type = GetValueType(specializationType);
+            if (specializationType->GetContainerClassTemplateKind() != ContainerClassTemplateKind::notContainerClassTemplate)
+            {
+                hasContainerSubscript = true;
+            }
             break;
         }
         default:
@@ -345,33 +347,13 @@ void DebugExprBinder::Visit(CastDebugExprNode& node)
     std::unique_ptr<BoundDebugNode> exprNode = std::move(currentNode);
     std::string gdbExprString;
     DIType* type = typeNode->Type();
-    if (exprNode->GetKind() == BoundDebugNode::Kind::addressNode)
-    {
-        gdbExprString = "{" + type->IrName() + "}" + exprNode->GdbExprString();
-    }
-    else
-    {
-        gdbExprString = "(" + type->IrName() + ")" + exprNode->GdbExprString();
-    }
+    gdbExprString = "(" + type->IrName() + ")" + exprNode->GdbExprString();
     currentNode.reset(new BoundCastNode(typeNode.release(), exprNode.release(), gdbExprString, &node));
-}
-
-void DebugExprBinder::Visit(DebuggerVarExprNode& node)
-{
-    const DebuggerVariable* variable = debugger.GetDebuggerVariable(node.VariableIndex());
-    if (variable)
-    {
-        currentNode.reset(new BoundDebuggerVarNode(debugInfo->GetMainProject()->GetLongType(), variable, &node));
-    }
-    else
-    {
-        throw std::runtime_error("debugger variable index " + std::to_string(node.VariableIndex()) + " not found");
-    }
 }
 
 BoundDebugExpression* DebugExprBinder::BoundExpression(DebugExprNode* sourceNode)
 {
-    expression.reset(new BoundDebugExpression(currentNode.release(), sourceNode));
+    expression.reset(new BoundDebugExpression(currentNode.release(), sourceNode, hasContainerSubscript));
     return expression.get();
 }
 

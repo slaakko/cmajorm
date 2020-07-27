@@ -13,12 +13,12 @@ struct DEBUG_API DebugExprParser
 {
     static std::unique_ptr<cmajor::debug::DebugExprNode> Parse(DebugExprLexer& lexer);
     static soulng::parser::Match DebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match AdditiveDebugExpr(DebugExprLexer& lexer);
     static soulng::parser::Match PrefixDebugExpr(DebugExprLexer& lexer);
     static soulng::parser::Match PostfixDebugExpr(DebugExprLexer& lexer);
     static soulng::parser::Match PrimaryDebugExpr(DebugExprLexer& lexer);
     static soulng::parser::Match CastDebugExpr(DebugExprLexer& lexer);
     static soulng::parser::Match TypeIdExpr(DebugExprLexer& lexer);
-    static soulng::parser::Match DebuggerVarExpr(DebugExprLexer& lexer);
 };
 
 #endif // DEBUGEXPRPARSER_HPP

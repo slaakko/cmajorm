@@ -36,8 +36,9 @@
     <p>
         <ul>
             <li>
-                Download and install <a href="https://releases.llvm.org/download.html#10.0.0">LLVM 10.0.0</a> or newer
-                <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/LLVM-10.0.0-win64.exe">pre-built binaries for Windows (64-bit)</a>.
+                Download and install <a href="https://releases.llvm.org/download.html#10.0.0">LLVM 10.0.0</a> or newer.
+                This is a direct link to download 
+                <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/LLVM-10.0.0-win64.exe">LLVM 10.0.0 pre-built binaries for Windows (64-bit)</a>. 
             </li>
             <li>
                 Add LLVM tools to System PATH so that Cmajor compiler can find them:
@@ -223,7 +224,7 @@
     <p>
         I have Ubuntu 18.04, so I downloaded the <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz">Pre-Built Binaries</a> package.
         I extracted the package to the <strong>~/llvm-10.0.0</strong> directory and inserted <strong>~/llvm-10.0.0/bin</strong> directory to the front of my PATH environment variable.
-        After that, to be sure, run the following command:
+        After I ran the following command:
         <pre>
             which clang++
         </pre>
@@ -282,21 +283,18 @@
             Start command prompt, and start your distro. I use Ubuntu 18.04.
             <pre>
                 C:\>ubuntu
-                slaakko@ACER:~$
-            </pre>
-        </li>
-        <li>
-            First it's wise to update the system:
-            <pre>
-                sudo update
-                sudo upgrade
+                slaakko@pluto:~$
             </pre>
         </li>
     </ul>
 
     <h4>
-        2.4.1 Installing LLVM, LLD and Clang
+        2.4.1 Installing LLVM, LLD and Clang from sources
     </h4>
+    
+    <p>
+        You may alternatively use a <a href="https://releases.llvm.org/download.html#10.0.0">LLVM Pre-built Binaries package</a> so this may not be required.
+    </p>
 
     <ul>
         <li>
@@ -415,17 +413,13 @@
             </pre>
         </li>
         <li>
-            To ensure that it works we build and run a simple hello world program.
-            Change to Hello directory and compile the Hello.cmp and run it:
+            To test that the system basically works, change to Hello directory, compile the Hello.cmp and run it:
             <pre>
-                cd projects/examples/Hello
+                slaakko@pluto:~/cmajor-3.6.0-src$ cd cmajor/projects/examples/Hello
                 cmc -v Hello.cmp
-                slaakko@ACER:~/cmajor-3.6.0-src/cmajor/projects/examples/Hello$ bin/debug/Hello
+                slaakko@pluto:~/cmajor-3.6.0-src/cmajor/projects/examples/Hello$ bin/debug/Hello
                 Hello, world!
             </pre>
-        </li>
-        <li>
-            That's all!
         </li>
     </ul>
 

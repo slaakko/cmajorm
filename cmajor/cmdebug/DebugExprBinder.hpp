@@ -24,7 +24,6 @@ class DEBUG_API DebugExprBinder : public DebugExprVisitor
 {
 public:
     DebugExprBinder(Debugger& debugger_, DebugInfo* debugInfo_, Scope* scope_);
-    void Visit(AddressDebugExprNode& node) override;
     void Visit(IdentifierDebugExprNode& node) override;
     void Visit(IntegerDebugExprNode& node) override;
     void Visit(AddDebugExprNode& node) override;
@@ -37,7 +36,6 @@ public:
     void Visit(RangeDebugExprNode& node) override;
     void Visit(TypeIdDebugExprNode& node) override;
     void Visit(CastDebugExprNode& node) override;
-    void Visit(DebuggerVarExprNode& node) override;
     BoundDebugExpression* BoundExpression(DebugExprNode* sourceNode);
     DIType* GetValueType(DIClassTemplateSpecializationType* specializationType) const;
 private:
@@ -46,6 +44,7 @@ private:
     Scope* scope;
     std::unique_ptr<BoundDebugNode> currentNode;
     std::unique_ptr<BoundDebugExpression> expression;
+    bool hasContainerSubscript;
 };
 
 } } // namespace cmajor::debug

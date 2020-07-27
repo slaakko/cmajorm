@@ -20,30 +20,6 @@ BoundDebugNode::~BoundDebugNode()
 {
 }
 
-BoundAddressNode::BoundAddressNode(DIType* type, const std::string& value_, DebugExprNode* sourceNode) : BoundDebugNode(Kind::addressNode, type, sourceNode), value(value_)
-{
-}
-
-void BoundAddressNode::Accept(BoundDebugNodeVisitor& visitor)
-{
-    visitor.Visit(*this);
-}
-
-std::string BoundAddressNode::ToString() const
-{
-    return value;
-}
-
-BoundDebugNode* BoundAddressNode::Clone() const
-{
-    return new BoundAddressNode(Type(), value, SourceNode());
-}
-
-std::string BoundAddressNode::GdbExprString() const
-{
-    return value;
-}
-
 BoundVariableReferenceNode::BoundVariableReferenceNode(DIType* type, DIVariable* variable_, DebugExprNode* sourceNode) :
     BoundDebugNode(Kind::variableReferenceNode, type, sourceNode), variable(variable_)
 {
@@ -106,7 +82,7 @@ void BoundAddNode::Accept(BoundDebugNodeVisitor& visitor)
 
 std::string BoundAddNode::ToString() const
 {
-    return left->ToString() + " + " + right->ToString();
+    return left->ToString() + "+" + right->ToString();
 }
 
 BoundDebugNode* BoundAddNode::Clone() const
@@ -116,7 +92,7 @@ BoundDebugNode* BoundAddNode::Clone() const
 
 std::string BoundAddNode::GdbExprString() const
 {
-    return left->GdbExprString() + " + " + right->GdbExprString();
+    return left->GdbExprString() + "+" + right->GdbExprString();
 }
 
 BoundSubNode::BoundSubNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
@@ -131,7 +107,7 @@ void BoundSubNode::Accept(BoundDebugNodeVisitor& visitor)
 
 std::string BoundSubNode::ToString() const
 {
-    return left->ToString() + " - " + right->ToString();
+    return left->ToString() + "-" + right->ToString();
 }
 
 BoundDebugNode* BoundSubNode::Clone() const
@@ -141,7 +117,7 @@ BoundDebugNode* BoundSubNode::Clone() const
 
 std::string BoundSubNode::GdbExprString() const
 {
-    return left->GdbExprString() + " - " + right->GdbExprString();
+    return left->GdbExprString() + "-" + right->GdbExprString();
 }
 
 BoundDerefNode::BoundDerefNode(DIType* type, BoundDebugNode* subject_, DebugExprNode* sourceNode) : BoundDebugNode(Kind::derefNode, type, sourceNode), subject(subject_)
@@ -262,7 +238,8 @@ std::string BoundRangeNode::GdbExprString() const
     return std::string();
 }
 
-BoundParenExprNode::BoundParenExprNode(BoundDebugNode* subject_, DebugExprNode* sourceNode) : BoundDebugNode(Kind::parenExprNode, subject_->Type(), sourceNode), subject(subject_)
+BoundParenExprNode::BoundParenExprNode(BoundDebugNode* subject_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::parenExprNode, subject_->Type(), sourceNode), subject(subject_)
 {
 }
 
@@ -335,33 +312,8 @@ std::string BoundCastNode::GdbExprString() const
     return gdbExprString;
 }
 
-BoundDebuggerVarNode::BoundDebuggerVarNode(DIType* type, const DebuggerVariable* variable_, DebugExprNode* sourceNode) :
-    BoundDebugNode(Kind::debuggerVarNode, type, sourceNode), variable(variable_)
-{
-}
-
-void BoundDebuggerVarNode::Accept(BoundDebugNodeVisitor& visitor)
-{
-    visitor.Visit(*this);
-}
-
-std::string BoundDebuggerVarNode::ToString() const
-{
-    return "$" + std::to_string(variable->Index());
-}
-
-BoundDebugNode* BoundDebuggerVarNode::Clone() const
-{
-    return new BoundDebuggerVarNode(Type(), variable, SourceNode());
-}
-
-std::string BoundDebuggerVarNode::GdbExprString() const
-{
-    return variable->GdbVarName();
-}
-
-BoundDebugExpression::BoundDebugExpression(BoundDebugNode* node_, DebugExprNode* sourceNode) :
-    BoundDebugNode(Kind::debugExpression, node_->Type(), sourceNode), node(node_)
+BoundDebugExpression::BoundDebugExpression(BoundDebugNode* node_, DebugExprNode* sourceNode, bool hasContainerSubscript_) :
+    BoundDebugNode(Kind::debugExpression, node_->Type(), sourceNode), node(node_), hasContainerSubscript(hasContainerSubscript_)
 {
 }
 
@@ -377,7 +329,7 @@ std::string BoundDebugExpression::ToString() const
 
 BoundDebugNode* BoundDebugExpression::Clone() const
 {
-    return new BoundDebugExpression(node->Clone(), SourceNode());
+    return new BoundDebugExpression(node->Clone(), SourceNode(), hasContainerSubscript);
 }
 
 std::string BoundDebugExpression::GdbExprString() const
