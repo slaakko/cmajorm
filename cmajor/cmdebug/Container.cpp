@@ -116,19 +116,14 @@ uint64_t Pointer::Address()
         }
         if (success)
         {
-            JsonValue* variableValue = jsonObject->GetField(U"variable");
-            if (variableValue && variableValue->Type() == JsonValueType::object)
+            JsonValue* addrValue = jsonObject->GetField(U"value");
+            if (addrValue && addrValue->Type() == JsonValueType::string)
             {
-                JsonObject* variableObject = static_cast<JsonObject*>(variableValue);
-                JsonValue* addrValue = variableObject->GetField(U"value");
-                if (addrValue && addrValue->Type() == JsonValueType::string)
-                {
-                    JsonString* addrStr = static_cast<JsonString*>(addrValue);
-                    std::string addressStr = ToUtf8(addrStr->Value());
-                    address = ParseHex(addressStr);
-                    hasAddress = true;
-                    return address;
-                }
+                JsonString* addrStr = static_cast<JsonString*>(addrValue);
+                std::string addressStr = ToUtf8(addrStr->Value());
+                address = ParseHex(addressStr);
+                hasAddress = true;
+                return address;
             }
         }
     }
@@ -226,17 +221,12 @@ uint64_t GetContainerAddress(Debugger& debugger, ContainerClassTemplateKind cont
             }
             if (success)
             {
-                JsonValue* variableValue = resultObject->GetField(U"variable");
-                if (variableValue && variableValue->Type() == JsonValueType::object)
+                JsonValue* addressValue = resultObject->GetField(U"value");
+                if (addressValue && addressValue->Type() == JsonValueType::string)
                 {
-                    JsonObject* variableObject = static_cast<JsonObject*>(variableValue);
-                    JsonValue* addressValue = variableObject->GetField(U"value");
-                    if (addressValue && addressValue->Type() == JsonValueType::string)
-                    {
-                        JsonString* addrStr = static_cast<JsonString*>(addressValue);
-                        std::string addressStr = ToUtf8(addrStr->Value());
-                        address = ParseHex(addressStr);
-                    }
+                    JsonString* addrStr = static_cast<JsonString*>(addressValue);
+                    std::string addressStr = ToUtf8(addrStr->Value());
+                    address = ParseHex(addressStr);
                 }
             }
         }
@@ -604,18 +594,13 @@ int64_t Container::Count(const std::string& expr)
         }
         if (success)
         {
-            JsonValue* variableValue = resultObject->GetField(U"variable");
-            if (variableValue && variableValue->Type() == JsonValueType::object)
+            JsonValue* countValue = resultObject->GetField(U"value");
+            if (countValue && countValue->Type() == JsonValueType::string)
             {
-                JsonObject* variableObject = static_cast<JsonObject*>(variableValue);
-                JsonValue* countValue = variableObject->GetField(U"value");
-                if (countValue && countValue->Type() == JsonValueType::string)
-                {
-                    JsonString* countString = static_cast<JsonString*>(countValue);
-                    std::string countStr = ToUtf8(countString->Value());
-                    count = boost::lexical_cast<int64_t>(countStr);
-                    return count;
-                }
+                JsonString* countString = static_cast<JsonString*>(countValue);
+                std::string countStr = ToUtf8(countString->Value());
+                count = boost::lexical_cast<int64_t>(countStr);
+                return count;
             }
         }
     }

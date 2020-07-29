@@ -19,7 +19,88 @@
         The cmdb uses it to drive the GNU debugger GDB.
     </p>
 
-    <h2>1. Requirements</h2>
+    <h2>Table of contents</h2>
+    
+    <div class="toc">
+        1 <a href="#requirements">Requirements</a><br />
+        2 <a href="#running">Running the debugger</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="#options">Command-line options</a><br />
+        3 <a href="#commands">Debugger commands</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.1 <a href="#list-command">List command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.1.1 <a href="#list-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.1.2 <a href="#list-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.1.3 <a href="#list-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.2 <a href="#break-command">Break command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1 <a href="#break-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.2 <a href="#break-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.3 <a href="#break-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.3 <a href="#delete-command">Delete command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3.1 <a href="#delete-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3.2 <a href="#delete-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3.3 <a href="#delete-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.4 <a href="#show-breakpoint-command">Show breakpoint command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4.1 <a href="#show-breakpoint-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4.2 <a href="#show-breakpoint-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4.3 <a href="#show-breakpoint-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.5 <a href="#show-breakpoints-command">Show breakpoints command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.5.1 <a href="#show-breakpoints-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.5.2 <a href="#show-breakpoints-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.5.3 <a href="#show-breakpoints-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.6 <a href="#next-command">Next command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.6.1 <a href="#next-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.6.2 <a href="#next-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.6.3 <a href="#next-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.7 <a href="#step-command">Step command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.7.1 <a href="#step-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.7.2 <a href="#step-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.7.3 <a href="#step-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.8 <a href="#finish-command">Finish command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.8.1 <a href="#finish-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.8.2 <a href="#finish-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.8.3 <a href="#finish-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.9 <a href="#until-command">Until command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.9.1 <a href="#until-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.9.2 <a href="#until-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.9.3 <a href="#until-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.10 <a href="#continue-command">Continue command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.10.1 <a href="#continue-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.10.2 <a href="#continue-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.10.3 <a href="#continue-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.11 <a href="#depth-command">Depth command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.11.1 <a href="#depth-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.11.2 <a href="#depth-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.11.3 <a href="#depth-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.12 <a href="#frames-command">Frames command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.1 <a href="#frames-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.2 <a href="#frames-command-examples">Examples</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.12.3 <a href="#frames-command-result">Result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.13 <a href="#print-command">Print command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.1 <a href="#print-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2 <a href="#print-command-expressions">Expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.1 <a href="#additive-expressions">Additive expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.2 <a href="#dereference-expression">Dereference expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.3 <a href="#address-of-expression">Address-of expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.4 <a href="#postfix-expressions">Postfix expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.5 <a href="#member-selection-expression">Member selection expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.6 <a href="#base-selection-expression">Base selection expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.7 <a href="#subscript-expression">Subscript expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.8 <a href="#range-expression">Range expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.9 <a href="#primary-expressions">Primary expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.10 <a href="#local-variable">Printing value of a local variable</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.11 <a href="#typeid-expression">Printing information about a type</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.12 <a href="#cast-expression">Cast expression</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.3 <a href="#print-command-containers">Containers</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.4 <a href="#print-command-type-identifiers">Type identifiers</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.14 <a href="#exit-command">Exit command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.14.1 <a href="#exit-command-syntax">Syntax</a><br />
+        4 <a href="#common-results">Common results</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.1 <a href="#stopped-result">Stopped result</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;4.2 <a href="#error-result">Error result</a><br />
+        5 <a href="#summary">Summary of the command syntax</a><br />
+        6 <a href="#bugs">Known bugs</a><br />
+    </div>
+
+    <h2 id="requirements">1. Requirements</h2>
     
     <ul>
         <li>
@@ -38,14 +119,14 @@
         </li>
     </ul>
     
-    <h2>2. Running the debugger</h2>
+    <h2 id="running">2. Running the debugger</h2>
     
     The debugger is started by giving command <strong>cmdb</strong> followed by an absolute or relative path of a Cmajor executable program with or without the .exe suffix (Windows).
     The debugger starts GDB and prints a prompt <strong>cmdb> </strong>. You may now enter debugger commands.
     If a plain ENTER is given as a debugger command, the latest command is repeated.
     The debugger exits by commands: <strong>exit</strong>, <strong>e</strong>, <strong>quit</strong> and <strong>q</strong>.
 
-    <h3>2.1 Command-line Options</h3>
+    <h3 id="options">2.1 Command-line Options</h3>
     
     <table class="opt">
         <tr>
@@ -70,9 +151,9 @@
         </tr>
     </table>
     
-    <h2>3. Debugger commands</h2>
+    <h2 id="commands">3. Debugger commands</h2>
     
-    <h3>3.1 List command</h3>
+    <h3 id="list-command">3.1 List command</h3>
     
     <p>
         The list command shows source file content starting from the specified list location.
@@ -102,7 +183,7 @@
         the source location for example using project name slash prefix.
     </p>
     
-    <h4>3.1.1 Syntax</h4>
+    <h4 id="list-command-syntax">3.1.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -173,7 +254,7 @@
         </tr>
     </table>
 
-    <h4>3.1.2 Examples</h4>
+    <h4 id="list-command-examples">3.1.2 Examples</h4>
     
     <ol>
         <li>
@@ -215,14 +296,14 @@
         </li>
     </ol>
     
-    <h4>3.1.3 Result</h4>
+    <h4 id="list-command-result">3.1.3 Result</h4>
     
     <p>
         If the list command succeeds, the result is 11 lines of source code.
         If the list command fails, the result is an <a href="#error-result">error result</a>.
     </p>
         
-    <h3>3.2 Break command</h3>
+    <h3 id="break-command">3.2 Break command</h3>
     
     <p>
         The break command sets a breakpoint to a source location.
@@ -231,7 +312,7 @@
         A successful break command sets the current source file path to file path of the source location.
     </p>
     
-    <h4>3.2.1 Syntax</h4>
+    <h4 id="break-command-syntax">3.2.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -244,7 +325,7 @@
         </tr>
     </table>   
     
-    <h4>3.2.2 Examples</h4>
+    <h4 id="break-command-examples">3.2.2 Examples</h4>
     
     <ol>
         <li>
@@ -307,7 +388,7 @@
         </li>
     </ol>
      
-    <h4>3.2.3 Result</h4>
+    <h4 id="break-command-result">3.2.3 Result</h4>
 
     <p>
         If the break command succeeds, the debugger prints a JSON object describing the created breakpoint.
@@ -332,13 +413,13 @@
         If the break command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
 
-    <h3>3.3 Delete command</h3>
+    <h3 id="delete-command">3.3 Delete command</h3>
     
     <p>
         The delete command deletes a breakpoint.
     </p>
     
-    <h4>3.3.1 Syntax</h4>
+    <h4 id="delete-command-syntax">3.3.1 Syntax</h4>
 
     <table class="grammar">
         <tr>
@@ -358,7 +439,7 @@
         </tr>
     </table>   
     
-    <h4>3.3.2 Examples</h4>
+    <h4 id="delete-command-examples">3.3.2 Examples</h4>
     
     <ol>
         <li>
@@ -394,7 +475,7 @@
         </li>
     </ol>
 
-    <h4>3.3.3 Result</h4>
+    <h4 id="delete-command-result">3.3.3 Result</h4>
 
     <p>
         If the delete command succeeds, the debugger prints a JSON object with the following field:
@@ -407,13 +488,13 @@
         If the delete command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
     
-    <h3>3.4 Show breakpoint command</h3>
+    <h3 id="show-breakpoint-command">3.4 Show breakpoint command</h3>
     
     <p>
         The show breakpoint command shows information about a breakpoint given a breakpoint identifier.
     </p>
 
-    <h4>3.4.1 Syntax</h4>
+    <h4 id="show-breakpoint-command-syntax">3.4.1 Syntax</h4>
 
         <table class="grammar">
         <tr>
@@ -426,7 +507,7 @@
         </tr>
     </table>   
     
-    <h4>3.4.2 Examples</h4>
+    <h4 id="show-breakpoint-command-examples">3.4.2 Examples</h4>
     
     <ol>
         <li>
@@ -465,7 +546,7 @@
         </li>
     </ol>
 
-    <h4>3.4.3 Result</h4>
+    <h4 id="show-breakpoint-command-result">3.4.3 Result</h4>
     
     <p>
         If the show breakpoint command succeeds, the debugger prints a JSON object with the following fields:
@@ -488,13 +569,13 @@
         If the show breakpoint command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
 
-    <h3>3.5 Show breakpoints command</h3>
+    <h3 id="show-breakpoints-command">3.5 Show breakpoints command</h3>
     
     <p>
         The show breakpoints command lists current breakpoints.
     </p>
     
-    <h4>3.5.1 Syntax</h4>
+    <h4 id="show-breakpoints-command-syntax">3.5.1 Syntax</h4>
 
     <table class="grammar">
         <tr>
@@ -506,7 +587,7 @@
         </tr>
     </table>   
 
-    <h4>3.5.2 Examples</h4>
+    <h4 id="show-breakpoints-command-examples">3.5.2 Examples</h4>
     
     <ol>
         <li>
@@ -546,7 +627,7 @@
         </li>
     </ol>
 
-    <h4>3.5.3 Result</h4>
+    <h4 id="show-breakpoints-command-result">3.5.3 Result</h4>
     
     <p>
         If the show breakpoints command succeeds, the debugger prints a JSON object that contains a JSON array of breakpoints.
@@ -570,7 +651,7 @@
         If the show breakpoints command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
     
-    <h3>3.6 Next command</h3>
+    <h3 id="next-command">3.6 Next command</h3>
     
     <p>
         The next command executes current source line of the program being debugged, transfers control to the next source line and stops the process.
@@ -579,7 +660,7 @@
         After execution the debugger prints a JSON object describing current state of the process and lists source lines around the current instruction.
     <p>
     
-    <h4>3.6.1 Syntax</h4>
+    <h4 id="next-command-syntax">3.6.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -591,7 +672,7 @@
         </tr>
     </table>   
     
-    <h4>3.6.2 Examples</h4>
+    <h4 id="next-command-examples">3.6.2 Examples</h4>
     
     <ol>
         <li>
@@ -688,7 +769,7 @@
         </li>
     </ol>
     
-    <h4>3.6.3 Result</h4>
+    <h4 id="next-command-result">3.6.3 Result</h4>
     
     <p>
         If the next command succceeds, the debugger prints a <a href="#stopped-result">stopped result</a>, a JSON object that describes the current state of the process.
@@ -699,7 +780,7 @@
         If the next command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
 
-    <h3>3.7 Step command</h3>
+    <h3 id="step-command">3.7 Step command</h3>
     
     <p>
         The step command starts executing current source line of the program being debugged. 
@@ -708,7 +789,7 @@
         After execution the debugger prints a JSON object describing the current state of the process and lists source lines around the current instruction.
     <p>
     
-    <h4>3.7.1 Syntax</h4>
+    <h4 id="step-command-syntax">3.7.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -720,7 +801,7 @@
         </tr>
     </table>   
     
-    <h4>3.7.2 Examples</h4>
+    <h4 id="step-command-examples">3.7.2 Examples</h4>
     
     <ol>
         <li>
@@ -755,7 +836,7 @@
         </li>
     </ol>
     
-    <h4>3.7.3 Result</h4>
+    <h4 id="step-command-result">3.7.3 Result</h4>
     
     <p>
         If the step command succceeds, the debugger prints a <a href="#stopped-result">stopped result</a>, a JSON object that describes the current state of the process.
@@ -766,7 +847,7 @@
         If the step command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
     
-    <h3>3.8 Finish command</h3>
+    <h3 id="finish-command">3.8 Finish command</h3>
     
     <p>
         The finish command runs the program to the end of the current function and steps out of the function.
@@ -774,7 +855,7 @@
         After execution the debugger prints a JSON object describing current state of the process and lists source lines around the current instruction.
     </p>
     
-    <h4>3.8.1 Syntax</h4>
+    <h4 id="finish-command-syntax">3.8.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -786,7 +867,7 @@
         </tr>
     </table>   
     
-    <h4>3.8.2 Examples</h4>
+    <h4 id="finish-command-examples">3.8.2 Examples</h4>
     
     <p>
         <ol>
@@ -824,7 +905,7 @@
         </ol>
     </p>
     
-    <h4>3.8.3 Result</h4>
+    <h4 id="finish-command-result">3.8.3 Result</h4>
 
     <p>
         If the finish command succceeds, the debugger prints a <a href="#stopped-result">stopped result</a>, a JSON object that describes the current state of the process.
@@ -835,13 +916,13 @@
         If the finish command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
     
-    <h3>3.9 Until command</h3>
+    <h3 id="until-command">3.9 Until command</h3>
     
     <p>
         The until command runs the program to the specified source location.
     </p>
     
-    <h4>3.9.1 Syntax</h4>
+    <h4 id="until-command-syntax">3.9.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -854,7 +935,7 @@
         </tr>
     </table>   
     
-    <h4>3.9.2 Examples</h4>
+    <h4 id="until-command-examples">3.9.2 Examples</h4>
     
     <p>
         <ol>
@@ -891,7 +972,7 @@
         </ol>
     </p>
     
-    <h4>3.9.3 Result</h4>
+    <h4 id="until-command-result">3.9.3 Result</h4>
 
     <p>
         If the until command succceeds, the debugger prints a <a href="#stopped-result">stopped result</a>, a JSON object that describes the current state of the process.
@@ -902,14 +983,14 @@
         If the until command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
     
-    <h3>3.10 Continue command</h3>
+    <h3 id="continue-command">3.10 Continue command</h3>
     
     <p>
         The continue command starts executing the program being debugged from the current source line, and runs it until a breakpoint is hit, 
         the process receives a signal, or the process exits gracefully or not so gracefully.
     </p>
     
-    <h4>3.10.1 Syntax</h4>
+    <h4 id="continue-command-syntax">3.10.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -921,7 +1002,7 @@
         </tr>
     </table>   
 
-    <h4>3.10.2 Examples</h4>
+    <h4 id="continue-command-examples">3.10.2 Examples</h4>
     
     <p>
         <ol>
@@ -976,7 +1057,7 @@
         </ol>
     </p>
     
-    <h4>3.10.3 Result</h4>
+    <h4 id="continue-command-result">3.10.3 Result</h4>
 
     <p>
         If the continue command succceeds, the debugger prints a <a href="#stopped-result">stopped result</a>, a JSON object that describes the current state of the process.
@@ -988,13 +1069,13 @@
         If the continue command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
 
-    <h3>3.11 Depth command</h3>
+    <h3 id="depth-command">3.11 Depth command</h3>
     
     <p>
         The depth command prints a JSON object that contains the depth of the current call stack.
     </p>
 
-    <h4>3.11.1 Syntax</h4>
+    <h4 id="depth-command-syntax">3.11.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -1006,7 +1087,7 @@
         </tr>
     </table>   
     
-    <h4>3.11.2 Examples</h4>
+    <h4 id="depth-command-examples">3.11.2 Examples</h4>
     
     <p>
         <ol>
@@ -1025,7 +1106,7 @@
         </ol>
     </p>
 
-    <h4>3.11.3 Result</h4>
+    <h4 id="depth-command-result">3.11.3 Result</h4>
     
     <p>
         If the depth command succeeds, the debugger prints a JSON object that contains the depth of the call stack. The JSON object contains the following fields:
@@ -1039,14 +1120,14 @@
         If the depth command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
 
-    <h3>3.12 Frames command</h3>
+    <h3 id="frames-command">3.12 Frames command</h3>
     
     <p>
         The frames command prints a JSON object that contains specified frames of the current call stack. 
         If no frame numbers are given, the debugger prints entire call stack. The number of the current frame is zero and outer frames have succeeding numbers.
     </p>
     
-    <h4>3.12.1 Syntax</h4>
+    <h4 id="frames-command-syntax">3.12.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -1074,7 +1155,7 @@
         </tr>
     </table>   
 
-    <h4>3.12.2 Examples</h4>
+    <h4 id="frames-command-examples">3.12.2 Examples</h4>
     
     <p>
         <ol>
@@ -1180,7 +1261,7 @@
         </ol>
     </p>
 
-    <h4>3.12.3 Result</h4>
+    <h4 id="frames-command-result">3.12.3 Result</h4>
     
     <p>
         If the frames command succeeds, the debugger prints a JSON object that contains two JSON arrays of frame objects, one for C++ frames and one for Cmajor frames:
@@ -1207,15 +1288,15 @@
         If the frames command fails, the debugger prints an <a href="#error-result">error result</a>.
     </p>
 
-    <h3>3.13 Print command</h3>
+    <h3 id="print-command">3.13 Print command</h3>
     
     <p>
         The print command evaluates an expression and prints the result as a JSON object.
         The expression can contain for example a name of a local variable, <strong>this</strong> pointer, subscript or range expression, 
-        pointer dereferencing, member selection or address-of expression.
+        pointer dereference, member selection or address-of expression.
     </p>
 
-    <h4>3.13.1 Syntax</h4>
+    <h4 id="print-command-syntax">3.13.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -1274,9 +1355,9 @@
                 <span class="rule"><a href="#rule.primary-expression">primary&#8209;expression</a></span><br/>
                 (
                     <span class="rule"><a href="#rule.member-selection-expression">member&#8209;selection&#8209;expression</a></span> |
-                    <span class="rule"><a href="#rule.base-selection-expression">base&#8209;selection&#8209;expression</a></span> |
-                    <span class="rule"><a href="#rule.range-expression">range&#8209;expression</a></span> |
-                    <span class="rule"><a href="#rule.subscript-expression">subscript&#8209;expression</a></span>
+                    <span class="rule"><a href="#rule.base-selection-expression">base&#8209;selection&#8209;expression</a></span> |<br/>
+                    <span class="rule"><a href="#rule.subscript-expression">subscript&#8209;expression</a></span> |
+                    <span class="rule"><a href="#rule.range-expression">range&#8209;expression</a></span>
                 )*
             </td>
         </tr>
@@ -1295,6 +1376,13 @@
             </td>
         </tr>
         <tr>
+            <td class="rule" id="rule.subscript-expression">subscript&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">[</span> <span class="rule"><a href="#rule.expression">expression</a></span> <span class="mono">]</span>
+            </td>
+        </tr>
+        <tr>
             <td class="rule" id="rule.range-expression">range&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
@@ -1303,13 +1391,6 @@
                 <span class="mono">,</span>
                 <span class="rule"><a href="#rule.expression">expression</a></span>
                 <span class="mono">]</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="rule" id="rule.subscript-expression">subscript&#8209;expression</td>
-            <td class="sep">&rarr;</td>
-            <td class="rcontent">
-                <span class="mono">[</span> <span class="rule"><a href="#rule.expression">expression</a></span> <span class="mono">]</span>
             </td>
         </tr>
         <tr>
@@ -1429,12 +1510,9 @@
         </tr>
     </table>   
 
-    <h4>3.13.2 Expressions<h4>
+    <h4 id="print-command-expressions">3.13.2 Expressions<h4>
     
-    <p>
-    </p>
-    
-    <h5>3.13.2.1 Additive expressions</h5>
+    <h5 id="additive-expressions">3.13.2.1 Additive expressions</h5>
     
     <p>
         Additive expressions are of the form <em>ptr</em><span class="mono">+</span><em>offset</em>,
@@ -1464,7 +1542,7 @@
         </pre>
     </p>
 
-    <h5>3.13.2.2 Dereference expression</h5>
+    <h5 id="dereference-expression">3.13.2.2 Dereference expression</h5>
     
     <p>
         A dereference expression is of the form <span class="mono">*</span><em>ptr</em>, where
@@ -1496,7 +1574,7 @@
         </pre>
     </p>
 
-    <h5>3.13.2.3 Address-of expression</h5>
+    <h5 id="address-of-expression">3.13.2.3 Address-of expression</h5>
     
     <p>
         An address-of expression is of the form <span class="mono">&</span><em>expr</em>,
@@ -1516,311 +1594,367 @@
     </pre>
     
     <p>
-        the debugger will print a JSON object with the <em>value</em> field having e.g. value "0x2ccf944".
+        the debugger will print a JSON object with the <em>value</em> field having e.g. a value "0x2ccf944".
     </p>
 
-    <h5>3.13.2.4 Postfix expressions<h5>
+    <h5 id="postfix-expressions">3.13.2.4 Postfix expressions</h5>
     
     <p>
-        
+        A postfix expression consists of a <a href="#rule.primary-expression">primary expression</a> 
+        followed by a possibly empty sequence of <a href="#rule.member-selection-expression">member selection</a>, 
+        <a href="#rule.base-selection-expression">base selection</a>, <a href="#rule.subscript-expression">subscript</a> 
+        and <a href="#rule.range-expression">range</a> expressions.
     </p>
 
-    <p>
-        This <a href="../../code/debugging/content/DebugExample/index.html">program</a> contains the code that I have used in these examples.
-    </p>
-
-    <h4>3.13.2 Simple local variable expression</h4>
-
-    <h5>Syntax</h5>
-    
-    <strong>print </strong><em>localVariableName</em>
-
-    <h5>Code</h5>
+    <h5 id="member-selection-expression">3.13.2.5 Member selection expression</h5>
     
     <p>
-        <a href="../../code/debugging/content/DebugExample/file/SimpleLocalVar.cm.html">SimpleLocalVar.cm</a>.
+        Member selection expression is of the form <em>o</em><span class="mono">.</span><em>m</em>,
+        where <em>o</em> is an expression of a class type and <em>m</em> is a member variable of that class type.
     </p>
-
-    <h5>Example</h5>
-    
-    <h6>
-        List SimpleLocalVar.cm:
-    </h6>
-    
-    <pre>
-    cmdb> list SimpleLocalVar.cm
-    1  using System;
-    2
-    3  void SimpleLocalVar()
-    4  {
-    5      int x = 42;
-    6  }
-    7
-    8:-end of file-
-    </pre>
-
-    <h6>
-        Set breakpoint to line 6:
-    </h6>
-        
-    <pre>
-    cmdb> break 6
-    {
-        "breakpoint" :
-        {
-            "id" : "1",
-            "location" :
-            {
-                "file" : "D:\/work\/cmajorm\/cmajor\/doc\/code\/debugging\/SimpleLocalVar.cm",
-                "func" : "SimpleLocalVar()",
-                "line" : "6"
-            }
-            ,
-            "numInsts" : "1"
-        }
-        ,
-        "success" : true
-    }
-    </pre>
-    
-    <h6>
-        Run program to breakpoint:
-    </h6>
-    
-    <pre>
-    cmdb> continue
-    {
-        "stopped" :
-        {
-            "breakpointId" : "1",
-            "cppFrame" :
-            {
-                "file" : "D:\/work\/cmajorm\/cmajor\/doc\/code\/debugging\/lib\/cpp\/gcc\/debug\/SimpleLocalVar.cpp",
-                "func" : "function_SimpleLocalVar_3F37F432BF8ADD8099B23E4FE05582693CD46B05",
-                "line" : "117"
-            }
-            ,
-            "frame" :
-            {
-                "file" : "D:\/work\/cmajorm\/cmajor\/doc\/code\/debugging\/SimpleLocalVar.cm",
-                "func" : "SimpleLocalVar()",
-                "line" : "6"
-            }
-            ,
-            "gdbBreakpointNumber" : "2",
-            "reason" : "breakpoint-hit",
-            "threadId" : "1"
-        }
-        ,
-        "success" : true
-    }
-    1  using System;
-    2
-    3  void SimpleLocalVar()
-    4  {
-    5      int x = 42;
-    6> }
-    7
-    8:-end of file-
-    </pre>
     
     <p>
-        Value of a local variable of a primitive type is in the <strong>value</strong> JSON string member of the <strong>variable</strong> JSON object:
-    </p>
-    
-    <pre>
-    cmdb> print x
-    {
-        "static_type" :
-        {
-            "id" : "191c2fac-e5c3-40a1-9e8b-e6dd9791aceb",
-            "irName" : "int32_t",
-            "name" : "int"
-        }
-        ,
-        "success" : true,
-        "variable" :
-        {
-            "has_more" : "0",
-            "kind" : "local",
-            "name" : "v1",
-            "numchild" : "0",
-            "status" : "initialized",
-            "thread-id" : "1",
-            "type" : "int32_t",
-            "value" : "42",
-            "varIndex" : "1"
-        }
-    }
-    </pre>
-        
-    <h4>3.13.3 Information about a local variable of a container type</h4>
-
-    <p>
-        Printing information about a local variable of a container type:
+        If <em>p</em> is a pointer to a class type object, 
+        <span class="mono">(*</span><em>p</em><span class="mono">).</span><em>m</em> denotes a member <em>m</em> of that class object.
+        In this case the parentheses are necessary because the precedence of the member selection operator <span class="mono">.</span>
+        is greater than the precedence of the dereference operator <span class="mono">*</span>.
     </p>
 
-    <h5>Syntax</h5>
-    
-    <strong>print </strong><em>containerVariableName</em>
-
-    <h5>Code</h5>
+    <h5 id="base-selection-expression">3.13.2.6 Base selection expression</h5>
     
     <p>
-        <a href="../../code/debugging/content/DebugExample/file/ContainerLocalVar.cm.html">ContainerLocalVar.cm</a>.
+        Base selection expression is of the form <em>o</em><span class="mono">.</span><span class="kw">base</span>,
+        where <em>o</em> is an expression of a class type having a base class. It denotes the base class object of class object <em>o</em>.
     </p>
 
-    <h5>Example</h5>
+    <h5 id="subscript-expression">3.13.2.7 Subscript expression</h5>
     
     <p>
-        If a local variable is of a container type, the <strong>container</strong> field contains the name of the container, and the <strong>count</strong> field 
-        contains the number of elements in the container (if available):
+        Substricpt expression is of the form <em>e</em><span class="mono">[</span><em>index</em><span class="mono">]</span>,
+        where <em>e</em> is of an array, pointer or container type and <em>index</em> is an integer. Indeces start from 0.
     </p>
     
-    <pre>
-    cmdb> print x
-    {
-        "container" : "list",
-        "count" : "3",
-        "static_type" :
-        {
-            "id" : "202397b1-17a4-4339-a19a-fe548292bdf8",
-            "irName" : "__T0_ContainerLocalVar_22D85006E338E95CD428DABC3705C1F582CF88B0",
-            "name" : "List&lt;int>"
-        }
-        ,
-        "success" : true,
-        "variable" :
-        {
-            "has_more" : "0",
-            "kind" : "local",
-            "name" : "v1",
-            "numchild" : "1",
-            "status" : "initialized",
-            "thread-id" : "1",
-            "type" : "__T0_ContainerLocalVar_22D85006E338E95CD428DABC3705C1F582CF88B0",
-            "value" : "{...}",
-            "varIndex" : "1"
-        }
-    }
-    </pre>
-
-    <h5>Containers</h5>
-    
-    The names of the container types are:
+    When <em>e</em> is
     <ul>
-        <li>forwardList: ForwardList&lt;T></li>
-        <li>hashMap: HashMap&lt;K, T, H, C></li>
-        <li>hashSet: HashSet&lt;T, H, C></li>
-        <li>linkedList: LinkedList&lt;T></li>
-        <li>list: List&lt;T></li>
-        <li>map: Map&lt;Key, Value, KeyCompare></li>
-        <li>queue: Queue&lt;T></li>
-        <li>set: Set&lt;T></li>
-        <li>stack: Stack&lt;T></li>
+        <li>an array, <em>e</em><span class="mono">[</span><em>i</em><span class="mono">]</span> denotes the <em>i'th</em> element of the array <em>e</em>.</li>
+        <li>a pointer, <em>e</em><span class="mono">[</span><em>i</em><span class="mono">]</span> is equivalent to an expression 
+        <span class="mono">*</span>(<em>e</em><span class="mono">+</span><em>i</em>).
+        <li>a <a href="#print-command-containers">container</a>, <em>e</em><span class="mono">[</span><em>i</em><span class="mono">]</span> denotes the <em>i'th</em> element of the container <em>e</em>.</li>
     </ul>
 
-    <h4>3.13.4 Elements of a local variable of a container type</h4>
-
     <p>
-        Printing elements of a local variable of a container type:
-    </p>
-
-    <h5>Syntax</h5>
-    
-    <strong>print </strong><em>containerVariableName</em><strong>[</strong><em>rangeStart</em><strong>,</strong> <em>rangeEnd</em> <strong>]</strong>
-
-    <p>
-        where <em>rangeStart</em> and <em>rangeEnd</em> are <a href="#rule.integer">integer</a>s.
-        Ranges are half-open, so that range [0, 10] means 0 to 10 excluding 10.
-    </p>
-    
-    <p>
-        <em>rangeEnd</em> can also be a special <a href="#rule.identifier">identifier</a>, "<strong>count</strong>", to specify maximum range end.
-    </p>
-
-    <h5>Example</h5>
-    
-    <p>
-        The elements are contained in a JSON array in a field whose name is <strong>range</strong>:
+        After executing the following code:
     </p>
     
     <pre>
-    cmdb> print x[0, count]
-    {
-        "range" :
-        [
-            {
-                "static_type" :
-                {
-                    "id" : "191c2fac-e5c3-40a1-9e8b-e6dd9791aceb",
-                    "irName" : "int32_t",
-                    "name" : "int"
-                }
-                ,
-                "success" : true,
-                "variable" :
-                {
-                    "has_more" : "0",
-                    "name" : "v5",
-                    "numchild" : "0",
-                    "thread-id" : "1",
-                    "type" : "int32_t",
-                    "value" : "0",
-                    "varIndex" : "5"
-                }
-            }
-            ,
-            {
-                "static_type" :
-                {
-                    "id" : "191c2fac-e5c3-40a1-9e8b-e6dd9791aceb",
-                    "irName" : "int32_t",
-                    "name" : "int"
-                }
-                ,
-                "success" : true,
-                "variable" :
-                {
-                    "has_more" : "0",
-                    "name" : "v6",
-                    "numchild" : "0",
-                    "thread-id" : "1",
-                    "type" : "int32_t",
-                    "value" : "1",
-                    "varIndex" : "6"
-                }
-            }
-            ,
-            {
-                "static_type" :
-                {
-                    "id" : "191c2fac-e5c3-40a1-9e8b-e6dd9791aceb",
-                    "irName" : "int32_t",
-                    "name" : "int"
-                }
-                ,
-                "success" : true,
-                "variable" :
-                {
-                    "has_more" : "0",
-                    "name" : "v7",
-                    "numchild" : "0",
-                    "thread-id" : "1",
-                    "type" : "int32_t",
-                    "value" : "2",
-                    "varIndex" : "7"
-                }
-            }
-        ]
-        ,
-        "success" : true
-    }    
+        List&lt;<strong>int</strong>> x;
+        x.Add(1);
     </pre>
+
+    <p>
+        and then issuing the following print command:
+    </p>
+    <pre>
+        print x[0];
+    </pre>
+
+    <p>
+        the debugger will print a JSON object with the <em>value</em> field having value "1".
+    </p>
+
+    <h5 id="range-expression">3.13.2.8 Range expression</h5>
     
-    <h3>3.14 Exit command</h3>
+    <p>
+        A range expression is of the form <em>r</em><span class="mono">[</span><em>s</em><span class="mono">,</span><em>e</em><span class="mono">]</span>,
+        where <em>r</em> is of an array, pointer or <a href="#print-command-containers">container</a> type, <em>s</em> is an integer denoting range start and <em>e</em> is an integer denoting range end.
+        Ranges are half-open so that <em>r</em><span class="mono">[</span>0<span class="mono">,</span>10<span class="mono">]</span>
+        means indeces 0 to 10 excluding 10.
+    </p>
     
-    <h4>3.14.1 Syntax</h4>
+    <p>
+        When <em>r</em> is of an array type that has its size specified, or of a <a href="#print-command-containers">container</a> type, 
+        <em>e</em> can also be a special <a href="#rule.identifier">identifier</a>, <strong>count</strong>, that denotes the number of elements in <em>r</em>.
+    </p>
+    
+    <p>
+        The resulting JSON object has a field <em>range</em> that is a JSON array of JSON objects. Each of those JSON objects have a <em>value</em> field having the value of an element.
+    </p>
+    
+    <p>
+        After executing the following code:
+    </p>
+
+    <pre>
+        Set&lt;<strong>int</strong>> s;
+        s.Insert(1);
+        s.Insert(2);
+        s.Insert(3);
+    </pre>
+
+    <p>
+        and then issuing the following print command:
+    </p>
+    
+    <pre>
+        print s[0,count];
+    </pre>
+
+    <p>
+        the debugger will print a JSON object with a <em>range</em> field that is a JSON array of JSON objects that have <em>value</em> fields containing values 1, 2 and 3.
+    </p>
+
+    <h5 id="primary-expressions">3.13.2.9 Primary expressions</h5>
+    
+    <p>
+        A primary expression can be
+        <ul>
+            <li>an identifier whose value is a name of a <a href="#local-variable">local variable</a>,</li>
+            <li>a <strong>this</strong> pointer,</li>
+            <li>an integer,</li>
+            <li>a parenthesized expression,</li>
+            <li>a <a href="#typeid-expression">typeid</a> expression, or</li> 
+            <li>a <a href="#cast-expression">cast</a> expression.
+        </ul>
+    </p>
+    
+    <h5 id="local-variable">3.13.2.10 Printing value of a local variable</h5>
+    
+    <p>
+        If <em>x</em> is a local variable, command 
+        
+        <pre>
+        print x
+        </pre>
+        prints information about <em>x</em> and the value of <em>x</em> if available.
+    </p>
+    
+    <p>
+        If <em>x</em> is of a primitive type, the resulting JSON object contains the following fields:
+        <ul>
+            <li>static_type (JSON object): fields:
+                <ul>
+                    <li>id (JSON string): <a href="#print-command-type-identifiers">type identifier</a></li>
+                    <li>irName (JSON string): the name of the type in the C++ file (intermediate representation name)</li>
+                    <li>name (JSON string): the name of the primitive type</li>
+                </ul>
+            </li>
+            <li>status (JSON string): may have the following values:
+                <ul>
+                    <li>initialized: local variable is initialized, value valid</li>
+                    <li>uninitialized: local variable is not yet initialized, value not valid</li>
+                    <li>unknown: status not known</li>
+                </ul>
+            </li>
+            <li>
+                success (JSON Boolean): <strong>true</strong>
+            </li>
+            <li>
+                value (JSON string): the value of the local variable <em>x</em>.
+            </li>
+        </ul>
+    </p>
+    
+    <p>
+        If <em>x</em> is of a class type, but not of a container type, the resulting JSON object contains the following fields:
+        <ul>
+            <li>static_type, as above</li>
+            <li>status, as above</li>
+            <li>success, as above</li>
+            <li>value (JSON string): contains string "{...}"</li>
+        </ul>
+    </p>
+    
+    <p>
+        If <em>x</em> is of a pointer type, the resulting JSON object contains the following fields:
+        <ul>
+            <li>dynamic_type (JSON object): Present if <em>x</em> is a pointer to a polymorphic class type. Then reflects the actual type of the object <em>x</em> points to. Fields:
+                <ul>
+                    <li>id (JSON string): <a href="#print-command-type-identifiers">type identifier</a> of the dynamic type</li>
+                    <li>irName (JSON string): the name of the dynamic type in the C++ file (intermediate representation name)</li>
+                    <li>name (JSON string): the name of dynamic type. This is the name of a pointer type to a class type of the object <em>x</em> points to.</li>
+                </ul>
+            </li>
+            <li>static_type (JSON object): fields:
+                <ul>
+                    <li>id (JSON string): <a href="#print-command-type-identifiers">type identifier</a> of the static type</li>
+                    <li>irName (JSON string): the name of the static type in the C++ file (intermediate representation name)</li>
+                    <li>name (JSON string): the name of the static type. This is the declared type of the pointer type.</li>
+                </ul>
+            </li>
+            <li>status, as above</li>
+            <li>success, as above</li>
+            <li>
+                value (JSON string): the value of the local variable <em>x</em>. This is an address with a hexadecimal value.
+            </li>
+        </ul>
+    </p>
+    
+    <p>
+        If <em>x</em> is of a container type, the resulting JSON object contains the following fields:
+        <ul>
+            <li>container (JSON string): the name of the <a href="#print-command-containers">container</a></li>
+            <li>count (JSON string): the number of elements in the container</li>
+            <li>static_type, as above</li>
+            <li>status, as above</li>
+            <li>success, as above</li>
+            <li>value (JSON string): contains string "{...}"</li>
+        </ul>
+    </p>
+    
+    <h5 id="typeid-expression">3.13.2.11 Printing information about a type</h5>
+    
+    <p>
+        A <a href="#rule.typeid-expression">typeid expression</a> consists of the keyword <strong>typeid</strong> 
+        followed by a <a href="#print-command-type-identifiers">type dentifier</a> string, an UUID, in parentheses.
+    </p>
+    
+    <p>
+        If <em>t</em> is a <a href="#print-command-type-identifiers">type identifier</a> string, command 
+        
+        <pre>
+        print t
+        </pre>
+        prints information about the type with identifier <em>t</em> as a JSON object.
+    </p>
+        
+    <p>
+        The JSON object contains the following fields:
+        <ul>
+            <li>success (JSON Boolean): <strong>true</strong></li>
+            <li>type (JSON object): fields:
+                <ul>
+                    <li>baseClassId (JSON string): present for a class type, contains the <a href="#print-command-type-identifiers">type identifier</a> of the base class type,
+                    or string "00000000&#8209;0000&#8209;0000&#8209;0000&#8209;000000000000", if the class has no base class.</li>
+                    <li>baseTypeId (JSON string): present for a const or reference type, contains the <a href="#print-command-type-identifiers">type identifier</a> of the base type of the const or reference type</li>
+                    <li>container (JSON string): present for a container type, contains the name of the <a href="#print-command-containers">container</a></li>
+                    <li>elementTypeId (JSON string): present for an array type, contains the <a href="#print-command-type-identifiers">type identifier</a> of the element type of the array type</li>
+                    <li>id (JSON string): the <a href="#print-command-type-identifiers">type identifier</a> of the type</li>
+                    <li>irName (JSON string): the name of type in a C++ file (intermediate representation name)</li>
+                    <li>kind (JSON string): can be one of the following
+                        <ul>
+                            <li>"array": array type</li>
+                            <li>"class": class type that is not a class template specialization</li>
+                            <li>"classDelegate": class delegate type</li>
+                            <li>"const": const type</li>
+                            <li>"delegate": delegate type</li>
+                            <li>"enum": enumerated type</li>
+                            <li>"interface": interface type</li>
+                            <li>"reference": reference type</li>
+                            <li>"pointer": pointer type</li>
+                            <li>"primitive": primitive type</li>
+                            <li>"specialization": class template specialization</li>
+                        </ul>
+                    </li>
+                    <li>
+                        memberVariables (JSON array): present for a class type, an array of JSON objects with the following fields:
+                        <ul>
+                            <li>irName (JSON string): the name of the member variable in the C++ file (intermediate representation name)</li>
+                            <li>name (JSON string): the name of the member variable</li>
+                            <li>typeId (JSON string): the <a href="#print-command-type-identifiers">type identifier</a> of the type of the member variable</li>
+                        </ul>
+                    </li>
+                    <li>
+                        name (JSON string): the name of the type
+                    </li>
+                    <li>
+                        pointedTypeId (JSON string): present for a pointer type, the <a href="#print-command-type-identifiers">type identifier</a> of the pointed-to type</li>
+                    </li>
+                    <li>
+                        polymorphic (JSON Boolean): <strong>true</strong> if the type is a polymorphic class type
+                    </li>
+                    <li>
+                        primaryTypeId (JSON string): present for a class template specialization, contains the <a href="#print-command-type-identifiers">type identifier</a> 
+                        of the class template 
+                    </li>
+                    <li>
+                        primitiveType (JSON string): present for a primitive type, can be one of the following:
+                        <ul>
+                            <li>"bool"</li>
+                            <li>"sbyte"</li>
+                            <li>"byte"</li>
+                            <li>"short"</li>
+                            <li>"ushort"</li>
+                            <li>"int"</li>
+                            <li>"uint"</li>
+                            <li>"long"</li>
+                            <li>"ulong"</li>
+                            <li>"float"</li>
+                            <li>"double"</li>
+                            <li>"char"</li>
+                            <li>"wchar"</li>
+                            <li>"uchar"</li>
+                            <li>"void"</li>
+                        </ul>
+                    </li>
+                    <li>
+                        size (JSON string): present for an array type, contains the size of the array type
+                    </li>
+                    <li>
+                        templateArgumentTypeIds (JSON array): present for a class template specialization, contains the <a href="#print-command-type-identifiers">type identifier</a>s
+                        of the template argument types
+                    </li>
+                    <li>
+                        templateParameters (JSON array): present for a class template, contains JSON objects with the following fields:
+                        <ul>
+                            <li>kind (JSON string): "templateParameter"</li>
+                            <li>name (JSON string): the name of the template parameter</li>
+                        </ul>
+                    </li>
+                    <li>underlyingTypeId (JSON string): present for an enumerated type, contains the <a href="#print-command-type-identifiers">type identifier</a> of the underlying type of the enumerated type</li>
+                    <li>
+                        valueTypeId (JSON string): present for a container, the <a href="#print-command-type-identifiers">type identifier</a> of the element type of the container
+                    </li>
+                    <li>
+                        vmtPtrIndex (JSON string): present for a polymorphic class type, contains the index of the virtual method table pointer field of the polymorphic class type
+                    </li>
+                    <li>
+                        vmtVariableName (JSON string): present for a polymorphic class type, contains the C++ name of the virtual method table variable of the polymorphic class type
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        
+    </p>
+    
+    <h5 id="cast-expression">3.13.2.12 Cast expression</h5>
+    
+    <p>
+        A <a href="#rule.cast-expression">cast expression</a> consists of the keyword <strong>cast</strong> followed by a <a href="#typeid-expression">typeid expression</a> in angle brackets
+        followed by an <a href="#rule.expression">expression</a> in parentheses.
+    </p>
+    
+    <p>
+        It casts the given expression to the type identified by the typeid expression.
+    </p>
+    
+    <h4 id="print-command-containers">3.13.3 Containers</h4>
+
+    <p>
+        <strong>cmdb</strong> can print elements of and information about the following container types:
+        <table>
+            <tr><th>container name</th><th>container type</th></tr>
+            <tr><td>forwardList</td><td>ForwardList&lt;T></td></tr>
+            <tr><td>hashMap</td><td>HashMap&lt;K, T, H, C></td></tr>
+            <tr><td>hashSet</td><td>HashSet&lt;T, H, C></td></tr>
+            <tr><td>linkedList</td><td>LinkedList&lt;T></td></tr>
+            <tr><td>list</td><td>List&lt;T></td></tr>
+            <tr><td>map</td><td>Map&lt;Key, Value, KeyCompare></td></tr>
+            <tr><td>queue</td><td>Queue&lt;T></td></tr>
+            <tr><td>set</td><td>Set&lt;T></td></tr>
+            <tr><td>stack</td><td>Stack&lt;T></td></tr>
+        </table>
+    </p>
+        
+    <h4 id="print-command-type-identifiers">3.13.4 Type identifiers</h4>
+    
+    <p>
+        A type identifier is a UUID string of the form "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx". 
+        It uniquely identifies a Cmajor type.
+    </p>
+    
+    <h3 id="exit-command">3.14 Exit command</h3>
+    
+    <h4 id="exit-command-syntax">3.14.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -1832,9 +1966,8 @@
             </td>
         </tr>
     </table>   
-    
         
-    <h2>4. Common results</h2>
+    <h2 id="common-results">4. Common results</h2>
     
     <h3 id="stopped-result">4.1 Stopped result</h3>
 
@@ -1888,7 +2021,7 @@
         </ul>
     </p>
 
-    <h2>5. Summary of the command syntax</h2>
+    <h2 id="summary">5. Summary of the command syntax</h2>
     
     <table class="grammar">
         <tr>
@@ -2138,8 +2271,8 @@
                 (
                     <span class="rule"><a href="#summary.rule.member-selection-expression">member&#8209;selection&#8209;expression</a></span> |
                     <span class="rule"><a href="#summary.rule.base-selection-expression">base&#8209;selection&#8209;expression</a></span> |
-                    <span class="rule"><a href="#summary.rule.range-expression">range&#8209;expression</a></span> |
-                    <span class="rule"><a href="#summary.rule.subscript-expression">subscript&#8209;expression</a></span>
+                    <span class="rule"><a href="#summary.rule.subscript-expression">subscript&#8209;expression</a></span> |
+                    <span class="rule"><a href="#summary.rule.range-expression">range&#8209;expression</a></span>
                 )*
             </td>
         </tr>
@@ -2158,6 +2291,13 @@
             </td>
         </tr>
         <tr>
+            <td class="rule" id="summary.rule.subscript-expression">subscript&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">[</span> <span class="rule"><a href="#summary.rule.expression">expression</a></span> <span class="mono">]</span>
+            </td>
+        </tr>
+        <tr>
             <td class="rule" id="summary.rule.range-expression">range&#8209;expression</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
@@ -2166,13 +2306,6 @@
                 <span class="mono">,</span>
                 <span class="rule"><a href="#summary.rule.expression">expression</a></span>
                 <span class="mono">]</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="rule" id="summary.rule.subscript-expression">subscript&#8209;expression</td>
-            <td class="sep">&rarr;</td>
-            <td class="rcontent">
-                <span class="mono">[</span> <span class="rule"><a href="#summary.rule.expression">expression</a></span> <span class="mono">]</span>
             </td>
         </tr>
         <tr>
@@ -2300,7 +2433,7 @@
         </tr>
     </table>
 
-    <h2>6. Known bugs</h2>
+    <h2 id="bugs">6. Known bugs</h2>
     
     <p>
         The debugger may not operate properly (especially) with programs that contain console input.

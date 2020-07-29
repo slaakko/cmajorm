@@ -12,6 +12,17 @@
 
 namespace cmajor { namespace debug {
 
+std::string InitializationStatusStr(InitializationStatus status)
+{
+    switch (status)
+    {
+        case InitializationStatus::unknown: return "unknown";
+        case InitializationStatus::initialized: return "initialized";
+        case InitializationStatus::uninitialized: return "uninitialized";
+    }
+    return std::string();
+}
+
 BoundDebugNode::BoundDebugNode(Kind kind_, DIType* type_, DebugExprNode* sourceNode_) : kind(kind_), type(type_), sourceNode(sourceNode_)
 {
 }
@@ -20,8 +31,8 @@ BoundDebugNode::~BoundDebugNode()
 {
 }
 
-BoundVariableReferenceNode::BoundVariableReferenceNode(DIType* type, DIVariable* variable_, DebugExprNode* sourceNode) :
-    BoundDebugNode(Kind::variableReferenceNode, type, sourceNode), variable(variable_)
+BoundVariableReferenceNode::BoundVariableReferenceNode(DIType* type, DIVariable* variable_, InitializationStatus status_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::variableReferenceNode, type, sourceNode), variable(variable_), status(status_)
 {
 }
 
@@ -37,7 +48,7 @@ std::string BoundVariableReferenceNode::ToString() const
 
 BoundDebugNode* BoundVariableReferenceNode::Clone() const
 {
-    return new BoundVariableReferenceNode(Type(), variable, SourceNode());
+    return new BoundVariableReferenceNode(Type(), variable, status, SourceNode());
 }
 
 std::string BoundVariableReferenceNode::GdbExprString() const
@@ -312,8 +323,8 @@ std::string BoundCastNode::GdbExprString() const
     return gdbExprString;
 }
 
-BoundDebugExpression::BoundDebugExpression(BoundDebugNode* node_, DebugExprNode* sourceNode, bool hasContainerSubscript_) :
-    BoundDebugNode(Kind::debugExpression, node_->Type(), sourceNode), node(node_), hasContainerSubscript(hasContainerSubscript_)
+BoundDebugExpression::BoundDebugExpression(BoundDebugNode* node_, DebugExprNode* sourceNode, bool hasContainerSubscript_, InitializationStatus status_) :
+    BoundDebugNode(Kind::debugExpression, node_->Type(), sourceNode), node(node_), hasContainerSubscript(hasContainerSubscript_), status(status_)
 {
 }
 
@@ -329,7 +340,7 @@ std::string BoundDebugExpression::ToString() const
 
 BoundDebugNode* BoundDebugExpression::Clone() const
 {
-    return new BoundDebugExpression(node->Clone(), SourceNode(), hasContainerSubscript);
+    return new BoundDebugExpression(node->Clone(), SourceNode(), hasContainerSubscript, status);
 }
 
 std::string BoundDebugExpression::GdbExprString() const

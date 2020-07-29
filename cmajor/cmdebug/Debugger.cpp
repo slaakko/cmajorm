@@ -437,7 +437,11 @@ bool GetVarCreateResult(GdbResults* results, std::unique_ptr<JsonValue>& result)
     {
         JsonObject* resultObject = new JsonObject();
         resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
-        resultObject->AddField(U"variable", std::unique_ptr<JsonValue>(results->ToJson()));
+        GdbValue* value = results->GetField("value");
+        if (value && value->GetKind() == GdbValue::Kind::string)
+        {
+            resultObject->AddField(U"value", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(static_cast<GdbStringValue*>(value)->Value()))));
+        }
         result.reset(resultObject); 
         return true;
     }
@@ -457,7 +461,11 @@ bool GetVarEvaluateResult(GdbResults* results, std::unique_ptr<JsonValue>& resul
     {
         JsonObject* resultObject = new JsonObject();
         resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
-        resultObject->AddField(U"variable", std::unique_ptr<JsonValue>(results->ToJson()));
+        GdbValue* value = results->GetField("value");
+        if (value && value->GetKind() == GdbValue::Kind::string)
+        {
+            resultObject->AddField(U"value", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(static_cast<GdbStringValue*>(value)->Value()))));
+        }
         result.reset(resultObject);
         return true;
     }
@@ -1317,21 +1325,16 @@ DIType* Debugger::GetDynamicType(DIType* diType, BoundDebugNode* node)
                         if (result->Type() == JsonValueType::object)
                         {
                             JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
-                            JsonValue* variableValue = jsonObject->GetField(U"variable");
-                            if (variableValue && variableValue->Type() == JsonValueType::object)
+                            JsonValue* value = jsonObject->GetField(U"value");
+                            if (value && value->Type() == JsonValueType::string)
                             {
-                                JsonObject* variableObject = static_cast<JsonObject*>(variableValue);
-                                JsonValue* value = variableObject->GetField(U"value");
-                                if (value && value->Type() == JsonValueType::string)
+                                std::string vmtVarFieldStr = ToUtf8(static_cast<JsonString*>(value)->Value());
+                                std::string vmtVarName = ParseVmtVariableName(vmtVarFieldStr);
+                                if (!vmtVarName.empty())
                                 {
-                                    std::string vmtVarFieldStr = ToUtf8(static_cast<JsonString*>(value)->Value());
-                                    std::string vmtVarName = ParseVmtVariableName(vmtVarFieldStr);
-                                    if (!vmtVarName.empty())
-                                    {
-                                        DIType* dynamicType = debugInfo->GetPolymorphicType(vmtVarName);
-                                        result.reset(mainResult.release());
-                                        return dynamicType;
-                                    }
+                                    DIType* dynamicType = debugInfo->GetPolymorphicType(vmtVarName);
+                                    result.reset(mainResult.release());
+                                    return dynamicType;
                                 }
                             }
                         }
@@ -1447,7 +1450,7 @@ void Debugger::Evaluate(const std::string& expression)
     }
     else
     {
-        DebugExpressionEvaluator evaluator(*this);
+        DebugExpressionEvaluator evaluator(*this, debugInfo.get());
         boundExpression->Accept(evaluator);
         result.reset(evaluator.ReleaseResult());
     }

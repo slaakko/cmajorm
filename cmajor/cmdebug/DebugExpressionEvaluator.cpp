@@ -5,7 +5,6 @@
 
 #include <cmajor/cmdebug/DebugExpressionEvaluator.hpp>
 #include <cmajor/cmdebug/Debugger.hpp>
-#include <cmajor/cmdebug/BoundDebugExpr.hpp>
 #include <cmajor/cmdebug/DebugExpr.hpp>
 #include <cmajor/cmdebug/DIType.hpp>
 #include <cmajor/cmdebug/Gdb.hpp>
@@ -16,7 +15,8 @@ namespace cmajor { namespace debug {
 
 using namespace soulng::unicode;
 
-DebugExpressionEvaluator::DebugExpressionEvaluator(Debugger& debugger_) : debugger(debugger_), integer(-1), rangeStart(-1), rangeEnd(-1)
+DebugExpressionEvaluator::DebugExpressionEvaluator(Debugger& debugger_, DebugInfo* debugInfo_) :
+    debugger(debugger_), debugInfo(debugInfo_), integer(-1), rangeStart(-1), rangeEnd(-1), status(InitializationStatus::unknown)
 {
 }
 
@@ -24,6 +24,7 @@ void DebugExpressionEvaluator::Visit(BoundDebugExpression& expr)
 {
     bool addTypes = false;
     BoundDebugNode* node = expr.Node();
+    status = expr.Status();
     switch (node->GetKind())
     {
         case BoundDebugNode::Kind::typeNode:
@@ -31,6 +32,7 @@ void DebugExpressionEvaluator::Visit(BoundDebugExpression& expr)
             DIType* type = node->Type();
             JsonObject* object = new JsonObject();
             object->AddField(U"type", type->ToJson());
+            object->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
             result.reset(object);
             break;
         }
@@ -106,12 +108,13 @@ void DebugExpressionEvaluator::Visit(BoundRangeNode& node)
     switch (subjectType->GetKind())
     {
         case DIType::Kind::pointerType:
+        {
+            EvaluatePointerRange(&node, subject, rangeStart, rangeEnd);
+            break;
+        }
         case DIType::Kind::arrayType:
         {
-            for (int64_t index = rangeStart; index < rangeEnd; ++index)
-            {
-
-            }
+            EvaluateArrayRange(&node, subject, rangeStart, rangeEnd);
             break;
         }
         case DIType::Kind::specializationType:
@@ -131,6 +134,62 @@ void DebugExpressionEvaluator::Visit(BoundRangeNode& node)
     }
 }
 
+void DebugExpressionEvaluator::EvaluatePointerRange(BoundDebugNode* node, BoundDebugNode* subject, int64_t rangeStart, int64_t rangeEnd)
+{
+    if (rangeEnd == -1)
+    {
+        throw std::runtime_error("must specify range end explicitly for pointer type range expression: " + node->ToString());
+    }
+    std::unique_ptr<JsonObject> rangeResult(new JsonObject());
+    std::unique_ptr<JsonArray> rangeArray(new JsonArray());
+    for (int64_t index = rangeStart; index < rangeEnd; ++index)
+    {
+        IntegerDebugExprNode integerLiteralNode(index);
+        BoundIntegerLiteralNode boundIntegerLiteralNode(debugInfo->GetMainProject()->GetLongType(), index, &integerLiteralNode);
+        SubscriptDebugExprNode subscriptNode(subject->SourceNode()->Clone(), integerLiteralNode.Clone());
+        BoundSubscriptNode boundSubscriptNode(node->Type(), subject->Clone(), boundIntegerLiteralNode.Clone(), &subscriptNode);
+        boundSubscriptNode.Accept(*this);
+        std::unique_ptr<JsonValue> subscriptResult(result.release());
+        rangeArray->AddItem(std::unique_ptr<JsonValue>(subscriptResult.release()));
+    }
+    rangeResult->AddField(U"range", std::unique_ptr<JsonValue>(rangeArray.release()));
+    result.reset(rangeResult.release());
+}
+
+void DebugExpressionEvaluator::EvaluateArrayRange(BoundDebugNode* node, BoundDebugNode* subject, int64_t rangeStart, int64_t rangeEnd)
+{
+    DIType* subjectType = subject->Type();
+    if (rangeEnd == -1)
+    {
+        if (subjectType->GetKind() == DIType::Kind::arrayType)
+        {
+            DIArrayType* arrayType = static_cast<DIArrayType*>(subjectType);
+            if (arrayType->Size() != -1)
+            {
+                rangeEnd = arrayType->Size();
+            }
+        }
+    }
+    if (rangeEnd == -1)
+    {
+        throw std::runtime_error("must specify range end explicitly for array type without size range expression: " + node->ToString());
+    }
+    std::unique_ptr<JsonObject> rangeResult(new JsonObject());
+    std::unique_ptr<JsonArray> rangeArray(new JsonArray());
+    for (int64_t index = rangeStart; index < rangeEnd; ++index)
+    {
+        IntegerDebugExprNode integerLiteralNode(index);
+        BoundIntegerLiteralNode boundIntegerLiteralNode(debugInfo->GetMainProject()->GetLongType(), index, &integerLiteralNode);
+        SubscriptDebugExprNode subscriptNode(subject->SourceNode()->Clone(), integerLiteralNode.Clone());
+        BoundSubscriptNode boundSubscriptNode(node->Type(), subject->Clone(), boundIntegerLiteralNode.Clone(), &subscriptNode);
+        boundSubscriptNode.Accept(*this);
+        std::unique_ptr<JsonValue> subscriptResult(result.release());
+        rangeArray->AddItem(std::unique_ptr<JsonValue>(subscriptResult.release()));
+    }
+    rangeResult->AddField(U"range", std::unique_ptr<JsonValue>(rangeArray.release()));
+    result.reset(rangeResult.release());
+}
+
 void DebugExpressionEvaluator::Evaluate(BoundDebugNode* node)
 {
     DebuggerVariable variable = debugger.GetNextDebuggerVariable();
@@ -148,29 +207,7 @@ void DebugExpressionEvaluator::Evaluate(BoundDebugNode* node)
         if (result->Type() == JsonValueType::object)
         {
             JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
-            JsonValue* variableValue = jsonObject->GetField(U"variable");
-            if (variableValue && variableValue->Type() == JsonValueType::object)
-            {
-                JsonObject* variableObject = static_cast<JsonObject*>(variableValue);
-                if (node->GetKind() == BoundDebugNode::Kind::variableReferenceNode)
-                {
-                    BoundVariableReferenceNode* variableReferenceNode = static_cast<BoundVariableReferenceNode*>(node);
-                    DIVariable* variable = variableReferenceNode->Variable();
-                    variableObject->AddField(U"kind", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(DIVariable::KindStr(variable->GetKind())))));
-                    if (variable->GetKind() == DIVariable::Kind::localVariable && variable->GetInitLineNumber() != -1)
-                    {
-                        if (debugger.StoppedInstruction()->SourceLineNumber() > variable->GetInitLineNumber())
-                        {
-                            variableObject->AddField(U"status", std::unique_ptr<JsonValue>(new JsonString(U"initialized")));
-                        }
-                        else
-                        {
-                            variableObject->AddField(U"status", std::unique_ptr<JsonValue>(new JsonString(U"uninitialized")));
-                            uninitialized = true;
-                        }
-                    }
-                }
-            }
+            jsonObject->AddField(U"status", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(InitializationStatusStr(status)))));
         }
         AddTypes(node);
         ContainerClassTemplateKind containerKind = GetContainerKind(node->Type());

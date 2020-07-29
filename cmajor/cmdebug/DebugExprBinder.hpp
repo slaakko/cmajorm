@@ -6,6 +6,7 @@
 #ifndef CMAJOR_DEBUG_DEBUG_EXPR_BINDER_INCLUDED
 #define CMAJOR_DEBUG_DEBUG_EXPR_BINDER_INCLUDED
 #include <cmajor/cmdebug/DebugExprVisitor.hpp>
+#include <cmajor/cmdebug/BoundDebugExpr.hpp>
 #include <memory>
 #include <string>
 
@@ -45,6 +46,7 @@ private:
     std::unique_ptr<BoundDebugNode> currentNode;
     std::unique_ptr<BoundDebugExpression> expression;
     bool hasContainerSubscript;
+    InitializationStatus status;
 };
 
 } } // namespace cmajor::debug

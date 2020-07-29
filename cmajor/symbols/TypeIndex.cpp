@@ -112,7 +112,7 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                         tp->SetId(templateParameter->TypeId());
                         tp->SetName(ToUtf8(templateParameter->Name())); 
                         typeMap[tp->Id()] = type;
-                        diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(tp));
+                        type->AddTemplateParameter(tp);
                     }
                     for (MemberVariableSymbol* memberVariable : classType->MemberVariables())
                     {

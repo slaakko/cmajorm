@@ -12,7 +12,7 @@
 namespace cmajor { namespace debug {
 
 DebugExprBinder::DebugExprBinder(Debugger& debugger_, DebugInfo* debugInfo_, Scope* scope_) :
-    debugger(debugger_), debugInfo(debugInfo_), scope(scope_), hasContainerSubscript(false)
+    debugger(debugger_), debugInfo(debugInfo_), scope(scope_), hasContainerSubscript(false), status(InitializationStatus::unknown)
 {
 }
 
@@ -21,7 +21,23 @@ void DebugExprBinder::Visit(IdentifierDebugExprNode& node)
     DIVariable* variable = scope->GetVariable(node.Identifier());
     if (variable)
     {
-        currentNode.reset(new BoundVariableReferenceNode(variable->GetType(), variable, &node));
+        InitializationStatus varStatus = InitializationStatus::unknown;
+        if (variable->GetKind() == DIVariable::Kind::localVariable && variable->GetInitLineNumber() != -1)
+        {
+            if (debugger.StoppedInstruction()->SourceLineNumber() > variable->GetInitLineNumber())
+            {
+                varStatus = InitializationStatus::initialized;
+            }
+            else
+            {
+                varStatus = InitializationStatus::uninitialized;
+            }
+        }
+        currentNode.reset(new BoundVariableReferenceNode(variable->GetType(), variable, varStatus, &node));
+        if (status == InitializationStatus::unknown)
+        {
+            status = varStatus;
+        }
     }
     else
     {
@@ -353,7 +369,7 @@ void DebugExprBinder::Visit(CastDebugExprNode& node)
 
 BoundDebugExpression* DebugExprBinder::BoundExpression(DebugExprNode* sourceNode)
 {
-    expression.reset(new BoundDebugExpression(currentNode.release(), sourceNode, hasContainerSubscript));
+    expression.reset(new BoundDebugExpression(currentNode.release(), sourceNode, hasContainerSubscript, status));
     return expression.get();
 }
 

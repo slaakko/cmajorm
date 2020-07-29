@@ -19,6 +19,13 @@ class DebugInfo;
 class Project;
 class DebuggerVariable;
 
+enum class InitializationStatus : int8_t
+{
+    unknown, initialized, uninitialized
+};
+
+DEBUG_API std::string InitializationStatusStr(InitializationStatus status);
+
 class DEBUG_API BoundDebugNode
 {
 public:
@@ -48,14 +55,16 @@ private:
 class DEBUG_API BoundVariableReferenceNode : public BoundDebugNode
 {
 public:
-    BoundVariableReferenceNode(DIType* type, DIVariable* variable_, DebugExprNode* sourceNode);
+    BoundVariableReferenceNode(DIType* type, DIVariable* variable_, InitializationStatus status_, DebugExprNode* sourceNode);
     void Accept(BoundDebugNodeVisitor& visitor) override;
     std::string ToString() const override;
     BoundDebugNode* Clone() const override;
     DIVariable* Variable() const { return variable; }
     std::string GdbExprString() const override;
+    InitializationStatus Status() const { return status; }
 private:
     DIVariable* variable;
+    InitializationStatus status;
 };
 
 class DEBUG_API BoundIntegerLiteralNode : public BoundDebugNode
@@ -219,16 +228,18 @@ private:
 class DEBUG_API BoundDebugExpression : public BoundDebugNode
 {
 public:
-    BoundDebugExpression(BoundDebugNode* node_, DebugExprNode* sourceNode, bool hasContainerSubscript_);
+    BoundDebugExpression(BoundDebugNode* node_, DebugExprNode* sourceNode, bool hasContainerSubscript_, InitializationStatus status_);
     bool HasContainerSubscript() const { return hasContainerSubscript; }
     void Accept(BoundDebugNodeVisitor& visitor) override;
     std::string ToString() const override;
     BoundDebugNode* Clone() const override;
     std::string GdbExprString() const override;
     BoundDebugNode* Node() const { return node.get(); }
+    InitializationStatus Status() const { return status; }
 private:
     std::unique_ptr<BoundDebugNode> node;
     bool hasContainerSubscript;
+    InitializationStatus status;
 };
 
 } } // namespace cmajor::debug
