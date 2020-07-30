@@ -584,9 +584,12 @@ void Debugger::StartProgram()
                 SetState(State::programStarted);
                 AddStopResultToResult();
                 result->Write(formatter);
-                if (stoppedInstruction != nullptr)
+                if (state != State::programExitedNormally && state != State::programExited)
                 {
-                    stoppedInstruction->PrintSource(formatter);
+                    if (stoppedInstruction != nullptr)
+                    {
+                        stoppedInstruction->PrintSource(formatter);
+                    }
                 }
             }
         }
@@ -817,9 +820,12 @@ void Debugger::Next()
                 std::lock_guard<std::recursive_mutex> lock(outputMutex);
                 AddStopResultToResult();
                 result->Write(formatter);
-                if (stoppedInstruction != nullptr)
+                if (state != State::programExitedNormally && state != State::programExited)
                 {
-                    stoppedInstruction->PrintSource(formatter);
+                    if (stoppedInstruction != nullptr)
+                    {
+                        stoppedInstruction->PrintSource(formatter);
+                    }
                 }
                 stop = true;
             }
@@ -915,9 +921,12 @@ void Debugger::Step()
                 std::lock_guard<std::recursive_mutex> lock(outputMutex);
                 AddStopResultToResult();
                 result->Write(formatter);
-                if (stoppedInstruction != nullptr)
+                if (state != State::programExitedNormally && state != State::programExited)
                 {
-                    stoppedInstruction->PrintSource(formatter);
+                    if (stoppedInstruction != nullptr)
+                    {
+                        stoppedInstruction->PrintSource(formatter);
+                    }
                 }
                 stop = true;
             }
@@ -962,9 +971,12 @@ void Debugger::Continue()
             std::lock_guard<std::recursive_mutex> lock(outputMutex);
             AddStopResultToResult();
             result->Write(formatter);
-            if (stoppedInstruction != nullptr)
+            if (state != State::programExitedNormally && state != State::programExited)
             {
-                stoppedInstruction->PrintSource(formatter);
+                if (stoppedInstruction != nullptr)
+                {
+                    stoppedInstruction->PrintSource(formatter);
+                }
             }
         }
     }

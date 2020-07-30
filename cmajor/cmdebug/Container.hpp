@@ -31,13 +31,13 @@ enum class ContainerClassTemplateKind : int8_t
     stack = 9
 };
 
-std::string ContainerName(ContainerClassTemplateKind containerKind);
+DEBUG_API std::string ContainerName(ContainerClassTemplateKind containerKind);
 
 class Container;
 class Debugger;
 class DIType;
 
-class Pointer
+class DEBUG_API Pointer
 {
 public:
     Pointer(Container& container_);
@@ -58,7 +58,7 @@ private:
     uint64_t address;
 };
 
-class Iterator
+class DEBUG_API Iterator
 {
 public:
     Iterator(Container& container_, int64_t index_);
@@ -75,7 +75,7 @@ private:
     int64_t index;
 };
 
-class ForwardListIterator : public Iterator
+class DEBUG_API ForwardListIterator : public Iterator
 {
 public:
     ForwardListIterator(Container& container, int64_t index, Pointer* nodePtr_);
@@ -86,7 +86,7 @@ private:
     Pointer* nodePtr;
 };
 
-class LinkedListIterator : public Iterator
+class DEBUG_API LinkedListIterator : public Iterator
 {
 public:
     LinkedListIterator(Container& container, int64_t index, Pointer* nodePtr_);
@@ -97,7 +97,7 @@ private:
     Pointer* nodePtr;
 };
 
-class HashtableIterator : public Iterator
+class DEBUG_API HashtableIterator : public Iterator
 {
 public:
     HashtableIterator(Container& container, int64_t index, Pointer* bucketPtr_, int64_t bucketIndex_, int64_t bucketCount_, const std::string& bucketsExpr_);
@@ -111,7 +111,7 @@ private:
     std::string bucketsExpr;
 };
 
-class TreeIterator : public Iterator
+class DEBUG_API TreeIterator : public Iterator
 {
 public:
     TreeIterator(Container& container, int64_t index, Pointer* nodePtr_);
@@ -122,7 +122,7 @@ private:
     Pointer* nodePtr;
 };
 
-class ListIterator : public Iterator
+class DEBUG_API ListIterator : public Iterator
 {
 public:
     ListIterator(Container& container, int64_t index, int64_t count, Pointer* itemsPtr_);
@@ -134,14 +134,18 @@ private:
     int64_t count;
 };
 
-uint64_t GetContainerAddress(Debugger& debugger, ContainerClassTemplateKind containerKind, const std::string& containerVarExpr);
-Container* CreateContainer(Debugger& debugger, ContainerClassTemplateKind containerKind, uint64_t address);
+DEBUG_API uint64_t GetContainerAddress(Debugger& debugger, ContainerClassTemplateKind containerKind, const std::string& containerVarExpr);
+DEBUG_API Container* CreateContainer(Debugger& debugger, ContainerClassTemplateKind containerKind, uint64_t address);
 
-class Container
+class DEBUG_API Container
 {
 public:
     Container(ContainerClassTemplateKind kind_, Debugger& debugger_, uint64_t address_);
     virtual ~Container();
+    Container(const Container&) = delete;
+    Container(Container&&) = delete;
+    Container& operator=(const Container&) = delete;
+    Container& operator=(Container&&) = delete;
     virtual void ClearBrowsingData();
     virtual int64_t Count(const std::string& expr);
     virtual Iterator* Begin(const std::string& containerVarExpr) = 0;
@@ -175,7 +179,7 @@ private:
     std::vector<std::unique_ptr<Iterator>> iterators;
 };
 
-class ForwardContainer : public Container
+class DEBUG_API ForwardContainer : public Container
 {
 public:
     ForwardContainer(Debugger& debugger, ContainerClassTemplateKind kind, uint64_t address);
@@ -183,14 +187,14 @@ public:
     std::string SubscriptExpressionString(const std::string& containerVarExpr, int64_t index) override;
 };
 
-class ListContainer : public ForwardContainer
+class DEBUG_API ListContainer : public ForwardContainer
 {
 public:
     ListContainer(Debugger& debugger, ContainerClassTemplateKind kind, uint64_t address);
     int64_t Count(const std::string& containerVarExpr) override;
 };
 
-class HashtableContainer : public ForwardContainer
+class DEBUG_API HashtableContainer : public ForwardContainer
 {
 public:
     HashtableContainer(Debugger& debugger, ContainerClassTemplateKind kind, uint64_t address);
@@ -204,7 +208,7 @@ private:
     int64_t bucketCount;
 };
 
-class TreeContainer : public ForwardContainer
+class DEBUG_API TreeContainer : public ForwardContainer
 {
 public:
     TreeContainer(Debugger& debugger, ContainerClassTemplateKind kind, uint64_t address);
@@ -217,7 +221,7 @@ private:
     std::unique_ptr<Pointer> headerPtr;
 };
 
-class ForwardList : public ForwardContainer
+class DEBUG_API ForwardList : public ForwardContainer
 {
 public:
     ForwardList(Debugger& debugger, uint64_t address);
@@ -231,7 +235,7 @@ private:
     std::unique_ptr<Pointer> nullPtr;
 };
 
-class LinkedList : public ListContainer
+class DEBUG_API LinkedList : public ListContainer
 {
 public:
     LinkedList(Debugger& debugger, uint64_t address);
@@ -244,19 +248,19 @@ private:
     std::unique_ptr<Pointer> nullPtr;
 };
 
-class HashMap : public HashtableContainer
+class DEBUG_API HashMap : public HashtableContainer
 {
 public:
     HashMap(Debugger& debugger, uint64_t address);
 };
 
-class HashSet : public HashtableContainer
+class DEBUG_API HashSet : public HashtableContainer
 {
 public:
     HashSet(Debugger& debugger, uint64_t address);
 };
 
-class List : public ListContainer
+class DEBUG_API List : public ListContainer
 {
 public:
     List(Debugger& debugger, uint64_t address);
@@ -269,7 +273,7 @@ private:
     std::unique_ptr<Pointer> itemsPtr;
 };
 
-class ListRepContainer : public Container
+class DEBUG_API ListRepContainer : public Container
 {
 public:
     ListRepContainer(Debugger& debugger, ContainerClassTemplateKind kind, uint64_t address);
@@ -282,25 +286,25 @@ private:
     List rep;
 };
 
-class Map : public TreeContainer
+class DEBUG_API Map : public TreeContainer
 {
 public:
     Map(Debugger& debugger, uint64_t address);
 };
 
-class Queue : public ListRepContainer
+class DEBUG_API Queue : public ListRepContainer
 {
 public:
     Queue(Debugger& debugger, uint64_t address);
 };
 
-class Set : public TreeContainer
+class DEBUG_API Set : public TreeContainer
 {
 public:
     Set(Debugger& debugger, uint64_t address);
 };
 
-class Stack : public ListRepContainer
+class DEBUG_API Stack : public ListRepContainer
 {
 public:
     Stack(Debugger& debugger, uint64_t address);

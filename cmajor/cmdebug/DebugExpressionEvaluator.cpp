@@ -8,6 +8,7 @@
 #include <cmajor/cmdebug/DebugExpr.hpp>
 #include <cmajor/cmdebug/DIType.hpp>
 #include <cmajor/cmdebug/Gdb.hpp>
+#include <cmajor/cmdebug/EvaluationGuard.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -195,11 +196,8 @@ void DebugExpressionEvaluator::Evaluate(BoundDebugNode* node)
     DebuggerVariable variable = debugger.GetNextDebuggerVariable();
     std::string gdbExprString = node->GdbExprString();
     GdbVarCreateCommand command(variable.GdbVarName(), "*", gdbExprString);
+    EvaluationGuard evaluationGuard(debugger);
     bool succeeded = debugger.ExecuteGDBCommand(command);
-    if (succeeded)
-    {
-        debugger.AddDebuggerVariable(variable);
-    }
     result.reset(debugger.ReleaseResult());
     bool uninitialized = false;
     if (succeeded)
@@ -228,6 +226,10 @@ void DebugExpressionEvaluator::Evaluate(BoundDebugNode* node)
                 }
             }
         }
+        std::unique_ptr<JsonValue> origResult(result.release());
+        GdbVarDeleteCommand varDeleteComand(variable.GdbVarName(), false);
+        bool succeeded = debugger.ExecuteGDBCommand(varDeleteComand);
+        result.reset(origResult.release());
     }
 }
 

@@ -5,6 +5,7 @@
 
 #include <cmajor/cmdebug/Container.hpp>
 #include <cmajor/cmdebug/Debugger.hpp>
+#include <cmajor/cmdebug/EvaluationGuard.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -38,19 +39,6 @@ std::string ContainerName(ContainerClassTemplateKind containerKind)
     }
     return std::string();
 }
-
-struct EvaluationGuard
-{
-    EvaluationGuard(Debugger& debugger_) : debugger(debugger_), value(debugger.ReleaseResult())
-    {
-    }
-    ~EvaluationGuard()
-    {
-        debugger.ResetResult(value);
-    }
-    Debugger& debugger;
-    JsonValue* value;
-};
 
 Pointer::Pointer(Container& container_, const std::string& expression_) : container(container_), expression(expression_), address(0), hasAddress(false)
 {
