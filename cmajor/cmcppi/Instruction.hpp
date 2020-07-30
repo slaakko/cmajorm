@@ -526,6 +526,14 @@ private:
     BasicBlock* block;
 };
 
+class CMCPPI_API StartFunctionInstruction : public Instruction
+{
+public:
+    StartFunctionInstruction();
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts) override;
+    std::string IrName() const override { return "start"; }
+};
+
 } // namespace cmcppi
 
 #endif // CMAJOR_CMCPPI_INSTRUCTION_INCLUDED

@@ -54,7 +54,8 @@ enum class InstructionFlags : int16_t
     entryCode = 1 << 0,
     exitCode = 1 << 1,
     beginBrace = 1 << 2,
-    endBrace = 1 << 3
+    endBrace = 1 << 3,
+    startFunction = 1 << 4
 };
 
 DEBUG_API inline constexpr InstructionFlags operator|(InstructionFlags left, InstructionFlags right)

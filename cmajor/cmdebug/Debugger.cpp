@@ -1431,6 +1431,10 @@ bool Debugger::IsStopInstruction(Instruction* instruction) const
     {
         return false;
     }
+    if ((flags & (InstructionFlags::startFunction)) != InstructionFlags::none)
+    {
+        return false;
+    }
     return true;
 }
 

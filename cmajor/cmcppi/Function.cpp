@@ -145,11 +145,6 @@ void Function::Write(CodeFormatter& formatter, Context& context, BinaryWriter& w
         formatter.Write(" noexcept");
     }
     formatter.WriteLine();
-    formatter.WriteLine("{");
-    formatter.IncIndent();
-    formatter.WriteLine("// " + fullName);
-    formatter.WriteLine();
-    WriteValueDeclarations(formatter, context);
     int32_t numInsts = 0;
     uint32_t numInstsPos = 0;
     if (fileIndex != -1 && !functionId.is_nil())
@@ -157,7 +152,19 @@ void Function::Write(CodeFormatter& formatter, Context& context, BinaryWriter& w
         cmajor::debug::WriteCompileUnitFunctionRecord(writer, fileIndex, functionId);
         numInstsPos = writer.Pos();
         cmajor::debug::WriteNumberOfInstructionRecords(writer, numInsts);
+        StartFunctionInstruction startInst;
+        startInst.SetSourceLineNumber(-1);
+        startInst.SetCppLineNumber(formatter.Line());
+        startInst.SetCppLineIndex(0);
+        startInst.SetScopeId(-1);
+        startInst.SetFlags(16); // InstructionFlags::startFunction
+        startInst.WriteDebugInfoRecord(writer, numInsts);
     }
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    formatter.WriteLine("// " + fullName);
+    formatter.WriteLine();
+    WriteValueDeclarations(formatter, context);
     bool first = true;
     for (const auto& bb : basicBlocks)
     {

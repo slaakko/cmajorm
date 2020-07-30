@@ -978,4 +978,12 @@ void IncludeBasicBlockInstruction::CollectReferencedBasicBlocks(BasicBlock* pare
     basicBlocks.insert(block);
 }
 
+StartFunctionInstruction::StartFunctionInstruction()
+{
+}
+
+void StartFunctionInstruction::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
+{
+}
+
 } // namespace cmcppi

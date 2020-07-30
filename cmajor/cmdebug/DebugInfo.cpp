@@ -100,6 +100,14 @@ std::string InstructionFlagsStr(InstructionFlags flags)
         }
         s.append("endBrace");
     }
+    if ((flags & InstructionFlags::startFunction) != InstructionFlags::none)
+    {
+        if (!s.empty())
+        {
+            s.append(" | ");
+        }
+        s.append("startFunction");
+    }
     return s;
 }
 
@@ -895,7 +903,14 @@ Instruction* DebugInfo::GetMainFunctionEntryInstruction() const
 {
     Project* mainProject = GetMainProject();
     CompileUnitFunction* mainFunction = mainProject->GetMainFunction();
-    return mainFunction->GetInstruction(0);
+    int index = 0;
+    Instruction* inst = mainFunction->GetInstruction(index);
+    while ((inst->GetFlags() & InstructionFlags::startFunction) != InstructionFlags::none)
+    {
+        ++index;
+        inst = mainFunction->GetInstruction(index);
+    }
+    return inst;
 }
 
 Instruction* DebugInfo::GetInstruction(const Frame& frame, CodeFormatter& formatter) const
