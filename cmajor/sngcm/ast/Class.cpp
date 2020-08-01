@@ -25,7 +25,7 @@ Node* ClassNode::Clone(CloneContext& cloneContext) const
     {
         clonedAttributes = attributes->Clone();
     }
-    ClassNode* clone = new ClassNode(GetSpan(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+    ClassNode* clone = new ClassNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
     if (!cloneContext.InstantiateClassNode())
     {
         int tn = templateParameters.Count();
@@ -48,10 +48,10 @@ Node* ClassNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddMember(members[i]->Clone(cloneContext));
     }
-    clone->SetSpecifierSpan(specifierSpan);
-    clone->SetClassSpan(classSpan);
-    clone->SetBeginBraceSpan(beginBraceSpan);
-    clone->SetEndBraceSpan(endBraceSpan);
+    clone->SetSpecifierSpan(cloneContext.MapSpan(specifierSpan, RootModuleId()));
+    clone->SetClassSpan(cloneContext.MapSpan(classSpan, RootModuleId()));
+    clone->SetBeginBraceSpan(cloneContext.MapSpan(beginBraceSpan, RootModuleId()));
+    clone->SetEndBraceSpan(cloneContext.MapSpan(endBraceSpan, RootModuleId()));
     return clone;
 }
 
@@ -236,7 +236,7 @@ ThisInitializerNode::ThisInitializerNode(const Span& span_) : InitializerNode(No
 
 Node* ThisInitializerNode::Clone(CloneContext& cloneContext) const
 {
-    ThisInitializerNode* clone = new ThisInitializerNode(GetSpan());
+    ThisInitializerNode* clone = new ThisInitializerNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
     int n = Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -256,7 +256,7 @@ BaseInitializerNode::BaseInitializerNode(const Span& span_) : InitializerNode(No
 
 Node* BaseInitializerNode::Clone(CloneContext& cloneContext) const
 {
-    BaseInitializerNode* clone = new BaseInitializerNode(GetSpan());
+    BaseInitializerNode* clone = new BaseInitializerNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
     int n = Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -281,7 +281,7 @@ MemberInitializerNode::MemberInitializerNode(const Span& span_, IdentifierNode* 
 
 Node* MemberInitializerNode::Clone(CloneContext& cloneContext) const
 {
-    MemberInitializerNode* clone = new MemberInitializerNode(GetSpan(), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
+    MemberInitializerNode* clone = new MemberInitializerNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(memberId->Clone(cloneContext)));
     int n = Arguments().Count();
     for (int i = 0; i < n; ++i)
     {
@@ -319,7 +319,7 @@ StaticConstructorNode::StaticConstructorNode(const Span& span_, Specifiers speci
 
 Node* StaticConstructorNode::Clone(CloneContext& cloneContext) const
 {
-    StaticConstructorNode* clone = new StaticConstructorNode(GetSpan(), GetSpecifiers(), nullptr);
+    StaticConstructorNode* clone = new StaticConstructorNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), GetSpecifiers(), nullptr);
     int n = initializers.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -366,7 +366,7 @@ ConstructorNode::ConstructorNode(const Span& span_, Specifiers specifiers_, Attr
 
 Node* ConstructorNode::Clone(CloneContext& cloneContext) const
 {
-    ConstructorNode* clone = new ConstructorNode(GetSpan(), GetSpecifiers(), nullptr);
+    ConstructorNode* clone = new ConstructorNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), GetSpecifiers(), nullptr);
     int n = initializers.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -413,7 +413,7 @@ DestructorNode::DestructorNode(const Span& span_, Specifiers specifiers_, Attrib
 
 Node* DestructorNode::Clone(CloneContext& cloneContext) const
 {
-    DestructorNode* clone = new DestructorNode(GetSpan(), GetSpecifiers(), nullptr);
+    DestructorNode* clone = new DestructorNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), GetSpecifiers(), nullptr);
     clone->classId.reset(static_cast<IdentifierNode*>(classId->Clone(cloneContext)));
     CloneContent(clone, cloneContext);
     return clone;
@@ -447,7 +447,7 @@ MemberFunctionNode::MemberFunctionNode(const Span& span_, Specifiers specifiers_
 
 Node* MemberFunctionNode::Clone(CloneContext& cloneContext) const
 {
-    MemberFunctionNode* clone = new MemberFunctionNode(GetSpan());
+    MemberFunctionNode* clone = new MemberFunctionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
     CloneContent(clone, cloneContext);
     if (IsConst())
     {
@@ -472,7 +472,7 @@ ConversionFunctionNode::ConversionFunctionNode(const Span& span_, Specifiers spe
 
 Node* ConversionFunctionNode::Clone(CloneContext& cloneContext) const
 {
-    ConversionFunctionNode* clone = new ConversionFunctionNode(GetSpan());
+    ConversionFunctionNode* clone = new ConversionFunctionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()));
     CloneContent(clone, cloneContext);
     if (IsConst())
     {
@@ -504,7 +504,7 @@ Node* MemberVariableNode::Clone(CloneContext& cloneContext) const
     {
         clonedAttributes = attributes->Clone();
     }
-    MemberVariableNode* clone =  new MemberVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+    MemberVariableNode* clone =  new MemberVariableNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
     clone->SetSpecifierSpan(specifierSpan);
     return clone;
 }

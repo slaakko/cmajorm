@@ -46,11 +46,11 @@ Node* NamespaceNode::Clone(CloneContext& cloneContext) const
     NamespaceNode* clone = nullptr;
     if (IsUnnamedNs())
     {
-        clone = new NamespaceNode(GetSpan(), nullptr);
+        clone = new NamespaceNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), nullptr);
     }
     else
     {
-        clone = new NamespaceNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+        clone = new NamespaceNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     }
     clone->flags = flags;
     int n = members.Count();
@@ -120,7 +120,7 @@ AliasNode::AliasNode(const Span& span_, IdentifierNode* id_, IdentifierNode* qid
 
 Node* AliasNode::Clone(CloneContext& cloneContext) const
 {
-    return new AliasNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)), static_cast<IdentifierNode*>(qid->Clone(cloneContext)));
+    return new AliasNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)), static_cast<IdentifierNode*>(qid->Clone(cloneContext)));
 }
 
 void AliasNode::Accept(Visitor& visitor)
@@ -165,7 +165,7 @@ NamespaceImportNode::NamespaceImportNode(const Span& span_, IdentifierNode* ns_)
 
 Node* NamespaceImportNode::Clone(CloneContext& cloneContext) const
 {
-    return new NamespaceImportNode(GetSpan(), static_cast<IdentifierNode*>(ns->Clone(cloneContext)));
+    return new NamespaceImportNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(ns->Clone(cloneContext)));
 }
 
 void NamespaceImportNode::Accept(Visitor& visitor)

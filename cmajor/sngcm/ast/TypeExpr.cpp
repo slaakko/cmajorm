@@ -21,7 +21,7 @@ ConstNode::ConstNode(const Span& span_, Node* subject_) : Node(NodeType::constNo
 
 Node* ConstNode::Clone(CloneContext& cloneContext) const
 {
-    return new ConstNode(GetSpan(), subject->Clone(cloneContext));
+    return new ConstNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext));
 }
 
 void ConstNode::Accept(Visitor& visitor)
@@ -58,7 +58,7 @@ LValueRefNode::LValueRefNode(const Span& span_, Node* subject_) : Node(NodeType:
 
 Node* LValueRefNode::Clone(CloneContext& cloneContext) const
 {
-    return new LValueRefNode(GetSpan(), subject->Clone(cloneContext));
+    return new LValueRefNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext));
 }
 
 void LValueRefNode::Accept(Visitor& visitor)
@@ -95,7 +95,7 @@ RValueRefNode::RValueRefNode(const Span& span_, Node* subject_) : Node(NodeType:
 
 Node* RValueRefNode::Clone(CloneContext& cloneContext) const
 {
-    return new RValueRefNode(GetSpan(), subject->Clone(cloneContext));
+    return new RValueRefNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext));
 }
 
 void RValueRefNode::Accept(Visitor& visitor)
@@ -132,7 +132,7 @@ PointerNode::PointerNode(const Span& span_, Node* subject_) : Node(NodeType::poi
 
 Node* PointerNode::Clone(CloneContext& cloneContext) const
 {
-    return new PointerNode(GetSpan(), subject->Clone(cloneContext));
+    return new PointerNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext));
 }
 
 void PointerNode::Accept(Visitor& visitor)
@@ -178,7 +178,7 @@ Node* ArrayNode::Clone(CloneContext& cloneContext) const
     {
         clonedSize = size->Clone(cloneContext);
     }
-    return new ArrayNode(GetSpan(), subject->Clone(cloneContext), clonedSize);
+    return new ArrayNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), subject->Clone(cloneContext), clonedSize);
 }
 
 void ArrayNode::Accept(Visitor& visitor)

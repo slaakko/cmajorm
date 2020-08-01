@@ -33,7 +33,7 @@ Node* ConstantNode::Clone(CloneContext& cloneContext) const
     {
         clonedValue = value->Clone(cloneContext);
     }
-    return new ConstantNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedValue);
+    return new ConstantNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedValue);
 }
 
 void ConstantNode::Accept(Visitor& visitor)

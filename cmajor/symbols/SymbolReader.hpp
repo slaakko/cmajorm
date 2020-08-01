@@ -55,7 +55,7 @@ public:
     bool SetProjectBit() const { return setProjectBit; }
     void SetProjectBitForSymbols() { setProjectBit = true; }
     void SetRootModule(Module* rootModule_) { rootModule = rootModule_; }
-    Module* RootModule() const { return rootModule; }
+    Module* RootModuleId() const { return rootModule; }
 private:
     AstReader astReader;
     SymbolTable* symbolTable;

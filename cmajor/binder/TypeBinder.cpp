@@ -168,6 +168,8 @@ void TypeBinder::Visit(FunctionNode& functionNode)
         if (functionNode.WhereConstraint())
         {
             CloneContext cloneContext;
+            SpanMapper spanMapper;
+            cloneContext.SetSpanMapper(&spanMapper);
             functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
         }
     }
@@ -197,6 +199,8 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     if (!functionSymbol->Constraint() && functionNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
     }
     functionSymbol->ComputeName();
@@ -241,6 +245,8 @@ void TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, ClassNode* cl
     if (classNode->WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         classTemplate->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
@@ -291,6 +297,8 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
     if (classNode->WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         classTypeSymbol->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
@@ -391,6 +399,8 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
     if (!staticConstructorSymbol->Constraint() && staticConstructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         staticConstructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(staticConstructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     staticConstructorSymbol->ComputeName();
@@ -463,6 +473,8 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     if (!constructorSymbol->Constraint() && constructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         constructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(constructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     constructorSymbol->ComputeName();
@@ -542,6 +554,8 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     if (!destructorSymbol->Constraint() && destructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         destructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(destructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     destructorSymbol->ComputeName();
@@ -618,6 +632,8 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     if (!memberFunctionSymbol->Constraint() && memberFunctionNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         memberFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(memberFunctionNode.WhereConstraint()->Clone(cloneContext)));
     }
     memberFunctionSymbol->ComputeName();
@@ -706,6 +722,8 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     if (!conversionFunctionSymbol->Constraint() && conversionFunctionNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         conversionFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(conversionFunctionNode.WhereConstraint()->Clone(cloneContext)));
     }
     conversionFunctionSymbol->ComputeName();

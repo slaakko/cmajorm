@@ -8,10 +8,13 @@
 #include <sngcm/ast/Statement.hpp>
 #include <sngcm/ast/Concept.hpp>
 #include <sngcm/ast/Statement.hpp>
+#include <sngcm/ast/Class.hpp>
+#include <boost/uuid/nil_generator.hpp>
 
 namespace sngcm { namespace ast {
 
-AstReader::AstReader(const std::string& fileName_) : binaryReader(fileName_), moduleId(-1)
+AstReader::AstReader(const std::string& fileName_) :
+    binaryReader(fileName_), rootModuleId(boost::uuids::nil_uuid()), moduleNameTable(nullptr), moduleIdMap(nullptr)
 {
 }
 
@@ -20,6 +23,7 @@ Node* AstReader::ReadNode()
     NodeType nodeType = static_cast<NodeType>(binaryReader.ReadByte());
     Span span = ReadSpan();
     Node* node = NodeFactory::Instance().CreateNode(nodeType, span);
+    node->SetRootModuleId(rootModuleId);
     node->Read(*this);
     return node;
 }
@@ -182,16 +186,38 @@ Span AstReader::ReadSpan()
     else
     {
         uint32_t fileIndex = binaryReader.ReadULEB128UInt();
-        if (moduleId != -1)
+        int16_t moduleId = GetModuleId(fileIndex);
+        auto it = moduleNameTable->find(moduleId);
+        if (it != moduleNameTable->cend())
         {
-            int16_t fileId = GetFileId(static_cast<int32_t>(fileIndex));
-            fileIndex = static_cast<uint32_t>(MakeFileIndex(moduleId, fileId));
+            auto it2 = moduleIdMap->find(it->second);
+            if (it2 != moduleIdMap->cend())
+            {
+                moduleId = it2->second;
+            }
+            else
+            {
+                throw std::runtime_error("module id for module name '" + it->second + "' not found");
+            }
         }
+        else
+        {
+            throw std::runtime_error("module name for module id " + std::to_string(moduleId) + " not found");
+        }
+        int16_t fileId = GetFileId(static_cast<int32_t>(fileIndex));
+        fileIndex = static_cast<uint32_t>(MakeFileIndex(moduleId, fileId));
         uint32_t line = binaryReader.ReadULEB128UInt();
         uint32_t start = binaryReader.ReadULEB128UInt();
         uint32_t end = binaryReader.ReadULEB128UInt();
         return Span(static_cast<int32_t>(fileIndex), static_cast<int32_t>(line), static_cast<int32_t>(start), static_cast<int32_t>(end));
     }
+}
+
+void AstReader::SetModuleMaps(const boost::uuids::uuid& rootModuleId_, std::unordered_map<int16_t, std::string>* moduleNameTable_, std::unordered_map<std::string, int16_t>* moduleIdMap_)
+{
+    rootModuleId = rootModuleId_;
+    moduleNameTable = moduleNameTable_;
+    moduleIdMap = moduleIdMap_;
 }
 
 } } // namespace sngcm::ast

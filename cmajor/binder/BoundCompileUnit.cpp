@@ -263,7 +263,6 @@ void CharacterPointerLiteralToStringFunctionContainerConversion::GenerateCall(Em
 
 std::unique_ptr<Value> CharacterPointerLiteralToStringFunctionContainerConversion::ConvertValue(const std::unique_ptr<Value>& value) const
 {
-    int x = 0;
     return std::unique_ptr<Value>();
 }
 

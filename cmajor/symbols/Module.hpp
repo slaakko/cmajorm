@@ -47,11 +47,12 @@ const uint8_t moduleFormat_8 = uint8_t('8');
 const uint8_t moduleFormat_9 = uint8_t('9');
 const uint8_t moduleFormat_10 = uint8_t('A');
 const uint8_t moduleFormat_11 = uint8_t('B');
-const uint8_t currentModuleFormat = moduleFormat_11;
+const uint8_t moduleFormat_12 = uint8_t('C');
+const uint8_t currentModuleFormat = moduleFormat_12;
 
 enum class ModuleFlags : uint8_t
 {
-    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4
+    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4, dontRemoveFromModuleMap = 1 << 5
 };
 
 inline ModuleFlags operator|(ModuleFlags left, ModuleFlags right)
@@ -100,15 +101,26 @@ private:
     std::vector<std::string> filePaths;
 };
 
+class SYMBOLS_API SpanMapper : public sngcm::ast::SpanMapper
+{
+public:
+    SpanMapper();
+    Span MapSpan(const Span& span, const boost::uuids::uuid& rootModuleId) override;
+private:
+    Module* currentRootModule;
+};
+
 class SYMBOLS_API Module
 {
 public:
     Module();
     Module(const std::string& filePath);
     Module(const std::u32string& name_, const std::string& filePath_, sngcm::ast::Target target);
+    ~Module();
     uint8_t Format() const { return format; }
     ModuleFlags Flags() const { return flags; }
     const std::u32string& Name() const { return name; }
+    const boost::uuids::uuid& Id() const { return id; }
     const std::string& OriginalFilePath() const { return originalFilePath; }
     const std::string& FilePathReadFrom() const { return filePathReadFrom; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
@@ -195,10 +207,13 @@ public:
     void WriteProjectDebugInfoFile(const std::string& projectDebufInfoFilePath);
     void WriteCmdbFile(const std::string& cmdbFilePath);
     void WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Module* rootModule);
+    std::unordered_map<int16_t, std::string>* GetModuleNameTable() { return &moduleNameTable; }
+    std::unordered_map<std::string, int16_t>* GetModuleIdMap() { return &moduleIdMap; }
 private:
     uint8_t format;
     ModuleFlags flags;
     std::u32string name;
+    boost::uuids::uuid id;
     std::string originalFilePath;
     std::string filePathReadFrom;
     std::string libraryFilePath;
@@ -214,7 +229,8 @@ private:
     std::vector<FileTable*> fileTables;
     std::vector<std::unique_ptr<CmajorLexer>> lexers;
     std::vector<soulng::lexer::Lexer*> lexerVec;
-    std::unordered_map<Module*, int16_t> moduleIdMap;
+    std::unordered_map<int16_t, std::string> moduleNameTable;
+    std::unordered_map<std::string, int16_t> moduleIdMap;
     std::vector<std::string> exportedFunctions;
     std::vector<std::string> exportedData;
     std::vector<std::string> allExportedFunctions;

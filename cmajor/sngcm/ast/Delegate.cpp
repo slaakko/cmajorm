@@ -22,7 +22,7 @@ DelegateNode::DelegateNode(const Span& span_, Specifiers specifiers_, Node* retu
 
 Node* DelegateNode::Clone(CloneContext& cloneContext) const
 {
-    DelegateNode* clone = new DelegateNode(GetSpan(), specifiers, returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    DelegateNode* clone = new DelegateNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int n = parameters.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -76,7 +76,7 @@ ClassDelegateNode::ClassDelegateNode(const Span& span_, Specifiers specifiers_, 
 
 Node* ClassDelegateNode::Clone(CloneContext& cloneContext) const
 {
-    ClassDelegateNode* clone = new ClassDelegateNode(GetSpan(), specifiers, returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    ClassDelegateNode* clone = new ClassDelegateNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int n = parameters.Count();
     for (int i = 0; i < n; ++i)
     {

@@ -100,6 +100,7 @@ std::u32string MapGroupId(const std::u32string& groupId, bool& changed)
 
 ConversionVisitor::ConversionVisitor() : changed(false), baseClassId(false), derivesFromXmlContentHandler(false)
 {
+    ctx.SetSpanMapper(&spanMapper);
 }
 
 std::unique_ptr<CompileUnitNode> ConversionVisitor::GetConvertedCompileUnit()

@@ -31,7 +31,7 @@ Node* ParameterNode::Clone(CloneContext& cloneContext) const
     {
         clonedId = static_cast<IdentifierNode*>(id->Clone(cloneContext));
     }
-    ParameterNode* clone = new ParameterNode(GetSpan(), typeExpr->Clone(cloneContext), clonedId);
+    ParameterNode* clone = new ParameterNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), typeExpr->Clone(cloneContext), clonedId);
     if (artificialId)
     {
         clone->artificialId = true;

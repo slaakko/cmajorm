@@ -26,7 +26,7 @@ ParenthesizedConstraintNode::ParenthesizedConstraintNode(const Span& span_, Cons
 
 Node* ParenthesizedConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    return new ParenthesizedConstraintNode(GetSpan(), static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+    return new ParenthesizedConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
 }
 
 void ParenthesizedConstraintNode::Accept(Visitor& visitor)
@@ -88,7 +88,7 @@ DisjunctiveConstraintNode::DisjunctiveConstraintNode(const Span& span_, Constrai
 
 Node* DisjunctiveConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    return new DisjunctiveConstraintNode(GetSpan(), static_cast<ConstraintNode*>(Left()->Clone(cloneContext)), static_cast<ConstraintNode*>(Right()->Clone(cloneContext)));
+    return new DisjunctiveConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<ConstraintNode*>(Left()->Clone(cloneContext)), static_cast<ConstraintNode*>(Right()->Clone(cloneContext)));
 }
 
 void DisjunctiveConstraintNode::Accept(Visitor& visitor)
@@ -112,7 +112,7 @@ ConjunctiveConstraintNode::ConjunctiveConstraintNode(const Span& span_, Constrai
 
 Node* ConjunctiveConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    return new ConjunctiveConstraintNode(GetSpan(), static_cast<ConstraintNode*>(Left()->Clone(cloneContext)), static_cast<ConstraintNode*>(Right()->Clone(cloneContext)));
+    return new ConjunctiveConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<ConstraintNode*>(Left()->Clone(cloneContext)), static_cast<ConstraintNode*>(Right()->Clone(cloneContext)));
 }
 
 void ConjunctiveConstraintNode::Accept(Visitor& visitor)
@@ -138,7 +138,7 @@ WhereConstraintNode::WhereConstraintNode(const Span& span_, ConstraintNode* cons
 
 Node* WhereConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    WhereConstraintNode* clone = new WhereConstraintNode(GetSpan(), static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
+    WhereConstraintNode* clone = new WhereConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
     if (headerConstraint)
     {
         clone->SetHeaderConstraint();
@@ -188,7 +188,7 @@ PredicateConstraintNode::PredicateConstraintNode(const Span& span_, Node* invoke
 
 Node* PredicateConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    return new PredicateConstraintNode(GetSpan(), invokeExpr->Clone(cloneContext));
+    return new PredicateConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), invokeExpr->Clone(cloneContext));
 }
 
 void PredicateConstraintNode::Accept(Visitor& visitor)
@@ -227,7 +227,7 @@ IsConstraintNode::IsConstraintNode(const Span& span_, Node* typeExpr_, Node* con
 
 Node* IsConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    return new IsConstraintNode(GetSpan(), typeExpr->Clone(cloneContext), conceptOrTypeName->Clone(cloneContext));
+    return new IsConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), typeExpr->Clone(cloneContext), conceptOrTypeName->Clone(cloneContext));
 }
 
 void IsConstraintNode::Accept(Visitor& visitor)
@@ -267,7 +267,7 @@ MultiParamConstraintNode::MultiParamConstraintNode(const Span& span_, Identifier
 
 Node* MultiParamConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    MultiParamConstraintNode* clone = new MultiParamConstraintNode(GetSpan(), static_cast<IdentifierNode*>(conceptId->Clone(cloneContext)));
+    MultiParamConstraintNode* clone = new MultiParamConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(conceptId->Clone(cloneContext)));
     int n = typeExprs.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -331,7 +331,7 @@ TypeNameConstraintNode::TypeNameConstraintNode(const Span& span_, Node* typeId_)
 
 Node* TypeNameConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    return new TypeNameConstraintNode(GetSpan(), typeId->Clone(cloneContext));
+    return new TypeNameConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), typeId->Clone(cloneContext));
 }
 
 void TypeNameConstraintNode::Accept(Visitor& visitor)
@@ -372,7 +372,7 @@ ConstructorConstraintNode::ConstructorConstraintNode(const Span& span_, Identifi
 
 Node* ConstructorConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    ConstructorConstraintNode* clone = new ConstructorConstraintNode(GetSpan(), static_cast<IdentifierNode*>(typeParamId->Clone(cloneContext)));
+    ConstructorConstraintNode* clone = new ConstructorConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(typeParamId->Clone(cloneContext)));
     int n = parameters.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -437,7 +437,7 @@ DestructorConstraintNode::DestructorConstraintNode(const Span& span_, Identifier
 
 Node* DestructorConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    return new DestructorConstraintNode(GetSpan(), static_cast<IdentifierNode*>(typeParamId->Clone(cloneContext)));
+    return new DestructorConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(typeParamId->Clone(cloneContext)));
 }
 
 void DestructorConstraintNode::Accept(Visitor& visitor)
@@ -479,7 +479,7 @@ MemberFunctionConstraintNode::MemberFunctionConstraintNode(const Span& span_, No
 
 Node* MemberFunctionConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    MemberFunctionConstraintNode* clone = new MemberFunctionConstraintNode(GetSpan(), returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(typeParamId->Clone(cloneContext)), groupId);
+    MemberFunctionConstraintNode* clone = new MemberFunctionConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), returnTypeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(typeParamId->Clone(cloneContext)), groupId);
     int n = parameters.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -556,7 +556,7 @@ FunctionConstraintNode::FunctionConstraintNode(const Span& span_, Node* returnTy
 
 Node* FunctionConstraintNode::Clone(CloneContext& cloneContext) const
 {
-    FunctionConstraintNode* clone = new FunctionConstraintNode(GetSpan(), returnTypeExpr->Clone(cloneContext), groupId);
+    FunctionConstraintNode* clone = new FunctionConstraintNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), returnTypeExpr->Clone(cloneContext), groupId);
     int n = parameters.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -628,7 +628,7 @@ AxiomStatementNode::AxiomStatementNode(const Span& span_, Node* expression_, con
 
 Node* AxiomStatementNode::Clone(CloneContext& cloneContext) const
 {
-    return new AxiomStatementNode(GetSpan(), expression->Clone(cloneContext), text);
+    return new AxiomStatementNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), expression->Clone(cloneContext), text);
 }
 
 void AxiomStatementNode::Accept(Visitor& visitor)
@@ -667,7 +667,7 @@ AxiomNode::AxiomNode(const Span& span_, IdentifierNode* id_) : Node(NodeType::ax
 
 Node* AxiomNode::Clone(CloneContext& cloneContext) const
 {
-    AxiomNode* clone = new AxiomNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    AxiomNode* clone = new AxiomNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int np = parameters.Count();
     for (int i = 0; i < np; ++i)
     {
@@ -678,8 +678,8 @@ Node* AxiomNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddStatement(static_cast<AxiomStatementNode*>(statements[i]->Clone(cloneContext)));
     }
-    clone->SetBeginBraceSpan(beginBraceSpan);
-    clone->SetEndBraceSpan(endBraceSpan);
+    clone->SetBeginBraceSpan(cloneContext.MapSpan(beginBraceSpan, RootModuleId()));
+    clone->SetEndBraceSpan(cloneContext.MapSpan(endBraceSpan, RootModuleId()));
     return clone;
 }
 
@@ -734,7 +734,7 @@ ConceptIdNode::ConceptIdNode(const Span& span_, IdentifierNode* id_) : Node(Node
 
 Node* ConceptIdNode::Clone(CloneContext& cloneContext) const
 {
-    ConceptIdNode* clone = new ConceptIdNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    ConceptIdNode* clone = new ConceptIdNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int n = typeParameters.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -809,7 +809,7 @@ ConceptNode::ConceptNode(NodeType nodeType_, const Span& span_, Specifiers speci
 
 Node* ConceptNode::Clone(CloneContext& cloneContext) const
 {
-    ConceptNode* clone = new ConceptNode(GetSpan(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    ConceptNode* clone = new ConceptNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int nt = typeParameters.Count();
     for (int i = 0; i < nt; ++i)
     {
@@ -829,8 +829,8 @@ Node* ConceptNode::Clone(CloneContext& cloneContext) const
     {
         clone->AddAxiom(static_cast<AxiomNode*>(axioms[i]->Clone(cloneContext)));
     }
-    clone->SetBeginBraceSpan(beginBraceSpan);
-    clone->SetEndBraceSpan(endBraceSpan);
+    clone->SetBeginBraceSpan(cloneContext.MapSpan(beginBraceSpan, RootModuleId()));
+    clone->SetEndBraceSpan(cloneContext.MapSpan(endBraceSpan, RootModuleId()));
     return clone;
 }
 

@@ -169,6 +169,8 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, c
     InvokeNode* setEx = new InvokeNode(Span(), new IdentifierNode(Span(), U"RtSetUnitTestException"));
     ConstructionStatementNode* constructExStr = new ConstructionStatementNode(Span(), new IdentifierNode(Span(), U"string"), new IdentifierNode(Span(), U"@ex"));
     CloneContext cloneContext;
+    cmajor::symbols::SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     constructExStr->AddArgument(exToString->Clone(cloneContext));
     catchBlock->AddStatement(constructExStr);
     InvokeNode* exStr = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"@ex"), new IdentifierNode(Span(), U"Chars")));
@@ -336,12 +338,16 @@ std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> SplitIntoT
 {
     std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> testUnits;
     CloneContext makeUnitTestUnitContext;
+    cmajor::symbols::SpanMapper spanMapper;
+    makeUnitTestUnitContext.SetSpanMapper(&spanMapper);
     makeUnitTestUnitContext.SetMakeTestUnits();
     std::unique_ptr<CompileUnitNode> environmentNode(static_cast<CompileUnitNode*>(compileUnit->Clone(makeUnitTestUnitContext)));
     for (FunctionNode* unitTestFunction : makeUnitTestUnitContext.UnitTestFunctions())
     {
         std::string unitTestName = ToUtf8(unitTestFunction->GroupId());
         CloneContext testUnitContext;
+        cmajor::symbols::SpanMapper spanMapper;
+        testUnitContext.SetSpanMapper(&spanMapper);
         std::pair<std::unique_ptr<CompileUnitNode>, std::string> testUnit = std::make_pair(
             std::unique_ptr<CompileUnitNode>(static_cast<CompileUnitNode*>(environmentNode->Clone(testUnitContext))), unitTestName);
         NamespaceNode* ns = testUnit.first->GlobalNs();

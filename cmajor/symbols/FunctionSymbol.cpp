@@ -1224,6 +1224,8 @@ void FunctionSymbol::SetSpecifiers(Specifiers specifiers)
 void FunctionSymbol::CloneUsingNodes(const std::vector<Node*>& usingNodes_)
 {
     CloneContext cloneContext;
+    SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     for (Node* usingNode : usingNodes_)
     {
         usingNodes.Add(usingNode->Clone(cloneContext));

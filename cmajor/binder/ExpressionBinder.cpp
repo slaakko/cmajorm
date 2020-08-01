@@ -1409,6 +1409,8 @@ void ExpressionBinder::Visit(PrefixIncrementNode& prefixIncrementNode)
             if (expression->GetType()->IsUnsignedType())
             {
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 AssignmentStatementNode assignmentStatement(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext),
                     new AddNode(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(prefixIncrementNode.GetSpan(), 1u)));
                 statementBinder->CompileStatement(&assignmentStatement, false);
@@ -1416,6 +1418,8 @@ void ExpressionBinder::Visit(PrefixIncrementNode& prefixIncrementNode)
             else
             {
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 AssignmentStatementNode assignmentStatement(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext),
                     new AddNode(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(prefixIncrementNode.GetSpan(), 1)));
                 statementBinder->CompileStatement(&assignmentStatement, false);
@@ -1446,6 +1450,8 @@ void ExpressionBinder::Visit(PrefixDecrementNode& prefixDecrementNode)
             if (expression->GetType()->IsUnsignedType())
             {
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 AssignmentStatementNode assignmentStatement(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext),
                     new SubNode(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(prefixDecrementNode.GetSpan(), 1u)));
                 statementBinder->CompileStatement(&assignmentStatement, false);
@@ -1453,6 +1459,8 @@ void ExpressionBinder::Visit(PrefixDecrementNode& prefixDecrementNode)
             else
             {
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 AssignmentStatementNode assignmentStatement(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext),
                     new SubNode(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(prefixDecrementNode.GetSpan(), 1)));
                 statementBinder->CompileStatement(&assignmentStatement, false);
@@ -2191,7 +2199,9 @@ void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode)
         if (expression->GetType()->PlainType(postfixIncrementNode.GetSpan())->IsClassTypeSymbol())
         {
             CloneContext cloneContext;
-            ExpressionStatementNode prefixIncrementExpression(postfixIncrementNode.GetSpan(), new PrefixIncrementNode(postfixIncrementNode.GetSpan(), 
+            SpanMapper spanMapper;
+            cloneContext.SetSpanMapper(&spanMapper);
+            ExpressionStatementNode prefixIncrementExpression(postfixIncrementNode.GetSpan(), new PrefixIncrementNode(postfixIncrementNode.GetSpan(),
                 postfixIncrementNode.Subject()->Clone(cloneContext)));
             statementBinder->CompileStatement(&prefixIncrementExpression, true);
         }
@@ -2200,6 +2210,8 @@ void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode)
             if (expression->GetType()->IsUnsignedType())
             {
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 AssignmentStatementNode assignmentStatement(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext),
                     new AddNode(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(postfixIncrementNode.GetSpan(), 1u)));
                 statementBinder->CompileStatement(&assignmentStatement, true);
@@ -2207,6 +2219,8 @@ void ExpressionBinder::Visit(PostfixIncrementNode& postfixIncrementNode)
             else
             {
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 AssignmentStatementNode assignmentStatement(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext),
                     new AddNode(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(postfixIncrementNode.GetSpan(), 1)));
                 statementBinder->CompileStatement(&assignmentStatement, true);
@@ -2231,6 +2245,8 @@ void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
         if (expression->GetType()->PlainType(postfixDecrementNode.GetSpan())->IsClassTypeSymbol())
         {
             CloneContext cloneContext;
+            SpanMapper spanMapper;
+            cloneContext.SetSpanMapper(&spanMapper);
             ExpressionStatementNode prefixDecrementExpression(postfixDecrementNode.GetSpan(), new PrefixDecrementNode(postfixDecrementNode.GetSpan(),
                 postfixDecrementNode.Subject()->Clone(cloneContext)));
             statementBinder->CompileStatement(&prefixDecrementExpression, true);
@@ -2240,6 +2256,8 @@ void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
             if (expression->GetType()->IsUnsignedType())
             {
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 AssignmentStatementNode assignmentStatement(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext),
                     new AddNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext), new ByteLiteralNode(postfixDecrementNode.GetSpan(), 1u)));
                 statementBinder->CompileStatement(&assignmentStatement, true);
@@ -2247,6 +2265,8 @@ void ExpressionBinder::Visit(PostfixDecrementNode& postfixDecrementNode)
             else
             {
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 AssignmentStatementNode assignmentStatement(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext),
                     new AddNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext), new SByteLiteralNode(postfixDecrementNode.GetSpan(), 1)));
                 statementBinder->CompileStatement(&assignmentStatement, true);
@@ -2460,6 +2480,8 @@ void ExpressionBinder::Visit(ConstructNode& constructNode)
         if (i == 0)
         {
             CloneContext cloneContext;
+            SpanMapper spanMapper;
+            cloneContext.SetSpanMapper(&spanMapper);
             CastNode castNode(constructNode.GetSpan(), new PointerNode(constructNode.GetSpan(), constructNode.TypeExpr()->Clone(cloneContext)), argumentNode->Clone(cloneContext));
             castNode.Accept(*this);
             resultType = expression->GetType();
@@ -2489,6 +2511,8 @@ void ExpressionBinder::Visit(ConstructNode& constructNode)
 void ExpressionBinder::Visit(NewNode& newNode)
 {
     CloneContext cloneContext;
+    SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     InvokeNode* invokeMemAlloc = nullptr;
     bool memDebug = boundCompileUnit.GetModule().IsSymbolDefined(U"MEM_DEBUG");
     if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)

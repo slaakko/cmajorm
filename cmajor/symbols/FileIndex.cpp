@@ -16,7 +16,12 @@ void FileIndex::AddFile(int32_t fileIndex, Module* module)
     std::lock_guard<std::mutex> lock(mtx);
     if (fileMap.find(fileIndex) == fileMap.cend())
     {
-        fileMap[fileIndex] = module->GetFilePath(fileIndex);
+        std::string filePath = module->GetFilePath(fileIndex);
+        if (filePath.empty())
+        {
+            filePath = module->GetFilePath(fileIndex);
+        }
+        fileMap[fileIndex] = filePath;
     }
 }
 

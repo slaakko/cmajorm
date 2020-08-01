@@ -46,7 +46,7 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
     {
         clonedReturnTypeExpr = returnTypeExpr->Clone(cloneContext);
     }
-    FunctionNode* clone = new FunctionNode(GetSpan(), specifiers, clonedReturnTypeExpr, groupId, clonedAttributes);
+    FunctionNode* clone = new FunctionNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, clonedReturnTypeExpr, groupId, clonedAttributes);
     if (!cloneContext.InstantiateFunctionNode())
     {
         int nt = templateParameters.Count();
@@ -65,6 +65,7 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
         if (cloneContext.InstantiateClassNode())
         {
             CloneContext bodyCloneContext;
+            bodyCloneContext.SetSpanMapper(cloneContext.GetSpanMapper());
             clone->SetBodySource(static_cast<CompoundStatementNode*>(body->Clone(bodyCloneContext)));
         }
         else
@@ -76,8 +77,8 @@ Node* FunctionNode::Clone(CloneContext& cloneContext) const
     {
         clone->SetConstraint(static_cast<WhereConstraintNode*>(whereConstraint->Clone(cloneContext)));
     }
-    clone->SetGroupIdSpan(groupIdSpan);
-    clone->SetSpecifierSpan(specifierSpan);
+    clone->SetGroupIdSpan(cloneContext.MapSpan(groupIdSpan, RootModuleId()));
+    clone->SetSpecifierSpan(cloneContext.MapSpan(specifierSpan, RootModuleId()));
     return clone;
 }
 
@@ -109,6 +110,7 @@ void FunctionNode::CloneContent(FunctionNode* clone, CloneContext& cloneContext)
         if (cloneContext.InstantiateClassNode())
         {
             CloneContext bodyCloneContext;
+            bodyCloneContext.SetSpanMapper(cloneContext.GetSpanMapper());
             clone->SetBodySource(static_cast<CompoundStatementNode*>(body->Clone(bodyCloneContext)));
         }
         else
@@ -120,8 +122,8 @@ void FunctionNode::CloneContent(FunctionNode* clone, CloneContext& cloneContext)
     { 
         clone->SetConstraint(static_cast<WhereConstraintNode*>(whereConstraint->Clone(cloneContext)));
     }
-    clone->SetGroupIdSpan(groupIdSpan);
-    clone->SetSpecifierSpan(specifierSpan);
+    clone->SetGroupIdSpan(cloneContext.MapSpan(groupIdSpan, RootModuleId()));
+    clone->SetSpecifierSpan(cloneContext.MapSpan(specifierSpan, RootModuleId()));
 }
 
 void FunctionNode::Accept(Visitor& visitor)

@@ -3433,6 +3433,8 @@ void Evaluator::Visit(PrefixIncrementNode& prefixIncrementNode)
     }
     bool unsignedType = value->GetType(symbolTable)->IsUnsignedType();
     CloneContext cloneContext;
+    SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     if (unsignedType)
     {
         AssignmentStatementNode assignmentStatementNode(prefixIncrementNode.GetSpan(), prefixIncrementNode.Subject()->Clone(cloneContext),
@@ -3485,6 +3487,8 @@ void Evaluator::Visit(PrefixDecrementNode& prefixDecrementNode)
     }
     bool unsignedType = value->GetType(symbolTable)->IsUnsignedType();
     CloneContext cloneContext;
+    SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     if (unsignedType)
     {
         AssignmentStatementNode assignmentStatementNode(prefixDecrementNode.GetSpan(), prefixDecrementNode.Subject()->Clone(cloneContext),
@@ -3888,6 +3892,8 @@ void Evaluator::Visit(PostfixIncrementNode& postfixIncrementNode)
     bool unsignedType = value->GetType(symbolTable)->IsUnsignedType();
     std::unique_ptr<Value> result = std::move(value);
     CloneContext cloneContext;
+    SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     if (unsignedType)
     {
         AssignmentStatementNode assignmentStatementNode(postfixIncrementNode.GetSpan(), postfixIncrementNode.Subject()->Clone(cloneContext),
@@ -3922,6 +3928,8 @@ void Evaluator::Visit(PostfixDecrementNode& postfixDecrementNode)
     bool unsignedType = value->GetType(symbolTable)->IsUnsignedType();
     std::unique_ptr<Value> result = std::move(value);
     CloneContext cloneContext;
+    SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     if (unsignedType)
     {
         AssignmentStatementNode assignmentStatementNode(postfixDecrementNode.GetSpan(), postfixDecrementNode.Subject()->Clone(cloneContext),

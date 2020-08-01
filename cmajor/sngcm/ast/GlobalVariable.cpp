@@ -24,7 +24,7 @@ GlobalVariableNode::GlobalVariableNode(const Span& span_, Specifiers specifiers_
 
 Node* GlobalVariableNode::Clone(CloneContext& cloneContext) const
 {
-    GlobalVariableNode* clone = new GlobalVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), cu);
+    GlobalVariableNode* clone = new GlobalVariableNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)), cu);
     if (initializer)
     {
         clone->SetInitializer(initializer->Clone(cloneContext));

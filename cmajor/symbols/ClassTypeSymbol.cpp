@@ -551,6 +551,8 @@ void ClassTypeSymbol::Accept(SymbolCollector* collector)
             if (Constraint())
             {
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 prototype->SetConstraint(static_cast<ConstraintNode*>(Constraint()->Clone(cloneContext)));
             }
             collector->AddClass(prototype);
@@ -816,6 +818,8 @@ void ClassTypeSymbol::AddImplementedInterface(InterfaceTypeSymbol* interfaceType
 void ClassTypeSymbol::CloneUsingNodes(const std::vector<Node*>& usingNodes_)
 {
     CloneContext cloneContext;
+    SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     for (Node* usingNode : usingNodes_)
     {
         usingNodes.Add(usingNode->Clone(cloneContext));

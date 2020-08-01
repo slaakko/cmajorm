@@ -25,6 +25,7 @@
 #include <sngcm/ast/Concept.hpp>
 #include <sngcm/ast/GlobalVariable.hpp>
 #include <sngcm/ast/Comment.hpp>
+#include <boost/uuid/nil_generator.hpp>
 #include <algorithm>
 
 namespace sngcm { namespace ast {
@@ -65,7 +66,7 @@ std::string NodeTypeStr(NodeType nodeType)
     return nodeTypeStr[static_cast<size_t>(nodeType)];
 }
 
-Node::Node(NodeType nodeType_, const Span& span_) : nodeType(nodeType_), span(span_), parent(nullptr)
+Node::Node(NodeType nodeType_, const Span& span_) : nodeType(nodeType_), span(span_), parent(nullptr), rootModuleId(boost::uuids::nil_uuid())
 {
 }
 

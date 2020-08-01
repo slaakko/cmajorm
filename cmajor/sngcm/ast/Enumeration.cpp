@@ -24,14 +24,14 @@ EnumTypeNode::EnumTypeNode(const Span& span_, Specifiers specifiers_, Identifier
 
 Node* EnumTypeNode::Clone(CloneContext& cloneContext) const
 {
-    EnumTypeNode* clone = new EnumTypeNode(GetSpan(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    EnumTypeNode* clone = new EnumTypeNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)));
     int n = constants.Count();
     for (int i = 0; i < n; ++i)
     {
         clone->AddConstant(static_cast<EnumConstantNode*>(constants[i]->Clone(cloneContext)));
     }
-    clone->SetBeginBraceSpan(beginBraceSpan);
-    clone->SetEndBraceSpan(endBraceSpan);
+    clone->SetBeginBraceSpan(cloneContext.MapSpan(beginBraceSpan, RootModuleId()));
+    clone->SetEndBraceSpan(cloneContext.MapSpan(endBraceSpan, RootModuleId()));
     return clone;
 }
 
@@ -108,7 +108,7 @@ EnumConstantNode::EnumConstantNode(const Span& span_, IdentifierNode* id_, Node*
 
 Node* EnumConstantNode::Clone(CloneContext& cloneContext) const
 {
-    EnumConstantNode* clone = new EnumConstantNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)), value->Clone(cloneContext));
+    EnumConstantNode* clone = new EnumConstantNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)), value->Clone(cloneContext));
     if (hasValue)
     {
         clone->SetHasValue();

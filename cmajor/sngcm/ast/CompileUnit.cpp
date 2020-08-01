@@ -25,7 +25,7 @@ CompileUnitNode::CompileUnitNode(const Span& span_, const std::string& filePath_
 
 Node* CompileUnitNode::Clone(CloneContext& cloneContext) const
 {
-    CompileUnitNode* clone = new CompileUnitNode(GetSpan(), filePath);
+    CompileUnitNode* clone = new CompileUnitNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), filePath);
     clone->globalNs.reset(static_cast<NamespaceNode*>(globalNs->Clone(cloneContext)));
     return clone;
 }

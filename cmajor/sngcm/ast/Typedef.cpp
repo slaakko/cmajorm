@@ -23,7 +23,7 @@ TypedefNode::TypedefNode(const Span& span_, Specifiers specifiers_, Node* typeEx
 
 Node* TypedefNode::Clone(CloneContext& cloneContext) const
 {
-    return new TypedefNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    return new TypedefNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, typeExpr->Clone(cloneContext), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
 }
 
 void TypedefNode::Accept(Visitor& visitor)

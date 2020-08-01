@@ -10,6 +10,7 @@
 #include <sngcm/ast/Clone.hpp>
 #include <sngcm/ast/Specifier.hpp>
 #include <soulng/util/Error.hpp>
+#include <boost/uuid/uuid.hpp>
 #include <memory>
 #include <stdint.h>
 
@@ -86,10 +87,13 @@ public:
     const Node* Parent() const { return parent; }
     Node* Parent() { return parent; }
     void SetParent(Node* parent_);
+    const boost::uuids::uuid& RootModuleId() const { return rootModuleId; }
+    void SetRootModuleId(const boost::uuids::uuid& rootModuleId_) { rootModuleId = rootModuleId_; }
 private:
     NodeType nodeType;
     Span span;
     Node* parent;
+    boost::uuids::uuid rootModuleId;
 };
 
 class SNGCM_AST_API UnaryNode : public Node

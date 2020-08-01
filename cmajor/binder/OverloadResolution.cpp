@@ -1245,6 +1245,8 @@ std::unique_ptr<BoundFunctionCall> SelectViableFunction(const ViableFunctionSet&
                             if (constraint)
                             {
                                 CloneContext cloneContext;
+                                SpanMapper spanMapper;
+                                cloneContext.SetSpanMapper(&spanMapper);
                                 viableFunction->SetConstraint(static_cast<ConstraintNode*>(constraint->Clone(cloneContext)));
                             }
                         }

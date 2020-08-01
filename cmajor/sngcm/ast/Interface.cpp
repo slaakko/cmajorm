@@ -26,15 +26,15 @@ Node* InterfaceNode::Clone(CloneContext& cloneContext) const
     {
         clonedAttributes = attributes->Clone();
     }
-    InterfaceNode* clone = new InterfaceNode(GetSpan(), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+    InterfaceNode* clone = new InterfaceNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), specifiers, static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
     int n = members.Count();
     for (int i = 0; i < n; ++i)
     {
         clone->AddMember(members[i]->Clone(cloneContext));
     }
-    clone->SetSpecifierSpan(specifierSpan);
-    clone->SetBeginBraceSpan(beginBraceSpan);
-    clone->SetEndBraceSpan(endBraceSpan);
+    clone->SetSpecifierSpan(cloneContext.MapSpan(specifierSpan, RootModuleId()));
+    clone->SetBeginBraceSpan(cloneContext.MapSpan(beginBraceSpan, RootModuleId()));
+    clone->SetEndBraceSpan(cloneContext.MapSpan(endBraceSpan, RootModuleId()));
     return clone;
 }
 

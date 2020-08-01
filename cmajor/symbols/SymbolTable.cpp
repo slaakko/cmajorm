@@ -179,7 +179,6 @@ void SymbolTable::Read(SymbolReader& reader)
             positionIds.push_back(positionId);
         }
     }
-    reader.GetAstReader().SetModuleId(reader.RootModule()->GetModuleId(reader.GetModule()));
     globalNs.Read(reader);
     uint32_t na = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < na; ++i)
@@ -427,6 +426,8 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode, int32_t functionInde
     if (functionNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
     }
     if (functionSymbol->GroupName() == U"main" || functionSymbol->GroupName() == U"WinMain")
@@ -589,6 +590,8 @@ void SymbolTable::BeginStaticConstructor(StaticConstructorNode& staticConstructo
     if (staticConstructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         staticConstructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(staticConstructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     MapNode(&staticConstructorNode, staticConstructorSymbol);
@@ -625,6 +628,8 @@ void SymbolTable::BeginConstructor(ConstructorNode& constructorNode, int32_t fun
     if (constructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         constructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(constructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     MapNode(&constructorNode, constructorSymbol);
@@ -671,6 +676,8 @@ void SymbolTable::BeginDestructor(DestructorNode& destructorNode, int32_t functi
     if (destructorNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         destructorSymbol->SetConstraint(static_cast<WhereConstraintNode*>(destructorNode.WhereConstraint()->Clone(cloneContext)));
     }
     MapNode(&destructorNode, destructorSymbol);
@@ -721,6 +728,8 @@ void SymbolTable::BeginMemberFunction(MemberFunctionNode& memberFunctionNode, in
     if (memberFunctionNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         memberFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(memberFunctionNode.WhereConstraint()->Clone(cloneContext)));
     }
     MapNode(&memberFunctionNode, memberFunctionSymbol);
@@ -786,6 +795,8 @@ void SymbolTable::BeginConversionFunction(ConversionFunctionNode& conversionFunc
     if (conversionFunctionNode.WhereConstraint())
     {
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         conversionFunctionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(conversionFunctionNode.WhereConstraint()->Clone(cloneContext)));
     }
     MapNode(&conversionFunctionNode, conversionFunctionSymbol);

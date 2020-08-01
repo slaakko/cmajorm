@@ -45,7 +45,7 @@ IdentifierNode::IdentifierNode(const Span& span_, const soulng::lexer::Token& to
 
 Node* IdentifierNode::Clone(CloneContext& cloneContext) const
 {
-    return new IdentifierNode(GetSpan(), identifier);
+    return new IdentifierNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), identifier);
 }
 
 void IdentifierNode::Accept(Visitor& visitor)
@@ -80,7 +80,7 @@ CursorIdNode::CursorIdNode(const Span& span_, const std::u32string& identifier_)
 
 Node* CursorIdNode::Clone(CloneContext& cloneContext) const 
 {
-    return new CursorIdNode(GetSpan(), Str());
+    return new CursorIdNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), Str());
 }
 
 void CursorIdNode::Accept(Visitor& visitor)

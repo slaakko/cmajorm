@@ -5,6 +5,7 @@
 
 #ifndef CMUPD_CONVERSION_VISITOR_INCLUDED
 #define CMUPD_CONVERSION_VISITOR_INCLUDED
+#include <cmajor/symbols/Module.hpp>
 #include <sngcm/ast/Visitor.hpp>
 #include <sngcm/ast/Node.hpp>
 #include <memory>
@@ -192,6 +193,7 @@ public:
     void Visit(GlobalVariableNode& globalVariableNode);
 private:
     std::unique_ptr<Node> node;
+    cmajor::symbols::SpanMapper spanMapper;
     CloneContext ctx;
     bool changed;
     bool baseClassId;

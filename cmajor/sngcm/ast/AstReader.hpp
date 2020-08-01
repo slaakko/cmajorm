@@ -9,6 +9,7 @@
 #include <sngcm/ast/Specifier.hpp>
 #include <soulng/util/BinaryReader.hpp>
 #include <soulng/lexer/Span.hpp>
+#include <unordered_map>
 
 namespace sngcm { namespace ast {
 
@@ -61,10 +62,12 @@ public:
     ConditionalCompilationPartNode* ReadConditionalCompilationPartNode();
     Specifiers ReadSpecifiers();
     Span ReadSpan();
-    void SetModuleId(int16_t moduleId_) { moduleId = moduleId_; }
+    void SetModuleMaps(const boost::uuids::uuid& rootModuleId, std::unordered_map<int16_t, std::string>* moduleNameTable_, std::unordered_map<std::string, int16_t>* moduleIdMap_);
 private:
     BinaryReader binaryReader;
-    int16_t moduleId;
+    boost::uuids::uuid rootModuleId;
+    std::unordered_map<int16_t, std::string>* moduleNameTable;
+    std::unordered_map<std::string, int16_t>* moduleIdMap;
 };
 
 } } // namespace sngcm::ast

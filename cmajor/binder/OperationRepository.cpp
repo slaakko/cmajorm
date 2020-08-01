@@ -3610,6 +3610,8 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                     arguments.push_back(std::unique_ptr<BoundExpression>(
                         new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(boundMemberVariable), boundMemberVariable->GetType()->AddPointer(span))));
                     CloneContext cloneContext;
+                    SpanMapper spanMapper;
+                    cloneContext.SetSpanMapper(&spanMapper);
                     DotNode thatMemberVarNode(span, constructorNode->Parameters()[0]->Clone(cloneContext),
                         new IdentifierNode(span, memberVariableSymbol->Name()));
                     std::unique_ptr<BoundExpression> thatMemberVarArgument = BindExpression(&thatMemberVarNode, boundCompileUnit, boundFunction, containerScope, statementBinder);
@@ -3754,6 +3756,8 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                     arguments.push_back(std::unique_ptr<BoundExpression>(
                         new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(boundMemberVariable), boundMemberVariable->GetType()->AddPointer(span))));
                     CloneContext cloneContext;
+                    SpanMapper spanMapper;
+                    cloneContext.SetSpanMapper(&spanMapper);
                     DotNode thatMemberVarNode(span, assignmentNode->Parameters()[0]->Clone(cloneContext),
                         new IdentifierNode(span, memberVariableSymbol->Name()));
                     std::unique_ptr<BoundExpression> thatMemberVarArgument = BindExpression(&thatMemberVarNode, boundCompileUnit, boundFunction, containerScope, statementBinder);

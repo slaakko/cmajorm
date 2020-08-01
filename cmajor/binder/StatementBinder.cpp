@@ -1438,6 +1438,8 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
         iteratorTypeNode.reset(new IdentifierNode(span, U"Iterator"));
     }
     CloneContext cloneContext;
+    SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     std::unique_ptr<CompoundStatementNode> compoundStatementNode(new CompoundStatementNode(span));
     if (rangeForStatementNode.Action()->GetNodeType() == NodeType::compoundStatementNode)
     {
@@ -1693,6 +1695,8 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
             {
                 NewNode* newNode = new NewNode(span, new IdentifierNode(span, exceptionClassType->FullName()));
                 CloneContext cloneContext;
+                SpanMapper spanMapper;
+                cloneContext.SetSpanMapper(&spanMapper);
                 newNode->AddArgument(throwStatementNode.Expression()->Clone(cloneContext));
                 if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
                 {
@@ -1789,6 +1793,8 @@ void StatementBinder::Visit(CatchNode& catchNode)
     }
     PointerNode exceptionPtrTypeNode(span, new IdentifierNode(span, catchedType->BaseType()->FullName()));
     CloneContext cloneContext;
+    SpanMapper spanMapper;
+    cloneContext.SetSpanMapper(&spanMapper);
     ConstructionStatementNode* constructExceptionPtr = new ConstructionStatementNode(span, exceptionPtrTypeNode.Clone(cloneContext), new IdentifierNode(span, U"@exceptionPtr"));
     constructExceptionPtr->AddArgument(new CastNode(span, exceptionPtrTypeNode.Clone(cloneContext), new IdentifierNode(span, U"@exceptionAddr")));
     handlerBlock.AddStatement(constructExceptionPtr);
@@ -1850,6 +1856,8 @@ void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
         InvokeNode* invokeSetUnitTestAssertionResult = new InvokeNode(assertStatementNode.GetSpan(), new IdentifierNode(assertStatementNode.GetSpan(), U"RtSetUnitTestAssertionResult"));
         invokeSetUnitTestAssertionResult->AddArgument(new IntLiteralNode(assertStatementNode.GetSpan(), assertionIndex));
         CloneContext cloneContext;
+        SpanMapper spanMapper;
+        cloneContext.SetSpanMapper(&spanMapper);
         invokeSetUnitTestAssertionResult->AddArgument(assertStatementNode.AssertExpr()->Clone(cloneContext));
         invokeSetUnitTestAssertionResult->AddArgument(new IntLiteralNode(assertStatementNode.GetSpan(), assertionLineNumber));
         ExpressionStatementNode setUnitTestAssertionResult(assertStatementNode.GetSpan(), invokeSetUnitTestAssertionResult);

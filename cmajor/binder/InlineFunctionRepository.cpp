@@ -43,9 +43,12 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         Assert(node, "function node not read");
     }
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
-    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(inlineFunction->GetSpan(), new IdentifierNode(inlineFunction->GetSpan(), U"")));
+    SpanMapper spanMapper;
+    std::unique_ptr<NamespaceNode> globalNs(new NamespaceNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()),
+        new IdentifierNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()), U"")));
     NamespaceNode* currentNs = globalNs.get();
     CloneContext cloneContext;
+    cloneContext.SetSpanMapper(&spanMapper);
     cloneContext.SetInstantiateFunctionNode();
     bool fileScopeAdded = false;
     int n = inlineFunction->UsingNodes().Count();
@@ -74,7 +77,8 @@ FunctionSymbol* InlineFunctionRepository::Instantiate(FunctionSymbol* inlineFunc
         std::vector<std::u32string> nsComponents = Split(fullNsName, '.');
         for (const std::u32string& nsComponent : nsComponents)
         {
-            NamespaceNode* nsNode = new NamespaceNode(inlineFunction->GetSpan(), new IdentifierNode(inlineFunction->GetSpan(), nsComponent));
+            NamespaceNode* nsNode = new NamespaceNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()),
+                new IdentifierNode(spanMapper.MapSpan(functionNode->GetSpan(), functionNode->RootModuleId()), nsComponent));
             currentNs->AddMember(nsNode);
             currentNs = nsNode;
         }

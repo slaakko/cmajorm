@@ -4,6 +4,7 @@
 // =================================
 
 #include <sngcm/ast/AstWriter.hpp>
+#include <sngcm/ast/AstReader.hpp>
 #include <sngcm/ast/Node.hpp>
 
 namespace sngcm { namespace ast {

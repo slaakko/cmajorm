@@ -20,7 +20,7 @@ TemplateIdNode::TemplateIdNode(const Span& span_, Node* primary_) : Node(NodeTyp
 
 Node* TemplateIdNode::Clone(CloneContext& cloneContext) const
 {
-    TemplateIdNode* clone = new TemplateIdNode(GetSpan(), primary->Clone(cloneContext));
+    TemplateIdNode* clone = new TemplateIdNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), primary->Clone(cloneContext));
     int n = templateArguments.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -95,7 +95,7 @@ Node* TemplateParameterNode::Clone(CloneContext& cloneContext) const
     {
         clonedDefaultTemplateArgument = defaultTemplateArgument->Clone(cloneContext);
     }
-    return new TemplateParameterNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedDefaultTemplateArgument);
+    return new TemplateParameterNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), static_cast<IdentifierNode*>(id->Clone(cloneContext)), clonedDefaultTemplateArgument);
 }
 
 void TemplateParameterNode::Accept(Visitor& visitor)

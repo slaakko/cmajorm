@@ -20,7 +20,7 @@ CommentNode::CommentNode(const Span& span_, const std::u32string& comment_) : No
 
 Node* CommentNode::Clone(CloneContext& cloneContext) const
 {
-    return new CommentNode(GetSpan(), comment);
+    return new CommentNode(cloneContext.MapSpan(GetSpan(), RootModuleId()), comment);
 }
 
 void CommentNode::Accept(Visitor& visitor)
