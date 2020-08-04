@@ -5,6 +5,7 @@
 
 #include <cmajor/rts/Io.hpp>
 #include <cmajor/rts/Error.hpp>
+#include <cmajor/rts/Debug.hpp>
 #include <soulng/util/Error.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
@@ -765,7 +766,14 @@ extern "C" RT_API int32_t RtWrite(int32_t fileHandle, const uint8_t* buffer, int
 {
     try
     {
-        cmajor::rt::FileTable::Instance().WriteFile(fileHandle, buffer, count);
+        if ((fileHandle == 1 || fileHandle == 2) && cmajor::rt::IsCmdbSessionOpen())
+        {
+            cmajor::rt::WriteBytesToCmdbSession(fileHandle, buffer, count);
+        }
+        else
+        {
+            cmajor::rt::FileTable::Instance().WriteFile(fileHandle, buffer, count);
+        }
         return 0;
     }
     catch (const cmajor::rt::FileSystemError& ex)
@@ -782,7 +790,15 @@ extern "C" RT_API int32_t RtWriteByte(int32_t fileHandle, uint8_t x)
 {
     try
     {
-        cmajor::rt::FileTable::Instance().WriteByte(fileHandle, x);
+        if ((fileHandle == 1 || fileHandle == 2) && cmajor::rt::IsCmdbSessionOpen())
+        {
+            uint8_t buffer = x;
+            cmajor::rt::WriteBytesToCmdbSession(fileHandle, &buffer, 1);
+        }
+        else
+        {
+            cmajor::rt::FileTable::Instance().WriteByte(fileHandle, x);
+        }
         return 0;
     }
     catch (const cmajor::rt::FileSystemError& ex)
@@ -799,7 +815,14 @@ extern "C" RT_API int64_t RtRead(int32_t fileHandle, uint8_t* buffer, int64_t bu
 {
     try
     {
-        return cmajor::rt::FileTable::Instance().ReadFile(fileHandle, buffer, bufferSize);
+        if (fileHandle == 0 && cmajor::rt::IsCmdbSessionOpen())
+        {
+            return cmajor::rt::ReadBytesFromCmdbSession(buffer, bufferSize);
+        }
+        else
+        {
+            return cmajor::rt::FileTable::Instance().ReadFile(fileHandle, buffer, bufferSize);
+        }
     }
     catch (const cmajor::rt::FileSystemError& ex)
     {
@@ -811,7 +834,22 @@ extern "C" RT_API int32_t RtReadByte(int32_t fileHandle)
 {
     try
     {
-        return cmajor::rt::FileTable::Instance().ReadByte(fileHandle);
+        if (fileHandle == 0 && cmajor::rt::IsCmdbSessionOpen())
+        {
+            uint8_t buffer = 0;
+            if (cmajor::rt::ReadBytesFromCmdbSession(&buffer, 1) == 1)
+            {
+                return buffer;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            return cmajor::rt::FileTable::Instance().ReadByte(fileHandle);
+        }
     }
     catch (const cmajor::rt::FileSystemError& ex)
     {

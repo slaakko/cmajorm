@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmdebug/Debugger.hpp>
+#include <cmajor/cmdebug/Console.hpp>
 #include <cmajor/cmdebug/DebuggerCommandParser.hpp>
 #include <cmajor/cmdebug/DebuggerCommandLexer.hpp>
 #include <cmajor/cmdebug/DebugExprLexer.hpp>
@@ -11,6 +12,7 @@
 #include <cmajor/cmdebug/BoundDebugExpr.hpp>
 #include <cmajor/cmdebug/DebugExprBinder.hpp>
 #include <cmajor/cmdebug/DebugExpressionEvaluator.hpp>
+#include <cmajor/cmdebug/CmdbSession.hpp>
 #include <cmajor/cmdebug/ContainerSubscriptTranslator.hpp>
 #include <cmajor/cmdebug/Gdb.hpp>
 #include <cmajor/cmdebug/TokenValueParsers.hpp>
@@ -34,136 +36,6 @@ std::unique_ptr<DebuggerCommand> ParseDebuggerCommand(std::string& currentSource
     DebuggerCommandLexer lexer(ToUtf32(commandLine), "", 0);
     std::unique_ptr<DebuggerCommand> command = DebuggerCommandParser::Parse(lexer, &currentSourceFilePath);
     return command;
-}
-
-Console::Console() : driver(nullptr), terminated(false), commandAvailable(false), commandReceived(false), targetRunning(false), canProceeed(false)
-{
-}
-
-void Console::SetDriver(GdbDriver* driver_)
-{
-    driver = driver_;
-}
-
-void Console::Run()
-{
-    std::string line;
-    while (std::getline(std::cin, line))
-    {
-        canProceeed = false;
-        bool commandIsRunningCommand = false;
-        if (driver->TargetRunning())
-        {
-            WriteTargetInputLine(line);
-        }
-        else
-        {
-            std::unique_ptr<DebuggerCommand> command;
-            try
-            {
-                command = ParseDebuggerCommand(driver->CurrentSourceFilePath(), line);
-            }
-            catch (const std::exception& ex)
-            {
-                driver->Error(ex.what());
-                driver->Prompt();
-                continue;
-            }
-            commandIsRunningCommand = command->IsRunningCommand(*driver);
-            if (command->GetKind() == DebuggerCommand::Kind::exit)
-            {
-                break;
-            }
-            else
-            {
-                std::unique_lock<std::mutex> lock(mtx);
-                commandReceived = false;
-                targetRunning = false;
-                commands.push_back(std::move(command));
-                commandAvailableVar.notify_one();
-                commandAvailable = true;
-                commandReceivedVar.wait(lock, [this]{ return commandReceived; });
-            }
-        }
-        if (commandIsRunningCommand)
-        {
-            std::unique_lock<std::mutex> lock(mtx);
-            targetRunningVar.wait(lock, [this] { return targetRunning; });
-        }
-        commandAvailable = false;
-        bool wait = true;
-        while (wait)
-        {
-            std::unique_lock<std::mutex> lock(mtx);
-            std::cv_status status = proceed.wait_for(lock, std::chrono::milliseconds{ 500 });
-            if (status == std::cv_status::timeout)
-            {
-                if (driver->TargetRunning())
-                {
-                    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-                    std::chrono::steady_clock::duration idlePeriod = now - activeTimeStamp;
-                    if (std::chrono::duration_cast<std::chrono::milliseconds>(idlePeriod).count() > 3000)
-                    {
-                        wait = false;
-                    }
-                }
-            }
-            else if (status == std::cv_status::no_timeout && canProceeed)
-            {
-                wait = false;
-            }
-        }
-        if (!driver->TargetRunning())
-        {
-            driver->Prompt();
-        }
-    }
-    terminated = true;
-    TerminateGDB();
-    std::unique_lock<std::mutex> lock(mtx);
-    commands.push_back(std::unique_ptr<DebuggerCommand>(new DebuggerExitCommand()));
-    commandAvailable = true;
-    commandAvailableVar.notify_one();
-}
-
-void Console::SetActive()
-{
-    activeTimeStamp = std::chrono::steady_clock::now();
-}
-
-std::unique_ptr<DebuggerCommand> Console::GetCommand()
-{
-    if (terminated) return std::unique_ptr<DebuggerCommand>();
-    std::unique_lock<std::mutex> lock(mtx);
-    commandAvailableVar.wait(lock, [this] { return commandAvailable; });
-    std::unique_ptr<DebuggerCommand> command = std::move(commands.front());
-    commands.pop_front();
-    commandReceived = true;
-    commandReceivedVar.notify_one();
-    return command;
-}
-
-void Console::SetTargetRunning()
-{
-    std::unique_lock<std::mutex> lock(mtx);
-    targetRunning = true;
-    targetRunningVar.notify_one();
-}
-
-void Console::Reset()
-{
-    std::unique_lock<std::mutex> lock(mtx);
-    commandAvailable = false;
-    commandReceived = false;
-    targetRunning = true;
-    targetRunningVar.notify_one();
-}
-
-void Console::Proceed()
-{
-    std::unique_lock<std::mutex> lock(mtx);
-    canProceeed = true;
-    proceed.notify_one();
 }
 
 void RunConsole(Console* console)
@@ -487,6 +359,25 @@ DebuggerVariable::DebuggerVariable(int index_, const std::string& gdbVarName_) :
 {
 }
 
+struct RemoveCmdbSessionFileGuard
+{
+    RemoveCmdbSessionFileGuard(const std::string& cmdbSessionFilePath_) : cmdbSessionFilePath(cmdbSessionFilePath_)
+    {
+
+    }
+    ~RemoveCmdbSessionFileGuard()
+    {
+        try
+        {
+            boost::filesystem::remove(cmdbSessionFilePath);
+        }
+        catch (...)
+        {
+        }
+    }
+    std::string cmdbSessionFilePath;
+};
+
 Debugger::Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_) :
     verbose(verbose_), formatter(formatter_), state(State::initializing), wasRunning(false), targetOutput(false), nextBreakpointNumber(1), nextTempBreakpointNumber(1),
     nextGdbVariableIndex(1), console(console_)
@@ -512,6 +403,17 @@ Debugger::Debugger(const std::string& executable, const std::vector<std::string>
     {
         throw std::runtime_error("error: debug information '" + cmdbFilePath + "' file for executable '" + executable + "' not found");
     }
+    std::string cmdbSessionFilePath;
+    if (soulng::util::EndsWith(executable, ".exe"))
+    {
+        cmdbSessionFilePath = Path::ChangeExtension(executable, ".cmdbs");
+    }
+    else
+    {
+        cmdbSessionFilePath = executable + ".cmdbs";
+    }
+    StartCmdbSession(cmdbSessionFilePath, formatter, this, verbose);
+    RemoveCmdbSessionFileGuard removeSessionFileGuard(cmdbSessionFilePath);
     if (verbose)
     {
         formatter.WriteLine("starting GDB...");
@@ -543,6 +445,18 @@ Debugger::~Debugger()
     catch (...)
     {
     }
+    try
+    {
+        if (verbose)
+        {
+            std::lock_guard<std::recursive_mutex> lock(outputMutex);
+            formatter.WriteLine("stopping CMDB session...");
+        }
+        StopCmdbSession();
+    }
+    catch (...)
+    {
+    }
 }
 
 void Debugger::Exit()
@@ -554,6 +468,12 @@ void Debugger::Prompt()
 {
     std::lock_guard<std::recursive_mutex> lock(outputMutex);
     formatter.Write("cmdb> ");
+}
+
+void Debugger::TargetInputPrompt()
+{
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
+    formatter.Write("target input> ");
 }
 
 void Debugger::Error(const std::string& msg)
@@ -1503,6 +1423,37 @@ bool Debugger::ExecuteGDBCommand(const GdbCommand& command)
         succeeded = resultRecord->CommandSucceeded();
     }
     return succeeded;
+}
+
+void Debugger::WriteTargetOuput(int handle, const std::string& s)
+{
+    if (handle == 1)
+    {
+        std::cout << s;
+    }
+    else if (handle == 2)
+    {
+        std::cerr << s;
+    }
+}
+
+std::string Debugger::GetTargetInputBytes()
+{
+    std::string targetInputLine = console.GetTargetInputLine();
+    if (console.TargetInputEof())
+    {
+        return std::string();
+    }
+    else
+    {
+        std::string targetInputBytes;
+        for (unsigned char c : targetInputLine)
+        {
+            targetInputBytes.append(ToHexString(static_cast<uint8_t>(c)));
+        }
+        targetInputBytes.append(ToHexString(static_cast<uint8_t>('\n')));
+        return targetInputBytes;
+    }
 }
 
 void Debugger::ProcessReply(GdbCommand::Kind commandKind, GdbReply* reply)

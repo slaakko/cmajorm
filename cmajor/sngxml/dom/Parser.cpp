@@ -12,6 +12,7 @@
 #include <soulng/util/TextUtils.hpp>
 #include <string>
 #include <stack>
+#include <sstream>
 
 namespace sngxml { namespace dom {
 
@@ -213,6 +214,23 @@ std::unique_ptr<Document> ReadDocument(const std::string& fileName, Flags flags)
 {
     std::u32string content = ToUtf32(ReadFile(fileName));
     return ParseDocument(content, fileName, flags);
+}
+
+void SendDocument(soulng::util::TcpSocket& socket, Document& document)
+{
+    std::stringstream sstream;
+    CodeFormatter formatter(sstream);
+    document.Write(formatter);
+    Write(socket, sstream.str());
+}
+
+std::unique_ptr<Document> ReceiveDocument(soulng::util::TcpSocket& socket)
+{
+    std::string str = ReadStr(socket);
+    if (str.empty()) return std::unique_ptr<Document>();
+    std::u32string content = ToUtf32(str);
+    std::unique_ptr<Document> doc = ParseDocument(content, "socket");
+    return doc;
 }
 
 } } // namespace sngxml::dom

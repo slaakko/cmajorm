@@ -31,6 +31,7 @@ public:
     virtual bool Exiting() const = 0;
     virtual void Exit() = 0;
     virtual void Prompt() = 0;
+    virtual void TargetInputPrompt() = 0;
     virtual void Error(const std::string& msg) = 0;
     virtual bool LatestCommandWasRunningCommand() = 0;
     virtual std::string& CurrentSourceFilePath() = 0;

@@ -53,6 +53,9 @@ private:
     bool shutdown;
 };
 
+UTIL_API void Write(TcpSocket& socket, const std::string& s);
+UTIL_API std::string ReadStr(TcpSocket& socket);
+
 } } // namespace soulng::util
 
 #endif // SOULNG_UTIL_SOCKET_INCLUDED

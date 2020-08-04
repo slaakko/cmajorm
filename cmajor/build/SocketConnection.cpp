@@ -38,12 +38,7 @@ void SocketConnection::DoSend(JsonObject* messageObject)
         {
             messageStr = "{ }";
         }
-        int32_t size = messageStr.length();
-        uint8_t buffer[sizeof(size)];
-        MemoryWriter writer(&buffer[0], sizeof(size));
-        writer.Write(size);
-        socket.Send(&buffer[0], sizeof(size));
-        socket.Send(reinterpret_cast<const uint8_t*>(messageStr.c_str()), size);
+        Write(socket, messageStr);
     }
     catch (const std::exception& ex)
     {
@@ -55,42 +50,11 @@ std::unique_ptr<JsonObject> SocketConnection::DoReceive()
 {
     try
     {
-        int32_t size = 0;
-        uint8_t buffer[sizeof(size)];
-        int offset = 0;
-        int bytesToReceive = sizeof(size);
-        int bytesReceived = socket.Receive(&buffer[offset], bytesToReceive);
-        if (bytesReceived == 0)
+        std::string messageStr = ReadStr(socket);
+        if (messageStr.empty())
         {
             return std::unique_ptr<JsonObject>();
         }
-        bytesToReceive = bytesToReceive - bytesReceived;
-        offset = offset + bytesReceived;
-        while (bytesToReceive > 0)
-        {
-            bytesReceived = socket.Receive(&buffer[offset], bytesToReceive);
-            if (bytesReceived == 0)
-            {
-                return std::unique_ptr<JsonObject>();
-            }
-            bytesToReceive = bytesToReceive - bytesReceived;
-            offset = offset + bytesReceived;
-        }
-        MemoryReader reader(&buffer[0], sizeof(size));
-        size = reader.ReadInt();
-        std::unique_ptr<uint8_t[]> mem(new uint8_t[size]);
-        offset = 0;
-        bytesToReceive = size;
-        bytesReceived = socket.Receive(mem.get() + offset, bytesToReceive);
-        bytesToReceive = bytesToReceive - bytesReceived;
-        offset = offset + bytesReceived;
-        while (bytesToReceive > 0)
-        {
-            bytesReceived = socket.Receive(mem.get() + offset, bytesToReceive);
-            bytesToReceive = bytesToReceive - bytesReceived;
-            offset = offset + bytesReceived;
-        }
-        std::string messageStr(reinterpret_cast<const char*>(mem.get()), size);
         JsonLexer lexer(ToUtf32(messageStr), "", 0);
         std::unique_ptr<JsonValue> jsonValue = JsonParser::Parse(lexer);
         if (jsonValue->Type() == JsonValueType::object)

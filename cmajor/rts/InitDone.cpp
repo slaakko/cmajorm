@@ -6,6 +6,7 @@
 #include <cmajor/rts/InitDone.hpp>
 #include <cmajor/rts/Error.hpp>
 #include <soulng/util/InitDone.hpp>
+#include <sngxml/xpath/InitDone.hpp>
 #include <cmajor/rts/Io.hpp>
 #include <cmajor/rts/Directory.hpp>
 #include <cmajor/rts/CallStack.hpp>
@@ -24,6 +25,7 @@
 #include <cmajor/rts/Socket.hpp>
 #include <cmajor/rts/Environment.hpp>
 #include <cmajor/rts/Unwind.hpp>
+#include <cmajor/rts/Debug.hpp>
 #include <csignal>
 
 GlobalInitFunctionType initCompileUnitsFunction = nullptr;
@@ -80,6 +82,7 @@ void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassI
 {
     InitMutex();
     soulng::util::Init();
+    sngxml::xpath::Init();
     InitIo();
     InitScreen();
     InitDirectory();
@@ -96,10 +99,13 @@ void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassI
     InitCommandLine();
 #endif
     InitUnwind();
+    InitCmdbSession();
+    StartCmdbSession();
 }
 
 void Done()
 {
+    DoneCmdbSession();
     DoneUnwind();
 #if defined(_WIN32) && !defined(__MINGW32__)
     DoneCommandLine();
@@ -116,6 +122,7 @@ void Done()
     DoneDirectory();
     DoneScreen();
     DoneIo();
+    sngxml::xpath::Done();
     soulng::util::Done();
     DoneMutex();
 }

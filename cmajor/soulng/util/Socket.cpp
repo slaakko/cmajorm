@@ -6,6 +6,8 @@
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Error.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/MemoryReader.hpp>
+#include <soulng/util/MemoryWriter.hpp>
 #include <memory>
 #include <vector>
 #include <atomic>
@@ -765,6 +767,57 @@ int TcpSocket::Receive(uint8_t* buffer, int count)
 {
     int result = ReceiveSocket(handle, buffer, count, 0);
     return result;
+}
+
+void Write(TcpSocket& socket, const std::string& s)
+{
+    int32_t size = s.length();
+    uint8_t buffer[sizeof(size)];
+    MemoryWriter writer(&buffer[0], sizeof(size));
+    writer.Write(size);
+    socket.Send(&buffer[0], sizeof(size));
+    socket.Send(reinterpret_cast<const uint8_t*>(s.c_str()), size);
+}
+
+std::string ReadStr(TcpSocket& socket)
+{
+    int32_t size = 0;
+    uint8_t buffer[sizeof(size)];
+    int offset = 0;
+    int bytesToReceive = sizeof(size);
+    int bytesReceived = socket.Receive(&buffer[offset], bytesToReceive);
+    if (bytesReceived == 0)
+    {
+        return std::string();
+    }
+    bytesToReceive = bytesToReceive - bytesReceived;
+    offset = offset + bytesReceived;
+    while (bytesToReceive > 0)
+    {
+        bytesReceived = socket.Receive(&buffer[offset], bytesToReceive);
+        if (bytesReceived == 0)
+        {
+            return std::string();
+        }
+        bytesToReceive = bytesToReceive - bytesReceived;
+        offset = offset + bytesReceived;
+    }
+    MemoryReader reader(&buffer[0], sizeof(size));
+    size = reader.ReadInt();
+    std::unique_ptr<uint8_t[]> mem(new uint8_t[size]);
+    offset = 0;
+    bytesToReceive = size;
+    bytesReceived = socket.Receive(mem.get() + offset, bytesToReceive);
+    bytesToReceive = bytesToReceive - bytesReceived;
+    offset = offset + bytesReceived;
+    while (bytesToReceive > 0)
+    {
+        bytesReceived = socket.Receive(mem.get() + offset, bytesToReceive);
+        bytesToReceive = bytesToReceive - bytesReceived;
+        offset = offset + bytesReceived;
+    }
+    std::string str(reinterpret_cast<const char*>(mem.get()), size);
+    return str;
 }
 
 } } // namespace soulng::util

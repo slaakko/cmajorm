@@ -20,39 +20,14 @@ namespace cmajor { namespace debug {
 
 using namespace soulng::util;
 
+class Console;
 class DebugInfo;
 class BoundDebugNode;
 class Instruction;
 class DebuggerCommand;
 struct SourceLocation;
 
-class DEBUG_API Console
-{
-public:
-    Console();
-    void SetDriver(GdbDriver* driver_);
-    void Run();
-    void SetActive();
-    std::unique_ptr<DebuggerCommand> GetCommand();
-    void SetTargetRunning();
-    void Proceed();
-    void Reset();
-    bool Terminated() const { return terminated; }
-private:
-    GdbDriver* driver;
-    std::mutex mtx;
-    std::condition_variable commandAvailableVar;
-    std::condition_variable commandReceivedVar;
-    std::condition_variable targetRunningVar;
-    std::condition_variable proceed;
-    std::list<std::unique_ptr<DebuggerCommand>> commands;
-    bool terminated;
-    bool commandAvailable;
-    bool commandReceived;
-    bool targetRunning;
-    bool canProceeed;
-    std::chrono::steady_clock::time_point activeTimeStamp;
-};
+std::unique_ptr<DebuggerCommand> ParseDebuggerCommand(std::string& currentSourceFilePath, const std::string& line);
 
 class DEBUG_API GdbBreakpoint
 {
@@ -118,6 +93,7 @@ public:
     bool Exiting() const override { return state == State::exitingDebugger; }
     void Exit() override;
     void Prompt() override;
+    void TargetInputPrompt() override;
     void Error(const std::string& msg) override;
     bool LatestCommandWasRunningCommand() override;
     bool Run();
@@ -141,6 +117,8 @@ public:
     void Evaluate(const std::string& expression);
     DIType* GetType(const std::string& expression);
     bool ExecuteGDBCommand(const GdbCommand& command);
+    void WriteTargetOuput(int handle, const std::string& s);
+    std::string GetTargetInputBytes();
     void ProcessReply(GdbCommand::Kind commandKind, GdbReply* reply);
     void ProcessConsoleOutput(GdbConsoleOutputRecord* record);
     void ProcessTargetOutput(GdbTargetOutputRecord* record);

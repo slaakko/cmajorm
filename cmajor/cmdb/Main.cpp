@@ -1,9 +1,11 @@
 #include <cmajor/cmdebug/Gdb.hpp>
 #include <cmajor/cmdebug/InitDone.hpp>
 #include <cmajor/cmdebug/Debugger.hpp>
+#include <cmajor/cmdebug/CmdbSession.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <sngxml/xpath/InitDone.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 
 struct InitDone
@@ -36,6 +38,8 @@ void PrintHelp()
     std::cout << "  Be verbose." << std::endl;
     std::cout << "--debug | -d" << std::endl;
     std::cout << "  Debug the debugger." << std::endl;
+    std::cout << "--sessionPort=PORT_NUMBER | -s=PORT_NUMBER" << std::endl;
+    std::cout << "  Set the port number of the CMDB session that cmdb and the program being debugged will use for exchanging console I/O messages. Default port is 54322." << std::endl;
 }
 
 int main(int argc, const char** argv)
@@ -68,6 +72,26 @@ int main(int argc, const char** argv)
                         PrintHelp();
                         return 1;
                     }
+                    else if (arg.find('=') != std::string::npos)
+                    {
+                        std::vector<std::string> components = Split(arg, '=');
+                        if (components.size() == 2)
+                        {
+                            if (components[0] == "--sessionPort")
+                            {
+                                int port = boost::lexical_cast<int>(components[1]);
+                                cmajor::debug::SetCmdbSessionPort(port);
+                            }
+                            else
+                            {
+                                throw std::runtime_error("unknown option '" + arg + "'");
+                            }
+                        }
+                        else
+                        {
+                            throw std::runtime_error("unknown option '" + arg + "'");
+                        }
+                    }
                     else
                     {
                         throw std::runtime_error("unknown option '" + arg + "'");
@@ -76,28 +100,47 @@ int main(int argc, const char** argv)
                 else if (StartsWith(arg, "-"))
                 {
                     std::string options = arg.substr(1);
-                    for (char o : options)
+                    if (options.find('=') != std::string::npos)
                     {
-                        switch (o)
+                        std::vector<std::string> components = Split(arg, '=');
+                        if (components.size() == 2)
                         {
-                            case 'v':
+                            if (components[0] == "s")
                             {
-                                verbose = true;
-                                break;
+                                int port = boost::lexical_cast<int>(components[1]);
+                                cmajor::debug::SetCmdbSessionPort(port);
                             }
-                            case 'd':
+                        }
+                        else
+                        {
+                            throw std::runtime_error("unknown option '" + arg + "'");
+                        }
+                    }
+                    else
+                    {
+                        for (char o : options)
+                        {
+                            switch (o)
                             {
-                                cmajor::debug::SetDebugFlag();
-                                break;
-                            }
-                            case 'h':
-                            {
-                                PrintHelp();
-                                return 1;
-                            }
-                            default:
-                            {
-                                throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
+                                case 'v':
+                                {
+                                    verbose = true;
+                                    break;
+                                }
+                                case 'd':
+                                {
+                                    cmajor::debug::SetDebugFlag();
+                                    break;
+                                }
+                                case 'h':
+                                {
+                                    PrintHelp();
+                                    return 1;
+                                }
+                                default:
+                                {
+                                    throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
+                                }
                             }
                         }
                     }
