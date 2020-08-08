@@ -53,6 +53,7 @@ public:
     void Visit(BoundConstructionStatement& boundConstructionStatement) override;
     void Visit(BoundAssignmentStatement& boundAssignmentStatement) override;
     void Visit(BoundExpressionStatement& boundExpressionStatement) override;
+    void Visit(BoundInitializationStatement& boundInitializationStatement) override;
     void Visit(BoundEmptyStatement& boundEmptyStatement) override;
     void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) override;
     void Visit(BoundThrowStatement& boundThrowStatement) override;
@@ -402,6 +403,17 @@ void Bdt2DomVisitor::Visit(BoundExpressionStatement& boundExpressionStatement)
     sngxml::dom::Element* prevElement = currentElement;
     currentElement = expressionElement.get();
     boundExpressionStatement.Expression()->Accept(*this);
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(expressionElement.release()));
+    currentElement = prevElement;
+}
+
+void Bdt2DomVisitor::Visit(BoundInitializationStatement& boundInitializationStatement)
+{
+    CheckCurrentElement();
+    std::unique_ptr<sngxml::dom::Element> expressionElement(new sngxml::dom::Element(U"BoundInitializationStatement"));
+    sngxml::dom::Element* prevElement = currentElement;
+    currentElement = expressionElement.get();
+    boundInitializationStatement.InitializationExpression()->Accept(*this);
     prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(expressionElement.release()));
     currentElement = prevElement;
 }

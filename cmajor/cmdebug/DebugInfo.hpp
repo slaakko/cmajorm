@@ -17,6 +17,7 @@
 #include <string>
 #include <unordered_map>
 #include <map>
+#include <set>
 
 namespace cmajor { namespace debug {
 
@@ -26,6 +27,21 @@ using soulng::util::JsonValue;
 class CompileUnitFunction;
 class Scope;
 class SourceFileReference;
+
+struct DEBUG_API SourceSpan
+{
+    SourceSpan() : line(0), scol(0), ecol(0) {}
+    SourceSpan(int32_t line_, int16_t scol_, int16_t ecol_) : line(line_), scol(scol_), ecol(ecol_) {}
+    std::string ToString() const;
+    int32_t line;
+    int16_t scol;
+    int16_t ecol;
+};
+
+DEBUG_API inline bool operator==(const SourceSpan& left, const SourceSpan& right)
+{
+    return left.line == right.line && left.scol == right.scol && left.ecol == right.ecol;
+}
 
 struct DEBUG_API Frame
 {
@@ -42,7 +58,7 @@ struct DEBUG_API Frame
 struct DEBUG_API InstructionLocation
 {
     InstructionLocation();
-    int32_t sourceLineNumber;
+    SourceSpan span;
     int32_t projectIndex;
     int32_t compileUnitIndex;
     int32_t cppLineNumber;
@@ -78,12 +94,12 @@ DEBUG_API std::string InstructionFlagsStr(InstructionFlags flags);
 class DEBUG_API Instruction
 {
 public:
-    Instruction(CompileUnitFunction* compileUnitFunction_, int32_t cppLineNumber_, int32_t sourceLineNumber_, int32_t cppLineIndex_, int16_t scopeId_, InstructionFlags flags_);
+    Instruction(CompileUnitFunction* compileUnitFunction_, int32_t cppLineNumber_, const SourceSpan& span_, int32_t cppLineIndex_, int16_t scopeId_, InstructionFlags flags_);
     CompileUnitFunction* GetCompileUnitFunction() const { return compileUnitFunction; }
     SourceFileReference* GetSourceFileReference() const;
     Scope* GetScope() const;
     int32_t CppLineNumber() const { return cppLineNumber; }
-    int32_t SourceLineNumber() const { return sourceLineNumber; }
+    const SourceSpan& GetSourceSpan() const { return span; }
     int32_t CppLineIndex() const { return cppLineIndex; }
     int16_t ScopeId() const { return scopeId; }
     InstructionFlags GetFlags() const { return flags; }
@@ -96,11 +112,49 @@ public:
 private:
     CompileUnitFunction* compileUnitFunction;
     int32_t cppLineNumber;
-    int32_t sourceLineNumber;
+    SourceSpan span;
     int32_t cppLineIndex;
     int16_t scopeId;
     InstructionFlags flags;
     Instruction* next;
+};
+
+class DEBUG_API ControlFlowGraphNode
+{
+public:
+    ControlFlowGraphNode(int32_t nodeId_, const SourceSpan& span_, int32_t cppLineIndex_, int32_t cppLineNumber_);
+    int32_t NodeId() const { return nodeId; }
+    const SourceSpan& GetSourceSpan() const { return span; }
+    int32_t CppLineIndex() const { return cppLineIndex; }
+    int32_t CppLineNumber() const { return cppLineNumber; }
+    const std::set<int32_t>& Next() const { return nextSet; }
+    void AddNext(int32_t next);
+    void SetInst(Instruction* inst_) { inst = inst_; }
+    Instruction* Inst() const { return inst; }
+private:
+    int32_t nodeId;
+    SourceSpan span;
+    int32_t cppLineIndex;
+    int32_t cppLineNumber;
+    std::set<int32_t> nextSet;
+    Instruction* inst;
+};
+
+class DEBUG_API ControlFlowGraph
+{
+public:
+    ControlFlowGraph();
+    ControlFlowGraph(const ControlFlowGraph&) = delete;
+    ControlFlowGraph(ControlFlowGraph&&) = delete;
+    ControlFlowGraph& operator=(const ControlFlowGraph&) = delete;
+    ControlFlowGraph& operator=(ControlFlowGraph&&) = delete;
+    void AddNode(ControlFlowGraphNode* node);
+    ControlFlowGraphNode* GetNodeById(int32_t nodeId) const;
+    ControlFlowGraphNode* GetNodeByCppLineNumber(int32_t cppLineNumber) const;
+private:
+    std::unordered_map<int32_t, ControlFlowGraphNode*> nodeIdMap;
+    std::unordered_map<int32_t, ControlFlowGraphNode*> cppLineNodeMap;
+    std::vector<std::unique_ptr<ControlFlowGraphNode>> nodes;
 };
 
 class DEBUG_API FunctionScope : public Scope
@@ -151,12 +205,14 @@ public:
     void AddScope(FunctionScope* scope);
     const std::vector<std::unique_ptr<Instruction>>& Instructions() const { return instructions; }
     const std::vector<std::unique_ptr<FunctionScope>>& Scopes() const { return scopes; }
+    ControlFlowGraph& GetControlFlowGraph() { return controlFlowGraph; }
 private:
     CompileUnit* compileUnit;
     int32_t fileIndex;
     boost::uuids::uuid functionId;
     std::vector<std::unique_ptr<Instruction>> instructions;
     std::vector<std::unique_ptr<FunctionScope>> scopes;
+    ControlFlowGraph controlFlowGraph;
 };
 
 class Project;

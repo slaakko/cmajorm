@@ -14,6 +14,21 @@ namespace cmcppi {
 
 class Context;
 
+class ControlFlowGraphNode
+{
+public:
+    ControlFlowGraphNode(int32_t id_);
+    int32_t Id() const { return id; }
+    void SetInstruction(Instruction* inst_);
+    Instruction* Inst() const { return inst; }
+    void AddNext(int32_t next);
+    const std::set<int32_t>& Next() const { return nextSet; }
+private:
+    int32_t id;
+    Instruction* inst;
+    std::set<int32_t> nextSet;
+};
+
 class CMCPPI_API Function : public Value
 {
 public:
@@ -27,6 +42,7 @@ public:
     uint64_t GetNextResultNumber() { return nextResultNumber++; }
     uint64_t GetNextLocalNumber() { return nextLocalNumber++; }
     uint64_t GetNextArgumentNumber() { return nextArgumentNumber++; }
+    int32_t GetNextControlFlowGraphNodeNumber() { return nextControlFlowGraphNodeNumber++; }
     Type* GetType(Context& context) override { return type; }
     Value* GetParam(int index) const;
     std::string Name(Context& context) override { return name; }
@@ -47,6 +63,9 @@ public:
     Scope* GetScope(int16_t scopeId);
     bool NopResultDeclarationWritten() const { return nopResultDeclarationWritten; }
     void SetNopResultDeclarationWritten() { nopResultDeclarationWritten = true; }
+    int32_t AddControlFlowGraphNode();
+    ControlFlowGraphNode* GetControlFlowGraphNode(int32_t id) const;
+    void AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId);
 private:
     std::string name;
     std::string fullName;
@@ -59,6 +78,7 @@ private:
     uint64_t nextResultNumber;
     uint64_t nextLocalNumber;
     uint64_t nextArgumentNumber;
+    int32_t nextControlFlowGraphNodeNumber;
     bool linkOnce;
     int nextBBNumber;
     bool nothrow;
@@ -66,6 +86,8 @@ private:
     boost::uuids::uuid functionId;
     std::vector<std::unique_ptr<Scope>> scopes;
     bool nopResultDeclarationWritten;
+    std::map<int32_t, ControlFlowGraphNode*> controlFlowGraph;
+    std::vector<std::unique_ptr<ControlFlowGraphNode>> controlFlowGraphNodes;
 };
 
 } // namespace cmcppi

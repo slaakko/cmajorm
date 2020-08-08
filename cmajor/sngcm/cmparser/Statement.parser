@@ -132,9 +132,9 @@ parser api(SNGCM_PARSER_API) StatementParser
         |   EmptyStatement(ctx):emptyStatement{ return emptyStatement; }
         ;
 
-    ForLoopStatementExpr(ParsingContext* ctx) : StatementNode*
+    ForLoopStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> exprNode) : StatementNode*
         ::= AssignmentStatementExpr(ctx):assignmentStatementExpr{ return assignmentStatementExpr; }
-        |   Expression(ctx):expr{ return new ExpressionStatementNode(span, expr); }
+        |   Expression(ctx):expr{ exprNode.reset(expr); Span s = exprNode->GetSpan(); return new ExpressionStatementNode(s, exprNode.release()); }
         |   empty{ return new EmptyStatementNode(span); }
         ;
 

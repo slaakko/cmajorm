@@ -689,6 +689,8 @@ void Debugger::Next()
     {
         throw std::runtime_error("error: state is '" + StateStr(state) + "'");
     }
+    std::set<Instruction*> next;
+    AddToNextSet(next, stoppedInstruction);
     Instruction* prevStoppedInstruction = stoppedInstruction;
     bool stop = false;
     while (!stop)
@@ -702,13 +704,15 @@ void Debugger::Next()
             {
                 if (stoppedInstruction != nullptr)
                 {
+                    AddToNextSet(next, stoppedInstruction);
                     if (stoppedInstruction->CppLineIndex() == 0)
                     {
+                        bool foundInNext = next.find(stoppedInstruction) != next.cend();
                         if (prevStoppedInstruction == nullptr ||
                             prevStoppedInstruction->GetCompileUnitFunction() != stoppedInstruction->GetCompileUnitFunction() ||
-                            stoppedInstruction->SourceLineNumber() > prevStoppedInstruction->SourceLineNumber())
+                            stoppedInstruction->GetSourceSpan().line > prevStoppedInstruction->GetSourceSpan().line || foundInNext)
                         {
-                            if (IsStopInstruction(stoppedInstruction))
+                            if (IsStopInstruction(stoppedInstruction) || foundInNext)
                             {
                                 std::lock_guard<std::recursive_mutex> lock(outputMutex);
                                 AddStopResultToResult();
@@ -770,6 +774,8 @@ void Debugger::Step()
     {
         throw std::runtime_error("error: state is '" + StateStr(state) + "'");
     }
+    std::set<Instruction*> next;
+    AddToNextSet(next, stoppedInstruction);
     Instruction* prevStoppedInstruction = stoppedInstruction;
     Instruction* prevSingleStepInstruction = nullptr;
     bool stop = false;
@@ -793,14 +799,16 @@ void Debugger::Step()
             {
                 if (stoppedInstruction != nullptr)
                 {
+                    AddToNextSet(next, stoppedInstruction);
                     prevSingleStepInstruction = stoppedInstruction;
                     if (stoppedInstruction->CppLineIndex() == 0)
                     {
+                        bool foundInNext = next.find(stoppedInstruction) != next.cend();
                         if (prevStoppedInstruction == nullptr ||
                             prevStoppedInstruction->GetCompileUnitFunction() != stoppedInstruction->GetCompileUnitFunction() ||
-                            stoppedInstruction->SourceLineNumber() > prevStoppedInstruction->SourceLineNumber())
+                            stoppedInstruction->GetSourceSpan().line > prevStoppedInstruction->GetSourceSpan().line || foundInNext)
                         {
-                            if (IsStopInstruction(stoppedInstruction))
+                            if (IsStopInstruction(stoppedInstruction) || foundInNext)
                             {
                                 std::lock_guard<std::recursive_mutex> lock(outputMutex);
                                 AddStopResultToResult();
@@ -1171,7 +1179,7 @@ void Debugger::List(const SourceLocation& location)
     }
     else if (loc.path == "*")
     {
-        loc = SourceLocation(stoppedInstruction->GetCmajorFrame().file, std::max(1, stoppedInstruction->SourceLineNumber() - debugInfo->GetSourceFileWindowSize()));
+        loc = SourceLocation(stoppedInstruction->GetCmajorFrame().file, std::max(1, stoppedInstruction->GetSourceSpan().line - debugInfo->GetSourceFileWindowSize()));
     }
     std::string sourceFilePath = debugInfo->GetSourceFileMap().GetSourceFilePath(loc);
     SourceFile& sourceFile = debugInfo->GetSourceFileCache().GetSourceFile(sourceFilePath);
@@ -1330,6 +1338,42 @@ void Debugger::ClearBrowsingData()
     for (auto& container : containers)
     {
         container->ClearBrowsingData();
+    }
+}
+
+void Debugger::AddToNextSet(std::set<Instruction*>& nextSet, Instruction* inst) const
+{
+    CompileUnitFunction* function = inst->GetCompileUnitFunction();
+    if (function)
+    {
+        ControlFlowGraphNode* node = function->GetControlFlowGraph().GetNodeByCppLineNumber(inst->CppLineNumber());
+        if (node)
+        {
+            for (int32_t nextId : node->Next())
+            {
+                ControlFlowGraphNode* next = function->GetControlFlowGraph().GetNodeById(nextId);
+                if (next)
+                {
+                    Instruction* inst = next->Inst();
+                    if (!inst)
+                    {
+                        CompileUnit* compileUnit = function->GetCompileUnit();
+                        if (compileUnit)
+                        {
+                            inst = compileUnit->GetInstruction(next->CppLineNumber());
+                            if (inst)
+                            {
+                                next->SetInst(inst);
+                            }
+                        }
+                    }
+                    if (inst)
+                    {
+                        nextSet.insert(inst);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -2012,7 +2056,7 @@ bool Debugger::ProcessExecStoppedRecord(GdbExecStoppedRecord* execStoppedRecord)
                     stopObject->AddField(U"frame", instruction->GetCmajorFrame().ToJson(false));
                     stoppedInstruction = instruction;
                     SourceFile& sourceFile = stoppedInstruction->GetCompileUnitFunction()->GetSourceFile();
-                    int sourceLine = std::min(int(sourceFile.Lines().size()), instruction->SourceLineNumber() + debugInfo->GetSourceFileWindowSize() + 1);
+                    int sourceLine = std::min(int(sourceFile.Lines().size()), instruction->GetSourceSpan().line + debugInfo->GetSourceFileWindowSize() + 1);
                     listLocation = SourceLocation(sourceFile.FilePath(), sourceLine);
                     currentSourceFilePath = sourceFile.FilePath();
                 }

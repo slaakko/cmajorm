@@ -24,7 +24,7 @@ void DebugExprBinder::Visit(IdentifierDebugExprNode& node)
         InitializationStatus varStatus = InitializationStatus::unknown;
         if (variable->GetKind() == DIVariable::Kind::localVariable && variable->GetInitLineNumber() != -1)
         {
-            if (debugger.StoppedInstruction()->SourceLineNumber() > variable->GetInitLineNumber())
+            if (debugger.StoppedInstruction()->GetSourceSpan().line > variable->GetInitLineNumber())
             {
                 varStatus = InitializationStatus::initialized;
             }

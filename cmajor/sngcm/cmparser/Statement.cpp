@@ -2525,6 +2525,7 @@ soulng::parser::Match StatementParser::ForLoopStatementExpr(CmajorLexer& lexer, 
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("ForLoopStatementExpr"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
+    std::unique_ptr<Node> exprNode = std::unique_ptr<Node>();
     std::unique_ptr<StatementNode> assignmentStatementExpr;
     std::unique_ptr<Node> expr;
     soulng::parser::Match match(false);
@@ -2563,16 +2564,17 @@ soulng::parser::Match StatementParser::ForLoopStatementExpr(CmajorLexer& lexer, 
                     soulng::parser::Match* parentMatch4 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::lexer::Span span = lexer.GetSpan();
                         soulng::parser::Match match = ExpressionParser::Expression(lexer, ctx);
                         expr.reset(static_cast<Node*>(match.value));
                         if (match.hit)
                         {
+                            exprNode.reset(expr.release());
+                            Span s = exprNode->GetSpan();
                             {
                                 #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                 if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("ForLoopStatementExpr"));
                                 #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                return soulng::parser::Match(true, new ExpressionStatementNode(span, expr.release()));
+                                return soulng::parser::Match(true, new ExpressionStatementNode(s, exprNode.release()));
                             }
                         }
                         *parentMatch4 = match;

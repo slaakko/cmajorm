@@ -10,6 +10,7 @@
 #include <cmajor/cmmid/InitDone.hpp>
 #ifdef _WIN32
 #include <cmajor/cmres/InitDone.hpp>
+#include <Windows.h>
 #endif
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/InitDone.hpp>

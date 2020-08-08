@@ -360,7 +360,7 @@ void Lexer::GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) con
         lineEnd = lineStart;
     }
     int lineLength = static_cast<int>(lineEnd - lineStart);
-    int spanCols = std::max(static_cast<int>(1), std::min(span.end - span.start, lineLength - cols));
+    int spanCols = std::max(static_cast<int>(1), std::min(static_cast<int>(endToken.match.end - startToken.match.begin), lineLength - cols));
     endCol = startCol + spanCols;
 }
 

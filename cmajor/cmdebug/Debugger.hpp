@@ -15,6 +15,7 @@
 #include <memory>
 #include <mutex>
 #include <condition_variable>
+#include <set>
 
 namespace cmajor { namespace debug {
 
@@ -157,6 +158,7 @@ public:
     Instruction* StoppedInstruction() const { return stoppedInstruction; }
     Container* GetContainer(ContainerClassTemplateKind containerKind, const std::string& containerVarExpr);
     void ClearBrowsingData();
+    void AddToNextSet(std::set<Instruction*>& nextSet, Instruction* inst) const;
 private:
     State state;
     bool wasRunning;

@@ -61,6 +61,7 @@ public:
     void Visit(BoundCaseStatement& boundCaseStatement) override;
     void Visit(BoundDefaultStatement& boundDefaultStatement) override;
     void Visit(BoundExpressionStatement& boundExpressionStatement) override;
+    void Visit(BoundInitializationStatement& boundInitializationStatement) override;
     void Visit(BoundConstructionStatement& boundConstructionStatement) override;
     void Visit(BoundAssignmentStatement& boundAssignmentStatement) override;
     void Visit(BoundEmptyStatement& boundEmptyStatement) override;

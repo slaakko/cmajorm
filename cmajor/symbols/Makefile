@@ -1,9 +1,9 @@
 include ../Makefile.common
 
 OBJECTS = ArrayTypeSymbol.o BasicTypeOperation.o BasicTypeSymbol.o ClassTemplateSpecializationSymbol.o ClassTypeSymbol.o ConceptSymbol.o \
-ConstantSymbol.o ContainerSymbol.o ConversionTable.o DebugFlags.o DelegateSymbol.o DerivedTypeSymbol.o EnumSymbol.o Exception.o FunctionSymbol.o \
+ConstantSymbol.o ContainerSymbol.o ConversionTable.o DebugFlags.o DelegateSymbol.o DerivedTypeSymbol.o EnumSymbol.o Exception.o FileIndex.o FunctionIndex.o FunctionSymbol.o \
 GlobalFlags.o InitDone.o InterfaceTypeSymbol.o Meta.o Module.o ModuleCache.o NamespaceSymbol.o Operation.o Scope.o StringFunctions.o Symbol.o SymbolCollector.o \
-SymbolCreatorVisitor.o SymbolReader.o SymbolTable.o SymbolWriter.o TemplateSymbol.o TypeMap.o TypeSymbol.o TypedefSymbol.o Value.o VariableSymbol.o \
+SymbolCreatorVisitor.o SymbolReader.o SymbolTable.o SymbolWriter.o TemplateSymbol.o TypeMap.o TypeSymbol.o TypedefSymbol.o TypeIndex.o Value.o VariableSymbol.o \
 Warning.o
 
 %.o: %.cpp

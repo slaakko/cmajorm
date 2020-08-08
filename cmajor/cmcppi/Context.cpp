@@ -13,8 +13,8 @@
 namespace cmcppi {
 
 Context::Context() :
-    currentLineNumber(0), currentFunction(nullptr), currentBasicBlock(nullptr), currentParentBlock(nullptr), sourceLineNumber(0), cppLineIndex(0),
-    currentScopeId(-1), currentInstructionFlags(0), typeRepository(*this)
+    currentSourceSpan(), currentFunction(nullptr), currentBasicBlock(nullptr), currentParentBlock(nullptr), sourceSpan(), cppLineIndex(0),
+    currentScopeId(-1), currentInstructionFlags(0), currentControlFlowGraphNodeId(-1), typeRepository(*this)
 {
 }
 
@@ -695,11 +695,11 @@ GlobalVariable* Context::CreateGlobalUStringPtr(const std::u32string& stringValu
     return dataRepository.CreateGlobalUStringPtr(*this, stringValue);
 }
 
-void Context::SetCurrentLineNumber(int lineNumber)
+void Context::SetCurrentSourceSpan(const cmajor::debug::SourceSpan& span)
 {
-    if (lineNumber != -1)
+    if (span.line != 0)
     {
-        currentLineNumber = lineNumber;
+        currentSourceSpan = span;
     }
 }
 
@@ -729,7 +729,13 @@ void Context::EndInstructionFlag(int16_t instructionFlag)
 
 void Context::AddLineInfoScopeIdAndFlags(Instruction* inst)
 {
-    inst->SetSourceLineNumber(currentLineNumber);
+    if (currentControlFlowGraphNodeId != -1)
+    {
+        ControlFlowGraphNode* node = currentFunction->GetControlFlowGraphNode(currentControlFlowGraphNodeId);
+        node->SetInstruction(inst);
+        currentControlFlowGraphNodeId = -1;
+    }
+    inst->SetSourceSpan(currentSourceSpan);
     inst->SetScopeId(currentScopeId);
     inst->SetFlags(currentInstructionFlags);
 }
@@ -766,12 +772,23 @@ void Context::AddLocalVariable(const std::string& name, const boost::uuids::uuid
 {
     Scope* scope = currentFunction->GetScope(currentScopeId);
     cmajor::debug::DIVariable* localVariable = new cmajor::debug::DIVariable(cmajor::debug::DIVariable::Kind::localVariable);
-    localVariable->SetInitLineNumber(currentLineNumber);
+    localVariable->SetInitLineNumber(currentSourceSpan.line);
     localVariable->SetName(name);
     inst->ObtainLocalName(*currentFunction);
     localVariable->SetIrName(inst->LocalName());
     localVariable->SetTypeId(typeId);
     scope->AddLocalVariable(localVariable);
+}
+
+int32_t Context::AddControlFlowGraphNode()
+{
+    currentControlFlowGraphNodeId = currentFunction->AddControlFlowGraphNode();
+    return currentControlFlowGraphNodeId;
+}
+
+void Context::AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId)
+{
+    currentFunction->AddControlFlowGraphEdge(startNodeId, endNodeId);
 }
 
 } // namespace cmcppi

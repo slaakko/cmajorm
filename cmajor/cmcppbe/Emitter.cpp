@@ -7,6 +7,7 @@
 #include <cmajor/cmcppi/Context.hpp>
 #include <cmajor/cmcppi/Function.hpp>
 #include <cmajor/cmcppi/Type.hpp>
+#include <cmajor/cmdebug/DebugInfo.hpp>
 
 namespace cmcppbe {
 
@@ -1649,6 +1650,16 @@ void Emitter::SetCurrentScopeId(int16_t scopeId)
     context->SetCurrentScopeId(scopeId);
 }
 
+int32_t Emitter::AddControlFlowGraphNode()
+{
+    return context->AddControlFlowGraphNode();
+}
+
+void Emitter::AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId)
+{
+    context->AddControlFlowGraphEdge(startNodeId, endNodeId);
+}
+
 void Emitter::AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject)
 {
     context->AddLocalVariable(localVariableName, typeId, static_cast<cmcppi::LocalInstruction*>(irObject));
@@ -1842,9 +1853,9 @@ void Emitter::SetFunctionMdId(void* function, int mdId)
 {
 }
 
-void Emitter::SetCurrentLineNumber(int currentLineNumber)
+void Emitter::SetCurrentSourceSpan(int32_t line, int16_t scol, int16_t ecol)
 {
-    context->SetCurrentLineNumber(currentLineNumber);
+    context->SetCurrentSourceSpan(cmajor::debug::SourceSpan(line, scol, ecol));
 }
 
 void* Emitter::GetMDStructRefForSourceFile(const std::string& sourceFileName)

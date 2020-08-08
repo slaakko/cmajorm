@@ -33,9 +33,9 @@ void BasicBlock::SetParent(BasicBlock* parent_)
     }
 }
 
-void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts)
+void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts, bool writeDebugInfoRecords)
 {
-    context.SetSourceLineNumber(0);
+    context.SetSourceSpan(cmajor::debug::SourceSpan());
     if (!Referenced()) return;
     BasicBlock* prevBB = context.GetCurrentBasicBlock();
     context.SetCurrentBasicBlock(this);
@@ -65,14 +65,17 @@ void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& co
     for (int i = 0; i < ni; ++i)
     {
         Instruction* inst = instructions[i].get();
-        inst->SetLineNumbers(formatter, context);
-        inst->WriteDebugInfoRecord(writer, numInsts);
+        if (writeDebugInfoRecords)
+        {
+            inst->SetLineNumbers(formatter, context);
+            inst->WriteDebugInfoRecord(writer, numInsts);
+        }
         std::string flagsStr;
         if (inst->Flags() != 0)
         {
             flagsStr.append(", flags=[").append(cmajor::debug::InstructionFlagsStr(static_cast<cmajor::debug::InstructionFlags>(inst->Flags()))).append("]");
         }
-        formatter.WriteLine("// " + n + inst->IrName() + " : source line=" + std::to_string(inst->SourceLineNumber()) +
+        formatter.WriteLine("// " + n + inst->IrName() + " : source span=" + inst->GetSourceSpan().ToString() +
             ", line index=" + std::to_string(inst->CppLineIndex()) + ", scope=" + std::to_string(inst->ScopeId()) + flagsStr + ":");
         if (first)
         {
@@ -82,7 +85,7 @@ void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& co
             }
             first = false;
         }
-        inst->Write(formatter, function, context, writer, numInsts);
+        inst->Write(formatter, function, context, writer, numInsts, writeDebugInfoRecords);
         if (!inst->NoSemicolon())
         {
             formatter.WriteLine(";");
@@ -94,7 +97,7 @@ void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& co
         if (!cleanupBlock->Included())
         {
             cleanupBlock->SetIncluded();
-            cleanupBlock->Write(formatter, function, context, writer, numInsts);
+            cleanupBlock->Write(formatter, function, context, writer, numInsts, writeDebugInfoRecords);
         }
     }
     for (BasicBlock* child : children)
@@ -111,7 +114,7 @@ void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& co
         {
             child->SetIncluded();
             formatter.WriteLine();
-            child->Write(formatter, function, context, writer, numInsts);
+            child->Write(formatter, function, context, writer, numInsts, writeDebugInfoRecords);
         }
     }
     if (handlerBlock != nullptr)
@@ -120,7 +123,7 @@ void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& co
         {
             handlerBlock->SetIncluded();
             formatter.WriteLine();
-            handlerBlock->Write(formatter, function, context, writer, numInsts);
+            handlerBlock->Write(formatter, function, context, writer, numInsts, writeDebugInfoRecords);
         }
     }
     context.SetCurrentBasicBlock(prevBB);

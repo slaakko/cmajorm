@@ -6,6 +6,7 @@
 #ifndef CMAJOR_DEBUG_INFO_IO_INCLUDED
 #define CMAJOR_DEBUG_INFO_IO_INCLUDED
 #include <cmajor/cmdebug/DebugApi.hpp>
+#include <cmajor/cmdebug/DebugInfo.hpp>
 #include <soulng/util/BinaryReader.hpp>
 #include <soulng/util/BinaryWriter.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -37,8 +38,16 @@ DEBUG_API void WriteCompileUnitFunctionRecord(BinaryWriter& writer, int32_t file
 DEBUG_API void ReadCompileUnitFunctionRecord(BinaryReader& reader, int32_t& fileIndex, boost::uuids::uuid& functionId);
 DEBUG_API void WriteNumberOfInstructionRecords(BinaryWriter& writer, int32_t numInstructionRecords);
 DEBUG_API void ReadNumberOfInstructionRecords(BinaryReader& reader, int32_t& numInstructionRecods);
-DEBUG_API void WriteInstructionRecord(BinaryWriter& writer, int32_t cppLineNumber, int32_t sourceLineNumber, int32_t cppLineIndex, int16_t scopeId, int16_t flags);
-DEBUG_API void ReadInstructionRecord(BinaryReader& reader, int32_t& cppLineNumber, int32_t& sourceLineNumber, int32_t& cppLineIndex, int16_t& scopeId, int16_t& flags);
+DEBUG_API void WriteInstructionRecord(BinaryWriter& writer, int32_t cppLineNumber, const SourceSpan& span, int32_t cppLineIndex, int16_t scopeId, int16_t flags);
+DEBUG_API void ReadInstructionRecord(BinaryReader& reader, int32_t& cppLineNumber, SourceSpan& span, int32_t& cppLineIndex, int16_t& scopeId, int16_t& flags);
+DEBUG_API void WriteControlFlowGraphNodeCount(BinaryWriter& writer, int32_t nodeCount);
+DEBUG_API void ReadControlFlowGraphNodeCount(BinaryReader& reader, int32_t& nodeCount);
+DEBUG_API void WriteControlFlowGraphNode(BinaryWriter& writer, int32_t nodeId, const SourceSpan& span, int32_t cppLineIndex, int32_t cppLineNumber);
+DEBUG_API void ReadControlFlowGraphNode(BinaryReader& reader, int32_t& nodeId, SourceSpan& span, int32_t& cppLineIndex, int32_t& cppLineNumber);
+DEBUG_API void WriteControlFlowGraphNodeEdgeCount(BinaryWriter& writer, int32_t edgeCount);
+DEBUG_API void ReadControlFlowGraphNodeEdgeCount(BinaryReader& reader, int32_t& edgeCount);
+DEBUG_API void WriteControlFlowGraphNodeEdge(BinaryWriter& writer, int32_t endNodeId);
+DEBUG_API void ReadControlFlowGraphNodeEdge(BinaryReader& reader, int32_t& endNodeId);
 DEBUG_API void WriteNumberOfScopes(BinaryWriter& writer, int32_t numScopes);
 DEBUG_API void ReadNumberOfScopes(BinaryReader& reader, int32_t& numScopes);
 DEBUG_API void WriteScopeRecord(BinaryWriter& writer, int16_t scopeId, int16_t parentScopeId, int32_t numLocalVariables);

@@ -5,17 +5,46 @@
 
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/Ansi.hpp>
 #include <string>
 #include <iostream>
 
 #ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
+#include <Windows.h>
+#else
+#include <unistd.h>
 #endif 
 
 namespace soulng { namespace util {
 
 #ifdef _WIN32
+
+WORD prevAttr = 0;
+
+void SetColorAttribute()
+{
+    HANDLE consoleOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    if (GetConsoleScreenBufferInfo(consoleOutHandle, &info))
+    {
+        prevAttr = info.wAttributes;
+    }
+    if (!SetConsoleTextAttribute(consoleOutHandle, FOREGROUND_INTENSITY | FOREGROUND_RED))
+    {
+        int x = 0;
+    }
+}
+
+void ResetColorAttribute()
+{
+    HANDLE consoleOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (!SetConsoleTextAttribute(consoleOutHandle, prevAttr))
+    {
+        int x = 0;
+    }
+}
 
 void SetStdHandlesToUtf16Mode()
 {
@@ -67,12 +96,14 @@ void WriteUtf8(std::ostream& s, const std::string& str)
 {
     if (&s == &std::cout && !IsHandleRedirected(1))
     {
-        std::u16string utf16Str = soulng::unicode::ToUtf16(str);
+        std::string ps = AnsiIntercept(1, str);
+        std::u16string utf16Str = soulng::unicode::ToUtf16(ps);
         WriteUtf16StrToStdOutOrStdErr(utf16Str, stdout);
     }
     else if (&s == &std::cerr && !IsHandleRedirected(2))
     {
-        std::u16string utf16Str = soulng::unicode::ToUtf16(str);
+        std::string ps = AnsiIntercept(2, str);
+        std::u16string utf16Str = soulng::unicode::ToUtf16(ps);
         WriteUtf16StrToStdOutOrStdErr(utf16Str, stderr);
     }
     else
@@ -82,6 +113,11 @@ void WriteUtf8(std::ostream& s, const std::string& str)
 }
 
 #else // !_WIN32
+
+bool IsHandleRedirected(int handle)
+{
+    return !isatty(handle);
+}
 
 void WriteUtf8(std::ostream& s, const std::string& str)
 {

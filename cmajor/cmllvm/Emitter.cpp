@@ -237,6 +237,15 @@ void Emitter::SetCurrentScopeId(int16_t scopeId)
 {
 }
 
+int32_t Emitter::AddControlFlowGraphNode()
+{
+    return -1;
+}
+
+void Emitter::AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId)
+{
+}
+
 void Emitter::AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject)
 {
 }
@@ -2155,7 +2164,7 @@ void Emitter::SetFunctionMdId(void* function, int mdId)
 {
 }
 
-void Emitter::SetCurrentLineNumber(int currentLineNumber)
+void Emitter::SetCurrentSourceSpan(int32_t line, int16_t scol, int16_t ecol)
 {
 }
 

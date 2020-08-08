@@ -1,6 +1,6 @@
 include ../Makefile.common
 
-OBJECTS = BasicBlock.o CompileUnit.o Context.o Data.o Function.o Instruction.o Type.o Value.o
+OBJECTS = BasicBlock.o CompileUnit.o Context.o Data.o Function.o Instruction.o Scope.o Type.o Value.o
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<

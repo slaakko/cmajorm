@@ -16,6 +16,7 @@ build:
 	$(MAKE) -C cmcppi
 	$(MAKE) -C cmtoolchain
 	$(MAKE) -C cmtoolchainconfig
+	$(MAKE) -C cmdebug
 	$(MAKE) -C symbols
 	$(MAKE) -C cmmid
 	$(MAKE) -C binder
@@ -33,6 +34,8 @@ build:
 	$(MAKE) -C cmclient
 	$(MAKE) -C cmserver
 	$(MAKE) -C cppcmc
+	$(MAKE) -C cmdb
+	$(MAKE) -C cmdb2xml
 	$(MAKE) -C cmupd
 	$(MAKE) -C cm2html
 	$(MAKE) -C cmdoc
@@ -78,7 +81,7 @@ bindist:
 	cp -r system/* $(BINDISTDIR)/system
 	cp -r projects/* $(BINDISTDIR)/projects
 	cp  unicode/cmajor_ucd.bin $(BINDISTDIR)/unicode
-
+    
 clean:
 	$(MAKE) -C soulng clean
 	$(MAKE) -C sngxml clean
@@ -91,6 +94,7 @@ clean:
 	$(MAKE) -C cmcppi clean
 	$(MAKE) -C cmtoolchain clean
 	$(MAKE) -C cmtoolchainconfig clean
+	$(MAKE) -C cmdebug clean
 	$(MAKE) -C symbols clean
 	$(MAKE) -C cmmid clean
 	$(MAKE) -C binder clean
@@ -106,7 +110,10 @@ clean:
 	$(MAKE) -C build clean
 	$(MAKE) -C compiler clean
 	$(MAKE) -C cmclient clean
+	$(MAKE) -C cmserver clean
 	$(MAKE) -C cppcmc clean
+	$(MAKE) -C cmdb clean
+	$(MAKE) -C cmdb2xml clean
 	$(MAKE) -C cmupd clean
 	$(MAKE) -C cm2html clean
 	$(MAKE) -C cmdoc clean

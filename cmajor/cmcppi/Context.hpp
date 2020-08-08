@@ -7,6 +7,7 @@
 #define CMAJOR_CMCPPI_CONTEXT_INCLUDED
 #include <cmajor/cmcppi/Type.hpp>
 #include <cmajor/cmcppi/Data.hpp>
+#include <cmajor/cmdebug/DebugInfo.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <stack>
 
@@ -130,7 +131,7 @@ public:
     GlobalVariable* CreateGlobalStringPtr(const std::string& stringValue);
     GlobalVariable* CreateGlobalWStringPtr(const std::u16string& stringValue);
     GlobalVariable* CreateGlobalUStringPtr(const std::u32string& stringValue);
-    void SetCurrentLineNumber(int lineNumber);
+    void SetCurrentSourceSpan(const cmajor::debug::SourceSpan& span);
     void BeginScope();
     void EndScope();
     int16_t CurrentScopeId() const { return currentScopeId; }
@@ -145,11 +146,13 @@ public:
     void SetHandlerBlock(BasicBlock* tryBlock, BasicBlock* catchBlock);
     void SetCleanupBlock(BasicBlock* cleanupBlock);
     BasicBlock* CurrentParent() const { return currentParentBlock; }
-    int32_t SourceLineNumber() const { return sourceLineNumber; }
-    void SetSourceLineNumber(int32_t sourceLineNumber_) { sourceLineNumber = sourceLineNumber_; }
+    const cmajor::debug::SourceSpan& GetSourceSpan() const { return sourceSpan; }
+    void SetSourceSpan(const cmajor::debug::SourceSpan& sourceSpan_) { sourceSpan = sourceSpan_; }
     int32_t CppLineIndex() const { return cppLineIndex; }
     void SetCppLineIndex(int32_t cppLineIndex_) { cppLineIndex = cppLineIndex_; }
     void AddLocalVariable(const std::string& name, const boost::uuids::uuid& typeId, LocalInstruction* inst);
+    int32_t AddControlFlowGraphNode();
+    void AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId);
 private:
     TypeRepository typeRepository;
     DataRepository dataRepository;
@@ -159,9 +162,10 @@ private:
     BasicBlock* currentParentBlock;
     int16_t currentScopeId;
     int16_t currentInstructionFlags;
+    int32_t currentControlFlowGraphNodeId;
     std::stack<BasicBlock*> blockStack;
-    int currentLineNumber;
-    int32_t sourceLineNumber;
+    cmajor::debug::SourceSpan currentSourceSpan;
+    cmajor::debug::SourceSpan sourceSpan;
     int32_t cppLineIndex;
 };
 

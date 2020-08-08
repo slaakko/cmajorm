@@ -2140,7 +2140,7 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(new BoundCompoundStatement(GetModule(), span)));
         if (classType->StaticConstructor())
         {
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::unique_ptr<BoundExpression>(
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::unique_ptr<BoundExpression>(
                 new BoundFunctionCall(GetModule(), span, classType->StaticConstructor())))));
             if (!classType->StaticConstructor()->DontThrow()) nothrow = false;
         }
@@ -2163,7 +2163,7 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
             std::unique_ptr<BoundFunctionCall> baseConstructorCall = ResolveOverload(U"@constructor", containerScope, baseConstructorCallLookups, baseConstructorCallArguments, GetBoundCompileUnit(),
                 boundFunction.get(), span);
             if (!baseConstructorCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(baseConstructorCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(baseConstructorCall))));
         }
         if (classType->IsPolymorphic())
         {
@@ -2203,7 +2203,7 @@ bool ClassDefaultConstructorOperation::GenerateImplementation(ClassDefaultConstr
                 GetBoundCompileUnit(), boundFunction.get(), span);
             if (!memberConstructorCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
             boundFunction->MoveTemporaryDestructorCallsTo(*memberConstructorCall);
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(memberConstructorCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(memberConstructorCall))));
         }
         GetBoundCompileUnit().AddBoundNode(std::move(boundFunction));
         if (nothrow)
@@ -2347,7 +2347,7 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(new BoundCompoundStatement(GetModule(), span)));
         if (classType->StaticConstructor())
         {
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::unique_ptr<BoundExpression>(new BoundFunctionCall(GetModule(), span,
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::unique_ptr<BoundExpression>(new BoundFunctionCall(GetModule(), span,
                 classType->StaticConstructor())))));
             if (!classType->StaticConstructor()->DontThrow()) nothrow = false;
         }
@@ -2379,7 +2379,7 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
             std::unique_ptr<BoundFunctionCall> baseConstructorCall = ResolveOverload(U"@constructor", containerScope, baseConstructorCallLookups, baseConstructorCallArguments, GetBoundCompileUnit(),
                 boundFunction.get(), span);
             if (!baseConstructorCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(baseConstructorCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(baseConstructorCall))));
         }
         if (classType->IsPolymorphic())
         {
@@ -2424,7 +2424,7 @@ bool ClassCopyConstructorOperation::GenerateImplementation(ClassCopyConstructor*
                 GetBoundCompileUnit(), boundFunction.get(), span);
             if (!memberConstructorCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
             boundFunction->MoveTemporaryDestructorCallsTo(*memberConstructorCall);
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(memberConstructorCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(memberConstructorCall))));
         }
         GetBoundCompileUnit().AddBoundNode(std::move(boundFunction));
         if (nothrow)
@@ -2559,7 +2559,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
         boundFunction->SetBody(std::unique_ptr<BoundCompoundStatement>(new BoundCompoundStatement(GetModule(), span)));
         if (classType->StaticConstructor())
         {
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::unique_ptr<BoundExpression>(new BoundFunctionCall(GetModule(), span,
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::unique_ptr<BoundExpression>(new BoundFunctionCall(GetModule(), span,
                 classType->StaticConstructor())))));
             if (!classType->StaticConstructor()->DontThrow()) nothrow = false;
         }
@@ -2590,7 +2590,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
             std::unique_ptr<BoundFunctionCall> baseConstructorCall = ResolveOverload(U"@constructor", containerScope, baseConstructorCallLookups, baseConstructorCallArguments, GetBoundCompileUnit(),
                 boundFunction.get(), span);
             if (!baseConstructorCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(baseConstructorCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(baseConstructorCall))));
         }
         if (classType->IsPolymorphic())
         {
@@ -2641,7 +2641,7 @@ bool ClassMoveConstructorOperation::GenerateImplementation(ClassMoveConstructor*
                 GetBoundCompileUnit(), boundFunction.get(), span);
             if (!memberConstructorCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
             boundFunction->MoveTemporaryDestructorCallsTo(*memberConstructorCall);
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(memberConstructorCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(memberConstructorCall))));
         }
         GetBoundCompileUnit().AddBoundNode(std::move(boundFunction));
         if (nothrow)
@@ -2806,7 +2806,7 @@ bool ClassCopyAssignmentOperation::GenerateImplementation(ClassCopyAssignment* c
             std::unique_ptr<BoundFunctionCall> baseAssignmentCall = ResolveOverload(U"operator=", containerScope, baseAssignmentCallLookups, baseAssignmentCallArguments, GetBoundCompileUnit(),
                 boundFunction.get(), span);
             if (!baseAssignmentCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(baseAssignmentCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(baseAssignmentCall))));
         }
         int n = classType->MemberVariables().size();
         for (int i = 0; i < n; ++i)
@@ -2830,7 +2830,7 @@ bool ClassCopyAssignmentOperation::GenerateImplementation(ClassCopyAssignment* c
                 GetBoundCompileUnit(), boundFunction.get(), span);
             if (!memberAssignmentCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
             boundFunction->MoveTemporaryDestructorCallsTo(*memberAssignmentCall);
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(memberAssignmentCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(memberAssignmentCall))));
         }
         GetBoundCompileUnit().AddBoundNode(std::move(boundFunction));
         if (nothrow)
@@ -2992,7 +2992,7 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
             std::unique_ptr<BoundFunctionCall> baseAssignmentCall = ResolveOverload(U"operator=", containerScope, baseAssignmentCallLookups, baseAssignmentCallArguments, GetBoundCompileUnit(),
                 boundFunction.get(), span);
             if (!baseAssignmentCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(baseAssignmentCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(baseAssignmentCall))));
         }
         int n = classType->MemberVariables().size();
         for (int i = 0; i < n; ++i)
@@ -3012,7 +3012,7 @@ bool ClassMoveAssignmentOperation::GenerateImplementation(ClassMoveAssignment* m
             swapArguments.push_back(std::move(thatBoundMemberVariable));
             std::unique_ptr<BoundFunctionCall> swapMemberCall = ResolveOverload(U"System.Swap", containerScope, swapLookups, swapArguments, GetBoundCompileUnit(), boundFunction.get(), span);
             if (!swapMemberCall->GetFunctionSymbol()->DontThrow()) nothrow = false;
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(GetModule(), std::move(swapMemberCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(GetModule(), std::move(swapMemberCall))));
         }
         GetBoundCompileUnit().AddBoundNode(std::move(boundFunction));
         if (nothrow)
@@ -3078,7 +3078,7 @@ void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* 
                     new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(boundMemberVariable), boundMemberVariable->GetType()->AddPointer(span))));
                 std::unique_ptr<BoundFunctionCall> memberDestructorCall = ResolveOverload(U"@destructor", containerScope, memberDestructorCallLookups, memberDestructorCallArguments,
                     boundCompileUnit, boundFunction.get(), span);
-                boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(memberDestructorCall))));
+                boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(memberDestructorCall), span)));
             }
         }
         if (classType->BaseClass() && classType->BaseClass()->HasNontrivialDestructor())
@@ -3099,7 +3099,7 @@ void GenerateDestructorImplementation(BoundClass* boundClass, DestructorSymbol* 
             baseDestructorCallArguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
             std::unique_ptr<BoundFunctionCall> baseDestructorCall = ResolveOverload(U"@destructor", containerScope, baseDestructorCallLookups, baseDestructorCallArguments, boundCompileUnit,
                 boundFunction.get(), span);
-            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(baseDestructorCall))));
+            boundFunction->Body()->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(baseDestructorCall), span)));
         }
         boundClass->AddMember(std::move(boundFunction));
     }
@@ -3173,8 +3173,8 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
                 staticInitCriticalSectionClassType->AddPointer(span))));
             constructorArguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new UuidValue(span,
                 boundCompileUnit.Install(classType->TypeId()))), boundCompileUnit.GetSymbolTable().GetTypeByName(U"void")->AddPointer(span))));
-            std::unique_ptr<BoundConstructionStatement> constructionStatement(new BoundConstructionStatement(module, ResolveOverload(U"@constructor", containerScope, constructorLookups, constructorArguments,
-                boundCompileUnit, boundFunction, span)));
+            std::unique_ptr<BoundConstructionStatement> constructionStatement(new BoundConstructionStatement(
+                module, ResolveOverload(U"@constructor", containerScope, constructorLookups, constructorArguments, boundCompileUnit, boundFunction, span), span));
             boundCompoundStatement->AddStatement(std::move(constructionStatement));
             std::unique_ptr<BoundIfStatement> ifStatement2(new BoundIfStatement(module, span, std::unique_ptr<BoundExpression>(new BoundMemberVariable(module, span, classType->InitializedVar())),
                 std::unique_ptr<BoundStatement>(new BoundReturnStatement(module, std::unique_ptr<BoundFunctionCall>(nullptr), span)), std::unique_ptr<BoundStatement>(nullptr)));
@@ -3188,15 +3188,15 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
             classType->InitializedVar()->GetType()->AddPointer(span))));
         assignmentArguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new BoolValue(span, true)),
             boundCompileUnit.GetSymbolTable().GetTypeByName(U"bool"))));
-        std::unique_ptr<BoundAssignmentStatement> assignmentStatement(new BoundAssignmentStatement(module, ResolveOverload(U"operator=", containerScope, assignmentLookups, assignmentArguments,
-            boundCompileUnit, boundFunction, span)));
+        std::unique_ptr<BoundAssignmentStatement> assignmentStatement(new BoundAssignmentStatement(module,
+            ResolveOverload(U"operator=", containerScope, assignmentLookups, assignmentArguments, boundCompileUnit, boundFunction, span), span));
         boundCompoundStatement->AddStatement(std::move(assignmentStatement));
         ClassTypeSymbol* baseClass = classType->BaseClass();
         if (baseClass)
         {
             if (baseClass->StaticConstructor())
             {
-                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::unique_ptr<BoundExpression>(
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::unique_ptr<BoundExpression>(
                     new BoundFunctionCall(module, span, baseClass->StaticConstructor())))));
             }
         }
@@ -3260,7 +3260,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
                 std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, 
                     span);
                 boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
-                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(constructorCall))));
                 if (memberVariableClassTypeWithDestructor)
                 {
                     if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
@@ -3277,7 +3277,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
                         const char32_t* enqueueDestructorFunction = U"RtEnqueueDestruction";
                         std::unique_ptr<BoundFunctionCall> enqueueDestructorCall = ResolveOverload(enqueueDestructorFunction, containerScope, enqueueLookups, enqueueArguments, boundCompileUnit,
                             boundFunction, span);
-                        boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(enqueueDestructorCall))));
+                        boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(enqueueDestructorCall))));
                     }
                     else if (GetBackEnd() == BackEnd::cmsx)
                     {
@@ -3294,7 +3294,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
                         const char32_t* atExitFunction = U"at_exit";
                         std::unique_ptr<BoundFunctionCall> atExitCall = ResolveOverload(atExitFunction, containerScope, atExitLookups, atExitArguments, boundCompileUnit,
                             boundFunction, span);
-                        boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(atExitCall))));
+                        boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(atExitCall))));
                     }
                 }
             }
@@ -3319,7 +3319,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
                 std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction,
                     span);
                 boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
-                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(constructorCall))));
                 if (memberVariableClassTypeWithDestructor)
                 {
                     if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)
@@ -3336,7 +3336,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
                         const char32_t* enqueueDestructorFunction = U"RtEnqueueDestruction";
                         std::unique_ptr<BoundFunctionCall> enqueueDestructorCall = ResolveOverload(enqueueDestructorFunction, containerScope, enqueueLookups, enqueueArguments, boundCompileUnit,
                             boundFunction, span);
-                        boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(enqueueDestructorCall))));
+                        boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(enqueueDestructorCall))));
                     }
                     else if (GetBackEnd() == BackEnd::cmsx)
                     {
@@ -3353,7 +3353,7 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
                         const char32_t* atExitFunction = U"at_exit";
                         std::unique_ptr<BoundFunctionCall> atExitCall = ResolveOverload(atExitFunction, containerScope, atExitLookups, atExitArguments, boundCompileUnit,
                             boundFunction, span);
-                        boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(atExitCall))));
+                        boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(atExitCall))));
                     }
                 }
             }
@@ -3386,7 +3386,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
     { 
         if (classType->StaticConstructor())
         {
-            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::unique_ptr<BoundExpression>(new BoundFunctionCall(module, span,
+            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::unique_ptr<BoundExpression>(new BoundFunctionCall(module, span,
                 classType->StaticConstructor())))));
         }
         ParameterSymbol* thisParam = constructorSymbol->GetThisParam();
@@ -3459,7 +3459,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
                 flags, templateArgumentTypes, exception);
             boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
-            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
+            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(constructorCall))));
         }
         else if (baseInitializer)
         {
@@ -3498,7 +3498,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
                 flags, templateArgumentTypes, exception);
             boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
-            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
+            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(constructorCall))));
         }
         else if (classType->BaseClass())
         {
@@ -3540,7 +3540,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
             std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
                 flags, templateArgumentTypes, exception);
             boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
-            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
+            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(constructorCall))));
         }
         if (classType->IsPolymorphic() && !thisInitializer)
         {
@@ -3594,7 +3594,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                 std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
                     flags, templateArgumentTypes, exception);
                 boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
-                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(constructorCall))));
             }
             else if (!thisInitializer)
             {
@@ -3619,7 +3619,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                     std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction,
                         span);
                     boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
-                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
+                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(constructorCall))));
                 }
                 else if (constructorSymbol->IsMoveConstructor())
                 {
@@ -3648,7 +3648,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                     std::unique_ptr<BoundFunctionCall> memberConstructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, 
                         span);
                     boundFunction->MoveTemporaryDestructorCallsTo(*memberConstructorCall);
-                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(memberConstructorCall))));
+                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(memberConstructorCall))));
                 }
                 else
                 {
@@ -3671,7 +3671,7 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                     std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
                         flags, templateArgumentTypes, exception);
                     boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
-                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
+                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(constructorCall))));
                 }
             }
         }
@@ -3738,7 +3738,7 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 std::unique_ptr<BoundFunctionCall> assignmentCall = ResolveOverload(U"operator=", containerScope, lookups, arguments, boundCompileUnit, boundFunction,
                     span);
                 boundFunction->MoveTemporaryDestructorCallsTo(*assignmentCall);
-                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(assignmentCall))));
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(assignmentCall))));
             }
             if (generateDefault)
             {
@@ -3765,7 +3765,7 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                     std::unique_ptr<BoundFunctionCall> assignmentCall = ResolveOverload(U"operator=", containerScope, lookups, arguments, boundCompileUnit, boundFunction,
                         span);
                     boundFunction->MoveTemporaryDestructorCallsTo(*assignmentCall);
-                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(assignmentCall))));
+                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(assignmentCall))));
                 }
             }
         }
@@ -3799,7 +3799,7 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                 std::unique_ptr<BoundFunctionCall> assignmentCall = ResolveOverload(U"operator=", containerScope, lookups, arguments, boundCompileUnit, boundFunction,
                     span);
                 boundFunction->MoveTemporaryDestructorCallsTo(*assignmentCall);
-                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(assignmentCall))));
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(assignmentCall))));
             }
             if (generateDefault)
             {
@@ -3822,7 +3822,7 @@ void GenerateClassAssignment(MemberFunctionSymbol* assignmentFunctionSymbol, Mem
                         std::unique_ptr<BoundExpression>(new BoundParameter(module, span, thatParam)), thatPtrType)));
                     arguments.push_back(std::unique_ptr<BoundExpression>(thatBoundMemberVariable));
                     std::unique_ptr<BoundFunctionCall> swapCall = ResolveOverload(U"System.Swap", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span);
-                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(swapCall))));
+                    boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::move(swapCall))));
                 }
             }
         }
@@ -3886,7 +3886,7 @@ void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode
                     new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(boundMemberVariable), boundMemberVariable->GetType()->AddPointer(span))));
                 std::unique_ptr<BoundFunctionCall> memberDestructorCall = ResolveOverload(U"@destructor", containerScope, memberDestructorCallLookups, memberDestructorCallArguments,
                     boundCompileUnit, boundFunction, span);
-                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(memberDestructorCall))));
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(memberDestructorCall), span)));
             }
         }
         if (classType->BaseClass() && classType->BaseClass()->HasNontrivialDestructor())
@@ -3907,7 +3907,7 @@ void GenerateClassTermination(DestructorSymbol* destructorSymbol, DestructorNode
             baseDestructorCallArguments.push_back(std::unique_ptr<BoundExpression>(baseClassPointerConversion));
             std::unique_ptr<BoundFunctionCall> baseDestructorCall = ResolveOverload(U"@destructor", containerScope, baseDestructorCallLookups, baseDestructorCallArguments, boundCompileUnit,
                 boundFunction, span);
-            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(baseDestructorCall))));
+            boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(baseDestructorCall), span)));
         }
     }
     catch (const Exception& ex)

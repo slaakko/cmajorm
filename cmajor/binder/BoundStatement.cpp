@@ -268,9 +268,8 @@ void BoundGotoStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundConstructionStatement::BoundConstructionStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& constructorCall_) :
-    BoundStatement(module_, constructorCall_->GetSpan(), BoundNodeType::boundConstructionStatement), constructorCall(std::move(constructorCall_)),
-    localVariable(nullptr)
+BoundConstructionStatement::BoundConstructionStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& constructorCall_, const Span& span) :
+    BoundStatement(module_, span, BoundNodeType::boundConstructionStatement), constructorCall(std::move(constructorCall_)), localVariable(nullptr)
 {
 }
 
@@ -284,8 +283,8 @@ void BoundConstructionStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundAssignmentStatement::BoundAssignmentStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& assignmentCall_) :
-    BoundStatement(module_, assignmentCall_->GetSpan(), BoundNodeType::boundAssignmentStatement), assignmentCall(std::move(assignmentCall_))
+BoundAssignmentStatement::BoundAssignmentStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& assignmentCall_, const Span& span) :
+    BoundStatement(module_, span, BoundNodeType::boundAssignmentStatement), assignmentCall(std::move(assignmentCall_))
 {
 }
 
@@ -294,12 +293,23 @@ void BoundAssignmentStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundExpressionStatement::BoundExpressionStatement(Module* module_, std::unique_ptr<BoundExpression>&& expression_) :
-    BoundStatement(module_, expression_->GetSpan(), BoundNodeType::boundExpressionStatement), expression(std::move(expression_))
+BoundExpressionStatement::BoundExpressionStatement(Module* module_, std::unique_ptr<BoundExpression>&& expression_, const Span& span) :
+    BoundStatement(module_, span, BoundNodeType::boundExpressionStatement), expression(std::move(expression_))
 { 
 }
 
 void BoundExpressionStatement::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+BoundInitializationStatement::BoundInitializationStatement(Module* module_, std::unique_ptr<BoundExpression>&& initializationExpression_) :
+    BoundStatement(module_, initializationExpression_->GetSpan(), BoundNodeType::boundInitializationStatement),
+    initializationExpression(std::move(initializationExpression_))
+{
+}
+
+void BoundInitializationStatement::Accept(BoundNodeVisitor& visitor)
 {
     visitor.Visit(*this);
 }

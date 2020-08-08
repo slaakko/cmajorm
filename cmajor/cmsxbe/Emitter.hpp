@@ -302,6 +302,8 @@ public:
     void EndScope() override;
     int16_t GetCurrentScopeId() const override;
     void SetCurrentScopeId(int16_t scopeId) override;
+    int32_t AddControlFlowGraphNode() override;
+    void AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId) override;
     void AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject) override;
     void BeginInstructionFlag(int16_t flag) override;
     void EndInstructionFlag(int16_t flag) override;
@@ -340,7 +342,7 @@ public:
     void* CreateMDBasicBlockRef(void* bb) override;
     void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) override;
     void SetFunctionMdId(void* function, int mdId) override;
-    void SetCurrentLineNumber(int currentLineNumber) override;
+    void SetCurrentSourceSpan(int32_t line, int16_t scol, int16_t ecol) override;
     void* GetMDStructRefForSourceFile(const std::string& sourceFileName) override;
     void SetMetadataRef(void* inst, void* mdStructRef) override;
     void FinalizeFunction(void* function, bool hasCleanup) override;

@@ -11,6 +11,7 @@
 #include <cmajor/symbols/FunctionIndex.hpp>
 #include <cmajor/symbols/TypeIndex.hpp>
 #include <cmajor/cmdebug/Container.hpp>
+#include <cmajor/cmdebug/DebugInfo.hpp>
 #ifdef _WIN32
 #include <cmajor/symbols/ResourceTable.hpp>
 #endif
@@ -99,6 +100,19 @@ public:
     void Dump(CodeFormatter& formatter);
 private:
     std::vector<std::string> filePaths;
+};
+
+class SYMBOLS_API SourceFileCache
+{
+public:
+    SourceFileCache();
+    SourceFileCache(const SourceFileCache&) = delete;
+    SourceFileCache(SourceFileCache&&) = delete;
+    SourceFileCache& operator=(const SourceFileCache&) = delete;
+    SourceFileCache& operator=(SourceFileCache&&) = delete;
+    const std::u32string& GetFileContent(const std::string& filePath);
+private:
+    std::unordered_map<std::string, std::unique_ptr<std::u32string>> fileContentMap;
 };
 
 class SYMBOLS_API SpanMapper : public sngcm::ast::SpanMapper
@@ -209,6 +223,7 @@ public:
     void WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Module* rootModule);
     std::unordered_map<int16_t, std::string>* GetModuleNameTable() { return &moduleNameTable; }
     std::unordered_map<std::string, int16_t>* GetModuleIdMap() { return &moduleIdMap; }
+    cmajor::debug::SourceSpan SpanToSourceSpan(const Span& span);
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -259,6 +274,7 @@ private:
     FileIndex fileIndex;
     FunctionIndex functionIndex;
     TypeIndex typeIndex;
+    SourceFileCache sourceFileCache;
     void CheckUpToDate();
 };
 

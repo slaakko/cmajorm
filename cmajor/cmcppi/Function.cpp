@@ -10,8 +10,22 @@
 
 namespace cmcppi {
 
+ControlFlowGraphNode::ControlFlowGraphNode(int32_t id_) : id(id_), inst(nullptr)
+{
+}
+
+void ControlFlowGraphNode::SetInstruction(Instruction* inst_)
+{
+    inst = inst_;
+}
+
+void ControlFlowGraphNode::AddNext(int32_t next)
+{
+    nextSet.insert(next);
+}
+
 Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), nextLocalNumber(0), nextArgumentNumber(0), 
-    linkOnce(false), nextBBNumber(0), nothrow(false), fileIndex(-1), functionId(), nopResultDeclarationWritten(false)
+    linkOnce(false), nextBBNumber(0), nothrow(false), fileIndex(-1), functionId(), nopResultDeclarationWritten(false), nextControlFlowGraphNodeNumber(0)
 {
     entryBlock.reset(new BasicBlock(nextBBNumber++, "entry"));
     int paramIndex = 0;
@@ -147,18 +161,20 @@ void Function::Write(CodeFormatter& formatter, Context& context, BinaryWriter& w
     formatter.WriteLine();
     int32_t numInsts = 0;
     uint32_t numInstsPos = 0;
+    bool writeDebugInfoRecords = false;
     if (fileIndex != -1 && !functionId.is_nil())
     {
         cmajor::debug::WriteCompileUnitFunctionRecord(writer, fileIndex, functionId);
         numInstsPos = writer.Pos();
         cmajor::debug::WriteNumberOfInstructionRecords(writer, numInsts);
         StartFunctionInstruction startInst;
-        startInst.SetSourceLineNumber(-1);
+        startInst.SetSourceSpan(cmajor::debug::SourceSpan(-1, 0, 0));
         startInst.SetCppLineNumber(formatter.Line());
         startInst.SetCppLineIndex(0);
         startInst.SetScopeId(-1);
         startInst.SetFlags(16); // InstructionFlags::startFunction
         startInst.WriteDebugInfoRecord(writer, numInsts);
+        writeDebugInfoRecords = true;
     }
     formatter.WriteLine("{");
     formatter.IncIndent();
@@ -180,7 +196,7 @@ void Function::Write(CodeFormatter& formatter, Context& context, BinaryWriter& w
         {
             formatter.WriteLine();
         }
-        bb->Write(formatter, *this, context, writer, numInsts);
+        bb->Write(formatter, *this, context, writer, numInsts, writeDebugInfoRecords);
     }
     formatter.DecIndent();
     formatter.WriteLine("}");
@@ -200,6 +216,19 @@ void Function::Write(CodeFormatter& formatter, Context& context, BinaryWriter& w
             {
                 cmajor::debug::DIVariable* localVariable = scope->GetLocalVariable(i);
                 localVariable->Write(writer);
+            }
+        }
+        int32_t controlFlowGraphNodeCount = controlFlowGraph.size();
+        cmajor::debug::WriteControlFlowGraphNodeCount(writer, controlFlowGraphNodeCount);
+        for (const auto& p : controlFlowGraph)
+        {
+            ControlFlowGraphNode* node = p.second;
+            cmajor::debug::WriteControlFlowGraphNode(writer, node->Id(), node->Inst()->GetSourceSpan(), node->Inst()->CppLineIndex(), node->Inst()->CppLineNumber());
+            int32_t edgeCount = node->Next().size();
+            cmajor::debug::WriteControlFlowGraphNodeEdgeCount(writer, edgeCount);
+            for (int32_t n : node->Next())
+            {
+                cmajor::debug::WriteControlFlowGraphNodeEdge(writer, n);
             }
         }
         ++numFunctions;
@@ -239,6 +268,34 @@ void Function::AddScope(Scope* scope)
 Scope* Function::GetScope(int16_t scopeId)
 {
     return scopes[scopeId].get();
+}
+
+int32_t Function::AddControlFlowGraphNode()
+{
+    int32_t id = GetNextControlFlowGraphNodeNumber();
+    ControlFlowGraphNode* node = new ControlFlowGraphNode(id);
+    controlFlowGraph[id] = node;
+    controlFlowGraphNodes.push_back(std::unique_ptr<ControlFlowGraphNode>(node));
+    return id;
+}
+
+ControlFlowGraphNode* Function::GetControlFlowGraphNode(int32_t id) const
+{
+    auto it = controlFlowGraph.find(id);
+    if (it != controlFlowGraph.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        throw std::runtime_error("control flow graph node id " + std::to_string(id) + " not found");
+    }
+}
+
+void Function::AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId)
+{
+    ControlFlowGraphNode* node = GetControlFlowGraphNode(startNodeId);
+    node->AddNext(endNodeId);
 }
 
 } // namespace cmcppi

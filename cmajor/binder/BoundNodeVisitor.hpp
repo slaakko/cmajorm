@@ -32,6 +32,7 @@ class BoundGotoStatement;
 class BoundConstructionStatement;
 class BoundAssignmentStatement;
 class BoundExpressionStatement;
+class BoundInitializationStatement;
 class BoundEmptyStatement;
 class BoundSetVmtPtrStatement;
 class BoundThrowStatement;
@@ -97,6 +98,7 @@ public:
     virtual void Visit(BoundConstructionStatement& boundConstructionStatement) {}
     virtual void Visit(BoundAssignmentStatement& boundAssignmentStatement) {}
     virtual void Visit(BoundExpressionStatement& boundExpressionStatement) {}
+    virtual void Visit(BoundInitializationStatement& boundInitializationStatement) {}
     virtual void Visit(BoundEmptyStatement& boundEmptyStatement) {}
     virtual void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) {}
     virtual void Visit(BoundThrowStatement& boundThrowStatement) {}

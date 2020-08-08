@@ -35,7 +35,7 @@ public:
     BasicBlock* HandlerBlock() const { return handlerBlock; }
     void SetCleanupBlock(BasicBlock* cleanupBlock_) { cleanupBlock = cleanupBlock_; }
     BasicBlock* CleanupBlock() const { return cleanupBlock; }
-    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts);
+    void Write(CodeFormatter& formatter, Function& function, Context& context, BinaryWriter& writer, int32_t& numInsts, bool writeDebugInfoRecords);
     void CollectReferencedBasicBlocks(std::set<BasicBlock*>& basicBlocks);
     void SetReferenced() { referenced = true; }
     bool Referenced() const { return referenced; }

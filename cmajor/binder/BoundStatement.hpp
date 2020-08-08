@@ -253,7 +253,7 @@ private:
 class BINDER_API BoundConstructionStatement : public BoundStatement
 {
 public:
-    BoundConstructionStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& constructorCall_);
+    BoundConstructionStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& constructorCall_, const Span& span);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundFunctionCall* ConstructorCall() { return constructorCall.get(); }
     void SetLocalVariable(LocalVariableSymbol* localVariable_);
@@ -266,7 +266,7 @@ private:
 class BINDER_API BoundAssignmentStatement : public BoundStatement
 {
 public:
-    BoundAssignmentStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& assignmentCall_);
+    BoundAssignmentStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& assignmentCall_, const Span& span);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundFunctionCall* AssignmentCall() { return assignmentCall.get(); }
 private:
@@ -276,11 +276,21 @@ private:
 class BINDER_API BoundExpressionStatement : public BoundStatement
 {
 public:
-    BoundExpressionStatement(Module* module_, std::unique_ptr<BoundExpression>&& expression_);
+    BoundExpressionStatement(Module* module_, std::unique_ptr<BoundExpression>&& expression_, const Span& span);
     void Accept(BoundNodeVisitor& visitor) override;
     BoundExpression* Expression() { return expression.get(); }
 private:
     std::unique_ptr<BoundExpression> expression;
+};
+
+class BINDER_API BoundInitializationStatement : public BoundStatement
+{
+public:
+    BoundInitializationStatement(Module* module_, std::unique_ptr<BoundExpression>&& initializationExpression_);
+    void Accept(BoundNodeVisitor& visitor) override;
+    BoundExpression* InitializationExpression() { return initializationExpression.get(); }
+private:
+    std::unique_ptr<BoundExpression> initializationExpression;
 };
 
 class BINDER_API BoundEmptyStatement : public BoundStatement

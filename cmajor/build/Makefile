@@ -4,7 +4,7 @@ OBJECTS = Build.o BuildClient.o BuildLangClassMap.o BuildLangClientParser.o Buil
 BuildLangLexer.o BuildLangOptionParser.o BuildLangServerParser.o BuildLangTokens.o BuildOption.o \
 BuildServer.o BuildServerMessage.o ClientCommand.o ClientExecutionContext.o Connection.o ExecutionContext.o \
 FiberConnection.o FiberExecutionContext.o Host.o InitDone.o LocalExecutionContext.o Log.o Message.o MessageBody.o \
-MessageHandler.o ServerConfig.o ServerCommand.o ServerExecutionContext.o SocketClient.o SocketConnection.o SocketServer.o
+MessageHandler.o ServerCommand.o ServerConfig.o ServerExecutionContext.o SocketClient.o SocketConnection.o SocketServer.o
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<

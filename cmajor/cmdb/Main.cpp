@@ -2,11 +2,15 @@
 #include <cmajor/cmdebug/InitDone.hpp>
 #include <cmajor/cmdebug/Debugger.hpp>
 #include <cmajor/cmdebug/CmdbSession.hpp>
+#include <soulng/util/Ansi.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 struct InitDone
 {
@@ -44,6 +48,15 @@ void PrintHelp()
 
 int main(int argc, const char** argv)
 {
+/*
+#ifdef _WIN32
+    HANDLE consoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (!SetConsoleMode(consoleOut, ENABLE_VIRTUAL_TERMINAL_PROCESSING))
+    {
+        std::cout << "could not set console mode" << std::endl;
+    }
+#endif
+*/
     std::cout << "Cmajor debugger version " << version << std::endl;
     InitDone initDone;
     try

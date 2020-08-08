@@ -282,14 +282,14 @@ std::unique_ptr<sngxml::dom::Document> GetDebugInfoAsXml(const std::string& cmdb
                 for (int32_t i = 0; i < numInstructionRecords; ++i)
                 {
                     int32_t cppLineNumber;
-                    int32_t sourceLineNumber;
+                    SourceSpan span;
                     int32_t cppLineIndex;
                     int16_t scopeId;
                     int16_t flags;
-                    ReadInstructionRecord(reader, cppLineNumber, sourceLineNumber, cppLineIndex, scopeId, flags);
+                    ReadInstructionRecord(reader, cppLineNumber, span, cppLineIndex, scopeId, flags);
                     sngxml::dom::Element* instructionElement = new sngxml::dom::Element(U"instruction");
                     instructionElement->SetAttribute(U"cppLineNumber", ToUtf32(std::to_string(cppLineNumber)));
-                    instructionElement->SetAttribute(U"sourceLineNumber", ToUtf32(std::to_string(sourceLineNumber)));
+                    instructionElement->SetAttribute(U"span", ToUtf32(span.ToString()));
                     instructionElement->SetAttribute(U"cppLineIndex", ToUtf32(std::to_string(cppLineIndex)));
                     instructionElement->SetAttribute(U"scopeId", ToUtf32(std::to_string(scopeId)));
                     if (flags != 0)
@@ -330,6 +330,34 @@ std::unique_ptr<sngxml::dom::Document> GetDebugInfoAsXml(const std::string& cmdb
                 {
                     functionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(scopesElement));
                 }
+                sngxml::dom::Element* controlFlowGraphElement = new sngxml::dom::Element(U"controlFlowGraph");
+                int32_t controlFlowGraphNodeCount;
+                ReadControlFlowGraphNodeCount(reader, controlFlowGraphNodeCount);
+                for (int32_t i = 0; i < controlFlowGraphNodeCount; ++i)
+                {
+                    int32_t nodeId;
+                    SourceSpan span;
+                    int32_t cppLineIndex;
+                    int32_t cppLineNumber;
+                    ReadControlFlowGraphNode(reader, nodeId, span, cppLineIndex, cppLineNumber);
+                    sngxml::dom::Element* controlFlowGraphNodeElement = new sngxml::dom::Element(U"controlFlowGraphNode");
+                    controlFlowGraphNodeElement->SetAttribute(U"nodeId", ToUtf32(std::to_string(nodeId)));
+                    controlFlowGraphNodeElement->SetAttribute(U"span", ToUtf32(span.ToString()));
+                    controlFlowGraphNodeElement->SetAttribute(U"cppLineIndex", ToUtf32(std::to_string(cppLineIndex)));
+                    controlFlowGraphNodeElement->SetAttribute(U"cppLineNumber", ToUtf32(std::to_string(cppLineNumber)));
+                    int32_t edgeCount;
+                    ReadControlFlowGraphNodeEdgeCount(reader, edgeCount);
+                    for (int32_t i = 0; i < edgeCount; ++i)
+                    {
+                        int32_t endNodeId;
+                        ReadControlFlowGraphNodeEdge(reader, endNodeId);
+                        sngxml::dom::Element* nextElement = new sngxml::dom::Element(U"next");
+                        nextElement->SetAttribute(U"id", ToUtf32(std::to_string(endNodeId)));
+                        controlFlowGraphNodeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(nextElement));
+                    }
+                    controlFlowGraphElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(controlFlowGraphNodeElement));
+                }
+                functionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(controlFlowGraphElement));
                 compileUnitElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(functionElement));
             }
             projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(compileUnitElement));

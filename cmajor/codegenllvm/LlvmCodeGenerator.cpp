@@ -989,6 +989,19 @@ void LlvmCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatement
     }
 }
 
+void LlvmCodeGenerator::Visit(BoundInitializationStatement& boundInitializationStatement)
+{
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    SetTarget(&boundInitializationStatement);
+    boundInitializationStatement.InitializationExpression()->Accept(*this);
+    if (boundInitializationStatement.InitializationExpression()->HasValue())
+    {
+        emitter->Stack().Pop();
+    }
+}
+
 void LlvmCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
 {
     destructorCallGenerated = false;
@@ -1366,7 +1379,7 @@ void LlvmCodeGenerator::GenerateInitUnwindInfoFunction(BoundCompileUnit& boundCo
     emitter->SetCurrentDIBuilder(nullptr);
     bool prevDebugInfo = debugInfo;
     debugInfo = false;
-    emitter->SetCurrentLineNumber(0);
+    emitter->SetCurrentSourceSpan(0, 0, 0);
     handlerBlock = nullptr;
     cleanupBlock = nullptr;
     newCleanupNeeded = false;
@@ -1437,7 +1450,7 @@ void LlvmCodeGenerator::GenerateInitCompileUnitFunction(BoundCompileUnit& boundC
     bool prevDebugInfo = debugInfo;
     debugInfo = false;
     emitter->ResetCurrentDebugLocation();
-    emitter->SetCurrentLineNumber(0);
+    emitter->SetCurrentSourceSpan(0, 0, 0);
     handlerBlock = nullptr;
     cleanupBlock = nullptr;
     newCleanupNeeded = false;
@@ -1496,7 +1509,7 @@ void LlvmCodeGenerator::GenerateGlobalInitFuncion(BoundCompileUnit& boundCompile
     bool prevDebugInfo = debugInfo;
     debugInfo = false;
     emitter->ResetCurrentDebugLocation();
-    emitter->SetCurrentLineNumber(0);
+    emitter->SetCurrentSourceSpan(0, 0, 0);
     emitter->ResetCurrentDebugLocation();
     FunctionSymbol* globalInitFunctionSymbol = boundCompileUnit.GetGlobalInitializationFunctionSymbol();
     if (!globalInitFunctionSymbol)

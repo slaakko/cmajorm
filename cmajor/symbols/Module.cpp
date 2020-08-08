@@ -314,6 +314,26 @@ void FileTable::Dump(CodeFormatter& formatter)
     }
 }
 
+SourceFileCache::SourceFileCache()
+{
+}
+
+const std::u32string& SourceFileCache::GetFileContent(const std::string& filePath)
+{
+    auto it = fileContentMap.find(filePath);
+    if (it != fileContentMap.cend())
+    {
+        return *it->second;
+    }
+    else
+    {
+        std::unique_ptr<std::u32string> fileContent(new std::u32string(ToUtf32(ReadFile(filePath))));
+        std::u32string* str = fileContent.get();
+        fileContentMap[filePath] = std::move(fileContent);
+        return *str;
+    }
+}
+
 class ModuleMap
 {
 public:
@@ -1777,12 +1797,12 @@ void Module::WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Modu
             for (int32_t i = 0; i < numInstructionRecords; ++i)
             {
                 int32_t cppLineNumber;
-                int32_t sourceLineNumber;
+                cmajor::debug::SourceSpan span;
                 int32_t cppLineIndex;
                 int16_t scopeId;
                 int16_t flags;
-                cmajor::debug::ReadInstructionRecord(cudiReader, cppLineNumber, sourceLineNumber, cppLineIndex, scopeId, flags);
-                cmajor::debug::WriteInstructionRecord(cmdbWriter, cppLineNumber, sourceLineNumber, cppLineIndex, scopeId, flags);
+                cmajor::debug::ReadInstructionRecord(cudiReader, cppLineNumber, span, cppLineIndex, scopeId, flags);
+                cmajor::debug::WriteInstructionRecord(cmdbWriter, cppLineNumber, span, cppLineIndex, scopeId, flags);
             }
             int32_t numScopes;
             cmajor::debug::ReadNumberOfScopes(cudiReader, numScopes);
@@ -1799,6 +1819,27 @@ void Module::WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Modu
                     cmajor::debug::DIVariable variable(cmajor::debug::DIVariable::Kind::localVariable);
                     variable.Read(cudiReader);
                     variable.Write(cmdbWriter);
+                }
+            }
+            int32_t controlFlowGraphNodeCount;
+            cmajor::debug::ReadControlFlowGraphNodeCount(cudiReader, controlFlowGraphNodeCount);
+            cmajor::debug::WriteControlFlowGraphNodeCount(cmdbWriter, controlFlowGraphNodeCount);
+            for (int32_t i = 0; i < controlFlowGraphNodeCount; ++i)
+            {
+                int32_t nodeId;
+                cmajor::debug::SourceSpan span;
+                int32_t cppLineIndex;
+                int32_t cppLineNumber;
+                cmajor::debug::ReadControlFlowGraphNode(cudiReader, nodeId, span, cppLineIndex, cppLineNumber);
+                cmajor::debug::WriteControlFlowGraphNode(cmdbWriter, nodeId, span, cppLineIndex, cppLineNumber);
+                int32_t edgeCount;
+                cmajor::debug::ReadControlFlowGraphNodeEdgeCount(cudiReader, edgeCount);
+                cmajor::debug::WriteControlFlowGraphNodeEdgeCount(cmdbWriter, edgeCount);
+                for (int32_t i = 0; i < edgeCount; ++i)
+                {
+                    int32_t endNodeId;
+                    cmajor::debug::ReadControlFlowGraphNodeEdge(cudiReader, endNodeId);
+                    cmajor::debug::WriteControlFlowGraphNodeEdge(cmdbWriter, endNodeId);
                 }
             }
         }
@@ -1832,6 +1873,35 @@ void Module::WriteDebugInfo(BinaryWriter& cmdbWriter, int32_t& numProjects, Modu
         cmajor::debug::WriteType(cmdbWriter, diType.get());
     }
     ++numProjects;
+}
+
+cmajor::debug::SourceSpan Module::SpanToSourceSpan(const Span& span)
+{
+    if (!span.Valid()) return cmajor::debug::SourceSpan();
+    cmajor::debug::SourceSpan sourceSpan;
+    sourceSpan.line = span.line;
+    int16_t moduleId = sngcm::ast::GetModuleId(span.fileIndex);
+    int16_t fileId = sngcm::ast::GetFileId(span.fileIndex);
+    if (moduleId == 0)
+    {
+        CmajorLexer* lexer = lexers[fileId].get();
+        int32_t startCol = 0;
+        int32_t endCol = 0;
+        lexer->GetColumns(span, startCol, endCol);
+        sourceSpan.scol = static_cast<int16_t>(startCol);
+        sourceSpan.ecol = static_cast<int16_t>(endCol);
+    }
+    else
+    {
+        std::string filePath = GetFilePath(span.fileIndex);
+        const std::u32string& content = sourceFileCache.GetFileContent(filePath);
+        int32_t startCol = 0;
+        int32_t endCol = 0;
+        soulng::lexer::GetColumns(content.c_str(), content.c_str() + content.length(), span, startCol, endCol);
+        sourceSpan.scol = static_cast<int16_t>(startCol);
+        sourceSpan.ecol = static_cast<int16_t>(endCol);
+    }
+    return sourceSpan;
 }
 
 #ifdef _WIN32

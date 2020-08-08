@@ -41,6 +41,7 @@ public:
     void Visit(BoundConstructionStatement& boundConstructionStatement) override;
     void Visit(BoundAssignmentStatement& boundAssignmentStatement) override;
     void Visit(BoundExpressionStatement& boundExpressionStatement) override;
+    void Visit(BoundInitializationStatement& boundInitializationStatement) override;
     void Visit(BoundEmptyStatement& boundEmptyStatement) override;
     void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) override;
     void Visit(BoundThrowStatement& boundThrowStatement) override;
@@ -332,6 +333,14 @@ void ControlFlowAnalyzer::Visit(BoundExpressionStatement& boundExpressionStateme
     if (collectLabels)
     {
         CollectLabel(boundExpressionStatement);
+    }
+}
+
+void ControlFlowAnalyzer::Visit(BoundInitializationStatement& boundInitializationStatement)
+{
+    if (collectLabels)
+    {
+        CollectLabel(boundInitializationStatement);
     }
 }
 

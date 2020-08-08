@@ -63,7 +63,7 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     NativeModule nativeModule(emitter, intermediateFilePath);
     compileUnitId = boundCompileUnit.Id();
     emitter->SetCompileUnitId(compileUnitId);
-    emitter->SetCurrentLineNumber(0);
+    emitter->SetCurrentSourceSpan(0, 0, 0);
     generateLineNumbers = false;
     symbolTable = &boundCompileUnit.GetSymbolTable();
     module = &boundCompileUnit.GetModule();
@@ -202,12 +202,12 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     if (functionSymbol->HasSource())
     {
         generateLineNumbers = true;
-        emitter->SetCurrentLineNumber(boundFunction.Body()->GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundFunction.Body()->GetSpan().line, 0, 0);
     }
     else
     {
         generateLineNumbers = false;
-        emitter->SetCurrentLineNumber(0);
+        emitter->SetCurrentSourceSpan(0, 0, 0);
     }
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType, functionSymbol->DontThrow());
     if (functionSymbol->HasSource())
@@ -393,7 +393,7 @@ void SystemXCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundCompoundStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundCompoundStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -434,7 +434,7 @@ void SystemXCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundReturnStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundReturnStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -479,7 +479,7 @@ void SystemXCodeGenerator::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundGotoCaseStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundGotoCaseStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -504,7 +504,7 @@ void SystemXCodeGenerator::Visit(BoundGotoDefaultStatement& boundGotoDefaultStat
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundGotoDefaultStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundGotoDefaultStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -526,7 +526,7 @@ void SystemXCodeGenerator::Visit(BoundBreakStatement& boundBreakStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundBreakStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundBreakStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -547,7 +547,7 @@ void SystemXCodeGenerator::Visit(BoundContinueStatement& boundContinueStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundContinueStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundContinueStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -566,7 +566,7 @@ void SystemXCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundGotoStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundGotoStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -593,7 +593,7 @@ void SystemXCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundIfStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundIfStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -634,7 +634,7 @@ void SystemXCodeGenerator::Visit(BoundWhileStatement& boundWhileStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundWhileStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundWhileStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -675,7 +675,7 @@ void SystemXCodeGenerator::Visit(BoundDoStatement& boundDoStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundDoStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundDoStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -718,7 +718,7 @@ void SystemXCodeGenerator::Visit(BoundForStatement& boundForStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundForStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundForStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -766,7 +766,7 @@ void SystemXCodeGenerator::Visit(BoundSwitchStatement& boundSwitchStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundSwitchStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundSwitchStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -837,7 +837,7 @@ void SystemXCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundCaseStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundCaseStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -872,7 +872,7 @@ void SystemXCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundDefaultStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundDefaultStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -896,7 +896,7 @@ void SystemXCodeGenerator::Visit(BoundConstructionStatement& boundConstructionSt
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundConstructionStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundConstructionStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -943,7 +943,7 @@ void SystemXCodeGenerator::Visit(BoundAssignmentStatement& boundAssignmentStatem
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundAssignmentStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundAssignmentStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -956,7 +956,7 @@ void SystemXCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatem
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundExpressionStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundExpressionStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -969,11 +969,28 @@ void SystemXCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatem
     }
 }
 
+void SystemXCodeGenerator::Visit(BoundInitializationStatement& boundInitializationStatement)
+{
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentSourceSpan(boundInitializationStatement.GetSpan().line, 0, 0);
+    }
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    SetTarget(&boundInitializationStatement);
+    boundInitializationStatement.InitializationExpression()->Accept(*this);
+    if (boundInitializationStatement.InitializationExpression()->HasValue())
+    {
+        emitter->Stack().Pop();
+    }
+}
+
 void SystemXCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundEmptyStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundEmptyStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -1005,7 +1022,7 @@ void SystemXCodeGenerator::Visit(BoundThrowStatement& boundThrowStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundThrowStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundThrowStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -1018,7 +1035,7 @@ void SystemXCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundTryStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundTryStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -1069,7 +1086,7 @@ void SystemXCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
 {
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundCatchStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundCatchStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -1102,7 +1119,7 @@ void SystemXCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     // TODO???
     if (generateLineNumbers)
     {
-        emitter->SetCurrentLineNumber(boundRethrowStatement.GetSpan().line);
+        emitter->SetCurrentSourceSpan(boundRethrowStatement.GetSpan().line, 0, 0);
     }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;

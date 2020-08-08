@@ -333,6 +333,8 @@ public:
     virtual void EndScope() = 0;
     virtual int16_t GetCurrentScopeId() const = 0;
     virtual void SetCurrentScopeId(int16_t scopeId) = 0;
+    virtual int32_t AddControlFlowGraphNode() = 0;
+    virtual void AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId) = 0;
     virtual void AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject) = 0;
     virtual void BeginInstructionFlag(int16_t flag) = 0;
     virtual void EndInstructionFlag(int16_t flag) = 0;
@@ -372,7 +374,7 @@ public:
     virtual void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) = 0;
     virtual void SetFunctionMdId(void* function, int mdId) = 0;
     virtual void* GetMDStructRefForSourceFile(const std::string& sourceFileName) = 0;
-    virtual void SetCurrentLineNumber(int currentLineNumber) = 0;
+    virtual void SetCurrentSourceSpan(int32_t lineNumber, int16_t scol, int16_t ecol) = 0;
     virtual void SetMetadataRef(void* inst, void* mdStructRef) = 0;
     virtual void FinalizeFunction(void* function, bool hasCleanup) = 0;
     virtual int Install(const std::string& str) = 0;

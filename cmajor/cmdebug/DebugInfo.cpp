@@ -7,6 +7,7 @@
 #include <cmajor/cmdebug/DebugInfoIo.hpp>
 #include <cmajor/cmdebug/DIVariable.hpp>
 #include <cmajor/cmdebug/DIType.hpp>
+#include <soulng/util/Ansi.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -20,6 +21,19 @@ namespace cmajor { namespace debug {
 
 using namespace soulng::util;
 using namespace soulng::unicode;
+
+std::string SourceSpan::ToString() const
+{
+    std::string s = std::to_string(line);
+    if (line != 0)
+    {
+        if (scol != 0 && ecol != 0)
+        {
+            s.append(1, ':').append(std::to_string(scol)).append(1, ':').append(std::to_string(ecol));
+        }
+    }
+    return s;
+}
 
 Frame::Frame() : level(0), func(), file(), line(0)
 {
@@ -61,7 +75,7 @@ std::unique_ptr<JsonValue> Frame::ToJson(bool includeLevel) const
     return std::unique_ptr<JsonValue>(jsonObject);
 }
 
-InstructionLocation::InstructionLocation() : sourceLineNumber(0), projectIndex(-1), compileUnitIndex(-1), cppLineNumber(-1)
+InstructionLocation::InstructionLocation() : span(), projectIndex(-1), compileUnitIndex(-1), cppLineNumber(-1)
 {
 }
 
@@ -111,9 +125,9 @@ std::string InstructionFlagsStr(InstructionFlags flags)
     return s;
 }
 
-Instruction::Instruction(CompileUnitFunction* compileUnitFunction_, int32_t cppLineNumber_, int32_t sourceLineNumber_, int32_t cppLineIndex_,
+Instruction::Instruction(CompileUnitFunction* compileUnitFunction_, int32_t cppLineNumber_, const SourceSpan& span_, int32_t cppLineIndex_,
     int16_t scopeId_, InstructionFlags flags_) :
-    compileUnitFunction(compileUnitFunction_), cppLineNumber(cppLineNumber_), sourceLineNumber(sourceLineNumber_), cppLineIndex(cppLineIndex_), scopeId(scopeId_),
+    compileUnitFunction(compileUnitFunction_), cppLineNumber(cppLineNumber_), span(span_), cppLineIndex(cppLineIndex_), scopeId(scopeId_),
     flags(flags_), next(nullptr)
 {
 }
@@ -130,14 +144,14 @@ Frame Instruction::GetCmajorFrame() const
     frame.func = function->FullName();
     const SourceFile& sourceFile = compileUnitFunction->GetSourceFile();
     frame.file = sourceFile.FilePath();
-    frame.line = sourceLineNumber;
+    frame.line = span.line;
     return frame;
 }
 
 void Instruction::PrintSource(CodeFormatter& formatter)
 {
     SourceFile& sourceFile = compileUnitFunction->GetSourceFile();
-    sourceFile.Print(formatter, sourceLineNumber, this, true);
+    sourceFile.Print(formatter, span.line, this, true);
 }
 
 std::string Instruction::GetExplicitCppLocationArgs() const
@@ -173,6 +187,53 @@ Scope* Instruction::GetScope() const
 
 Scope::~Scope()
 {
+}
+
+ControlFlowGraphNode::ControlFlowGraphNode(int32_t nodeId_, const SourceSpan& span_, int32_t cppLineIndex_, int32_t cppLineNumber_) :
+    nodeId(nodeId_), span(span_), cppLineIndex(cppLineIndex_), cppLineNumber(cppLineNumber_), inst(nullptr)
+{
+}
+
+void ControlFlowGraphNode::AddNext(int32_t next)
+{
+    nextSet.insert(next);
+}
+
+ControlFlowGraph::ControlFlowGraph()
+{
+}
+
+void ControlFlowGraph::AddNode(ControlFlowGraphNode* node)
+{
+    nodeIdMap[node->NodeId()] = node;
+    cppLineNodeMap[node->CppLineNumber()] = node;
+    nodes.push_back(std::unique_ptr<ControlFlowGraphNode>(node));
+}
+
+ControlFlowGraphNode* ControlFlowGraph::GetNodeById(int32_t nodeId) const
+{
+    auto it = nodeIdMap.find(nodeId);
+    if (it != nodeIdMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+ControlFlowGraphNode* ControlFlowGraph::GetNodeByCppLineNumber(int32_t cppLineNumber) const
+{
+    auto it = cppLineNodeMap.find(cppLineNumber);
+    if (it != cppLineNodeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 FunctionScope::FunctionScope(CompileUnitFunction* compileUnitFunction_, int16_t id_, int16_t parentScopeId_) :
@@ -598,7 +659,7 @@ void SourceFile::Print(CodeFormatter& formatter, int lineNumber, Instruction* cu
     int currentInstructionLineNumber = -1;
     if (currentInstruction)
     {
-        currentInstructionLineNumber = currentInstruction->SourceLineNumber();
+        currentInstructionLineNumber = currentInstruction->GetSourceSpan().line;
     }
     int windowSize = debugInfo->GetSourceFileWindowSize();
     int startLineNumber = lineNumber - windowSize;
@@ -618,12 +679,25 @@ void SourceFile::Print(CodeFormatter& formatter, int lineNumber, Instruction* cu
             if (sourceFileMatch && i == currentInstructionLineNumber)
             {
                 formatter.Write("> ");
+                SourceSpan span = currentInstruction->GetSourceSpan();
+                if (span.scol != 0 && span.ecol != 0)
+                {
+                    formatter.Write(line.substr(0, span.scol - 1));
+                    formatter.Write(fgWhite);
+                    formatter.Write(line.substr(span.scol - 1, span.ecol - span.scol));
+                    formatter.Write(reset);
+                    formatter.WriteLine(line.substr(span.ecol - 1));
+                }
+                else
+                {
+                    formatter.WriteLine(line);
+                }
             }
             else
             {
                 formatter.Write("  ");
+                formatter.WriteLine(line);
             }
-            formatter.WriteLine(line);
         }
     }
     if (endLineNumber >= lines.size())
@@ -655,7 +729,7 @@ SourceLineMap::SourceLineMap(DebugInfo* debugInfo_) : debugInfo(debugInfo_)
 
 void SourceLineMap::AddInstructionLocation(const InstructionLocation& location)
 {
-    std::vector<InstructionLocation>& locations = sourceLineLocationsMap[location.sourceLineNumber];
+    std::vector<InstructionLocation>& locations = sourceLineLocationsMap[location.span.line];
     locations.push_back(location);
 }
 
@@ -1031,12 +1105,12 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
                 for (int32_t i = 0; i < numInstructionRecords; ++i)
                 {
                     int32_t cppLineNumber;
-                    int32_t sourceLineNumber;
+                    SourceSpan span;
                     int32_t cppLineIndex;
                     int16_t scopeId;
                     int16_t flags;
-                    ReadInstructionRecord(reader, cppLineNumber, sourceLineNumber, cppLineIndex, scopeId, flags);
-                    std::unique_ptr<Instruction> instruction(new Instruction(compileUnitFunction.get(), cppLineNumber, sourceLineNumber, cppLineIndex, scopeId,
+                    ReadInstructionRecord(reader, cppLineNumber, span, cppLineIndex, scopeId, flags);
+                    std::unique_ptr<Instruction> instruction(new Instruction(compileUnitFunction.get(), cppLineNumber, span, cppLineIndex, scopeId,
                         static_cast<InstructionFlags>(flags)));
                     if (prev)
                     {
@@ -1048,7 +1122,7 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
                     if (cppLineIndex == 0)
                     {
                         InstructionLocation location;
-                        location.sourceLineNumber = sourceLineNumber;
+                        location.span = span;
                         location.projectIndex = projectIndex;
                         location.compileUnitIndex = compileUnitIndex;
                         location.cppLineNumber = cppLineNumber;
@@ -1072,6 +1146,26 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
                         localVariable->SetProject(project.get());
                     }
                     compileUnitFunction->AddScope(scope.release());
+                }
+                int32_t controlFlowGraphNodeCount;
+                ReadControlFlowGraphNodeCount(reader, controlFlowGraphNodeCount);
+                for (int32_t i = 0; i < controlFlowGraphNodeCount; ++i)
+                {
+                    int32_t nodeId;
+                    SourceSpan span;
+                    int32_t cppLineIndex;
+                    int32_t cppLineNumber;
+                    ReadControlFlowGraphNode(reader, nodeId, span, cppLineIndex, cppLineNumber);
+                    std::unique_ptr<ControlFlowGraphNode> node(new ControlFlowGraphNode(nodeId, span, cppLineIndex, cppLineNumber));
+                    int32_t edgeCount;
+                    ReadControlFlowGraphNodeEdgeCount(reader, edgeCount);
+                    for (int32_t i = 0; i < edgeCount; ++i)
+                    {
+                        int32_t endNodeId;
+                        ReadControlFlowGraphNodeEdge(reader, endNodeId);
+                        node->AddNext(endNodeId);
+                    }
+                    compileUnitFunction->GetControlFlowGraph().AddNode(node.release());
                 }
                 compileUnit->AddCompileUnitFunction(compileUnitFunction.release());
             }

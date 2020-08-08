@@ -695,7 +695,7 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
     Assert(symbol->GetSymbolType() == SymbolType::declarationBlock, "declaration block expected");
     DeclarationBlock* declarationBlock = static_cast<DeclarationBlock*>(symbol);
     containerScope = declarationBlock->GetContainerScope();
-    std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(module, compoundStatementNode.GetSpan(), compoundStatementNode.EndBraceSpan()));
+    std::unique_ptr<BoundCompoundStatement> boundCompoundStatement(new BoundCompoundStatement(module, compoundStatementNode.BeginBraceSpan(), compoundStatementNode.EndBraceSpan()));
     if (compoundLevel == 0)
     {
         if (GetGlobalFlag(GlobalFlags::profile))
@@ -748,7 +748,7 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
         {
             if (currentClass->GetClassTypeSymbol()->StaticConstructor())
             {
-                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::unique_ptr<BoundExpression>(
+                boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundInitializationStatement(module, std::unique_ptr<BoundExpression>(
                     new BoundFunctionCall(module, boundCompoundStatement->GetSpan(), currentClass->GetClassTypeSymbol()->StaticConstructor())))));
             }
         }
@@ -811,7 +811,7 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             classReturnArgs.push_back(std::move(expression));
             std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, classReturnLookups, classReturnArgs, boundCompileUnit, currentFunction,
                 returnStatementNode.GetSpan());
-            std::unique_ptr<BoundStatement> constructStatement(new BoundExpressionStatement(module, std::move(constructorCall)));
+            std::unique_ptr<BoundStatement> constructStatement(new BoundInitializationStatement(module, std::move(constructorCall)));
             AddStatement(constructStatement.release());
             std::unique_ptr<BoundFunctionCall> returnFunctionCall;
             std::unique_ptr<BoundStatement> returnStatement(new BoundReturnStatement(module, std::move(returnFunctionCall), returnStatementNode.GetSpan()));
@@ -1228,7 +1228,7 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
             }
         }
     }
-    BoundConstructionStatement* boundConstructionStatement = new BoundConstructionStatement(module, std::move(constructorCall));
+    BoundConstructionStatement* boundConstructionStatement = new BoundConstructionStatement(module, std::move(constructorCall), constructionStatementNode.GetSpan());
     boundConstructionStatement->SetLocalVariable(localVariableSymbol);
     AddStatement(boundConstructionStatement);
 }
@@ -1250,9 +1250,9 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
             lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> arguments;
             arguments.push_back(std::move(std::unique_ptr<BoundExpression>(ptr->Clone())));
-            std::unique_ptr<BoundFunctionCall> disposeCall = ResolveOverload(U"RtDispose", containerScope, lookups, arguments, boundCompileUnit, currentFunction, deleteStatementNode.GetSpan());
+            std::unique_ptr<BoundFunctionCall> disposeCall = ResolveOverload(U"RtDispose", containerScope, lookups, arguments, boundCompileUnit, currentFunction, Span());
             CheckAccess(currentFunction->GetFunctionSymbol(), disposeCall->GetFunctionSymbol());
-            AddStatement(new BoundExpressionStatement(module, std::move(disposeCall)));
+            AddStatement(new BoundExpressionStatement(module, std::move(disposeCall), Span()));
         }
     }
     std::unique_ptr<BoundExpression> memFreePtr;
@@ -1267,13 +1267,13 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
         lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
         std::vector<std::unique_ptr<BoundExpression>> arguments;
         arguments.push_back(std::move(ptr));
-        std::unique_ptr<BoundFunctionCall> destructorCall = ResolveOverload(U"@destructor", containerScope, lookups, arguments, boundCompileUnit, currentFunction, deleteStatementNode.GetSpan());
+        std::unique_ptr<BoundFunctionCall> destructorCall = ResolveOverload(U"@destructor", containerScope, lookups, arguments, boundCompileUnit, currentFunction, Span());
         CheckAccess(currentFunction->GetFunctionSymbol(), destructorCall->GetFunctionSymbol());
         if (destructorCall->GetFunctionSymbol()->IsVirtualAbstractOrOverride())
         {
             destructorCall->SetFlag(BoundExpressionFlags::virtualCall);
         }
-        AddStatement(new BoundExpressionStatement(module, std::move(destructorCall)));
+        AddStatement(new BoundExpressionStatement(module, std::move(destructorCall), Span()));
         memFreePtr = BindExpression(deleteStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this);
         if (insideCatch && memFreePtr->ContainsExceptionCapture())
         {
@@ -1298,13 +1298,13 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
     {
         memFreeFunctionName = U"MemFree";
     }
-    std::unique_ptr<BoundFunctionCall> memFreeCall = ResolveOverload(memFreeFunctionName, containerScope, lookups, arguments, boundCompileUnit, currentFunction, deleteStatementNode.GetSpan());
+    std::unique_ptr<BoundFunctionCall> memFreeCall = ResolveOverload(memFreeFunctionName, containerScope, lookups, arguments, boundCompileUnit, currentFunction, Span());
     CheckAccess(currentFunction->GetFunctionSymbol(), memFreeCall->GetFunctionSymbol());
     if (exceptionCapture)
     {
         AddReleaseExceptionStatement(deleteStatementNode.GetSpan());
     }
-    AddStatement(new BoundExpressionStatement(module, std::move(memFreeCall)));
+    AddStatement(new BoundExpressionStatement(module, std::move(memFreeCall), deleteStatementNode.GetSpan()));
 }
 
 void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
@@ -1340,7 +1340,7 @@ void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
         {
             AddReleaseExceptionStatement(destroyStatementNode.GetSpan());
         }
-        AddStatement(new BoundExpressionStatement(module, std::move(destructorCall)));
+        AddStatement(new BoundExpressionStatement(module, std::move(destructorCall), destroyStatementNode.GetSpan()));
     }
     else
     {
@@ -1395,7 +1395,7 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
     {
         AddReleaseExceptionStatement(assignmentStatementNode.GetSpan());
     }
-    AddStatement(new BoundAssignmentStatement(module, std::move(assignmentCall)));
+    AddStatement(new BoundAssignmentStatement(module, std::move(assignmentCall), assignmentStatementNode.GetSpan()));
 }
 
 void StatementBinder::Visit(ExpressionStatementNode& expressionStatementNode)
@@ -1410,7 +1410,7 @@ void StatementBinder::Visit(ExpressionStatementNode& expressionStatementNode)
     {
         AddReleaseExceptionStatement(expressionStatementNode.GetSpan());
     }
-    AddStatement(new BoundExpressionStatement(module, std::move(expression)));
+    AddStatement(new BoundExpressionStatement(module, std::move(expression), expressionStatementNode.GetSpan()));
 }
 
 void StatementBinder::Visit(EmptyStatementNode& emptyStatementNode)
@@ -1902,9 +1902,9 @@ void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
                 failAssertionFunctionName = U"System.FailAssertion";
             }
             std::unique_ptr<BoundStatement> ifStatement(new BoundIfStatement(module, assertStatementNode.GetSpan(), std::move(assertExpression),
-                std::unique_ptr<BoundStatement>(new BoundEmptyStatement(module, assertStatementNode.GetSpan())),
-                std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, ResolveOverload(failAssertionFunctionName, containerScope, lookups, arguments, boundCompileUnit, currentFunction,
-                    assertStatementNode.GetSpan())))));
+                std::unique_ptr<BoundStatement>(new BoundEmptyStatement(module, Span())),
+                std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, ResolveOverload(failAssertionFunctionName, containerScope, lookups, arguments,
+                    boundCompileUnit, currentFunction, assertStatementNode.GetSpan()), Span()))));
             AddStatement(ifStatement.release());
         }
     }

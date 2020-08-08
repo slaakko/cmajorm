@@ -145,22 +145,76 @@ void ReadNumberOfInstructionRecords(BinaryReader& reader, int32_t& numInstructio
     numInstructionRecords = reader.ReadInt();
 }
 
-void WriteInstructionRecord(BinaryWriter& writer, int32_t cppLineNumber, int32_t sourceLineNumber, int32_t cppLineIndex, int16_t scopeId, int16_t flags)
+void WriteInstructionRecord(BinaryWriter& writer, int32_t cppLineNumber, const SourceSpan& span, int32_t cppLineIndex, int16_t scopeId, int16_t flags)
 {
     writer.Write(cppLineNumber);
-    writer.Write(sourceLineNumber);
+    writer.Write(span.line);
+    writer.Write(span.scol);
+    writer.Write(span.ecol);
     writer.Write(cppLineIndex);
     writer.Write(scopeId);
     writer.Write(flags);
 }
 
-void ReadInstructionRecord(BinaryReader& reader, int32_t& cppLineNumber, int32_t& sourceLineNumber, int32_t& cppLineIndex, int16_t& scopeId, int16_t& flags)
+void ReadInstructionRecord(BinaryReader& reader, int32_t& cppLineNumber, SourceSpan& span, int32_t& cppLineIndex, int16_t& scopeId, int16_t& flags)
 {
     cppLineNumber = reader.ReadInt();
-    sourceLineNumber = reader.ReadInt();
+    span.line = reader.ReadInt();
+    span.scol = reader.ReadShort();
+    span.ecol = reader.ReadShort();
     cppLineIndex = reader.ReadInt();
     scopeId = reader.ReadShort();
     flags = reader.ReadShort();
+}
+
+void WriteControlFlowGraphNodeCount(BinaryWriter& writer, int32_t nodeCount)
+{
+    writer.Write(nodeCount);
+}
+
+void ReadControlFlowGraphNodeCount(BinaryReader& reader, int32_t& nodeCount)
+{
+    nodeCount = reader.ReadInt();
+}
+
+void WriteControlFlowGraphNode(BinaryWriter& writer, int32_t nodeId, const SourceSpan& span, int32_t cppLineIndex, int32_t cppLineNumber)
+{
+    writer.Write(nodeId);
+    writer.Write(span.line);
+    writer.Write(span.scol);
+    writer.Write(span.ecol);
+    writer.Write(cppLineIndex);
+    writer.Write(cppLineNumber);
+}
+
+void ReadControlFlowGraphNode(BinaryReader& reader, int32_t& nodeId, SourceSpan& span, int32_t& cppLineIndex, int32_t& cppLineNumber)
+{
+    nodeId = reader.ReadInt();
+    span.line = reader.ReadInt();
+    span.scol = reader.ReadShort();
+    span.ecol = reader.ReadShort();
+    cppLineIndex = reader.ReadInt();
+    cppLineNumber = reader.ReadInt();
+}
+
+void WriteControlFlowGraphNodeEdgeCount(BinaryWriter& writer, int32_t edgeCount)
+{
+    writer.Write(edgeCount);
+}
+
+void ReadControlFlowGraphNodeEdgeCount(BinaryReader& reader, int32_t& edgeCount)
+{
+    edgeCount = reader.ReadInt();
+}
+
+void WriteControlFlowGraphNodeEdge(BinaryWriter& writer, int32_t endNodeId)
+{
+    writer.Write(endNodeId);
+}
+
+void ReadControlFlowGraphNodeEdge(BinaryReader& reader, int32_t& endNodeId)
+{
+    endNodeId = reader.ReadInt();
 }
 
 void WriteNumberOfScopes(BinaryWriter& writer, int32_t numScopes)

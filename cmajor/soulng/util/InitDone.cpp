@@ -4,6 +4,7 @@
 // =================================
 
 #include <soulng/util/InitDone.hpp>
+#include <soulng/util/Ansi.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Socket.hpp>
 
@@ -13,10 +14,12 @@ void Init()
 {
     soulng::unicode::UnicodeInit();
     soulng::util::InitSocket();
+    soulng::util::AnsiInit();
 }
 
 void Done()
 {
+    soulng::util::AnsiDone();
     soulng::util::DoneSocket();
     soulng::unicode::UnicodeDone();
 }
