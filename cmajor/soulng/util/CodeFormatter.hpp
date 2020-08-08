@@ -8,6 +8,7 @@
 #include <soulng/util/UtilApi.hpp>
 #include <ostream>
 #include <string>
+#include <stdint.h>
 
 namespace soulng { namespace util {
 
@@ -23,6 +24,7 @@ public:
     void WriteLine(const std::string& text);
     void NewLine();
     void WriteLine() { NewLine(); }
+    void Flush();
     void IncIndent()
     {
         ++indent;
@@ -43,6 +45,9 @@ public:
     void SetLogging() { logging = true; }
     void BeginContent() { ++contentCount; }
     void EndContent() { --contentCount; }
+    typedef std::basic_ostream<char, std::char_traits<char>> CoutType;
+    typedef CoutType& (*StandardEndLine)(CoutType&);
+    CodeFormatter& operator<<(StandardEndLine manip);
 private:
     std::ostream& stream;
     int indent;
@@ -55,6 +60,14 @@ private:
     int contentCount;
     bool logging;
 };
+
+UTIL_API CodeFormatter& operator<<(CodeFormatter& f, const std::string& s);
+UTIL_API CodeFormatter& operator<<(CodeFormatter& f, char c);
+UTIL_API CodeFormatter& operator<<(CodeFormatter& f, bool b);
+UTIL_API CodeFormatter& operator<<(CodeFormatter& f, int x);
+UTIL_API CodeFormatter& operator<<(CodeFormatter& f, double x);
+UTIL_API CodeFormatter& operator<<(CodeFormatter& f, int64_t x);
+UTIL_API CodeFormatter& operator<<(CodeFormatter& f, uint64_t x);
 
 UTIL_API void WriteUtf8(std::ostream& s, const std::string& str);
 UTIL_API bool IsHandleRedirected(int handle);

@@ -12,7 +12,6 @@
 #ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
-#include <Windows.h>
 #else
 #include <unistd.h>
 #endif 
@@ -20,31 +19,6 @@
 namespace soulng { namespace util {
 
 #ifdef _WIN32
-
-WORD prevAttr = 0;
-
-void SetColorAttribute()
-{
-    HANDLE consoleOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO info;
-    if (GetConsoleScreenBufferInfo(consoleOutHandle, &info))
-    {
-        prevAttr = info.wAttributes;
-    }
-    if (!SetConsoleTextAttribute(consoleOutHandle, FOREGROUND_INTENSITY | FOREGROUND_RED))
-    {
-        int x = 0;
-    }
-}
-
-void ResetColorAttribute()
-{
-    HANDLE consoleOutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (!SetConsoleTextAttribute(consoleOutHandle, prevAttr))
-    {
-        int x = 0;
-    }
-}
 
 void SetStdHandlesToUtf16Mode()
 {
@@ -97,14 +71,20 @@ void WriteUtf8(std::ostream& s, const std::string& str)
     if (&s == &std::cout && !IsHandleRedirected(1))
     {
         std::string ps = AnsiIntercept(1, str);
-        std::u16string utf16Str = soulng::unicode::ToUtf16(ps);
-        WriteUtf16StrToStdOutOrStdErr(utf16Str, stdout);
+        if (!ps.empty())
+        {
+            std::u16string utf16Str = soulng::unicode::ToUtf16(ps);
+            WriteUtf16StrToStdOutOrStdErr(utf16Str, stdout);
+        }
     }
     else if (&s == &std::cerr && !IsHandleRedirected(2))
     {
         std::string ps = AnsiIntercept(2, str);
-        std::u16string utf16Str = soulng::unicode::ToUtf16(ps);
-        WriteUtf16StrToStdOutOrStdErr(utf16Str, stderr);
+        if (!ps.empty())
+        {
+            std::u16string utf16Str = soulng::unicode::ToUtf16(ps);
+            WriteUtf16StrToStdOutOrStdErr(utf16Str, stderr);
+        }
     }
     else
     {
@@ -157,6 +137,67 @@ void CodeFormatter::NewLine()
     stream << "\n";
     atBeginningOfLine = true;
     ++line;
+}
+
+void CodeFormatter::Flush()
+{
+    stream.flush();
+}
+
+CodeFormatter& CodeFormatter::operator<<(StandardEndLine manip)
+{
+    WriteLine();
+    Flush();
+    return *this;
+}
+
+CodeFormatter& operator<<(CodeFormatter& f, const std::string& s)
+{
+    f.Write(s);
+    return f;
+}
+
+CodeFormatter& operator<<(CodeFormatter& f, char c)
+{
+    f.Write(std::string(1, c));
+    return f;
+}
+
+CodeFormatter& operator<<(CodeFormatter& f, bool b)
+{
+    if (b)
+    {
+        f.Write("true");
+    }
+    else
+    {
+        f.Write("false");
+    }
+    return f;
+}
+
+CodeFormatter& operator<<(CodeFormatter& f, int x)
+{
+    f.Write(std::to_string(x));
+    return f;
+}
+
+CodeFormatter& operator<<(CodeFormatter& f, double x)
+{
+    f.Write(std::to_string(x));
+    return f;
+}
+
+CodeFormatter& operator<<(CodeFormatter& f, int64_t x)
+{
+    f.Write(std::to_string(x));
+    return f;
+}
+
+CodeFormatter& operator<<(CodeFormatter& f, uint64_t x)
+{
+    f.Write(std::to_string(x));
+    return f;
 }
 
 } } // namespace soulng::util

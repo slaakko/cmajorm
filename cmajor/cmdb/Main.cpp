@@ -48,17 +48,7 @@ void PrintHelp()
 
 int main(int argc, const char** argv)
 {
-/*
-#ifdef _WIN32
-    HANDLE consoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (!SetConsoleMode(consoleOut, ENABLE_VIRTUAL_TERMINAL_PROCESSING))
-    {
-        std::cout << "could not set console mode" << std::endl;
-    }
-#endif
-*/
     std::cout << "Cmajor debugger version " << version << std::endl;
-    InitDone initDone;
     try
     {
         bool verbose = false;

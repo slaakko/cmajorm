@@ -12,73 +12,6 @@
 
 namespace soulng { namespace util {
 
-enum class Color 
-{
-    none, black, red, green, yellow, blue, magenta, cyan, white
-};
-
-enum class Intensity
-{
-    none, dark, bright
-};
-
-enum class ForeBack
-{
-    none, foreground, background
-};
-
-enum class ConsoleColor : uint8_t
-{
-    black = 0u, darkBlue = 1u, darkGreen = 2u, darkCyan = 3u, darkRed = 4u, darkYellow = 6u, gray = 7u,
-    darkGray = 8u, blue = 9u, green = 10u, cyan = 11u, red = 12u, magenta = 13u, yellow = 14u, white = 15u
-};
-
-struct Attributes
-{
-    Attributes() : color(Color::none), intensity(Intensity::none), foreback(ForeBack::none) {}
-    Attributes(Color color_, Intensity intensity_, ForeBack foreback_) : color(color_), intensity(intensity_), foreback(foreback_) {}
-    Color color;
-    Intensity intensity;
-    ForeBack foreback;
-};
-
-ConsoleColor ToConsoleColor(Color color, Intensity intensity)
-{
-    switch (intensity)
-    {
-        case Intensity::dark:
-        {
-            switch (color)
-            {
-                case Color::black: return ConsoleColor::black;
-                case Color::red: return ConsoleColor::darkRed;
-                case Color::green: return ConsoleColor::darkGreen;
-                case Color::yellow: return ConsoleColor::darkYellow;
-                case Color::blue: return ConsoleColor::darkBlue;
-                case Color::magenta: return ConsoleColor::magenta;
-                case Color::cyan: return ConsoleColor::darkCyan;
-                case Color::white: return ConsoleColor::gray;
-            }
-            break;
-        }
-        case Intensity::bright:
-        {
-            switch (color)
-            {
-                case Color::black: return ConsoleColor::darkGray;
-                case Color::red: return ConsoleColor::red;
-                case Color::green: return ConsoleColor::green;
-                case Color::yellow: return ConsoleColor::yellow;
-                case Color::blue: return ConsoleColor::blue;
-                case Color::magenta: return ConsoleColor::magenta;
-                case Color::cyan: return ConsoleColor::cyan;
-                case Color::white: return ConsoleColor::white;
-            }
-        }
-    }
-    return ConsoleColor::gray;
-}
-
 const std::string fgBlack = "\033[30m";
 const std::string fgDarkRed = "\033[31m";
 const std::string fgDarkGreen = "\033[32m";
@@ -114,6 +47,73 @@ const std::string bgWhite = "\033[107m";
 const std::string reset = "\033[0m";
 
 #ifdef _WIN32
+
+enum class Color
+{
+    none, black, red, green, yellow, blue, magenta, cyan, white
+};
+
+enum class Intensity
+{
+    none, dark, bright
+};
+
+enum class ForeBack
+{
+    none, foreground, background
+};
+
+enum class ConsoleColor : uint8_t
+{
+    black = 0u, darkBlue = 1u, darkGreen = 2u, darkCyan = 3u, darkRed = 4u, darkYellow = 6u, gray = 7u,
+    darkGray = 8u, blue = 9u, green = 10u, cyan = 11u, red = 12u, magenta = 13u, yellow = 14u, white = 15u
+};
+
+struct Attributes
+{
+    Attributes() : color(Color::none), intensity(Intensity::none), foreback(ForeBack::none) {}
+    Attributes(Color color_, Intensity intensity_, ForeBack foreback_) : color(color_), intensity(intensity_), foreback(foreback_) {}
+    Color color;
+    Intensity intensity;
+    ForeBack foreback;
+};
+
+ConsoleColor ToConsoleColor(Color color, Intensity intensity)
+{
+    switch (intensity)
+    {
+    case Intensity::dark:
+    {
+        switch (color)
+        {
+        case Color::black: return ConsoleColor::black;
+        case Color::red: return ConsoleColor::darkRed;
+        case Color::green: return ConsoleColor::darkGreen;
+        case Color::yellow: return ConsoleColor::darkYellow;
+        case Color::blue: return ConsoleColor::darkBlue;
+        case Color::magenta: return ConsoleColor::magenta;
+        case Color::cyan: return ConsoleColor::darkCyan;
+        case Color::white: return ConsoleColor::gray;
+        }
+        break;
+    }
+    case Intensity::bright:
+    {
+        switch (color)
+        {
+        case Color::black: return ConsoleColor::darkGray;
+        case Color::red: return ConsoleColor::red;
+        case Color::green: return ConsoleColor::green;
+        case Color::yellow: return ConsoleColor::yellow;
+        case Color::blue: return ConsoleColor::blue;
+        case Color::magenta: return ConsoleColor::magenta;
+        case Color::cyan: return ConsoleColor::cyan;
+        case Color::white: return ConsoleColor::white;
+        }
+    }
+    }
+    return ConsoleColor::gray;
+}
 
 class AnsiEngine
 {
@@ -946,12 +946,16 @@ void AnsiEngine::Put(char c)
 
 void AnsiInit()
 {
+#ifdef _WIN32
     AnsiEngine::Init();
+#endif
 }
 
 void AnsiDone()
 {
+#ifdef _WIN32
     AnsiEngine::Done();
+#endif
 }
 
 } } // namespace soulng::util
