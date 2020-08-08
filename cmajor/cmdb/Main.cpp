@@ -48,6 +48,7 @@ void PrintHelp()
 
 int main(int argc, const char** argv)
 {
+    InitDone initDone;
     std::cout << "Cmajor debugger version " << version << std::endl;
     try
     {
