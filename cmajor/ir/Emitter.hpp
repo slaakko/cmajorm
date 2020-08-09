@@ -334,6 +334,7 @@ public:
     virtual int16_t GetCurrentScopeId() const = 0;
     virtual void SetCurrentScopeId(int16_t scopeId) = 0;
     virtual int32_t AddControlFlowGraphNode() = 0;
+    virtual void SetCurrentControlFlowGraphNodeId(int32_t controlFlowGraphNodeId) = 0;
     virtual void AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId) = 0;
     virtual void AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject) = 0;
     virtual void BeginInstructionFlag(int16_t flag) = 0;

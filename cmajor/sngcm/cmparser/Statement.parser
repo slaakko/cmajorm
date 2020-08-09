@@ -77,13 +77,14 @@ parser api(SNGCM_PARSER_API) StatementParser
         ::= RETURN{ s = span; } Expression(ctx):expr? SEMICOLON!{ s.end = span.end; return new ReturnStatementNode(s, expr); }
         ;
 
-    IfStatement(ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span elseSpan) : IfStatementNode*
+    IfStatement(ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span elseSpan, var std::unique_ptr<Node> condNode) : IfStatementNode*
         ::=
-        (   IF{ s = span; } LPAREN{ leftParenSpan = span; } Expression(ctx):cond RPAREN{ rightParenSpan = span; } Statement(ctx):thenS{ s.end = span.end; }
-            (ELSE{ elseSpan = span; } Statement(ctx):elseS{ s.end = span.end; })?
+        (   IF{ s = span; } LPAREN{ leftParenSpan = span; } Expression(ctx):cond{ condNode.reset(cond); s.end = condNode->GetSpan().end; }
+            RPAREN{ rightParenSpan = span; s.end = span.end; }
+            Statement(ctx):thenS (ELSE{ elseSpan = span; } Statement(ctx):elseS)?
         )
         {
-            IfStatementNode* value = new IfStatementNode(s, cond, thenS, elseS);
+            IfStatementNode* value = new IfStatementNode(s, condNode.release(), thenS, elseS);
             value->SetLeftParenSpan(leftParenSpan);
             value->SetRightParenSpan(rightParenSpan);
             value->SetElseSpan(elseSpan);
@@ -133,9 +134,22 @@ parser api(SNGCM_PARSER_API) StatementParser
         ;
 
     ForLoopStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> exprNode) : StatementNode*
-        ::= AssignmentStatementExpr(ctx):assignmentStatementExpr{ return assignmentStatementExpr; }
-        |   Expression(ctx):expr{ exprNode.reset(expr); Span s = exprNode->GetSpan(); return new ExpressionStatementNode(s, exprNode.release()); }
-        |   empty{ return new EmptyStatementNode(span); }
+        ::= AssignmentStatementExpr(ctx):assignmentStatementExpr
+        {
+            return assignmentStatementExpr;
+        }
+        |   Expression(ctx):expr
+        {
+            exprNode.reset(expr);
+            Span s = exprNode->GetSpan();
+            ExpressionStatementNode* expressionStatementNode = new ExpressionStatementNode(s, exprNode.release());
+            return expressionStatementNode;
+        }
+        |   empty
+        {
+            EmptyStatementNode* emptyStatementNode = new EmptyStatementNode(span);
+            return emptyStatementNode;
+        }
         ;
 
     RangeForStatement(ParsingContext* ctx, var Span s, var Span leftParenSpan, var Span rightParenSpan, var Span colonSpan) : RangeForStatementNode*
@@ -210,7 +224,7 @@ parser api(SNGCM_PARSER_API) StatementParser
 
     AssignmentStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> target, var Span s) : StatementNode*
         ::= empty{ ctx->PushParsingLvalue(true); }
-            Expression(ctx):tgt{ target.reset(tgt); ctx->PopParsingLvalue(); } / { ctx->PopParsingLvalue(); } ASSIGN{ s = span; } Expression(ctx):source
+            Expression(ctx):tgt{ target.reset(tgt); s = target->GetSpan(); ctx->PopParsingLvalue(); } / { ctx->PopParsingLvalue(); } ASSIGN Expression(ctx):source
         {
             s.end = span.end; return new AssignmentStatementNode(s, target.release(), source);
         }
@@ -237,9 +251,18 @@ parser api(SNGCM_PARSER_API) StatementParser
         ::= DESTROY{ s = span; } Expression(ctx):ptr! SEMICOLON!{ s.end = span.end; return new DestroyStatementNode(s, ptr); }
         ;
 
-    ExpressionStatement(ParsingContext* ctx, var Span s) : StatementNode*
+    ExpressionStatement(ParsingContext* ctx, var std::unique_ptr<Node> exprNode, var Span s) : StatementNode*
         ::= empty{ ctx->PushParsingExpressionStatement(true); }
-            (Expression(ctx):expr{ s = span; } SEMICOLON{ s.end = span.end; }){ ctx->PopParsingExpressionStatement(); return new ExpressionStatementNode(s, expr); } / { ctx->PopParsingExpressionStatement(); }
+            (Expression(ctx):expr{ exprNode.reset(expr); s = span; } SEMICOLON{ s.end = span.end; })
+            {
+                ctx->PopParsingExpressionStatement();
+                exprNode->SetSpan(s);
+                return new ExpressionStatementNode(s, exprNode.release());
+            }
+            /
+            {
+                ctx->PopParsingExpressionStatement();
+            }
         ;
 
     EmptyStatement(ParsingContext* ctx) : StatementNode*

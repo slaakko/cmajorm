@@ -53,6 +53,8 @@ struct DEBUG_API Frame
     std::string func;
     std::string file;
     int line;
+    int scol;
+    int ecol;
 };
 
 struct DEBUG_API InstructionLocation

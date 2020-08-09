@@ -49,7 +49,7 @@ CmCppCodeGenerator::CmCppCodeGenerator(cmajor::ir::EmittingContext& emittingCont
     trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr), sequenceSecond(nullptr), currentFunction(nullptr), currentBlock(nullptr),
     breakTargetBlock(nullptr), continueTargetBlock(nullptr), lastAlloca(nullptr), currentClass(nullptr), basicBlockOpen(false), defaultDest(nullptr), currentCaseMap(nullptr),
     generateLineNumbers(false), currentTryBlockId(-1), nextTryBlockId(0), currentTryNextBlock(nullptr), handlerBlock(nullptr), cleanupBlock(nullptr), inTryBlock(false),
-    prevWasTerminator(false), numTriesInCurrentBlock(0), tryIndex(0), prevLineNumber(0), prevControlFlowGraphNodeId(-1)
+    prevWasTerminator(false), numTriesInCurrentBlock(0), tryIndex(0), prevLineNumber(0), prevControlFlowGraphNodeId(-1), continueTargetNodeId(-1), loopNodeId(-1)
 {
     emitter->SetEmittingDelegate(this);
 }
@@ -206,6 +206,10 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->MangledName() == U"member_function_SetCharacterClass_CharClassTable_F6EC4C3D8DE56CE384A6B7D60702F69286C9B2C2")
+    {
+        int x = 0;
+    }
     if (compileUnit->CodeGenerated(functionSymbol)) return;
     compileUnit->SetCodeGenerated(functionSymbol);
     void* functionType = functionSymbol->IrType(*emitter);
@@ -561,13 +565,14 @@ void CmCppCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
         }
         ExitBlocks(nullptr);
         GenerateExitFunctionCode(*currentFunction);
+        int32_t retNodeId = -1;
         if (generateLineNumbers)
         {
             emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
             cmajor::debug::SourceSpan span = module->SpanToSourceSpan(currentBlock->EndSpan());
             emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
+            retNodeId = emitter->AddControlFlowGraphNode();
         }
-        int32_t retNodeId = emitter->AddControlFlowGraphNode();
         emitter->CreateRet(returnValue);
         if (prevControlFlowGraphNodeId != -1)
         {
@@ -584,13 +589,14 @@ void CmCppCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
     {
         ExitBlocks(nullptr);
         GenerateExitFunctionCode(*currentFunction);
+        int32_t retNodeId = -1;
         if (generateLineNumbers)
         {
             emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::endBrace));
             cmajor::debug::SourceSpan span = module->SpanToSourceSpan(currentBlock->EndSpan());
             emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
+            retNodeId = emitter->AddControlFlowGraphNode();
         }
-        int32_t retNodeId = emitter->AddControlFlowGraphNode();
         emitter->CreateRetVoid();
         if (prevControlFlowGraphNodeId != -1)
         {
@@ -636,7 +642,11 @@ void CmCppCodeGenerator::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
     if (it != currentCaseMap->cend())
     {
         void* caseDest = it->second;
-        int32_t brNodeId = emitter->AddControlFlowGraphNode();
+        int32_t brNodeId = -1;
+        if (generateLineNumbers)
+        {
+            brNodeId = emitter->AddControlFlowGraphNode();
+        }
         emitter->CreateBr(caseDest);
         if (prevControlFlowGraphNodeId != -1)
         {
@@ -665,7 +675,11 @@ void CmCppCodeGenerator::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatem
     ExitBlocks(breakTargetBlock);
     if (defaultDest)
     {
-        int32_t brNodeId = emitter->AddControlFlowGraphNode();
+        int32_t brNodeId = -1;
+        if (generateLineNumbers)
+        {
+            brNodeId = emitter->AddControlFlowGraphNode();
+        }
         emitter->CreateBr(defaultDest);
         if (prevControlFlowGraphNodeId != -1)
         {
@@ -692,7 +706,11 @@ void CmCppCodeGenerator::Visit(BoundBreakStatement& boundBreakStatement)
     SetTarget(&boundBreakStatement);
     Assert(breakTarget && breakTargetBlock, "break target not set");
     ExitBlocks(breakTargetBlock);
-    int32_t brNodeId = emitter->AddControlFlowGraphNode();
+    int32_t brNodeId = -1;
+    if (generateLineNumbers)
+    {
+        brNodeId = emitter->AddControlFlowGraphNode();
+    }
     emitter->CreateBr(breakTarget);
     if (prevControlFlowGraphNodeId != -1)
     {
@@ -721,11 +739,16 @@ void CmCppCodeGenerator::Visit(BoundContinueStatement& boundContinueStatement)
     SetTarget(&boundContinueStatement);
     Assert(continueTarget && continueTargetBlock, "continue target not set");
     ExitBlocks(continueTargetBlock);
-    int32_t brNodeId = emitter->AddControlFlowGraphNode();
+    int32_t brNodeId = -1;
+    if (generateLineNumbers)
+    {
+        brNodeId = emitter->AddControlFlowGraphNode();
+    }
     emitter->CreateBr(continueTarget);
     if (prevControlFlowGraphNodeId != -1)
     {
         emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, brNodeId);
+        emitter->AddControlFlowGraphEdge(brNodeId, continueTargetNodeId);
     }
     prevControlFlowGraphNodeId = brNodeId;
     void* nextBlock = emitter->CreateBasicBlock("next");
@@ -750,7 +773,11 @@ void CmCppCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
     if (it != labeledStatementMap.cend())
     {
         void* target = it->second;
-        int32_t brNodeId = emitter->AddControlFlowGraphNode();
+        int32_t brNodeId = -1;
+        if (generateLineNumbers)
+        {
+            brNodeId = emitter->AddControlFlowGraphNode();
+        }
         emitter->CreateBr(target);
         if (prevControlFlowGraphNodeId != -1)
         {
@@ -769,6 +796,10 @@ void CmCppCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
 
 void CmCppCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
 {
+    if (boundIfStatement.IsAssertNode())
+    {
+        int x = 0;
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -787,10 +818,11 @@ void CmCppCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
     }
     bool prevGenJumpingBoolCode = genJumpingBoolCode;
     genJumpingBoolCode = true;
-    int32_t condNodeId = emitter->AddControlFlowGraphNode();
+    int32_t condNodeId = -1; 
     if (generateLineNumbers)
     {
-        cmajor::debug::SourceSpan span = module->SpanToSourceSpan(boundIfStatement.Condition()->GetSpan());
+        condNodeId = emitter->AddControlFlowGraphNode();
+        cmajor::debug::SourceSpan span = module->SpanToSourceSpan(boundIfStatement.GetSpan());
         emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
     }
     boundIfStatement.Condition()->Accept(*this);
@@ -839,9 +871,12 @@ void CmCppCodeGenerator::Visit(BoundWhileStatement& boundWhileStatement)
     continueTarget = condBlock;
     bool prevGenJumpingBoolCode = genJumpingBoolCode;
     genJumpingBoolCode = true;
-    int32_t condNodeId = emitter->AddControlFlowGraphNode();
+    int32_t prevContinueTargetNodeId = continueTargetNodeId;
+    int32_t condNodeId = -1;
     if (generateLineNumbers)
     {
+        condNodeId = emitter->AddControlFlowGraphNode();
+        continueTargetNodeId = condNodeId;
         cmajor::debug::SourceSpan span = module->SpanToSourceSpan(boundWhileStatement.Condition()->GetSpan());
         emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
     }
@@ -858,12 +893,14 @@ void CmCppCodeGenerator::Visit(BoundWhileStatement& boundWhileStatement)
     {
         emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, condNodeId);
     }
+    prevControlFlowGraphNodeId = condNodeId;
     emitter->CreateBr(condBlock);
     emitter->SetCurrentBasicBlock(falseBlock);
     breakTargetBlock = prevBreakTargetBlock;
     continueTargetBlock = prevContinueTargetBlock;
     breakTarget = prevBreakTarget;
     continueTarget = prevContinueTarget;
+    continueTargetNodeId = prevContinueTargetNodeId;
     trueBlock = prevTrueBlock;
     falseBlock = prevFalseBlock;
 }
@@ -890,21 +927,34 @@ void CmCppCodeGenerator::Visit(BoundDoStatement& boundDoStatement)
     continueTarget = condBlock;
     emitter->CreateBr(doBlock);
     emitter->SetCurrentBasicBlock(doBlock);
+    int32_t doNodeId = -1;
+    if (generateLineNumbers)
+    {
+        doNodeId = emitter->AddControlFlowGraphNode();
+        cmajor::debug::SourceSpan span = module->SpanToSourceSpan(boundDoStatement.Statement()->GetSpan());
+        emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
+        emitter->CreateNop();
+        prevControlFlowGraphNodeId = doNodeId;
+    }
     boundDoStatement.Statement()->Accept(*this);
     emitter->CreateBr(condBlock);
     emitter->SetCurrentBasicBlock(condBlock);
     bool prevGenJumpingBoolCode = genJumpingBoolCode;
     genJumpingBoolCode = true;
-    int32_t condNodeId = emitter->AddControlFlowGraphNode();
+    int32_t prevContinueTargetNodeId = continueTargetNodeId;
+    int32_t condNodeId = -1;
     if (generateLineNumbers)
     {
-        cmajor::debug::SourceSpan span = module->SpanToSourceSpan(boundDoStatement.Condition()->GetSpan());
-        emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
+        condNodeId = emitter->AddControlFlowGraphNode();
+        continueTargetNodeId = condNodeId;
+        cmajor::debug::SourceSpan condSpan = module->SpanToSourceSpan(boundDoStatement.Condition()->GetSpan());
+        emitter->SetCurrentSourceSpan(condSpan.line, condSpan.scol, condSpan.ecol);
     }
     boundDoStatement.Condition()->Accept(*this);
     if (prevControlFlowGraphNodeId != -1)
     {
         emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, condNodeId);
+        emitter->AddControlFlowGraphEdge(condNodeId, doNodeId);
     }
     prevControlFlowGraphNodeId = condNodeId;
     genJumpingBoolCode = prevGenJumpingBoolCode;
@@ -914,6 +964,7 @@ void CmCppCodeGenerator::Visit(BoundDoStatement& boundDoStatement)
     continueTargetBlock = prevContinueTargetBlock;
     breakTarget = prevBreakTarget;
     continueTarget = prevContinueTarget;
+    continueTargetNodeId = prevContinueTargetNodeId;
     trueBlock = prevTrueBlock;
     falseBlock = prevFalseBlock;
 }
@@ -944,9 +995,11 @@ void CmCppCodeGenerator::Visit(BoundForStatement& boundForStatement)
     emitter->SetCurrentBasicBlock(condBlock);
     bool prevGenJumpingBoolCode = genJumpingBoolCode;
     genJumpingBoolCode = true;
-    int32_t condNodeId = emitter->AddControlFlowGraphNode();
+    int32_t prevContinueTargetNodeId = continueTargetNodeId;
+    int32_t condNodeId = -1;
     if (generateLineNumbers)
     {
+        condNodeId = emitter->AddControlFlowGraphNode();
         cmajor::debug::SourceSpan span = module->SpanToSourceSpan(boundForStatement.Condition()->GetSpan());
         emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
     }
@@ -958,10 +1011,19 @@ void CmCppCodeGenerator::Visit(BoundForStatement& boundForStatement)
     prevControlFlowGraphNodeId = condNodeId;
     genJumpingBoolCode = prevGenJumpingBoolCode;
     emitter->SetCurrentBasicBlock(actionBlock);
+    int32_t currentLoopNodeId = -1;
+    if (generateLineNumbers)
+    {
+        currentLoopNodeId = emitter->AddControlFlowGraphNode();
+        continueTargetNodeId = currentLoopNodeId;
+    }
     boundForStatement.ActionS()->Accept(*this);
     emitter->CreateBr(loopBlock);
     emitter->SetCurrentBasicBlock(loopBlock);
+    int32_t prevLoopNodeId = loopNodeId;
+    loopNodeId = currentLoopNodeId;
     boundForStatement.LoopS()->Accept(*this);
+    loopNodeId = prevLoopNodeId;
     if (prevControlFlowGraphNodeId != -1)
     {
         emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, condNodeId);
@@ -974,6 +1036,7 @@ void CmCppCodeGenerator::Visit(BoundForStatement& boundForStatement)
     continueTargetBlock = prevContinueTargetBlock;
     breakTarget = prevBreakTarget;
     continueTarget = prevContinueTarget;
+    continueTargetNodeId = prevContinueTargetNodeId;
     trueBlock = prevTrueBlock;
     falseBlock = prevFalseBlock;
 }
@@ -987,9 +1050,10 @@ void CmCppCodeGenerator::Visit(BoundSwitchStatement& boundSwitchStatement)
     void* prevBreakTarget = breakTarget;
     BoundCompoundStatement* prevBreakTargetBlock = breakTargetBlock;
     breakTargetBlock = currentBlock;
-    int32_t condNodeId = emitter->AddControlFlowGraphNode();
+    int32_t condNodeId = -1;
     if (generateLineNumbers)
     {
+        condNodeId = emitter->AddControlFlowGraphNode();
         cmajor::debug::SourceSpan span = module->SpanToSourceSpan(boundSwitchStatement.Condition()->GetSpan());
         emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
     }
@@ -1137,7 +1201,11 @@ void CmCppCodeGenerator::Visit(BoundConstructionStatement& boundConstructionStat
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundConstructionStatement);
-    int32_t constructorNodeId = emitter->AddControlFlowGraphNode();
+    int32_t constructorNodeId = -1;
+    if (generateLineNumbers)
+    {
+        constructorNodeId = emitter->AddControlFlowGraphNode();
+    }
     boundConstructionStatement.ConstructorCall()->Accept(*this);
     if (prevControlFlowGraphNodeId != -1)
     {
@@ -1200,7 +1268,19 @@ void CmCppCodeGenerator::Visit(BoundAssignmentStatement& boundAssignmentStatemen
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundAssignmentStatement);
-    int32_t assignmentNodeId = emitter->AddControlFlowGraphNode();
+    int32_t assignmentNodeId = -1;
+    if (generateLineNumbers)
+    {
+        if (boundAssignmentStatement.IsForLoopStatementNode())
+        {
+            assignmentNodeId = loopNodeId;
+            emitter->SetCurrentControlFlowGraphNodeId(assignmentNodeId);
+        }
+        else
+        {
+            assignmentNodeId = emitter->AddControlFlowGraphNode();
+        }
+    }
     boundAssignmentStatement.AssignmentCall()->Accept(*this);
     if (prevControlFlowGraphNodeId != -1)
     {
@@ -1211,7 +1291,7 @@ void CmCppCodeGenerator::Visit(BoundAssignmentStatement& boundAssignmentStatemen
 
 void CmCppCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatement)
 {
-    if (generateLineNumbers)
+    if (generateLineNumbers && !boundExpressionStatement.IgnoreNode())
     {
         cmajor::debug::SourceSpan span = module->SpanToSourceSpan(boundExpressionStatement.GetSpan());
         emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
@@ -1220,13 +1300,28 @@ void CmCppCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatemen
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundExpressionStatement);
-    int32_t expressionNodeId = emitter->AddControlFlowGraphNode();
-    boundExpressionStatement.Expression()->Accept(*this);
-    if (prevControlFlowGraphNodeId != -1)
+    int32_t expressionNodeId = -1;
+    if (generateLineNumbers && !boundExpressionStatement.IgnoreNode())
     {
-        emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, expressionNodeId);
+        if (boundExpressionStatement.IsForLoopStatementNode())
+        {
+            expressionNodeId = loopNodeId;
+            emitter->SetCurrentControlFlowGraphNodeId(expressionNodeId);
+        }
+        else
+        {
+            expressionNodeId = emitter->AddControlFlowGraphNode();
+        }
     }
-    prevControlFlowGraphNodeId = expressionNodeId;
+    boundExpressionStatement.Expression()->Accept(*this);
+    if (!boundExpressionStatement.IgnoreNode())
+    {
+        if (prevControlFlowGraphNodeId != -1)
+        {
+            emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, expressionNodeId);
+        }
+        prevControlFlowGraphNodeId = expressionNodeId;
+    }
     if (boundExpressionStatement.Expression()->HasValue())
     {
         emitter->Stack().Pop();
@@ -1249,7 +1344,7 @@ void CmCppCodeGenerator::Visit(BoundInitializationStatement& boundInitialization
 
 void CmCppCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
 {
-    if (generateLineNumbers)
+    if (generateLineNumbers && !boundEmptyStatement.IgnoreNode())
     {
         cmajor::debug::SourceSpan span = module->SpanToSourceSpan(boundEmptyStatement.GetSpan());
         emitter->SetCurrentSourceSpan(span.line, span.scol, span.ecol);
@@ -1258,13 +1353,28 @@ void CmCppCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundEmptyStatement);
-    int32_t nopNodeId = emitter->AddControlFlowGraphNode();
-    emitter->CreateNop();
-    if (prevControlFlowGraphNodeId != -1)
+    int32_t nopNodeId = -1;
+    if (generateLineNumbers && !boundEmptyStatement.IgnoreNode())
     {
-        emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, nopNodeId);
+        if (boundEmptyStatement.IsForLoopStatementNode())
+        {
+            nopNodeId = loopNodeId;
+            emitter->SetCurrentControlFlowGraphNodeId(nopNodeId);
+        }
+        else
+        {
+            nopNodeId = emitter->AddControlFlowGraphNode();
+        }
     }
-    prevControlFlowGraphNodeId = nopNodeId;
+    emitter->CreateNop();
+    if (!boundEmptyStatement.IgnoreNode())
+    {
+        if (prevControlFlowGraphNodeId != -1)
+        {
+            emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, nopNodeId);
+        }
+        prevControlFlowGraphNodeId = nopNodeId;
+    }
 }
 
 void CmCppCodeGenerator::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement)
@@ -1297,7 +1407,11 @@ void CmCppCodeGenerator::Visit(BoundThrowStatement& boundThrowStatement)
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundThrowStatement);
-    int32_t throwNodeId = emitter->AddControlFlowGraphNode();
+    int32_t throwNodeId = -1;
+    if (generateLineNumbers)
+    {
+        throwNodeId = emitter->AddControlFlowGraphNode();
+    }
     boundThrowStatement.ThrowCallExpr()->Accept(*this);
     if (prevControlFlowGraphNodeId != -1)
     {
@@ -1401,7 +1515,11 @@ void CmCppCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     basicBlockOpen = false;
     SetTarget(&boundRethrowStatement);
     boundRethrowStatement.ReleaseCall()->Accept(*this);
-    int32_t resumeNodeId = emitter->AddControlFlowGraphNode();
+    int32_t resumeNodeId = -1;
+    if (generateLineNumbers)
+    {
+        resumeNodeId = emitter->AddControlFlowGraphNode();
+    }
     emitter->CreateResume(nullptr);
     if (prevControlFlowGraphNodeId != -1)
     {

@@ -152,6 +152,7 @@ public:
     void SetCppLineIndex(int32_t cppLineIndex_) { cppLineIndex = cppLineIndex_; }
     void AddLocalVariable(const std::string& name, const boost::uuids::uuid& typeId, LocalInstruction* inst);
     int32_t AddControlFlowGraphNode();
+    void SetCurrentFlowGraphNodeId(int32_t controlFlowGraphNodeId);
     void AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId);
 private:
     TypeRepository typeRepository;

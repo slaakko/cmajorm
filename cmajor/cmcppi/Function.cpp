@@ -223,7 +223,12 @@ void Function::Write(CodeFormatter& formatter, Context& context, BinaryWriter& w
         for (const auto& p : controlFlowGraph)
         {
             ControlFlowGraphNode* node = p.second;
-            cmajor::debug::WriteControlFlowGraphNode(writer, node->Id(), node->Inst()->GetSourceSpan(), node->Inst()->CppLineIndex(), node->Inst()->CppLineNumber());
+            Instruction* inst = node->Inst();
+            if (!inst)
+            {
+                throw std::runtime_error("internal error: control flow graph node with no instruction in function '" + name + "'");
+            }
+            cmajor::debug::WriteControlFlowGraphNode(writer, node->Id(), inst->GetSourceSpan(), inst->CppLineIndex(), inst->CppLineNumber());
             int32_t edgeCount = node->Next().size();
             cmajor::debug::WriteControlFlowGraphNodeEdgeCount(writer, edgeCount);
             for (int32_t n : node->Next())

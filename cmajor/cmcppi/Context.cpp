@@ -786,6 +786,11 @@ int32_t Context::AddControlFlowGraphNode()
     return currentControlFlowGraphNodeId;
 }
 
+void Context::SetCurrentFlowGraphNodeId(int32_t controlFlowGraphNodeId)
+{
+    currentControlFlowGraphNodeId = controlFlowGraphNodeId;
+}
+
 void Context::AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId)
 {
     currentFunction->AddControlFlowGraphEdge(startNodeId, endNodeId);

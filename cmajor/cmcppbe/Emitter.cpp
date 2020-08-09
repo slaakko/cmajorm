@@ -1655,6 +1655,11 @@ int32_t Emitter::AddControlFlowGraphNode()
     return context->AddControlFlowGraphNode();
 }
 
+void Emitter::SetCurrentControlFlowGraphNodeId(int32_t controlFlowGraphNodeId)
+{
+    context->SetCurrentFlowGraphNodeId(controlFlowGraphNodeId);
+}
+
 void Emitter::AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId)
 {
     context->AddControlFlowGraphEdge(startNodeId, endNodeId);

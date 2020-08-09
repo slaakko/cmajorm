@@ -35,7 +35,7 @@ std::string SourceSpan::ToString() const
     return s;
 }
 
-Frame::Frame() : level(0), func(), file(), line(0)
+Frame::Frame() : level(0), func(), file(), line(0), scol(0), ecol(0)
 {
 }
 
@@ -55,6 +55,10 @@ std::string Frame::ToString(bool printLevel) const
         s.append(func);
         s.append(1, ' ');
         s.append(file).append(":").append(std::to_string(line));
+        if (scol != 0 && ecol != 0)
+        {
+            s.append(1, ':').append(std::to_string(scol)).append(1, ':').append(std::to_string(ecol));
+        }
     }
     return s;
 }
@@ -71,6 +75,11 @@ std::unique_ptr<JsonValue> Frame::ToJson(bool includeLevel) const
         jsonObject->AddField(U"func", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(func))));
         jsonObject->AddField(U"file", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(file))));
         jsonObject->AddField(U"line", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(line)))));
+        if (scol != 0 && ecol != 0)
+        {
+            jsonObject->AddField(U"scol", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(scol)))));
+            jsonObject->AddField(U"ecol", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(ecol)))));
+        }
     }
     return std::unique_ptr<JsonValue>(jsonObject);
 }
@@ -145,6 +154,8 @@ Frame Instruction::GetCmajorFrame() const
     const SourceFile& sourceFile = compileUnitFunction->GetSourceFile();
     frame.file = sourceFile.FilePath();
     frame.line = span.line;
+    frame.scol = span.scol;
+    frame.ecol = span.ecol;
     return frame;
 }
 
@@ -683,7 +694,7 @@ void SourceFile::Print(CodeFormatter& formatter, int lineNumber, Instruction* cu
                 if (span.scol != 0 && span.ecol != 0)
                 {
                     formatter.Write(line.substr(0, span.scol - 1));
-                    formatter.Write(fgWhite);
+                    formatter.Write(fgGreen);
                     formatter.Write(line.substr(span.scol - 1, span.ecol - span.scol));
                     formatter.Write(reset);
                     formatter.WriteLine(line.substr(span.ecol - 1));

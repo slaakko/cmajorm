@@ -51,6 +51,11 @@ void BoundSequenceStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
+void BoundSequenceStatement::SetForLoopStatementNode()
+{
+    first->SetForLoopStatementNode();
+}
+
 BoundCompoundStatement::BoundCompoundStatement(Module* module_, const Span& span_) : BoundStatement(module_, span_, BoundNodeType::boundCompoundStatement), endSpan()
 {
 }

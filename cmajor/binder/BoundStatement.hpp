@@ -23,7 +23,10 @@ enum class BoundStatementFlags : uint8_t
 {
     none = 0,
     postfix = 1 << 0,
-    generated = 1 << 1
+    generated = 1 << 1,
+    forLoopStatementNode = 1 << 2,
+    ignoreNode = 1 << 3,
+    assertNode = 1 << 4
 };
 
 inline BoundStatementFlags operator|(BoundStatementFlags left, BoundStatementFlags right)
@@ -53,7 +56,13 @@ public:
     bool Postfix() const { return GetFlag(BoundStatementFlags::postfix); }
     void SetGenerated() { SetFlag(BoundStatementFlags::generated); }
     bool Generated() const { return GetFlag(BoundStatementFlags::generated); }
+    bool IsForLoopStatementNode() const { return GetFlag(BoundStatementFlags::forLoopStatementNode); }
+    virtual void SetForLoopStatementNode() { SetFlag(BoundStatementFlags::forLoopStatementNode); }
     virtual bool IsOrContainsBoundReturnStatement() const { return false; }
+    bool IgnoreNode() const { return GetFlag(BoundStatementFlags::ignoreNode); }
+    void SetIgnoreNode() { SetFlag(BoundStatementFlags::ignoreNode); }
+    bool IsAssertNode() const { return GetFlag(BoundStatementFlags::assertNode); }
+    void SetAssertNode() { SetFlag(BoundStatementFlags::assertNode); }
 private:
     std::u32string label;
     BoundStatement* parent;
@@ -70,6 +79,7 @@ public:
     BoundStatement* First() { return first.get(); }
     BoundStatement* Second() { return second.get(); }
     bool IsOrContainsBoundReturnStatement() const override { return second->IsOrContainsBoundReturnStatement(); }
+    void SetForLoopStatementNode() override;
 private:
     std::unique_ptr<BoundStatement> first;
     std::unique_ptr<BoundStatement> second;

@@ -1648,6 +1648,10 @@ int32_t Emitter::AddControlFlowGraphNode()
     return -1;
 }
 
+void Emitter::SetCurrentControlFlowGraphNodeId(int32_t controlFlowGraphNodeId)
+{
+}
+
 void Emitter::AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId)
 {
 }

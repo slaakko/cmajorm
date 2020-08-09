@@ -136,6 +136,8 @@ private:
     void* falseBlock;
     void* breakTarget;
     void* continueTarget;
+    int32_t continueTargetNodeId;
+    int32_t loopNodeId;
     BoundStatement* sequenceSecond;
     BoundFunction* currentFunction;
     BoundCompoundStatement* currentBlock;

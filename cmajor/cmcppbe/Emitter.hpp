@@ -305,6 +305,7 @@ public:
     int16_t GetCurrentScopeId() const override;
     void SetCurrentScopeId(int16_t scopeId) override;
     int32_t AddControlFlowGraphNode() override;
+    void SetCurrentControlFlowGraphNodeId(int32_t controlFlowGraphNodeId) override;
     void AddControlFlowGraphEdge(int32_t startNodeId, int32_t endNodeId) override;
     void AddLocalVariable(const std::string& localVariableName, const boost::uuids::uuid& typeId, void* irObject) override;
     void BeginInstructionFlag(int16_t flag) override;
