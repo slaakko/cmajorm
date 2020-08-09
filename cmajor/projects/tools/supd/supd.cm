@@ -1,0 +1,210 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Dom;
+using System.XPath;
+
+void ReadPatterns(Document* doc)
+{
+    UniquePtr<XPathObject> patternsObject = Evaluate(u"/supd/patterns", doc);
+    if (!patternsObject.IsNull())
+    {
+        if (patternsObject.Get() is XPathNodeSet*)
+        {
+            XPathNodeSet* nodeSet = cast<XPathNodeSet*>(patternsObject.Get());
+            for (int i = 0; i < nodeSet->Length(); ++i)
+            {
+                Node* node = (*nodeSet)[i];
+                if (node is Element*)
+                {
+                    Element* patternsElement = cast<Element*>(node);
+                    string id = ToUtf8(patternsElement->GetAttribute(u"id"));
+                    if (id.IsEmpty())
+                    {
+                        throw Exception("'supd/patterns' element index " + ToString(i) + " has no 'id' attribute");
+                    }
+                    UniquePtr<XPathObject> patternObject = Evaluate(u"pattern", patternsElement);
+                    if (!patternObject.IsNull())
+                    {
+                        if (patternObject.Get() is XPathNodeSet*)
+                        {
+                            XPathNodeSet* nodeSet = cast<XPathNodeSet*>(patternObject.Get());
+                            for (int i = 0; i < nodeSet->Length(); ++i)
+                            {
+                                Node* node = (*nodeSet)[i];
+                                if (node is Element*)
+                                {
+                                    Element* patternElement = cast<Element*>(node);
+                                    string include = ToUtf8(patternElement->GetAttribute(u"include"));
+                                    if (include.IsEmpty())
+                                    {
+                                        string exclude = ToUtf8(patternElement->GetAttribute(u"exclude"));
+                                        if (exclude.IsEmpty())
+                                        {
+                                        }
+                                        else
+                                        {
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Process(const string& file, const string& from, bool verbose, bool update)
+{
+    if (!File.Exists(file))
+    {
+        throw Exception("file '" + file + "' does not exist");
+    }
+    string root = Path.GetDirectoryName(file);
+    UniquePtr<Document> doc = ReadDocument(file);
+    string fromRoot = from;
+    if (fromRoot.IsEmpty())
+    {
+        UniquePtr<XPathObject> supdObject = Evaluate(u"/supd", doc.Get());
+        if (!supdObject.IsNull())
+        {
+            if (supdObject.Get() is XPathNodeSet*)
+            {
+                XPathNodeSet* nodeSet = cast<XPathNodeSet*>(supdObject.Get());
+                if (nodeSet->Length() == 1)
+                {
+                    Node* node = (*nodeSet)[0];
+                    if (node is Element*)
+                    {
+                        Element* element = cast<Element*>(node);
+                        fromRoot = ToUtf8(element->GetAttribute(u"from"));
+                    }
+                }
+            }
+        }
+    }
+    if (fromRoot.IsEmpty())
+    {
+        throw Exception("error: '" + file + "' does not contain 'supd' element with from=\"FROM_DIR_PATH\" attribute set and no --from FROM_DIR_PATH option specified. stop.");
+    }
+    if (!Directory.Exists(fromRoot))
+    {
+        throw Exception("error: from root directory '" + fromRoot + "' not found. stop.");
+    }
+}
+
+void PrintHelp()
+{
+    Console.WriteLine("usage: supd [options] [file.xml]");
+    Console.WriteLine("options:");
+    Console.WriteLine("--verbose | -v");
+    Console.WriteLine(" Be verbose.");
+    Console.WriteLine("--update | -u");
+    Console.WriteLine(" Make changes.");
+    Console.WriteLine("--from DIR | -f DIR");
+    Console.WriteLine(" Set from directory.");
+    Console.WriteLine("--help | -h");
+    Console.WriteLine(" Print help and exit.");
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        bool verbose = false;
+        bool update = false;
+        bool prevWasFrom = false;
+        string from;
+        List<string> files;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--verbose")
+                {
+                    verbose = true;
+                }
+                else if (arg == "--update")
+                {
+                    update = true;
+                }
+                else if (arg == "--from")
+                {
+                    prevWasFrom = true;
+                }
+                else if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else
+                {
+                    throw Exception("unknown argument '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                for (char o : options)
+                {
+                    bool fail = false;
+                    switch (o)
+                    {
+                        case 'v': verbose = true; break;
+                        case 'u': update = true; break;
+                        case 'h': PrintHelp(); return 1;
+                        case 'f': prevWasFrom = true; break;
+                        default:
+                        {
+                            fail = true;
+                            break;
+                        }
+                    }
+                    if (fail)
+                    {
+                        throw Exception("unknown option '-" + string(o) + "'");
+                    }
+                }
+            }
+            else if (prevWasFrom)
+            {
+                prevWasFrom = false;
+                from = GetFullPath(arg);
+            }
+            else 
+            {
+                files.Add(GetFullPath(arg));
+            }
+        }
+        if (files.IsEmpty())
+        {
+            string defaultFile = GetFullPath("supd.xml");
+            if (File.Exists(defaultFile))
+            {
+                files.Add(defaultFile);
+            }
+            else
+            {
+                throw Exception("error: no supd.xml found ('" + defaultFile + "' and no files given. stop.");
+            }
+        }
+        for (const string& file : files)
+        {
+            Process(file, from, verbose, update);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

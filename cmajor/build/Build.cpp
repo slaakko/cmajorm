@@ -3025,6 +3025,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
     }
     catch (const std::exception& ex)
     {
+        rootModule->SetFlag(ModuleFlags::dontRemoveFromModuleMap);
         LogMessage(-1, "project: " + ToUtf8(project->Name()) + ": " + ex.what());
         throw;
     }

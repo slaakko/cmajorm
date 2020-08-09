@@ -232,6 +232,10 @@ namespace CmajorTasks
                 }
                 if (!success || cmc.ExitCode != 0)
                 {
+                    if (cmc.ExitCode != 0)
+                    {
+                        Log.LogError("cmc returned exit code " + cmc.ExitCode.ToString());
+                    }
                     return false;
                 }
             }

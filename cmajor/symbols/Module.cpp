@@ -27,6 +27,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/functional/hash.hpp>
 #include <iostream>
+#include <mutex>
 
 namespace cmajor { namespace symbols {
 
@@ -344,6 +345,7 @@ public:
     void PutModule(Module* module);
     void RemoveModule(Module* module);
 private:
+    std::mutex mtx;
     static std::unique_ptr<ModuleMap> instance;
     std::unordered_map<boost::uuids::uuid, Module*, boost::hash<boost::uuids::uuid>> moduleMap;
     std::unordered_map<boost::uuids::uuid, std::string, boost::hash<boost::uuids::uuid>> moduleFilePathMap;

@@ -613,6 +613,10 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&memberFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::memberFunctionSymbol, "member function symbol expected");
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
+    if (memberFunctionSymbol->MangledName() == U"member_function_Write_BinaryWriter_42759A137A9CCC36E5D886D61C3CFD42E1EEE7E8")
+    {
+        int x = 0;
+    }
     if (!dontCheckDuplicateFunctionSymbols)
     {
         memberFunctionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
@@ -1236,6 +1240,11 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
 
 void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
 {
+    Span span;
+    if (GetBackEnd() == BackEnd::llvm)
+    {
+        span = deleteStatementNode.GetSpan();
+    }
     bool exceptionCapture = false;
     std::unique_ptr<BoundExpression> ptr = BindExpression(deleteStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this);
     if (insideCatch && ptr->ContainsExceptionCapture())
@@ -1251,9 +1260,9 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
             lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
             std::vector<std::unique_ptr<BoundExpression>> arguments;
             arguments.push_back(std::move(std::unique_ptr<BoundExpression>(ptr->Clone())));
-            std::unique_ptr<BoundFunctionCall> disposeCall = ResolveOverload(U"RtDispose", containerScope, lookups, arguments, boundCompileUnit, currentFunction, Span());
+            std::unique_ptr<BoundFunctionCall> disposeCall = ResolveOverload(U"RtDispose", containerScope, lookups, arguments, boundCompileUnit, currentFunction, span);
             CheckAccess(currentFunction->GetFunctionSymbol(), disposeCall->GetFunctionSymbol());
-            AddStatement(new BoundExpressionStatement(module, std::move(disposeCall), Span()));
+            AddStatement(new BoundExpressionStatement(module, std::move(disposeCall), span));
         }
     }
     std::unique_ptr<BoundExpression> memFreePtr;
@@ -1268,13 +1277,13 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
         lookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
         std::vector<std::unique_ptr<BoundExpression>> arguments;
         arguments.push_back(std::move(ptr));
-        std::unique_ptr<BoundFunctionCall> destructorCall = ResolveOverload(U"@destructor", containerScope, lookups, arguments, boundCompileUnit, currentFunction, Span());
+        std::unique_ptr<BoundFunctionCall> destructorCall = ResolveOverload(U"@destructor", containerScope, lookups, arguments, boundCompileUnit, currentFunction, span);
         CheckAccess(currentFunction->GetFunctionSymbol(), destructorCall->GetFunctionSymbol());
         if (destructorCall->GetFunctionSymbol()->IsVirtualAbstractOrOverride())
         {
             destructorCall->SetFlag(BoundExpressionFlags::virtualCall);
         }
-        AddStatement(new BoundExpressionStatement(module, std::move(destructorCall), Span()));
+        AddStatement(new BoundExpressionStatement(module, std::move(destructorCall), span));
         memFreePtr = BindExpression(deleteStatementNode.Expression(), boundCompileUnit, currentFunction, containerScope, this);
         if (insideCatch && memFreePtr->ContainsExceptionCapture())
         {
@@ -1299,7 +1308,7 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
     {
         memFreeFunctionName = U"MemFree";
     }
-    std::unique_ptr<BoundFunctionCall> memFreeCall = ResolveOverload(memFreeFunctionName, containerScope, lookups, arguments, boundCompileUnit, currentFunction, Span());
+    std::unique_ptr<BoundFunctionCall> memFreeCall = ResolveOverload(memFreeFunctionName, containerScope, lookups, arguments, boundCompileUnit, currentFunction, span);
     CheckAccess(currentFunction->GetFunctionSymbol(), memFreeCall->GetFunctionSymbol());
     if (exceptionCapture)
     {
@@ -1421,6 +1430,11 @@ void StatementBinder::Visit(EmptyStatementNode& emptyStatementNode)
 
 void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
 {
+    Span span;
+    if (GetBackEnd() == BackEnd::llvm)
+    {
+        span = rangeForStatementNode.GetSpan();
+    }
     Span actionBeginBraceSpan;
     Span actionEndBraceSpan;
     if (rangeForStatementNode.Action()->GetNodeType() == NodeType::compoundStatementNode)
@@ -1439,7 +1453,7 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
     Span containerSpan = rangeForStatementNode.Container()->GetSpan();
     Span colonSpan = rangeForStatementNode.ColonSpan();
     std::unique_ptr<BoundExpression> container = BindExpression(rangeForStatementNode.Container(), boundCompileUnit, currentFunction, containerScope, this);
-    TypeSymbol* plainContainerType = container->GetType()->PlainType(Span());
+    TypeSymbol* plainContainerType = container->GetType()->PlainType(span);
     std::u32string plainContainerTypeFullName = plainContainerType->FullName();
     ParsingContext parsingContext;
     CmajorLexer cmajorLexer(plainContainerTypeFullName + U"\n", "", 0);
@@ -1448,60 +1462,60 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
     std::unique_ptr<IdentifierNode> iteratorTypeNode = nullptr;
     if (container->GetType()->IsConstType())
     {
-        iteratorTypeNode.reset(new IdentifierNode(Span(), U"ConstIterator"));
+        iteratorTypeNode.reset(new IdentifierNode(span, U"ConstIterator"));
     }
     else
     {
-        iteratorTypeNode.reset(new IdentifierNode(Span(), U"Iterator"));
+        iteratorTypeNode.reset(new IdentifierNode(span, U"Iterator"));
     }
     CloneContext cloneContext;
     SpanMapper spanMapper;
     cloneContext.SetSpanMapper(&spanMapper);
-    std::unique_ptr<CompoundStatementNode> compoundStatementNode(new CompoundStatementNode(Span()));
+    std::unique_ptr<CompoundStatementNode> compoundStatementNode(new CompoundStatementNode(span));
     if (rangeForStatementNode.Action()->GetNodeType() == NodeType::compoundStatementNode)
     {
         CompoundStatementNode* action = static_cast<CompoundStatementNode*>(rangeForStatementNode.Action());
-        compoundStatementNode->SetBeginBraceSpan(Span());
-        compoundStatementNode->SetEndBraceSpan(Span());
+        compoundStatementNode->SetBeginBraceSpan(span);
+        compoundStatementNode->SetEndBraceSpan(span);
     }
     else
     {
-        compoundStatementNode->SetBeginBraceSpan(Span());
-        compoundStatementNode->SetEndBraceSpan(Span());
+        compoundStatementNode->SetBeginBraceSpan(span);
+        compoundStatementNode->SetEndBraceSpan(span);
     }
     compoundStatementNode->SetParent(rangeForStatementNode.Parent());
-    ConstructionStatementNode* constructEndIteratorStatement = new ConstructionStatementNode(Span(), 
-        new DotNode(Span(), containerTypeNode->Clone(cloneContext), static_cast<IdentifierNode*>(iteratorTypeNode->Clone(cloneContext))), new IdentifierNode(Span(), U"@end"));
+    ConstructionStatementNode* constructEndIteratorStatement = new ConstructionStatementNode(span, 
+        new DotNode(span, containerTypeNode->Clone(cloneContext), static_cast<IdentifierNode*>(iteratorTypeNode->Clone(cloneContext))), new IdentifierNode(span, U"@end"));
     if (container->GetType()->IsConstType())
     {
-        constructEndIteratorStatement->AddArgument(new InvokeNode(Span(), new DotNode(Span(), rangeForStatementNode.Container()->Clone(cloneContext), new IdentifierNode(Span(), U"CEnd"))));
+        constructEndIteratorStatement->AddArgument(new InvokeNode(span, new DotNode(span, rangeForStatementNode.Container()->Clone(cloneContext), new IdentifierNode(span, U"CEnd"))));
     }
     else
     {
-        constructEndIteratorStatement->AddArgument(new InvokeNode(Span(), new DotNode(Span(), rangeForStatementNode.Container()->Clone(cloneContext), new IdentifierNode(Span(), U"End"))));
+        constructEndIteratorStatement->AddArgument(new InvokeNode(span, new DotNode(span, rangeForStatementNode.Container()->Clone(cloneContext), new IdentifierNode(span, U"End"))));
     }
     compoundStatementNode->AddStatement(constructEndIteratorStatement);
     ConstructionStatementNode* constructIteratorStatement = new ConstructionStatementNode(initSpan, 
-        new DotNode(Span(), containerTypeNode->Clone(cloneContext), static_cast<IdentifierNode*>(iteratorTypeNode->Clone(cloneContext))), new IdentifierNode(Span(), U"@it"));
+        new DotNode(span, containerTypeNode->Clone(cloneContext), static_cast<IdentifierNode*>(iteratorTypeNode->Clone(cloneContext))), new IdentifierNode(span, U"@it"));
     if (container->GetType()->IsConstType())
     {
-        constructIteratorStatement->AddArgument(new InvokeNode(Span(), new DotNode(Span(), rangeForStatementNode.Container()->Clone(cloneContext), new IdentifierNode(Span(), U"CBegin"))));
+        constructIteratorStatement->AddArgument(new InvokeNode(span, new DotNode(span, rangeForStatementNode.Container()->Clone(cloneContext), new IdentifierNode(span, U"CBegin"))));
     }
     else
     {
-        constructIteratorStatement->AddArgument(new InvokeNode(Span(), new DotNode(Span(), rangeForStatementNode.Container()->Clone(cloneContext), new IdentifierNode(Span(), U"Begin"))));
+        constructIteratorStatement->AddArgument(new InvokeNode(span, new DotNode(span, rangeForStatementNode.Container()->Clone(cloneContext), new IdentifierNode(span, U"Begin"))));
     }
     Node* itNotEndCond = new NotEqualNode(colonSpan, new IdentifierNode(colonSpan, U"@it"), new IdentifierNode(colonSpan, U"@end"));
     StatementNode* incrementItStatement = new ExpressionStatementNode(containerSpan, new PrefixIncrementNode(containerSpan, new IdentifierNode(containerSpan, U"@it")));
     CompoundStatementNode* actionStatement = new CompoundStatementNode(actionBeginBraceSpan);
     actionStatement->SetBeginBraceSpan(actionBeginBraceSpan);
     actionStatement->SetEndBraceSpan(actionEndBraceSpan);
-    ConstructionStatementNode* constructLoopVarStatement = new ConstructionStatementNode(Span(),
+    ConstructionStatementNode* constructLoopVarStatement = new ConstructionStatementNode(span,
         rangeForStatementNode.TypeExpr()->Clone(cloneContext), static_cast<IdentifierNode*>(rangeForStatementNode.Id()->Clone(cloneContext)));
-    constructLoopVarStatement->AddArgument(new DerefNode(Span(), new IdentifierNode(Span(), U"@it")));
+    constructLoopVarStatement->AddArgument(new DerefNode(span, new IdentifierNode(span, U"@it")));
     actionStatement->AddStatement(constructLoopVarStatement);
     actionStatement->AddStatement(static_cast<StatementNode*>(rangeForStatementNode.Action()->Clone(cloneContext)));
-    ForStatementNode* forStatement = new ForStatementNode(Span(), constructIteratorStatement, itNotEndCond, incrementItStatement, actionStatement);
+    ForStatementNode* forStatement = new ForStatementNode(span, constructIteratorStatement, itNotEndCond, incrementItStatement, actionStatement);
     compoundStatementNode->AddStatement(forStatement);
 
     symbolTable.BeginContainer(containerScope->Container());

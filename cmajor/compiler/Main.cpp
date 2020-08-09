@@ -213,13 +213,14 @@ void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, Module* module)
 
 int main(int argc, const char** argv)
 {
+    InitDone initDone;
+    SetNumBuildThreads(1);
     std::unique_ptr<Module> rootModule;
     std::vector<std::unique_ptr<Module>> rootModules;
     std::set<std::string> builtProjects;
     try
     {
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-        InitDone initDone;
         bool all = false;
         std::string projectName;
         std::string projectDirectory;
