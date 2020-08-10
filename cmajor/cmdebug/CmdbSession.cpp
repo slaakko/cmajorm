@@ -152,16 +152,15 @@ void CmdbSession::Stop()
     try
     {
         exiting = true;
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         try
         {
-            listenSocket.Close();
+            TcpSocket socket;
+            socket.Connect("localhost", std::to_string(port));
         }
         catch (...)
         {
-            std::cerr << "error from listen socket close." << std::endl;
+
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         thread.join();
     }
     catch (const std::exception& ex)
