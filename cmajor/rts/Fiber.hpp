@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_FIBER_INCLUDED
-#define CMAJOR_RT_FIBER_INCLUDED
+#ifndef CMAJOR_RTS_FIBER_INCLUDED
+#define CMAJOR_RTS_FIBER_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -14,4 +14,4 @@ extern "C" RT_API void RtSwitchToFiber(void* fiber);
 extern "C" RT_API void* RtGetFiberData();
 extern "C" RT_API void RtDeleteFiber(void* fiber);
 
-#endif // CMAJOR_RT_FIBER_INCLUDED
+#endif // CMAJOR_RTS_FIBER_INCLUDED

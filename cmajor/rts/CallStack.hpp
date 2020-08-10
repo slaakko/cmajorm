@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_CALL_STACK_INCLUDED
-#define CMAJOR_RT_CALL_STACK_INCLUDED
+#ifndef CMAJOR_RTS_CALL_STACK_INCLUDED
+#define CMAJOR_RTS_CALL_STACK_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -15,4 +15,4 @@ extern "C" RT_API void RtPrintCallStack(int fileHandle);
 extern "C" RT_API const char* RtGetStackTrace();
 extern "C" RT_API void RtDisposeStackTrace();
 
-#endif // CMAJOR_RT_CALL_STACK_INCLUDED
+#endif // CMAJOR_RTS_CALL_STACK_INCLUDED

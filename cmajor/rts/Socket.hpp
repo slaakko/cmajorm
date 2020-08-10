@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_SOCKET_INCLUDED
-#define CMAJOR_RT_SOCKET_INCLUDED
+#ifndef CMAJOR_RTS_SOCKET_INCLUDED
+#define CMAJOR_RTS_SOCKET_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -45,4 +45,4 @@ void DoneSocket();
 
 } }  // namespace cmajor::rt
 
-#endif // CMAJOR_RT_SOCKET_INCLUDED
+#endif // CMAJOR_RTS_SOCKET_INCLUDED

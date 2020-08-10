@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_DEBUG_INCLUDED
-#define CMAJOR_RT_DEBUG_INCLUDED
+#ifndef CMAJOR_RTS_DEBUG_INCLUDED
+#define CMAJOR_RTS_DEBUG_INCLUDED
 #include <stdint.h>
 
 namespace cmajor { namespace rt {
@@ -18,4 +18,4 @@ void DoneCmdbSession();
 
 } } // namespace cmajor::rt
 
-#endif // CMAJOR_RT_DEBUG_INCLUDED
+#endif // CMAJOR_RTS_DEBUG_INCLUDED

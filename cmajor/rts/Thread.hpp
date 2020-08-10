@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_THREAD_INCLUDED
-#define CMAJOR_RT_THREAD_INCLUDED
+#ifndef CMAJOR_RTS_THREAD_INCLUDED
+#define CMAJOR_RTS_THREAD_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -23,4 +23,4 @@ void DoneThread();
 
 } } // namespace cmajor::rt
 
-#endif // CMAJOR_RT_THREAD_INCLUDED
+#endif // CMAJOR_RTS_THREAD_INCLUDED

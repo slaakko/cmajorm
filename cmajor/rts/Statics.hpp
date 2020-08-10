@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_STATICS_INCLUDED
-#define CMAJOR_RT_STATICS_INCLUDED
+#ifndef CMAJOR_RTS_STATICS_INCLUDED
+#define CMAJOR_RTS_STATICS_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <vector>
@@ -23,4 +23,4 @@ void DoneStatics();
 
 } }  // namespace cmajor::rt
 
-#endif // CMAJOR_RT_STATICS_INCLUDED
+#endif // CMAJOR_RTS_STATICS_INCLUDED

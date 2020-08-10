@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_CLASSES_INCLUDED
-#define CMAJOR_RT_CLASSES_INCLUDED
+#ifndef CMAJOR_RTS_CLASSES_INCLUDED
+#define CMAJOR_RTS_CLASSES_INCLUDED
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/uuid/uuid.hpp>
 
@@ -17,4 +17,4 @@ boost::multiprecision::uint128_t GetClassId(const boost::uuids::uuid& typeId);
 
 } } // namespace cmajor::rt
 
-#endif // CMAJOR_RT_CLASSES_INCLUDED
+#endif // CMAJOR_RTS_CLASSES_INCLUDED

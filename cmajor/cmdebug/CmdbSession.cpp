@@ -4,7 +4,6 @@
 // =================================
 
 #include <cmajor/cmdebug/CmdbSession.hpp>
-#include <cmajor/cmdebug/Debugger.hpp>
 #include <sngxml/dom/Document.hpp>
 #include <sngxml/dom/Element.hpp>
 #include <sngxml/dom/Parser.hpp>
@@ -16,12 +15,14 @@
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 #include <thread>
 #include <fstream>
 #include <stdexcept>
 #include <mutex>
 #include <condition_variable>
 #include <iostream>
+#include <chrono>
 #include <time.h>
 
 namespace cmajor { namespace debug {
@@ -31,6 +32,25 @@ using namespace soulng::unicode;
 
 int port = 54322;
 
+RemoveCmdbSessionFileGuard::RemoveCmdbSessionFileGuard(const std::string& cmdbSessionFilePath_) : cmdbSessionFilePath(cmdbSessionFilePath_)
+{
+}
+
+RemoveCmdbSessionFileGuard::~RemoveCmdbSessionFileGuard()
+{
+    try
+    {
+        boost::filesystem::remove(cmdbSessionFilePath);
+    }
+    catch (...)
+    {
+    }
+}
+
+CmdbSessionClient::~CmdbSessionClient()
+{
+}
+
 class CmdbSession
 {
 public:
@@ -38,7 +58,7 @@ public:
     static void Done();
     static CmdbSession& Instance() { return *instance; }
     void SetKeys(const std::string& skeyStr_, const std::string& rkeyStr_);
-    void Start(Debugger* debugger_);
+    void Start(CmdbSessionClient* client_);
     void Stop();
     void Run();
     void WaitForStarted();
@@ -55,9 +75,9 @@ private:
     TcpSocket listenSocket;
     std::mutex mtx;
     std::condition_variable started;
-    bool exiting;
-    bool sessionClosed;
-    Debugger* debugger;
+    std::atomic<bool> exiting;
+    std::atomic<bool> sessionClosed;
+    CmdbSessionClient* client;
     CmdbSession();
 };
 
@@ -73,7 +93,7 @@ void CmdbSession::Done()
     instance.reset();
 }
 
-CmdbSession::CmdbSession() : exiting(false), sessionClosed(false), debugger(nullptr)
+CmdbSession::CmdbSession() : exiting(false), sessionClosed(false), client(nullptr)
 {
 }
 
@@ -93,6 +113,7 @@ void CmdbSession::Run()
         while (!exiting)
         {
             TcpSocket socket = listenSocket.Accept();
+            if (exiting) return;
             sessionClosed = false;
             while (!sessionClosed)
             {
@@ -120,9 +141,9 @@ void RunSession()
     CmdbSession::Instance().Run();
 }
 
-void CmdbSession::Start(Debugger* debugger_)
+void CmdbSession::Start(CmdbSessionClient* client_)
 {
-    debugger = debugger_;
+    client = client_;
     thread = std::thread{ RunSession };
 }
 
@@ -131,13 +152,16 @@ void CmdbSession::Stop()
     try
     {
         exiting = true;
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         try
         {
             listenSocket.Close();
         }
         catch (...)
         {
+            std::cerr << "error from listen socket close." << std::endl;
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         thread.join();
     }
     catch (const std::exception& ex)
@@ -221,7 +245,7 @@ void CmdbSession::Transact(TcpSocket& socket)
 
 void CmdbSession::GetInput(TcpSocket& socket)
 {
-    std::string bytes = debugger->GetTargetInputBytes();
+    std::string bytes = client->GetTargetInputBytes();
     sngxml::dom::Document inputResponse;
     sngxml::dom::Element* inputResponseElement = new sngxml::dom::Element(U"cmdbMessage");
     inputResponseElement->SetAttribute(U"kind", U"inputResponse");
@@ -253,7 +277,7 @@ void CmdbSession::PutOutput(TcpSocket& socket, sngxml::dom::Element* request)
                     uint8_t x = ParseHexByte(hex);
                     output.append(1, static_cast<char>(x));
                 }
-                debugger->WriteTargetOuput(handle, output);
+                client->WriteTargetOuput(handle, output);
                 sngxml::dom::Document outputResponse;
                 sngxml::dom::Element* outputResponseElement = new sngxml::dom::Element(U"cmdbMessage");
                 outputResponseElement->SetAttribute(U"kind", U"outputResponse");
@@ -269,7 +293,7 @@ void SetCmdbSessionPort(int port_)
     port = port_;
 }
 
-void StartCmdbSession(const std::string& cmdbSessionFilePath, CodeFormatter& formatter, Debugger* debugger, bool verbose)
+void StartCmdbSession(const std::string& cmdbSessionFilePath, CodeFormatter& formatter, CmdbSessionClient* client, bool verbose)
 {
     if (verbose)
     {
@@ -301,7 +325,7 @@ void StartCmdbSession(const std::string& cmdbSessionFilePath, CodeFormatter& for
     cmdbSessionDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(sessionElement));
     cmdbSessionDoc.Write(sessionFileFormatter);
     CmdbSession::Instance().SetKeys(skeyStr, rkeyStr);
-    CmdbSession::Instance().Start(debugger);
+    CmdbSession::Instance().Start(client);
     CmdbSession::Instance().WaitForStarted();
 }
 

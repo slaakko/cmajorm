@@ -359,28 +359,9 @@ DebuggerVariable::DebuggerVariable(int index_, const std::string& gdbVarName_) :
 {
 }
 
-struct RemoveCmdbSessionFileGuard
-{
-    RemoveCmdbSessionFileGuard(const std::string& cmdbSessionFilePath_) : cmdbSessionFilePath(cmdbSessionFilePath_)
-    {
-
-    }
-    ~RemoveCmdbSessionFileGuard()
-    {
-        try
-        {
-            boost::filesystem::remove(cmdbSessionFilePath);
-        }
-        catch (...)
-        {
-        }
-    }
-    std::string cmdbSessionFilePath;
-};
-
 Debugger::Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_) :
     verbose(verbose_), formatter(formatter_), state(State::initializing), wasRunning(false), targetOutput(false), nextBreakpointNumber(1), nextTempBreakpointNumber(1),
-    nextGdbVariableIndex(1), console(console_)
+    nextGdbVariableIndex(1), console(console_), outFormatter(std::cout), errorFormatter(std::cerr)
 {
     std::string cmdbFilePath;
     if (soulng::util::EndsWith(executable, ".exe") )
@@ -1473,11 +1454,11 @@ void Debugger::WriteTargetOuput(int handle, const std::string& s)
 {
     if (handle == 1)
     {
-        std::cout << s;
+        outFormatter.Write(s);
     }
     else if (handle == 2)
     {
-        std::cerr << s;
+        errorFormatter.Write(s);
     }
 }
 

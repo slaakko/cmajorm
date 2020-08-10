@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_COMPRESSION_INCLUDED
-#define CMAJOR_RT_COMPRESSION_INCLUDED
+#ifndef CMAJOR_RTS_COMPRESSION_INCLUDED
+#define CMAJOR_RTS_COMPRESSION_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -27,4 +27,4 @@ extern "C" RT_API int32_t RtDecompressBZip2(void* outChunk, uint32_t outChunkSiz
 extern "C" RT_API const char* RtRetvalStrBZip2(int32_t retVal);
 
 
-#endif // CMAJOR_RT_COMPRESSION_INCLUDED
+#endif // CMAJOR_RTS_COMPRESSION_INCLUDED

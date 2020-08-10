@@ -11,20 +11,20 @@
 
 namespace soulng { namespace util {
 
-enum class ShutdownMode : int32_t
+enum class ShutdownMode 
 {
     receive = 0, send = 1, both = 2
 };
 
-UTIL_API int32_t CreateSocket();
-UTIL_API void BindSocket(int32_t socketHandle, int32_t port);
-UTIL_API void ListenSocket(int32_t socketHandle, int32_t backLog);
-UTIL_API int32_t AcceptSocket(int32_t socketHandle);
-UTIL_API void CloseSocket(int32_t socketHandle);
-UTIL_API void ShutdownSocket(int32_t socketHandle, ShutdownMode mode);
-UTIL_API int32_t ConnectSocket(const char* node, const char* service);
-UTIL_API int32_t SendSocket(int32_t socketHandle, uint8_t * buf, int32_t len, int32_t flags);
-UTIL_API int32_t ReceiveSocket(int32_t socketHandle, uint8_t * buf, int32_t len, int32_t flags);
+UTIL_API int64_t CreateSocket();
+UTIL_API void BindSocket(int64_t socketHandle, int port);
+UTIL_API void ListenSocket(int64_t socketHandle, int backLog);
+UTIL_API int64_t AcceptSocket(int64_t socketHandle);
+UTIL_API void CloseSocket(int64_t socketHandle);
+UTIL_API void ShutdownSocket(int64_t socketHandle, ShutdownMode mode);
+UTIL_API int64_t ConnectSocket(const std::string& node, const std::string& service);
+UTIL_API int SendSocket(int64_t socketHandle, uint8_t* buf, int len, int flags);
+UTIL_API int ReceiveSocket(int64_t socketHandle, uint8_t* buf, int len, int flags);
 UTIL_API void InitSocket();
 UTIL_API void DoneSocket();
 
@@ -33,7 +33,7 @@ class UTIL_API TcpSocket
 public:
     TcpSocket();
     TcpSocket(const std::string& node, const std::string& service);
-    TcpSocket(int handle_) noexcept;
+    TcpSocket(int64_t handle_) noexcept;
     TcpSocket(const TcpSocket&) = delete;
     TcpSocket& operator=(const TcpSocket&) = delete;
     TcpSocket(TcpSocket&& that) noexcept;
@@ -48,7 +48,7 @@ public:
     void Send(const uint8_t* buffer, int count);
     int Receive(uint8_t* buffer, int count);
 private:
-    int handle;
+    int64_t handle;
     bool connected;
     bool shutdown;
 };

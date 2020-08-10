@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_MUTEX_INCLUDED
-#define CMAJOR_RT_MUTEX_INCLUDED
+#ifndef CMAJOR_RTS_MUTEX_INCLUDED
+#define CMAJOR_RTS_MUTEX_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 #include <mutex>
@@ -27,4 +27,4 @@ void DoneMutex();
 
 } } // namespace cmajor::rt
 
-#endif // CMAJOR_RT_MUTEX_INCLUDED
+#endif // CMAJOR_RTS_MUTEX_INCLUDED

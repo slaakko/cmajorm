@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_PROCESS_INCLUDED
-#define CMAJOR_RT_PROCESS_INCLUDED
+#ifndef CMAJOR_RTS_PROCESS_INCLUDED
+#define CMAJOR_RTS_PROCESS_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -20,5 +20,5 @@ extern "C" RT_API int32_t RtProcessReadLine(void* process, int handle, int32_t& 
 extern "C" RT_API int32_t RtProcessReadToEnd(void* process, int handle, int32_t& errorStringHandle);
 extern "C" RT_API bool RtProcessWriteLine(void* process, const char* line, int32_t& errorStrHandle);
 
-#endif // CMAJOR_RT_PROCESS_INCLUDED
+#endif // CMAJOR_RTS_PROCESS_INCLUDED
 

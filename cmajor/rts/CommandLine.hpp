@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_COMMAND_LINE_INCLUDED
-#define CMAJOR_RT_COMMAND_LINE_INCLUDED
+#ifndef CMAJOR_RTS_COMMAND_LINE_INCLUDED
+#define CMAJOR_RTS_COMMAND_LINE_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -18,4 +18,4 @@ void DoneCommandLine();
 
 } } // namespace cmajor::rt
 
-#endif // CMAJOR_RT_COMMAND_LINE_INCLUDED
+#endif // CMAJOR_RTS_COMMAND_LINE_INCLUDED

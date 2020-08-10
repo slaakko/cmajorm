@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_MATH_INCLUDED
-#define CMAJOR_RT_MATH_INCLUDED
+#ifndef CMAJOR_RTS_MATH_INCLUDED
+#define CMAJOR_RTS_MATH_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -17,4 +17,4 @@ extern "C" RT_API double RtSin(double angleRad);
 extern "C" RT_API double RtAtan2(double y, double x);
 extern "C" RT_API double RtEpsilon();
 
-#endif // CMAJOR_RT_MATH_INCLUDED
+#endif // CMAJOR_RTS_MATH_INCLUDED

@@ -40,57 +40,12 @@ namespace soulng { namespace util {
 
 using namespace soulng::unicode;
 
-struct SocketData
-{
-    SocketData() : socket(INVALID_SOCKET)  {}
-    SocketData(SOCKET socket_) : socket(socket_) {}
-    SOCKET socket;
-};
-
-class SocketTable
-{
-public:
-    static void Init();
-    static void Done();
-    static SocketTable& Instance() { Assert(instance, "socket table not initialized"); return *instance; }
-    ~SocketTable();
-    int32_t CreateSocket();
-    void BindSocket(int32_t socketHandle, int32_t port);
-    void ListenSocket(int32_t socketHandle, int32_t backlog);
-    int32_t AcceptSocket(int32_t socketHandle);
-    void CloseSocket(int32_t socketHandle);
-    void ShutdownSocket(int32_t socketHandle, ShutdownMode mode);
-    int32_t ConnectSocket(const std::string& node, const std::string& service);
-    int32_t SendSocket(int32_t socketHandle, const uint8_t* buf, int32_t len, int32_t flags);
-    int32_t ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t len, int32_t flags);
-private:
-    static std::unique_ptr<SocketTable> instance;
-    const int32_t maxNoLockSocketHandles = 256;
-    std::vector<std::unique_ptr<SocketData>> sockets;
-    std::unordered_map<int32_t, std::unique_ptr<SocketData>> socketMap;
-    std::atomic<int32_t> nextSocketHandle;
-    std::mutex mtx;
-    SocketTable();
-};
-
-std::unique_ptr<SocketTable> SocketTable::instance;
-
-void SocketTable::Init()
-{
-    instance.reset(new SocketTable());
-}
-
-void SocketTable::Done()
-{
-    instance.reset();
-}
-
 #ifdef _WIN32
 
 std::string GetSocketErrorMessage(int errorCode)
 {
-    char16_t buf[1024];
-    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, (LPWSTR)(&buf[0]), sizeof(buf), NULL);
+    char16_t buf[2048];
+    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, NULL, errorCode, 0, (LPWSTR)(&buf[0]), sizeof(buf) / 2, NULL);
     return ToUtf8(std::u16string(buf));
 }
 
@@ -113,9 +68,15 @@ int GetLastSocketError()
 
 #endif
 
-SocketTable::SocketTable() : nextSocketHandle(1)
+class Sockets
 {
-    sockets.resize(maxNoLockSocketHandles);
+public:
+    static void Init();
+    static void Done();
+};
+
+void Sockets::Init()
+{
 #ifdef _WIN32
     WORD ver = MAKEWORD(2, 2);
     WSADATA wsaData;
@@ -128,14 +89,14 @@ SocketTable::SocketTable() : nextSocketHandle(1)
 #endif
 }
 
-SocketTable::~SocketTable()
+void Sockets::Done()
 {
 #ifdef _WIN32
     WSACleanup();
 #endif
 }
 
-int32_t SocketTable::CreateSocket()
+int64_t CreateSocket()
 {
     SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (s == INVALID_SOCKET)
@@ -144,69 +105,18 @@ int32_t SocketTable::CreateSocket()
         std::string errorMessage = GetSocketErrorMessage(errorCode);
         throw std::runtime_error(errorMessage);
     }
-    int32_t socketHandle = nextSocketHandle++;
-    if (socketHandle < maxNoLockSocketHandles)
-    {
-        sockets[socketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        socketMap[socketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
-    }
-    return socketHandle;
+    return static_cast<int64_t>(s);
 }
 
-void SocketTable::BindSocket(int32_t socketHandle, int32_t port)
+void BindSocket(int64_t socketHandle, int port)
 {
     int result = 0;
-    if (socketHandle <= 0)
-    {
-        throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-    }
-    else if (socketHandle < maxNoLockSocketHandles)
-    {
-        if (!sockets[socketHandle])
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        SOCKET s = sockets[socketHandle]->socket;
-        if (s == INVALID_SOCKET)
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        struct sockaddr_in addr;
-        addr.sin_family = AF_INET;
-        addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-        addr.sin_port = htons(port);
-        result = bind(s, (struct sockaddr*)&addr, sizeof(addr));
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = socketMap.find(socketHandle);
-        if (it != socketMap.cend())
-        {
-            if (!it->second)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            SOCKET s = it->second->socket;
-            if (s == INVALID_SOCKET)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            struct sockaddr_in addr;
-            addr.sin_family = AF_INET;
-            addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-            addr.sin_port = htons(port);
-            result = bind(s, (struct sockaddr*)&addr, sizeof(addr));
-        }
-        else
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-    }
+    SOCKET s = static_cast<SOCKET>(socketHandle);
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    addr.sin_port = htons(port);
+    result = bind(s, (struct sockaddr*)&addr, sizeof(addr));
     if (result != 0)
     {
         int errorCode = GetLastSocketError();
@@ -215,48 +125,11 @@ void SocketTable::BindSocket(int32_t socketHandle, int32_t port)
     }
 }
 
-void SocketTable::ListenSocket(int32_t socketHandle, int32_t backlog)
+void ListenSocket(int64_t socketHandle, int backlog)
 {
     int result = 0;
-    if (socketHandle <= 0)
-    {
-        throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-    }
-    else if (socketHandle < maxNoLockSocketHandles)
-    {
-        if (!sockets[socketHandle])
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        SOCKET s = sockets[socketHandle]->socket;
-        if (s == INVALID_SOCKET)
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        result = listen(s, backlog);
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = socketMap.find(socketHandle);
-        if (it != socketMap.cend())
-        {
-            if (!it->second)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            SOCKET s = it->second->socket;
-            if (s == INVALID_SOCKET)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            result = listen(s, backlog);
-        }
-        else
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-    }
+    SOCKET s = static_cast<SOCKET>(socketHandle);
+    result = listen(s, backlog);
     if (result != 0)
     {
         int errorCode = GetLastSocketError();
@@ -265,127 +138,28 @@ void SocketTable::ListenSocket(int32_t socketHandle, int32_t backlog)
     }
 }
 
-int32_t SocketTable::AcceptSocket(int32_t socketHandle)
+int64_t AcceptSocket(int64_t socketHandle)
 {
-    SOCKET a = 0;
-    if (socketHandle <= 0)
+    SOCKET s = static_cast<SOCKET>(socketHandle);
+    SOCKET a = accept(s, NULL, NULL);
+    if (a == INVALID_SOCKET)
     {
-        throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
+        int errorCode = GetLastSocketError();
+        std::string errorMessage = GetSocketErrorMessage(errorCode);
+        throw std::runtime_error(errorMessage);
     }
-    else if (socketHandle < maxNoLockSocketHandles)
-    {
-        if (!sockets[socketHandle])
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        SOCKET s = sockets[socketHandle]->socket;
-        if (s == INVALID_SOCKET)
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        a = accept(s, NULL, NULL);
-        if (a == INVALID_SOCKET)
-        {
-            int errorCode = GetLastSocketError();
-            std::string errorMessage = GetSocketErrorMessage(errorCode);
-            throw std::runtime_error(errorMessage);
-        }
-        int32_t acceptedSocketHandle = nextSocketHandle++;
-        if (acceptedSocketHandle < maxNoLockSocketHandles)
-        {
-            sockets[acceptedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(a));
-        }
-        else
-        {
-            std::lock_guard<std::mutex> lock(mtx);
-            socketMap[acceptedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(a));
-        }
-        return acceptedSocketHandle;
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = socketMap.find(socketHandle);
-        if (it != socketMap.cend())
-        {
-            if (!it->second)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            SOCKET s = it->second->socket;
-            if (s == INVALID_SOCKET)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            a = accept(s, NULL, NULL);
-            if (a == INVALID_SOCKET)
-            {
-                int errorCode = GetLastSocketError();
-                std::string errorMessage = GetSocketErrorMessage(errorCode);
-                throw std::runtime_error(errorMessage);
-            }
-            int32_t acceptedSocketHandle = nextSocketHandle++;
-            if (acceptedSocketHandle < maxNoLockSocketHandles)
-            {
-                sockets[acceptedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(a));
-            }
-            else
-            {
-                socketMap[acceptedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(a));
-            }
-            return acceptedSocketHandle;
-        }
-        else
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-    }
+    return static_cast<int64_t>(a);
 }
 
-void SocketTable::CloseSocket(int32_t socketHandle)
+void CloseSocket(int64_t socketHandle)
 {
     int result = 0;
-    if (socketHandle <= 0)
-    {
-        throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-    }
-    else if (socketHandle < maxNoLockSocketHandles)
-    {
-        SocketData* socketData = sockets[socketHandle].get();
-        if (!socketData)
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        SOCKET s = socketData->socket;
+    SOCKET s = static_cast<SOCKET>(socketHandle);
 #ifdef _WIN32
-        result = closesocket(s);
+    result = closesocket(s);
 #else
-        result = close(s);
+    result = close(s);
 #endif
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = socketMap.find(socketHandle);
-        if (it != socketMap.cend())
-        {
-            SocketData* socketData = it->second.get();
-            if (!socketData)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            SOCKET s = socketData->socket;
-#ifdef _WIN32
-            result = closesocket(s);
-#else
-            result = close(s);
-#endif
-        }
-        else
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-    }
     if (result != 0)
     {
         int errorCode = GetLastSocketError();
@@ -394,7 +168,7 @@ void SocketTable::CloseSocket(int32_t socketHandle)
     }
 }
 
-void SocketTable::ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
+void ShutdownSocket(int64_t socketHandle, ShutdownMode mode)
 {
     int result = 0;
     int how = SD_RECEIVE;
@@ -404,39 +178,8 @@ void SocketTable::ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
         case ShutdownMode::send: how = SD_SEND; break;
         case ShutdownMode::both: how = SD_BOTH; break;
     }
-    if (socketHandle <= 0)
-    {
-        throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-    }
-    else if (socketHandle < maxNoLockSocketHandles)
-    {
-        SocketData* socketData = sockets[socketHandle].get();
-        if (!socketData)
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        SOCKET s = socketData->socket;
-        result = shutdown(s, how);
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = socketMap.find(socketHandle);
-        if (it != socketMap.cend())
-        {
-            SocketData* socketData = it->second.get();
-            if (!socketData)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            SOCKET s = socketData->socket;
-            result = shutdown(s, how);
-        }
-        else
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-    }
+    SOCKET s = static_cast<SOCKET>(socketHandle);
+    result = shutdown(s, how);
     if (result != 0)
     {
         int errorCode = GetLastSocketError();
@@ -445,9 +188,8 @@ void SocketTable::ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
     }
 }
 
-int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& service)
+int64_t ConnectSocket(const std::string& node, const std::string& service)
 {
-    std::unique_ptr<SocketData> socketData(new SocketData());
     struct addrinfo hint;
     struct addrinfo* rp;
     struct addrinfo* res;
@@ -484,17 +226,7 @@ int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& s
             if (result == 0)
             {
                 freeaddrinfo(res);
-                int32_t connectedSocketHandle = nextSocketHandle++;
-                if (connectedSocketHandle < maxNoLockSocketHandles)
-                {
-                    sockets[connectedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
-                }
-                else
-                {
-                    std::lock_guard<std::mutex> lock(mtx);
-                    socketMap[connectedSocketHandle] = std::unique_ptr<SocketData>(new SocketData(s));
-                }
-                return connectedSocketHandle;
+                return static_cast<int64_t>(s);
             }
             else
             {
@@ -509,42 +241,11 @@ int32_t SocketTable::ConnectSocket(const std::string& node, const std::string& s
     throw std::runtime_error(errorMessage);
 }
 
-int32_t SocketTable::SendSocket(int32_t socketHandle, const uint8_t* buf, int32_t len, int32_t flags)
+int SendSocket(int64_t socketHandle, const uint8_t* buf, int len, int flags)
 {
-    int32_t result = 0;
-    if (socketHandle <= 0)
-    {
-        throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-    }
-    else if (socketHandle < maxNoLockSocketHandles)
-    {
-        SocketData* socketData = sockets[socketHandle].get();
-        if (!socketData)
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        SOCKET s = socketData->socket;
-        result = send(s, (const char*)buf, len, flags);
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = socketMap.find(socketHandle);
-        if (it != socketMap.cend())
-        {
-            SocketData* socketData = it->second.get();
-            if (!socketData)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            SOCKET s = socketData->socket;
-            result = send(s, (const char*)buf, len, flags);
-        }
-        else
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-    }
+    int result = 0;
+    SOCKET s = static_cast<SOCKET>(socketHandle);
+    result = send(s, (const char*)buf, len, flags);
     if (result < 0)
     {
         int errorCode = GetLastSocketError();
@@ -554,42 +255,11 @@ int32_t SocketTable::SendSocket(int32_t socketHandle, const uint8_t* buf, int32_
     return result;
 }
 
-int32_t SocketTable::ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t len, int32_t flags)
+int ReceiveSocket(int64_t socketHandle, uint8_t* buf, int len, int flags)
 {
-    int32_t result = 0;
-    if (socketHandle <= 0)
-    {
-        throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-    }
-    else if (socketHandle < maxNoLockSocketHandles)
-    {
-        SocketData* socketData = sockets[socketHandle].get();
-        if (!socketData)
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-        SOCKET s = socketData->socket;
-        result = recv(s, (char*)buf, len, flags);
-    }
-    else
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = socketMap.find(socketHandle);
-        if (it != socketMap.cend())
-        {
-            SocketData* socketData = it->second.get();
-            if (!socketData)
-            {
-                throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-            }
-            SOCKET s = socketData->socket;
-            result = recv(s, (char*)buf, len, flags);
-        }
-        else
-        {
-            throw std::runtime_error("invalid socket handle " + std::to_string(socketHandle));
-        }
-    }
+    int result = 0;
+    SOCKET s = static_cast<SOCKET>(socketHandle);
+    result = recv(s, (char*)buf, len, flags);
     if (result < 0)
     {
         int errorCode = GetLastSocketError();
@@ -601,57 +271,12 @@ int32_t SocketTable::ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t l
 
 void InitSocket()
 {
-    SocketTable::Init();
+    Sockets::Init();
 }
 
 void DoneSocket()
 {
-    SocketTable::Done();
-}
-
-int32_t CreateSocket()
-{
-    return SocketTable::Instance().CreateSocket();
-}
-
-void BindSocket(int32_t socketHandle, int32_t port)
-{
-    SocketTable::Instance().BindSocket(socketHandle, port);
-}
-
-void ListenSocket(int32_t socketHandle, int32_t backLog)
-{
-    SocketTable::Instance().ListenSocket(socketHandle, backLog);
-}
-
-int32_t AcceptSocket(int32_t socketHandle)
-{
-    return SocketTable::Instance().AcceptSocket(socketHandle);
-}
-
-void CloseSocket(int32_t socketHandle)
-{
-    SocketTable::Instance().CloseSocket(socketHandle);
-}
-
-void ShutdownSocket(int32_t socketHandle, ShutdownMode mode)
-{
-    SocketTable::Instance().ShutdownSocket(socketHandle, mode);
-}
-
-int32_t ConnectSocket(const char* node, const char* service)
-{
-    return SocketTable::Instance().ConnectSocket(node, service);
-}
-
-int32_t SendSocket(int32_t socketHandle, const uint8_t* buf, int32_t len, int32_t flags)
-{
-    return SocketTable::Instance().SendSocket(socketHandle, buf, len, flags);
-}
-
-int32_t ReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t len, int32_t flags)
-{
-    return SocketTable::Instance().ReceiveSocket(socketHandle, buf, len, flags);
+    Sockets::Done();
 }
 
 TcpSocket::TcpSocket() : handle(CreateSocket()), connected(false), shutdown(false)
@@ -662,7 +287,7 @@ TcpSocket::TcpSocket(const std::string& node, const std::string& service) : hand
 {
 }
 
-TcpSocket::TcpSocket(int handle_) noexcept : handle(handle_), connected(true), shutdown(false)
+TcpSocket::TcpSocket(int64_t handle_) noexcept : handle(handle_), connected(true), shutdown(false)
 {
 }
 
@@ -683,7 +308,7 @@ TcpSocket& TcpSocket::operator=(TcpSocket&& that) noexcept
 
 TcpSocket::~TcpSocket()
 {
-    if (handle > 0)
+    if (handle != -1)
     {
         if (connected && !shutdown)
         {
@@ -707,15 +332,16 @@ TcpSocket::~TcpSocket()
 
 void TcpSocket::Close()
 {
-    if (handle > 0)
+    if (handle != -1)
     {
         if (connected && !shutdown)
         {
             Shutdown(ShutdownMode::both);
         }
-        CloseSocket(handle);
+        int64_t s = handle;
         handle = -1;
         connected = false;
+        CloseSocket(s);
     }
 }
 
@@ -738,7 +364,7 @@ void TcpSocket::Listen(int backlog)
 
 TcpSocket TcpSocket::Accept()
 {
-    int acceptedHandle = AcceptSocket(handle);
+    int64_t acceptedHandle = AcceptSocket(handle);
     return TcpSocket(acceptedHandle);
 }
 
@@ -754,7 +380,7 @@ void TcpSocket::Send(const uint8_t* buffer, int count)
     int bytesToSend = count;
     while (bytesToSend > 0)
     {
-        int result = SendSocket(handle, buffer + offset, count, 0);
+        int32_t result = SendSocket(handle, buffer + offset, count, 0);
         if (result >= 0)
         {
             bytesToSend = bytesToSend - result;

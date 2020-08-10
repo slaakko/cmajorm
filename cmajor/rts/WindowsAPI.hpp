@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_WINDOWS_API_INCLUDED
-#define CMAJOR_RT_WINDOWS_API_INCLUDED
+#ifndef CMAJOR_RTS_WINDOWS_API_INCLUDED
+#define CMAJOR_RTS_WINDOWS_API_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -274,4 +274,4 @@ extern "C" RT_API bool WinGlobalUnlock(void* memHandle);
 extern "C" RT_API void* WinGlobalFree(void* memHandle);
 extern "C" RT_API uint64_t WinGlobalSize(void* memHandle);
 
-#endif // CMAJOR_RT_WINDOWS_API_INCLUDED
+#endif // CMAJOR_RTS_WINDOWS_API_INCLUDED

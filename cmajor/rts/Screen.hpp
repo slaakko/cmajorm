@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_SCREEN_INCLUDED
-#define CMAJOR_RT_SCREEN_INCLUDED
+#ifndef CMAJOR_RTS_SCREEN_INCLUDED
+#define CMAJOR_RTS_SCREEN_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 
 extern "C" RT_API void RtInitScreen();
@@ -166,4 +166,4 @@ void DoneScreen();
 
 } } // namespace cmajor::rt
 
-#endif // CMAJOR_RT_SCREEN_INCLUDED
+#endif // CMAJOR_RTS_SCREEN_INCLUDED

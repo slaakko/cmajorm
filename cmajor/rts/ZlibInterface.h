@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_ZLIB_INTERFACE_INCLUDED
-#define CMAJOR_RT_ZLIB_INTERFACE_INCLUDED
+#ifndef CMAJOR_RTS_ZLIB_INTERFACE_INCLUDED
+#define CMAJOR_RTS_ZLIB_INTERFACE_INCLUDED
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -22,4 +22,4 @@ const char* zlib_retval_str(int32_t retVal);
 }
 #endif
 
-#endif // CMAJOR_RT_ZLIB_INTERFACE_INCLUDED
+#endif // CMAJOR_RTS_ZLIB_INTERFACE_INCLUDED

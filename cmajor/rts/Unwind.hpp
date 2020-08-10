@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_UNWIND_INCLUDED
-#define CMAJOR_RT_UNWIND_INCLUDED
+#ifndef CMAJOR_RTS_UNWIND_INCLUDED
+#define CMAJOR_RTS_UNWIND_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 
 extern "C" RT_API void* RtPushUnwindInfo(void* unwindInfo);
@@ -15,4 +15,4 @@ extern "C" RT_API void RtDisposeCallStack();
 void InitUnwind();
 void DoneUnwind();
 
-#endif // CMAJOR_RT_UNWIND_INCLUDED
+#endif // CMAJOR_RTS_UNWIND_INCLUDED

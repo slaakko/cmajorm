@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_MULTIPRECISION_INCLUDED
-#define CMAJOR_RT_MULTIPRECISION_INCLUDED
+#ifndef CMAJOR_RTS_MULTIPRECISION_INCLUDED
+#define CMAJOR_RTS_MULTIPRECISION_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -103,4 +103,4 @@ extern "C" RT_API bool RtGreaterBigFloat(void* left, void* right, int32_t& error
 extern "C" RT_API bool RtLessEqualBigFloat(void* left, void* right, int32_t& errorStrHandle);
 extern "C" RT_API bool RtGreaterEqualBigFloat(void* left, void* right, int32_t& errorStrHandle);
 
-#endif // CMAJOR_RT_MULTIPRECISION_INCLUDED
+#endif // CMAJOR_RTS_MULTIPRECISION_INCLUDED

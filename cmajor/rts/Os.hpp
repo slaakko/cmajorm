@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_OS_INCLUDED
-#define CMAJOR_RT_OS_INCLUDED
+#ifndef CMAJOR_RTS_OS_INCLUDED
+#define CMAJOR_RTS_OS_INCLUDED
 #include <cmajor/rts/RtsApi.hpp>
 #include <stdint.h>
 
@@ -59,4 +59,4 @@ extern "C" RT_API void* OsFindFirstChangeNotification(const char* directoryPath)
 extern "C" RT_API bool OsFindNextChangeNotification(void* handle);
 extern "C" RT_API void OsFindCloseChangeNotification(void* handle);
 
-#endif // CMAJOR_RT_OS_INCLUDED
+#endif // CMAJOR_RTS_OS_INCLUDED

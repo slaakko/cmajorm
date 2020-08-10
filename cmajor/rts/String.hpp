@@ -3,8 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#ifndef CMAJOR_RT_STRING_INCLUDED
-#define CMAJOR_RT_STRING_INCLUDED
+#ifndef CMAJOR_RTS_STRING_INCLUDED
+#define CMAJOR_RTS_STRING_INCLUDED
 #include <soulng/util/Error.hpp>
 #include <memory>
 #include <unordered_map>
@@ -38,4 +38,4 @@ void DoneString();
 
 } } // namespace cmajor::rt
 
-#endif // CMAJOR_RT_STRING_INCLUDED
+#endif // CMAJOR_RTS_STRING_INCLUDED

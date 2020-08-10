@@ -8,6 +8,7 @@
 #include <cmajor/cmdebug/DebugApi.hpp>
 #include <cmajor/cmdebug/DebugInfo.hpp>
 #include <cmajor/cmdebug/Gdb.hpp>
+#include <cmajor/cmdebug/CmdbSession.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <string>
 #include <vector>
@@ -73,7 +74,7 @@ private:
     std::string gdbVarName;
 };
 
-class DEBUG_API Debugger : public GdbDriver
+class DEBUG_API Debugger : public GdbDriver, public CmdbSessionClient
 {
 public:
     Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_);
@@ -97,6 +98,8 @@ public:
     void TargetInputPrompt() override;
     void Error(const std::string& msg) override;
     bool LatestCommandWasRunningCommand() override;
+    void WriteTargetOuput(int handle, const std::string& s) override;
+    std::string GetTargetInputBytes() override;
     bool Run();
     void Help();
     void Next();
@@ -118,8 +121,6 @@ public:
     void Evaluate(const std::string& expression);
     DIType* GetType(const std::string& expression);
     bool ExecuteGDBCommand(const GdbCommand& command);
-    void WriteTargetOuput(int handle, const std::string& s);
-    std::string GetTargetInputBytes();
     void ProcessReply(GdbCommand::Kind commandKind, GdbReply* reply);
     void ProcessConsoleOutput(GdbConsoleOutputRecord* record);
     void ProcessTargetOutput(GdbTargetOutputRecord* record);
@@ -184,6 +185,8 @@ private:
     std::string debuggerBreakpointId;
     Console& console;
     std::recursive_mutex outputMutex;
+    CodeFormatter outFormatter;
+    CodeFormatter errorFormatter;
 };
 
 class DEBUG_API DebuggerCommand
