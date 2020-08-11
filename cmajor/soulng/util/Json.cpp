@@ -152,7 +152,8 @@ std::string JsonObject::GetStringField(const std::u32string& fieldName)
     {
         if (value->Type() == JsonValueType::string)
         {
-            return value->ToString();
+            JsonString* str = static_cast<JsonString*>(value);
+            return ToUtf8(str->Value());
         }
         else
         {

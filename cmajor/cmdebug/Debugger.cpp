@@ -361,7 +361,7 @@ DebuggerVariable::DebuggerVariable(int index_, const std::string& gdbVarName_) :
 
 Debugger::Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_) :
     verbose(verbose_), formatter(formatter_), state(State::initializing), wasRunning(false), targetOutput(false), nextBreakpointNumber(1), nextTempBreakpointNumber(1),
-    nextGdbVariableIndex(1), console(console_), outFormatter(std::cout), errorFormatter(std::cerr)
+    nextGdbVariableIndex(1), console(console_), outFormatter(std::cout), errorFormatter(std::cerr), stoppedInstruction(nullptr)
 {
     std::string cmdbFilePath;
     if (soulng::util::EndsWith(executable, ".exe") )
@@ -659,11 +659,25 @@ bool Debugger::Run()
 
 void Debugger::Help()
 {
-    // todo
+    formatter.WriteLine("(e)xit | (q)uit |");
+    formatter.WriteLine("(n)ext |");
+    formatter.WriteLine("(s)tep |");
+    formatter.WriteLine("(c)ontinue |");
+    formatter.WriteLine("(f)inish |");
+    formatter.WriteLine("(u)ntil <location> |");
+    formatter.WriteLine("(b)reak <location> |");
+    formatter.WriteLine("(d)elete <breakpoint_number> |");
+    formatter.WriteLine("depth |");
+    formatter.WriteLine("frames [low high] |");
+    formatter.WriteLine("show breakpoint <breakpoint_number> |");
+    formatter.WriteLine("show breakpoints");
+    formatter.WriteLine("list (<location> | *) |");
+    formatter.WriteLine("print <expression>");
 }
 
 void Debugger::Next()
 {
+    bool succeeded = false;
     ClearBrowsingData();
     result.reset(new JsonObject());
     if (state != State::stopped && state != State::programStarted)
@@ -671,14 +685,17 @@ void Debugger::Next()
         throw std::runtime_error("error: state is '" + StateStr(state) + "'");
     }
     std::set<Instruction*> next;
-    AddToNextSet(next, stoppedInstruction);
+    if (stoppedInstruction != nullptr)
+    {
+        AddToNextSet(next, stoppedInstruction);
+    }
     Instruction* prevStoppedInstruction = stoppedInstruction;
     bool stop = false;
     while (!stop)
     {
         stoppedInstruction = nullptr;
         GdbExecNextCommand execNextCommand;
-        bool succeeded = ExecuteGDBCommand(execNextCommand);
+        succeeded = ExecuteGDBCommand(execNextCommand);
         if (succeeded)
         {
             if (state == State::stopped)
@@ -743,12 +760,50 @@ void Debugger::Next()
                 std::lock_guard<std::recursive_mutex> lock(outputMutex);
                 result->Write(formatter);
             }
+            stop = true;
         }
     }
 }
 
 void Debugger::Step()
 {
+    bool step = true;
+    if (state == State::stopped && stoppedInstruction != nullptr && (stoppedInstruction->GetFlags() & InstructionFlags::endBrace) != InstructionFlags::none)
+    {
+        step = false;
+        GdbStackListFramesCommand frames(1, 1);
+        bool succeeded = ExecuteGDBCommand(frames);
+        if (succeeded)
+        {
+            if (result->Type() == JsonValueType::object)
+            {
+                JsonObject* resultObject = static_cast<JsonObject*>(result.get());
+                JsonValue* framesValue = resultObject->GetField(U"frames");
+                if (framesValue && framesValue->Type() == JsonValueType::array)
+                {
+                    JsonArray* framesArray = static_cast<JsonArray*>(framesValue);
+                    if (framesArray->Count() == 1)
+                    {
+                        JsonValue* frameValue = (*framesArray)[0];
+                        if (frameValue && frameValue->Type() == JsonValueType::object)
+                        {
+                            JsonObject* frameObject = static_cast<JsonObject*>(frameValue);
+                            JsonValue* line = frameObject->GetField(U"line");
+                            if (line)
+                            {
+                                step = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (!step)
+    {
+        Next();
+        return;
+    }
     ClearBrowsingData();
     result.reset(new JsonObject());
     if (state != State::stopped && state != State::programStarted)
@@ -850,7 +905,7 @@ void Debugger::Step()
     }
 }
 
-void Debugger::Continue()
+bool Debugger::Continue()
 {
     ClearBrowsingData();
     result.reset(new JsonObject());
@@ -893,7 +948,13 @@ void Debugger::Continue()
     {
         std::lock_guard<std::recursive_mutex> lock(outputMutex);
         result->Write(formatter);
+        return false;
     }
+    else
+    {
+        return false;
+    }
+    return true;
 }
 
 void Debugger::Finish()
@@ -904,33 +965,92 @@ void Debugger::Finish()
     {
         throw std::runtime_error("error: state is '" + StateStr(state) + "'");
     }
-    GdbExecFinishCommand execFinishCommand;
-    bool succeeded = ExecuteGDBCommand(execFinishCommand);
+    GdbStackListFramesCommand frames(1, 1);
+    bool succeeded = ExecuteGDBCommand(frames);
     if (succeeded)
     {
-        if (state == State::stopped)
+        succeeded = false;
+        if (result->Type() == JsonValueType::object)
         {
-            if (stoppedInstruction != nullptr)
+            JsonObject* resultObject = static_cast<JsonObject*>(result.get());
+            JsonValue* framesValue = resultObject->GetField(U"frames");
+            if (framesValue && framesValue->Type() == JsonValueType::array)
             {
-                if (stoppedInstruction->CppLineIndex() == 0 && IsStopInstruction(stoppedInstruction))
+                JsonArray* framesArray = static_cast<JsonArray*>(framesValue);
+                if (framesArray->Count() == 1)
                 {
-                    std::lock_guard<std::recursive_mutex> lock(outputMutex);
-                    AddStopResultToResult();
-                    result->Write(formatter);
-                    stoppedInstruction->PrintSource(formatter);
+                    JsonValue* frameValue = (*framesArray)[0];
+                    if (frameValue && frameValue->Type() == JsonValueType::object)
+                    {
+                        JsonObject* frameObject = static_cast<JsonObject*>(frameValue);
+                        JsonValue* line = frameObject->GetField(U"line");
+                        if (line)
+                        {
+                            JsonValue* cppFramesValue = resultObject->GetField(U"cppFrames");
+                            if (cppFramesValue && cppFramesValue->Type() == JsonValueType::array)
+                            {
+                                JsonArray* cppFramesArray = static_cast<JsonArray*>(cppFramesValue);
+                                if (cppFramesArray->Count() == 1)
+                                {
+                                    JsonValue* cppFrameValue = (*cppFramesArray)[0];
+                                    if (cppFrameValue && cppFrameValue->Type() == JsonValueType::object)
+                                    {
+                                        JsonObject* cppFrameObject = static_cast<JsonObject*>(cppFrameValue);
+                                        std::string func = cppFrameObject->GetStringField(U"func");
+                                        std::string file = cppFrameObject->GetStringField(U"file");
+                                        std::string line = cppFrameObject->GetStringField(U"line");
+                                        Frame frame;
+                                        frame.func = func;
+                                        frame.file = file;
+                                        frame.line = boost::lexical_cast<int>(line);
+                                        Instruction* inst = debugInfo->GetInstruction(frame, formatter);
+                                        if (inst)
+                                        {
+                                            std::set<Instruction*> nextSet;
+                                            AddToNextSet(nextSet, inst);
+                                            while (nextSet.empty() && inst)
+                                            {
+                                                inst = inst->Next();
+                                                if (inst && !inst->GetCmajorFrame().IsEmpty() && inst->CppLineIndex() == 0)
+                                                {
+                                                    nextSet.insert(inst);
+                                                }
+                                            }
+                                            std::vector<Instruction*> instructions;
+                                            for (Instruction* next : nextSet)
+                                            {
+                                                instructions.push_back(next);
+                                            }
+                                            if (!instructions.empty())
+                                            {
+                                                std::unique_ptr<DebuggerBreakpoint> bp(new DebuggerBreakpoint(GetNextTemporaryBreakpointId()));
+                                                std::string bpId = bp->Id();
+                                                if (Break(std::move(bp), instructions))
+                                                {
+                                                    Continue();
+                                                    Delete(bpId, false);
+                                                    succeeded = true;
+                                                }
+                                                else
+                                                {
+                                                    throw std::runtime_error("error: finish: could not set temporary breakpoint");
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-                else
-                {
-                    Next();
-                }
-            }
-            else
-            {
-                Next();
             }
         }
+        if (!succeeded)
+        {
+            throw std::runtime_error("error: finish: could not set temporary breakpoint");
+        }
     }
-    else if (result)
+    if (!succeeded && result)
     {
         std::lock_guard<std::recursive_mutex> lock(outputMutex);
         result->Write(formatter);
@@ -946,41 +1066,30 @@ void Debugger::Until(const SourceLocation& location)
         throw std::runtime_error("error: state is '" + StateStr(state) + "'");
     }
     std::vector<Instruction*> instructions = debugInfo->GetSourceFileMap().GetInstructions(location);
-    if (instructions.size() == 1)
-    {
-        Instruction* instruction = instructions[0];
-        GdbExecUntilCommand execUntilCommand(instruction->GetFileLineCppLocationArgs());
-        bool succeeded = ExecuteGDBCommand(execUntilCommand);
-        if (succeeded)
-        {
-            if (state == State::stopped)
-            {
-                if (stoppedInstruction != nullptr)
-                {
-                    if (stoppedInstruction->CppLineIndex() == 0 && IsStopInstruction(stoppedInstruction))
-                    {
-                        std::lock_guard<std::recursive_mutex> lock(outputMutex);
-                        AddStopResultToResult();
-                        result->Write(formatter);
-                        stoppedInstruction->PrintSource(formatter);
-                    }
-                }
-            }
-        }
-    }
-    else if (instructions.size() > 1)
+    bool succeeded = false;
+    if (!instructions.empty())
     {
         std::unique_ptr<DebuggerBreakpoint> bp(new DebuggerBreakpoint(GetNextTemporaryBreakpointId()));
         std::string bpId = bp->Id();
         if (Break(std::move(bp), instructions))
         {
             Continue();
-            Delete(bpId);
+            Delete(bpId, false);
+            succeeded = true;
         }
         else
         {
             throw std::runtime_error("error: could not set temporary breakpoint to location '" + location.ToString() + "'");
         }
+    }
+    else
+    {
+        throw std::runtime_error("error: could not set temporary breakpoint to location '" + location.ToString() + "': no matching instructions");
+    }
+    if (!succeeded && result)
+    {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
+        result->Write(formatter);
     }
 }
 
@@ -1037,6 +1146,11 @@ void Debugger::Break(const SourceLocation& location)
 
 void Debugger::Delete(const std::string& breakpointId)
 {
+    Delete(breakpointId, true);
+}
+
+void Debugger::Delete(const std::string& breakpointId, bool printResult)
+{
     JsonObject* resultObject = new JsonObject();
     result.reset(resultObject);
     auto it = debuggerBreakpointMap.find(breakpointId);
@@ -1074,8 +1188,11 @@ void Debugger::Delete(const std::string& breakpointId)
     {
         throw std::runtime_error("error: breakpoint " + breakpointId + " not found");
     }
-    std::lock_guard<std::recursive_mutex> lock(outputMutex);
-    result->Write(formatter);
+    if (printResult)
+    {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
+        result->Write(formatter);
+    }
 }
 
 void Debugger::Depth()
@@ -1123,7 +1240,7 @@ void Debugger::ShowBreakpoint(int breakpointId)
     }
     else
     {
-        throw std::runtime_error("breakpoint id '" + std::to_string(breakpointId) + "' not found");
+        throw std::runtime_error("error: breakpoint id '" + std::to_string(breakpointId) + "' not found");
     }
     std::lock_guard<std::recursive_mutex> lock(outputMutex);
     if (result)
@@ -1373,7 +1490,7 @@ void Debugger::RepeatLatestCommand()
     }
     else
     {
-        throw std::runtime_error("no latest command: try 'help'");
+        throw std::runtime_error("error: no latest command: try 'help'");
     }
 }
 
@@ -1680,6 +1797,10 @@ void Debugger::ProcessExecRunReply(GdbReply* reply)
         {
             success = true;
         }
+        else if (resultRecord->GetClass() == GdbResultRecord::Class::error)
+        {
+            SetState(State::stopped);
+        }
     }
     else
     {
@@ -1713,6 +1834,10 @@ void Debugger::ProcessExecContinueReply(GdbReply* reply)
         if (resultRecord->GetClass() == GdbResultRecord::Class::running)
         {
             success = true;
+        }
+        else if (resultRecord->GetClass() == GdbResultRecord::Class::error)
+        {
+            SetState(State::stopped);
         }
     }
     else
@@ -1748,6 +1873,10 @@ void Debugger::ProcessExecNextReply(GdbReply* reply)
         {
             success = true;
         }
+        else if (resultRecord->GetClass() == GdbResultRecord::Class::error)
+        {
+            SetState(State::stopped);
+        }
     }
     else
     {
@@ -1781,6 +1910,10 @@ void Debugger::ProcessExecStepReply(GdbReply* reply)
         if (resultRecord->GetClass() == GdbResultRecord::Class::running)
         {
             success = true;
+        }
+        else if (resultRecord->GetClass() == GdbResultRecord::Class::error)
+        {
+            SetState(State::stopped);
         }
     }
     else
@@ -1816,6 +1949,10 @@ void Debugger::ProcessExecFinishReply(GdbReply* reply)
         {
             success = true;
         }
+        else if (resultRecord->GetClass() == GdbResultRecord::Class::error)
+        {
+            SetState(State::stopped);
+        }
     }
     else
     {
@@ -1849,6 +1986,10 @@ void Debugger::ProcessExecUntilReply(GdbReply* reply)
         if (resultRecord->GetClass() == GdbResultRecord::Class::running)
         {
             success = true;
+        }
+        else if (resultRecord->GetClass() == GdbResultRecord::Class::error)
+        {
+            SetState(State::stopped);
         }
     }
     else

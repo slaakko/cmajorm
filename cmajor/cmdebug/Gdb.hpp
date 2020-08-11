@@ -50,7 +50,7 @@ public:
         exit, breakInsert, breakDelete, execContinue, execFinish, execNext, execStep, execUntil, execRun, stackInfoDepth, stackListFrames,
         varCreate, varDelete, varSetFormat, varShowFormat, varInfoNumChildren, varListChildren, varInfoType, varInfoExpression,
         varInfoPathExpression, varShowAttributes, varEvaluateExpression, varAssign, varUpdate, varSetFrozen, varSetUpdateRange,
-        varSetVisualizer, print
+        varSetVisualizer, print, deleteAll
     };
     GdbCommand(Kind kind_, const std::string& str_);
     GdbCommand(const GdbCommand&) = delete;
@@ -75,6 +75,12 @@ class DEBUG_API GdbBreakDeleteCommand : public GdbCommand
 {
 public:
     GdbBreakDeleteCommand(const std::string& breakpoints);
+};
+
+class DEBUG_API GdbDeleteAllBreakpointsCommand : public GdbCommand
+{
+public:
+    GdbDeleteAllBreakpointsCommand();
 };
 
 class DEBUG_API GdbExecContinueCommand : public GdbCommand

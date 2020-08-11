@@ -34,6 +34,10 @@ GdbBreakDeleteCommand::GdbBreakDeleteCommand(const std::string& breakpoints) : G
 {
 }
 
+GdbDeleteAllBreakpointsCommand::GdbDeleteAllBreakpointsCommand() : GdbCommand(Kind::deleteAll, "delete")
+{
+}
+
 GdbExecContinueCommand::GdbExecContinueCommand() : GdbCommand(Kind::execContinue, "-exec-continue")
 {
 }

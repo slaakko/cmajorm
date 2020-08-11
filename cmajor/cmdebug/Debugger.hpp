@@ -104,12 +104,13 @@ public:
     void Help();
     void Next();
     void Step();
-    void Continue();
+    bool Continue();
     void Finish();
     void Until(const SourceLocation& location);
     bool Break(std::unique_ptr<DebuggerBreakpoint>&& bp, const std::vector<Instruction*>& instructions);
     void Break(const SourceLocation& location);
     void Delete(const std::string& breakpointId);
+    void Delete(const std::string& breakpointId, bool printResult);
     void Depth();
     void Frames(int low, int high);
     void ShowBreakpoint(int breakpointId);
