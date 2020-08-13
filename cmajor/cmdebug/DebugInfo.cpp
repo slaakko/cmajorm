@@ -131,6 +131,22 @@ std::string InstructionFlagsStr(InstructionFlags flags)
         }
         s.append("startFunction");
     }
+    if ((flags & InstructionFlags::throwInst) != InstructionFlags::none)
+    {
+        if (!s.empty())
+        {
+            s.append(" | ");
+        }
+        s.append("throw");
+    }
+    if ((flags & InstructionFlags::catchInst) != InstructionFlags::none)
+    {
+        if (!s.empty())
+        {
+            s.append(" | ");
+        }
+        s.append("catch");
+    }
     return s;
 }
 
@@ -1070,6 +1086,16 @@ void DebugInfo::AddType(DIType* type)
     typeMap[boost::uuids::to_string(type->Id())] = type;
 }
 
+void DebugInfo::AddThrowInstruction(Instruction* throwInstruction)
+{
+    throwInstructions.push_back(throwInstruction);
+}
+
+void DebugInfo::AddCatchInstruction(Instruction* catchInstruction)
+{
+    catchInstructions.push_back(catchInstruction);
+}
+
 std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
 {
     std::unique_ptr<DebugInfo> debugInfo(new DebugInfo(cmdbFilePath));
@@ -1113,6 +1139,8 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
                 int32_t numInstructionRecords;
                 ReadNumberOfInstructionRecords(reader, numInstructionRecords);
                 Instruction* prev = nullptr;
+                bool firstThrowInst = true;
+                bool firstCatchInst = true;
                 for (int32_t i = 0; i < numInstructionRecords; ++i)
                 {
                     int32_t cppLineNumber;
@@ -1129,6 +1157,30 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
                     }
                     prev = instruction.get();
                     compileUnit->AddInstruction(instruction.get());
+                    if ((instruction->GetFlags() & InstructionFlags::throwInst) != InstructionFlags::none)
+                    {
+                        if (firstThrowInst || instruction->CppLineIndex() == 0)
+                        {
+                            debugInfo->AddThrowInstruction(instruction.get());
+                            firstThrowInst = false;
+                        }
+                    }
+                    else
+                    {
+                        firstThrowInst = true;
+                    }
+                    if ((instruction->GetFlags() & InstructionFlags::catchInst) != InstructionFlags::none)
+                    {
+                        if (firstCatchInst)
+                        {
+                            debugInfo->AddCatchInstruction(instruction.get());
+                            firstCatchInst = false;
+                        }
+                    }
+                    else
+                    {
+                        firstCatchInst = true;
+                    }
                     compileUnitFunction->AddInstruction(instruction.release());
                     if (cppLineIndex == 0)
                     {

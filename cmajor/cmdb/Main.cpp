@@ -42,6 +42,8 @@ void PrintHelp()
     std::cout << "  Be verbose." << std::endl;
     std::cout << "--debug | -d" << std::endl;
     std::cout << "  Debug the debugger." << std::endl;
+    std::cout << "--dontBreakOnThrow | -t" << std::endl;
+    std::cout << "  Do not break on throw instructions." << std::endl;
     std::cout << "--sessionPort=PORT_NUMBER | -s=PORT_NUMBER" << std::endl;
     std::cout << "  Set the port number of the CMDB session that cmdb and the program being debugged will use for exchanging console I/O messages. Default port is 54322." << std::endl;
 }
@@ -56,6 +58,7 @@ int main(int argc, const char** argv)
         std::string executable;
         std::vector<std::string> args;
         bool executableSeen = false;
+        bool breakOnThrow = true;
         for (int i = 1; i < argc; ++i)
         {
             std::string arg = argv[i];
@@ -75,6 +78,10 @@ int main(int argc, const char** argv)
                     {
                         PrintHelp();
                         return 1;
+                    }
+                    else if (arg == "--dontBreakOnThrow")
+                    {
+                        breakOnThrow = false;
                     }
                     else if (arg.find('=') != std::string::npos)
                     {
@@ -141,6 +148,11 @@ int main(int argc, const char** argv)
                                     PrintHelp();
                                     return 1;
                                 }
+                                case 't':
+                                {
+                                    breakOnThrow = false;
+                                    break;
+                                }
                                 default:
                                 {
                                     throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
@@ -160,7 +172,7 @@ int main(int argc, const char** argv)
                 args.push_back(arg);
             }
         }
-        cmajor::debug::RunDebuggerInteractive(executable, args, verbose);
+        cmajor::debug::RunDebuggerInteractive(executable, args, verbose, breakOnThrow);
     }
     catch (const std::exception& ex)
     {

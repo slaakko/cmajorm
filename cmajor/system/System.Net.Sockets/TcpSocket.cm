@@ -190,4 +190,80 @@ namespace System.Net.Sockets
         private bool connected;
         private bool shutdown;
     }
+
+    public void Write(TcpSocket& socket, const string& str)
+    {
+        int size = cast<int>(str.Length());
+        byte[4] buffer;
+        MemoryWriter writer(&buffer[0], 4);
+        writer.Write(size);
+        int bytesToSend = 4;
+        int offset = 0;
+        while (bytesToSend > 0)
+        {
+            int bytesSent = socket.Send(&buffer[0] + offset, bytesToSend);
+            bytesToSend = bytesToSend - bytesSent;
+            offset = offset + bytesSent;
+        }
+        byte* p = cast<byte*>(cast<void*>(str.Chars()));
+        int count = size;
+        while (count > 0)
+        {
+            int bytesSent = socket.Send(p, count);
+            p = p + bytesSent;
+            count = count - bytesSent;
+        }
+    }
+
+    public string ReadStr(TcpSocket& socket)
+    {
+        byte[4] buffer;
+        int bytesToReceive = 4;
+        int offset = 0;
+        int bytesReceived = socket.Receive(&buffer[offset], bytesToReceive);
+        if (bytesReceived == 0)
+        {
+            return string();
+        }
+        bytesToReceive = bytesToReceive - bytesReceived;
+        offset = offset + bytesReceived;
+        while (bytesToReceive > 0)
+        {
+            bytesReceived = socket.Receive(&buffer[offset], bytesToReceive);
+            if (bytesReceived == 0)
+            {
+                return string();
+            }
+            bytesToReceive = bytesToReceive - bytesReceived;
+            offset = offset + bytesReceived;
+        }
+        MemoryReader reader(&buffer[0], 4);
+        int size = reader.ReadInt();
+        if (size == 0)
+        {
+            return string();
+        }
+        UniquePtr<byte> mem(cast<byte*>(MemAlloc(size)));
+        offset = 0;
+        bytesToReceive = size;
+        bytesReceived = socket.Receive(mem.Get() + offset, bytesToReceive);
+        if (bytesReceived == 0)
+        {
+            return string();
+        }
+        bytesToReceive = bytesToReceive - bytesReceived;
+        offset = offset + bytesReceived;
+        while (bytesToReceive > 0)
+        {
+            bytesReceived = socket.Receive(mem.Get() + offset, bytesToReceive);
+            if (bytesReceived == 0)
+            {
+                return string();
+            }
+            bytesToReceive = bytesToReceive - bytesReceived;
+            offset = offset + bytesReceived;
+        }
+        string s(cast<const char*>(cast<void*>(mem.Get())), size);
+        return s;
+    }
 }

@@ -41,7 +41,11 @@ namespace DebuggerCommandKeywords
         {U"breakpoints", BREAKPOINTS}, 
         {U"cast", CAST}, 
         {U"typeid", TYPEID}, 
-        {U"base", BASE},
+        {U"base", BASE}, 
+        {U"set", SET}, 
+        {U"breakOnThrow", BREAKONTHROW}, 
+        {U"true", TRUE}, 
+        {U"false", FALSE},
         {nullptr, -1}
     };
 

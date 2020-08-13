@@ -1788,8 +1788,12 @@ void StatementBinder::Visit(CatchNode& catchNode)
 {
     bool prevInsideCatch = insideCatch;
     insideCatch = true;
-    Span span = catchNode.GetSpan();
-    std::unique_ptr<BoundCatchStatement> boundCatchStatement(new BoundCatchStatement(module, catchNode.GetSpan()));
+    Span span;
+    if (GetBackEnd() == BackEnd::llvm)
+    {
+        span = catchNode.GetSpan();
+    }
+    std::unique_ptr<BoundCatchStatement> boundCatchStatement(new BoundCatchStatement(module, span));
     TypeSymbol* catchedType = ResolveType(catchNode.TypeExpr(), boundCompileUnit, containerScope);
     boundCatchStatement->SetCatchedType(catchedType);
     boundCatchStatement->SetCatchedTypeUuidId(boundCompileUnit.Install(catchedType->BaseType()->TypeId()));
@@ -1802,7 +1806,8 @@ void StatementBinder::Visit(CatchNode& catchNode)
         boundCatchStatement->SetCatchVar(catchVar);
         currentFunction->GetFunctionSymbol()->AddLocalVariable(catchVar);
     }
-    CompoundStatementNode handlerBlock(span);
+    CompoundStatementNode handlerBlock(catchNode.CatchBlock()->BeginBraceSpan());
+    handlerBlock.SetBeginBraceSpan(catchNode.CatchBlock()->BeginBraceSpan());
     handlerBlock.SetEndBraceSpan(catchNode.CatchBlock()->EndBraceSpan());
     handlerBlock.SetParent(catchNode.Parent());
     if (GetBackEnd() == BackEnd::llvm || GetBackEnd() == BackEnd::cmcpp)

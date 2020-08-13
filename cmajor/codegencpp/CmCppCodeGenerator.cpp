@@ -1411,11 +1411,16 @@ void CmCppCodeGenerator::Visit(BoundThrowStatement& boundThrowStatement)
     if (generateLineNumbers)
     {
         throwNodeId = emitter->AddControlFlowGraphNode();
+        emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::throwInst));
     }
     boundThrowStatement.ThrowCallExpr()->Accept(*this);
     if (prevControlFlowGraphNodeId != -1)
     {
         emitter->AddControlFlowGraphEdge(prevControlFlowGraphNodeId, throwNodeId);
+    }
+    if (generateLineNumbers)
+    {
+        emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::throwInst));
     }
     prevControlFlowGraphNodeId = throwNodeId;
 }
@@ -1484,7 +1489,15 @@ void CmCppCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         emitter->CreateCondBr(handleThisEx, thisHandlerTarget, nextHandlerTarget);
         emitter->SetCurrentBasicBlock(thisHandlerTarget);
         prevControlFlowGraphNodeId = tryBlockId;
+        if (generateLineNumbers)
+        {
+            emitter->BeginInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::catchInst));
+        }
         boundCatchStatement->CatchBlock()->Accept(*this);
+        if (generateLineNumbers)
+        {
+            emitter->EndInstructionFlag(static_cast<int16_t>(cmajor::debug::InstructionFlags::catchInst));
+        }
         emitter->CreateBr(tryNextBlock);
     }
     emitter->SetCurrentBasicBlock(resumeBlock);

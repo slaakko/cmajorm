@@ -31,6 +31,10 @@ tokens DebuggerCommandTokens
     (CAST, "'cast'"),
     (TYPEID, "'typeid'"),
     (BASE, "'base'"),
+    (SET, "'set'"),
+    (BREAKONTHROW, "'breakOnThrow'"),
+    (TRUE, "'true'"),
+    (FALSE, "'false'"),
     (ID, "id"),
     (PATH, "'path'"),
     (INTEGER, "'integer'"),
@@ -47,7 +51,8 @@ tokens DebuggerCommandTokens
     (DOT, "'.'"),
     (COMMA, "','"),
     (PLUS, "'+'"),
-    (MINUS, "'-'")
+    (MINUS, "'-'"),
+    (EQ, "'='")
 }
 
 keywords DebuggerCommandKeywords
@@ -70,7 +75,11 @@ keywords DebuggerCommandKeywords
     ("breakpoints", BREAKPOINTS),
     ("cast", CAST),
     ("typeid", TYPEID),
-    ("base", BASE)
+    ("base", BASE),
+    ("set", SET),
+    ("breakOnThrow", BREAKONTHROW),
+    ("true", TRUE),
+    ("false", FALSE)
 }
 
 expressions
@@ -113,4 +122,5 @@ lexer api(DEBUG_API) DebuggerCommandLexer
     ","{ return COMMA; }
     "\+"{ return PLUS; }
     "\-"{ return MINUS; }
+    "="{ return EQ; }
 }

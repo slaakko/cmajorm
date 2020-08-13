@@ -359,9 +359,9 @@ DebuggerVariable::DebuggerVariable(int index_, const std::string& gdbVarName_) :
 {
 }
 
-Debugger::Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_) :
+Debugger::Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_, bool breakOnThrow_) :
     verbose(verbose_), formatter(formatter_), state(State::initializing), wasRunning(false), targetOutput(false), nextBreakpointNumber(1), nextTempBreakpointNumber(1),
-    nextGdbVariableIndex(1), console(console_), outFormatter(std::cout), errorFormatter(std::cerr), stoppedInstruction(nullptr)
+    nextGdbVariableIndex(1), console(console_), outFormatter(std::cout), errorFormatter(std::cerr), stoppedInstruction(nullptr), breakOnThrow(false)
 {
     std::string cmdbFilePath;
     if (soulng::util::EndsWith(executable, ".exe") )
@@ -406,7 +406,7 @@ Debugger::Debugger(const std::string& executable, const std::vector<std::string>
         std::unique_ptr<JsonValue> value = startReply->ToJson();
         value->Write(formatter);
     }
-    StartProgram();
+    StartProgram(breakOnThrow_);
 }
 
 Debugger::~Debugger()
@@ -463,7 +463,7 @@ void Debugger::Error(const std::string& msg)
     formatter.WriteLine(msg);
 }
 
-void Debugger::StartProgram()
+void Debugger::StartProgram(bool breakOnThrow_)
 {
     result.reset(new JsonObject());
     std::lock_guard<std::recursive_mutex> lock(outputMutex);
@@ -478,6 +478,10 @@ void Debugger::StartProgram()
             succeeded = DeleteBreakpoint(bp->GetInstruction());
             if (succeeded)
             {
+                if (breakOnThrow_)
+                {
+                    SetBreakOnThrow(breakOnThrow_, false);
+                }
                 if (verbose)
                 {
                     formatter.WriteLine("program started.");
@@ -688,6 +692,19 @@ void Debugger::Next()
     if (stoppedInstruction != nullptr)
     {
         AddToNextSet(next, stoppedInstruction);
+    }
+    if (stoppedInstruction != nullptr)
+    {
+        if ((stoppedInstruction->GetFlags() & InstructionFlags::throwInst) != InstructionFlags::none)
+        {
+            bool succeeded = SetCatchBreakpoints();
+            if (succeeded)
+            {
+                Continue();
+                ClearCatchBreakpoints();
+            }
+            return;
+        }
     }
     Instruction* prevStoppedInstruction = stoppedInstruction;
     bool stop = false;
@@ -1473,6 +1490,95 @@ void Debugger::AddToNextSet(std::set<Instruction*>& nextSet, Instruction* inst) 
             }
         }
     }
+}
+
+void Debugger::SetBreakOnThrow(bool breakOnThrow_, bool printResult)
+{
+    result.reset(new JsonObject());
+    JsonObject* resultObject = static_cast<JsonObject*>(result.get());
+    resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+    bool succeeded = true;
+    bool resultPrinted = false;
+    if (breakOnThrow_)
+    {
+        if (!breakOnThrow)
+        {
+            breakOnThrow = breakOnThrow_;
+            if (verbose)
+            {
+                formatter.WriteLine("setting throw breakpoints...");
+            }
+            SetThrowBreakpoints(printResult);
+            if (verbose)
+            {
+                formatter.WriteLine("done.");
+            }
+            resultPrinted = printResult;
+        }
+    }
+    else
+    {
+        if (breakOnThrow)
+        {
+            breakOnThrow = breakOnThrow_;
+            if (verbose)
+            {
+                formatter.WriteLine("clearing throw breakpoints...");
+            }
+            ClearThrowBreakpoints(printResult);
+            if (verbose)
+            {
+                formatter.WriteLine("done.");
+            }
+            resultPrinted = printResult;
+        }
+    }
+    if (!resultPrinted && printResult)
+    {
+        std::lock_guard<std::recursive_mutex> lock(outputMutex);
+        result->Write(formatter);
+    }
+}
+
+void Debugger::SetThrowBreakpoints(bool printResult)
+{
+    result.reset(new JsonObject());
+    std::unique_ptr<DebuggerBreakpoint> bp(new DebuggerBreakpoint(GetNextTemporaryBreakpointId()));
+    throwBreakpointsId = bp->Id();
+    bool succeeded = Break(std::move(bp), debugInfo->GetThrowInstructions());
+    if (succeeded)
+    {
+        JsonObject* resultObject = static_cast<JsonObject*>(result.get());
+        resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+        if (printResult)
+        {
+            std::lock_guard<std::recursive_mutex> lock(outputMutex);
+            result->Write(formatter);
+        }
+    }
+    else
+    {
+        throw std::runtime_error("error: could not set throw breakpoints");
+    }
+}
+
+void Debugger::ClearThrowBreakpoints(bool printResult)
+{
+    Delete(throwBreakpointsId, printResult);
+}
+
+bool Debugger::SetCatchBreakpoints()
+{
+    result.reset(new JsonObject());
+    std::unique_ptr<DebuggerBreakpoint> bp(new DebuggerBreakpoint(GetNextTemporaryBreakpointId()));
+    catchBreakpointsId = bp->Id();
+    bool succeeded = Break(std::move(bp), debugInfo->GetCatchInstructions());
+    return succeeded;
+}
+
+void Debugger::ClearCatchBreakpoints()
+{
+    Delete(catchBreakpointsId, false);
 }
 
 void Debugger::RepeatLatestCommand()
@@ -2421,6 +2527,20 @@ DebuggerCommand* DebuggerPrintCommand::Clone()
     return new DebuggerPrintCommand(expression);
 }
 
+DebuggerSetBreakOnThrowCommand::DebuggerSetBreakOnThrowCommand(bool breakOnThrow_) : DebuggerCommand(Kind::setBreakOnThrow), breakOnThrow(breakOnThrow_)
+{
+}
+
+void DebuggerSetBreakOnThrowCommand::Execute(Debugger& debugger)
+{
+    debugger.SetBreakOnThrow(breakOnThrow, true);
+}
+
+DebuggerCommand* DebuggerSetBreakOnThrowCommand::Clone()
+{
+    return new DebuggerSetBreakOnThrowCommand(breakOnThrow);
+}
+
 DebuggerRepeatLatestCommand::DebuggerRepeatLatestCommand() : DebuggerCommand(Kind::repeatLatest)
 {
 }
@@ -2440,11 +2560,11 @@ DebuggerCommand* DebuggerRepeatLatestCommand::Clone()
     return new DebuggerRepeatLatestCommand();
 }
 
-void RunDebuggerInteractive(const std::string& executable, const std::vector<std::string>& args, bool verbose)
+void RunDebuggerInteractive(const std::string& executable, const std::vector<std::string>& args, bool verbose, bool breakOnThrow)
 {
     CodeFormatter formatter(std::cout);
     Console console;
-    Debugger debugger(executable, args, verbose, formatter, console);
+    Debugger debugger(executable, args, verbose, formatter, console, breakOnThrow);
     console.SetDriver(&debugger);
     std::thread consoleThread{ RunConsole, &console };
     try

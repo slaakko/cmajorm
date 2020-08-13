@@ -133,11 +133,35 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 {
                     return 22;
                 }
+                case 42:
+                {
+                    return 23;
+                }
                 default:
                 {
                     return -1;
                 }
             }
+        }
+        case 23:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(19);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            return -1;
         }
         case 22:
         {
@@ -361,99 +385,58 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 39:
                 case 40:
                 case 41:
-                {
-                    return 23;
-                }
-                case 23:
+                case 42:
                 {
                     return 24;
                 }
-                case 24:
+                case 23:
                 {
                     return 25;
                 }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 25:
-        {
-            switch (i)
-            {
-                case 14:
+                case 24:
                 {
                     return 26;
                 }
-                case 15:
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 26:
+        {
+            switch (i)
+            {
+                case 14:
                 {
                     return 27;
                 }
-                case 16:
+                case 15:
                 {
                     return 28;
                 }
-                case 17:
+                case 16:
                 {
                     return 29;
                 }
-                case 19:
+                case 17:
                 {
                     return 30;
                 }
-                case 20:
+                case 19:
                 {
                     return 31;
                 }
-                case 22:
+                case 20:
                 {
                     return 32;
                 }
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
+                case 22:
                 {
                     return 33;
                 }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 33:
-        {
-            switch (i)
-            {
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
+                case 23:
+                case 24:
                 case 25:
                 case 26:
                 case 27:
@@ -462,100 +445,6 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 30:
                 case 31:
                 case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                {
-                    return 23;
-                }
-                case 23:
-                {
-                    return 24;
-                }
-                case 24:
-                {
-                    return 25;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 32:
-        {
-            switch (i)
-            {
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                {
-                    return 23;
-                }
-                case 23:
-                {
-                    return 24;
-                }
-                case 24:
-                {
-                    return 25;
-                }
-                case 22:
-                {
-                    return 32;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 31:
-        {
-            switch (i)
-            {
-                case 21:
-                case 22:
                 {
                     return 34;
                 }
@@ -588,6 +477,8 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 18:
                 case 19:
                 case 20:
+                case 21:
+                case 22:
                 case 25:
                 case 26:
                 case 27:
@@ -605,21 +496,17 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 39:
                 case 40:
                 case 41:
-                {
-                    return 23;
-                }
-                case 23:
+                case 42:
                 {
                     return 24;
                 }
-                case 24:
+                case 23:
                 {
                     return 25;
                 }
-                case 21:
-                case 22:
+                case 24:
                 {
-                    return 34;
+                    return 26;
                 }
                 default:
                 {
@@ -627,33 +514,75 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 30:
+        case 33:
         {
             switch (i)
             {
-                case 21:
-                case 22:
-                {
-                    return 34;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 29:
-        {
-            switch (i)
-            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
                 case 18:
                 case 19:
                 case 20:
                 case 21:
-                case 22:
                 case 25:
                 case 26:
                 case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                {
+                    return 24;
+                }
+                case 23:
+                {
+                    return 25;
+                }
+                case 24:
+                {
+                    return 26;
+                }
+                case 22:
+                {
+                    return 33;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 32:
+        {
+            switch (i)
+            {
+                case 21:
+                case 22:
                 {
                     return 35;
                 }
@@ -664,6 +593,84 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
             }
         }
         case 35:
+        {
+            switch (i)
+            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                {
+                    return 24;
+                }
+                case 23:
+                {
+                    return 25;
+                }
+                case 24:
+                {
+                    return 26;
+                }
+                case 21:
+                case 22:
+                {
+                    return 35;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 31:
+        {
+            switch (i)
+            {
+                case 21:
+                case 22:
+                {
+                    return 35;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 30:
         {
             switch (i)
             {
@@ -814,6 +821,27 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 25:
+                case 26:
+                case 27:
+                {
+                    return 43;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 43:
+        {
+            switch (i)
+            {
                 case 2:
                 case 3:
                 case 4:
@@ -852,37 +880,17 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 39:
                 case 40:
                 case 41:
-                {
-                    return 23;
-                }
-                case 23:
+                case 42:
                 {
                     return 24;
                 }
-                case 24:
+                case 23:
                 {
                     return 25;
                 }
-                default:
+                case 24:
                 {
-                    return -1;
-                }
-            }
-        }
-        case 28:
-        {
-            switch (i)
-            {
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 25:
-                case 26:
-                case 27:
-                {
-                    return 43;
+                    return 26;
                 }
                 default:
                 {
@@ -890,7 +898,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 43:
+        case 29:
         {
             switch (i)
             {
@@ -957,65 +965,6 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                {
-                    return 23;
-                }
-                case 23:
-                {
-                    return 24;
-                }
-                case 24:
-                {
-                    return 25;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 27:
-        {
-            switch (i)
-            {
                 case 18:
                 case 19:
                 case 20:
@@ -1053,6 +1002,14 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 15:
                 case 16:
                 case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 25:
+                case 26:
+                case 27:
                 case 28:
                 case 29:
                 case 30:
@@ -1067,27 +1024,17 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 39:
                 case 40:
                 case 41:
-                {
-                    return 23;
-                }
-                case 23:
+                case 42:
                 {
                     return 24;
                 }
-                case 24:
+                case 23:
                 {
                     return 25;
                 }
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 25:
-                case 26:
-                case 27:
+                case 24:
                 {
-                    return 47;
+                    return 26;
                 }
                 default:
                 {
@@ -1095,7 +1042,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 26:
+        case 28:
         {
             switch (i)
             {
@@ -1108,7 +1055,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 26:
                 case 27:
                 {
-                    return 47;
+                    return 48;
                 }
                 default:
                 {
@@ -1116,7 +1063,91 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 24:
+        case 48:
+        {
+            switch (i)
+            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                {
+                    return 24;
+                }
+                case 23:
+                {
+                    return 25;
+                }
+                case 24:
+                {
+                    return 26;
+                }
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 25:
+                case 26:
+                case 27:
+                {
+                    return 48;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 27:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 25:
+                case 26:
+                case 27:
+                {
+                    return 48;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 25:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1136,7 +1167,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
             }
             return -1;
         }
-        case 23:
+        case 24:
         {
             switch (i)
             {
@@ -1178,16 +1209,17 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 39:
                 case 40:
                 case 41:
-                {
-                    return 23;
-                }
-                case 23:
+                case 42:
                 {
                     return 24;
                 }
-                case 24:
+                case 23:
                 {
                     return 25;
+                }
+                case 24:
+                {
+                    return 26;
                 }
                 default:
                 {
@@ -1248,7 +1280,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
             {
                 case 7:
                 {
-                    return 48;
+                    return 49;
                 }
                 case 8:
                 case 9:
@@ -1264,91 +1296,6 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 20:
                 case 21:
                 case 22:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                {
-                    return 49;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 49:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(3);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 7:
-                {
-                    return 48;
-                }
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                {
-                    return 49;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 48:
-        {
-            switch (i)
-            {
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
                 case 25:
                 case 26:
                 case 27:
@@ -1387,7 +1334,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
             {
                 case 7:
                 {
-                    return 48;
+                    return 49;
                 }
                 case 8:
                 case 9:
@@ -1411,7 +1358,92 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 30:
                 case 31:
                 {
+                    return 50;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 49:
+        {
+            switch (i)
+            {
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                {
+                    return 51;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 51:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(3);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 7:
+                {
                     return 49;
+                }
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                {
+                    return 50;
                 }
                 default:
                 {
@@ -1441,7 +1473,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
             {
                 case 7:
                 {
-                    return 48;
+                    return 49;
                 }
                 case 8:
                 case 9:
@@ -1465,7 +1497,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 30:
                 case 31:
                 {
-                    return 49;
+                    return 50;
                 }
                 default:
                 {
@@ -1495,18 +1527,18 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
             {
                 case 7:
                 {
-                    return 48;
+                    return 49;
                 }
                 case 8:
                 case 11:
                 case 12:
                 {
-                    return 49;
+                    return 50;
                 }
                 case 2:
                 case 3:
                 {
-                    return 51;
+                    return 52;
                 }
                 case 9:
                 case 10:
@@ -1527,7 +1559,69 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 30:
                 case 31:
                 {
+                    return 53;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 53:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(2);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 7:
+                {
+                    return 49;
+                }
+                case 8:
+                case 11:
+                case 12:
+                {
+                    return 50;
+                }
+                case 2:
+                case 3:
+                {
                     return 52;
+                }
+                case 9:
+                case 10:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                {
+                    return 53;
                 }
                 default:
                 {
@@ -1555,21 +1649,8 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 7:
-                {
-                    return 48;
-                }
-                case 8:
-                case 11:
-                case 12:
-                {
-                    return 49;
-                }
                 case 2:
                 case 3:
-                {
-                    return 51;
-                }
                 case 9:
                 case 10:
                 case 14:
@@ -1590,55 +1671,6 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 31:
                 {
                     return 52;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 51:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 2:
-                case 3:
-                case 9:
-                case 10:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                {
-                    return 51;
                 }
                 default:
                 {
@@ -1668,18 +1700,18 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
             {
                 case 7:
                 {
-                    return 48;
+                    return 49;
                 }
                 case 8:
                 case 11:
                 case 12:
                 {
-                    return 49;
+                    return 50;
                 }
                 case 2:
                 case 3:
                 {
-                    return 51;
+                    return 52;
                 }
                 case 9:
                 case 10:
@@ -1700,11 +1732,11 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 30:
                 case 31:
                 {
-                    return 52;
+                    return 53;
                 }
                 case 6:
                 {
-                    return 53;
+                    return 54;
                 }
                 default:
                 {
@@ -1712,7 +1744,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 53:
+        case 54:
         {
             switch (i)
             {
@@ -1739,7 +1771,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 30:
                 case 31:
                 {
-                    return 50;
+                    return 51;
                 }
                 default:
                 {
@@ -1790,7 +1822,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 30:
                 case 31:
                 {
-                    return 50;
+                    return 51;
                 }
                 default:
                 {
@@ -1890,7 +1922,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 case 30:
                 case 31:
                 {
-                    return 51;
+                    return 52;
                 }
                 default:
                 {
@@ -1940,7 +1972,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
             {
                 case 1:
                 {
-                    return 54;
+                    return 55;
                 }
                 default:
                 {
@@ -1948,7 +1980,7 @@ int DebuggerCommandLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 54:
+        case 55:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -2089,6 +2121,12 @@ int DebuggerCommandLexer::GetTokenId(int statementIndex)
         {
             Retract();
             return MINUS;
+            break;
+        }
+        case 19:
+        {
+            Retract();
+            return EQ;
             break;
         }
     }

@@ -11,6 +11,11 @@ namespace System.IO
     public const int stdout = 1;
     public const int stderr = 2;
 
+    public nothrow bool IsConsoleHandle(int handle)
+    {
+        return RtIsConsoleHandle(handle);
+    }
+
     public enum OpenMode : byte
     {
         none = 0u,

@@ -430,15 +430,27 @@ std::string ReadStr(TcpSocket& socket)
     }
     MemoryReader reader(&buffer[0], sizeof(size));
     size = reader.ReadInt();
+    if (size == 0)
+    {
+        return std::string();
+    }
     std::unique_ptr<uint8_t[]> mem(new uint8_t[size]);
     offset = 0;
     bytesToReceive = size;
     bytesReceived = socket.Receive(mem.get() + offset, bytesToReceive);
+    if (bytesReceived == 0)
+    {
+        return std::string();
+    }
     bytesToReceive = bytesToReceive - bytesReceived;
     offset = offset + bytesReceived;
     while (bytesToReceive > 0)
     {
         bytesReceived = socket.Receive(mem.get() + offset, bytesToReceive);
+        if (bytesReceived == 0)
+        {
+            return std::string();
+        }
         bytesToReceive = bytesToReceive - bytesReceived;
         offset = offset + bytesReceived;
     }

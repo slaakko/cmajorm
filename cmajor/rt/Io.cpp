@@ -919,3 +919,12 @@ extern "C" RT_API void RtFlushAll()
     cmajor::rt::FileTable::Instance().FlushAll();
 }
 
+extern "C" RT_API bool RtIsConsoleHandle(int handle)
+{
+#ifdef _WIN32
+    return _isatty(handle);
+#else
+    return isatty(handle);
+#endif
+}
+

@@ -82,5 +82,4 @@ DateTime MemoryReader::ReadDateTime()
     return dt;
 }
 
-
 } } // namespace soulng::util

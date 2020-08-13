@@ -33,6 +33,7 @@ parser api(DEBUG_API) DebuggerCommandParser
         |   DebuggerShowBreakpointsCommand:showBreakpointsCommand{ return showBreakpointsCommand; }
         |   DebuggerListCommand(currentSourceFilePath):listCommand{ return listCommand; }
         |   DebuggerPrintCommand:printCommand{ return printCommand; }
+        |   DebuggerSetBreakOnThrowCommand:setBreakOnThrowCommand{ return setBreakOnThrowCommand; } 
         |   DebuggerRepeatLatestCommand:latestCommand{ return latestCommand; }
         ;
 
@@ -130,6 +131,16 @@ parser api(DEBUG_API) DebuggerCommandParser
         )
         {
             return new cmajor::debug::DebuggerPrintCommand(expression);
+        }
+        ;
+
+    DebuggerSetBreakOnThrowCommand(var bool breakOnThrow) : cmajor::debug::DebuggerCommand*
+        ::=
+        (
+            SET BREAKONTHROW EQ (TRUE{ breakOnThrow = true; } | FALSE{ breakOnThrow = false; }) NL
+        )
+        {
+            return new cmajor::debug::DebuggerSetBreakOnThrowCommand(breakOnThrow);
         }
         ;
 

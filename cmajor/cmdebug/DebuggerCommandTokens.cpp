@@ -10,53 +10,58 @@ namespace DebuggerCommandTokens
 
     void InitTokenIdMap()
     {
-        tokenIdMap[U"AMP"] = 40;
-        tokenIdMap[U"AST"] = 39;
+        tokenIdMap[U"AMP"] = 44;
+        tokenIdMap[U"AST"] = 43;
         tokenIdMap[U"B"] = 19;
         tokenIdMap[U"BASE"] = 33;
         tokenIdMap[U"BREAK"] = 18;
+        tokenIdMap[U"BREAKONTHROW"] = 35;
         tokenIdMap[U"BREAKPOINT"] = 29;
         tokenIdMap[U"BREAKPOINTS"] = 30;
         tokenIdMap[U"C"] = 13;
         tokenIdMap[U"CAST"] = 31;
-        tokenIdMap[U"COLON"] = 38;
-        tokenIdMap[U"COMMA"] = 48;
+        tokenIdMap[U"COLON"] = 42;
+        tokenIdMap[U"COMMA"] = 52;
         tokenIdMap[U"CONTINUE"] = 12;
         tokenIdMap[U"D"] = 21;
         tokenIdMap[U"DELETE"] = 20;
         tokenIdMap[U"DEPTH"] = 24;
-        tokenIdMap[U"DOT"] = 47;
+        tokenIdMap[U"DOT"] = 51;
         tokenIdMap[U"E"] = 3;
+        tokenIdMap[U"EQ"] = 55;
         tokenIdMap[U"EXIT"] = 2;
         tokenIdMap[U"F"] = 15;
+        tokenIdMap[U"FALSE"] = 37;
         tokenIdMap[U"FINISH"] = 14;
         tokenIdMap[U"FRAMES"] = 25;
         tokenIdMap[U"H"] = 7;
         tokenIdMap[U"HELP"] = 6;
-        tokenIdMap[U"ID"] = 34;
-        tokenIdMap[U"INTEGER"] = 36;
+        tokenIdMap[U"ID"] = 38;
+        tokenIdMap[U"INTEGER"] = 40;
         tokenIdMap[U"L"] = 27;
-        tokenIdMap[U"LANGLE"] = 43;
-        tokenIdMap[U"LBRACKET"] = 45;
+        tokenIdMap[U"LANGLE"] = 47;
+        tokenIdMap[U"LBRACKET"] = 49;
         tokenIdMap[U"LIST"] = 26;
-        tokenIdMap[U"LPAREN"] = 41;
-        tokenIdMap[U"MINUS"] = 50;
+        tokenIdMap[U"LPAREN"] = 45;
+        tokenIdMap[U"MINUS"] = 54;
         tokenIdMap[U"N"] = 9;
         tokenIdMap[U"NEXT"] = 8;
         tokenIdMap[U"NL"] = 1;
         tokenIdMap[U"P"] = 23;
-        tokenIdMap[U"PATH"] = 35;
-        tokenIdMap[U"PLUS"] = 49;
+        tokenIdMap[U"PATH"] = 39;
+        tokenIdMap[U"PLUS"] = 53;
         tokenIdMap[U"PRINT"] = 22;
         tokenIdMap[U"Q"] = 5;
         tokenIdMap[U"QUIT"] = 4;
-        tokenIdMap[U"RANGLE"] = 44;
-        tokenIdMap[U"RBRACKET"] = 46;
-        tokenIdMap[U"RPAREN"] = 42;
+        tokenIdMap[U"RANGLE"] = 48;
+        tokenIdMap[U"RBRACKET"] = 50;
+        tokenIdMap[U"RPAREN"] = 46;
         tokenIdMap[U"S"] = 11;
+        tokenIdMap[U"SET"] = 34;
         tokenIdMap[U"SHOW"] = 28;
         tokenIdMap[U"STEP"] = 10;
-        tokenIdMap[U"STRING"] = 37;
+        tokenIdMap[U"STRING"] = 41;
+        tokenIdMap[U"TRUE"] = 36;
         tokenIdMap[U"TYPEID"] = 32;
         tokenIdMap[U"U"] = 17;
         tokenIdMap[U"UNTIL"] = 16;
@@ -111,6 +116,10 @@ namespace DebuggerCommandTokens
         "CAST",
         "TYPEID",
         "BASE",
+        "SET",
+        "BREAKONTHROW",
+        "TRUE",
+        "FALSE",
         "ID",
         "PATH",
         "INTEGER",
@@ -127,7 +136,8 @@ namespace DebuggerCommandTokens
         "DOT",
         "COMMA",
         "PLUS",
-        "MINUS"
+        "MINUS",
+        "EQ"
     };
 
     const char* GetTokenName(int tokenId)
@@ -171,6 +181,10 @@ namespace DebuggerCommandTokens
         "'cast'",
         "'typeid'",
         "'base'",
+        "'set'",
+        "'breakOnThrow'",
+        "'true'",
+        "'false'",
         "id",
         "'path'",
         "'integer'",
@@ -187,7 +201,8 @@ namespace DebuggerCommandTokens
         "'.'",
         "','",
         "'+'",
-        "'-'"
+        "'-'",
+        "'='"
     };
 
     const char* GetTokenInfo(int tokenId)

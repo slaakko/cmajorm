@@ -73,7 +73,9 @@ enum class InstructionFlags : int16_t
     exitCode = 1 << 1,
     beginBrace = 1 << 2,
     endBrace = 1 << 3,
-    startFunction = 1 << 4
+    startFunction = 1 << 4,
+    throwInst = 1 << 5,
+    catchInst = 1 << 6
 };
 
 DEBUG_API inline constexpr InstructionFlags operator|(InstructionFlags left, InstructionFlags right)
@@ -406,6 +408,10 @@ public:
     const std::string& FilePath() const { return filePath; }
     DIType* GetType(const std::string& typeId) const;
     void AddType(DIType* type);
+    void AddThrowInstruction(Instruction* throwInstruction);
+    const std::vector<Instruction*>& GetThrowInstructions() const { return throwInstructions; }
+    void AddCatchInstruction(Instruction* catchInstruction);
+    const std::vector<Instruction*>& GetCatchInstructions() const { return catchInstructions; }
 private:
     std::string filePath;
     std::vector<std::unique_ptr<Project>> projects;
@@ -417,6 +423,8 @@ private:
     SourceFileCache sourceFileCache;
     SourceFileMap sourceFileMap;
     int sourceFileWindowSize;
+    std::vector<Instruction*> throwInstructions;
+    std::vector<Instruction*> catchInstructions;
 };
 
 std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath);

@@ -77,7 +77,7 @@ private:
 class DEBUG_API Debugger : public GdbDriver, public CmdbSessionClient
 {
 public:
-    Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_);
+    Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_, bool breakOnThrow_);
     ~Debugger();
     enum class State
     {
@@ -139,7 +139,7 @@ public:
     void ProcessVarCreateReply(GdbReply* reply);
     void ProcessVarEvaluateReply(GdbReply* reply);
     bool ProcessExecStoppedRecord(GdbExecStoppedRecord* execStoppedRecord);
-    void StartProgram();
+    void StartProgram(bool breakOnThrow_);
     GdbBreakpoint* SetBreakpoint(Instruction* instruction);
     bool DeleteBreakpoint(Instruction* instruction);
     GdbBreakpoint* GetBreakpoint(Instruction* instruction) const;
@@ -161,6 +161,11 @@ public:
     Container* GetContainer(ContainerClassTemplateKind containerKind, const std::string& containerVarExpr);
     void ClearBrowsingData();
     void AddToNextSet(std::set<Instruction*>& nextSet, Instruction* inst) const;
+    void SetBreakOnThrow(bool breakOnThrow_, bool printResult);
+    void SetThrowBreakpoints(bool printResult);
+    void ClearThrowBreakpoints(bool printResult);
+    bool SetCatchBreakpoints();
+    void ClearCatchBreakpoints();
 private:
     State state;
     bool wasRunning;
@@ -188,6 +193,9 @@ private:
     std::recursive_mutex outputMutex;
     CodeFormatter outFormatter;
     CodeFormatter errorFormatter;
+    bool breakOnThrow;
+    std::string throwBreakpointsId;
+    std::string catchBreakpointsId;
 };
 
 class DEBUG_API DebuggerCommand
@@ -195,7 +203,7 @@ class DEBUG_API DebuggerCommand
 public:
     enum class Kind
     {
-        exit, help, next, step, continue_, finish, until, break_, delete_, depth, frames, showBreakpoint, showBreakpoints, list, print, repeatLatest
+        exit, help, next, step, continue_, finish, until, break_, delete_, depth, frames, showBreakpoint, showBreakpoints, list, print, setBreakOnThrow, repeatLatest
     };
     DebuggerCommand(Kind kind_);
     virtual ~DebuggerCommand();
@@ -348,6 +356,16 @@ private:
     std::string expression;
 };
 
+class DEBUG_API DebuggerSetBreakOnThrowCommand : public DebuggerCommand
+{
+public:
+    DebuggerSetBreakOnThrowCommand(bool breakOnThrow_);
+    void Execute(Debugger& debugger) override;
+    DebuggerCommand* Clone() override;
+private:
+    bool breakOnThrow;
+};
+
 class DEBUG_API DebuggerRepeatLatestCommand : public DebuggerCommand
 {
 public:
@@ -357,7 +375,7 @@ public:
     DebuggerCommand* Clone() override;
 };
 
-DEBUG_API void RunDebuggerInteractive(const std::string& executable, const std::vector<std::string>& args, bool verbose);
+DEBUG_API void RunDebuggerInteractive(const std::string& executable, const std::vector<std::string>& args, bool verbose, bool breakOnThrow);
 
 } } // namespace cmajor::debug
 
