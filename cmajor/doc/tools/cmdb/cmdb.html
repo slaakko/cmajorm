@@ -91,8 +91,10 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.12 <a href="#cast-expression">Cast expression</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.3 <a href="#print-command-containers">Containers</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.4 <a href="#print-command-type-identifiers">Type identifiers</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;3.14 <a href="#exit-command">Exit command</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.14.1 <a href="#exit-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.14 <a href="#set-command">Set command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.14.1 <a href="#set-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.15 <a href="#exit-command">Exit command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.15.1 <a href="#exit-command-syntax">Syntax</a><br />
         4 <a href="#common-results">Common results</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;4.1 <a href="#stopped-result">Stopped result</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;4.2 <a href="#error-result">Error result</a><br />
@@ -148,6 +150,11 @@
             <td class="opt">--debug</td>
             <td class="opt">-d</td>
             <td class="opt">Debug the debugger.</td>
+        </tr>
+        <tr>
+            <td class="opt">--dontBreakOnThrow</td>
+            <td class="opt">-t</td>
+            <td class="opt">Set <em>breakOnThrow</em> to <strong>off</strong>. By default it is <strong>on</strong>.</td>
         </tr>
         <tr>
             <td class="opt">&#8209;&#8209;sessionPort=PORT_NUBER</td>
@@ -1956,10 +1963,46 @@
         A type identifier is a UUID string of the form "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx". 
         It uniquely identifies a Cmajor type.
     </p>
+
+        <h3 id="set-command">3.14 Set command</h3>
     
-    <h3 id="exit-command">3.14 Exit command</h3>
+    <p>
+        The set command sets the state of a debugger variable.
+        There's just one debugger variable defined at the moment:
+        <em>breakOnThrow</em>.
+    </p>
     
-    <h4 id="exit-command-syntax">3.14.1 Syntax</h4>
+    <p>
+        When the <em>breakOnThrow</em> variable is <strong>true</strong> (default),
+        the debugger stops the program when a <strong>throw</strong> statement is encountered.
+        If the <em>breakOnThrow</em> variable is false, the program does not stop automatically on throw statements.
+    </p>
+    
+    <p>
+        When a program is stopped on a <strong>throw</strong> statement, the <strong>next</strong>
+        debugger command drives the program to the corresponding <strong>catch</strong> statement and
+        stops the program.
+    </p>
+    
+    <h4 id="set-command-syntax">3.14.1 Syntax</h4>
+    
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.set-command">set&#8209;command</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">set</span> breakOnThrow <span class="mono">=</span> (<span class="kw">true</span> | <span class="kw">false</span>)
+            </td>
+        </tr>
+    </table>   
+
+    <h3 id="exit-command">3.15 Exit command</h3>
+    
+    <p>
+        The exit command exists the debugger.
+    </p>
+    
+    <h4 id="exit-command-syntax">3.15.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -1971,7 +2014,7 @@
             </td>
         </tr>
     </table>   
-        
+
     <h2 id="common-results">4. Common results</h2>
     
     <h3 id="stopped-result">4.1 Stopped result</h3>
@@ -2046,6 +2089,7 @@
                 <span class="rule"><a href="#summary.rule.depth-command">depth&#8209;command</a></span> |<br/>
                 <span class="rule"><a href="#summary.rule.frames-command">frames&#8209;command</a></span> |<br/>
                 <span class="rule"><a href="#summary.rule.print-command">print&#8209;command</a></span> |<br/>
+                <span class="rule"><a href="#summary.rule.set-command">set&#8209;command</a></span> |<br/>
                 <span class="rule"><a href="#summary.rule.exit-command">exit&#8209;command</a></span>
             </td>
         </tr>
@@ -2426,6 +2470,13 @@
                 <span class="mono">(</span>
                 <span class="rule"><a href="#summary.rule.expression">expression</a></span> 
                 <span class="mono">)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.set-command">set&#8209;command</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">set</span> breakOnThrow <span class="mono">=</span> (<span class="kw">true</span> | <span class="kw">false</span>)
             </td>
         </tr>
         <tr>
