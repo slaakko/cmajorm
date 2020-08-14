@@ -69,6 +69,7 @@ BINDISTDIR = ~/cmajor-3.6.0
 bindist:
 	mkdir -p $(BINDISTDIR)
 	mkdir -p $(BINDISTDIR)/bin
+	mkdir -p $(BINDISTDIR)/config
 	mkdir -p $(BINDISTDIR)/lib
 	mkdir -p $(BINDISTDIR)/lib/gcc
 	mkdir -p $(BINDISTDIR)/doc
@@ -76,12 +77,29 @@ bindist:
 	mkdir -p $(BINDISTDIR)/unicode
 	mkdir -p $(BINDISTDIR)/projects
 	cp bin/* $(BINDISTDIR)/bin
+	cp config/* $(BINDISTDIR)/config
 	cp -r lib/* $(BINDISTDIR)/lib
 	cp -r doc/* $(BINDISTDIR)/doc
 	cp -r system/* $(BINDISTDIR)/system
 	cp -r projects/* $(BINDISTDIR)/projects
 	cp  unicode/cmajor_ucd.bin $(BINDISTDIR)/unicode
-    
+	mkdir -p $(BINDISTDIR)/eh
+	rm -f eh/*.o
+	cp -r eh/* $(BINDISTDIR)/eh
+	mkdir -p $(BINDISTDIR)/rts
+	rm -f rts/*.o
+	cp -r rts/* $(BINDISTDIR)/rts
+	mkdir -p $(BINDISTDIR)/sngxml
+	rm -f sngxml/dom/*.o
+	rm -f sngxml/xml/*.o
+	rm -f sngxml/xpath/*.o
+	cp -r sngxml/* $(BINDISTDIR)/sngxml
+	mkdir -p $(BINDISTDIR)/soulng
+	rm -f soulng/util/*.o
+	rm -f soulng/lexer/*.o
+	rm -f soulng/parser/*.o
+	cp -r soulng/* $(BINDISTDIR)/soulng
+	
 clean:
 	$(MAKE) -C soulng clean
 	$(MAKE) -C sngxml clean
