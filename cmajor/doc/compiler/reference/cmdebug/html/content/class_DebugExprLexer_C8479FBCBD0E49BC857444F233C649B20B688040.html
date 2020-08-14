@@ -1,0 +1,152 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>DebugExprLexer Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | prev | <a href="struct_DebugExprParser_873A7CE04EFFBEDACF200981AE2038592105475C.html">next</a>
+        <hr/>
+        <h1>DebugExprLexer Class</h1>
+        <span>
+            Definition at line <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html#9">9</a>
+             of <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html">DebugExprLexer.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DebugExprLexer_C8479FBCBD0E49BC857444F233C649B20B688040.html#constructor_DebugExprLexer_4CFF955C8A6655B3D6927F4EEFCDF6BEEE3AF801">DebugExprLexer</a>(<span class="kw">const </span><span class="kw">char32_t</span>* start_, <span class="kw">const </span><span class="kw">char32_t</span>* end_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DebugExprLexer_C8479FBCBD0E49BC857444F233C649B20B688040.html#constructor_DebugExprLexer_0DEAE4CC57C3CD042CAE803B6AABBFF8C001698D">DebugExprLexer</a>(<span class="kw">const </span>std::u32string&amp; content_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebugExprLexer_C8479FBCBD0E49BC857444F233C649B20B688040.html#function_GetTokenId_CCD49A066F8802CD5D3A7F9D462EB1E274B9F564">GetTokenId</a>(<span class="kw">int</span> statementIndex)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebugExprLexer_C8479FBCBD0E49BC857444F233C649B20B688040.html#function_NextState_3D3B5BDA63D32BBECCA65741BAC55A94741A5589">NextState</a>(<span class="kw">int</span> state, <span class="kw">char32_t</span> c) <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_DebugExprLexer_4CFF955C8A6655B3D6927F4EEFCDF6BEEE3AF801">DebugExprLexer Constructor</h3>
+        <h4>
+            DebugExprLexer::DebugExprLexer(<span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * start_, <span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * end_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/DebugExprLexer.cpp_866800DAE76BA76F151F9EADA39EE7C41317A093.html#18">18</a>
+             of <a href="file/DebugExprLexer.cpp_866800DAE76BA76F151F9EADA39EE7C41317A093.html">DebugExprLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;18</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><span class="identifier">Lexer</span><span class="other">(</span><span class="identifier">start_</span><span class="other">,&nbsp;</span><span class="identifier">end_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;19</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_DebugExprKeywords_5CCC1EA5F8FEE2DF463A5C140F898916500D526F.html">DebugExprKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;21</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html#13">13</a>
+             of <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html">DebugExprLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="constructor_DebugExprLexer_0DEAE4CC57C3CD042CAE803B6AABBFF8C001698D">DebugExprLexer Constructor</h3>
+        <h4>
+            DebugExprLexer::DebugExprLexer(<span class="kw">const </span>
+            std::u32string&amp; content_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/DebugExprLexer.cpp_866800DAE76BA76F151F9EADA39EE7C41317A093.html#13">13</a>
+             of <a href="file/DebugExprLexer.cpp_866800DAE76BA76F151F9EADA39EE7C41317A093.html">DebugExprLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;13</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><span class="identifier">Lexer</span><span class="other">(</span><span class="identifier">content_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;14</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_DebugExprKeywords_5CCC1EA5F8FEE2DF463A5C140F898916500D526F.html">DebugExprKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;16</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html#12">12</a>
+             of <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html">DebugExprLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_GetTokenId_CCD49A066F8802CD5D3A7F9D462EB1E274B9F564">GetTokenId Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             DebugExprLexer::GetTokenId(<span class="kw">int</span>
+             statementIndex)</h4>
+        <span>
+            Definition at line <a href="file/DebugExprLexer.cpp_866800DAE76BA76F151F9EADA39EE7C41317A093.html#1362">1362</a>
+             of <a href="file/DebugExprLexer.cpp_866800DAE76BA76F151F9EADA39EE7C41317A093.html">DebugExprLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html#16">16</a>
+             of <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html">DebugExprLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_DebugExprLexer_C8479FBCBD0E49BC857444F233C649B20B688040.html#function_NextState_3D3B5BDA63D32BBECCA65741BAC55A94741A5589">DebugExprLexer::NextState</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_NextState_3D3B5BDA63D32BBECCA65741BAC55A94741A5589">NextState Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             DebugExprLexer::NextState(<span class="kw">int</span>
+             state, <span class="kw">char32_t</span>
+             c) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DebugExprLexer.cpp_866800DAE76BA76F151F9EADA39EE7C41317A093.html#23">23</a>
+             of <a href="file/DebugExprLexer.cpp_866800DAE76BA76F151F9EADA39EE7C41317A093.html">DebugExprLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html#14">14</a>
+             of <a href="file/DebugExprLexer.hpp_AE3CF58570F6C870D5F6270438060AA5B38BB200.html">DebugExprLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_DebugExprLexer_C8479FBCBD0E49BC857444F233C649B20B688040.html#function_GetTokenId_CCD49A066F8802CD5D3A7F9D462EB1E274B9F564">DebugExprLexer::GetTokenId</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | prev | <a href="struct_DebugExprParser_873A7CE04EFFBEDACF200981AE2038592105475C.html">next</a>
+    </body>
+</html>

@@ -75,6 +75,15 @@
         <span>
             Definition at line <a href="file/Data.cpp_DE1DD2A2E5F3B1D7788428D82B13BCECEDEF88F4.html#54">54</a>
              of <a href="file/Data.cpp_DE1DD2A2E5F3B1D7788428D82B13BCECEDEF88F4.html">Data.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_DataRepository_029BEAC8338B95613FD8CD8D0F43847F173C2797.html#variable_globalVariableDefinitions_5F1683CEA98FC83A119F3F957222E2EACAFAB1A2">globalVariableDefinitions</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_DataRepository_029BEAC8338B95613FD8CD8D0F43847F173C2797.html#variable_globalVariableMap_1903CD0D4A80D46E1085F7F4A0D04B5655BB0705">globalVariableMap</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_DataRepository_029BEAC8338B95613FD8CD8D0F43847F173C2797.html#variable_nextStringId_E6DE55B7839132083A019A98AB082DB10DF6BE25">nextStringId</a><span class="other">(</span><span class="other">0</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -107,6 +116,21 @@
         <span>
             Definition at line <a href="file/Data.cpp_DE1DD2A2E5F3B1D7788428D82B13BCECEDEF88F4.html#71">71</a>
              of <a href="file/Data.cpp_DE1DD2A2E5F3B1D7788428D82B13BCECEDEF88F4.html">Data.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">*</span>&nbsp;<span class="identifier">globalVariable</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">(</span><span class="identifier">context</span><span class="other">.</span><span class="identifier">GetByteType</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"string"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_DataRepository_029BEAC8338B95613FD8CD8D0F43847F173C2797.html#variable_nextStringId_E6DE55B7839132083A019A98AB082DB10DF6BE25">nextStringId</a><span class="other">++</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"_"</span><span class="other">&nbsp;+&nbsp;</span><a href="./class_DataRepository_029BEAC8338B95613FD8CD8D0F43847F173C2797.html#variable_compileUnitId_FFFDC6E941D19ED26D2212BEC4140808D9E91670">compileUnitId</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">globalVariable</span><span class="other">-></span><span class="identifier">SetInitializer</span><span class="other">(</span><span class="identifier">context</span><span class="other">.</span><span class="identifier">GetStringValue</span><span class="other">(</span><span class="identifier">globalVariable</span><span class="other">-></span><span class="identifier">GetType</span><span class="other">(</span><span class="identifier">context</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">stringValue</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DataRepository_029BEAC8338B95613FD8CD8D0F43847F173C2797.html#variable_globalVariableDefinitions_5F1683CEA98FC83A119F3F957222E2EACAFAB1A2">globalVariableDefinitions</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_GlobalVariable_3BA6B03F2CA7C35790FBAF75A9C5B513C3EBCA31.html">GlobalVariable</a><span class="other">></span><span class="other">(</span><span class="identifier">globalVariable</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">globalVariable</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -160,6 +184,15 @@
         <span>
             Definition at line <a href="file/Data.cpp_DE1DD2A2E5F3B1D7788428D82B13BCECEDEF88F4.html#95">95</a>
              of <a href="file/Data.cpp_DE1DD2A2E5F3B1D7788428D82B13BCECEDEF88F4.html">Data.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DataRepository_029BEAC8338B95613FD8CD8D0F43847F173C2797.html#variable_compileUnitId_FFFDC6E941D19ED26D2212BEC4140808D9E91670">compileUnitId</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">compileUnitId_</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>

@@ -79,6 +79,15 @@
         <span>
             Definition at line <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html#275">275</a>
              of <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html">BasicTypeOperation.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_basicTypeMoveAssignment_2269CE52207DA8D76C0388D8EE79EB31D95CB30E">basicTypeMoveAssignment</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -98,8 +107,12 @@
         <span>
             Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#730">730</a>
              of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;730</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"BasicTypeMoveAssignment"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_ClassName_89669E070A33919DA464776855DF5F48ACC1C9AF">cmajor::symbols::ContainerSymbol::ClassName</a>
@@ -117,8 +130,12 @@
         <span>
             Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#727">727</a>
              of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;727</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_DeclaredAccess_6AA704F5576A556C4F39E3D7DFFC48A1E8E4BF67">cmajor::symbols::Symbol::DeclaredAccess</a>
@@ -135,6 +152,23 @@
         <span>
             Definition at line <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html#279">279</a>
              of <a href="file/BasicTypeOperation.cpp_FB2EFDE64D4FC26BEF556C5F407ABFDC8D5D7117.html">BasicTypeOperation.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">genObjects</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">2</span><span class="other">,&nbsp;</span><span class="string">"move&nbsp;assignment&nbsp;needs&nbsp;two&nbsp;objects"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">genObjects</span><span class="other">[</span><span class="other">1</span><span class="other">]</span><span class="other">-></span><span class="identifier">Load</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="identifier">OperationFlags</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">rvalueRefValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Stack</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateLoad</span><span class="other">(</span><span class="identifier">rvalueRefValue</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">genObjects</span><span class="other">[</span><span class="other">0</span><span class="other">]</span><span class="other">-></span><span class="identifier">Store</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><span class="identifier">OperationFlags</span><span class="other">::</span><span class="identifier">none</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -151,8 +185,12 @@
         <span>
             Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#731">731</a>
              of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;731</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Info_032A420EBC4B8282D9B463477215571342D848EB">cmajor::symbols::FunctionSymbol::Info</a>
@@ -169,8 +207,12 @@
         <span>
             Definition at line <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html#729">729</a>
              of <a href="file/BasicTypeOperation.hpp_EDEC9989D33546D2234733AF9F758487340D7793.html">BasicTypeOperation.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;729</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_IsBasicTypeOperation_370ECFE6425F9F520B8008A31FBA47E39FEBC4BF">cmajor::symbols::FunctionSymbol::IsBasicTypeOperation</a>

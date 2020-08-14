@@ -58,6 +58,15 @@
         <span>
             Definition at line <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html#644">644</a>
              of <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html">Meta.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">644</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_IntrinsicFunction_F521E1B5E39D27BD0AB8435AD65FF36EA03CF46C.html">IntrinsicFunction</a><span class="other">(</span><span class="identifier">module_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">645</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">646</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -76,8 +85,12 @@
         <span>
             Definition at line <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html#628">628</a>
              of <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html">Meta.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">628</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_IntrinsicFunction_F521E1B5E39D27BD0AB8435AD65FF36EA03CF46C.html#function_Arity_4E1707C63C4E8DB4A9100F506D15CB45F306754E">cmajor::symbols::IntrinsicFunction::Arity</a>
@@ -98,8 +111,28 @@
         <span>
             Definition at line <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html#632">632</a>
              of <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html">Meta.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">633</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">634</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">type</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">templateArguments</span><span class="other">.</span><span class="identifier">front</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">635</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">type</span><span class="other">-></span><span class="identifier">IsArrayType</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">636</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">637</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">arrayType</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">type</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">638</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_LongValue_1BD265CB5802007DF44E57306A8CE9482A5A8B33.html">LongValue</a><span class="other">(</span><span class="identifier">span</span><span class="other">,&nbsp;</span><span class="identifier">arrayType</span><span class="other">-></span><span class="identifier">Size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">639</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">640</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_LongValue_1BD265CB5802007DF44E57306A8CE9482A5A8B33.html">LongValue</a><span class="other">(</span><span class="identifier">span</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">641</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_IntrinsicFunction_F521E1B5E39D27BD0AB8435AD65FF36EA03CF46C.html#function_DoEvaluate_8E511548E2DCE72BDABCC64F875718F63C4CE8F8">cmajor::symbols::IntrinsicFunction::DoEvaluate</a>
@@ -122,8 +155,12 @@
         <span>
             Definition at line <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html#631">631</a>
              of <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html">Meta.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">631</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ArrayLength"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_IntrinsicFunction_F521E1B5E39D27BD0AB8435AD65FF36EA03CF46C.html#function_GroupName_7C064FC51AE7D023D05CC395D48D2AFEB41691C6">cmajor::symbols::IntrinsicFunction::GroupName</a>
@@ -139,8 +176,12 @@
         <span>
             Definition at line <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html#629">629</a>
              of <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html">Meta.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">629</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">1</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_IntrinsicFunction_F521E1B5E39D27BD0AB8435AD65FF36EA03CF46C.html#function_NumberOfTypeParameters_4B1003F1B6C586DCDBBF4DB8CF2350C3DDA31654">cmajor::symbols::IntrinsicFunction::NumberOfTypeParameters</a>
@@ -157,8 +198,12 @@
         <span>
             Definition at line <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html#630">630</a>
              of <a href="file/Meta.cpp_F15762B71DA5DAC3D1BFD7D60480ABB83AEC1529.html">Meta.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">630</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">symbolTable</span><span class="other">.</span><span class="identifier">GetTypeByName</span><span class="other">(</span><span class="string">U"long"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_IntrinsicFunction_F521E1B5E39D27BD0AB8435AD65FF36EA03CF46C.html#function_ReturnType_9CA4DEE1A2E93689FD69732CF619745EB3AF0E90">cmajor::symbols::IntrinsicFunction::ReturnType</a>

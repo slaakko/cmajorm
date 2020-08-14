@@ -1,0 +1,285 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>GlobalUnwindInfo Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="struct_FunctionUnwindInfo_6FE9E651B9011814E6F7E1ACF7379DE0DD0CF45C.html">prev</a>
+         | <a href="struct_RecursiveMutex_792DC7EBBE7783E62EDBA289FF5DD8C1A426AE1B.html">next</a>
+        <hr/>
+        <h1>GlobalUnwindInfo Class</h1>
+        <span>
+            Definition at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#44">44</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#constructor_GlobalUnwindInfo_C6F682C59618180B3758636EC59BDCDBF4540693">GlobalUnwindInfo</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#function_AddUnwindInfo_E86074E0701B49CB42F1C4F0788051D367225CB3">AddUnwindInfo</a>(<span class="kw">void</span>* functionAddress, <span class="kw">const </span><span class="kw">char</span>* functionName, <span class="kw">const </span><span class="kw">char</span>* sourceFilePath)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#function_DisposeCallStack_ACC73A2ECABFE952771B644B296F5D3E459CF458">DisposeCallStack</a>(<a href="./struct_UnwindInfo_7A66C1BB4370BD8BDBF129A5AA09745491CBAF0D.html">UnwindInfo</a>* unwindInfoList)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#function_Done_F2C096D87A302FD82CE5EB1A458EE71C0C16BB41">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><span class="kw">char</span>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#function_GetCallStack_A0A1614AD10F87713895B218CE9A87389E5084ED">GetCallStack</a>(<a href="./struct_UnwindInfo_7A66C1BB4370BD8BDBF129A5AA09745491CBAF0D.html">UnwindInfo</a>* unwindInfoList)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#function_Init_61B9D1DB344AAAE64EB49E5D760E76666954BBE4">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#function_Initialized_25CAF1BB519645413535DD4D3C25E0165882F94C">Initialized</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html">GlobalUnwindInfo</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#function_Instance_3B26552CA65D81E538FB22719841B0A0FA406177">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_callStackMap_7D103F0C14844CED3F9B09F7100A32E3B6D27147">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;<span class="kw">void</span>*, std::string*></td>
+                <td class="functionTableSecondCol" xml:space="preserve">callStackMap</td>
+            </tr>
+            <tr id="variable_instance_9D473D2D37231DC6E0B60EEC768454CF74A0DD8E">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html">GlobalUnwindInfo</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_unwindInfoMap_5B33B18526BDAEA173F5A3222274B9D03221CEB9">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;<span class="kw">void</span>*, <a href="./struct_FunctionUnwindInfo_6FE9E651B9011814E6F7E1ACF7379DE0DD0CF45C.html">FunctionUnwindInfo</a>*></td>
+                <td class="functionTableSecondCol" xml:space="preserve">unwindInfoMap</td>
+            </tr>
+            <tr id="variable_unwindInfoVec_AD0C7FC335236B3DBBC7E526B9AC821647329B1D">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="./struct_FunctionUnwindInfo_6FE9E651B9011814E6F7E1ACF7379DE0DD0CF45C.html">FunctionUnwindInfo</a>>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">unwindInfoVec</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_GlobalUnwindInfo_C6F682C59618180B3758636EC59BDCDBF4540693">GlobalUnwindInfo Constructor</h3>
+        <h4>
+            GlobalUnwindInfo::GlobalUnwindInfo()</h4>
+        <span>
+            Definition at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#74">74</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#56">56</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddUnwindInfo_E86074E0701B49CB42F1C4F0788051D367225CB3">AddUnwindInfo Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             GlobalUnwindInfo::AddUnwindInfo(<span class="kw">void</span>
+            * functionAddress, <span class="kw">const </span>
+            <span class="kw">char</span>
+            * functionName, <span class="kw">const </span>
+            <span class="kw">char</span>
+            * sourceFilePath)</h4>
+        <span>
+            Definition at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#78">78</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_unwindInfoMap_5B33B18526BDAEA173F5A3222274B9D03221CEB9">unwindInfoMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">functionAddress</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;==&nbsp;</span><a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_unwindInfoMap_5B33B18526BDAEA173F5A3222274B9D03221CEB9">unwindInfoMap</a><span class="other">.</span><a href="./namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_cend_617683F805C954BBF5635F152EF23D739E6AADB9">cend</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./struct_FunctionUnwindInfo_6FE9E651B9011814E6F7E1ACF7379DE0DD0CF45C.html">FunctionUnwindInfo</a><span class="other">*</span>&nbsp;<span class="identifier">unwindInfo</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./struct_FunctionUnwindInfo_6FE9E651B9011814E6F7E1ACF7379DE0DD0CF45C.html">FunctionUnwindInfo</a><span class="other">(</span><span class="identifier">functionName</span><span class="other">,&nbsp;</span><span class="identifier">sourceFilePath</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_unwindInfoVec_AD0C7FC335236B3DBBC7E526B9AC821647329B1D">unwindInfoVec</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./struct_FunctionUnwindInfo_6FE9E651B9011814E6F7E1ACF7379DE0DD0CF45C.html">FunctionUnwindInfo</a><span class="other">></span><span class="other">(</span><span class="identifier">unwindInfo</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_unwindInfoMap_5B33B18526BDAEA173F5A3222274B9D03221CEB9">unwindInfoMap</a><span class="other">[</span><span class="identifier">functionAddress</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">unwindInfo</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#51">51</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_DisposeCallStack_ACC73A2ECABFE952771B644B296F5D3E459CF458">DisposeCallStack Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             GlobalUnwindInfo::DisposeCallStack(<a href="./struct_UnwindInfo_7A66C1BB4370BD8BDBF129A5AA09745491CBAF0D.html">UnwindInfo</a>
+            * unwindInfoList)</h4>
+        <span>
+            Definition at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#120">120</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_callStackMap_7D103F0C14844CED3F9B09F7100A32E3B6D27147">callStackMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">unwindInfoList</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_callStackMap_7D103F0C14844CED3F9B09F7100A32E3B6D27147">callStackMap</a><span class="other">.</span><a href="./namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html#variable_cend_617683F805C954BBF5635F152EF23D739E6AADB9">cend</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">delete</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_callStackMap_7D103F0C14844CED3F9B09F7100A32E3B6D27147">callStackMap</a><span class="other">.</span><span class="identifier">erase</span><span class="other">(</span><span class="identifier">unwindInfoList</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#53">53</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Done_F2C096D87A302FD82CE5EB1A458EE71C0C16BB41">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             GlobalUnwindInfo::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#67">67</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_instance_9D473D2D37231DC6E0B60EEC768454CF74A0DD8E">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#48">48</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetCallStack_A0A1614AD10F87713895B218CE9A87389E5084ED">GetCallStack Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <span class="kw">char</span>
+            * GlobalUnwindInfo::GetCallStack(<a href="./struct_UnwindInfo_7A66C1BB4370BD8BDBF129A5AA09745491CBAF0D.html">UnwindInfo</a>
+            * unwindInfoList)</h4>
+        <span>
+            Definition at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#89">89</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#52">52</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_61B9D1DB344AAAE64EB49E5D760E76666954BBE4">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             GlobalUnwindInfo::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#62">62</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_instance_9D473D2D37231DC6E0B60EEC768454CF74A0DD8E">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html">GlobalUnwindInfo</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#47">47</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Initialized_25CAF1BB519645413535DD4D3C25E0165882F94C">Initialized Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             GlobalUnwindInfo::Initialized() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#49">49</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_instance_9D473D2D37231DC6E0B60EEC768454CF74A0DD8E">instance</a><span class="other">&nbsp;!=&nbsp;</span><span class="kw">nullptr</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_3B26552CA65D81E538FB22719841B0A0FA406177">Instance Member Function</h3>
+        <h4>
+            <a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html">GlobalUnwindInfo</a>
+            &amp; GlobalUnwindInfo::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html#50">50</a>
+             of <a href="file/Unwind.cpp_807CBDFE444A0637219EBE111A014187F79A1986.html">Unwind.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="./class_GlobalUnwindInfo_5062A5945231A0E5C7F7D4D3BB6B1ACDE7B74435.html#variable_instance_9D473D2D37231DC6E0B60EEC768454CF74A0DD8E">instance</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="struct_FunctionUnwindInfo_6FE9E651B9011814E6F7E1ACF7379DE0DD0CF45C.html">prev</a>
+         | <a href="struct_RecursiveMutex_792DC7EBBE7783E62EDBA289FF5DD8C1A426AE1B.html">next</a>
+    </body>
+</html>

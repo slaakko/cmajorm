@@ -43,6 +43,7 @@ public:
     void Append(char32_t c);
     JsonValue* Clone() const override;
     const std::u32string& Value() const { return value; }
+    void SetValue(const std::u32string& value_);
     std::u16string JsonCharStr(char32_t c) const;
     std::string ToString() const override;
 private:

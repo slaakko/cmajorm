@@ -1,0 +1,326 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmdebug/Console.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmdebug/Gdb.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmdebug/Debugger.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;iostream></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">debug</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html">Console</a><span class="other">::</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#constructor_Console_1B86B08414A620D4F4AA56721C10E75BF1770C8A">Console</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_driver_1E1796A5267DD4B282737D2EB9EE75C2E54CD82F">driver</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_terminated_0CE9A6B22D26D4BB1B5D484AA58D7A47C484E040">terminated</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandAvailable_303C9C42D78893493B5A36C5F596C0C44FE3B9C4">commandAvailable</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandReceived_CDE6E77DBE62D960079DB7B043A22AD6487F2CFF">commandReceived</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetRunning_9CAF96478EF7294880A1382E350060276F93AE73">targetRunning</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_canProceeed_0C45BEA41CFE68CF4EA7FFC66A1B1F8CB5B106CB">canProceeed</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_needTargetInput_62771D92F1B089AA06537E384D9282A078EE25C0">needTargetInput</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineAvailable_870F54E45CB312CB47125B70192C38E0621E9F7C">targetInputLineAvailable</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputEof_C45FD305C1F3DBD9696406F5E45B52D31E3B9136">targetInputEof</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html">Console</a><span class="other">::</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#function_SetDriver_353B3C9D090392713D620FABF9CA859A83F13380">SetDriver</a><span class="other">(</span><a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html">GdbDriver</a><span class="other">*</span>&nbsp;<span class="identifier">driver_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_driver_1E1796A5267DD4B282737D2EB9EE75C2E54CD82F">driver</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">driver_</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html">Console</a><span class="other">::</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#function_Run_94BED08A61A7A5DE3EE571020B4DE0138198725B">Run</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">line</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while&nbsp;</span><span class="other">(</span><span class="kw">true</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">istream</span><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">getline</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">cin</span><span class="other">,&nbsp;</span><span class="identifier">line</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_canProceeed_0C45BEA41CFE68CF4EA7FFC66A1B1F8CB5B106CB">canProceeed</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_needTargetInput_62771D92F1B089AA06537E384D9282A078EE25C0">needTargetInput</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_mtx_867605E4CD069E18CC5329BF46787596235F8F67">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineReceived_9E72E38F0291CB6F77EEFCB44BE2C993F26EB345">targetInputLineReceived</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">s</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputEof_C45FD305C1F3DBD9696406F5E45B52D31E3B9136">targetInputEof</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputEof_C45FD305C1F3DBD9696406F5E45B52D31E3B9136">targetInputEof</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLine_8BBF039161F41C9CF1AB9AC5F352B4C66E627816">targetInputLine</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">line</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineAvailable_870F54E45CB312CB47125B70192C38E0621E9F7C">targetInputLineAvailable</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineAvailableVar_993E2408544FE9CCAB2F89AC55D245A13540B326">targetInputLineAvailableVar</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineReceivedVar_27AC58106A0CF76D1EF15D8C4C0E79606D7964FA">targetInputLineReceivedVar</a><span class="other">.</span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="other">[</span><span class="kw">this</span><span class="other">]</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineReceived_9E72E38F0291CB6F77EEFCB44BE2C993F26EB345">targetInputLineReceived</a><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_needTargetInput_62771D92F1B089AA06537E384D9282A078EE25C0">needTargetInput</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">s</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html">DebuggerCommand</a><span class="other">></span>&nbsp;<span class="identifier">command</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">command</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">ParseDebuggerCommand</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_driver_1E1796A5267DD4B282737D2EB9EE75C2E54CD82F">driver</a><span class="other">-></span><span class="identifier">CurrentSourceFilePath</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">line</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">exception</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_driver_1E1796A5267DD4B282737D2EB9EE75C2E54CD82F">driver</a><span class="other">-></span><span class="identifier">Error</span><span class="other">(</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">what</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_driver_1E1796A5267DD4B282737D2EB9EE75C2E54CD82F">driver</a><span class="other">-></span><span class="identifier">Prompt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">continue</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">command</span><span class="other">-></span><span class="identifier">GetKind</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html">DebuggerCommand</a><span class="other">::</span><a href="../enum_Kind_C7891FA0751599A11F106FC2C2AE622670FEC297.html">Kind</a><span class="other">::</span><a href="../enum_Kind_C7891FA0751599A11F106FC2C2AE622670FEC297.html#enumerator_exit_727E8DB1ADF648728FD5288C2ABB757AA27B4625">exit</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_mtx_867605E4CD069E18CC5329BF46787596235F8F67">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandReceived_CDE6E77DBE62D960079DB7B043A22AD6487F2CFF">commandReceived</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetRunning_9CAF96478EF7294880A1382E350060276F93AE73">targetRunning</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commands_21AF4871C70955D1466750A40951631294EEB909">commands</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">command</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandAvailableVar_293762957D5BF1AFD7FB457CAA2479ED774ED468">commandAvailableVar</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandAvailable_303C9C42D78893493B5A36C5F596C0C44FE3B9C4">commandAvailable</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandReceivedVar_B9CDB1885D20B39EEAC49A12D01878E10A24C7BA">commandReceivedVar</a><span class="other">.</span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="other">[</span><span class="kw">this</span><span class="other">]</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandReceived_CDE6E77DBE62D960079DB7B043A22AD6487F2CFF">commandReceived</a><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineAvailable_870F54E45CB312CB47125B70192C38E0621E9F7C">targetInputLineAvailable</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandAvailable_303C9C42D78893493B5A36C5F596C0C44FE3B9C4">commandAvailable</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_mtx_867605E4CD069E18CC5329BF46787596235F8F67">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_proceed_A559D403F8FCC5994AD5748D2D016FE92260422C">proceed</a><span class="other">.</span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="other">[</span><span class="kw">this</span><span class="other">]</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_canProceeed_0C45BEA41CFE68CF4EA7FFC66A1B1F8CB5B106CB">canProceeed</a><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_needTargetInput_62771D92F1B089AA06537E384D9282A078EE25C0">needTargetInput</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_driver_1E1796A5267DD4B282737D2EB9EE75C2E54CD82F">driver</a><span class="other">-></span><span class="identifier">TargetInputPrompt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_driver_1E1796A5267DD4B282737D2EB9EE75C2E54CD82F">driver</a><span class="other">-></span><span class="identifier">Prompt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_terminated_0CE9A6B22D26D4BB1B5D484AA58D7A47C484E040">terminated</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">TerminateGDB</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_mtx_867605E4CD069E18CC5329BF46787596235F8F67">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commands_21AF4871C70955D1466750A40951631294EEB909">commands</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html">DebuggerCommand</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../class_DebuggerExitCommand_8E5AB82B780F8098D42598302A6DD0392567B0FA.html">DebuggerExitCommand</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandAvailable_303C9C42D78893493B5A36C5F596C0C44FE3B9C4">commandAvailable</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandAvailableVar_293762957D5BF1AFD7FB457CAA2479ED774ED468">commandAvailableVar</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html">Console</a><span class="other">::</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#function_SetActive_3085694F6EB703C6337E83573CB51E3380B5480D">SetActive</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_activeTimeStamp_69C0DE4661F7730536F85A6B3CB14762B3921D29">activeTimeStamp</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">chrono</span><span class="other">::</span><span class="identifier">steady_clock</span><span class="other">::</span><span class="identifier">now</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html">DebuggerCommand</a><span class="other">></span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html">Console</a><span class="other">::</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#function_GetCommand_FD07D3A1252FBA5928A1F380E551686A794FFE06">GetCommand</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_terminated_0CE9A6B22D26D4BB1B5D484AA58D7A47C484E040">terminated</a><span class="other">)</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html">DebuggerCommand</a><span class="other">></span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_mtx_867605E4CD069E18CC5329BF46787596235F8F67">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandAvailableVar_293762957D5BF1AFD7FB457CAA2479ED774ED468">commandAvailableVar</a><span class="other">.</span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="other">[</span><span class="kw">this</span><span class="other">]</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandAvailable_303C9C42D78893493B5A36C5F596C0C44FE3B9C4">commandAvailable</a><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html">DebuggerCommand</a><span class="other">></span>&nbsp;<span class="identifier">command</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commands_21AF4871C70955D1466750A40951631294EEB909">commands</a><span class="other">.</span><span class="identifier">front</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commands_21AF4871C70955D1466750A40951631294EEB909">commands</a><span class="other">.</span><span class="identifier">pop_front</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandReceived_CDE6E77DBE62D960079DB7B043A22AD6487F2CFF">commandReceived</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandReceivedVar_B9CDB1885D20B39EEAC49A12D01878E10A24C7BA">commandReceivedVar</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">command</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html">Console</a><span class="other">::</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#function_SetTargetRunning_3734769672EF502F3DA03760F08995E18521B466">SetTargetRunning</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_mtx_867605E4CD069E18CC5329BF46787596235F8F67">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetRunning_9CAF96478EF7294880A1382E350060276F93AE73">targetRunning</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetRunningVar_1B2BFD3C679C2DA7623A5CF62E12F32388CA10D9">targetRunningVar</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html">Console</a><span class="other">::</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#function_GetTargetInputLine_1B267FCC054772F09116EA791B31A615FFFE88B6">GetTargetInputLine</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_mtx_867605E4CD069E18CC5329BF46787596235F8F67">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineAvailable_870F54E45CB312CB47125B70192C38E0621E9F7C">targetInputLineAvailable</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_needTargetInput_62771D92F1B089AA06537E384D9282A078EE25C0">needTargetInput</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_canProceeed_0C45BEA41CFE68CF4EA7FFC66A1B1F8CB5B106CB">canProceeed</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_proceed_A559D403F8FCC5994AD5748D2D016FE92260422C">proceed</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineAvailableVar_993E2408544FE9CCAB2F89AC55D245A13540B326">targetInputLineAvailableVar</a><span class="other">.</span><span class="identifier">wait</span><span class="other">(</span><span class="identifier">lock</span><span class="other">,&nbsp;</span><span class="other">[</span><span class="kw">this</span><span class="other">]</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineAvailable_870F54E45CB312CB47125B70192C38E0621E9F7C">targetInputLineAvailable</a><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">line</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLine_8BBF039161F41C9CF1AB9AC5F352B4C66E627816">targetInputLine</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineReceived_9E72E38F0291CB6F77EEFCB44BE2C993F26EB345">targetInputLineReceived</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetInputLineReceivedVar_27AC58106A0CF76D1EF15D8C4C0E79606D7964FA">targetInputLineReceivedVar</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">line</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html">Console</a><span class="other">::</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#function_Reset_7327C654CB9685D13779A99CDF5FAB90488CA6B1">Reset</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_mtx_867605E4CD069E18CC5329BF46787596235F8F67">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandAvailable_303C9C42D78893493B5A36C5F596C0C44FE3B9C4">commandAvailable</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_commandReceived_CDE6E77DBE62D960079DB7B043A22AD6487F2CFF">commandReceived</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetRunning_9CAF96478EF7294880A1382E350060276F93AE73">targetRunning</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_targetRunningVar_1B2BFD3C679C2DA7623A5CF62E12F32388CA10D9">targetRunningVar</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html">Console</a><span class="other">::</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#function_Proceed_734DC9A227D7314C7F5413EE8E5B9C8D3EA1B372">Proceed</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_lock</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_mtx_867605E4CD069E18CC5329BF46787596235F8F67">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_canProceeed_0C45BEA41CFE68CF4EA7FFC66A1B1F8CB5B106CB">canProceeed</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Console_1D6AB740705747E08A43076E92C63A94F98FACA8.html#variable_proceed_A559D403F8FCC5994AD5748D2D016FE92260422C">proceed</a><span class="other">.</span><span class="identifier">notify_one</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::debug</span></span>
+  <br/>
+ </body>
+</html>

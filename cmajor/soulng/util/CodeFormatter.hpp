@@ -62,6 +62,7 @@ private:
 };
 
 UTIL_API CodeFormatter& operator<<(CodeFormatter& f, const std::string& s);
+UTIL_API CodeFormatter& operator<<(CodeFormatter& f, const char* s);
 UTIL_API CodeFormatter& operator<<(CodeFormatter& f, char c);
 UTIL_API CodeFormatter& operator<<(CodeFormatter& f, bool b);
 UTIL_API CodeFormatter& operator<<(CodeFormatter& f, int x);

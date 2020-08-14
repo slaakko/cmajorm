@@ -16,7 +16,7 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#64">64</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#74">74</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -37,8 +37,16 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#function_First_8525F94F1417B114FEE379E4741DE1D0F9475AE0">First</a>()</td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#function_IsOrContainsBoundReturnStatement_C7B9942C934C16969F07B0BB351A34D1347DCFC2">IsOrContainsBoundReturnStatement</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>*</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#function_Second_F70286A7B7C7789FF97BC6E82431191C03AE35BF">Second</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#function_SetForLoopStatementNode_A74768BC3E5479F67800D08F8197EB7A8E0795FB">SetForLoopStatementNode</a>() <span class="kw">override</span></td>
             </tr>
         </table>
         <h2>Member Variables</h2>
@@ -63,8 +71,22 @@
         <span>
             Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#42">42</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a><span class="other">(</span><span class="identifier">module_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundSequenceStatement_744718D1BD4EC7DDC55194CEC8DC49BE08A78B4E">boundSequenceStatement</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#variable_first_5F3F6259670119434C491F7E2BBA86FF5ED5EF16">first</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">first_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#variable_second_AEC08A263EB5FA04D20AA1E19235CFAA4028C19E">second</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">second_</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#variable_first_5F3F6259670119434C491F7E2BBA86FF5ED5EF16">first</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#variable_second_AEC08A263EB5FA04D20AA1E19235CFAA4028C19E">second</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -77,10 +99,19 @@
         <span>
             Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#49">49</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#68">68</a>
+            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#78">78</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -101,13 +132,48 @@
             <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             * cmajor::binder::BoundSequenceStatement::First()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#69">69</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#79">79</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#variable_first_5F3F6259670119434C491F7E2BBA86FF5ED5EF16">first</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_E9C42282886875DCB9DA9AFDD94E88E5DC5E11DC">cmajor::binder::ControlFlowAnalyzer::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsOrContainsBoundReturnStatement_C7B9942C934C16969F07B0BB351A34D1347DCFC2">IsOrContainsBoundReturnStatement Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::binder::BoundSequenceStatement::IsOrContainsBoundReturnStatement() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#81">81</a>
+             of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#variable_second_AEC08A263EB5FA04D20AA1E19235CFAA4028C19E">second</a><span class="other">-></span><span class="identifier">IsOrContainsBoundReturnStatement</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html#function_IsOrContainsBoundReturnStatement_9C421DDBBAFB65901AD4C1024A8D4C840D0FEDFE">cmajor::binder::BoundStatement::IsOrContainsBoundReturnStatement</a>
         </span>
         <br/>
         <br/>
         <span>
-            Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_E9C42282886875DCB9DA9AFDD94E88E5DC5E11DC">cmajor::binder::ControlFlowAnalyzer::Visit</a>
+            Calls: <a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#function_IsOrContainsBoundReturnStatement_C7B9942C934C16969F07B0BB351A34D1347DCFC2">cmajor::binder::BoundSequenceStatement::IsOrContainsBoundReturnStatement</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#function_IsOrContainsBoundReturnStatement_C7B9942C934C16969F07B0BB351A34D1347DCFC2">cmajor::binder::BoundSequenceStatement::IsOrContainsBoundReturnStatement</a>
         </span>
         <br/>
         <br/>
@@ -117,13 +183,58 @@
             <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             * cmajor::binder::BoundSequenceStatement::Second()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#70">70</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#80">80</a>
+             of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#variable_second_AEC08A263EB5FA04D20AA1E19235CFAA4028C19E">second</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_E9C42282886875DCB9DA9AFDD94E88E5DC5E11DC">cmajor::binder::ControlFlowAnalyzer::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetForLoopStatementNode_A74768BC3E5479F67800D08F8197EB7A8E0795FB">SetForLoopStatementNode Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::binder::BoundSequenceStatement::SetForLoopStatementNode() <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#54">54</a>
+             of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#variable_first_5F3F6259670119434C491F7E2BBA86FF5ED5EF16">first</a><span class="other">-></span><span class="identifier">SetForLoopStatementNode</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#82">82</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
-            Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_E9C42282886875DCB9DA9AFDD94E88E5DC5E11DC">cmajor::binder::ControlFlowAnalyzer::Visit</a>
+            Base class overridden functions: <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html#function_SetForLoopStatementNode_E4C1199089C099BFA96AF43955B392B89F00FF77">cmajor::binder::BoundStatement::SetForLoopStatementNode</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#function_SetForLoopStatementNode_A74768BC3E5479F67800D08F8197EB7A8E0795FB">cmajor::binder::BoundSequenceStatement::SetForLoopStatementNode</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html#function_SetForLoopStatementNode_A74768BC3E5479F67800D08F8197EB7A8E0795FB">cmajor::binder::BoundSequenceStatement::SetForLoopStatementNode</a>
         </span>
         <br/>
         <br/>

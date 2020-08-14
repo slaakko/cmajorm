@@ -1,0 +1,154 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>GdbReplyLexer Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="struct_DebuggerCommandParser_9FACC26E33F6E3CFCD7229BCF3124829013A1CA7.html">prev</a>
+         | <a href="struct_GdbReplyLineParser_FD4BE59792F9A102D6BF4E48C56D2382A6269DF9.html">next</a>
+        <hr/>
+        <h1>GdbReplyLexer Class</h1>
+        <span>
+            Definition at line <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html#9">9</a>
+             of <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html">GdbReplyLexer.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_GdbReplyLexer_6BEA4A08352EE2DDBFD878113FB7CDA6BB6508CB.html#constructor_GdbReplyLexer_AA367A2EFC7DC271616BF7FCDB3FBEAF7928E095">GdbReplyLexer</a>(<span class="kw">const </span><span class="kw">char32_t</span>* start_, <span class="kw">const </span><span class="kw">char32_t</span>* end_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_GdbReplyLexer_6BEA4A08352EE2DDBFD878113FB7CDA6BB6508CB.html#constructor_GdbReplyLexer_AB5CFF1AA548B5990E3369572528E5D059A0B3EB">GdbReplyLexer</a>(<span class="kw">const </span>std::u32string&amp; content_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_GdbReplyLexer_6BEA4A08352EE2DDBFD878113FB7CDA6BB6508CB.html#function_GetTokenId_2EBF6F2F00BD2ABFA7F93C4826E762F58C0F6CEE">GetTokenId</a>(<span class="kw">int</span> statementIndex)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_GdbReplyLexer_6BEA4A08352EE2DDBFD878113FB7CDA6BB6508CB.html#function_NextState_6B1459518227A3E8046017617EB611965AC424A0">NextState</a>(<span class="kw">int</span> state, <span class="kw">char32_t</span> c) <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_GdbReplyLexer_AA367A2EFC7DC271616BF7FCDB3FBEAF7928E095">GdbReplyLexer Constructor</h3>
+        <h4>
+            GdbReplyLexer::GdbReplyLexer(<span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * start_, <span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * end_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/GdbReplyLexer.cpp_AAAAB012E90D4C959690D36AB92B8D7D8276DF51.html#18">18</a>
+             of <a href="file/GdbReplyLexer.cpp_AAAAB012E90D4C959690D36AB92B8D7D8276DF51.html">GdbReplyLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;18</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><span class="identifier">Lexer</span><span class="other">(</span><span class="identifier">start_</span><span class="other">,&nbsp;</span><span class="identifier">end_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;19</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_GdbReplyKeywords_1BC89C32B3D709EDB50055018BBC5DA8BAA701E4.html">GdbReplyKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;21</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html#13">13</a>
+             of <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html">GdbReplyLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="constructor_GdbReplyLexer_AB5CFF1AA548B5990E3369572528E5D059A0B3EB">GdbReplyLexer Constructor</h3>
+        <h4>
+            GdbReplyLexer::GdbReplyLexer(<span class="kw">const </span>
+            std::u32string&amp; content_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/GdbReplyLexer.cpp_AAAAB012E90D4C959690D36AB92B8D7D8276DF51.html#13">13</a>
+             of <a href="file/GdbReplyLexer.cpp_AAAAB012E90D4C959690D36AB92B8D7D8276DF51.html">GdbReplyLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;13</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><span class="identifier">Lexer</span><span class="other">(</span><span class="identifier">content_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;14</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_GdbReplyKeywords_1BC89C32B3D709EDB50055018BBC5DA8BAA701E4.html">GdbReplyKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;16</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html#12">12</a>
+             of <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html">GdbReplyLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_GetTokenId_2EBF6F2F00BD2ABFA7F93C4826E762F58C0F6CEE">GetTokenId Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             GdbReplyLexer::GetTokenId(<span class="kw">int</span>
+             statementIndex)</h4>
+        <span>
+            Definition at line <a href="file/GdbReplyLexer.cpp_AAAAB012E90D4C959690D36AB92B8D7D8276DF51.html#1463">1463</a>
+             of <a href="file/GdbReplyLexer.cpp_AAAAB012E90D4C959690D36AB92B8D7D8276DF51.html">GdbReplyLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html#16">16</a>
+             of <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html">GdbReplyLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_GdbReplyLexer_6BEA4A08352EE2DDBFD878113FB7CDA6BB6508CB.html#function_NextState_6B1459518227A3E8046017617EB611965AC424A0">GdbReplyLexer::NextState</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_NextState_6B1459518227A3E8046017617EB611965AC424A0">NextState Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             GdbReplyLexer::NextState(<span class="kw">int</span>
+             state, <span class="kw">char32_t</span>
+             c) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/GdbReplyLexer.cpp_AAAAB012E90D4C959690D36AB92B8D7D8276DF51.html#23">23</a>
+             of <a href="file/GdbReplyLexer.cpp_AAAAB012E90D4C959690D36AB92B8D7D8276DF51.html">GdbReplyLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html#14">14</a>
+             of <a href="file/GdbReplyLexer.hpp_EDFD7E4C0928D32507069C06DA88F95546FDC407.html">GdbReplyLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_GdbReplyLexer_6BEA4A08352EE2DDBFD878113FB7CDA6BB6508CB.html#function_GetTokenId_2EBF6F2F00BD2ABFA7F93C4826E762F58C0F6CEE">GdbReplyLexer::GetTokenId</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="struct_DebuggerCommandParser_9FACC26E33F6E3CFCD7229BCF3124829013A1CA7.html">prev</a>
+         | <a href="struct_GdbReplyLineParser_FD4BE59792F9A102D6BF4E48C56D2382A6269DF9.html">next</a>
+    </body>
+</html>

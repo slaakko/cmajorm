@@ -1,0 +1,136 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>SourceLineMap Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html">up</a>
+         | <a href="class_SourceFileReference_4D827709E22358DB12BB18F0DB1E58A6C81421F0.html">prev</a>
+         | <a href="struct_SourceLocation_C5982C3BC6A946EB5056E9C782EBF9BFB565562B.html">next</a>
+        <hr/>
+        <h1>SourceLineMap Class</h1>
+        <span>
+            Definition at line <a href="file/DebugInfo.hpp_4FA059D9934DCFE5276D0AB6EC9230D708711A0A.html#344">344</a>
+             of <a href="file/DebugInfo.hpp_4FA059D9934DCFE5276D0AB6EC9230D708711A0A.html">DebugInfo.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_SourceLineMap_5AC4C00782D11B61E5176828E2836343C41308C7.html#constructor_SourceLineMap_DE02785AA6620D5567BCC7039166027760AA85EE">SourceLineMap</a>(<a href="./class_DebugInfo_99D3A87DFBF70512729B02D06F63B99425ADF306.html">DebugInfo</a>* debugInfo_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_SourceLineMap_5AC4C00782D11B61E5176828E2836343C41308C7.html#function_AddInstructionLocation_4D94806497CACD3A7D3D1C0F2CE2C2AB651A3FA8">AddInstructionLocation</a>(<span class="kw">const </span><a href="./struct_InstructionLocation_9D43541DB50D1EDBABC9ECC1D5671CE107325D1D.html">InstructionLocation</a>&amp; location)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;<a href="./class_Instruction_2396B83D9C52B3D85CB0A2DFFB844B8824429168.html">Instruction</a>*></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_SourceLineMap_5AC4C00782D11B61E5176828E2836343C41308C7.html#function_GetInstructions_9F64AAFD5B057001E96789DBAC4B6EB52796BDE7">GetInstructions</a>(int32_t sourceLineNumber) <span class="kw">const</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_debugInfo_6AC732EDF97B5A6A36CC4F523AE532926246E12E">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_DebugInfo_99D3A87DFBF70512729B02D06F63B99425ADF306.html">DebugInfo</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">debugInfo</td>
+            </tr>
+            <tr id="variable_sourceLineLocationsMap_83E90D8093A2D6793D8CD467FBE2F13591DADEB1">
+                <td class="functionTableFirstCol" xml:space="preserve">std::map&lt;int32_t, std::vector&lt;<a href="./struct_InstructionLocation_9D43541DB50D1EDBABC9ECC1D5671CE107325D1D.html">InstructionLocation</a>>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">sourceLineLocationsMap</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_SourceLineMap_DE02785AA6620D5567BCC7039166027760AA85EE">SourceLineMap Constructor</h3>
+        <h4>
+            cmajor::debug::SourceLineMap::SourceLineMap(<a href="./class_DebugInfo_99D3A87DFBF70512729B02D06F63B99425ADF306.html">DebugInfo</a>
+            * debugInfo_)</h4>
+        <span>
+            Definition at line <a href="file/DebugInfo.cpp_ED5BB8A7F61CD367C63992CE54055E7FD97E78D3.html#753">753</a>
+             of <a href="file/DebugInfo.cpp_ED5BB8A7F61CD367C63992CE54055E7FD97E78D3.html">DebugInfo.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;753</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_SourceLineMap_5AC4C00782D11B61E5176828E2836343C41308C7.html#variable_debugInfo_6AC732EDF97B5A6A36CC4F523AE532926246E12E">debugInfo</a><span class="other">(</span><span class="identifier">debugInfo_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;754</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;755</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebugInfo.hpp_4FA059D9934DCFE5276D0AB6EC9230D708711A0A.html#347">347</a>
+             of <a href="file/DebugInfo.hpp_4FA059D9934DCFE5276D0AB6EC9230D708711A0A.html">DebugInfo.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddInstructionLocation_4D94806497CACD3A7D3D1C0F2CE2C2AB651A3FA8">AddInstructionLocation Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::debug::SourceLineMap::AddInstructionLocation(<span class="kw">const </span>
+            <a href="./struct_InstructionLocation_9D43541DB50D1EDBABC9ECC1D5671CE107325D1D.html">InstructionLocation</a>
+            &amp; location)</h4>
+        <span>
+            Definition at line <a href="file/DebugInfo.cpp_ED5BB8A7F61CD367C63992CE54055E7FD97E78D3.html#757">757</a>
+             of <a href="file/DebugInfo.cpp_ED5BB8A7F61CD367C63992CE54055E7FD97E78D3.html">DebugInfo.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;758</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;759</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="./struct_InstructionLocation_9D43541DB50D1EDBABC9ECC1D5671CE107325D1D.html">InstructionLocation</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">locations</span><span class="other">=</span><a href="./class_SourceLineMap_5AC4C00782D11B61E5176828E2836343C41308C7.html#variable_sourceLineLocationsMap_83E90D8093A2D6793D8CD467FBE2F13591DADEB1">sourceLineLocationsMap</a><span class="other">[</span><span class="identifier">location</span><span class="other">.</span><a href="./struct_InstructionLocation_9D43541DB50D1EDBABC9ECC1D5671CE107325D1D.html#variable_span_B558963A1F8753921B11E368EED358BA359DD3EC">span</a><span class="other">.</span><a href="./struct_SourceSpan_CF9540613F80BAA2CC15C8FA2E6CC3F3B9244862.html#variable_line_A84127EFB1FD33E7ECFE76743919650D7F3D195F">line</a><span class="other">]</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;760</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">locations</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">location</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;761</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebugInfo.hpp_4FA059D9934DCFE5276D0AB6EC9230D708711A0A.html#349">349</a>
+             of <a href="file/DebugInfo.hpp_4FA059D9934DCFE5276D0AB6EC9230D708711A0A.html">DebugInfo.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetInstructions_9F64AAFD5B057001E96789DBAC4B6EB52796BDE7">GetInstructions Member Function</h3>
+        <h4>
+            std::vector&lt;<a href="./class_Instruction_2396B83D9C52B3D85CB0A2DFFB844B8824429168.html">Instruction</a>
+            *> cmajor::debug::SourceLineMap::GetInstructions(int32_t sourceLineNumber) <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DebugInfo.cpp_ED5BB8A7F61CD367C63992CE54055E7FD97E78D3.html#763">763</a>
+             of <a href="file/DebugInfo.cpp_ED5BB8A7F61CD367C63992CE54055E7FD97E78D3.html">DebugInfo.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebugInfo.hpp_4FA059D9934DCFE5276D0AB6EC9230D708711A0A.html#348">348</a>
+             of <a href="file/DebugInfo.hpp_4FA059D9934DCFE5276D0AB6EC9230D708711A0A.html">DebugInfo.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_DebugInfo_99D3A87DFBF70512729B02D06F63B99425ADF306.html#function_GetInstruction_793336F4516618BB77AA19FF2384612B229F371A">cmajor::debug::DebugInfo::GetInstruction</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_SourceFileMap_C6CF14B39E3745AECE459C7BECC7E4BA816C9E05.html#function_GetInstructions_5F1095BF725257545CF45DDEDBC7C44BF6DA4EC2">cmajor::debug::SourceFileMap::GetInstructions</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html">up</a>
+         | <a href="class_SourceFileReference_4D827709E22358DB12BB18F0DB1E58A6C81421F0.html">prev</a>
+         | <a href="struct_SourceLocation_C5982C3BC6A946EB5056E9C782EBF9BFB565562B.html">next</a>
+    </body>
+</html>

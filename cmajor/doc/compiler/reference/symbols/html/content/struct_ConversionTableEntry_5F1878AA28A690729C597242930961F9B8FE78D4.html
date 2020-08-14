@@ -50,8 +50,12 @@
         <span>
             Definition at line <a href="file/ConversionTable.hpp_536C524C85CCA19E77FACB56048D27F31D6E578B.html#18">18</a>
              of <a href="file/ConversionTable.hpp_536C524C85CCA19E77FACB56048D27F31D6E578B.html">ConversionTable.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./struct_ConversionTableEntry_5F1878AA28A690729C597242930961F9B8FE78D4.html#variable_sourceType_89907E72ACDC6B4DAB9D3B67E5178FD7A15D1109">sourceType</a><span class="other">(</span><span class="identifier">sourceType_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_ConversionTableEntry_5F1878AA28A690729C597242930961F9B8FE78D4.html#variable_targetType_762EF1D0FD7D222BEFE56C0465D75F3548B42420">targetType</a><span class="other">(</span><span class="identifier">targetType_</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -63,6 +67,29 @@
         <span>
             Definition at line <a href="file/ConversionTable.cpp_7BD92A3FBD3DC87463D2A66E7C70300C8EED2379.html#19">19</a>
              of <a href="file/ConversionTable.cpp_7BD92A3FBD3DC87463D2A66E7C70300C8EED2379.html">ConversionTable.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./struct_ConversionTableEntry_5F1878AA28A690729C597242930961F9B8FE78D4.html#variable_sourceType_89907E72ACDC6B4DAB9D3B67E5178FD7A15D1109">sourceType</a><span class="other">&nbsp;||&nbsp;</span><span class="other">!</span><a href="./struct_ConversionTableEntry_5F1878AA28A690729C597242930961F9B8FE78D4.html#variable_targetType_762EF1D0FD7D222BEFE56C0465D75F3548B42420">targetType</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"invalid&nbsp;conversion&nbsp;table&nbsp;entry:&nbsp;source&nbsp;type&nbsp;is&nbsp;null&nbsp;or&nbsp;target&nbsp;type&nbsp;is&nbsp;null"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./struct_ConversionTableEntry_5F1878AA28A690729C597242930961F9B8FE78D4.html#variable_sourceType_89907E72ACDC6B4DAB9D3B67E5178FD7A15D1109">sourceType</a><span class="other">-></span><span class="identifier">BaseType</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;||&nbsp;</span><span class="other">!</span><a href="./struct_ConversionTableEntry_5F1878AA28A690729C597242930961F9B8FE78D4.html#variable_targetType_762EF1D0FD7D222BEFE56C0465D75F3548B42420">targetType</a><span class="other">-></span><span class="identifier">BaseType</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"invalid&nbsp;conversion&nbsp;table&nbsp;entry:&nbsp;source&nbsp;base&nbsp;type&nbsp;is&nbsp;null&nbsp;or&nbsp;target&nbsp;base&nbsp;type&nbsp;is&nbsp;null"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>

@@ -1,0 +1,154 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>DebuggerCommandLexer Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="struct_DebugExprParser_873A7CE04EFFBEDACF200981AE2038592105475C.html">prev</a>
+         | <a href="struct_DebuggerCommandParser_9FACC26E33F6E3CFCD7229BCF3124829013A1CA7.html">next</a>
+        <hr/>
+        <h1>DebuggerCommandLexer Class</h1>
+        <span>
+            Definition at line <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html#9">9</a>
+             of <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html">DebuggerCommandLexer.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DebuggerCommandLexer_8383AD29D9781E2DAE88D1FD45DDBA4DD9EF66D1.html#constructor_DebuggerCommandLexer_630CDBBF09EA53FC53D658E7D510E4E5E166F052">DebuggerCommandLexer</a>(<span class="kw">const </span><span class="kw">char32_t</span>* start_, <span class="kw">const </span><span class="kw">char32_t</span>* end_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DebuggerCommandLexer_8383AD29D9781E2DAE88D1FD45DDBA4DD9EF66D1.html#constructor_DebuggerCommandLexer_38C9F160E8D0EDD80076E9E7C92224400C4FBD31">DebuggerCommandLexer</a>(<span class="kw">const </span>std::u32string&amp; content_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebuggerCommandLexer_8383AD29D9781E2DAE88D1FD45DDBA4DD9EF66D1.html#function_GetTokenId_29EA1BCACF7C461AB9CFC0F772B85B076DEA58AE">GetTokenId</a>(<span class="kw">int</span> statementIndex)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebuggerCommandLexer_8383AD29D9781E2DAE88D1FD45DDBA4DD9EF66D1.html#function_NextState_3644B34364D0A0D938061E327B49E5160E36C8AB">NextState</a>(<span class="kw">int</span> state, <span class="kw">char32_t</span> c) <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_DebuggerCommandLexer_630CDBBF09EA53FC53D658E7D510E4E5E166F052">DebuggerCommandLexer Constructor</h3>
+        <h4>
+            DebuggerCommandLexer::DebuggerCommandLexer(<span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * start_, <span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * end_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/DebuggerCommandLexer.cpp_25CB32A8881B20644858D7D4F4DBE2FB66B01879.html#18">18</a>
+             of <a href="file/DebuggerCommandLexer.cpp_25CB32A8881B20644858D7D4F4DBE2FB66B01879.html">DebuggerCommandLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;18</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><span class="identifier">Lexer</span><span class="other">(</span><span class="identifier">start_</span><span class="other">,&nbsp;</span><span class="identifier">end_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;19</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_DebuggerCommandKeywords_C298A5B74B61D47A76D67CCB1CD0F633591F7AF4.html">DebuggerCommandKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;21</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html#13">13</a>
+             of <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html">DebuggerCommandLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="constructor_DebuggerCommandLexer_38C9F160E8D0EDD80076E9E7C92224400C4FBD31">DebuggerCommandLexer Constructor</h3>
+        <h4>
+            DebuggerCommandLexer::DebuggerCommandLexer(<span class="kw">const </span>
+            std::u32string&amp; content_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/DebuggerCommandLexer.cpp_25CB32A8881B20644858D7D4F4DBE2FB66B01879.html#13">13</a>
+             of <a href="file/DebuggerCommandLexer.cpp_25CB32A8881B20644858D7D4F4DBE2FB66B01879.html">DebuggerCommandLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;13</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><span class="identifier">Lexer</span><span class="other">(</span><span class="identifier">content_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;14</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_DebuggerCommandKeywords_C298A5B74B61D47A76D67CCB1CD0F633591F7AF4.html">DebuggerCommandKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;16</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html#12">12</a>
+             of <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html">DebuggerCommandLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_GetTokenId_29EA1BCACF7C461AB9CFC0F772B85B076DEA58AE">GetTokenId Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             DebuggerCommandLexer::GetTokenId(<span class="kw">int</span>
+             statementIndex)</h4>
+        <span>
+            Definition at line <a href="file/DebuggerCommandLexer.cpp_25CB32A8881B20644858D7D4F4DBE2FB66B01879.html#2007">2007</a>
+             of <a href="file/DebuggerCommandLexer.cpp_25CB32A8881B20644858D7D4F4DBE2FB66B01879.html">DebuggerCommandLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html#16">16</a>
+             of <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html">DebuggerCommandLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_DebuggerCommandLexer_8383AD29D9781E2DAE88D1FD45DDBA4DD9EF66D1.html#function_NextState_3644B34364D0A0D938061E327B49E5160E36C8AB">DebuggerCommandLexer::NextState</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_NextState_3644B34364D0A0D938061E327B49E5160E36C8AB">NextState Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             DebuggerCommandLexer::NextState(<span class="kw">int</span>
+             state, <span class="kw">char32_t</span>
+             c) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DebuggerCommandLexer.cpp_25CB32A8881B20644858D7D4F4DBE2FB66B01879.html#23">23</a>
+             of <a href="file/DebuggerCommandLexer.cpp_25CB32A8881B20644858D7D4F4DBE2FB66B01879.html">DebuggerCommandLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html#14">14</a>
+             of <a href="file/DebuggerCommandLexer.hpp_A5D37DD298BBD265FD18976AC1FDE8A06B4A57AD.html">DebuggerCommandLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_DebuggerCommandLexer_8383AD29D9781E2DAE88D1FD45DDBA4DD9EF66D1.html#function_GetTokenId_29EA1BCACF7C461AB9CFC0F772B85B076DEA58AE">DebuggerCommandLexer::GetTokenId</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="struct_DebugExprParser_873A7CE04EFFBEDACF200981AE2038592105475C.html">prev</a>
+         | <a href="struct_DebuggerCommandParser_9FACC26E33F6E3CFCD7229BCF3124829013A1CA7.html">next</a>
+    </body>
+</html>

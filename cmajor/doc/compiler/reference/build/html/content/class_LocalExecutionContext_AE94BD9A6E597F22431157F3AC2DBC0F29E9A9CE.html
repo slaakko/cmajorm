@@ -1,0 +1,179 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>LocalExecutionContext Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html">up</a>
+         | <a href="class_InstallProjectClientCommand_1637398B174E7EE136CE31F28AEC5936BE1DF80A.html">prev</a>
+         | <a href="class_Log_E5FAA7543B7619E2D8F0ECB72340AD71D694329D.html">next</a>
+        <hr/>
+        <h1>LocalExecutionContext Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/LocalExecutionContext.hpp_317F3F0710502A9535103D1A855025C32057E369.html#15">15</a>
+             of <a href="file/LocalExecutionContext.hpp_317F3F0710502A9535103D1A855025C32057E369.html">LocalExecutionContext.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#constructor_LocalExecutionContext_8EF861BE5D8EF0FD897053D8AE28625CA47C3E95">LocalExecutionContext</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">BuildClient*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#function_GetClient_92C8E0E7300743CE4CB018A67BB5B2551B9C0071">GetClient</a>() <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html">Connection</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#function_GetConnection_FE1E580334C5E0FB02EAA7F3C4492C06FC6946EA">GetConnection</a>() <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_serverThread_27EC746C9FE25C66F12F8BF01551845D61508906">
+                <td class="functionTableFirstCol" xml:space="preserve">std::thread</td>
+                <td class="functionTableSecondCol" xml:space="preserve">serverThread</td>
+            </tr>
+            <tr id="variable_socketClient_6EA9E6DE61AD19ED63AA4D643DC30378A1EAF4E7">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_SocketClient_FB7687ED7FF1DA6F74B83864433A0AC7681D7CC8.html">SocketClient</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">socketClient</td>
+            </tr>
+            <tr id="variable_socketServer_D766E3C19D35E8B8C0E2FD98AA66BE42A173B633">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">socketServer</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_LocalExecutionContext_8EF861BE5D8EF0FD897053D8AE28625CA47C3E95">LocalExecutionContext Constructor</h3>
+        <h4>
+            cmajor::build::LocalExecutionContext::LocalExecutionContext()</h4>
+        <span>
+            Definition at line <a href="file/LocalExecutionContext.cpp_1ED4C09C49C05804D5AB75BD9038A4BCA37A3162.html#27">27</a>
+             of <a href="file/LocalExecutionContext.cpp_1ED4C09C49C05804D5AB75BD9038A4BCA37A3162.html">LocalExecutionContext.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html">ExecutionContext</a><span class="other">(</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#variable_socketServer_D766E3C19D35E8B8C0E2FD98AA66BE42A173B633">socketServer</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a><span class="other">(</span><span class="identifier">GetLog</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"local"</span><span class="other">,&nbsp;</span><span class="kw">false</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#variable_serverThread_27EC746C9FE25C66F12F8BF01551845D61508906">serverThread</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">thread</span><span class="other">(</span><span class="other">{</span><span class="identifier">RunSocketServer</span><span class="other">,&nbsp;</span><a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#variable_socketServer_D766E3C19D35E8B8C0E2FD98AA66BE42A173B633">socketServer</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#variable_socketServer_D766E3C19D35E8B8C0E2FD98AA66BE42A173B633">socketServer</a><span class="other">-></span><span class="identifier">WaitForRunning</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#variable_socketClient_6EA9E6DE61AD19ED63AA4D643DC30378A1EAF4E7">socketClient</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_SocketClient_FB7687ED7FF1DA6F74B83864433A0AC7681D7CC8.html">SocketClient</a><span class="other">(</span><span class="identifier">GetLog</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"local"</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#variable_socketClient_6EA9E6DE61AD19ED63AA4D643DC30378A1EAF4E7">socketClient</a><span class="other">-></span><span class="identifier">Run</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/LocalExecutionContext.hpp_317F3F0710502A9535103D1A855025C32057E369.html#18">18</a>
+             of <a href="file/LocalExecutionContext.hpp_317F3F0710502A9535103D1A855025C32057E369.html">LocalExecutionContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_GetClient_92C8E0E7300743CE4CB018A67BB5B2551B9C0071">GetClient Member Function</h3>
+        <h4>
+            BuildClient* cmajor::build::LocalExecutionContext::GetClient() <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/LocalExecutionContext.cpp_1ED4C09C49C05804D5AB75BD9038A4BCA37A3162.html#61">61</a>
+             of <a href="file/LocalExecutionContext.cpp_1ED4C09C49C05804D5AB75BD9038A4BCA37A3162.html">LocalExecutionContext.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#variable_socketClient_6EA9E6DE61AD19ED63AA4D643DC30378A1EAF4E7">socketClient</a><span class="other">-></span><span class="identifier">GetClient</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/LocalExecutionContext.hpp_317F3F0710502A9535103D1A855025C32057E369.html#20">20</a>
+             of <a href="file/LocalExecutionContext.hpp_317F3F0710502A9535103D1A855025C32057E369.html">LocalExecutionContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html#function_GetClient_838AC988C1DD975C820F6653082DCC05E37C450F">cmajor::build::ExecutionContext::GetClient</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#function_GetClient_92C8E0E7300743CE4CB018A67BB5B2551B9C0071">cmajor::build::LocalExecutionContext::GetClient</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#function_GetClient_92C8E0E7300743CE4CB018A67BB5B2551B9C0071">cmajor::build::LocalExecutionContext::GetClient</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetConnection_FE1E580334C5E0FB02EAA7F3C4492C06FC6946EA">GetConnection Member Function</h3>
+        <h4>
+            <a href="./class_Connection_6C90318ED52664031013E119C199EC38D4501BB9.html">Connection</a>
+            * cmajor::build::LocalExecutionContext::GetConnection() <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/LocalExecutionContext.cpp_1ED4C09C49C05804D5AB75BD9038A4BCA37A3162.html#66">66</a>
+             of <a href="file/LocalExecutionContext.cpp_1ED4C09C49C05804D5AB75BD9038A4BCA37A3162.html">LocalExecutionContext.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#variable_socketClient_6EA9E6DE61AD19ED63AA4D643DC30378A1EAF4E7">socketClient</a><span class="other">-></span><span class="identifier">GetConnection</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/LocalExecutionContext.hpp_317F3F0710502A9535103D1A855025C32057E369.html#21">21</a>
+             of <a href="file/LocalExecutionContext.hpp_317F3F0710502A9535103D1A855025C32057E369.html">LocalExecutionContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html#function_GetConnection_4C2BE911176336187A792A8CF6A039A0A5A8F8A7">cmajor::build::ExecutionContext::GetConnection</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#function_GetConnection_FE1E580334C5E0FB02EAA7F3C4492C06FC6946EA">cmajor::build::LocalExecutionContext::GetConnection</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#function_GetConnection_FE1E580334C5E0FB02EAA7F3C4492C06FC6946EA">cmajor::build::LocalExecutionContext::GetConnection</a>
+            , <a href="./class_LocalExecutionContext_AE94BD9A6E597F22431157F3AC2DBC0F29E9A9CE.html#destructor_destructor_A2DD00D843559DC1A85929DE38166EEEC1F63D8B">cmajor::build::LocalExecutionContext::destructor</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html">up</a>
+         | <a href="class_InstallProjectClientCommand_1637398B174E7EE136CE31F28AEC5936BE1DF80A.html">prev</a>
+         | <a href="class_Log_E5FAA7543B7619E2D8F0ECB72340AD71D694329D.html">next</a>
+    </body>
+</html>

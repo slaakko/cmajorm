@@ -9,7 +9,7 @@
         <a href="../../../compiler-projects.html">top</a>
          | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
          | <a href="class_ShortTypeSymbol_2BCD1E9A51BB519BF3F50428AB2B0223A5D9ED0D.html">prev</a>
-         | <a href="class_StaticConstructorSymbol_E9F44480525BDC50F6884592FC0E0D3B2C72B31E.html">next</a>
+         | <a href="class_SourceFileCache_7567C5352C8FDE17E345FE324B8990BB687E8C31.html">next</a>
         <hr/>
         <h1>ShortValue Abstract Class</h1>
         <div class="diagram">
@@ -88,8 +88,16 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#916">916</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;916</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a><span class="other">::</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html#enumerator_shortValue_A8593341620CAD18BE901969823B29D18BB4CF99">shortValue</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#variable_value_4A47689E48C596BF7A95E3EA95B873178D56C591">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;917</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;918</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -124,8 +132,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#130">130</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ShortValue"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_ClassName_CFF16D1ED1838560F82258BF6D6F0EF46777BCB6">cmajor::symbols::Value::ClassName</a>
@@ -141,8 +153,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#122">122</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html">ShortValue</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#variable_value_4A47689E48C596BF7A95E3EA95B873178D56C591">value</a><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_Clone_62B968BDB2F1127A90D4EADA95E8E660C18710F3">cmajor::symbols::Value::Clone</a>
@@ -164,6 +180,15 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#1135">1135</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">1136</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">symbolTable</span><span class="other">-></span><span class="identifier">GetTypeByName</span><span class="other">(</span><span class="string">U"short"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1138</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -190,8 +215,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#129">129</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#variable_value_4A47689E48C596BF7A95E3EA95B873178D56C591">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_IrValue_6B0C0BB510CE3D1CE4DF366E7B7DEFC3B8F7DEFB">IrValue Member Function</h3>
@@ -201,8 +230,16 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#920">920</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;921</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;922</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateIrValueForShort</span><span class="other">(</span><a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#variable_value_4A47689E48C596BF7A95E3EA95B873178D56C591">value</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;923</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_Read_9E063FAA8A15A9BF0A5307E09BAAE38245A7D5A8">Read Member Function</h3>
@@ -213,6 +250,15 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#930">930</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;931</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;932</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#variable_value_4A47689E48C596BF7A95E3EA95B873178D56C591">value</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadShort</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;933</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -234,8 +280,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#127">127</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#variable_value_4A47689E48C596BF7A95E3EA95B873178D56C591">value</a><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_ToString_048E414E143C3C85B8F9B37CBB43BBBDAD077110">cmajor::symbols::Value::ToString</a>
@@ -251,6 +301,15 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#925">925</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;926</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;927</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_ShortValue_112ED573381608CB01C4659D171C7E96C35A044C.html#variable_value_4A47689E48C596BF7A95E3EA95B873178D56C591">value</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;928</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -278,6 +337,6 @@
         <a href="../../../compiler-projects.html">top</a>
          | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
          | <a href="class_ShortTypeSymbol_2BCD1E9A51BB519BF3F50428AB2B0223A5D9ED0D.html">prev</a>
-         | <a href="class_StaticConstructorSymbol_E9F44480525BDC50F6884592FC0E0D3B2C72B31E.html">next</a>
+         | <a href="class_SourceFileCache_7567C5352C8FDE17E345FE324B8990BB687E8C31.html">next</a>
     </body>
 </html>

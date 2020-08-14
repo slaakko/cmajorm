@@ -1,0 +1,124 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_DEBUG_DIVARIABLE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_DEBUG_DIVARIABLE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmdebug/DebugApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/BinaryWriter.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/BinaryReader.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Json.hpp></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="pp">#include&nbsp;&lt;boost/uuid/uuid.hpp></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="pp">#include&nbsp;&lt;boost/uuid/nil_generator.hpp></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="pp">#include&nbsp;&lt;memory></span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">debug</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">util</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Project_557E6C6BD45ED5906CB025F653B9E4C397E6442C.html">Project</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DIType_047D8611E6A8D627B758ACD98A5F7CB9776EF6DB.html">DIType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html">DIVariable</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">Kind</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">int8_t</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">localVariable</span><span class="other">,&nbsp;</span><span class="identifier">memberVariable</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#constructor_DIVariable_D5272E1B4B8EDB69E2AF40C90B6207C559C92211">DIVariable</a><span class="other">(</span><a href="../enum_Kind_BF8630A487185D1A03C791C28FBE08A3409ABC09.html">Kind</a>&nbsp;<span class="identifier">kind_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">DIVariable</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_SetInitLineNumber_F01A0DC45220404CF415B90B4C886873E22F6C67">SetInitLineNumber</a><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">initLineNumber_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_GetInitLineNumber_235F036B4E814C24BA0AEE40C920DB96CB0C9873">GetInitLineNumber</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_initLineNumber_0D7B81B9D7F37A75D37B587F3F9417E633ACAA9E">initLineNumber</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Kind_BF8630A487185D1A03C791C28FBE08A3409ABC09.html">Kind</a>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_GetKind_E284BFA98493D7074E40B983CBCFFB76BB07B3E8">GetKind</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_kind_AC64D449FB3A2DE0D4852B12989592893FD9FDEB">kind</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_KindStr_8D018E845B50FECFE0E53575A9D7A624743A2429">KindStr</a><span class="other">(</span><a href="../enum_Kind_BF8630A487185D1A03C791C28FBE08A3409ABC09.html">Kind</a>&nbsp;<span class="identifier">kind</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_SetProject_A90685E98847DEAC2F2086739C8DE37DD28DE776">SetProject</a><span class="other">(</span><a href="../class_Project_557E6C6BD45ED5906CB025F653B9E4C397E6442C.html">Project</a><span class="other">*</span>&nbsp;<span class="identifier">project_</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_project_A0216172936B459FAA618DB9E7D36DEEB3C430DD">project</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">project_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_Write_E3667AFF1FBC966BB1EE8895D5240726EE9E97A8">Write</a><span class="other">(</span><a href="../../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">util</a><span class="other">::</span><a href="../../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html">BinaryWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_Read_8E302A9AA2CE9413C01F03BD76FAABB8F59B3CE5">Read</a><span class="other">(</span><a href="../../../../soulng/util/html/content/namespace_soulng_FC22ADE78BF10F501D24FE52A5FF780AB8F3122B.html">soulng</a><span class="other">::</span><a href="../../../../soulng/util/html/content/namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">util</a><span class="other">::</span><a href="../../../../soulng/util/html/content/class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html">BinaryReader</a><span class="other">&amp;</span>&nbsp;<span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_Name_2BB0FFD809AF0336374D4D57B28210E6341BCFC4">Name</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_name_46CDB17008976B3F53336E3CC35F87D0B7E067CC">name</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_SetName_52D6FFB37D6945CF293706E4695EDCC85156CF41">SetName</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_IrName_E8E45AE4631584C2E84D8498CD1AF5FD0ACFA3E3">IrName</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_irName_FC0FB657B64AC9249AF97406E477CFD280F53130">irName</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_SetIrName_2B2A3CF36FFE69D2DF95EDE451AD3DC29CD40EDE">SetIrName</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">irName_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_TypeId_01F5EFFBC908E7CCF524C025D7173E7E67257C24">TypeId</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_typeId_B1E370A8E50CF4552850C026210068A3169931DC">typeId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_SetTypeId_A8F29F66A8F149306DCC1E3B6FA8A302A54FE680">SetTypeId</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span><span class="other">&amp;</span>&nbsp;<span class="identifier">typeId_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DIType_047D8611E6A8D627B758ACD98A5F7CB9776EF6DB.html">DIType</a><span class="other">*</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_GetType_94A10B45137E6F32FA2385E7DE9FCAAADFE15D2D">GetType</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#function_ToJson_3087A4866CB4A42833F8452A415B7547E82C109A">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Kind_BF8630A487185D1A03C791C28FBE08A3409ABC09.html">Kind</a>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_kind_AC64D449FB3A2DE0D4852B12989592893FD9FDEB">kind</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_initLineNumber_0D7B81B9D7F37A75D37B587F3F9417E633ACAA9E">initLineNumber</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_name_46CDB17008976B3F53336E3CC35F87D0B7E067CC">name</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_irName_FC0FB657B64AC9249AF97406E477CFD280F53130">irName</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">uuid</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_typeId_B1E370A8E50CF4552850C026210068A3169931DC">typeId</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Project_557E6C6BD45ED5906CB025F653B9E4C397E6442C.html">Project</a><span class="other">*</span>&nbsp;<a href="../class_DIVariable_938C0DDB6AD1D969F00B3707E30E22F7F21743D6.html#variable_project_A0216172936B459FAA618DB9E7D36DEEB3C430DD">project</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::debug</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_DEBUG_DIVARIABLE_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

@@ -12,7 +12,7 @@
         <hr/>
         <h1>Project Class</h1>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#104">104</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#122">122</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
@@ -22,7 +22,7 @@
                 <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#constructor_Project_943CE707897B085351C0DFE8D6958888879BB4E1">Project</a>(<span class="kw">const </span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>&amp;) <span class="kw">delete</span></td>
             </tr>
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#constructor_Project_3D25007FF916C0EAD618A458DCC72D1A2AD5A094">Project</a>(<span class="kw">const </span>std::u32string&amp; name_, <span class="kw">const </span>std::string&amp; filePath_, <span class="kw">const </span>std::string&amp; config_, <a href="./enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html">BackEnd</a> backend)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#constructor_Project_43A2D15FA4C34149BA4182CA81E9FD20391310B5">Project</a>(<span class="kw">const </span>std::u32string&amp; name_, <span class="kw">const </span>std::string&amp; filePath_, <span class="kw">const </span>std::string&amp; config_, <a href="./enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html">BackEnd</a> backend_, <span class="kw">const </span>std::string&amp; toolChain_, <a href="./enum_SystemDirKind_5E73CBC154B0ADA1CA4D25CA2ED2106F3CC01441.html">SystemDirKind</a> systemDirKind)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -30,6 +30,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_AddDeclaration_D39D938A24A9111EF2C01314ED94282B5B030055">AddDeclaration</a>(<a href="./class_ProjectDeclaration_B438CE5E8808713DC78B1681B380AAA801F5E2FB.html">ProjectDeclaration</a>* declaration)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_AddDependsOnId_9A3C5FCA662BF5660E73DE1498AECD782324FA81">AddDependsOnId</a>(<span class="kw">const </span>std::string&amp; dependsOnId)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -42,6 +46,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_DependsOn_E02E8F3DC174242AE8947A537C43E2E121478FA7">DependsOn</a>(<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>* that) <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::vector&lt;std::string>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_DependsOnIds_625E12EB5CFAA9501D8C398F1D99181D50689BA4">DependsOnIds</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::vector&lt;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>*>&amp;</td>
@@ -58,6 +66,14 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_Target_79032B651E02755A84D8575665F261426C4542BB.html">Target</a></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_GetTarget_E8041BC30FA9A4D0C40CD1E93FB5CD210D0BFEFA">GetTarget</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::string&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_Hash_BB2F2E17F31F10FF6E2957087657228D3742C19D">Hash</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_Id_C2BCEEF3E06B2465D685B44692B5302776BEB972">Id</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
@@ -141,6 +157,10 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_SetHash_36095FA3767E28B60E242FF768E8A949CF26DF00">SetHash</a>(<span class="kw">const </span>std::string&amp; hash_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_SetIndex_B5C2FE65440D25C7492ED37A41A5C8FC2D798EBB">SetIndex</a>(<span class="kw">int</span> index_)</td>
             </tr>
             <tr>
@@ -176,12 +196,20 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_TextFilePaths_6F396CEF09620D773263887219F780CE65592EC4">TextFilePaths</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_Write_488F51C7A0868B1D8E9F3A426C0B49267B914C7A">Write</a>(<span class="kw">const </span>std::string&amp; projectFilePath)</td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_operator_assign_8BFEE16E744EC0A397C9FF3BCAAF4640F1830FFF">operator=</a>(<span class="kw">const </span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>&amp;) <span class="kw">delete</span></td>
             </tr>
         </table>
         <h2>Member Variables</h2>
         <table>
+            <tr id="variable_backend_358C440CCF8DA9367FBCA9884A832210AFE5F021">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html">BackEnd</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">backend</td>
+            </tr>
             <tr id="variable_built_7A7AE72CA0B5CFC46768E15E56532179AE223F54">
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve">built</td>
@@ -198,6 +226,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>*></td>
                 <td class="functionTableSecondCol" xml:space="preserve">dependsOn</td>
             </tr>
+            <tr id="variable_dependsOnIds_37F57425DBBA9C73D3565A17A43D03B068B5B8AF">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::string></td>
+                <td class="functionTableSecondCol" xml:space="preserve">dependsOnIds</td>
+            </tr>
             <tr id="variable_excludeSourceFilePath_E53A2FDEC1CFE506452F1CB2FEBD880FF6E8A4E5">
                 <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
                 <td class="functionTableSecondCol" xml:space="preserve">excludeSourceFilePath</td>
@@ -209,6 +241,10 @@
             <tr id="variable_filePath_7572463C2BF91B3A21A07DD1AE47132E7B9EB856">
                 <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
                 <td class="functionTableSecondCol" xml:space="preserve">filePath</td>
+            </tr>
+            <tr id="variable_hash_174FE3CDA0FB1EC63CED94C211078EB2A03F9588">
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve">hash</td>
             </tr>
             <tr id="variable_index_A1D56DA771DC0A7EBA94FD83E22ACFBB5FC1FB56">
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
@@ -290,6 +326,10 @@
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::string></td>
                 <td class="functionTableSecondCol" xml:space="preserve">textFilePaths</td>
             </tr>
+            <tr id="variable_toolChain_E48AB76234428382D4A6C298DB05120E3A8A15CF">
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve">toolChain</td>
+            </tr>
         </table>
         <hr/>
         <h2>Constructor Details</h2>
@@ -300,26 +340,28 @@
             &amp;) <span class="kw">delete</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#108">108</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#127">127</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="constructor_Project_3D25007FF916C0EAD618A458DCC72D1A2AD5A094">Project Constructor</h3>
+        <h3 id="constructor_Project_43A2D15FA4C34149BA4182CA81E9FD20391310B5">Project Constructor</h3>
         <h4>
             sngcm::ast::Project::Project(<span class="kw">const </span>
             std::u32string&amp; name_, <span class="kw">const </span>
             std::string&amp; filePath_, <span class="kw">const </span>
             std::string&amp; config_, <a href="./enum_BackEnd_CCCDC1B87ECBDC296F3DC7F4B4BACB7DE727AE25.html">BackEnd</a>
-             backend)</h4>
+             backend_, <span class="kw">const </span>
+            std::string&amp; toolChain_, <a href="./enum_SystemDirKind_5E73CBC154B0ADA1CA4D25CA2ED2106F3CC01441.html">SystemDirKind</a>
+             systemDirKind)</h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#121">121</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#210">210</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#107">107</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#125">125</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
@@ -332,21 +374,47 @@
              sngcm::ast::Project::AddDeclaration(<a href="./class_ProjectDeclaration_B438CE5E8808713DC78B1681B380AAA801F5E2FB.html">ProjectDeclaration</a>
             * declaration)</h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#186">186</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#314">314</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_declarations_C2A66D2F49F80BDF4479BD21AEF4F53BB5D0B7EF">declarations</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_ProjectDeclaration_B438CE5E8808713DC78B1681B380AAA801F5E2FB.html">ProjectDeclaration</a><span class="other">></span><span class="other">(</span><span class="identifier">declaration</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">316</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_declarations_C2A66D2F49F80BDF4479BD21AEF4F53BB5D0B7EF">declarations</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_ProjectDeclaration_B438CE5E8808713DC78B1681B380AAA801F5E2FB.html">ProjectDeclaration</a><span class="other">></span><span class="other">(</span><span class="identifier">declaration</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#114">114</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#133">133</a>
+             of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_AddDependsOnId_9A3C5FCA662BF5660E73DE1498AECD782324FA81">AddDependsOnId Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::Project::AddDependsOnId(<span class="kw">const </span>
+            std::string&amp; dependsOnId)</h4>
+        <span>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#546">546</a>
+             of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">547</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">548</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_dependsOnIds_37F57425DBBA9C73D3565A17A43D03B068B5B8AF">dependsOnIds</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">dependsOnId</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">549</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#170">170</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
@@ -358,21 +426,21 @@
              sngcm::ast::Project::AddDependsOnProjects(<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>
             * dependsOnProject)</h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#333">333</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#477">477</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">334</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">478</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">335</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_dependsOn_17C439E62A75B238A0EF9BCD0E4244031B272F95">dependsOn</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">dependsOnProject</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">479</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_dependsOn_17C439E62A75B238A0EF9BCD0E4244031B272F95">dependsOn</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">dependsOnProject</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">336</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">480</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#130">130</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#150">150</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
@@ -384,11 +452,11 @@
              sngcm::ast::Project::Built() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#143">143</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#163">163</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_built_7A7AE72CA0B5CFC46768E15E56532179AE223F54">built</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_built_7A7AE72CA0B5CFC46768E15E56532179AE223F54">built</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -406,24 +474,40 @@
             * that) <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#328">328</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#472">472</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">329</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">473</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">330</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">find</span><span class="other">(</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_references_ACEA893CAFD916E596870D274D1F3FDF4B26E583">references</a><span class="other">.</span><span class="identifier">cbegin</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_references_ACEA893CAFD916E596870D274D1F3FDF4B26E583">references</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">that</span><span class="other">-></span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_moduleFilePath_BE88646E75877D16008D7A5B99883A70661807BD">moduleFilePath</a><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_references_ACEA893CAFD916E596870D274D1F3FDF4B26E583">references</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">474</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">find</span><span class="other">(</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_references_ACEA893CAFD916E596870D274D1F3FDF4B26E583">references</a><span class="other">.</span><span class="identifier">cbegin</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_references_ACEA893CAFD916E596870D274D1F3FDF4B26E583">references</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">that</span><span class="other">-></span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_moduleFilePath_BE88646E75877D16008D7A5B99883A70661807BD">moduleFilePath</a><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_references_ACEA893CAFD916E596870D274D1F3FDF4B26E583">references</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">331</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">475</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#129">129</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#149">149</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_DependsOnIds_625E12EB5CFAA9501D8C398F1D99181D50689BA4">DependsOnIds Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            std::vector&lt;std::string>&amp; sngcm::ast::Project::DependsOnIds() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#171">171</a>
+             of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_dependsOnIds_37F57425DBBA9C73D3565A17A43D03B068B5B8AF">dependsOnIds</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
         <br/>
         <hr/>
         <h3 id="function_DependsOnProjects_D72A552C40D093D623C24039165B4454DBD54FF9">DependsOnProjects Member Function</h3>
@@ -432,11 +516,11 @@
             std::vector&lt;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a>
             *>&amp; sngcm::ast::Project::DependsOnProjects()</h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#142">142</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#162">162</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_dependsOn_17C439E62A75B238A0EF9BCD0E4244031B272F95">dependsOn</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_dependsOn_17C439E62A75B238A0EF9BCD0E4244031B272F95">dependsOn</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -448,11 +532,11 @@
             std::string&amp; sngcm::ast::Project::ExecutableFilePath() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#118">118</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#138">138</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_executableFilePath_DEAE7F809F5BA3CBCDD2D81DAAB3290DDF61BF30">executableFilePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_executableFilePath_DEAE7F809F5BA3CBCDD2D81DAAB3290DDF61BF30">executableFilePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -464,11 +548,11 @@
             std::string&amp; sngcm::ast::Project::FilePath() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#111">111</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#130">130</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_filePath_7572463C2BF91B3A21A07DD1AE47132E7B9EB856">filePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_filePath_7572463C2BF91B3A21A07DD1AE47132E7B9EB856">filePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -480,14 +564,59 @@
              sngcm::ast::Project::GetTarget() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#128">128</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#148">148</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_target_901CB833DFDD22A90D0382673316AE7DE5E158CD">target</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_target_901CB833DFDD22A90D0382673316AE7DE5E158CD">target</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Hash_BB2F2E17F31F10FF6E2957087657228D3742C19D">Hash Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            std::string&amp; sngcm::ast::Project::Hash() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#168">168</a>
+             of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_hash_174FE3CDA0FB1EC63CED94C211078EB2A03F9588">hash</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Id_C2BCEEF3E06B2465D685B44692B5302776BEB972">Id Member Function</h3>
+        <h4>
+            std::string sngcm::ast::Project::Id() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#539">539</a>
+             of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">540</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">541</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">id</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"project_"</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">542</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">id</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf8</span><span class="other">(</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_name_39C1A86F47A39FB3739DAF72D5F078AE79988E9A">name</a><span class="other">)</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="string">'_'</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">GetSha1MessageDigest</span><span class="other">(</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_filePath_7572463C2BF91B3A21A07DD1AE47132E7B9EB856">filePath</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">543</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">id</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">544</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#169">169</a>
+             of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_Index_FD86C8704D1F2EA7C39AF1E6B597A84DC4879905">Index Member Function</h3>
@@ -496,11 +625,11 @@
              sngcm::ast::Project::Index() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#141">141</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#161">161</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_index_A1D56DA771DC0A7EBA94FD83E22ACFBB5FC1FB56">index</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_index_A1D56DA771DC0A7EBA94FD83E22ACFBB5FC1FB56">index</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -512,11 +641,11 @@
              sngcm::ast::Project::IsSystemProject() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#131">131</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#151">151</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_isSystemProject_2383F757AB0BB13C36B8595F43FE2D065E92BB34">isSystemProject</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_isSystemProject_2383F757AB0BB13C36B8595F43FE2D065E92BB34">isSystemProject</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -534,12 +663,12 @@
             std::string&amp; systemModuleFilePath) <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#348">348</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#492">492</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#137">137</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#157">157</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
@@ -556,11 +685,11 @@
             std::string&amp; sngcm::ast::Project::LibraryFilePath() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#117">117</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#137">137</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_libraryFilePath_47082CF8B37CFEC155450F92F55C318DA37D657F">libraryFilePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_libraryFilePath_47082CF8B37CFEC155450F92F55C318DA37D657F">libraryFilePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -572,11 +701,11 @@
              sngcm::ast::Project::LogStreamId() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#138">138</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#158">158</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_logStreamId_A0C30DBD6F0C7AFBA2666E0FB3B56E3D81BCAE2A">logStreamId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_logStreamId_A0C30DBD6F0C7AFBA2666E0FB3B56E3D81BCAE2A">logStreamId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -588,11 +717,11 @@
             std::string&amp; sngcm::ast::Project::ModuleFilePath() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#116">116</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#136">136</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_moduleFilePath_BE88646E75877D16008D7A5B99883A70661807BD">moduleFilePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_moduleFilePath_BE88646E75877D16008D7A5B99883A70661807BD">moduleFilePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -604,14 +733,19 @@
             std::u32string&amp; sngcm::ast::Project::Name() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#110">110</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#129">129</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_name_39C1A86F47A39FB3739DAF72D5F078AE79988E9A">name</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_name_39C1A86F47A39FB3739DAF72D5F078AE79988E9A">name</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_Write_488F51C7A0868B1D8E9F3A426C0B49267B914C7A">sngcm::ast::Project::Write</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_OutdirBasePath_A55E2C45FD200B83AA959A94B1EA879A077494FE">OutdirBasePath Member Function</h3>
@@ -620,11 +754,11 @@
             boost::filesystem::path&amp; sngcm::ast::Project::OutdirBasePath() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#113">113</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#132">132</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_outdirBasePath_4072322322A0BB6543C9101678BDD55134AD4C0D">outdirBasePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_outdirBasePath_4072322322A0BB6543C9101678BDD55134AD4C0D">outdirBasePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -636,35 +770,35 @@
              sngcm::ast::Project::Ready() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#378">378</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#522">522</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">379</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">523</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">380</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a><span class="other">*</span>&nbsp;<span class="identifier">dependOn</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_dependsOn_17C439E62A75B238A0EF9BCD0E4244031B272F95">dependsOn</a><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">524</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html">Project</a><span class="other">*</span>&nbsp;<span class="identifier">dependOn</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_dependsOn_17C439E62A75B238A0EF9BCD0E4244031B272F95">dependsOn</a><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">381</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">525</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">382</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">dependOn</span><span class="other">-></span><span class="identifier">Built</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">526</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">dependOn</span><span class="other">-></span><span class="identifier">Built</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">383</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">527</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">384</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">528</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">385</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">529</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">386</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">530</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">387</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">531</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">388</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">532</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#145">145</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#165">165</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
@@ -681,11 +815,11 @@
             std::vector&lt;std::string>&amp; sngcm::ast::Project::ReferencedProjectFilePaths() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#120">120</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#140">140</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_referencedProjectFilePaths_253CD517F19F0D247B095EA43CF2D03312534EB1">referencedProjectFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_referencedProjectFilePaths_253CD517F19F0D247B095EA43CF2D03312534EB1">referencedProjectFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -697,11 +831,11 @@
             std::vector&lt;std::string>&amp; sngcm::ast::Project::References() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#119">119</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#139">139</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_references_ACEA893CAFD916E596870D274D1F3FDF4B26E583">references</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_references_ACEA893CAFD916E596870D274D1F3FDF4B26E583">references</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -713,11 +847,11 @@
             std::string&amp; sngcm::ast::Project::RelativeFilePath() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#134">134</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#154">154</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeFilePath_26BABF298983FDEA65899DFF3CB9DA31B89EB4D3">relativeFilePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeFilePath_26BABF298983FDEA65899DFF3CB9DA31B89EB4D3">relativeFilePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -729,11 +863,11 @@
             std::vector&lt;std::string>&amp; sngcm::ast::Project::RelativeReferencedProjectFilePaths() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#121">121</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#141">141</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeReferencedProjectFilePaths_7A643A5AD6DA07B4E388DB43D41025F359D19B89">relativeReferencedProjectFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeReferencedProjectFilePaths_7A643A5AD6DA07B4E388DB43D41025F359D19B89">relativeReferencedProjectFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -745,11 +879,11 @@
             std::vector&lt;std::string>&amp; sngcm::ast::Project::RelativeResourceFilePaths() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#125">125</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#145">145</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeResourceFilePaths_98E704BF027AEE961E76A9EC88F896DF3FA29064">relativeResourceFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeResourceFilePaths_98E704BF027AEE961E76A9EC88F896DF3FA29064">relativeResourceFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -761,11 +895,11 @@
             std::vector&lt;std::string>&amp; sngcm::ast::Project::RelativeSourceFilePaths() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#123">123</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#143">143</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeSourceFilePaths_470142E7C1DE74DC7346147C931E48A02CB59791">relativeSourceFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeSourceFilePaths_470142E7C1DE74DC7346147C931E48A02CB59791">relativeSourceFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -777,11 +911,11 @@
             std::vector&lt;std::string>&amp; sngcm::ast::Project::RelativeTextFilePaths() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#126">126</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#146">146</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeTextFilePaths_6CAF7B8FCC447B76740408C30DF21CF2259E73A2">relativeTextFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeTextFilePaths_6CAF7B8FCC447B76740408C30DF21CF2259E73A2">relativeTextFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -792,12 +926,12 @@
             <span class="kw">void</span>
              sngcm::ast::Project::ResolveDeclarations()</h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#191">191</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#319">319</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#115">115</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#134">134</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
@@ -818,11 +952,11 @@
             std::vector&lt;std::string>&amp; sngcm::ast::Project::ResourceFilePaths() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#124">124</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#144">144</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_resourceFilePaths_0AD87291646B2CACBF4F5884970BFF9CB3A3118D">resourceFilePaths</a><span class="other">;</span>&nbsp;&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_resourceFilePaths_0AD87291646B2CACBF4F5884970BFF9CB3A3118D">resourceFilePaths</a><span class="other">;</span>&nbsp;&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -833,11 +967,11 @@
             <span class="kw">void</span>
              sngcm::ast::Project::SetBuilt()</h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#144">144</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#164">164</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_built_7A7AE72CA0B5CFC46768E15E56532179AE223F54">built</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_built_7A7AE72CA0B5CFC46768E15E56532179AE223F54">built</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -849,24 +983,40 @@
              sngcm::ast::Project::SetExcludeSourceFilePath(<span class="kw">const </span>
             std::string&amp; excludeSourceFilePath_)</h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#390">390</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#534">534</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">391</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">535</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">392</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_excludeSourceFilePath_E53A2FDEC1CFE506452F1CB2FEBD880FF6E8A4E5">excludeSourceFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">excludeSourceFilePath_</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">536</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_excludeSourceFilePath_E53A2FDEC1CFE506452F1CB2FEBD880FF6E8A4E5">excludeSourceFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">excludeSourceFilePath_</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">393</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">537</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#146">146</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#166">166</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetHash_36095FA3767E28B60E242FF768E8A949CF26DF00">SetHash Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::Project::SetHash(<span class="kw">const </span>
+            std::string&amp; hash_)</h4>
+        <span>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#167">167</a>
+             of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_hash_174FE3CDA0FB1EC63CED94C211078EB2A03F9588">hash</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">hash_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
         <br/>
         <hr/>
         <h3 id="function_SetIndex_B5C2FE65440D25C7492ED37A41A5C8FC2D798EBB">SetIndex Member Function</h3>
@@ -875,11 +1025,11 @@
              sngcm::ast::Project::SetIndex(<span class="kw">int</span>
              index_)</h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#140">140</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#160">160</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_index_A1D56DA771DC0A7EBA94FD83E22ACFBB5FC1FB56">index</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">index_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_index_A1D56DA771DC0A7EBA94FD83E22ACFBB5FC1FB56">index</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">index_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -891,21 +1041,21 @@
              sngcm::ast::Project::SetLibraryFilePath(<span class="kw">const </span>
             std::string&amp; libraryFilePath_)</h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#343">343</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#487">487</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">344</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">488</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">345</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_libraryFilePath_47082CF8B37CFEC155450F92F55C318DA37D657F">libraryFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">libraryFilePath_</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">489</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_libraryFilePath_47082CF8B37CFEC155450F92F55C318DA37D657F">libraryFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">libraryFilePath_</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">346</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">490</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#136">136</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#156">156</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
@@ -917,11 +1067,11 @@
              sngcm::ast::Project::SetLogStreamId(<span class="kw">int</span>
              logStreamId_)</h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#139">139</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#159">159</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_logStreamId_A0C30DBD6F0C7AFBA2666E0FB3B56E3D81BCAE2A">logStreamId</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">logStreamId_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_logStreamId_A0C30DBD6F0C7AFBA2666E0FB3B56E3D81BCAE2A">logStreamId</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">logStreamId_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -933,21 +1083,21 @@
              sngcm::ast::Project::SetModuleFilePath(<span class="kw">const </span>
             std::string&amp; moduleFilePath_)</h4>
         <span>
-            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#338">338</a>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#482">482</a>
              of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">339</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">483</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">340</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_moduleFilePath_BE88646E75877D16008D7A5B99883A70661807BD">moduleFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">moduleFilePath_</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">484</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_moduleFilePath_BE88646E75877D16008D7A5B99883A70661807BD">moduleFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">moduleFilePath_</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">341</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">485</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#135">135</a>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#155">155</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>
@@ -959,11 +1109,11 @@
              sngcm::ast::Project::SetRelativeFilePath(<span class="kw">const </span>
             std::string&amp; relativeFilePath_)</h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#133">133</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#153">153</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeFilePath_26BABF298983FDEA65899DFF3CB9DA31B89EB4D3">relativeFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">relativeFilePath_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_relativeFilePath_26BABF298983FDEA65899DFF3CB9DA31B89EB4D3">relativeFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">relativeFilePath_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -974,11 +1124,11 @@
             <span class="kw">void</span>
              sngcm::ast::Project::SetSystemProject()</h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#132">132</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#152">152</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_isSystemProject_2383F757AB0BB13C36B8595F43FE2D065E92BB34">isSystemProject</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_isSystemProject_2383F757AB0BB13C36B8595F43FE2D065E92BB34">isSystemProject</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -990,11 +1140,11 @@
             boost::filesystem::path&amp; sngcm::ast::Project::SourceBasePath() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#112">112</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#131">131</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_sourceBasePath_693AF4A2B05DA3144F8532272C13D138ADE18A21">sourceBasePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_sourceBasePath_693AF4A2B05DA3144F8532272C13D138ADE18A21">sourceBasePath</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -1006,11 +1156,11 @@
             std::vector&lt;std::string>&amp; sngcm::ast::Project::SourceFilePaths() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#122">122</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#142">142</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_sourceFilePaths_67E6B0D0CFFB3F5B8FD9CF577E220C2A74354118">sourceFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_sourceFilePaths_67E6B0D0CFFB3F5B8FD9CF577E220C2A74354118">sourceFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -1022,14 +1172,58 @@
             std::vector&lt;std::string>&amp; sngcm::ast::Project::TextFilePaths() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#127">127</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#147">147</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_textFilePaths_76D737D055E545A746740BBCD17610F4B04BDCAC">textFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_textFilePaths_76D737D055E545A746740BBCD17610F4B04BDCAC">textFilePaths</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_488F51C7A0868B1D8E9F3A426C0B49267B914C7A">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::Project::Write(<span class="kw">const </span>
+            std::string&amp; projectFilePath)</h4>
+        <span>
+            Definition at line <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html#461">461</a>
+             of <a href="file/Project.cpp_A4454E9A31031ED7D4DCCFFE801778BFED693F1B.html">Project.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">462</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">463</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">ofstream</span>&nbsp;<span class="identifier">projectFile</span><span class="other">(</span><span class="identifier">projectFilePath</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">464</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./../../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a>&nbsp;<span class="identifier">formatter</span><span class="other">(</span><span class="identifier">projectFile</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">465</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"project&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">";"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">466</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_ProjectDeclaration_B438CE5E8808713DC78B1681B380AAA801F5E2FB.html">ProjectDeclaration</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">declaration</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#variable_declarations_C2A66D2F49F80BDF4479BD21AEF4F53BB5D0B7EF">declarations</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">467</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">468</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">declaration</span><span class="other">-></span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">469</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">470</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#135">135</a>
+             of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Project_7945EFCBE9AB8574B0A23B20A080808D344846C9.html#function_Name_42F3C1984DEE80E7BAD436C9E104C94DE303D0DE">sngcm::ast::Project::Name</a>
+            , <a href="./../../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_WriteLine_E18FDC056022CF75C77787ED1B7B1FD9560BF36A">soulng::util::CodeFormatter::WriteLine</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_operator_assign_8BFEE16E744EC0A397C9FF3BCAAF4640F1830FFF">operator= Member Function</h3>
@@ -1040,7 +1234,7 @@
             &amp;) <span class="kw">delete</span>
         </h4>
         <span>
-            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#109">109</a>
+            Definition at line <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html#128">128</a>
              of <a href="file/Project.hpp_628DC16BF0B62F7773474BFDA746F5AADF9A2E5C.html">Project.hpp</a>
         </span>
         <br/>

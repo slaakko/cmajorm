@@ -53,6 +53,15 @@
         <span>
             Definition at line <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html#383">383</a>
              of <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html">Instruction.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">383</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_LoadInstruction_92C4FAADE3952CB8C614B351684AB1EEF7781BB0.html#variable_ptr_237C64B2420DDE2CE314032FF46AC95DCCF8FE6D">ptr</a><span class="other">(</span><span class="identifier">ptr_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">384</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">385</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -72,6 +81,19 @@
         <span>
             Definition at line <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html#387">387</a>
              of <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html">Instruction.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">388</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">389</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><a href="./class_LoadInstruction_92C4FAADE3952CB8C614B351684AB1EEF7781BB0.html#variable_ptr_237C64B2420DDE2CE314032FF46AC95DCCF8FE6D">ptr</a><span class="other">-></span><span class="identifier">GetType</span><span class="other">(</span><span class="identifier">context</span><span class="other">)</span><span class="other">-></span><span class="identifier">IsPtrType</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"pointer&nbsp;type&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">390</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html">PtrType</a><span class="other">*</span>&nbsp;<span class="identifier">ptrType</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./class_PtrType_B685B13917C2C22E305B288D3B900CB36676B608.html">PtrType</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="./class_LoadInstruction_92C4FAADE3952CB8C614B351684AB1EEF7781BB0.html#variable_ptr_237C64B2420DDE2CE314032FF46AC95DCCF8FE6D">ptr</a><span class="other">-></span><span class="identifier">GetType</span><span class="other">(</span><span class="identifier">context</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">391</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ptrType</span><span class="other">-></span><span class="identifier">BaseType</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">392</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -103,8 +125,26 @@
         <span>
             Definition at line <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html#394">394</a>
              of <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html">Instruction.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">395</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">396</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">WriteResult</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">,&nbsp;</span><span class="identifier">function</span><span class="other">,&nbsp;</span><span class="identifier">context</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">397</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="string">"&nbsp;=&nbsp;load&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">398</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_LoadInstruction_92C4FAADE3952CB8C614B351684AB1EEF7781BB0.html#variable_ptr_237C64B2420DDE2CE314032FF46AC95DCCF8FE6D">ptr</a><span class="other">-></span><span class="identifier">GetType</span><span class="other">(</span><span class="identifier">context</span><span class="other">)</span><span class="other">-></span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">399</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="string">"&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">400</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_LoadInstruction_92C4FAADE3952CB8C614B351684AB1EEF7781BB0.html#variable_ptr_237C64B2420DDE2CE314032FF46AC95DCCF8FE6D">ptr</a><span class="other">-></span><span class="identifier">Name</span><span class="other">(</span><span class="identifier">context</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">401</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">WriteMetadataRef</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">402</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Calls: <a href="./class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html#function_WriteMetadataRef_75D47E978C8D4C567D243527095E8CB7B5BDD41F">cmsxi::Instruction::WriteMetadataRef</a>

@@ -1,0 +1,115 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>ServerExecutionContext Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_ServerExecutionContext_60E6DD8BF45F0AE8858D27AAC036BD1FB5CDCAF0_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html">up</a>
+         | <a href="class_ServerConfig_ECF49A7F78A9298F1377858FE5E0220012466DDF.html">prev</a>
+         | <a href="class_ServerInfo_BBD34CDEA3B847BE9895B9B88676ACFEEE267944.html">next</a>
+        <hr/>
+        <h1>ServerExecutionContext Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/ServerExecutionContext.hpp_B004C14EDC6A9600C303621B74242556065B09BE.html#14">14</a>
+             of <a href="file/ServerExecutionContext.hpp_B004C14EDC6A9600C303621B74242556065B09BE.html">ServerExecutionContext.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ServerExecutionContext_60E6DD8BF45F0AE8858D27AAC036BD1FB5CDCAF0.html#constructor_ServerExecutionContext_C0A044E35A1B83D84603772E0E53175D0ECEE23A">ServerExecutionContext</a>(<span class="kw">const </span>std::string&amp; serverName)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ServerExecutionContext_60E6DD8BF45F0AE8858D27AAC036BD1FB5CDCAF0.html#function_ExitServer_D6DEF4678F594FB9281F1F9830EB824BB9EB5E7D">ExitServer</a>() <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_serverThread_0352F83E5DC4C6D4ED092CA8F8233813B4A9883A">
+                <td class="functionTableFirstCol" xml:space="preserve">std::thread</td>
+                <td class="functionTableSecondCol" xml:space="preserve">serverThread</td>
+            </tr>
+            <tr id="variable_socketServer_61A5FB7642BA543025EC4A261A333E77F10BF2AA">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">socketServer</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_ServerExecutionContext_C0A044E35A1B83D84603772E0E53175D0ECEE23A">ServerExecutionContext Constructor</h3>
+        <h4>
+            cmajor::build::ServerExecutionContext::ServerExecutionContext(<span class="kw">const </span>
+            std::string&amp; serverName)</h4>
+        <span>
+            Definition at line <a href="file/ServerExecutionContext.cpp_537F79FA310BFB74D5E857CFA74142BF7C5EFEF7.html#25">25</a>
+             of <a href="file/ServerExecutionContext.cpp_537F79FA310BFB74D5E857CFA74142BF7C5EFEF7.html">ServerExecutionContext.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ServerExecutionContext_60E6DD8BF45F0AE8858D27AAC036BD1FB5CDCAF0.html#variable_socketServer_61A5FB7642BA543025EC4A261A333E77F10BF2AA">socketServer</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a><span class="other">(</span><span class="identifier">GetLog</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">serverName</span><span class="other">,&nbsp;</span><span class="kw">true</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ServerExecutionContext_60E6DD8BF45F0AE8858D27AAC036BD1FB5CDCAF0.html#variable_serverThread_0352F83E5DC4C6D4ED092CA8F8233813B4A9883A">serverThread</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">thread</span><span class="other">(</span><span class="other">{</span><span class="identifier">RunContinuousSocketServer</span><span class="other">,&nbsp;</span><a href="./class_ServerExecutionContext_60E6DD8BF45F0AE8858D27AAC036BD1FB5CDCAF0.html#variable_socketServer_61A5FB7642BA543025EC4A261A333E77F10BF2AA">socketServer</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ServerExecutionContext_60E6DD8BF45F0AE8858D27AAC036BD1FB5CDCAF0.html#variable_socketServer_61A5FB7642BA543025EC4A261A333E77F10BF2AA">socketServer</a><span class="other">-></span><span class="identifier">WaitForRunning</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ServerExecutionContext.hpp_B004C14EDC6A9600C303621B74242556065B09BE.html#17">17</a>
+             of <a href="file/ServerExecutionContext.hpp_B004C14EDC6A9600C303621B74242556065B09BE.html">ServerExecutionContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_ExitServer_D6DEF4678F594FB9281F1F9830EB824BB9EB5E7D">ExitServer Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::build::ServerExecutionContext::ExitServer() <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ServerExecutionContext.cpp_537F79FA310BFB74D5E857CFA74142BF7C5EFEF7.html#43">43</a>
+             of <a href="file/ServerExecutionContext.cpp_537F79FA310BFB74D5E857CFA74142BF7C5EFEF7.html">ServerExecutionContext.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ServerExecutionContext_60E6DD8BF45F0AE8858D27AAC036BD1FB5CDCAF0.html#variable_socketServer_61A5FB7642BA543025EC4A261A333E77F10BF2AA">socketServer</a><span class="other">-></span><span class="identifier">ExitContinuous</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ServerExecutionContext.hpp_B004C14EDC6A9600C303621B74242556065B09BE.html#19">19</a>
+             of <a href="file/ServerExecutionContext.hpp_B004C14EDC6A9600C303621B74242556065B09BE.html">ServerExecutionContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_ExecutionContext_27100B5CEBAD09C81C15C26C3882D2F1A04E81FD.html#function_ExitServer_1B503096BD77047FDCC3F78E755AF7397560F9A3">cmajor::build::ExecutionContext::ExitServer</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html">up</a>
+         | <a href="class_ServerConfig_ECF49A7F78A9298F1377858FE5E0220012466DDF.html">prev</a>
+         | <a href="class_ServerInfo_BBD34CDEA3B847BE9895B9B88676ACFEEE267944.html">next</a>
+    </body>
+</html>

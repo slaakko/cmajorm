@@ -1,0 +1,92 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_BUILD_SOCKET_SERVER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_BUILD_SOCKET_SERVER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/BuildServer.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/SocketConnection.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/Host.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;condition_variable></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">build</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html">SocketServer</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_Host_E94AA38A88E5E5A14022F010D55F30332CE31433.html">Host</a></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#constructor_SocketServer_34EBADD64005AD9DD2123D8C12C55352491B489A">SocketServer</a><span class="other">(</span><a href="../class_Log_E5FAA7543B7619E2D8F0ECB72340AD71D694329D.html">Log</a><span class="other">*</span>&nbsp;<span class="identifier">log_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">serverName</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">continuous_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_Name_EFD23D4D2318CCB956978E4DD2C1D2B640BA4069">Name</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Log_E5FAA7543B7619E2D8F0ECB72340AD71D694329D.html">Log</a><span class="other">*</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_GetLog_68DC42F764FD0E38574E3B65D6277375F5C05DC3">GetLog</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_log_CFF797990ED82A85DEE8FE71DC48F3704366FAEB">log</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_WaitForRunning_D4A347708C87BFFB3467E7EC34B8AE1F12891D10">WaitForRunning</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_Run_46AF09F98398376061C4A65904009714C15E5B35">Run</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">prompt</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_Exiting_39A51BA44DE028F082F9610D7499160B961ACFD9">Exiting</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_exiting_898D10BB91FC177E615F6D47669F00A5DB2CD925">exiting</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_Exit_A1D83AFEED5953A8D7E4E4C9AD99534D36D0953B">Exit</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#function_ExitContinuous_74932B78480F5186253FC8AD19AB17911C1432A3">ExitContinuous</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_exiting_898D10BB91FC177E615F6D47669F00A5DB2CD925">exiting</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_continuous_C72B2E824ECA12C8368293CCDB95A9824D7213C8">continuous</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_mtx_42A8B59A4B3CCD53D281E4027B3AEF7A82E7D150">mtx</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">condition_variable</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_running_0E39A675CAA5F697331D65D36A15BA403A3E7782">running</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_isRunning_C45936B8B1462FEE49C8C127D6AD15C1141E3BB7">isRunning</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Log_E5FAA7543B7619E2D8F0ECB72340AD71D694329D.html">Log</a><span class="other">*</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_log_CFF797990ED82A85DEE8FE71DC48F3704366FAEB">log</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_serverName_81ED63817C7E63E7111794C2C4A596E3A3D18BB4">serverName</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_name_69FC2DD0DEE760F38231EFA7051F64830A5429D5">name</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">TcpSocket</span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_socket_3EBDEDE6D5F216E617B12097733C69614D43A3E8">socket</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_SocketConnection_0530EC03D8565CF4D7DA890C49F360A34B151788.html">SocketConnection</a><span class="other">></span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_connection_EAF02DE491C36A431890E117F7ABA6B2F04059C1">connection</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">BuildServer</span><span class="other">></span>&nbsp;<a href="../class_SocketServer_21A5F3B5892FFB777821173C76023CBA81847CBB.html#variable_buildServer_7BD8089D8A2F5BE65D815A5837DC98F2AA63495C">buildServer</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::build</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_BUILD_SOCKET_SERVER_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

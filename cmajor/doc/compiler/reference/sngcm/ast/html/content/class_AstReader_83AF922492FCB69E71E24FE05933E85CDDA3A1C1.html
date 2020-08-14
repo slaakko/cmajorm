@@ -12,7 +12,7 @@
         <hr/>
         <h1>AstReader Class</h1>
         <span>
-            Definition at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#45">45</a>
+            Definition at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#46">46</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -86,7 +86,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#function_SetModuleId_E36E4D54CDC40B64A3EB80D71EE65E6D6098B967">SetModuleId</a>(int16_t moduleId_)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#function_SetModuleMaps_D67065BAB84E50C547D7416BE7464D5CCC8A6168">SetModuleMaps</a>(<span class="kw">const </span>boost::uuids::uuid&amp; rootModuleId_, std::unordered_map&lt;int16_t, std::string>* moduleNameTable_, std::unordered_map&lt;std::string, int16_t>* moduleIdMap_)</td>
             </tr>
         </table>
         <h2>Member Variables</h2>
@@ -95,9 +95,17 @@
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./../../../../soulng/util/html/content/class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html">BinaryReader</a></td>
                 <td class="functionTableSecondCol" xml:space="preserve">binaryReader</td>
             </tr>
-            <tr id="variable_moduleId_0F56284E089BB6164936468ED2DC0DDC740467F3">
-                <td class="functionTableFirstCol" xml:space="preserve">int16_t</td>
-                <td class="functionTableSecondCol" xml:space="preserve">moduleId</td>
+            <tr id="variable_moduleIdMap_9CDAE6A0855FEB5327300C0A8B9697271FD53B43">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;std::string, int16_t>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">moduleIdMap</td>
+            </tr>
+            <tr id="variable_moduleNameTable_9A3C6F8BA7ADBD3D76308CD1AA0688F113EBAE93">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;int16_t, std::string>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">moduleNameTable</td>
+            </tr>
+            <tr id="variable_rootModuleId_B70FBB89D58A72B9064D804E339BA87011912EEB">
+                <td class="functionTableFirstCol" xml:space="preserve">boost::uuids::uuid</td>
+                <td class="functionTableSecondCol" xml:space="preserve">rootModuleId</td>
             </tr>
         </table>
         <hr/>
@@ -107,21 +115,23 @@
             sngcm::ast::AstReader::AstReader(<span class="kw">const </span>
             std::string&amp; fileName_)</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#14">14</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#16">16</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_binaryReader_DA0E309983EBFCC5E447CCEA2F5303BB2851D563">binaryReader</a><span class="other">(</span><span class="identifier">fileName_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_moduleId_0F56284E089BB6164936468ED2DC0DDC740467F3">moduleId</a><span class="other">(</span><span class="other">-</span><span class="other">1</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_binaryReader_DA0E309983EBFCC5E447CCEA2F5303BB2851D563">binaryReader</a><span class="other">(</span><span class="identifier">fileName_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_rootModuleId_B70FBB89D58A72B9064D804E339BA87011912EEB">rootModuleId</a><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">nil_uuid</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_moduleNameTable_9A3C6F8BA7ADBD3D76308CD1AA0688F113EBAE93">moduleNameTable</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_moduleIdMap_9CDAE6A0855FEB5327300C0A8B9697271FD53B43">moduleIdMap</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#48">48</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#49">49</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -133,11 +143,11 @@
             <a href="./../../../../soulng/util/html/content/class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html">BinaryReader</a>
             &amp; sngcm::ast::AstReader::GetBinaryReader()</h4>
         <span>
-            Definition at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#49">49</a>
+            Definition at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#50">50</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_binaryReader_DA0E309983EBFCC5E447CCEA2F5303BB2851D563">binaryReader</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_binaryReader_DA0E309983EBFCC5E447CCEA2F5303BB2851D563">binaryReader</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -207,12 +217,12 @@
             <a href="./class_CompoundStatementNode_B674568F527671CDD23CADF95FAC626B94B8C3EF.html">CompoundStatementNode</a>
             * sngcm::ast::AstReader::ReadCompoundStatementNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#79">79</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#83">83</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#55">55</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#56">56</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -236,12 +246,12 @@
             <a href="./class_ConceptIdNode_CA66861A07095B3F9F74AA79D1B9C5B80FB4D50A.html">ConceptIdNode</a>
             * sngcm::ast::AstReader::ReadConceptIdNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#118">118</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#122">122</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#58">58</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#59">59</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -263,12 +273,12 @@
             <a href="./class_ConceptNode_6E09C7B31968ECB17A6F5F9E92F29B5BABA40ECE.html">ConceptNode</a>
             * sngcm::ast::AstReader::ReadConceptNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#131">131</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#135">135</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#59">59</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#60">60</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -285,12 +295,12 @@
             <a href="./class_ConditionalCompilationExpressionNode_0E2A9F385165FF3648A34BD21A6EF60DC2D98B5D.html">ConditionalCompilationExpressionNode</a>
             * sngcm::ast::AstReader::ReadConditionalCompilationExpressionNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#144">144</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#148">148</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#60">60</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#61">61</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -315,12 +325,12 @@
             <a href="./class_ConditionalCompilationPartNode_01E32244B3CCEB630093E6268978BAD22E17D2B7.html">ConditionalCompilationPartNode</a>
             * sngcm::ast::AstReader::ReadConditionalCompilationPartNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#157">157</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#161">161</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#61">61</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#62">62</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -342,12 +352,12 @@
             <a href="./class_ConstraintNode_8F17769E0F8B7D0FAB7516BA5F8CD95CAA1E96A7.html">ConstraintNode</a>
             * sngcm::ast::AstReader::ReadConstraintNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#92">92</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#96">96</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#56">56</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#57">57</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -371,12 +381,12 @@
             <a href="./class_DefaultStatementNode_44FB7E87C35E222F8A2DF2B7E8B4D8F6B11B6EE9.html">DefaultStatementNode</a>
             * sngcm::ast::AstReader::ReadDefaultStatementNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#66">66</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#70">70</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#54">54</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#55">55</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -398,12 +408,12 @@
             <a href="./class_IdentifierNode_4CE99E9F7A7A909CE85CE1E7ED4A63A5060B83E3.html">IdentifierNode</a>
             * sngcm::ast::AstReader::ReadIdentifierNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#27">27</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#31">31</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#51">51</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#52">52</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -454,12 +464,12 @@
             <a href="./class_LabelNode_CA29FD57DD242F38283331C8FC8948ED8313B1FA.html">LabelNode</a>
             * sngcm::ast::AstReader::ReadLabelNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#40">40</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#44">44</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#52">52</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#53">53</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -481,29 +491,31 @@
             <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>
             * sngcm::ast::AstReader::ReadNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#18">18</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#21">21</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a>&nbsp;<span class="identifier">nodeType</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">></span><span class="other">(</span><a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_binaryReader_DA0E309983EBFCC5E447CCEA2F5303BB2851D563">binaryReader</a><span class="other">.</span><span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a>&nbsp;<span class="identifier">nodeType</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">></span><span class="other">(</span><a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_binaryReader_DA0E309983EBFCC5E447CCEA2F5303BB2851D563">binaryReader</a><span class="other">.</span><span class="identifier">ReadByte</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Span</span>&nbsp;<span class="identifier">span</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadSpan</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Span</span>&nbsp;<span class="identifier">span</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadSpan</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">node</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_NodeFactory_6812844F8B3FDC42816BF78C8205B7CCD34B2E41.html">NodeFactory</a><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">CreateNode</span><span class="other">(</span><span class="identifier">nodeType</span><span class="other">,&nbsp;</span><span class="identifier">span</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">node</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_NodeFactory_6812844F8B3FDC42816BF78C8205B7CCD34B2E41.html">NodeFactory</a><span class="other">::</span><span class="identifier">Instance</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">CreateNode</span><span class="other">(</span><span class="identifier">nodeType</span><span class="other">,&nbsp;</span><span class="identifier">span</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">node</span><span class="other">-></span><span class="identifier">Read</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">node</span><span class="other">-></span><span class="identifier">SetRootModuleId</span><span class="other">(</span><a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_rootModuleId_B70FBB89D58A72B9064D804E339BA87011912EEB">rootModuleId</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">node</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">node</span><span class="other">-></span><span class="identifier">Read</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">node</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#50">50</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#51">51</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -511,6 +523,7 @@
         <span>
             Calls: <a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#function_ReadSpan_91D30B41697389B56B5EE1127A7E496C6EB4782E">sngcm::ast::AstReader::ReadSpan</a>
             , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Read_752482F1CB1306EFB283CCDCEDEE428813AFB309">sngcm::ast::Node::Read</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_SetRootModuleId_4B97B43BCDE5E3AB2FE1E27CFF175BF46196108A">sngcm::ast::Node::SetRootModuleId</a>
             , <a href="./class_NodeFactory_6812844F8B3FDC42816BF78C8205B7CCD34B2E41.html#function_CreateNode_960C2373885722B44F4213252D60A8B5BE711BC6">sngcm::ast::NodeFactory::CreateNode</a>
             , <a href="./class_NodeFactory_6812844F8B3FDC42816BF78C8205B7CCD34B2E41.html#function_Instance_4C2C18F83C5D7E0EAFE476879AEA4607883A82BF">sngcm::ast::NodeFactory::Instance</a>
             , <a href="./../../../../soulng/util/html/content/class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadByte_40AD82D1152B6D927FB4E28FC66201D3DC730429">soulng::util::BinaryReader::ReadByte</a>
@@ -590,12 +603,12 @@
         <h4>
             Span sngcm::ast::AstReader::ReadSpan()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#175">175</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#179">179</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#63">63</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#64">64</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -636,21 +649,21 @@
             <a href="./enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a>
              sngcm::ast::AstReader::ReadSpecifiers()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#170">170</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#174">174</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_binaryReader_DA0E309983EBFCC5E447CCEA2F5303BB2851D563">binaryReader</a><span class="other">.</span><span class="identifier">ReadUInt</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./enum_Specifiers_B0FE3D6AACD6EAFA55818F278AA0AE4D93F87BBE.html">Specifiers</a><span class="other">></span><span class="other">(</span><a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_binaryReader_DA0E309983EBFCC5E447CCEA2F5303BB2851D563">binaryReader</a><span class="other">.</span><span class="identifier">ReadUInt</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#62">62</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#63">63</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -680,12 +693,12 @@
             <a href="./class_StatementNode_C645560C48648EE9245172CF4CA54D85381420E3.html">StatementNode</a>
             * sngcm::ast::AstReader::ReadStatementNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#53">53</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#57">57</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#53">53</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#54">54</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -712,12 +725,12 @@
             <a href="./class_WhereConstraintNode_0C9AD1C057488945F020F191BFF32D20C2B333CC.html">WhereConstraintNode</a>
             * sngcm::ast::AstReader::ReadWhereConstraintNode()</h4>
         <span>
-            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#105">105</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#109">109</a>
              of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#57">57</a>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#58">58</a>
              of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
         </span>
         <br/>
@@ -734,19 +747,34 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_SetModuleId_E36E4D54CDC40B64A3EB80D71EE65E6D6098B967">SetModuleId Member Function</h3>
+        <h3 id="function_SetModuleMaps_D67065BAB84E50C547D7416BE7464D5CCC8A6168">SetModuleMaps Member Function</h3>
         <h4>
             <span class="kw">void</span>
-             sngcm::ast::AstReader::SetModuleId(int16_t moduleId_)</h4>
+             sngcm::ast::AstReader::SetModuleMaps(<span class="kw">const </span>
+            boost::uuids::uuid&amp; rootModuleId_, std::unordered_map&lt;int16_t, std::string>* moduleNameTable_, std::unordered_map&lt;std::string, int16_t>* moduleIdMap_)</h4>
         <span>
-            Definition at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#64">64</a>
-             of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
+            Definition at line <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html#216">216</a>
+             of <a href="file/AstReader.cpp_2092CE70C82457267FAD3E945DD622A336172268.html">AstReader.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_moduleId_0F56284E089BB6164936468ED2DC0DDC740467F3">moduleId</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">moduleId_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_rootModuleId_B70FBB89D58A72B9064D804E339BA87011912EEB">rootModuleId</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">rootModuleId_</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_moduleNameTable_9A3C6F8BA7ADBD3D76308CD1AA0688F113EBAE93">moduleNameTable</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">moduleNameTable_</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#variable_moduleIdMap_9CDAE6A0855FEB5327300C0A8B9697271FD53B43">moduleIdMap</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">moduleIdMap_</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html#65">65</a>
+             of <a href="file/AstReader.hpp_C05E73C66E4FE1B18B8E8FA129A315F56AF3F166.html">AstReader.hpp</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <a href="../../../../compiler-projects.html">top</a>

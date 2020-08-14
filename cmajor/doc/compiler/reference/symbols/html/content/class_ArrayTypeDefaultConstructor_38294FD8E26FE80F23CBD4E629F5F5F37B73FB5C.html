@@ -38,7 +38,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;<a href="./class_LocalVariableSymbol_F5A9F74EEFC0001129616C5EEBCFE3B2DFC74FCF.html">LocalVariableSymbol</a>*></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayTypeDefaultConstructor_38294FD8E26FE80F23CBD4E629F5F5F37B73FB5C.html#function_CreateTemporariesTo_55C25066A939D8B4BEAE81C8B48F46D7C3AFE9A7">CreateTemporariesTo</a>(<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>* currentFunction)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayTypeDefaultConstructor_38294FD8E26FE80F23CBD4E629F5F5F37B73FB5C.html#function_CreateTemporariesTo_55C25066A939D8B4BEAE81C8B48F46D7C3AFE9A7">CreateTemporariesTo</a>(<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>* currentFunction) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -71,6 +71,29 @@
         <span>
             Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#426">426</a>
              of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">426</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">427</span>&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">(</span><span class="identifier">arrayType_</span><span class="other">-></span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">U"@arrayDefaultCtor"</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayTypeDefaultConstructor_38294FD8E26FE80F23CBD4E629F5F5F37B73FB5C.html#variable_arrayType_2AA30D6460FC31903C0CB56609B7AD5F052CB56A">arrayType</a><span class="other">(</span><span class="identifier">arrayType_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayTypeDefaultConstructor_38294FD8E26FE80F23CBD4E629F5F5F37B73FB5C.html#variable_elementTypeDefaultConstructor_73B73486B2201AD56AE27F1D52F2D00C5F4EA4FA">elementTypeDefaultConstructor</a><span class="other">(</span><span class="identifier">elementTypeDefaultConstructor_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">428</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">429</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetGroupName</span><span class="other">(</span><span class="string">U"@constructor"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">430</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetAccess</span><span class="other">(</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html">SymbolAccess</a><span class="other">::</span><a href="./enum_SymbolAccess_F600C15F0FB7698B0621219523BC56AF008F8A35.html#enumerator_public__6DF3372A619A1B05863F124BB584B4A2F72346B7">public_</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">431</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html">ParameterSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">thisParam</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html">ParameterSymbol</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="string">U"this"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">432</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">thisParam</span><span class="other">-></span><span class="identifier">SetType</span><span class="other">(</span><a href="./class_ArrayTypeDefaultConstructor_38294FD8E26FE80F23CBD4E629F5F5F37B73FB5C.html#variable_arrayType_2AA30D6460FC31903C0CB56609B7AD5F052CB56A">arrayType</a><span class="other">-></span><span class="identifier">AddPointer</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">433</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddMember</span><span class="other">(</span><span class="identifier">thisParam</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">434</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ComputeName</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">435</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -120,8 +143,12 @@
         <span>
             Definition at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#125">125</a>
              of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ArrayTypeDefaultConstructor"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_ClassName_89669E070A33919DA464776855DF5F48ACC1C9AF">cmajor::symbols::ContainerSymbol::ClassName</a>
@@ -135,15 +162,34 @@
         <h4>
             std::vector&lt;<a href="./class_LocalVariableSymbol_F5A9F74EEFC0001129616C5EEBCFE3B2DFC74FCF.html">LocalVariableSymbol</a>
             *> cmajor::symbols::ArrayTypeDefaultConstructor::CreateTemporariesTo(<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
-            * currentFunction)</h4>
+            * currentFunction) <span class="kw">override</span>
+        </h4>
         <span>
             Definition at line <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html#437">437</a>
              of <a href="file/ArrayTypeSymbol.cpp_34A4DDDAA2A87F2515E32AD3735D8A6D688A9882.html">ArrayTypeSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">438</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">439</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="./class_LocalVariableSymbol_F5A9F74EEFC0001129616C5EEBCFE3B2DFC74FCF.html">LocalVariableSymbol</a><span class="other">*</span><span class="other">></span>&nbsp;<span class="identifier">temporaries</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">440</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">temporaries</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">currentFunction</span><span class="other">-></span><span class="identifier">CreateTemporary</span><span class="other">(</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">GetTypeByName</span><span class="other">(</span><span class="string">U"long"</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">Span</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">441</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">temporaries</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">442</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
             Declaration at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#122">122</a>
              of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_CreateTemporariesTo_542DF5751B9D7083501B13DE3DEB7F0F22404CCC">cmajor::symbols::FunctionSymbol::CreateTemporariesTo</a>
         </span>
         <br/>
         <br/>
@@ -188,8 +234,12 @@
         <span>
             Definition at line <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html#124">124</a>
              of <a href="file/ArrayTypeSymbol.hpp_53FBC648FCFDF784AC4286540B61AC290E40FEE8.html">ArrayTypeSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_IsBasicTypeOperation_370ECFE6425F9F520B8008A31FBA47E39FEBC4BF">cmajor::symbols::FunctionSymbol::IsBasicTypeOperation</a>

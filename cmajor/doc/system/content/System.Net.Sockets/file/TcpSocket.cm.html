@@ -393,7 +393,159 @@
   <br/>
   <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Net.Sockets.html#function_Write_C898F10E5373C79AF9ED51D3ECC940CAFF4F6ACB">Write</a><span class="other">(</span><a href="../doc/class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C.html">TcpSocket</a><span class="other">&amp;</span>&nbsp;<span class="identifier">socket</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">str</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">size</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">str</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Length_String_CharT_5DAD659AF865F217935177758B9A1E040AFCB58F">Length</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span><span class="other">[</span><span class="number">4</span><span class="other">]</span>&nbsp;<span class="identifier">buffer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Base/doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html">MemoryWriter</a>&nbsp;<span class="identifier">writer</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buffer</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">,&nbsp;</span><span class="number">4</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../../System.Base/doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_36DF7B856C7893FD68E8784D6E47F3FE2241BC1C">Write</a><span class="other">(</span><span class="identifier">size</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">bytesToSend</span><span class="other">&nbsp;=&nbsp;</span><span class="number">4</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">offset</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while</span>&nbsp;<span class="other">(</span><span class="identifier">bytesToSend</span><span class="other">&nbsp;>&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">bytesSent</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">socket</span><span class="other">.</span><a href="../doc/class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C.html#member_function_Send_TcpSocket_82B1153B1DEE898B2D2BD09C86750B1AC48EF7C5">Send</a><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buffer</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">offset</span><span class="other">,&nbsp;</span><span class="identifier">bytesToSend</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesToSend</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">bytesToSend</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">bytesSent</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">offset</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">offset</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">bytesSent</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span><span class="other">*</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">void</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">str</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Chars_String_CharT_F23E248DC46A5AA9215CDB25B6779E94681FBAB6">Chars</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">count</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">size</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while</span>&nbsp;<span class="other">(</span><span class="identifier">count</span><span class="other">&nbsp;>&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">bytesSent</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">socket</span><span class="other">.</span><a href="../doc/class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C.html#member_function_Send_TcpSocket_82B1153B1DEE898B2D2BD09C86750B1AC48EF7C5">Send</a><span class="other">(</span><span class="identifier">p</span><span class="other">,&nbsp;</span><span class="identifier">count</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">p</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">p</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">bytesSent</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">count</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">count</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">bytesSent</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/ns_System.Net.Sockets.html#function_ReadStr_48742E8564C8B4F4A09CDD23DCC86613F267EA67">ReadStr</a><span class="other">(</span><a href="../doc/class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C.html">TcpSocket</a><span class="other">&amp;</span>&nbsp;<span class="identifier">socket</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span><span class="other">[</span><span class="number">4</span><span class="other">]</span>&nbsp;<span class="identifier">buffer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">bytesToReceive</span><span class="other">&nbsp;=&nbsp;</span><span class="number">4</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">offset</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">bytesReceived</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">socket</span><span class="other">.</span><a href="../doc/class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C.html#member_function_Receive_TcpSocket_BF6688890E0F5D9770156E7AFD1E509E7A234B3E">Receive</a><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buffer</span><span class="other">[</span><span class="identifier">offset</span><span class="other">]</span><span class="other">,&nbsp;</span><span class="identifier">bytesToReceive</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">bytesReceived</span><span class="other">&nbsp;==&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#default_constructor_String_CharT_29D461A5530B53DD4D61100F8616E6F0141822A3">string</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesToReceive</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">bytesToReceive</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">bytesReceived</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">offset</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">offset</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">bytesReceived</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while</span>&nbsp;<span class="other">(</span><span class="identifier">bytesToReceive</span><span class="other">&nbsp;>&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesReceived</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">socket</span><span class="other">.</span><a href="../doc/class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C.html#member_function_Receive_TcpSocket_BF6688890E0F5D9770156E7AFD1E509E7A234B3E">Receive</a><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buffer</span><span class="other">[</span><span class="identifier">offset</span><span class="other">]</span><span class="other">,&nbsp;</span><span class="identifier">bytesToReceive</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">bytesReceived</span><span class="other">&nbsp;==&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#default_constructor_String_CharT_29D461A5530B53DD4D61100F8616E6F0141822A3">string</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesToReceive</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">bytesToReceive</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">bytesReceived</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">offset</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">offset</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">bytesReceived</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Core/index.html#ad6f3988-3aa5-4c6e-b612-f382780b023e">MemoryReader</a>&nbsp;<span class="identifier">reader</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buffer</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">,&nbsp;</span><span class="number">4</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">size</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><a href="../../System.Base/doc/class_MemoryReader_D8CB2B1DC0A4C87DEB55F63A0974F7D82A2798E1.html#member_function_ReadInt_MemoryReader_45B836E305AAEB9DE148B1A2AA9158ABFE608DB3">ReadInt</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">size</span><span class="other">&nbsp;==&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#default_constructor_String_CharT_29D461A5530B53DD4D61100F8616E6F0141822A3">string</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span>&nbsp;<span class="identifier">mem</span><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="../../System.Base/doc/ns_System.html#function_MemAlloc_53E1570ADBDFA8991E7C46F22D888AEECC5F91F0">MemAlloc</a><span class="other">(</span><span class="identifier">size</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">offset</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesToReceive</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">size</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesReceived</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">socket</span><span class="other">.</span><a href="../doc/class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C.html#member_function_Receive_TcpSocket_BF6688890E0F5D9770156E7AFD1E509E7A234B3E">Receive</a><span class="other">(</span><span class="identifier">mem</span><span class="other">.</span><a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#member_function_Get_UniquePtr_T_84A185E63E772D34101667B639B5989D36F16FAA">Get</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">offset</span><span class="other">,&nbsp;</span><span class="identifier">bytesToReceive</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">bytesReceived</span><span class="other">&nbsp;==&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#default_constructor_String_CharT_29D461A5530B53DD4D61100F8616E6F0141822A3">string</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesToReceive</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">bytesToReceive</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">bytesReceived</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">offset</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">offset</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">bytesReceived</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while</span>&nbsp;<span class="other">(</span><span class="identifier">bytesToReceive</span><span class="other">&nbsp;>&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesReceived</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">socket</span><span class="other">.</span><a href="../doc/class_TcpSocket_B38B3FFF6145E508D0B49BC2B9D97F255711ED1C.html#member_function_Receive_TcpSocket_BF6688890E0F5D9770156E7AFD1E509E7A234B3E">Receive</a><span class="other">(</span><span class="identifier">mem</span><span class="other">.</span><a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#member_function_Get_UniquePtr_T_84A185E63E772D34101667B639B5989D36F16FAA">Get</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">offset</span><span class="other">,&nbsp;</span><span class="identifier">bytesToReceive</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">bytesReceived</span><span class="other">&nbsp;==&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#default_constructor_String_CharT_29D461A5530B53DD4D61100F8616E6F0141822A3">string</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesToReceive</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">bytesToReceive</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">bytesReceived</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">offset</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">offset</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">bytesReceived</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<span class="identifier">s</span><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">void</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">mem</span><span class="other">.</span><a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#member_function_Get_UniquePtr_T_84A185E63E772D34101667B639B5989D36F16FAA">Get</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">size</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;<span class="other">}</span></span>
   <br/>
  </body>
 </html>

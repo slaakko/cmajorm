@@ -61,7 +61,15 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::string&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_Hash_29CF41759DCBEF7A07415F687964CEE094F8F42B">Hash</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::string&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_Id_BE520C955D7BAEF2A299BA031179280A4CF5202B">Id</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_IsProgramMainUnit_2EC633AED122F733F44D1959BBA2144AF7F24106">IsProgramMainUnit</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -74,6 +82,14 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_ResetGlobalNs_36D0992CD02FA771B3CA7375C49875D392D9059A">ResetGlobalNs</a>(<a href="./class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html">NamespaceNode</a>* ns)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_SetHash_0C4D4D45D65C8F691CA132AC57C62C7BBC69C88C">SetHash</a>(<span class="kw">const </span>std::string&amp; hash_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_SetProgramMainUnit_4D58AE9F09DC168CB7A7AD05D447E07294CD17A4">SetProgramMainUnit</a>()</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -90,9 +106,17 @@
                 <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html">NamespaceNode</a>></td>
                 <td class="functionTableSecondCol" xml:space="preserve">globalNs</td>
             </tr>
+            <tr id="variable_hash_781D5994FE8D060417535411A83177DEF5F5D205">
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve">hash</td>
+            </tr>
             <tr id="variable_id_C98EA0434EE055D4B411405B3871F452E0A2FE95">
                 <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
                 <td class="functionTableSecondCol" xml:space="preserve">id</td>
+            </tr>
+            <tr id="variable_isProgramMainUnit_64BE06F5F4C160043545D830D141C8B9580302AF">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">isProgramMainUnit</td>
             </tr>
             <tr id="variable_isSynthesizedUnit_47702A3F208A8313879CB76BF3ED9BCFBDB53B3F">
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -110,15 +134,15 @@
             sngcm::ast::CompileUnitNode::CompileUnitNode(<span class="kw">const </span>
             Span&amp; span_)</h4>
         <span>
-            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#16">16</a>
+            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#17">17</a>
              of <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html">CompileUnit.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_compileUnitNode_87B884A47C84527F63F215282165A470ADCB7F14">compileUnitNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_isSynthesizedUnit_47702A3F208A8313879CB76BF3ED9BCFBDB53B3F">isSynthesizedUnit</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_compileUnitNode_87B884A47C84527F63F215282165A470ADCB7F14">compileUnitNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_isSynthesizedUnit_47702A3F208A8313879CB76BF3ED9BCFBDB53B3F">isSynthesizedUnit</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_isProgramMainUnit_64BE06F5F4C160043545D830D141C8B9580302AF">isProgramMainUnit</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -136,17 +160,17 @@
             Span&amp; span_, <span class="kw">const </span>
             std::string&amp; filePath_)</h4>
         <span>
-            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#20">20</a>
+            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#21">21</a>
              of <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html">CompileUnit.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">:</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_compileUnitNode_87B884A47C84527F63F215282165A470ADCB7F14">compileUnitNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_filePath_7195DBF04A30EB880E5F2EC993DA7911017D441A">filePath</a><span class="other">(</span><span class="identifier">filePath_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html">NamespaceNode</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="./class_IdentifierNode_4CE99E9F7A7A909CE85CE1E7ED4A63A5060B83E3.html">IdentifierNode</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="string">U""</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_isSynthesizedUnit_47702A3F208A8313879CB76BF3ED9BCFBDB53B3F">isSynthesizedUnit</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_compileUnitNode_87B884A47C84527F63F215282165A470ADCB7F14">compileUnitNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_filePath_7195DBF04A30EB880E5F2EC993DA7911017D441A">filePath</a><span class="other">(</span><span class="identifier">filePath_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html">NamespaceNode</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="./class_IdentifierNode_4CE99E9F7A7A909CE85CE1E7ED4A63A5060B83E3.html">IdentifierNode</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="string">U""</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_isSynthesizedUnit_47702A3F208A8313879CB76BF3ED9BCFBDB53B3F">isSynthesizedUnit</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_isProgramMainUnit_64BE06F5F4C160043545D830D141C8B9580302AF">isProgramMainUnit</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -166,15 +190,15 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#32">32</a>
+            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#33">33</a>
              of <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html">CompileUnit.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -203,19 +227,19 @@
             &amp; cloneContext) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#25">25</a>
+            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#26">26</a>
              of <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html">CompileUnit.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a><span class="other">*</span>&nbsp;<span class="identifier">clone</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_filePath_7195DBF04A30EB880E5F2EC993DA7911017D441A">filePath</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a><span class="other">*</span>&nbsp;<span class="identifier">clone</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">.</span><span class="identifier">MapSpan</span><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">RootModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_filePath_7195DBF04A30EB880E5F2EC993DA7911017D441A">filePath</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clone</span><span class="other">-></span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="./class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html">NamespaceNode</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clone</span><span class="other">-></span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><a href="./class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html">NamespaceNode</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clone</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clone</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -232,8 +256,10 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_Clone_5AC238128E10D49BDBBB727635191F2812927541">sngcm::ast::CompileUnitNode::Clone</a>
+            Calls: <a href="./class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_MapSpan_4854B818E90C09061F441CEE0410C6DF44D518CF">sngcm::ast::CloneContext::MapSpan</a>
+            , <a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#function_Clone_5AC238128E10D49BDBBB727635191F2812927541">sngcm::ast::CompileUnitNode::Clone</a>
             , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_RootModuleId_2C637CA63FEB26C6458958EFD55F1248AA470C07">sngcm::ast::Node::RootModuleId</a>
         </span>
         <br/>
         <br/>
@@ -249,7 +275,7 @@
              sngcm::ast::CompileUnitNode::ComputeLineStarts(<span class="kw">const </span>
             std::u32string&amp; sourceFileContent)</h4>
         <span>
-            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#42">42</a>
+            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#43">43</a>
              of <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html">CompileUnit.cpp</a>
         </span>
         <br/>
@@ -283,7 +309,7 @@
             Span&amp; span) <span class="kw">const override</span>
         </h4>
         <span>
-            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#61">61</a>
+            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#62">62</a>
              of <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html">CompileUnit.cpp</a>
         </span>
         <br/>
@@ -334,30 +360,29 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_Hash_29CF41759DCBEF7A07415F687964CEE094F8F42B">Hash Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            std::string&amp; sngcm::ast::CompileUnitNode::Hash() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html#30">30</a>
+             of <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html">CompileUnit.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_hash_781D5994FE8D060417535411A83177DEF5F5D205">hash</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
         <h3 id="function_Id_BE520C955D7BAEF2A299BA031179280A4CF5202B">Id Member Function</h3>
         <h4>
             <span class="kw">const </span>
             std::string&amp; sngcm::ast::CompileUnitNode::Id()</h4>
         <span>
-            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#82">82</a>
+            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#83">83</a>
              of <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html">CompileUnit.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_id_C98EA0434EE055D4B411405B3871F452E0A2FE95">id</a><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_id_C98EA0434EE055D4B411405B3871F452E0A2FE95">id</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">GetSha1MessageDigest</span><span class="other">(</span><a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_filePath_7195DBF04A30EB880E5F2EC993DA7911017D441A">filePath</a><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_id_C98EA0434EE055D4B411405B3871F452E0A2FE95">id</a><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -365,6 +390,22 @@
              of <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html">CompileUnit.hpp</a>
         </span>
         <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsProgramMainUnit_2EC633AED122F733F44D1959BBA2144AF7F24106">IsProgramMainUnit Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             sngcm::ast::CompileUnitNode::IsProgramMainUnit() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html#32">32</a>
+             of <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html">CompileUnit.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_isProgramMainUnit_64BE06F5F4C160043545D830D141C8B9580302AF">isProgramMainUnit</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
         <br/>
         <hr/>
         <h3 id="function_IsSynthesizedUnit_F60431A8AFF92FE192B94C0A3AE00D533F5AD721">IsSynthesizedUnit Member Function</h3>
@@ -404,15 +445,15 @@
              sngcm::ast::CompileUnitNode::ResetGlobalNs(<a href="./class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html">NamespaceNode</a>
             * ns)</h4>
         <span>
-            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#37">37</a>
+            Definition at line <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html#38">38</a>
              of <a href="file/CompileUnit.cpp_D9CBCD7CC1C91E86E3AF1A11E48D10B59393E3AE.html">CompileUnit.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">ns</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_globalNs_0E29F1FA8867D626883737363FC2700023F05DAE">globalNs</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">ns</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -422,6 +463,37 @@
              of <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html">CompileUnit.hpp</a>
         </span>
         <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetHash_0C4D4D45D65C8F691CA132AC57C62C7BBC69C88C">SetHash Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::CompileUnitNode::SetHash(<span class="kw">const </span>
+            std::string&amp; hash_)</h4>
+        <span>
+            Definition at line <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html#31">31</a>
+             of <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html">CompileUnit.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_hash_781D5994FE8D060417535411A83177DEF5F5D205">hash</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">hash_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_SetProgramMainUnit_4D58AE9F09DC168CB7A7AD05D447E07294CD17A4">SetProgramMainUnit Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::CompileUnitNode::SetProgramMainUnit()</h4>
+        <span>
+            Definition at line <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html#33">33</a>
+             of <a href="file/CompileUnit.hpp_D7379F3F0A8B6285925B27C87E8683B711321B54.html">CompileUnit.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html#variable_isProgramMainUnit_64BE06F5F4C160043545D830D141C8B9580302AF">isProgramMainUnit</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
         <br/>
         <hr/>
         <h3 id="function_SetSynthesizedUnit_F32F33FEEADA7738D4675705C262F2360613145C">SetSynthesizedUnit Member Function</h3>

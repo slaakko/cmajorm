@@ -139,6 +139,17 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.cpp_F2A408E7F84869D563A9BE216E58B46943CF6C93.html#22">22</a>
              of <a href="file/ContainerSymbol.cpp_F2A408E7F84869D563A9BE216E58B46943CF6C93.html">ContainerSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">(</span><span class="identifier">symbolType_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_containerScope_6D60E9EC934543FA2F9F8987D5122A4CFFDED97F">containerScope</a><span class="other">.</span><span class="identifier">SetContainer</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -158,6 +169,27 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.cpp_F2A408E7F84869D563A9BE216E58B46943CF6C93.html#135">135</a>
              of <a href="file/ContainerSymbol.cpp_F2A408E7F84869D563A9BE216E58B46943CF6C93.html">ContainerSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">IsProject</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">member</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_members_800FADD0CEA07455BFDA1863145AAB0212B1A286">members</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">member</span><span class="other">-></span><span class="identifier">Accept</span><span class="other">(</span><span class="identifier">collector</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -276,8 +308,8 @@
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddLocalVariable_99816F7F6427E3716D975A9FE3ACBF71CF4921AD">cmajor::symbols::SymbolTable::AddLocalVariable</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddMemberVariable_2DF1D17AA60F0138A597DF8CF7FFF6FFA56933C1">cmajor::symbols::SymbolTable::AddMemberVariable</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddParameter_E9D5AB600DED722BEB998990D5F6D1EB78302DA8">cmajor::symbols::SymbolTable::AddParameter</a>
-            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTemplateParameter_9F7751B5C059F599CDF41F1586289D84D44E84FE">cmajor::symbols::SymbolTable::AddTemplateParameter</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTemplateParameter_5F18786C5561B5AD7EFB130D5E79ABACAB3BD853">cmajor::symbols::SymbolTable::AddTemplateParameter</a>
+            , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTemplateParameter_9F7751B5C059F599CDF41F1586289D84D44E84FE">cmajor::symbols::SymbolTable::AddTemplateParameter</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTypeSymbolToGlobalScope_AE3939953D2D6A6AE3E173897034EB0C7F5330F3">cmajor::symbols::SymbolTable::AddTypeSymbolToGlobalScope</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_AddTypedef_1404E0D136F900483AF666D50398CC8EB2925193">cmajor::symbols::SymbolTable::AddTypedef</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginClassDelegate_D5FE81B251C4C87ED1372D0D8DE134AA371F8179">cmajor::symbols::SymbolTable::BeginClassDelegate</a>
@@ -472,8 +504,12 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html#36">36</a>
              of <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html">ContainerSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ContainerSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_ClassName_C4FAFF23616F9C6F306CD331A2F514E68E55AE49">cmajor::symbols::Symbol::ClassName</a>
@@ -584,6 +620,17 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.cpp_F2A408E7F84869D563A9BE216E58B46943CF6C93.html#146">146</a>
              of <a href="file/ContainerSymbol.cpp_F2A408E7F84869D563A9BE216E58B46943CF6C93.html">ContainerSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_containerScope_6D60E9EC934543FA2F9F8987D5122A4CFFDED97F">containerScope</a><span class="other">.</span><span class="identifier">Clear</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_members_800FADD0CEA07455BFDA1863145AAB0212B1A286">members</a><span class="other">.</span><span class="identifier">clear</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -612,8 +659,12 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html#30">30</a>
              of <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html">ContainerSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_containerScope_6D60E9EC934543FA2F9F8987D5122A4CFFDED97F">containerScope</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetContainerScope_8BEFBF12ECAFD835FBFA066EA6ABFBDB1CC8D279">cmajor::symbols::Symbol::GetContainerScope</a>
@@ -637,8 +688,12 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html#31">31</a>
              of <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html">ContainerSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">&amp;</span><a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_containerScope_6D60E9EC934543FA2F9F8987D5122A4CFFDED97F">containerScope</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetContainerScope_8BEFBF12ECAFD835FBFA066EA6ABFBDB1CC8D279">cmajor::symbols::Symbol::GetContainerScope</a>
@@ -654,6 +709,7 @@
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_ClassInterfaceOrNsScope_D25A512430C0AF8090E3D63CE4D3EB8B85F20318">cmajor::symbols::Symbol::ClassInterfaceOrNsScope</a>
             , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_ClassOrNsScope_ED69F79240DA85E9094DA2698B12EFAF5EFC0351">cmajor::symbols::Symbol::ClassOrNsScope</a>
             , <a href="./class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_BeginNamespace_206F85DA17D2A770B9325614C6A23AA299DA5540">cmajor::symbols::SymbolTable::BeginNamespace</a>
+            , <a href="./class_TypeIndex_FF71288B299D46222D066CBF7B74BCF8724B4F82.html#function_AddType_1A0F9C67160B0E87F7C647636C0A770CD2EEA9C0">cmajor::symbols::TypeIndex::AddType</a>
         </span>
         <br/>
         <br/>
@@ -732,8 +788,12 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html#29">29</a>
              of <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html">ContainerSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsContainerSymbol_E8490522D17458C7E91FA44E2A75FD5AFDC26262">cmajor::symbols::Symbol::IsContainerSymbol</a>
@@ -884,8 +944,12 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html#32">32</a>
              of <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html">ContainerSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_members_800FADD0CEA07455BFDA1863145AAB0212B1A286">members</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_Members_FE810BACDAB508DBD890BF487DF86FDEA4993E27">Members Member Function</h3>
@@ -895,8 +959,12 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html#33">33</a>
              of <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html">ContainerSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#variable_members_800FADD0CEA07455BFDA1863145AAB0212B1A286">members</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Called by: <a href="./class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html#function_Import_64D5D7804284DE4B1E0B44419B9225E8EBFF3EF0">cmajor::symbols::NamespaceSymbol::Import</a>
@@ -913,6 +981,27 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.cpp_F2A408E7F84869D563A9BE216E58B46943CF6C93.html#46">46</a>
              of <a href="file/ContainerSymbol.cpp_F2A408E7F84869D563A9BE216E58B46943CF6C93.html">ContainerSymbol.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">uint32_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadULEB128UInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">uint32_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">*</span>&nbsp;<span class="identifier">symbol</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadSymbol</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">AddMember</span><span class="other">(</span><span class="identifier">symbol</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -956,6 +1045,7 @@
             , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Read_DA09E9D5A07A9D1468C1FBAA5018A46986D873FB">cmajor::symbols::FunctionSymbol::Read</a>
             , <a href="./class_StringFunctionContainerSymbol_84AE3D945AA56A4470A1479172085324DEB396CC.html#function_Read_DA05F0E81DCA7FDCBF8F169E441BDF4EE6342BBA">cmajor::symbols::StringFunctionContainerSymbol::Read</a>
             , <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_Read_DDB520FDA1A2A3EA681DEEF7F58B270F1A57B570">cmajor::symbols::StringLengthFunction::Read</a>
+            , <a href="./class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_Read_8FAF247065914176624B58915A6DAB2BBD2828BA">cmajor::symbols::TemplateParameterSymbol::Read</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Read_77A4771FA9CEDD5ABC0B9CA2E83D1C3FB6FA34A7">cmajor::symbols::TypeSymbol::Read</a>
             , <a href="./class_UnderlyingTypeToEnumTypeConversion_0AE88B332A17FAADFB513EB7C74C219739BD34D0.html#function_Read_B5DF1C0FD31C2715079F33F9620519F262849C6A">cmajor::symbols::UnderlyingTypeToEnumTypeConversion::Read</a>
         </span>
@@ -985,8 +1075,12 @@
         <span>
             Definition at line <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html#28">28</a>
              of <a href="file/ContainerSymbol.hpp_FF050B733ADD7E45ED72881EE4B16CD873A097A9.html">ContainerSymbol.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"container"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_TypeString_ADF55430A6F2BB7CBD995559B397884DC969DFFA">cmajor::symbols::Symbol::TypeString</a>
@@ -1084,6 +1178,7 @@
             , <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_Write_73CE77E7C98BC23AD6EDA09FDB413D2D799AB5F4">cmajor::symbols::FunctionSymbol::Write</a>
             , <a href="./class_StringFunctionContainerSymbol_84AE3D945AA56A4470A1479172085324DEB396CC.html#function_Write_827BAEA107A9F59FFE8A51B32194A48CD34A9BC9">cmajor::symbols::StringFunctionContainerSymbol::Write</a>
             , <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_Write_884984077CDFC3452D0F499E90AF75EEDD80C4B2">cmajor::symbols::StringLengthFunction::Write</a>
+            , <a href="./class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html#function_Write_296619D0FA23D5E1B3A68DDECB323E6BEFA7CADA">cmajor::symbols::TemplateParameterSymbol::Write</a>
             , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_Write_3B9CF1C2068B388E840353BCF6A2DA6AAE37A26F">cmajor::symbols::TypeSymbol::Write</a>
             , <a href="./class_UnderlyingTypeToEnumTypeConversion_0AE88B332A17FAADFB513EB7C74C219739BD34D0.html#function_Write_A2028B50205E45A2559205A83E7CA7CB1D07247E">cmajor::symbols::UnderlyingTypeToEnumTypeConversion::Write</a>
         </span>

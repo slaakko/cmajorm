@@ -1,0 +1,262 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_BUILD_BUILD_SERVER_MESSAGE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_BUILD_BUILD_SERVER_MESSAGE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/MessageBody.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/build/Message.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">build</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">pushProjectRequestId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">pushProjectResponseId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">pushProjectFileRequestId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">pushProjectFileResponseId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">pushProjectFileContentRequestId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">pushProjectFileContentResponseId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">buildProjectRequestId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">buildProjectResponseId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">showBuildMessageRequestId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">showBuildMessageResponseId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">errorResponseId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">closeConnectionRequestId</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_PushProjectRequest_8D27BB74FD5ED412B805368B49C9C9E2D1C5147F.html">PushProjectRequest</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_ProjectInfo_A8C0732EEE4236BD01C1B972101FB545056A767F.html">ProjectInfo</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectRequest_8D27BB74FD5ED412B805368B49C9C9E2D1C5147F.html#constructor_PushProjectRequest_83D210E9FCBF99912D0D33E3A3C580C31FEFEA9E">PushProjectRequest</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectRequest_8D27BB74FD5ED412B805368B49C9C9E2D1C5147F.html#constructor_PushProjectRequest_7A369C70973F83E1701525135B58DA5B3A855C3A">PushProjectRequest</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_PushProjectRequest_8D27BB74FD5ED412B805368B49C9C9E2D1C5147F.html#function_Id_287063119BD6913275CA62CA52FBACA9C6AA251E">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_pushProjectRequestId_C569165CF5DF85B98B871FBD9DD27DCBA526ABED">pushProjectRequestId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_PushProjectRequest_8D27BB74FD5ED412B805368B49C9C9E2D1C5147F.html#function_DispatchTo_38D1A20FEB690738B5B160ED61DAA25B56EC7E64">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_PushProjectResponse_47F20A376A1C1166D8B145822A450D6E5F512DF5.html">PushProjectResponse</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_ProjectUpToDate_92C6E82363EA57BBE8A64A4C56CE3D1B69F9C429.html">ProjectUpToDate</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectResponse_47F20A376A1C1166D8B145822A450D6E5F512DF5.html#constructor_PushProjectResponse_596A50F7E1370BA78773415203FF311369B4A55C">PushProjectResponse</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectResponse_47F20A376A1C1166D8B145822A450D6E5F512DF5.html#constructor_PushProjectResponse_992BB689A713FA7A0FB20F8C57898944278B7A2B">PushProjectResponse</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_PushProjectResponse_47F20A376A1C1166D8B145822A450D6E5F512DF5.html#function_Id_E6FC861601FA373FAC3C58CB238FB21B39B86C70">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_pushProjectResponseId_DF24296245352EED614812F35BE49B26EB0430F3">pushProjectResponseId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_PushProjectResponse_47F20A376A1C1166D8B145822A450D6E5F512DF5.html#function_DispatchTo_2B3DF0187198167108DF5F1A17963C951BB73F51">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_PushProjectFileRequest_75B851AF217995026F305882E0EDFD5EFF1223C1.html">PushProjectFileRequest</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_ProjectInfo_A8C0732EEE4236BD01C1B972101FB545056A767F.html">ProjectInfo</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectFileRequest_75B851AF217995026F305882E0EDFD5EFF1223C1.html#constructor_PushProjectFileRequest_42378C801CD5244F7CD6E5425EA893E930B81A97">PushProjectFileRequest</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectFileRequest_75B851AF217995026F305882E0EDFD5EFF1223C1.html#constructor_PushProjectFileRequest_80024948C036915BAF7AB6CDCD5F485F0880A45E">PushProjectFileRequest</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_PushProjectFileRequest_75B851AF217995026F305882E0EDFD5EFF1223C1.html#function_Id_9B553233D4AD5388A46A6FAA247259CB929A6CCF">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_pushProjectFileRequestId_2FF452C3E56124FB1FEE67E58B8937D45255283D">pushProjectFileRequestId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_PushProjectFileRequest_75B851AF217995026F305882E0EDFD5EFF1223C1.html#function_DispatchTo_FF006CB9C240DD6734F97CD75B10D225D6F80CD4">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_PushProjectFileResponse_48891D6BBEEC315956A8B7F0478CE56F93BAA9ED.html">PushProjectFileResponse</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_ProjectInfo_A8C0732EEE4236BD01C1B972101FB545056A767F.html">ProjectInfo</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectFileResponse_48891D6BBEEC315956A8B7F0478CE56F93BAA9ED.html#constructor_PushProjectFileResponse_46E5632167CE546F95EDFA2719EA189E5F6F5C4D">PushProjectFileResponse</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectFileResponse_48891D6BBEEC315956A8B7F0478CE56F93BAA9ED.html#constructor_PushProjectFileResponse_B62DB326DFC8E53A09A955AFB92620EF2A8208BC">PushProjectFileResponse</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_PushProjectFileResponse_48891D6BBEEC315956A8B7F0478CE56F93BAA9ED.html#function_Id_1755C2CD4A693FC433C972B702F93D72E87949F4">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_pushProjectFileResponseId_00E8960011C49EB98EE0912DDF4E3AB957B87F6D">pushProjectFileResponseId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_PushProjectFileResponse_48891D6BBEEC315956A8B7F0478CE56F93BAA9ED.html#function_DispatchTo_E665ADD6913459C09DD90BA611360A2CF53F9C86">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_PushProjectFileContentRequest_947F194EA0BD9B52CA72D38BF7ECE91537334F18.html">PushProjectFileContentRequest</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_ProjectInfo_A8C0732EEE4236BD01C1B972101FB545056A767F.html">ProjectInfo</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectFileContentRequest_947F194EA0BD9B52CA72D38BF7ECE91537334F18.html#constructor_PushProjectFileContentRequest_89CD26F29C1B392AE98843E32E3FCFCBCED52468">PushProjectFileContentRequest</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectFileContentRequest_947F194EA0BD9B52CA72D38BF7ECE91537334F18.html#constructor_PushProjectFileContentRequest_7445CAC9435618CCE80095D120350F8FDF957442">PushProjectFileContentRequest</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_PushProjectFileContentRequest_947F194EA0BD9B52CA72D38BF7ECE91537334F18.html#function_Id_893F4AC7EA8DC93E9F119F545EB6E5303A4FBB12">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_pushProjectFileContentRequestId_1BCCC5CEC64AFB48FCA7521AE5D1CD6077893B92">pushProjectFileContentRequestId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_PushProjectFileContentRequest_947F194EA0BD9B52CA72D38BF7ECE91537334F18.html#function_DispatchTo_D93B695A4FA7EDE298A6B0EF03B44A8D5D558728">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_PushProjectFileContentResponse_3881F10ADE05713577329AE35013CCFD6467C031.html">PushProjectFileContentResponse</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_ProjectUpdated_B0ECD961D280350CB1BCFB7B327EECB09550AC28.html">ProjectUpdated</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectFileContentResponse_3881F10ADE05713577329AE35013CCFD6467C031.html#constructor_PushProjectFileContentResponse_14BCDA054C60059CEA4B1CD47EB4643490F8D9E2">PushProjectFileContentResponse</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_PushProjectFileContentResponse_3881F10ADE05713577329AE35013CCFD6467C031.html#constructor_PushProjectFileContentResponse_35610BB8E97BE4C8A9221D2A3013C6848146BFD4">PushProjectFileContentResponse</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_PushProjectFileContentResponse_3881F10ADE05713577329AE35013CCFD6467C031.html#function_Id_71859C92C72EE3E4AE14CDFE4111FFEE07365DE4">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_pushProjectFileContentResponseId_005325F8349EBC9C05C1289DAA3CD7026FC876EF">pushProjectFileContentResponseId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_PushProjectFileContentResponse_3881F10ADE05713577329AE35013CCFD6467C031.html#function_DispatchTo_0E643501AEA8BC286BC17C167BFC32F14A501DB3">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_BuildProjectRequest_D22DA240C9051478804115B481FEFA516918A8E3.html">BuildProjectRequest</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_ProjectToBuild_808890BBB5A2DF5ED9A34881BE95B5CD4990E158.html">ProjectToBuild</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_BuildProjectRequest_D22DA240C9051478804115B481FEFA516918A8E3.html#constructor_BuildProjectRequest_46A0E4C19E6B402E7D09A6549FD2D1B9F4C2E120">BuildProjectRequest</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_BuildProjectRequest_D22DA240C9051478804115B481FEFA516918A8E3.html#constructor_BuildProjectRequest_526B07846A841C2CAEAEE4036E6146B61D8F968E">BuildProjectRequest</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_BuildProjectRequest_D22DA240C9051478804115B481FEFA516918A8E3.html#function_Id_F937229D46795F87F5BC0B3891728A8864AE38F7">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_buildProjectRequestId_5748FAD8F08D3A0F081141CF8948E03CF03F1327">buildProjectRequestId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_BuildProjectRequest_D22DA240C9051478804115B481FEFA516918A8E3.html#function_DispatchTo_871AB817312012FF7D675EDD85E63FD78EB282F8">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_BuildProjectResponse_0981A19E1DC49CE65051D8145DCA2E9E5A2A6501.html">BuildProjectResponse</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_ProjectBuilt_269D29937795BA10FE688B20A28252913C820FB4.html">ProjectBuilt</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_BuildProjectResponse_0981A19E1DC49CE65051D8145DCA2E9E5A2A6501.html#constructor_BuildProjectResponse_AAB921220408084E90EACA4FE1E1636D65E07E54">BuildProjectResponse</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_BuildProjectResponse_0981A19E1DC49CE65051D8145DCA2E9E5A2A6501.html#constructor_BuildProjectResponse_CD135FFCDCC0A80EFFD570624A37571F19C86166">BuildProjectResponse</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_BuildProjectResponse_0981A19E1DC49CE65051D8145DCA2E9E5A2A6501.html#function_Id_D1B0D22280CAEA9E7642E141CC9D5C99BF8BC7FC">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_buildProjectResponseId_BA578F89E2B4FB1F460B746686C8BD2D5FF44316">buildProjectResponseId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_BuildProjectResponse_0981A19E1DC49CE65051D8145DCA2E9E5A2A6501.html#function_DispatchTo_F98C0A3952856C3E43896B4A1B2BE0A18C2BA488">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_ShowBuildMessageRequest_9A095C93FAB57C94D67B3B31BA48A0A8B6C32FDD.html">ShowBuildMessageRequest</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_MessageLine_B3FE9EF260DBA3CB828A35CD944DC5AAE73F8F0D.html">MessageLine</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_ShowBuildMessageRequest_9A095C93FAB57C94D67B3B31BA48A0A8B6C32FDD.html#constructor_ShowBuildMessageRequest_36DA57570C6B8624AEAC33E0328B7ADB7C64E524">ShowBuildMessageRequest</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_ShowBuildMessageRequest_9A095C93FAB57C94D67B3B31BA48A0A8B6C32FDD.html#constructor_ShowBuildMessageRequest_1402721CA811C1A9ADB42D7434D57859F2EF4B62">ShowBuildMessageRequest</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_ShowBuildMessageRequest_9A095C93FAB57C94D67B3B31BA48A0A8B6C32FDD.html#function_Id_D2E9AA223FD61603A3E8E89DE5C4D6C3E1DC97A6">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_showBuildMessageRequestId_3C358E3E8550B0B21EDA2003D71D7E8F92FFEAE3">showBuildMessageRequestId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_ShowBuildMessageRequest_9A095C93FAB57C94D67B3B31BA48A0A8B6C32FDD.html#function_DispatchTo_AEFAD4261A62D47FCB1AA595B9A17DBEA8FAF701">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_ShowBuildMessageResponse_8057EA03E39B7B5900C76DBDCC1CC082FE8EE9CA.html">ShowBuildMessageResponse</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_MessageShown_48D3AA69E59248FE17354B823C3B4D044DA2B912.html">MessageShown</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_ShowBuildMessageResponse_8057EA03E39B7B5900C76DBDCC1CC082FE8EE9CA.html#constructor_ShowBuildMessageResponse_C73202F199A8D74E82D34023F78481EB57EDA72A">ShowBuildMessageResponse</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_ShowBuildMessageResponse_8057EA03E39B7B5900C76DBDCC1CC082FE8EE9CA.html#constructor_ShowBuildMessageResponse_771C808330D66769AFC8C27CC3416A173F329435">ShowBuildMessageResponse</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_ShowBuildMessageResponse_8057EA03E39B7B5900C76DBDCC1CC082FE8EE9CA.html#function_Id_F5E08321C2CBB02B5E123C3609AC9C55CAB19AC2">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_showBuildMessageResponseId_AFFC79838279800522D623B69DA4FE6C51DFC6C6">showBuildMessageResponseId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_ShowBuildMessageResponse_8057EA03E39B7B5900C76DBDCC1CC082FE8EE9CA.html#function_DispatchTo_2EE6DE026C4DC2B3C2BE36764775BA0910DFDD07">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_ErrorResponse_176BBF28503D19F7831A7E2F6754C7F25AA2B936.html">ErrorResponse</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_Error_7F2F6A15CF8DA2B27E5A4AF47B58E7AD71C0B3D9.html">Error</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_ErrorResponse_176BBF28503D19F7831A7E2F6754C7F25AA2B936.html#constructor_ErrorResponse_EB287F2D31B9747BB717783822221A38931E78AE">ErrorResponse</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_ErrorResponse_176BBF28503D19F7831A7E2F6754C7F25AA2B936.html#constructor_ErrorResponse_057A20B9E06A47BA3451F0C88C75B6BBED8124B9">ErrorResponse</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_ErrorResponse_176BBF28503D19F7831A7E2F6754C7F25AA2B936.html#function_Id_0F374CFF1D8A2D2EF8410C0538F9177B321AC65B">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_errorResponseId_709A55F2FEFAFD19289B262192B700C664B2E8F2">errorResponseId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_ErrorResponse_176BBF28503D19F7831A7E2F6754C7F25AA2B936.html#function_DispatchTo_E4A64DC81CA8A413ACBC60D8F3B7C2E0B547D53D">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="kw">struct</span>&nbsp;<a href="../struct_CloseConnectionRequest_55B5CE3226343CB5C1285AFE383C961D8275902B.html">CloseConnectionRequest</a>&nbsp;<span class="other">:&nbsp;</span>&nbsp;<span class="type">Message</span><span class="other">&lt;</span><a href="../struct_CloseConnection_5AD8915F0E56028D9D5A8D10BEF0423A660223CC.html">CloseConnection</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_CloseConnectionRequest_55B5CE3226343CB5C1285AFE383C961D8275902B.html#constructor_CloseConnectionRequest_7FAB8DADA457593217191F3E2630D11282D28372">CloseConnectionRequest</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../struct_CloseConnectionRequest_55B5CE3226343CB5C1285AFE383C961D8275902B.html#constructor_CloseConnectionRequest_8C966304E3C860F1D4A346B58DE00D298197C0C8">CloseConnectionRequest</a><span class="other">(</span><span class="identifier">JsonObject</span><span class="other">*</span>&nbsp;<span class="identifier">messageObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../struct_CloseConnectionRequest_55B5CE3226343CB5C1285AFE383C961D8275902B.html#function_Id_01A0ABD1288E6DA79C9337F940382F58C5B2756A">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#variable_closeConnectionRequestId_348AF825BB6674FBD5AC040BAF33FBA23A797788">closeConnectionRequestId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../struct_CloseConnectionRequest_55B5CE3226343CB5C1285AFE383C961D8275902B.html#function_DispatchTo_89A22913EC03178C464322EB5BFBCEAB6807A7E5">DispatchTo</a><span class="other">(</span><a href="../class_MessageHandler_564D7BFA33CB0E8DB0E008DEC634D73AFCC6A15B.html">MessageHandler</a><span class="other">&amp;</span>&nbsp;<span class="identifier">handler</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildServerMessageInit_A95E3C1776F82326AB168E97957A55FBCED95BBF">BuildServerMessageInit</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html#function_BuildServerMessageDone_66652B64E0A8B37C9C0F1D29BD8878D5986685B2">BuildServerMessageDone</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::build</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_BUILD_BUILD_SERVER_MESSAGE_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

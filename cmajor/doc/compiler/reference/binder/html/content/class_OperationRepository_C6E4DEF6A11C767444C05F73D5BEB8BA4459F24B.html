@@ -119,8 +119,26 @@
         <span>
             Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#4044">4044</a>
              of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">4046</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4047</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_operationGroupMap_C94859F6D58A4EED7D464A6E694C5E63C70385DF">operationGroupMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">groupName</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4048</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="./class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_operationGroupMap_C94859F6D58A4EED7D464A6E694C5E63C70385DF">operationGroupMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4049</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4050</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_OperationGroup_1EF1FAB0C8ADEBD26EE189509D491CF81A62A50C.html">OperationGroup</a><span class="other">*</span>&nbsp;<span class="identifier">operationGroup</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4051</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">operationGroup</span><span class="other">-></span><span class="identifier">CollectViableFunctions</span><span class="other">(</span><span class="identifier">containerScope</span><span class="other">,&nbsp;</span><span class="identifier">arguments</span><span class="other">,&nbsp;</span><span class="identifier">currentFunction</span><span class="other">,&nbsp;</span><span class="identifier">viableFunctions</span><span class="other">,&nbsp;</span><span class="identifier">exception</span><span class="other">,&nbsp;</span><span class="identifier">span</span><span class="other">,&nbsp;</span><span class="identifier">flags</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4052</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4053</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Calls: <a href="./class_OperationGroup_1EF1FAB0C8ADEBD26EE189509D491CF81A62A50C.html#function_CollectViableFunctions_9397621C42880EE34B1250DFF1A494DE5BE9A77C">cmajor::binder::OperationGroup::CollectViableFunctions</a>
@@ -167,10 +185,30 @@
             * currentFunction, <span class="kw">const </span>
             Span&amp; span)</h4>
         <span>
-            Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#4084">4084</a>
+            Definition at line <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html#4083">4083</a>
              of <a href="file/OperationRepository.cpp_73450625C7044A147F6AC4FBD2C7DA4222A081F9.html">OperationRepository.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">4084</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4085</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_boundCompileUnit_E08CD1F15C7C49188B6A69A892367C1A12984C63">boundCompileUnit</a><span class="other">.</span><span class="identifier">HasCopyConstructorFor</span><span class="other">(</span><span class="identifier">interfaceTypeSymbol</span><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span>&nbsp;<span class="kw">return</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4086</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">InterfaceTypeCopyConstructor</span><span class="other">></span>&nbsp;<span class="identifier">copyConstructor</span><span class="other">(</span><span class="kw">new&nbsp;</span><span class="identifier">InterfaceTypeCopyConstructor</span><span class="other">(</span><span class="identifier">interfaceTypeSymbol</span><span class="other">,&nbsp;</span><span class="identifier">span</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4087</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_boundCompileUnit_E08CD1F15C7C49188B6A69A892367C1A12984C63">boundCompileUnit</a><span class="other">.</span><span class="identifier">GetSymbolTable</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">SetFunctionIdFor</span><span class="other">(</span><span class="identifier">copyConstructor</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4088</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">copyConstructor</span><span class="other">-></span><span class="identifier">SetCompileUnit</span><span class="other">(</span><a href="./class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_boundCompileUnit_E08CD1F15C7C49188B6A69A892367C1A12984C63">boundCompileUnit</a><span class="other">.</span><span class="identifier">GetCompileUnitNode</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4089</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">copyConstructor</span><span class="other">-></span><span class="identifier">SetModule</span><span class="other">(</span><span class="other">&amp;</span><a href="./class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_boundCompileUnit_E08CD1F15C7C49188B6A69A892367C1A12984C63">boundCompileUnit</a><span class="other">.</span><span class="identifier">GetModule</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4090</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">copyConstructor</span><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="identifier">interfaceTypeSymbol</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4091</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html#variable_boundCompileUnit_E08CD1F15C7C49188B6A69A892367C1A12984C63">boundCompileUnit</a><span class="other">.</span><span class="identifier">AddCopyConstructorFor</span><span class="other">(</span><span class="identifier">interfaceTypeSymbol</span><span class="other">-></span><span class="identifier">TypeId</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">copyConstructor</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4092</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Calls: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_AddCopyConstructorFor_264D0B4B5DADE9F7DE6FB67C4560B1EF7EDD8877">cmajor::binder::BoundCompileUnit::AddCopyConstructorFor</a>

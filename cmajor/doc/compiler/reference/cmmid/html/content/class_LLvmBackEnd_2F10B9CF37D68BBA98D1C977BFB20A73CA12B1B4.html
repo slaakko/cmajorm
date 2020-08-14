@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>LLvmBackEnd Abstract Class</title>
+        <title>LLvmBackEnd Class</title>
         <link href="../style/style.css" rel="stylesheet" type="text/css"/>
         <script src="class_LLvmBackEnd_2F10B9CF37D68BBA98D1C977BFB20A73CA12B1B4_inheritance.js" type="text/javascript"> </script>
     </head>
@@ -10,7 +10,7 @@
          | <a href="namespace_mid_3129DC3C46A8448C2BDF46CC752977D37A01E30F.html">up</a>
          | <a href="class_CmsxBackEnd_A5CDA4F22ADDDDDB0E49041E6B17E1BFF3DBE585.html">prev</a>
          | next<hr/>
-        <h1>LLvmBackEnd Abstract Class</h1>
+        <h1>LLvmBackEnd Class</h1>
         <div class="diagram">
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
@@ -43,7 +43,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_BackEndKind_925F708C841BEC68CB24274EA2ABCC111972C37B.html">BackEndKind</a></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LLvmBackEnd_2F10B9CF37D68BBA98D1C977BFB20A73CA12B1B4.html#function_GetBackEndKind_CF3D120447D13C7EDBB0BD50F6F01CBA18CFC71C">GetBackEndKind</a>()</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LLvmBackEnd_2F10B9CF37D68BBA98D1C977BFB20A73CA12B1B4.html#function_GetBackEndKind_CF3D120447D13C7EDBB0BD50F6F01CBA18CFC71C">GetBackEndKind</a>() <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -61,6 +61,15 @@
         <span>
             Definition at line <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html#29">29</a>
              of <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html">LlvmBackEnd.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">CmllvmCreateEmitter</span><span class="other">(</span><span class="identifier">emittingContext</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -84,6 +93,15 @@
         <span>
             Definition at line <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html#19">19</a>
              of <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html">LlvmBackEnd.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">CmllvmCreateEmittingContext</span><span class="other">(</span><span class="identifier">optimizationLevel</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -107,6 +125,15 @@
         <span>
             Definition at line <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html#34">34</a>
              of <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html">LlvmBackEnd.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">CmllvmDestroyEmitter</span><span class="other">(</span><span class="identifier">emitterHandle</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -130,6 +157,15 @@
         <span>
             Definition at line <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html#24">24</a>
              of <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html">LlvmBackEnd.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">CmllvmDestroyEmittingContext</span><span class="other">(</span><span class="identifier">emittingContext</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -152,6 +188,13 @@
         <span>
             Definition at line <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html#15">15</a>
              of <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html">LlvmBackEnd.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -169,10 +212,20 @@
         <h3 id="function_GetBackEndKind_CF3D120447D13C7EDBB0BD50F6F01CBA18CFC71C">GetBackEndKind Member Function</h3>
         <h4>
             <a href="./enum_BackEndKind_925F708C841BEC68CB24274EA2ABCC111972C37B.html">BackEndKind</a>
-             cmajor::mid::LLvmBackEnd::GetBackEndKind()</h4>
+             cmajor::mid::LLvmBackEnd::GetBackEndKind() <span class="kw">override</span>
+        </h4>
         <span>
             Definition at line <a href="file/LlvmBackEnd.hpp_7ADF08AAF0E18A4543F58DC00630DAFDAE4710BB.html#21">21</a>
              of <a href="file/LlvmBackEnd.hpp_7ADF08AAF0E18A4543F58DC00630DAFDAE4710BB.html">LlvmBackEnd.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_BackEndKind_925F708C841BEC68CB24274EA2ABCC111972C37B.html">BackEndKind</a><span class="other">::</span><a href="./enum_BackEndKind_925F708C841BEC68CB24274EA2ABCC111972C37B.html#enumerator_llvmBackEnd_D1FE530B2D871E97FE40F99AA8B4EECFA803F642">llvmBackEnd</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html#function_GetBackEndKind_BC0373100AB64DB10FAB26A56780624343803E21">cmajor::mid::BackEnd::GetBackEndKind</a>
         </span>
         <br/>
         <br/>
@@ -185,6 +238,13 @@
         <span>
             Definition at line <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html#11">11</a>
              of <a href="file/LlvmBackEnd.cpp_3D8CCC02990DEEAA798F381314E40A0F0DA272E4.html">LlvmBackEnd.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>

@@ -1,0 +1,164 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>TypeIndex Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="struct_TypeDerivationRec_DB7AE136F12D465AFECA2E6B04B368469B324DF6.html">prev</a>
+         | <a href="class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html">next</a>
+        <hr/>
+        <h1>TypeIndex Class</h1>
+        <span>
+            Definition at line <a href="file/TypeIndex.hpp_FE1A63427D62FB7B1CA9A431BAB1A2A50BB505AA.html#22">22</a>
+             of <a href="file/TypeIndex.hpp_FE1A63427D62FB7B1CA9A431BAB1A2A50BB505AA.html">TypeIndex.hpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypeIndex_FF71288B299D46222D066CBF7B74BCF8724B4F82.html#function_AddType_1A0F9C67160B0E87F7C647636C0A770CD2EEA9C0">AddType</a>(<span class="kw">const </span>boost::uuids::uuid&amp; typeId, <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* typeSymbol, <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>&amp; emitter)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TypeIndex_FF71288B299D46222D066CBF7B74BCF8724B4F82.html#function_Write_E0BDC6C45329D23E27D8A6083BE560EA0CF3F0BC">Write</a>(<a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html">BinaryWriter</a>&amp; writer)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_diTypes_D965F8E739CADBDE74F70510753341DAABFAE136">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;cmajor::debug::DIType>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">diTypes</td>
+            </tr>
+            <tr id="variable_mtx_E8FB2FCCA4F7AE49DB6E58EEAC86BA94D85027C9">
+                <td class="functionTableFirstCol" xml:space="preserve">std::recursive_mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+            <tr id="variable_typeMap_B6812635376EF261B5F985EA33B059585C6F63AC">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;boost::uuids::uuid, cmajor::debug::DIType*, boost::hash&lt;boost::uuids::uuid>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">typeMap</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddType_1A0F9C67160B0E87F7C647636C0A770CD2EEA9C0">AddType Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::TypeIndex::AddType(<span class="kw">const </span>
+            boost::uuids::uuid&amp; typeId, <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
+            * typeSymbol, <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>
+            &amp; emitter)</h4>
+        <span>
+            Definition at line <a href="file/TypeIndex.cpp_2E8947D10E14A032ADDAA72C1198854B34AA8622.html#47">47</a>
+             of <a href="file/TypeIndex.cpp_2E8947D10E14A032ADDAA72C1198854B34AA8622.html">TypeIndex.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/TypeIndex.hpp_FE1A63427D62FB7B1CA9A431BAB1A2A50BB505AA.html#25">25</a>
+             of <a href="file/TypeIndex.hpp_FE1A63427D62FB7B1CA9A431BAB1A2A50BB505AA.html">TypeIndex.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_GetIrTypeName_3674190371AA389AFFBC36BCC6A4D6DCD8297C57">cmajor::ir::Emitter::GetIrTypeName</a>
+            , <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_MakeVmtVariableName_8827452E8E09A52004189EAD29D34F9B579CF47F">cmajor::ir::Emitter::MakeVmtVariableName</a>
+            , <a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html#function_ElementType_28D483F3DB54FD0A255A6DE0C1E54FA55A076EE4">cmajor::symbols::ArrayTypeSymbol::ElementType</a>
+            , <a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html#function_Size_71E749FE72124FCE62571B1D44FFB9FB7D2E0D3D">cmajor::symbols::ArrayTypeSymbol::Size</a>
+            , <a href="./class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html#function_GetClassTemplate_67DEE81819567A0A172FB9D67CA47A8463E25749">cmajor::symbols::ClassTemplateSpecializationSymbol::GetClassTemplate</a>
+            , <a href="./class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html#function_TemplateArgumentTypes_B2D9955CF6D93A6EA2E072139E48A4FCA8B32615">cmajor::symbols::ClassTemplateSpecializationSymbol::TemplateArgumentTypes</a>
+            , <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_BaseClass_33DC270B46C78AC5304F387FEE1689D2DE8848BB">cmajor::symbols::ClassTypeSymbol::BaseClass</a>
+            , <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_IsPolymorphic_108AA984B20AF8089D33972507CF8483300D9CC3">cmajor::symbols::ClassTypeSymbol::IsPolymorphic</a>
+            , <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_MemberVariables_C395D75ACF8DC0F6471928A71026F84A13AB3FFE">cmajor::symbols::ClassTypeSymbol::MemberVariables</a>
+            , <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_TemplateParameters_34A193EF30A41A0966D9E5AB1E3D921B616C8445">cmajor::symbols::ClassTypeSymbol::TemplateParameters</a>
+            , <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_VmtObjectName_7C42D1E5A3B51C30B21B3F25B28C1745C0CEB6F5">cmajor::symbols::ClassTypeSymbol::VmtObjectName</a>
+            , <a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html#function_VmtPtrIndex_EAAD67D6E06EED727F609BF0C6E4C5389ECC3A0E">cmajor::symbols::ClassTypeSymbol::VmtPtrIndex</a>
+            , <a href="./class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html#function_Lookup_8C5219BE76CBE49FB4A41A2E6CA94052D4574AB3">cmajor::symbols::ContainerScope::Lookup</a>
+            , <a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_GetContainerScope_A7A959C541BE4FFBF5757464BE9DD9B4E2CB59DA">cmajor::symbols::ContainerSymbol::GetContainerScope</a>
+            , <a href="./class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html#function_IsConstType_5BA08D8D25DC3BF03678BF3F06BB86A02E08CA28">cmajor::symbols::DerivedTypeSymbol::IsConstType</a>
+            , <a href="./class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html#function_IsPointerType_0DC6CB4CA5B0099EEAF06BA03CD3374DCAF796E1">cmajor::symbols::DerivedTypeSymbol::IsPointerType</a>
+            , <a href="./class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html#function_IsReferenceType_A97F624412D85811AB29D1DC042F23E613DAC41C">cmajor::symbols::DerivedTypeSymbol::IsReferenceType</a>
+            , <a href="./class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html#function_RemoveConst_023BEE38362761D1D1F3DF602AA1C53D5E1D46E7">cmajor::symbols::DerivedTypeSymbol::RemoveConst</a>
+            , <a href="./class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html#function_RemovePointer_4F63ADAF1471B1DCC4FD20992E823CA973080326">cmajor::symbols::DerivedTypeSymbol::RemovePointer</a>
+            , <a href="./class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html#function_RemoveReference_EAB882D41274275979B983C6D50657B1C60316AA">cmajor::symbols::DerivedTypeSymbol::RemoveReference</a>
+            , <a href="./class_EnumConstantSymbol_08D7A26EF542F380FF0C6E3270E139D2245D1CC3.html#function_GetValue_105B38F99D3FA065F3965CC1714FA83B576EE67B">cmajor::symbols::EnumConstantSymbol::GetValue</a>
+            , <a href="./class_EnumConstantSymbol_08D7A26EF542F380FF0C6E3270E139D2245D1CC3.html#function_StrValue_3BA1D29D7D2BF2A44CA82854CA41B1EA1BCB0E99">cmajor::symbols::EnumConstantSymbol::StrValue</a>
+            , <a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#function_GetEnumConstants_57437BD5D0B8732CE118C4EB31AEEFCC0B1CE1AC">cmajor::symbols::EnumTypeSymbol::GetEnumConstants</a>
+            , <a href="./class_EnumTypeSymbol_2BAAB2A27ED9B0673A8BDB522815996A62559E4E.html#function_UnderlyingType_6257EBF2A9C83EA981B3160E532CF83D1E0F89C2">cmajor::symbols::EnumTypeSymbol::UnderlyingType</a>
+            , <a href="./class_MemberVariableSymbol_F3A4DF7AE6AC421BB6B1CDDC87E16953D310E881.html#function_LayoutIndex_9FF5F2CF379AD1FD95FBE24642DE5A0DB879588A">cmajor::symbols::MemberVariableSymbol::LayoutIndex</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
+            , <a href="./class_TypeIndex_FF71288B299D46222D066CBF7B74BCF8724B4F82.html#function_AddType_1A0F9C67160B0E87F7C647636C0A770CD2EEA9C0">cmajor::symbols::TypeIndex::AddType</a>
+            , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IrType_CF492E4F6EE5C2476955057615923BBB6B3B1F13">cmajor::symbols::TypeSymbol::IrType</a>
+            , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsBasicTypeSymbol_195B59240ECED9EBE9CF27A31BC23131E1F538EF">cmajor::symbols::TypeSymbol::IsBasicTypeSymbol</a>
+            , <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_TypeId_E2CB67BF95F64693CD008DF2DB02CFAB8C67D033">cmajor::symbols::TypeSymbol::TypeId</a>
+            , <a href="./class_TypedefSymbol_82FD12A549DF50DFDBDDB89B0E73DAC6C586BB80.html#function_GetType_7E3500C3FAA04114BB31397DC6E924D0E663CA9F">cmajor::symbols::TypedefSymbol::GetType</a>
+            , <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_ToString_048E414E143C3C85B8F9B37CBB43BBBDAD077110">cmajor::symbols::Value::ToString</a>
+            , <a href="./class_VariableSymbol_ABBB9BDB6F527FE9F126B38BE55336949B8F964E.html#function_GetType_14C05D793AECFE077753292B1354FD70428B9196">cmajor::symbols::VariableSymbol::GetType</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_TypeIndex_FF71288B299D46222D066CBF7B74BCF8724B4F82.html#function_AddType_1A0F9C67160B0E87F7C647636C0A770CD2EEA9C0">cmajor::symbols::TypeIndex::AddType</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_E0BDC6C45329D23E27D8A6083BE560EA0CF3F0BC">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::TypeIndex::Write(<a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html">BinaryWriter</a>
+            &amp; writer)</h4>
+        <span>
+            Definition at line <a href="file/TypeIndex.cpp_2E8947D10E14A032ADDAA72C1198854B34AA8622.html#275">275</a>
+             of <a href="file/TypeIndex.cpp_2E8947D10E14A032ADDAA72C1198854B34AA8622.html">TypeIndex.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeIndex_FF71288B299D46222D066CBF7B74BCF8724B4F82.html#variable_diTypes_D965F8E739CADBDE74F70510753341DAABFAE136">diTypes</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">n</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">int32_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><span class="identifier">debug</span><span class="other">::</span><span class="identifier">DIType</span><span class="other">*</span>&nbsp;<span class="identifier">type</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_TypeIndex_FF71288B299D46222D066CBF7B74BCF8724B4F82.html#variable_diTypes_D965F8E739CADBDE74F70510753341DAABFAE136">diTypes</a><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><span class="identifier">debug</span><span class="other">::</span><span class="identifier">WriteType</span><span class="other">(</span><span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="identifier">type</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/TypeIndex.hpp_FE1A63427D62FB7B1CA9A431BAB1A2A50BB505AA.html#26">26</a>
+             of <a href="file/TypeIndex.hpp_FE1A63427D62FB7B1CA9A431BAB1A2A50BB505AA.html">TypeIndex.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_49E900F8FCBEE026FB051B768287EF8640B06FED">soulng::util::BinaryWriter::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_WriteProjectDebugInfoFile_9E09D5220DF0C93E866783C28CCAFDD259F9B778">cmajor::symbols::Module::WriteProjectDebugInfoFile</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="struct_TypeDerivationRec_DB7AE136F12D465AFECA2E6B04B368469B324DF6.html">prev</a>
+         | <a href="class_TypeMap_39E5F9950373CB507714B4C6C2670B8A3A28DDBB.html">next</a>
+    </body>
+</html>

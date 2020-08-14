@@ -1,0 +1,1064 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_DEBUG_GDB_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_DEBUG_GDB_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmdebug/DebugApi.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/CodeFormatter.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Json.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;vector></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="pp">#include&nbsp;&lt;memory></span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="pp">#include&nbsp;&lt;unordered_map></span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">debug</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">util</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html">GdbDriver</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_ProcessReplyRecord_B43A01331D80594C5787AB45B4A6E064B4D576A0">ProcessReplyRecord</a><span class="other">(</span><a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a><span class="other">*</span>&nbsp;<span class="identifier">record</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_TargetRunning_02B60531F49A23B34EDE951A144E42D366B19F08">TargetRunning</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_TargetWasRunning_8956C51F02381C5726334AAB0C493CB98AD12ED8">TargetWasRunning</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_TargetOutput_78294AF4970893B7D797C78BB5A74E4F823A3CDD">TargetOutput</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_Proceed_8E094D41598E311A426EFE2F1527E937D36FD628">Proceed</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_ResetConsole_96BC2849A8603EE81E4C219F4AF5665B3D7E0751">ResetConsole</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_Exiting_4FD0D7E85D88DCD1F632625232A9A3E8B1ACC324">Exiting</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_Exit_CCDD7C104B0A7E902F9684FE578BFB2F6C76F658">Exit</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_Prompt_669278D8D1B79F791BE37ED7E0FB485C98C086FC">Prompt</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_TargetInputPrompt_B9054D0B79C106841B12174A6A47D35874D7FFDA">TargetInputPrompt</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_Error_6A304D175959E537F8DF77A3413548EB2677E92D">Error</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">msg</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_LatestCommandWasRunningCommand_CA61EA201DF239883C9DC9B4E382F4F4C336B5B9">LatestCommandWasRunningCommand</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html#function_CurrentSourceFilePath_7AB272C555BFAC8A53CFFF95F996AE131B8154BB">CurrentSourceFilePath</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">Format</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">default_</span><span class="other">,&nbsp;</span><span class="identifier">binary</span><span class="other">,&nbsp;</span><span class="identifier">decimal</span><span class="other">,&nbsp;</span><span class="identifier">hexadecimal</span><span class="other">,&nbsp;</span><span class="identifier">octal</span><span class="other">,&nbsp;</span><span class="identifier">natural</span><span class="other">,&nbsp;</span><span class="identifier">zeroHexadecimal</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">Kind</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">exit</span><span class="other">,&nbsp;</span><span class="identifier">breakInsert</span><span class="other">,&nbsp;</span><span class="identifier">breakDelete</span><span class="other">,&nbsp;</span><span class="identifier">execContinue</span><span class="other">,&nbsp;</span><span class="identifier">execFinish</span><span class="other">,&nbsp;</span><span class="identifier">execNext</span><span class="other">,&nbsp;</span><span class="identifier">execStep</span><span class="other">,&nbsp;</span><span class="identifier">execUntil</span><span class="other">,&nbsp;</span><span class="identifier">execRun</span><span class="other">,&nbsp;</span><span class="identifier">stackInfoDepth</span><span class="other">,&nbsp;</span><span class="identifier">stackListFrames</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">varCreate</span><span class="other">,&nbsp;</span><span class="identifier">varDelete</span><span class="other">,&nbsp;</span><span class="identifier">varSetFormat</span><span class="other">,&nbsp;</span><span class="identifier">varShowFormat</span><span class="other">,&nbsp;</span><span class="identifier">varInfoNumChildren</span><span class="other">,&nbsp;</span><span class="identifier">varListChildren</span><span class="other">,&nbsp;</span><span class="identifier">varInfoType</span><span class="other">,&nbsp;</span><span class="identifier">varInfoExpression</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">varInfoPathExpression</span><span class="other">,&nbsp;</span><span class="identifier">varShowAttributes</span><span class="other">,&nbsp;</span><span class="identifier">varEvaluateExpression</span><span class="other">,&nbsp;</span><span class="identifier">varAssign</span><span class="other">,&nbsp;</span><span class="identifier">varUpdate</span><span class="other">,&nbsp;</span><span class="identifier">varSetFrozen</span><span class="other">,&nbsp;</span><span class="identifier">varSetUpdateRange</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">varSetVisualizer</span><span class="other">,&nbsp;</span><span class="identifier">print</span><span class="other">,&nbsp;</span><span class="identifier">deleteAll</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html#constructor_GdbCommand_7E7DB66B98595998F5D5FEDB728199DB76FB4B3B">GdbCommand</a><span class="other">(</span><a href="../enum_Kind_A585FC6A039F2E83D39CA37E52F7DBE65DE0A5D5.html">Kind</a>&nbsp;<span class="identifier">kind_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">str_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbCommand</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbCommand</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbCommand</span><span class="other">(</span><span class="identifier">GdbCommand</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbCommand</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbCommand</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbCommand</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">GdbCommand</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">GdbCommand</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Kind_A585FC6A039F2E83D39CA37E52F7DBE65DE0A5D5.html">Kind</a>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html#function_GetKind_6BD3D8D263C643D81790E8610F9742DF8BA8AD44">GetKind</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html#variable_kind_E9DB902FFD7AE925590805FC3E2D0E12DB920002">kind</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html#function_Str_CC302BEE699678A2D67B64B1AFB0E3C672EE7E50">Str</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html#variable_str_866D26D0311935D535C3986975E3D2241A4D5D78">str</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Kind_A585FC6A039F2E83D39CA37E52F7DBE65DE0A5D5.html">Kind</a>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html#variable_kind_E9DB902FFD7AE925590805FC3E2D0E12DB920002">kind</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html#variable_str_866D26D0311935D535C3986975E3D2241A4D5D78">str</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbBreakInsertCommand_E8BEDE741184E7E8DFED8B7ECB872C34A173BBC9.html">GdbBreakInsertCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbBreakInsertCommand_E8BEDE741184E7E8DFED8B7ECB872C34A173BBC9.html#constructor_GdbBreakInsertCommand_CFE13924BE8A9B54EA60AB1352F09042092558AA">GdbBreakInsertCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">location</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbBreakDeleteCommand_6410447CA8165BE280CD9694D14CB0AD87244500.html">GdbBreakDeleteCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbBreakDeleteCommand_6410447CA8165BE280CD9694D14CB0AD87244500.html#constructor_GdbBreakDeleteCommand_BF711EAA9FDAD78F3A5F75E1E60AA62F01D3ABC4">GdbBreakDeleteCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">breakpoints</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbDeleteAllBreakpointsCommand_0937FB91DA919F00277ED58C3879C5038156D8A8.html">GdbDeleteAllBreakpointsCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbDeleteAllBreakpointsCommand_0937FB91DA919F00277ED58C3879C5038156D8A8.html#constructor_GdbDeleteAllBreakpointsCommand_06E06CEBF5B18136A004F045ED8912CA5774EF41">GdbDeleteAllBreakpointsCommand</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExecContinueCommand_DFFC95D76ACBEDA65557A171C199E5A67EF1C16D.html">GdbExecContinueCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExecContinueCommand_DFFC95D76ACBEDA65557A171C199E5A67EF1C16D.html#constructor_GdbExecContinueCommand_CF92D14A7DB63BAB2330BA44DC36578CF71DD229">GdbExecContinueCommand</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExecFinishCommand_643BB4EFA709BD8D2C58A336B59F8406EDB98DE6.html">GdbExecFinishCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExecFinishCommand_643BB4EFA709BD8D2C58A336B59F8406EDB98DE6.html#constructor_GdbExecFinishCommand_BE84CB5C18A5C1A7E3462C2D83738E1187423F15">GdbExecFinishCommand</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExecNextCommand_A652C08E3B2B1D3DF835A57CCB790748A12671A5.html">GdbExecNextCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExecNextCommand_A652C08E3B2B1D3DF835A57CCB790748A12671A5.html#constructor_GdbExecNextCommand_16C7F484E5D3C59461C7C5464613266287EBE83E">GdbExecNextCommand</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExecStepCommand_50A56813B8C838FBA0E68E657780E92BA2EB1C96.html">GdbExecStepCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExecStepCommand_50A56813B8C838FBA0E68E657780E92BA2EB1C96.html#constructor_GdbExecStepCommand_9ADBDBEB2B7AD4B0D85FEE73D33A11263A4F89EB">GdbExecStepCommand</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExecUntilCommand_6BA1EC4E1300A77E0349B73C3C6D32E545BFCCE4.html">GdbExecUntilCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExecUntilCommand_6BA1EC4E1300A77E0349B73C3C6D32E545BFCCE4.html#constructor_GdbExecUntilCommand_7EB0F627DB05825184389B45A5EA19F199EA8AA7">GdbExecUntilCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">location</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExecRunCommand_AB47500E7A41A732E4A3493812DB3E50F23FF3FE.html">GdbExecRunCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExecRunCommand_AB47500E7A41A732E4A3493812DB3E50F23FF3FE.html#constructor_GdbExecRunCommand_C7F7B4ABD9C52A12EF70F0653B6B4227A8BBB204">GdbExecRunCommand</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExitCommand_62A504494A9F606D1875CB73A7385D7B0C9A7130.html">GdbExitCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExitCommand_62A504494A9F606D1875CB73A7385D7B0C9A7130.html#constructor_GdbExitCommand_F4F0EC3DC1000C53B476D720D5872B51037799B9">GdbExitCommand</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbStackInfoDepthCommand_2FB01D9E44094DE990CBB477FA9E6436AE8EEE86.html">GdbStackInfoDepthCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbStackInfoDepthCommand_2FB01D9E44094DE990CBB477FA9E6436AE8EEE86.html#constructor_GdbStackInfoDepthCommand_C951B2DF481A1816E13EFB862B151DEA0436CB16">GdbStackInfoDepthCommand</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbStackListFramesCommand_ECF037D9734B5237CD8A5D775E565C0D4DC97A63.html">GdbStackListFramesCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbStackListFramesCommand_ECF037D9734B5237CD8A5D775E565C0D4DC97A63.html#constructor_GdbStackListFramesCommand_B7E27BF45FC3B8066DFD2B394748C878D52CED43">GdbStackListFramesCommand</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">lowFrame</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">highFrame</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarCreateCommand_E5E81C566823A74CBCCC8882B7761402C5CD94D1.html">GdbVarCreateCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarCreateCommand_E5E81C566823A74CBCCC8882B7761402C5CD94D1.html#constructor_GdbVarCreateCommand_73E10833D7ABD500A416969CC24E363DCDD84C7F">GdbVarCreateCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">frame</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">expression</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarDeleteCommand_1A46592C8C49C16C892FC166F62D2D467BB86F19.html">GdbVarDeleteCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarDeleteCommand_1A46592C8C49C16C892FC166F62D2D467BB86F19.html#constructor_GdbVarDeleteCommand_BA15D43992A087FA706ED13B9F0097689D6442C2">GdbVarDeleteCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">justChildren</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarSetFormatCommand_87AC7C0B0275F4B73F8642FAE1126CC21B9EBFE2.html">GdbVarSetFormatCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarSetFormatCommand_87AC7C0B0275F4B73F8642FAE1126CC21B9EBFE2.html#constructor_GdbVarSetFormatCommand_B0D4D12F686112604E133907798CADE496CE52A5">GdbVarSetFormatCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><a href="../enum_Format_FC69DA42DA0D4D47F133874A1BB641D289B3517B.html">Format</a>&nbsp;<span class="identifier">format</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarShowFormatCommand_BBC3F647B9F7EDB012577691D74FC781623F0E4B.html">GdbVarShowFormatCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarShowFormatCommand_BBC3F647B9F7EDB012577691D74FC781623F0E4B.html#constructor_GdbVarShowFormatCommand_42D5F1955EF9EC2479851A01CA0A62B3F0EFEB1D">GdbVarShowFormatCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarInfoNumChildrenCommand_ABF541E7BDB37ED9F1E9B5932F0C507E3A6F0AD7.html">GdbVarInfoNumChildrenCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarInfoNumChildrenCommand_ABF541E7BDB37ED9F1E9B5932F0C507E3A6F0AD7.html#constructor_GdbVarInfoNumChildrenCommand_7B88FCB24E36D663578E078065D0663679F9CC71">GdbVarInfoNumChildrenCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarListChildrenCommand_6DAEBB2C725FEB44DA98F1A76CCA4A1B51088ED2.html">GdbVarListChildrenCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarListChildrenCommand_6DAEBB2C725FEB44DA98F1A76CCA4A1B51088ED2.html#constructor_GdbVarListChildrenCommand_967199FB53A4623693D5B64B0EB31BE6EB237554">GdbVarListChildrenCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">printValues</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">from</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">to</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarInfoTypeCommand_46FF35507A6821516AC2EF4959B2FE647A2C0E01.html">GdbVarInfoTypeCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarInfoTypeCommand_46FF35507A6821516AC2EF4959B2FE647A2C0E01.html#constructor_GdbVarInfoTypeCommand_F660BD36C61C6A5AAE82FFB09820E6A7653EA7F4">GdbVarInfoTypeCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarInfoExpressionCommand_174D7ADFE527980C996F1B34B0CF1AC93537A90C.html">GdbVarInfoExpressionCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarInfoExpressionCommand_174D7ADFE527980C996F1B34B0CF1AC93537A90C.html#constructor_GdbVarInfoExpressionCommand_26E3938FF66A67631DC035D6444146B560FED0D2">GdbVarInfoExpressionCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarInfoPathExpressionCommand_B7C15F4E92756FCE280D6AFF04BCA9320404BC8D.html">GdbVarInfoPathExpressionCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarInfoPathExpressionCommand_B7C15F4E92756FCE280D6AFF04BCA9320404BC8D.html#constructor_GdbVarInfoPathExpressionCommand_4BDFC3A7CCCD8F44F2B6F7931D865AF15585A0EA">GdbVarInfoPathExpressionCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarShowAttributesCommand_C5E51BFDE912D519947BE85FD556619FCCBA4519.html">GdbVarShowAttributesCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarShowAttributesCommand_C5E51BFDE912D519947BE85FD556619FCCBA4519.html#constructor_GdbVarShowAttributesCommand_C12E34DE5A4D215133C29276F985D895C3052F7F">GdbVarShowAttributesCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarEvaluateExpressionCommand_B714220170D69E335B625B67CA36D7F74065DE3F.html">GdbVarEvaluateExpressionCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarEvaluateExpressionCommand_B714220170D69E335B625B67CA36D7F74065DE3F.html#constructor_GdbVarEvaluateExpressionCommand_ED0CC2729A253FC95F5C09EED132D7C54BABE6C2">GdbVarEvaluateExpressionCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><a href="../enum_Format_FC69DA42DA0D4D47F133874A1BB641D289B3517B.html">Format</a>&nbsp;<span class="identifier">format</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarAssignCommand_241C8294A8FE17947340FE848272D1B138FC9002.html">GdbVarAssignCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarAssignCommand_241C8294A8FE17947340FE848272D1B138FC9002.html#constructor_GdbVarAssignCommand_018D1F673892546472763554E9ABB0C6E3158498">GdbVarAssignCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">expression</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarUpdateCommand_F8E1BF748754774DCE8ED11B3BE0A0198AA5FF60.html">GdbVarUpdateCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarUpdateCommand_F8E1BF748754774DCE8ED11B3BE0A0198AA5FF60.html#constructor_GdbVarUpdateCommand_C29921382ECC97648B64A2A94A3AB8ABC3AAD35B">GdbVarUpdateCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarSetFrozenCommand_060AD6B765EEBA79A1FC0E119D380A73AD8C53D6.html">GdbVarSetFrozenCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarSetFrozenCommand_060AD6B765EEBA79A1FC0E119D380A73AD8C53D6.html#constructor_GdbVarSetFrozenCommand_3C28B688602FA570DA529745856DE4E938FB37F4">GdbVarSetFrozenCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">frozen</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarSetUpdateRangeCommand_E8749D4D52AED076AF6E2AAD3DE4AB845BD5D6E7.html">GdbVarSetUpdateRangeCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarSetUpdateRangeCommand_E8749D4D52AED076AF6E2AAD3DE4AB845BD5D6E7.html#constructor_GdbVarSetUpdateRangeCommand_BAF39A8D5F8469D4BEEFB09145479C34AD8A0343">GdbVarSetUpdateRangeCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">from</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">to</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbVarSetVisualizerCommand_937F07A406162485E75A743ECE4FAE9904A696FF.html">GdbVarSetVisualizerCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbVarSetVisualizerCommand_937F07A406162485E75A743ECE4FAE9904A696FF.html#constructor_GdbVarSetVisualizerCommand_A23FEEFB8C19C41614341710C332F7F7F38FA562">GdbVarSetVisualizerCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">visualizer</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbPrintCommand_DA4E7CC630A5DAEAA69D30EA710227D9E691BEA0.html">GdbPrintCommand</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbPrintCommand_DA4E7CC630A5DAEAA69D30EA710227D9E691BEA0.html#constructor_GdbPrintCommand_21D412726A6030EF50A1B5A138030EA289CEAC32">GdbPrintCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">expression</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">Kind</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">,&nbsp;</span><span class="identifier">string</span><span class="other">,&nbsp;</span><span class="identifier">tuple</span><span class="other">,&nbsp;</span><span class="identifier">list</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html#constructor_GdbValue_B4ACA77682973DFCCCE8E252A0A79530437CC7EB">GdbValue</a><span class="other">(</span><a href="../enum_Kind_A9299647B3CD045E11EB10A131E6F76829E6B2F3.html">Kind</a>&nbsp;<span class="identifier">kind_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbValue</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbValue</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbValue</span><span class="other">(</span><span class="identifier">GdbValue</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbValue</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbValue</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbValue</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">GdbValue</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">GdbValue</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Kind_A9299647B3CD045E11EB10A131E6F76829E6B2F3.html">Kind</a>&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html#function_GetKind_87FFB25A262598803216C64D23BF3245BC35FE5E">GetKind</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html#variable_kind_4767D211E8030D256144AE709391C8828E79D7A9">kind</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html#function_ToJson_F371492859CE7C57CEB35479B937EC0D239FED59">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Kind_A9299647B3CD045E11EB10A131E6F76829E6B2F3.html">Kind</a>&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html#variable_kind_4767D211E8030D256144AE709391C8828E79D7A9">kind</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbStringValue_74F71DB6FC68D947C5891F733E987F5BFF44E6A5.html">GdbStringValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbStringValue_74F71DB6FC68D947C5891F733E987F5BFF44E6A5.html#constructor_GdbStringValue_5E1B77FC8D2ECA4E91266D1A42F090D51FF57FEA">GdbStringValue</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_GdbStringValue_74F71DB6FC68D947C5891F733E987F5BFF44E6A5.html#function_Value_9035A08ED9CB06724C8D6037AF7B8A9B1CFE9DA6">Value</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbStringValue_74F71DB6FC68D947C5891F733E987F5BFF44E6A5.html#variable_value_01AB9453D6B064EDBBEC3FD58D68C9F394AB6EAE">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_GdbStringValue_74F71DB6FC68D947C5891F733E987F5BFF44E6A5.html#function_ToJson_F91FFBD602286B276788EB85389293965D8A1011">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_GdbStringValue_74F71DB6FC68D947C5891F733E987F5BFF44E6A5.html#variable_value_01AB9453D6B064EDBBEC3FD58D68C9F394AB6EAE">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="270" xml:space="preserve"><span class="lineNumber">270</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="271" xml:space="preserve"><span class="lineNumber">271</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html">GdbResult</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="272" xml:space="preserve"><span class="lineNumber">272</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="273" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbTupleValue_C32264F8134C2B31FC819DFAC801CD3F8FEE6DC5.html">GdbTupleValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a></span>
+  <br/>
+  <span class="code" id="274" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="275" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="276" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbTupleValue_C32264F8134C2B31FC819DFAC801CD3F8FEE6DC5.html#constructor_GdbTupleValue_08374E950549EFB97F0DB2AAF4ADCB61FEBDD3FC">GdbTupleValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="277" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbTupleValue</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbTupleValue</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="278" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbTupleValue</span><span class="other">(</span><span class="identifier">GdbTupleValue</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="279" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbTupleValue</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbTupleValue</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="280" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbTupleValue</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">GdbTupleValue</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="281" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbTupleValue_C32264F8134C2B31FC819DFAC801CD3F8FEE6DC5.html#function_AddResult_31E64024EB77A66B5BD63B3226384828AC0ECA3E">AddResult</a><span class="other">(</span><a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html">GdbResult</a><span class="other">*</span>&nbsp;<span class="identifier">result</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="282" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html">GdbResult</a><span class="other">></span><span class="other">></span><span class="other">&amp;</span><a href="../class_GdbTupleValue_C32264F8134C2B31FC819DFAC801CD3F8FEE6DC5.html#function_Results_BC116F3775CBDB26BD6DA8061032F43215BB8EE6">Results</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">{</span><span class="kw">return</span><a href="../class_GdbTupleValue_C32264F8134C2B31FC819DFAC801CD3F8FEE6DC5.html#variable_results_D481CFB801848510FB630293DD70CBA4BCED068B">results</a><span class="other">;</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="283" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_GdbTupleValue_C32264F8134C2B31FC819DFAC801CD3F8FEE6DC5.html#function_ToJson_BDBF6581ADE4F8F75B3D94512EFD53DA816B256A">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="284" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">*</span>&nbsp;<a href="../class_GdbTupleValue_C32264F8134C2B31FC819DFAC801CD3F8FEE6DC5.html#function_GetField_6C0178AD7C07F845B9AF5547D75BC3E021FDAB25">GetField</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fieldName</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="285" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="286" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html">GdbResult</a><span class="other">></span><span class="other">></span><a href="../class_GdbTupleValue_C32264F8134C2B31FC819DFAC801CD3F8FEE6DC5.html#variable_results_D481CFB801848510FB630293DD70CBA4BCED068B">results</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="287" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">,&nbsp;</span><a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">*</span><span class="other">></span>&nbsp;<a href="../class_GdbTupleValue_C32264F8134C2B31FC819DFAC801CD3F8FEE6DC5.html#variable_fieldMap_E9163E6B2BA963706770AC6E00A76C8574800916">fieldMap</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="288" xml:space="preserve"><span class="lineNumber">288</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="289" xml:space="preserve"><span class="lineNumber">289</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="290" xml:space="preserve"><span class="lineNumber">290</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html">GdbListValue</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a></span>
+  <br/>
+  <span class="code" id="291" xml:space="preserve"><span class="lineNumber">291</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="292" xml:space="preserve"><span class="lineNumber">292</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="293" xml:space="preserve"><span class="lineNumber">293</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html#constructor_GdbListValue_E1514AB9986B4CC3BC41B33F034BA7708C1B6F63">GdbListValue</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="294" xml:space="preserve"><span class="lineNumber">294</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbListValue</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbListValue</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="295" xml:space="preserve"><span class="lineNumber">295</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbListValue</span><span class="other">(</span><span class="identifier">GdbListValue</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="296" xml:space="preserve"><span class="lineNumber">296</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbListValue</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbListValue</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="297" xml:space="preserve"><span class="lineNumber">297</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbListValue</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">GdbListValue</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="298" xml:space="preserve"><span class="lineNumber">298</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html#function_AddValue_A227EE31E8CDCEC64042FA3E3AB41B919A4AC254">AddValue</a><span class="other">(</span><a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">*</span>&nbsp;<span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="299" xml:space="preserve"><span class="lineNumber">299</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">></span><span class="other">></span><span class="other">&amp;</span><a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html#function_Values_DF2035A2AFA8D4CA1B1A7FC341C4F4A680C313E7">Values</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">{</span><span class="kw">return</span><a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html#variable_values_55D94711AC026E2F69328870C7D6B45D46EF52FA">values</a><span class="other">;</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="300" xml:space="preserve"><span class="lineNumber">300</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html#function_ToJson_DFA77C7AB9B2382B5E0889E11BEEA70150347FB4">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="301" xml:space="preserve"><span class="lineNumber">301</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html#function_Count_379519BAE145759CE6DCA5C7960CA8C796D6B692">Count</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html#variable_values_55D94711AC026E2F69328870C7D6B45D46EF52FA">values</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="302" xml:space="preserve"><span class="lineNumber">302</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">*</span>&nbsp;<a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html#function_GetValue_F1DBD5D59A159AE6E5E395319813B828DF5DDCE1">GetValue</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">index</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="303" xml:space="preserve"><span class="lineNumber">303</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="304" xml:space="preserve"><span class="lineNumber">304</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">></span><span class="other">></span><a href="../class_GdbListValue_89565D634FDBD396D45A096B2910BE2C626D38E2.html#variable_values_55D94711AC026E2F69328870C7D6B45D46EF52FA">values</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="305" xml:space="preserve"><span class="lineNumber">305</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="306" xml:space="preserve"><span class="lineNumber">306</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="307" xml:space="preserve"><span class="lineNumber">307</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html">GdbResult</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a></span>
+  <br/>
+  <span class="code" id="308" xml:space="preserve"><span class="lineNumber">308</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="309" xml:space="preserve"><span class="lineNumber">309</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="310" xml:space="preserve"><span class="lineNumber">310</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html#constructor_GdbResult_EF1F384FF074ED3314628F92D86CE0913981EB6E">GdbResult</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">*</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="311" xml:space="preserve"><span class="lineNumber">311</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbResult</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbResult</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="312" xml:space="preserve"><span class="lineNumber">312</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbResult</span><span class="other">(</span><span class="identifier">GdbResult</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="313" xml:space="preserve"><span class="lineNumber">313</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbResult</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbResult</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="314" xml:space="preserve"><span class="lineNumber">314</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbResult</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">GdbResult</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="315" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html#function_Name_C85BAD808DBD41C2177B737B7F96008C1DD6F9E7">Name</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html#variable_name_C47B5EA0043A624D40E2BCDD11B42EE668B4EBA2">name</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="316" xml:space="preserve"><span class="lineNumber">316</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">*</span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html#function_Value_317BBBF3A469CACC90DF304459F27C0E1B8FBD08">Value</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html#variable_value_84E8B16A94CD506BFF8E271E00E6BDEC157D5210">value</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="317" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html#function_ToJson_240EBB1FD32F8668BC4CC1F03119591EE9AC954B">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="318" xml:space="preserve"><span class="lineNumber">318</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html#function_AddJsonValueTo_D6265C35C29A656D94FF06958187E9B425FE193D">AddJsonValueTo</a><span class="other">(</span><a href="../../../../soulng/util/html/content/class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">*</span>&nbsp;<span class="identifier">jsonObject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="319" xml:space="preserve"><span class="lineNumber">319</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="320" xml:space="preserve"><span class="lineNumber">320</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html#variable_name_C47B5EA0043A624D40E2BCDD11B42EE668B4EBA2">name</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="321" xml:space="preserve"><span class="lineNumber">321</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">></span>&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html#variable_value_84E8B16A94CD506BFF8E271E00E6BDEC157D5210">value</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="322" xml:space="preserve"><span class="lineNumber">322</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="323" xml:space="preserve"><span class="lineNumber">323</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="324" xml:space="preserve"><span class="lineNumber">324</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="325" xml:space="preserve"><span class="lineNumber">325</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="326" xml:space="preserve"><span class="lineNumber">326</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="327" xml:space="preserve"><span class="lineNumber">327</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html#constructor_GdbResults_DEC21A2138E7C6920A8811DEFB4EB91832CF4A74">GdbResults</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="328" xml:space="preserve"><span class="lineNumber">328</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbResults</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbResults</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="329" xml:space="preserve"><span class="lineNumber">329</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbResults</span><span class="other">(</span><span class="identifier">GdbResults</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="330" xml:space="preserve"><span class="lineNumber">330</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbResults</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbResults</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="331" xml:space="preserve"><span class="lineNumber">331</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbResults</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">GdbResults</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="332" xml:space="preserve"><span class="lineNumber">332</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html#function_Add_2059D43DE5137F144087981B9FCD7A8D058600EF">Add</a><span class="other">(</span><a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html">GdbResult</a><span class="other">*</span>&nbsp;<span class="identifier">result</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="333" xml:space="preserve"><span class="lineNumber">333</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html#function_Count_D082D66D83D51C3B07C7457BBCEEF1DAB5333820">Count</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html#variable_results_C5ACF2607239125473AA3CE6C4394EE3D71500F2">results</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="334" xml:space="preserve"><span class="lineNumber">334</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html">GdbResult</a><span class="other">*</span>&nbsp;<span class="kw">operator</span><span class="other">[]</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">index</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html#variable_results_C5ACF2607239125473AA3CE6C4394EE3D71500F2">results</a><span class="other">[</span><span class="identifier">index</span><span class="other">]</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="335" xml:space="preserve"><span class="lineNumber">335</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">*</span>&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html#function_GetField_9AB84026DE426E1D33C4389D67B1DCAA68418433">GetField</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fieldName</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="336" xml:space="preserve"><span class="lineNumber">336</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span>&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html#function_ToJson_6210A9FF32180A0D0D1F6ACB60597551F54D7727">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="337" xml:space="preserve"><span class="lineNumber">337</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="338" xml:space="preserve"><span class="lineNumber">338</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbResult_AD735AFDC525C867FFFCC22A3C61ACC71A5747A4.html">GdbResult</a><span class="other">></span><span class="other">></span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html#variable_results_C5ACF2607239125473AA3CE6C4394EE3D71500F2">results</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="339" xml:space="preserve"><span class="lineNumber">339</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">,&nbsp;</span><a href="../class_GdbValue_826DC745FFB19ADEFA03E4CC2ECF6FD350A1B6E0.html">GdbValue</a><span class="other">*</span><span class="other">></span>&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html#variable_fieldMap_7E1123B5EFD1D77C77B893519878BAF558256B3E">fieldMap</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="340" xml:space="preserve"><span class="lineNumber">340</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="341" xml:space="preserve"><span class="lineNumber">341</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="342" xml:space="preserve"><span class="lineNumber">342</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="343" xml:space="preserve"><span class="lineNumber">343</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="344" xml:space="preserve"><span class="lineNumber">344</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="345" xml:space="preserve"><span class="lineNumber">345</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">Kind</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">uint8_t</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="346" xml:space="preserve"><span class="lineNumber">346</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="347" xml:space="preserve"><span class="lineNumber">347</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">,&nbsp;</span><span class="identifier">execRunning</span><span class="other">,&nbsp;</span><span class="identifier">execStopped</span><span class="other">,&nbsp;</span><span class="identifier">notification</span><span class="other">,&nbsp;</span><span class="identifier">consoleOutput</span><span class="other">,&nbsp;</span><span class="identifier">targetOutput</span><span class="other">,&nbsp;</span><span class="identifier">logOutput</span><span class="other">,&nbsp;</span><span class="identifier">prompt</span><span class="other">,&nbsp;</span><span class="identifier">parsingError</span></span>
+  <br/>
+  <span class="code" id="348" xml:space="preserve"><span class="lineNumber">348</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="349" xml:space="preserve"><span class="lineNumber">349</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#function_KindStr_76C0CEEF04753CEBD4D608DB4CDF77A9157C1697">KindStr</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="350" xml:space="preserve"><span class="lineNumber">350</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#constructor_GdbReplyRecord_DE62497C4C7D447B68910B7550DA8E5DBCC6A04D">GdbReplyRecord</a><span class="other">(</span><a href="../enum_Kind_C5F6AE1296E8B3D357C2B258CF4F3A5871186A59.html">Kind</a>&nbsp;<span class="identifier">kind_</span><span class="other">,&nbsp;</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="351" xml:space="preserve"><span class="lineNumber">351</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbReplyRecord</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbReplyRecord</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="352" xml:space="preserve"><span class="lineNumber">352</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbReplyRecord</span><span class="other">(</span><span class="identifier">GdbReplyRecord</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="353" xml:space="preserve"><span class="lineNumber">353</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbReplyRecord</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbReplyRecord</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="354" xml:space="preserve"><span class="lineNumber">354</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbReplyRecord</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">GdbReplyRecord</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="355" xml:space="preserve"><span class="lineNumber">355</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">GdbReplyRecord</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="356" xml:space="preserve"><span class="lineNumber">356</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Kind_C5F6AE1296E8B3D357C2B258CF4F3A5871186A59.html">Kind</a>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#function_GetKind_1D1C6A9FD32DEDA523CA45DE045F9554574518E7">GetKind</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#variable_kind_BCFD281A8E748825AC6162D2617F661932129872">kind</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="357" xml:space="preserve"><span class="lineNumber">357</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#function_Stopped_CD21F0C95AA824F4321EF68264F6669E3962403E">Stopped</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="358" xml:space="preserve"><span class="lineNumber">358</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#function_CommandSucceeded_747FE7E1A87D0A4453B939B6AD539336DDFC4B0A">CommandSucceeded</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#variable_kind_BCFD281A8E748825AC6162D2617F661932129872">kind</a><span class="other">&nbsp;!=&nbsp;</span><a href="../enum_Kind_C5F6AE1296E8B3D357C2B258CF4F3A5871186A59.html">Kind</a><span class="other">::</span><a href="../enum_Kind_C5F6AE1296E8B3D357C2B258CF4F3A5871186A59.html#enumerator_parsingError_6415D38542C579D1ED51ED030FFCAF4BB9FC748E">parsingError</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="359" xml:space="preserve"><span class="lineNumber">359</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#function_ToJson_6065D3545A5122C479DB887833AA53FB8D3D0844">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="360" xml:space="preserve"><span class="lineNumber">360</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#function_Results_1D37735CE0A44E55C500E9D02CBAAC2DC154306E">Results</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#variable_results_3E23C467B6AD08BAB29E93BA86E17636C3CD0A9E">results</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="361" xml:space="preserve"><span class="lineNumber">361</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="362" xml:space="preserve"><span class="lineNumber">362</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Kind_C5F6AE1296E8B3D357C2B258CF4F3A5871186A59.html">Kind</a>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#variable_kind_BCFD281A8E748825AC6162D2617F661932129872">kind</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="363" xml:space="preserve"><span class="lineNumber">363</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">></span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html#variable_results_3E23C467B6AD08BAB29E93BA86E17636C3CD0A9E">results</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="364" xml:space="preserve"><span class="lineNumber">364</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="365" xml:space="preserve"><span class="lineNumber">365</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="366" xml:space="preserve"><span class="lineNumber">366</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html">GdbResultRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a></span>
+  <br/>
+  <span class="code" id="367" xml:space="preserve"><span class="lineNumber">367</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="368" xml:space="preserve"><span class="lineNumber">368</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="369" xml:space="preserve"><span class="lineNumber">369</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<span class="identifier">Class</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">uint8_t</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="370" xml:space="preserve"><span class="lineNumber">370</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="371" xml:space="preserve"><span class="lineNumber">371</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">done</span><span class="other">,&nbsp;</span><span class="identifier">running</span><span class="other">,&nbsp;</span><span class="identifier">connected</span><span class="other">,&nbsp;</span><span class="identifier">error</span><span class="other">,&nbsp;</span><span class="identifier">exit</span></span>
+  <br/>
+  <span class="code" id="372" xml:space="preserve"><span class="lineNumber">372</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="373" xml:space="preserve"><span class="lineNumber">373</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html#constructor_GdbResultRecord_82A9FA06DB62FAD973A2BB0095B5E2AA476608ED">GdbResultRecord</a><span class="other">(</span><a href="../enum_Class_A643AEADA9C5FD10B4F86A58467AF258E0195A93.html">Class</a>&nbsp;<span class="identifier">cls</span><span class="other">,&nbsp;</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="374" xml:space="preserve"><span class="lineNumber">374</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html#function_ClassStr_AEAC0A4DD3AD0F93BBB8B45FFDBD030C3E69AB10">ClassStr</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="375" xml:space="preserve"><span class="lineNumber">375</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html#function_CommandSucceeded_8C4ED6854FA7DDADCF3DDB8F2C3089279F1CECB6">CommandSucceeded</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html#variable_cls_68389BACC0AB4728A9B3861A25862EAED6CBD39C">cls</a><span class="other">&nbsp;!=&nbsp;</span><a href="../enum_Class_A643AEADA9C5FD10B4F86A58467AF258E0195A93.html">Class</a><span class="other">::</span><a href="../enum_Class_A643AEADA9C5FD10B4F86A58467AF258E0195A93.html#enumerator_error_74645926094E8758C5C31626B086F9BF51663963">error</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="376" xml:space="preserve"><span class="lineNumber">376</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Class_A643AEADA9C5FD10B4F86A58467AF258E0195A93.html">Class</a>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html#function_GetClass_24575E61E1006E1860A25DD5EF8940E16C0077D8">GetClass</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html#variable_cls_68389BACC0AB4728A9B3861A25862EAED6CBD39C">cls</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="377" xml:space="preserve"><span class="lineNumber">377</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html#function_ToJson_5F6312A4329B89FD7DE67CA16C1D3ADAE6C09230">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="378" xml:space="preserve"><span class="lineNumber">378</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="379" xml:space="preserve"><span class="lineNumber">379</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_Class_A643AEADA9C5FD10B4F86A58467AF258E0195A93.html">Class</a>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html#variable_cls_68389BACC0AB4728A9B3861A25862EAED6CBD39C">cls</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="380" xml:space="preserve"><span class="lineNumber">380</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="381" xml:space="preserve"><span class="lineNumber">381</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="382" xml:space="preserve"><span class="lineNumber">382</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbDoneRecord_BD9FE28F43C771699A4A56041622E074A5F34CCA.html">GdbDoneRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html">GdbResultRecord</a></span>
+  <br/>
+  <span class="code" id="383" xml:space="preserve"><span class="lineNumber">383</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="384" xml:space="preserve"><span class="lineNumber">384</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="385" xml:space="preserve"><span class="lineNumber">385</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbDoneRecord_BD9FE28F43C771699A4A56041622E074A5F34CCA.html#constructor_GdbDoneRecord_8A2A7C3A3FA9E9DA7AABD65D6F49130884677162">GdbDoneRecord</a><span class="other">(</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="386" xml:space="preserve"><span class="lineNumber">386</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbDoneRecord_BD9FE28F43C771699A4A56041622E074A5F34CCA.html#function_Stopped_60F3B7A27C6A68ADEF7C00EE904DBC1D87FFCB18">Stopped</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="387" xml:space="preserve"><span class="lineNumber">387</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="388" xml:space="preserve"><span class="lineNumber">388</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="389" xml:space="preserve"><span class="lineNumber">389</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbRunningRecord_B9B221FCB643407E48A4E7C758257C696B243E7E.html">GdbRunningRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html">GdbResultRecord</a></span>
+  <br/>
+  <span class="code" id="390" xml:space="preserve"><span class="lineNumber">390</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="391" xml:space="preserve"><span class="lineNumber">391</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="392" xml:space="preserve"><span class="lineNumber">392</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbRunningRecord_B9B221FCB643407E48A4E7C758257C696B243E7E.html#constructor_GdbRunningRecord_216F9F741C2DFF2F5DEA30EB40FC2240F2593523">GdbRunningRecord</a><span class="other">(</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="393" xml:space="preserve"><span class="lineNumber">393</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="394" xml:space="preserve"><span class="lineNumber">394</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="395" xml:space="preserve"><span class="lineNumber">395</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbConnectedRecord_2C34B4BAE71D4609CBCA0B770DDB9AE82C6C76E7.html">GdbConnectedRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html">GdbResultRecord</a></span>
+  <br/>
+  <span class="code" id="396" xml:space="preserve"><span class="lineNumber">396</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="397" xml:space="preserve"><span class="lineNumber">397</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="398" xml:space="preserve"><span class="lineNumber">398</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbConnectedRecord_2C34B4BAE71D4609CBCA0B770DDB9AE82C6C76E7.html#constructor_GdbConnectedRecord_3AC82A8BBA80DBAE248A886E0935291B1471C28B">GdbConnectedRecord</a><span class="other">(</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="399" xml:space="preserve"><span class="lineNumber">399</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="400" xml:space="preserve"><span class="lineNumber">400</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="401" xml:space="preserve"><span class="lineNumber">401</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbErrorRecord_07756CB22DF2E697CF701311406FC4760FDD321C.html">GdbErrorRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html">GdbResultRecord</a></span>
+  <br/>
+  <span class="code" id="402" xml:space="preserve"><span class="lineNumber">402</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="403" xml:space="preserve"><span class="lineNumber">403</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="404" xml:space="preserve"><span class="lineNumber">404</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbErrorRecord_07756CB22DF2E697CF701311406FC4760FDD321C.html#constructor_GdbErrorRecord_A36A4D2EB7377DCF5368D20ADEE3AA909C1CD171">GdbErrorRecord</a><span class="other">(</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="405" xml:space="preserve"><span class="lineNumber">405</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbErrorRecord_07756CB22DF2E697CF701311406FC4760FDD321C.html#function_Stopped_01E85E80F7EE938E3D5160BC48A189B9764F9331">Stopped</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="406" xml:space="preserve"><span class="lineNumber">406</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="407" xml:space="preserve"><span class="lineNumber">407</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="408" xml:space="preserve"><span class="lineNumber">408</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExitRecord_FA2F5B4C4545421B9B5A7F49B94C75C21B993251.html">GdbExitRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html">GdbResultRecord</a></span>
+  <br/>
+  <span class="code" id="409" xml:space="preserve"><span class="lineNumber">409</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="410" xml:space="preserve"><span class="lineNumber">410</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="411" xml:space="preserve"><span class="lineNumber">411</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExitRecord_FA2F5B4C4545421B9B5A7F49B94C75C21B993251.html#constructor_GdbExitRecord_4B68B394D4CF2EF4D5D4A718A9890165AB4625C3">GdbExitRecord</a><span class="other">(</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="412" xml:space="preserve"><span class="lineNumber">412</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbExitRecord_FA2F5B4C4545421B9B5A7F49B94C75C21B993251.html#function_Stopped_AB5175B5E7DA9AD8F28FDFC69A5A48D6284C8B68">Stopped</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="413" xml:space="preserve"><span class="lineNumber">413</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="414" xml:space="preserve"><span class="lineNumber">414</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="415" xml:space="preserve"><span class="lineNumber">415</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbAsyncRecord_5D41AC3E9A3F6FDC57C53F5137A363FF2F49C455.html">GdbAsyncRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a></span>
+  <br/>
+  <span class="code" id="416" xml:space="preserve"><span class="lineNumber">416</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="417" xml:space="preserve"><span class="lineNumber">417</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="418" xml:space="preserve"><span class="lineNumber">418</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbAsyncRecord_5D41AC3E9A3F6FDC57C53F5137A363FF2F49C455.html#constructor_GdbAsyncRecord_EB3A1E360B6706B9C129CA8BAB75620032A1F723">GdbAsyncRecord</a><span class="other">(</span><a href="../enum_Kind_C5F6AE1296E8B3D357C2B258CF4F3A5871186A59.html">Kind</a>&nbsp;<span class="identifier">kind</span><span class="other">,&nbsp;</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="419" xml:space="preserve"><span class="lineNumber">419</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="420" xml:space="preserve"><span class="lineNumber">420</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="421" xml:space="preserve"><span class="lineNumber">421</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExecRecord_BEA7C993C62EF0453CE6F3949EC1564880E4106B.html">GdbExecRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbAsyncRecord_5D41AC3E9A3F6FDC57C53F5137A363FF2F49C455.html">GdbAsyncRecord</a></span>
+  <br/>
+  <span class="code" id="422" xml:space="preserve"><span class="lineNumber">422</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="423" xml:space="preserve"><span class="lineNumber">423</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="424" xml:space="preserve"><span class="lineNumber">424</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExecRecord_BEA7C993C62EF0453CE6F3949EC1564880E4106B.html#constructor_GdbExecRecord_E156B28890D2EE06A66F942F746D8045EE4EC9B5">GdbExecRecord</a><span class="other">(</span><a href="../enum_Kind_C5F6AE1296E8B3D357C2B258CF4F3A5871186A59.html">Kind</a>&nbsp;<span class="identifier">kind</span><span class="other">,&nbsp;</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="425" xml:space="preserve"><span class="lineNumber">425</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="426" xml:space="preserve"><span class="lineNumber">426</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="427" xml:space="preserve"><span class="lineNumber">427</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExecRunningRecord_3C86736B8334A0FFCE6ACEBFAAA93082E129C1CA.html">GdbExecRunningRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbExecRecord_BEA7C993C62EF0453CE6F3949EC1564880E4106B.html">GdbExecRecord</a></span>
+  <br/>
+  <span class="code" id="428" xml:space="preserve"><span class="lineNumber">428</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="429" xml:space="preserve"><span class="lineNumber">429</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="430" xml:space="preserve"><span class="lineNumber">430</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExecRunningRecord_3C86736B8334A0FFCE6ACEBFAAA93082E129C1CA.html#constructor_GdbExecRunningRecord_C927874C84C313B3074EBF866377FA5CE2DDD65C">GdbExecRunningRecord</a><span class="other">(</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="431" xml:space="preserve"><span class="lineNumber">431</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="432" xml:space="preserve"><span class="lineNumber">432</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="433" xml:space="preserve"><span class="lineNumber">433</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbExecStoppedRecord_C4809802D5872EA15EE3EE733F4951076F9C24F8.html">GdbExecStoppedRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbExecRecord_BEA7C993C62EF0453CE6F3949EC1564880E4106B.html">GdbExecRecord</a></span>
+  <br/>
+  <span class="code" id="434" xml:space="preserve"><span class="lineNumber">434</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="435" xml:space="preserve"><span class="lineNumber">435</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="436" xml:space="preserve"><span class="lineNumber">436</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbExecStoppedRecord_C4809802D5872EA15EE3EE733F4951076F9C24F8.html#constructor_GdbExecStoppedRecord_DE1F3C2815183D82CA6744555CA3BC0AA070A839">GdbExecStoppedRecord</a><span class="other">(</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="437" xml:space="preserve"><span class="lineNumber">437</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_GdbExecStoppedRecord_C4809802D5872EA15EE3EE733F4951076F9C24F8.html#function_Stopped_2A295E2CCADFE045D5D8FB726AF6DF73EB723EFD">Stopped</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="438" xml:space="preserve"><span class="lineNumber">438</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="439" xml:space="preserve"><span class="lineNumber">439</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="440" xml:space="preserve"><span class="lineNumber">440</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbNotifyAsyncRecord_B6C0B64E75395D1C7BC4C94AB11CE30EDF567C64.html">GdbNotifyAsyncRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbAsyncRecord_5D41AC3E9A3F6FDC57C53F5137A363FF2F49C455.html">GdbAsyncRecord</a></span>
+  <br/>
+  <span class="code" id="441" xml:space="preserve"><span class="lineNumber">441</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="442" xml:space="preserve"><span class="lineNumber">442</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="443" xml:space="preserve"><span class="lineNumber">443</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbNotifyAsyncRecord_B6C0B64E75395D1C7BC4C94AB11CE30EDF567C64.html#constructor_GdbNotifyAsyncRecord_F8F34D1B2C0AE8224B531A8B33BF3C64159B75DA">GdbNotifyAsyncRecord</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">notification_</span><span class="other">,&nbsp;</span><a href="../class_GdbResults_4531ACAF91105F353B9E42E9B1E86C179D9CFA43.html">GdbResults</a><span class="other">*</span>&nbsp;<span class="identifier">results</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="444" xml:space="preserve"><span class="lineNumber">444</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span>&nbsp;<a href="../class_GdbNotifyAsyncRecord_B6C0B64E75395D1C7BC4C94AB11CE30EDF567C64.html#function_ToJson_3F1F98143B77BD09272AFD9A01AC0DFAB86BD810">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="445" xml:space="preserve"><span class="lineNumber">445</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="446" xml:space="preserve"><span class="lineNumber">446</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_GdbNotifyAsyncRecord_B6C0B64E75395D1C7BC4C94AB11CE30EDF567C64.html#variable_notification_875D8909FD37BB2998A5B94473C25E624C8DF3AF">notification</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="447" xml:space="preserve"><span class="lineNumber">447</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="448" xml:space="preserve"><span class="lineNumber">448</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="449" xml:space="preserve"><span class="lineNumber">449</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbStreamRecord_9A64570F1543F1B9135DE1C315EF9E644733833E.html">GdbStreamRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a></span>
+  <br/>
+  <span class="code" id="450" xml:space="preserve"><span class="lineNumber">450</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="451" xml:space="preserve"><span class="lineNumber">451</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="452" xml:space="preserve"><span class="lineNumber">452</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbStreamRecord_9A64570F1543F1B9135DE1C315EF9E644733833E.html#constructor_GdbStreamRecord_D35156755747453502310E6977EBC413BD6DA89A">GdbStreamRecord</a><span class="other">(</span><a href="../enum_Kind_C5F6AE1296E8B3D357C2B258CF4F3A5871186A59.html">Kind</a>&nbsp;<span class="identifier">kind</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">text_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="453" xml:space="preserve"><span class="lineNumber">453</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_GdbStreamRecord_9A64570F1543F1B9135DE1C315EF9E644733833E.html#function_Text_92CF9AD89E8D9E7D9DF7EFA771CF8D7DFDEC1EEC">Text</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbStreamRecord_9A64570F1543F1B9135DE1C315EF9E644733833E.html#variable_text_31AFBCD68EB98322551C0000A8493F9C76AC8616">text</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="454" xml:space="preserve"><span class="lineNumber">454</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span>&nbsp;<a href="../class_GdbStreamRecord_9A64570F1543F1B9135DE1C315EF9E644733833E.html#function_ToJson_AEF9AD07C0F72C2C8069CE70ECAA26C3431D03B2">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="455" xml:space="preserve"><span class="lineNumber">455</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="456" xml:space="preserve"><span class="lineNumber">456</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_GdbStreamRecord_9A64570F1543F1B9135DE1C315EF9E644733833E.html#variable_text_31AFBCD68EB98322551C0000A8493F9C76AC8616">text</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="457" xml:space="preserve"><span class="lineNumber">457</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="458" xml:space="preserve"><span class="lineNumber">458</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="459" xml:space="preserve"><span class="lineNumber">459</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbConsoleOutputRecord_04635C266C66DA9156DBA01AFF1F48E9A3C89794.html">GdbConsoleOutputRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbStreamRecord_9A64570F1543F1B9135DE1C315EF9E644733833E.html">GdbStreamRecord</a></span>
+  <br/>
+  <span class="code" id="460" xml:space="preserve"><span class="lineNumber">460</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="461" xml:space="preserve"><span class="lineNumber">461</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="462" xml:space="preserve"><span class="lineNumber">462</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbConsoleOutputRecord_04635C266C66DA9156DBA01AFF1F48E9A3C89794.html#constructor_GdbConsoleOutputRecord_AA29B44907FBAEB83F5D271B18927E16DBBB6334">GdbConsoleOutputRecord</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">text</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="463" xml:space="preserve"><span class="lineNumber">463</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="464" xml:space="preserve"><span class="lineNumber">464</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="465" xml:space="preserve"><span class="lineNumber">465</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbTargetOutputRecord_1BB409B01CED40124207425955FD12671226D865.html">GdbTargetOutputRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbStreamRecord_9A64570F1543F1B9135DE1C315EF9E644733833E.html">GdbStreamRecord</a></span>
+  <br/>
+  <span class="code" id="466" xml:space="preserve"><span class="lineNumber">466</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="467" xml:space="preserve"><span class="lineNumber">467</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="468" xml:space="preserve"><span class="lineNumber">468</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbTargetOutputRecord_1BB409B01CED40124207425955FD12671226D865.html#constructor_GdbTargetOutputRecord_4E9304FAA8D66DD619D82028426073042D4DC55A">GdbTargetOutputRecord</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">text</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="469" xml:space="preserve"><span class="lineNumber">469</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="470" xml:space="preserve"><span class="lineNumber">470</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="471" xml:space="preserve"><span class="lineNumber">471</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbLogOutputRecord_BF4D2DD0F7B0D67462D7EF0023E24AC080624BD1.html">GdbLogOutputRecord</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbStreamRecord_9A64570F1543F1B9135DE1C315EF9E644733833E.html">GdbStreamRecord</a></span>
+  <br/>
+  <span class="code" id="472" xml:space="preserve"><span class="lineNumber">472</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="473" xml:space="preserve"><span class="lineNumber">473</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="474" xml:space="preserve"><span class="lineNumber">474</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbLogOutputRecord_BF4D2DD0F7B0D67462D7EF0023E24AC080624BD1.html#constructor_GdbLogOutputRecord_F0CCF231E9F17BC20FCEB9B092685DCB551BAB4E">GdbLogOutputRecord</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">text</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="475" xml:space="preserve"><span class="lineNumber">475</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="476" xml:space="preserve"><span class="lineNumber">476</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="477" xml:space="preserve"><span class="lineNumber">477</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbPrompt_C19627E5033EF3F412C0BBEF66B2B2624E104782.html">GdbPrompt</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a></span>
+  <br/>
+  <span class="code" id="478" xml:space="preserve"><span class="lineNumber">478</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="479" xml:space="preserve"><span class="lineNumber">479</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="480" xml:space="preserve"><span class="lineNumber">480</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbPrompt_C19627E5033EF3F412C0BBEF66B2B2624E104782.html#constructor_GdbPrompt_EC03CEB69C6D8F66ACD0B34302C5AC9DF7CFA6E4">GdbPrompt</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="481" xml:space="preserve"><span class="lineNumber">481</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="482" xml:space="preserve"><span class="lineNumber">482</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="483" xml:space="preserve"><span class="lineNumber">483</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbParsingError_257649FDE3C6F8C73663729CD9B82DC67562E7AB.html">GdbParsingError</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a></span>
+  <br/>
+  <span class="code" id="484" xml:space="preserve"><span class="lineNumber">484</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="485" xml:space="preserve"><span class="lineNumber">485</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="486" xml:space="preserve"><span class="lineNumber">486</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbParsingError_257649FDE3C6F8C73663729CD9B82DC67562E7AB.html#constructor_GdbParsingError_B44186142C0ECC9425493656CCE1516924AB146F">GdbParsingError</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">parsingError_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="487" xml:space="preserve"><span class="lineNumber">487</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<a href="../class_GdbParsingError_257649FDE3C6F8C73663729CD9B82DC67562E7AB.html#function_ParsingError_9246CF659D748FBC3E20DC79656BC1EA61C05A7C">ParsingError</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbParsingError_257649FDE3C6F8C73663729CD9B82DC67562E7AB.html#variable_parsingError_88022486877FBDA786ACCBB91B5B9ABF36C680C1">parsingError</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="488" xml:space="preserve"><span class="lineNumber">488</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="489" xml:space="preserve"><span class="lineNumber">489</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_GdbParsingError_257649FDE3C6F8C73663729CD9B82DC67562E7AB.html#variable_parsingError_88022486877FBDA786ACCBB91B5B9ABF36C680C1">parsingError</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="490" xml:space="preserve"><span class="lineNumber">490</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="491" xml:space="preserve"><span class="lineNumber">491</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="492" xml:space="preserve"><span class="lineNumber">492</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html">GdbReply</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="493" xml:space="preserve"><span class="lineNumber">493</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="494" xml:space="preserve"><span class="lineNumber">494</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="495" xml:space="preserve"><span class="lineNumber">495</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#constructor_GdbReply_CC10EBE01B16F17C8D978D6A9F9468571639A091">GdbReply</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="496" xml:space="preserve"><span class="lineNumber">496</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbReply</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbReply</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="497" xml:space="preserve"><span class="lineNumber">497</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbReply</span><span class="other">(</span><span class="identifier">GdbReply</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="498" xml:space="preserve"><span class="lineNumber">498</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbReply</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">GdbReply</span><span class="other">&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="499" xml:space="preserve"><span class="lineNumber">499</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">GdbReply</span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="identifier">GdbReply</span><span class="other">&amp;&amp;</span><span class="other">)</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">delete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="500" xml:space="preserve"><span class="lineNumber">500</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">GdbReply</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="501" xml:space="preserve"><span class="lineNumber">501</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#function_SetTextLines_B75C41085B237A2C703E0EBDBF57ABB5A3F15A2F">SetTextLines</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">textLines_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="502" xml:space="preserve"><span class="lineNumber">502</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span><span class="other">&amp;</span><a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#function_TextLines_0AD3AF8DA05702B6A0CBA4237570A28BA0532990">TextLines</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">{</span><span class="kw">return</span><a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#variable_textLines_F2B0AD8E65C21614A15D226F1BB628A2678E000B">textLines</a><span class="other">;</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="503" xml:space="preserve"><span class="lineNumber">503</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#function_AddReplyRecord_4D9AF2EE7F94CAFB5664CDB4D39C5DF9C24DD52E">AddReplyRecord</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a><span class="other">></span><span class="other">&amp;&amp;</span><span class="identifier">replyRecord</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="504" xml:space="preserve"><span class="lineNumber">504</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a><span class="other">></span><span class="other">></span><span class="other">&amp;</span><a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#function_ReplyRecords_8C4353BDAAD2827E6B4A848E1FBF3A66853260FC">ReplyRecords</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">{</span><span class="kw">return</span><a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#variable_replyRecords_762579E1378E92519081E3D574DDC2A0EB67C3D8">replyRecords</a><span class="other">;</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="505" xml:space="preserve"><span class="lineNumber">505</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../../../soulng/util/html/content/class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#function_ToJson_F70670AF290A6D222231D8135640FB1C0923FA79">ToJson</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="506" xml:space="preserve"><span class="lineNumber">506</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html">GdbResultRecord</a><span class="other">*</span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#function_GetResultRecord_FF9DEE3C4DC8AFC45EFD85A7426458D9AB6E2B09">GetResultRecord</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#variable_resultRecord_572A6B498B429FDB21D0E015C00B0028FFF92C74">resultRecord</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="507" xml:space="preserve"><span class="lineNumber">507</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a><span class="other">*</span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#function_GetStoppedRecord_28266E89C530578AA66F46BEAFD232E0ABA64452">GetStoppedRecord</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#variable_stoppedRecord_24E67095D87513EC35CD3820A5FA6E628641FEBB">stoppedRecord</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="508" xml:space="preserve"><span class="lineNumber">508</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="509" xml:space="preserve"><span class="lineNumber">509</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#variable_textLines_F2B0AD8E65C21614A15D226F1BB628A2678E000B">textLines</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="510" xml:space="preserve"><span class="lineNumber">510</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a><span class="other">></span><span class="other">></span><a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#variable_replyRecords_762579E1378E92519081E3D574DDC2A0EB67C3D8">replyRecords</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="511" xml:space="preserve"><span class="lineNumber">511</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbResultRecord_CC22C2D66AEF541C730214EB1CB721AE762FF221.html">GdbResultRecord</a><span class="other">*</span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#variable_resultRecord_572A6B498B429FDB21D0E015C00B0028FFF92C74">resultRecord</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="512" xml:space="preserve"><span class="lineNumber">512</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_GdbReplyRecord_77A86743BF0B7D7313002D350F4DC6B1C7932DE7.html">GdbReplyRecord</a><span class="other">*</span>&nbsp;<a href="../class_GdbReply_92857603A4F5B84D86107F49B8411F112EE6FF55.html#variable_stoppedRecord_24E67095D87513EC35CD3820A5FA6E628641FEBB">stoppedRecord</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="513" xml:space="preserve"><span class="lineNumber">513</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="514" xml:space="preserve"><span class="lineNumber">514</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="515" xml:space="preserve"><span class="lineNumber">515</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_SetDebugFlag_7BB49661624413729C5921D6081EC4B8BD96C2AC">SetDebugFlag</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="516" xml:space="preserve"><span class="lineNumber">516</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_StartGDB_7C39A7773F42525C42EA51F8063883039FF432C3">StartGDB</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">executable</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">></span><span class="other">&amp;</span><span class="identifier">args</span><span class="other">,&nbsp;</span><a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html">GdbDriver</a><span class="other">&amp;</span><span class="identifier">driver</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="517" xml:space="preserve"><span class="lineNumber">517</span>&nbsp;<span class="identifier">GdbReply</span><span class="other">*</span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_GetGDBStartReply_54CDEEA8CCE617B60D04AF845B40F5327B1FD569">GetGDBStartReply</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="518" xml:space="preserve"><span class="lineNumber">518</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">GdbReply</span><span class="other">></span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_ExecuteGDBCommand_8F7E6F64D27B5A9B07D08A63E9490B3A55F124C5">ExecuteGDBCommand</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../class_GdbCommand_E1C2766D94582D286A3ED45E1E9A2699EFA5284B.html">GdbCommand</a><span class="other">&amp;</span>&nbsp;<span class="identifier">command</span><span class="other">,&nbsp;</span><a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html">GdbDriver</a><span class="other">&amp;</span>&nbsp;<span class="identifier">driver</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="519" xml:space="preserve"><span class="lineNumber">519</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">GdbReply</span><span class="other">></span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_ReadGDBReply_46F19F5E28E52FF92814658D17BC3902449CCDB2">ReadGDBReply</a><span class="other">(</span><a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html">GdbDriver</a><span class="other">&amp;</span>&nbsp;<span class="identifier">driver</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="520" xml:space="preserve"><span class="lineNumber">520</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_WriteTargetInputLine_B5502E09FA6B054095BDAA199779D22CCADAA8E9">WriteTargetInputLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">line</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="521" xml:space="preserve"><span class="lineNumber">521</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_StopGDB_B63D1F6DD568FA9B7B03AA6A564E27093AF2B830">StopGDB</a><span class="other">(</span><a href="../class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html">GdbDriver</a><span class="other">&amp;</span>&nbsp;<span class="identifier">driver</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="522" xml:space="preserve"><span class="lineNumber">522</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_TerminateGDB_2DE6AF8F8731C199D8427FFCFDD11A6A688F7280">TerminateGDB</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="523" xml:space="preserve"><span class="lineNumber">523</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_InitGDB_9FE2CC1A6E11B73F5DBB92567F1FC889199D7F1D">InitGDB</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="524" xml:space="preserve"><span class="lineNumber">524</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html#function_DoneGDB_0877181709FB70D65757CD80196F94C426E32C9A">DoneGDB</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="525" xml:space="preserve"><span class="lineNumber">525</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="526" xml:space="preserve"><span class="lineNumber">526</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::debug</span></span>
+  <br/>
+  <span class="code" id="527" xml:space="preserve"><span class="lineNumber">527</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="528" xml:space="preserve"><span class="lineNumber">528</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_DEBUG_GDB_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

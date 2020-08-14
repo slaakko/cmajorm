@@ -92,17 +92,20 @@
             After installing Boost, you will need to <a href="#configure-boost-lib-dir">configure</a> the path to the Boost library file directory for <strong>cppcmc</strong>.
         </li>
         <li>
-            You may also need to change the Boost version number in a couple of places in the <a href="#set-boost-version-to-tool-chains-json-file">tool-chains.json</a> configuration file.
+            After installing, you will also need to <a href="#set-boost-version-to-tool-chains-json-file">configure</a> Boost version number.
         </li>
     </ul>
     
     <h5 id="configure-boost-lib-dir">2.1.2.1 Configuring Boost library directory for <strong>cppcmc</strong></h5>
     
     <ul>
-        <li>
-            The configuration file is <strong>C:\cmajor\config\compiler&#8209;config.xml</strong> (or %CMAJOR_ROOT%\config\compiler&#8209;config.xml),
-        </li>
-        <li>
+        <li>Option 1: use <a href="../cppcmcconfig/cppcmcconfig.html">cppcmcconfig</a> utility: e.g. <strong>cppcmcconfig --boost-lib-dir=C:/mingw-boost/lib</strong></li>
+        <li>Option 2: configure manually:
+        <ul>
+            <li>
+                The configuration file is <strong>C:\cmajor\config\compiler&#8209;config.xml</strong> (or %CMAJOR_ROOT%\config\compiler&#8209;config.xml),
+            </li>
+            <li>
             This is the default contents of the configuration file:
 <pre>
     &lt;?xml version="1.0" encoding="utf-8"?>
@@ -123,34 +126,41 @@
             I have Boost installed to the <strong>C:\mingw-boost</strong> directory and the library files are then located in the <strong>C:\mingw-boost\lib</strong> directory.
         </li>
     </ul>
+    </li>
+    </ul>
     
     <h5 id="set-boost-version-to-tool-chains-json-file">2.1.2.2 Setting Boost version number to <strong>tool-chains.json</strong></h5> 
     
     <ul>
-        <li>
-            The configuration file is <strong>C:\cmajor\config\tool-chains.json</strong>
-        </li>
-        <li>
-            Find JSON array named 'args' whose path in the JSON file is:
-            <pre>
-            $platforms[?(@.name=='windows')].toolChains[?(@.name=='gcc')].tools[?(@.commandName=='g++')].configurations[?(@.name=='debug')].args
-            </pre>
-            Replace "1_73" suffix of the boost_filesystem, boost_iostreams, boost_system library file names with your Boost version number (1_xx)
-            in the following line:
-            <pre>
-            "$RUNTIME_LIBS$-lcmrtsd;-lcmsnglexerd;-lcmsngparserd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmsngutild;-lpdcursesd;-lbz2d;-lzd;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-sd-x64-1_73;-lboost_iostreams-mgw8-mt-sd-x64-1_73;-lboost_system-mgw8-mt-sd-x64-1_73"
-            </pre>
-        </li>
-        <li>
-            The second place is the corresponding 'args' JSON array for the release configuration whose path in the JSON file is
-            <pre>
-            $platforms[?(@.name=='windows')].toolChains[?(@.name=='gcc')].tools[?(@.commandName=='g++')].configurations[?(@.name=='release')].args
-            </pre>
+        <li>Option 1: use <a href="../cppcmcconfig/cppcmcconfig.html">cppcmcconfig</a> utility: e.g. <strong>cppcmcconfig --boost-version=1_73.</strong></li>
+        <li>Option 2: configure manually:
+        <ul>
+            <li>
+                The configuration file is <strong>C:\cmajor\config\tool-chains.json</strong>
+            </li>
+            <li>
+                Find JSON array named 'args' whose path in the JSON file is:
+                <pre>
+                $platforms[?(@.name=='windows')].toolChains[?(@.name=='gcc')].tools[?(@.commandName=='g++')].configurations[?(@.name=='debug')].args
+                </pre>
+                Replace "1_73" suffix of the boost_filesystem, boost_iostreams, boost_system library file names with your Boost version number (1_xx)
+                in the following line:
+                <pre>
+                "$RUNTIME_LIBS$-lcmrtsd;-lcmsnglexerd;-lcmsngparserd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmsngutild;-lpdcursesd;-lbz2d;-lzd;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-sd-x64-1_73;-lboost_iostreams-mgw8-mt-sd-x64-1_73;-lboost_system-mgw8-mt-sd-x64-1_73"
+                </pre>
+            </li>
+            <li>
+                The second place is the corresponding 'args' JSON array for the release configuration whose path in the JSON file is
+                <pre>
+                $platforms[?(@.name=='windows')].toolChains[?(@.name=='gcc')].tools[?(@.commandName=='g++')].configurations[?(@.name=='release')].args
+                </pre>
 
-            The line to change is:
-            <pre>
-            "$RUNTIME_LIBS$-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lpdcurses;-lbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73"
-            </pre>
+                The line to change is:
+                <pre>
+                "$RUNTIME_LIBS$-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lpdcurses;-lbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73"
+                </pre>
+            </li>
+        </ul>
         </li>
     </ul>
     
@@ -165,11 +175,15 @@
     <ul>
         <li>Change to <strong>C:\cmajor\rts\build\gcc</strong> directory.</li>
         <li>
-            You may need to change the path to the Boost include directory in the <strong>Makefile.common</strong> file.
-            The include directory is in the following line:
-            <pre>
-            BOOST_INCLUDE_DIR=C:/mingw-boost/include/boost-1_73
-            </pre>
+            Configure Boost include directory:
+            <ul>
+                <li>Option 1: use <a href="../cppcmcconfig/cppcmcconfig.html">cppcmcconfig</a> utility: e.g. <strong>cppcmcconfig --boost-include-dir=C:/mingw-boost/include/boost-1_73.</strong></li>
+                <li>Option 2: configure manually:
+                the Boost include directory in in the <strong>Makefile.common</strong> file in the following line:
+                <pre>
+                BOOST_INCLUDE_DIR=C:/mingw-boost/include/boost-1_73
+                </pre>
+            </ul>
         </li>
         <li>
             The static debug and release versions of the Cmajor runtime libraries are built by entering the following command:
@@ -439,7 +453,7 @@
         <tr>
             <td class="opt">--quiet</td>
             <td class="opt">-q</td>
-            <td class="opt">Be quite, only return exit code.</td>
+            <td class="opt">Be quiet, only return exit code.</td>
         </tr>
         <tr>
             <td class="opt">--config=CONFIG</td>

@@ -1,0 +1,102 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>FileIndex Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">prev</a>
+         | <a href="class_FileScope_4759AFD971D57DACECD7F77635E53248B4E0AA50.html">next</a>
+        <hr/>
+        <h1>FileIndex Class</h1>
+        <span>
+            Definition at line <a href="file/FileIndex.hpp_3631A5D19C6B2D48699579F5C1C455CC3CFD3011.html#19">19</a>
+             of <a href="file/FileIndex.hpp_3631A5D19C6B2D48699579F5C1C455CC3CFD3011.html">FileIndex.hpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FileIndex_1A26C65CF2611992B4ED9F0EFF09B981EB3EBE8C.html#function_AddFile_01FF75499F5A31658A9D93B89289D15CE1BE601B">AddFile</a>(int32_t fileIndex, <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* module)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FileIndex_1A26C65CF2611992B4ED9F0EFF09B981EB3EBE8C.html#function_Write_FC85CF60EA21C00A85C3E2B3355AE0FEB4B71397">Write</a>(BinaryWriter&amp; writer)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_fileMap_C3B103D68E99E3E8EA5659FD4A45C6FC8A5558EB">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;int32_t, std::string></td>
+                <td class="functionTableSecondCol" xml:space="preserve">fileMap</td>
+            </tr>
+            <tr id="variable_mtx_32DE46F011C681819EE354A9480D3C16965DA472">
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddFile_01FF75499F5A31658A9D93B89289D15CE1BE601B">AddFile Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::FileIndex::AddFile(int32_t fileIndex, <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            * module)</h4>
+        <span>
+            Definition at line <a href="file/FileIndex.cpp_E79DB287D4EB3726A17CA52AA78638C6DBD6582E.html#13">13</a>
+             of <a href="file/FileIndex.cpp_E79DB287D4EB3726A17CA52AA78638C6DBD6582E.html">FileIndex.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FileIndex.hpp_3631A5D19C6B2D48699579F5C1C455CC3CFD3011.html#22">22</a>
+             of <a href="file/FileIndex.hpp_3631A5D19C6B2D48699579F5C1C455CC3CFD3011.html">FileIndex.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_GetFilePath_5CB477B8F81855891126D01A1C8203FB040300AD">cmajor::symbols::Module::GetFilePath</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_FC85CF60EA21C00A85C3E2B3355AE0FEB4B71397">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::FileIndex::Write(BinaryWriter&amp; writer)</h4>
+        <span>
+            Definition at line <a href="file/FileIndex.cpp_E79DB287D4EB3726A17CA52AA78638C6DBD6582E.html#28">28</a>
+             of <a href="file/FileIndex.cpp_E79DB287D4EB3726A17CA52AA78638C6DBD6582E.html">FileIndex.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><span class="identifier">debug</span><span class="other">::</span><span class="identifier">WriteNumberOfFileIndexRecords</span><span class="other">(</span><span class="identifier">writer</span><span class="other">,&nbsp;</span><a href="./class_FileIndex_1A26C65CF2611992B4ED9F0EFF09B981EB3EBE8C.html#variable_fileMap_C3B103D68E99E3E8EA5659FD4A45C6FC8A5558EB">fileMap</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_FileIndex_1A26C65CF2611992B4ED9F0EFF09B981EB3EBE8C.html#variable_fileMap_C3B103D68E99E3E8EA5659FD4A45C6FC8A5558EB">fileMap</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><span class="identifier">debug</span><span class="other">::</span><span class="identifier">WriteFileIndexRecord</span><span class="other">(</span><span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">first</span><span class="other">,&nbsp;</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_WriteProjectDebugInfoFile_9E09D5220DF0C93E866783C28CCAFDD259F9B778">cmajor::symbols::Module::WriteProjectDebugInfoFile</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">prev</a>
+         | <a href="class_FileScope_4759AFD971D57DACECD7F77635E53248B4E0AA50.html">next</a>
+    </body>
+</html>

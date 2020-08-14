@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Cppcmc configuration utility</title>
+    <link rel="stylesheet" type="text/css" href="../../style/tool.css" />
+</head>
+
+<body>
+    <h1>Cppcmcconfig  utility</h1>
+    
+    <h2 id="usage">Command-line arguments</h2>
+    
+    <p>
+        Usage: <b>cppcmcconfig [options]</b>
+    </p>
+    
+    <p>
+        Print and/or change MinGW-w64 Boost configuration on Windows for cppcmc.
+        If the program is started without options, it prints current values without making changes. 
+        The program can be launched from any directory. 
+        It will use CMAJOR_ROOT environment variable to find out locations of the configuration files.
+    </p>
+    
+    <table class="opt">
+        <tr>
+            <th class="opt">Long option</th>
+            <th class="opt">Short option</th>
+            <th class="opt">Description</th>
+        </tr>
+        <tr>
+            <td class="opt">&#8209;&#8209;boost&#8209;lib&#8209;dir=BOOST_LIB_DIR</td>
+            <td class="opt">&#8209;L=BOOST_LIB_DIR</td>
+            <td class="opt">where BOOST_LIB_DIR is an absolute path to the subdirectory whose name is <strong>lib</strong> that is under the Boost installation directory. 
+            It contains *.a files.
+            Effect: configures the Boost lib-directory for cppcmc.</td>
+        </tr>
+        <tr>
+            <td class="opt">&#8209;&#8209;boost&#8209;include&#8209;dir=BOOST_INCLUDE_DIR</td>
+            <td class="opt">&#8209;I=BOOST_INCLUDE_DIR</td>
+            <td class="opt">where BOOST_INCLUDE_DIR is an absolute path to the subdirectory whose name is <strong>boost&#8209;1_XX</strong> that is under the subdirectory whose name is <strong>include</strong> that is under the Boost installation directory.  
+            It contains a subdirectory whose name is <strong>boost</strong>.
+            Effect: configures the Boost include-directory for cppcmc.</td>
+        </tr>
+        <tr>
+            <td class="opt">&#8209;&#8209;boost&#8209;version=BOOST_VERSION_NUMBER</td>
+            <td class="opt">&#8209;V=BOOST_VERSION_NUMBER</td>
+            <td class="opt"> where BOOST_VERSION_NUMBER is the version number of Boost in format "1.XX" or "1_XX"
+            Effect: configures the Boost version number for cppcmc.
+            </td>
+        </tr>
+    </table>
+    
+    <h2>Example 1</h2>
+    
+    <p>
+        To see current configuration use the following command:
+    </p>
+    
+    <pre>
+        cppcmcconfig
+    </pre>
+    
+    <p>
+        The utility prints e.g.:
+    </p>
+    
+    <pre>
+    info: CMAJOR_ROOT=C:/cmajor
+
+    BOOST_LIB_DIR:
+    info: C:/cmajor/config/compiler-config.xml found.
+    info: boost lib-directory (1/1) path is C:/mingw-boost/lib
+
+    BOOST_INCLUDE_DIR:
+    info: C:/cmajor/rts/build/gcc/Makefile.common found.
+    info: boost include-directory (1/2) path is C:/mingw-boost/include/boost-1_73
+
+    info: C:/cmajor/rts/build/clang/Makefile.common found.
+    info: boost include-directory (2/2) path is C:/mingw-boost/include/boost-1_73
+
+    BOOST_VERSION_NUMBER:
+    info: C:/cmajor/config/tool-chains.json found.
+    info: boost version (1/6) is 1_73
+    info: boost version (2/6) is 1_73
+    info: boost version (3/6) is 1_73
+    info: boost version (4/6) is 1_73
+    info: boost version (5/6) is 1_73
+    info: boost version (6/6) is 1_73
+    </pre>
+    
+    <h2>Example 2</h2>
+    
+    <p>
+        To configure boost version 1.73 that is built using MinGW-w64 gcc and installed to directory <strong>C:\mingw-boost</strong> use the following command:
+    </p>
+        
+    <pre>
+    cppcmcconfig --boost-lib-dir=C:/mingw-boost/lib --boost-include-dir=C:/mingw-boost/include/boost-1_73 --boost-version=1.73
+    </pre>
+</body>

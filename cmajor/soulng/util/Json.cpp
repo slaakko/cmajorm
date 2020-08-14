@@ -38,6 +38,11 @@ JsonValue* JsonString::Clone() const
     return new JsonString(value);
 }
 
+void JsonString::SetValue(const std::u32string& value_)
+{
+    value = value_;
+}
+
 void JsonString::Append(char32_t c)
 {
     value.append(1, c);

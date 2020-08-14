@@ -16,7 +16,7 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#93">93</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#105">105</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -34,6 +34,10 @@
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundReturnStatement_D998176947E97E412567764578B6117F430440D4.html#function_Accept_81C5579B810E283595CD3F390D20ECC5FF784FCA">Accept</a>(<a href="./class_BoundNodeVisitor_CE5CFDED99644DA4EABDD18A7FDFBE5548A49675.html">BoundNodeVisitor</a>&amp; visitor) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundReturnStatement_D998176947E97E412567764578B6117F430440D4.html#function_IsOrContainsBoundReturnStatement_173664C7BE61295B219C52715DC4632D4742E096">IsOrContainsBoundReturnStatement</a>() <span class="kw">const override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>*</td>
@@ -59,10 +63,20 @@
             >&amp;&amp; returnFunctionCall_, <span class="kw">const </span>
             Span&amp; span_)</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#79">79</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#84">84</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a><span class="other">(</span><span class="identifier">module_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundReturnStatement_C1E545D20CB5A0094C8A5A226A362E42064C427F">boundReturnStatement</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundReturnStatement_D998176947E97E412567764578B6117F430440D4.html#variable_returnFunctionCall_8E7546E62862197DF7218F557539506C0D9F1140">returnFunctionCall</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">returnFunctionCall_</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="constructor_BoundReturnStatement_5714560563D0C5AE519D6DFA5EBB596E9567CE31">BoundReturnStatement Constructor</h3>
@@ -72,7 +86,7 @@
             &amp;) <span class="kw">delete</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#97">97</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#109">109</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -86,12 +100,21 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#84">84</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#89">89</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#99">99</a>
+            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#111">111</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -107,15 +130,40 @@
         <br/>
         <br/>
         <hr/>
+        <h3 id="function_IsOrContainsBoundReturnStatement_173664C7BE61295B219C52715DC4632D4742E096">IsOrContainsBoundReturnStatement Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::binder::BoundReturnStatement::IsOrContainsBoundReturnStatement() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#113">113</a>
+             of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html#function_IsOrContainsBoundReturnStatement_9C421DDBBAFB65901AD4C1024A8D4C840D0FEDFE">cmajor::binder::BoundStatement::IsOrContainsBoundReturnStatement</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_ReturnFunctionCall_9E3E2B2B77DCFA3CD9EDE962753768C529640506">ReturnFunctionCall Member Function</h3>
         <h4>
             <a href="./class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>
             * cmajor::binder::BoundReturnStatement::ReturnFunctionCall()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#100">100</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#112">112</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundReturnStatement_D998176947E97E412567764578B6117F430440D4.html#variable_returnFunctionCall_8E7546E62862197DF7218F557539506C0D9F1140">returnFunctionCall</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_operator_assign_1C488CBF99A7F50CF60EFB20837E25BD735199BE">operator= Member Function</h3>
@@ -126,7 +174,7 @@
             &amp;) <span class="kw">delete</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#98">98</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#110">110</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>

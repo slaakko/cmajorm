@@ -66,6 +66,15 @@
         <span>
             Definition at line <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html#58">58</a>
              of <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html">Compiler.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_instance_50A1ED05BB52B64F15D73649E79769A64C0D0AE9">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -102,6 +111,23 @@
         <span>
             Definition at line <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html#71">71</a>
              of <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html">Compiler.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_mtx_B29B81B5E14851613A1A125CCDEB3AF60447F1A2">mtx</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">compileResultHandle</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="other">0</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">compileResultHandle</span><span class="other">&nbsp;>=&nbsp;</span><a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_compileResults_1CC09AAD02DD6615CC37A020BD081AA57E676732">compileResults</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">-</span><span class="other">1</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_compileResults_1CC09AAD02DD6615CC37A020BD081AA57E676732">compileResults</a><span class="other">[</span><span class="identifier">compileResultHandle</span><span class="other">]</span><span class="other">)</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">-</span><span class="other">1</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">compileResult</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">*</span><a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_compileResults_1CC09AAD02DD6615CC37A020BD081AA57E676732">compileResults</a><span class="other">[</span><span class="identifier">compileResultHandle</span><span class="other">]</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">compileResult</span><span class="other">.</span><span class="identifier">length</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -119,6 +145,15 @@
         <span>
             Definition at line <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html#53">53</a>
              of <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html">Compiler.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_instance_50A1ED05BB52B64F15D73649E79769A64C0D0AE9">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html">CompileData</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -136,8 +171,12 @@
         <span>
             Definition at line <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html#41">41</a>
              of <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html">Compiler.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_instance_50A1ED05BB52B64F15D73649E79769A64C0D0AE9">instance</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_SetCompileResult_283D37834874B4B4E7EC394A06A70A686FF2A8AB">SetCompileResult Member Function</h3>
@@ -148,6 +187,21 @@
         <span>
             Definition at line <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html#63">63</a>
              of <a href="file/Compiler.cpp_BE2BCB3E63D828C8E032901AD372091FAC616FF4.html">Compiler.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_mtx_B29B81B5E14851613A1A125CCDEB3AF60447F1A2">mtx</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">compileResultHandle</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_compileResults_1CC09AAD02DD6615CC37A020BD081AA57E676732">compileResults</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CompileData_2CC19B1C20AD7D3448BBDD41EF39ECBF1DB3D817.html#variable_compileResults_1CC09AAD02DD6615CC37A020BD081AA57E676732">compileResults</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span><span class="other">(</span><span class="identifier">compileResult</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">compileResultHandle</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>

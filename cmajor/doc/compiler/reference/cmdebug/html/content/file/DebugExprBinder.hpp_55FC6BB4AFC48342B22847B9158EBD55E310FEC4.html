@@ -1,0 +1,116 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_DEBUG_DEBUG_EXPR_BINDER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_DEBUG_DEBUG_EXPR_BINDER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmdebug/DebugExprVisitor.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/cmdebug/BoundDebugExpr.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;memory></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;string></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">debug</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Debugger_7FE587CCCE2A5D5301F67F076DA4D2D8B1D2572B.html">Debugger</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DebugInfo_99D3A87DFBF70512729B02D06F63B99425ADF306.html">DebugInfo</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_Scope_2D49A0FC60001F39920D6B7BBBB03AF285FE2413.html">Scope</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_BoundDebugNode_BCEFED7793AD3370BDBE36B44E0A8BC69B85AD46.html">BoundDebugNode</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_BoundDebugExpression_7BC69B4A9A487081E71C9EC628FB8E6A0E325E17.html">BoundDebugExpression</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html">DebugExprNode</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DIType_047D8611E6A8D627B758ACD98A5F7CB9776EF6DB.html">DIType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DIClassTemplateSpecializationType_235BDA3FC34FFA47AF3675CA14EBF1CFADCDF7D7.html">DIClassTemplateSpecializationType</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html">DebugExprBinder</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../class_DebugExprVisitor_E73F793F17495CCE1B69EF812D95CDFD35EEBE7F.html">DebugExprVisitor</a></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#constructor_DebugExprBinder_0B19FBF087DD9B9D5FF648C9E4459B0FCE2A2924">DebugExprBinder</a><span class="other">(</span><a href="../class_Debugger_7FE587CCCE2A5D5301F67F076DA4D2D8B1D2572B.html">Debugger</a><span class="other">&amp;</span>&nbsp;<span class="identifier">debugger_</span><span class="other">,&nbsp;</span><a href="../class_DebugInfo_99D3A87DFBF70512729B02D06F63B99425ADF306.html">DebugInfo</a><span class="other">*</span>&nbsp;<span class="identifier">debugInfo_</span><span class="other">,&nbsp;</span><a href="../class_Scope_2D49A0FC60001F39920D6B7BBBB03AF285FE2413.html">Scope</a><span class="other">*</span>&nbsp;<span class="identifier">scope_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_3134D813550506FA6CE071FA9468F21C4531EF81">Visit</a><span class="other">(</span><a href="../class_IdentifierDebugExprNode_D16EA8B9BF8965717A0D26964AB569209352A475.html">IdentifierDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_2C683C351CE4BF46CA53F0D99882D0238D40583D">Visit</a><span class="other">(</span><a href="../class_IntegerDebugExprNode_98D198DE83A3A14BBD2EED242837B2C3508479F5.html">IntegerDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_B7E6E7B68C328B5F6EFDFE8FCAE97718603BA9C4">Visit</a><span class="other">(</span><a href="../class_AddDebugExprNode_B8439FDE61FF318A9A9DD2EA848F19FDD883BA0A.html">AddDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_B6BF3EA7F703E2BF638A80A2CA84AA196039BDD5">Visit</a><span class="other">(</span><a href="../class_SubDebugExprNode_E517C52DDFD1B4576FFE8F013C6C6DC7DE7D60F0.html">SubDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_6E3BBECC5041D8C8EC63BD1843690AD7ABAEB74D">Visit</a><span class="other">(</span><a href="../class_ParenthesizedDebugExprNode_4C5A530587CC7F4AD20B28B23CF7B0E08BF18CE5.html">ParenthesizedDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_005B9DF84B0FAB848AF15E2B00D449DFA022C42F">Visit</a><span class="other">(</span><a href="../class_DerefDebugExprNode_44972610CC26A5DDD1BFABB3FAAB1CEE3F89DE2A.html">DerefDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_E5D7AD6E434975442FED49EFB616E8458B35EEEB">Visit</a><span class="other">(</span><a href="../class_AddrOfDebugExprNode_B5EA23DF021B13D86DE4C86856D80008B96D4FD8.html">AddrOfDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_7EF24603B905900EC9F2168A0307F9ABC5116F0C">Visit</a><span class="other">(</span><a href="../class_DotDebugExprNode_00B683A0B50AA8B22D6EEB4287D2FCE5BE19B2BF.html">DotDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_411267A9047568551371B13FC3C78D6CE1D26254">Visit</a><span class="other">(</span><a href="../class_SubscriptDebugExprNode_9EBF7D8DCF0DFFD1FEF5BE5814C105560588BE12.html">SubscriptDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_C90D056ED8B75FAD107194AFFC33AF4D29EF876A">Visit</a><span class="other">(</span><a href="../class_RangeDebugExprNode_7903853BBB12547CBC8AC2B62D5F5BB117DFCFD1.html">RangeDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_FFFEF08E59B07E3CD209DF7C7A732ED5AA3AF2DC">Visit</a><span class="other">(</span><a href="../class_TypeIdDebugExprNode_E0C8D77BB42AC73B095B65414CA3B2EF079E108D.html">TypeIdDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_CA91EA073833CFBFD4906EA479EB4AD42134D5F4">Visit</a><span class="other">(</span><a href="../class_CastDebugExprNode_FA953B0E6886EC3FD89E8D71273C2E4D09BA326B.html">CastDebugExprNode</a><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_BoundDebugExpression_7BC69B4A9A487081E71C9EC628FB8E6A0E325E17.html">BoundDebugExpression</a><span class="other">*</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_BoundExpression_A01F637BC778335C5EAA96EBCDF8F8D122ED243A">BoundExpression</a><span class="other">(</span><a href="../class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html">DebugExprNode</a><span class="other">*</span>&nbsp;<span class="identifier">sourceNode</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DIType_047D8611E6A8D627B758ACD98A5F7CB9776EF6DB.html">DIType</a><span class="other">*</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_GetValueType_C8CBC7CB72F4A912C60234E09381A362E977342C">GetValueType</a><span class="other">(</span><a href="../class_DIClassTemplateSpecializationType_235BDA3FC34FFA47AF3675CA14EBF1CFADCDF7D7.html">DIClassTemplateSpecializationType</a><span class="other">*</span>&nbsp;<span class="identifier">specializationType</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Debugger_7FE587CCCE2A5D5301F67F076DA4D2D8B1D2572B.html">Debugger</a><span class="other">&amp;</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#variable_debugger_6A3ECBF6B7B422F88B5CB8ADFA99B0DD46E25EAE">debugger</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_DebugInfo_99D3A87DFBF70512729B02D06F63B99425ADF306.html">DebugInfo</a><span class="other">*</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#variable_debugInfo_1C28A1732125F9E944A1ED964F9D0DCF7D2CDF99">debugInfo</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_Scope_2D49A0FC60001F39920D6B7BBBB03AF285FE2413.html">Scope</a><span class="other">*</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#variable_scope_5A5C831B83623D8D1B2315AF283F75F55A9E83BB">scope</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_BoundDebugNode_BCEFED7793AD3370BDBE36B44E0A8BC69B85AD46.html">BoundDebugNode</a><span class="other">></span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#variable_currentNode_1375570431D2491066C419F9ECA4A99759151A15">currentNode</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_BoundDebugExpression_7BC69B4A9A487081E71C9EC628FB8E6A0E325E17.html">BoundDebugExpression</a><span class="other">></span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#variable_expression_BF0A3E877F56E933887153CD812B1FF76D6BE78A">expression</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#variable_hasContainerSubscript_D24D8BF5990EE11EAFA2503C16F6255BAB0C4AD2">hasContainerSubscript</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_InitializationStatus_8FA33E00B00A09990AD2B7D84DFFB83B2967AFD8.html">InitializationStatus</a>&nbsp;<a href="../class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#variable_status_08E1AE1A33372FB4BD01497A7801A9BFBFB9561C">status</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::debug</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_DEBUG_DEBUG_EXPR_BINDER_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

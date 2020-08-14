@@ -287,14 +287,15 @@ function drawClassInheritanceDiagram() {
         { name: "cmajor::binder::BoundGotoDefaultStatement", id: "class_16", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundGotoDefaultStatement_8AF1EB875ADD6C393850B230CFC5FD003F737241.html" },
         { name: "cmajor::binder::BoundGotoStatement", id: "class_17", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundGotoStatement_FCFCCD2D9BADF935C7D7DE2684A43343B1AAD43C.html" },
         { name: "cmajor::binder::BoundIfStatement", id: "class_18", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html" },
-        { name: "cmajor::binder::BoundRethrowStatement", id: "class_19", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundRethrowStatement_A720CEC1C74090443C19A23C0876F5A5D62007AA.html" },
-        { name: "cmajor::binder::BoundReturnStatement", id: "class_20", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundReturnStatement_D998176947E97E412567764578B6117F430440D4.html" },
-        { name: "cmajor::binder::BoundSequenceStatement", id: "class_21", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html" },
-        { name: "cmajor::binder::BoundSetVmtPtrStatement", id: "class_22", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundSetVmtPtrStatement_D2863C630BC058CCC2EF18A5F41A45BCC328B025.html" },
-        { name: "cmajor::binder::BoundSwitchStatement", id: "class_23", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundSwitchStatement_995D5CB824F96656D94DE278A00F91286CD6598F.html" },
-        { name: "cmajor::binder::BoundThrowStatement", id: "class_24", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundThrowStatement_EC217A057808FE9076D0AB267E6FBFB3354ECCF2.html" },
-        { name: "cmajor::binder::BoundTryStatement", id: "class_25", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundTryStatement_A14ED2DFB95B82CB86B48EC0AEA2D7C3D0757D10.html" },
-        { name: "cmajor::binder::BoundWhileStatement", id: "class_26", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundWhileStatement_34710CA10F2EDB4A9B691B578C1B3F261E4C79FD.html" }];
+        { name: "cmajor::binder::BoundInitializationStatement", id: "class_19", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundInitializationStatement_EDA41FE9A17314981F0AA0CC25E5F38E152AB506.html" },
+        { name: "cmajor::binder::BoundRethrowStatement", id: "class_20", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundRethrowStatement_A720CEC1C74090443C19A23C0876F5A5D62007AA.html" },
+        { name: "cmajor::binder::BoundReturnStatement", id: "class_21", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundReturnStatement_D998176947E97E412567764578B6117F430440D4.html" },
+        { name: "cmajor::binder::BoundSequenceStatement", id: "class_22", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundSequenceStatement_7224125F0C7751D0B97CE7F7037F4D2655824F59.html" },
+        { name: "cmajor::binder::BoundSetVmtPtrStatement", id: "class_23", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundSetVmtPtrStatement_D2863C630BC058CCC2EF18A5F41A45BCC328B025.html" },
+        { name: "cmajor::binder::BoundSwitchStatement", id: "class_24", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundSwitchStatement_995D5CB824F96656D94DE278A00F91286CD6598F.html" },
+        { name: "cmajor::binder::BoundThrowStatement", id: "class_25", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundThrowStatement_EC217A057808FE9076D0AB267E6FBFB3354ECCF2.html" },
+        { name: "cmajor::binder::BoundTryStatement", id: "class_26", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundTryStatement_A14ED2DFB95B82CB86B48EC0AEA2D7C3D0757D10.html" },
+        { name: "cmajor::binder::BoundWhileStatement", id: "class_27", level: 3, subject: false, hasDerivedClasses: false, link: "./class_BoundWhileStatement_34710CA10F2EDB4A9B691B578C1B3F261E4C79FD.html" }];
     drawDiagram(classes);
 }
 

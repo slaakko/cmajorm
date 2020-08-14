@@ -74,7 +74,7 @@
              of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">801</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_uuidLiteralNode_82F05E96CCFBE077ADEB22ED120CB4FE3EF45EC4">uuidLiteralNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html#variable_uuid_47B9358ECD9B179F5C87DD4D53E7982A8EE8A568">uuid</a><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">nil_generator</span><span class="other">(</span><span class="other">)</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">801</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html">LiteralNode</a><span class="other">(</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html#enumerator_uuidLiteralNode_82F05E96CCFBE077ADEB22ED120CB4FE3EF45EC4">uuidLiteralNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html#variable_uuid_47B9358ECD9B179F5C87DD4D53E7982A8EE8A568">uuid</a><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">nil_uuid</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">802</span>&nbsp;<span class="other">{</span></span>
                 <br/>
@@ -167,7 +167,7 @@
             <span class="code">
                 <span class="code" xml:space="preserve"><span class="lineNumber">810</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">811</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html">UuidLiteralNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html#variable_uuid_47B9358ECD9B179F5C87DD4D53E7982A8EE8A568">uuid</a><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">811</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html">UuidLiteralNode</a><span class="other">(</span><span class="identifier">cloneContext</span><span class="other">.</span><span class="identifier">MapSpan</span><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">RootModuleId</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html#variable_uuid_47B9358ECD9B179F5C87DD4D53E7982A8EE8A568">uuid</a><span class="other">)</span><span class="other">;</span></span>
                 <br/>
                 <span class="code" xml:space="preserve"><span class="lineNumber">812</span>&nbsp;<span class="other">}</span></span>
             </span>
@@ -186,7 +186,9 @@
         <br/>
         <br/>
         <span>
-            Calls: <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            Calls: <a href="./class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_MapSpan_4854B818E90C09061F441CEE0410C6DF44D518CF">sngcm::ast::CloneContext::MapSpan</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_RootModuleId_2C637CA63FEB26C6458958EFD55F1248AA470C07">sngcm::ast::Node::RootModuleId</a>
         </span>
         <br/>
         <br/>

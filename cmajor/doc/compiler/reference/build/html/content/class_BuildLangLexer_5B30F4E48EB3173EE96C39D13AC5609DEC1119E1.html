@@ -1,0 +1,169 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>BuildLangLexer Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_BuildLangLexer_5B30F4E48EB3173EE96C39D13AC5609DEC1119E1_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="struct_BuildLangClientParser_92B1FC685528F1E07A3BD992155B6A84287D3D9D.html">prev</a>
+         | <a href="struct_BuildLangOptionParser_CFEFC0B7FE56935A1564F4413F2F72A1B10DCA5E.html">next</a>
+        <hr/>
+        <h1>BuildLangLexer Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html#9">9</a>
+             of <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html">BuildLangLexer.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BuildLangLexer_5B30F4E48EB3173EE96C39D13AC5609DEC1119E1.html#constructor_BuildLangLexer_3546A1C31343E793105D5454BE997BCE85177E51">BuildLangLexer</a>(<span class="kw">const </span><span class="kw">char32_t</span>* start_, <span class="kw">const </span><span class="kw">char32_t</span>* end_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BuildLangLexer_5B30F4E48EB3173EE96C39D13AC5609DEC1119E1.html#constructor_BuildLangLexer_D037242FE8F6F516D6FEAAA2ABA9F27D635B1777">BuildLangLexer</a>(<span class="kw">const </span>std::u32string&amp; content_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BuildLangLexer_5B30F4E48EB3173EE96C39D13AC5609DEC1119E1.html#function_GetTokenId_68CC9F3FC4C3D636A7F7713E973CAB300CBDA0CC">GetTokenId</a>(<span class="kw">int</span> statementIndex)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BuildLangLexer_5B30F4E48EB3173EE96C39D13AC5609DEC1119E1.html#function_NextState_4678E8E2874791512050B3AC4726F7BC03FF6A09">NextState</a>(<span class="kw">int</span> state, <span class="kw">char32_t</span> c) <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_BuildLangLexer_3546A1C31343E793105D5454BE997BCE85177E51">BuildLangLexer Constructor</h3>
+        <h4>
+            BuildLangLexer::BuildLangLexer(<span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * start_, <span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * end_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/BuildLangLexer.cpp_4F8A8C47B1CFAC3327A2498DF7D3D94386CD73BA.html#18">18</a>
+             of <a href="file/BuildLangLexer.cpp_4F8A8C47B1CFAC3327A2498DF7D3D94386CD73BA.html">BuildLangLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><a href="./../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html">Lexer</a><span class="other">(</span><span class="identifier">start_</span><span class="other">,&nbsp;</span><span class="identifier">end_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_BuildLangKeywords_EEB7B40DB6BC20D5F63453CB6D6964A09DEEF7AF.html">BuildLangKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html#13">13</a>
+             of <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html">BuildLangLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="constructor_BuildLangLexer_D037242FE8F6F516D6FEAAA2ABA9F27D635B1777">BuildLangLexer Constructor</h3>
+        <h4>
+            BuildLangLexer::BuildLangLexer(<span class="kw">const </span>
+            std::u32string&amp; content_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/BuildLangLexer.cpp_4F8A8C47B1CFAC3327A2498DF7D3D94386CD73BA.html#13">13</a>
+             of <a href="file/BuildLangLexer.cpp_4F8A8C47B1CFAC3327A2498DF7D3D94386CD73BA.html">BuildLangLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><a href="./../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html">Lexer</a><span class="other">(</span><span class="identifier">content_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_BuildLangKeywords_EEB7B40DB6BC20D5F63453CB6D6964A09DEEF7AF.html">BuildLangKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html#12">12</a>
+             of <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html">BuildLangLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_GetTokenId_68CC9F3FC4C3D636A7F7713E973CAB300CBDA0CC">GetTokenId Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             BuildLangLexer::GetTokenId(<span class="kw">int</span>
+             statementIndex)</h4>
+        <span>
+            Definition at line <a href="file/BuildLangLexer.cpp_4F8A8C47B1CFAC3327A2498DF7D3D94386CD73BA.html#438">438</a>
+             of <a href="file/BuildLangLexer.cpp_4F8A8C47B1CFAC3327A2498DF7D3D94386CD73BA.html">BuildLangLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html#16">16</a>
+             of <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html">BuildLangLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html#function_GetKeywordToken_9803AB3AB12177597A7ADB33E7159FC29236CB66">soulng::lexer::Lexer::GetKeywordToken</a>
+            , <a href="./../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html#function_Retract_DEBB6C8BFF47ABA76B0034408E5FD4B1421A5F98">soulng::lexer::Lexer::Retract</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_BuildLangLexer_5B30F4E48EB3173EE96C39D13AC5609DEC1119E1.html#function_NextState_4678E8E2874791512050B3AC4726F7BC03FF6A09">BuildLangLexer::NextState</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_NextState_4678E8E2874791512050B3AC4726F7BC03FF6A09">NextState Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             BuildLangLexer::NextState(<span class="kw">int</span>
+             state, <span class="kw">char32_t</span>
+             c) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/BuildLangLexer.cpp_4F8A8C47B1CFAC3327A2498DF7D3D94386CD73BA.html#23">23</a>
+             of <a href="file/BuildLangLexer.cpp_4F8A8C47B1CFAC3327A2498DF7D3D94386CD73BA.html">BuildLangLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html#14">14</a>
+             of <a href="file/BuildLangLexer.hpp_28A48755078260C5B2BC9F968D0F45C34C21C77D.html">BuildLangLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html#function_NextState_770F33FD64D82342B2028F01CB63DB92E6E8D009">soulng::lexer::Lexer::NextState</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_BuildLangLexer_5B30F4E48EB3173EE96C39D13AC5609DEC1119E1.html#function_GetTokenId_68CC9F3FC4C3D636A7F7713E973CAB300CBDA0CC">BuildLangLexer::GetTokenId</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="struct_BuildLangClientParser_92B1FC685528F1E07A3BD992155B6A84287D3D9D.html">prev</a>
+         | <a href="struct_BuildLangOptionParser_CFEFC0B7FE56935A1564F4413F2F72A1B10DCA5E.html">next</a>
+    </body>
+</html>

@@ -16,7 +16,7 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#321">321</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#347">347</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -67,10 +67,18 @@
             cmajor::binder::BoundTryStatement::BoundTryStatement(Module* module_, <span class="kw">const </span>
             Span&amp; span_)</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#340">340</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#361">361</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">361</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a><span class="other">(</span><span class="identifier">module_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundTryStatement_3DC0C6EFCD99B89F0C306E3D1582410468E7108C">boundTryStatement</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">362</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">363</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -81,12 +89,21 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#356">356</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#377">377</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">378</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">379</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">380</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#329">329</a>
+            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#355">355</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -108,12 +125,23 @@
              cmajor::binder::BoundTryStatement::AddCatch(std::unique_ptr&lt;<a href="./class_BoundCatchStatement_CAC29640E4061B89F7B5C25BB28F2ABE3A16F627.html">BoundCatchStatement</a>
             >&amp;&amp; catchStatement)</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#350">350</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#371">371</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">372</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">373</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">catchStatement</span><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">374</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundTryStatement_A14ED2DFB95B82CB86B48EC0AEA2D7C3D0757D10.html#variable_catches_B45C909A68630A84554EC6BEF765D7D44FB7A35E">catches</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">catchStatement</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">375</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#327">327</a>
+            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#353">353</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -136,10 +164,14 @@
             >>&amp; cmajor::binder::BoundTryStatement::Catches() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#328">328</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#354">354</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">354</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundTryStatement_A14ED2DFB95B82CB86B48EC0AEA2D7C3D0757D10.html#variable_catches_B45C909A68630A84554EC6BEF765D7D44FB7A35E">catches</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_SetTryBlock_28A45BD61D6778C53F6E72014DD43C5DC66B6633">SetTryBlock Member Function</h3>
@@ -148,12 +180,23 @@
              cmajor::binder::BoundTryStatement::SetTryBlock(std::unique_ptr&lt;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             >&amp;&amp; tryBlock_)</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#344">344</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#365">365</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">366</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">367</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundTryStatement_A14ED2DFB95B82CB86B48EC0AEA2D7C3D0757D10.html#variable_tryBlock_814B081D4ED959FE6B4D0C0BC09C7B78B7BDFCBB">tryBlock</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">tryBlock_</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">368</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundTryStatement_A14ED2DFB95B82CB86B48EC0AEA2D7C3D0757D10.html#variable_tryBlock_814B081D4ED959FE6B4D0C0BC09C7B78B7BDFCBB">tryBlock</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">369</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#325">325</a>
+            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#351">351</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -174,10 +217,14 @@
             <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             * cmajor::binder::BoundTryStatement::TryBlock()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#326">326</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#352">352</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">352</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundTryStatement_A14ED2DFB95B82CB86B48EC0AEA2D7C3D0757D10.html#variable_tryBlock_814B081D4ED959FE6B4D0C0BC09C7B78B7BDFCBB">tryBlock</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_8B82E81A80FA6CBF8EC7F8663F06BE9DA8C6AAC1">cmajor::binder::ControlFlowAnalyzer::Visit</a>

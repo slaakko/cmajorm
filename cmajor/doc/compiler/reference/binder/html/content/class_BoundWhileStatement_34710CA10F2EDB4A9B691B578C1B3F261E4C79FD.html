@@ -16,7 +16,7 @@
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#119">119</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#132">132</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -61,10 +61,22 @@
             >&amp;&amp; condition_, std::unique_ptr&lt;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             >&amp;&amp; statement_)</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#104">104</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#109">109</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a><span class="other">(</span><span class="identifier">module_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundWhileStatement_29E6D06216B8D52AF1EA2DB996EA99F8278B4EC8">boundWhileStatement</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundWhileStatement_34710CA10F2EDB4A9B691B578C1B3F261E4C79FD.html#variable_condition_D0F2B8C73F8BBC7E513D5F05D0638ADE99AADF5B">condition</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">condition_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundWhileStatement_34710CA10F2EDB4A9B691B578C1B3F261E4C79FD.html#variable_statement_81A5B66C0522F08103E319E867E2ACD12E550F04">statement</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">statement_</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundWhileStatement_34710CA10F2EDB4A9B691B578C1B3F261E4C79FD.html#variable_statement_81A5B66C0522F08103E319E867E2ACD12E550F04">statement</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -75,12 +87,21 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#110">110</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#115">115</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#123">123</a>
+            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#136">136</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -101,10 +122,14 @@
             <a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
             * cmajor::binder::BoundWhileStatement::Condition()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#124">124</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#137">137</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundWhileStatement_34710CA10F2EDB4A9B691B578C1B3F261E4C79FD.html#variable_condition_D0F2B8C73F8BBC7E513D5F05D0638ADE99AADF5B">condition</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_Statement_A359C0E76F4D3D7CCFCA2491ABE3C7DAD0DDFEEC">Statement Member Function</h3>
@@ -112,10 +137,14 @@
             <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             * cmajor::binder::BoundWhileStatement::Statement()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#125">125</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#138">138</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundWhileStatement_34710CA10F2EDB4A9B691B578C1B3F261E4C79FD.html#variable_statement_81A5B66C0522F08103E319E867E2ACD12E550F04">statement</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_0B8630F0EE0680C6305A6ABB62C2951B87921A5E">cmajor::binder::ControlFlowAnalyzer::Visit</a>

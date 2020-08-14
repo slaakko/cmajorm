@@ -7,18 +7,19 @@
     <body>
         <a href="../../../compiler-projects.html">top</a>
          | <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html">up</a>
-         | prev | <a href="struct_CompileData_E71A698811081448EC232A3145C21D346BCA2322.html">next</a>
+         | <a href="class_AddServerServerCommand_462D836F2EDC083CDB89BE6800D6193EC8EFFE7F.html">prev</a>
+         | <a href="class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html">next</a>
         <hr/>
         <h1>BuildData Struct</h1>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1910">1910</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#3127">3127</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
         </span>
         <br/>
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#constructor_BuildData_E43A80922791DF5B89F3879EDBCD08F3584EBCB6">BuildData</a>(<span class="kw">bool</span>&amp; stop_, <a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html">ProjectQueue</a>&amp; buildQueue_, <a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html">ProjectQueue</a>&amp; readyQueue_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>>>&amp; rootModules_, <span class="kw">bool</span>&amp; isSystemSolution_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#constructor_BuildData_40A7D43E20ED26B8B8A48DA4B3596B5013EEF878">BuildData</a>(<span class="kw">bool</span>&amp; stop_, <a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html">ProjectQueue</a>&amp; buildQueue_, <a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html">ProjectQueue</a>&amp; readyQueue_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>>>&amp; rootModules_, <span class="kw">bool</span>&amp; isSystemSolution_, std::set&lt;std::string>&amp; builtProjects_)</td>
             </tr>
         </table>
         <h2>Member Variables</h2>
@@ -26,6 +27,10 @@
             <tr id="variable_buildQueue_A3412D413385204A560DFA98DD7FDBD6F483A2D7">
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html">ProjectQueue</a>&amp;</td>
                 <td class="functionTableSecondCol" xml:space="preserve">buildQueue</td>
+            </tr>
+            <tr id="variable_builtProjects_9CF9963DCA930F29C6EBDEEBB5867BF9666D5CDB">
+                <td class="functionTableFirstCol" xml:space="preserve">std::set&lt;std::string>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">builtProjects</td>
             </tr>
             <tr id="variable_exceptionMutex_D2AFD00F17199D0CC89A1CA986AAC5A2E1BDE4E1">
                 <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
@@ -54,26 +59,26 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_BuildData_E43A80922791DF5B89F3879EDBCD08F3584EBCB6">BuildData Constructor</h3>
+        <h3 id="constructor_BuildData_40A7D43E20ED26B8B8A48DA4B3596B5013EEF878">BuildData Constructor</h3>
         <h4>
             cmajor::build::BuildData::BuildData(<span class="kw">bool</span>
             &amp; stop_, <a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html">ProjectQueue</a>
             &amp; buildQueue_, <a href="./class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html">ProjectQueue</a>
             &amp; readyQueue_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
             >>&amp; rootModules_, <span class="kw">bool</span>
-            &amp; isSystemSolution_)</h4>
+            &amp; isSystemSolution_, std::set&lt;std::string>&amp; builtProjects_)</h4>
         <span>
-            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#1912">1912</a>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#3129">3129</a>
              of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1912</span>&nbsp;<span class="other">:</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3129</span>&nbsp;<span class="other">:</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1913</span>&nbsp;<a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_stop_95E8BCD3811522046CD53859F32CAEF0F8E38930">stop</a><span class="other">(</span><span class="identifier">stop_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_buildQueue_A3412D413385204A560DFA98DD7FDBD6F483A2D7">buildQueue</a><span class="other">(</span><span class="identifier">buildQueue_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_readyQueue_197BD3F9D809726C1AFFDC1F069ACBEDA8CDA6F2">readyQueue</a><span class="other">(</span><span class="identifier">readyQueue_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_rootModules_3229DB879A745B535C2A0FAD14F433AD8A091EC2">rootModules</a><span class="other">(</span><span class="identifier">rootModules_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_isSystemSolution_BAFF1E0A819A6E2C7558AC4E4E5EBA5D6F5B0F2B">isSystemSolution</a><span class="other">(</span><span class="identifier">isSystemSolution_</span><span class="other">)</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3130</span>&nbsp;<a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_stop_95E8BCD3811522046CD53859F32CAEF0F8E38930">stop</a><span class="other">(</span><span class="identifier">stop_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_buildQueue_A3412D413385204A560DFA98DD7FDBD6F483A2D7">buildQueue</a><span class="other">(</span><span class="identifier">buildQueue_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_readyQueue_197BD3F9D809726C1AFFDC1F069ACBEDA8CDA6F2">readyQueue</a><span class="other">(</span><span class="identifier">readyQueue_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_rootModules_3229DB879A745B535C2A0FAD14F433AD8A091EC2">rootModules</a><span class="other">(</span><span class="identifier">rootModules_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_isSystemSolution_BAFF1E0A819A6E2C7558AC4E4E5EBA5D6F5B0F2B">isSystemSolution</a><span class="other">(</span><span class="identifier">isSystemSolution_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_BuildData_30F72BBEA305A60F39CB3DEEFC675DED331AEFB3.html#variable_builtProjects_9CF9963DCA930F29C6EBDEEBB5867BF9666D5CDB">builtProjects</a><span class="other">(</span><span class="identifier">builtProjects_</span><span class="other">)</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1914</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3131</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1915</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3132</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -81,6 +86,7 @@
         <hr/>
         <a href="../../../compiler-projects.html">top</a>
          | <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html">up</a>
-         | prev | <a href="struct_CompileData_E71A698811081448EC232A3145C21D346BCA2322.html">next</a>
+         | <a href="class_AddServerServerCommand_462D836F2EDC083CDB89BE6800D6193EC8EFFE7F.html">prev</a>
+         | <a href="class_BuildProjectClientCommand_276246619FA718F8C6AB42EB808960CE87E50CF6.html">next</a>
     </body>
 </html>

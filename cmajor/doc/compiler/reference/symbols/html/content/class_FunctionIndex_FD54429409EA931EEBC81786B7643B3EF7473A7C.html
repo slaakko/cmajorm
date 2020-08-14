@@ -1,0 +1,215 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>FunctionIndex Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="class_FunctionGroupTypeSymbol_96F59756E91CF117BE8E342A85D9FA6A17F736A4.html">prev</a>
+         | <a href="struct_FunctionRequest_0B0BC85DA979968A766F3919D55F0B6806B2210E.html">next</a>
+        <hr/>
+        <h1>FunctionIndex Class</h1>
+        <span>
+            Definition at line <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html#22">22</a>
+             of <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html">FunctionIndex.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#constructor_FunctionIndex_C73C780C3F80C889101DE7D5281BC18526C140B5">FunctionIndex</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#function_AddFunction_1E4A31A5800855A34A9CFBC7EB6254B2C6E545F9">AddFunction</a>(<span class="kw">const </span>boost::uuids::uuid&amp; functionId, <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>* functionSymbol)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>boost::uuids::uuid&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#function_GetMainFunctionId_397FB8D44ED1967339918372098A0967F67F4DAA">GetMainFunctionId</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#function_SetMainFunctionId_EB2FC275CE4C120CB66395BF27D2414D1818FD8B">SetMainFunctionId</a>(<span class="kw">const </span>boost::uuids::uuid&amp; functionId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#function_Write_A3F331A96BD8659B6CFA7DCD5E6C07C9CCE59763">Write</a>(BinaryWriter&amp; writer)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_functionMap_045F1343DF190484BA29F634B0BEF2A03A2B9D5F">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;boost::uuids::uuid, <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>*, boost::hash&lt;boost::uuids::uuid>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">functionMap</td>
+            </tr>
+            <tr id="variable_mainFunctionId_EB7D24F5F60B2C307E93C0F8AF62107956BE77A3">
+                <td class="functionTableFirstCol" xml:space="preserve">boost::uuids::uuid</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mainFunctionId</td>
+            </tr>
+            <tr id="variable_mtx_4BCCA110D87B173AE47E23ECFA22291E862137FA">
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_FunctionIndex_C73C780C3F80C889101DE7D5281BC18526C140B5">FunctionIndex Constructor</h3>
+        <h4>
+            cmajor::symbols::FunctionIndex::FunctionIndex()</h4>
+        <span>
+            Definition at line <a href="file/FunctionIndex.cpp_B6F393589868827A4D6C6D82ED536ACE7E50AF27.html#16">16</a>
+             of <a href="file/FunctionIndex.cpp_B6F393589868827A4D6C6D82ED536ACE7E50AF27.html">FunctionIndex.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#variable_mainFunctionId_EB7D24F5F60B2C307E93C0F8AF62107956BE77A3">mainFunctionId</a><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">uuids</span><span class="other">::</span><span class="identifier">nil_uuid</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html#25">25</a>
+             of <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html">FunctionIndex.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddFunction_1E4A31A5800855A34A9CFBC7EB6254B2C6E545F9">AddFunction Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::FunctionIndex::AddFunction(<span class="kw">const </span>
+            boost::uuids::uuid&amp; functionId, <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
+            * functionSymbol)</h4>
+        <span>
+            Definition at line <a href="file/FunctionIndex.cpp_B6F393589868827A4D6C6D82ED536ACE7E50AF27.html#20">20</a>
+             of <a href="file/FunctionIndex.cpp_B6F393589868827A4D6C6D82ED536ACE7E50AF27.html">FunctionIndex.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="./class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#variable_mtx_4BCCA110D87B173AE47E23ECFA22291E862137FA">mtx</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#variable_functionMap_045F1343DF190484BA29F634B0BEF2A03A2B9D5F">functionMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">functionId</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="./class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#variable_functionMap_045F1343DF190484BA29F634B0BEF2A03A2B9D5F">functionMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#variable_functionMap_045F1343DF190484BA29F634B0BEF2A03A2B9D5F">functionMap</a><span class="other">[</span><span class="identifier">functionId</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">functionSymbol</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html#26">26</a>
+             of <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html">FunctionIndex.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetMainFunctionId_397FB8D44ED1967339918372098A0967F67F4DAA">GetMainFunctionId Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            boost::uuids::uuid&amp; cmajor::symbols::FunctionIndex::GetMainFunctionId() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html#28">28</a>
+             of <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html">FunctionIndex.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#variable_mainFunctionId_EB7D24F5F60B2C307E93C0F8AF62107956BE77A3">mainFunctionId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_WriteProjectDebugInfoFile_9E09D5220DF0C93E866783C28CCAFDD259F9B778">cmajor::symbols::Module::WriteProjectDebugInfoFile</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetMainFunctionId_EB2FC275CE4C120CB66395BF27D2414D1818FD8B">SetMainFunctionId Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::FunctionIndex::SetMainFunctionId(<span class="kw">const </span>
+            boost::uuids::uuid&amp; functionId)</h4>
+        <span>
+            Definition at line <a href="file/FunctionIndex.cpp_B6F393589868827A4D6C6D82ED536ACE7E50AF27.html#29">29</a>
+             of <a href="file/FunctionIndex.cpp_B6F393589868827A4D6C6D82ED536ACE7E50AF27.html">FunctionIndex.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#variable_mainFunctionId_EB7D24F5F60B2C307E93C0F8AF62107956BE77A3">mainFunctionId</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">functionId</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html#27">27</a>
+             of <a href="file/FunctionIndex.hpp_19C2D0714683B0369CB327F30174D639B8A87399.html">FunctionIndex.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_A3F331A96BD8659B6CFA7DCD5E6C07C9CCE59763">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::FunctionIndex::Write(BinaryWriter&amp; writer)</h4>
+        <span>
+            Definition at line <a href="file/FunctionIndex.cpp_B6F393589868827A4D6C6D82ED536ACE7E50AF27.html#34">34</a>
+             of <a href="file/FunctionIndex.cpp_B6F393589868827A4D6C6D82ED536ACE7E50AF27.html">FunctionIndex.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<span class="identifier">numFunctions</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#variable_functionMap_045F1343DF190484BA29F634B0BEF2A03A2B9D5F">functionMap</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><span class="identifier">debug</span><span class="other">::</span><span class="identifier">WriteNumberOfFunctionIndexFunctionRecords</span><span class="other">(</span><span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="identifier">numFunctions</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_FunctionIndex_FD54429409EA931EEBC81786B7643B3EF7473A7C.html#variable_functionMap_045F1343DF190484BA29F634B0BEF2A03A2B9D5F">functionMap</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">functionSymbol</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><span class="identifier">debug</span><span class="other">::</span><span class="identifier">WriteFunctionIndexFunctionRecord</span><span class="other">(</span><span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">first</span><span class="other">,&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">functionSymbol</span><span class="other">-></span><span class="identifier">FullName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">functionSymbol</span><span class="other">-></span><span class="identifier">MangledName</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Calls: <a href="./class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_FullName_FD4E65366E3C307338DFF4C995F5CD2A1855E8E3">cmajor::symbols::FunctionSymbol::FullName</a>
+            , <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_MangledName_6F4B3C08E6832F2EF32DD516A461D594D5C9AC64">cmajor::symbols::Symbol::MangledName</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_WriteProjectDebugInfoFile_9E09D5220DF0C93E866783C28CCAFDD259F9B778">cmajor::symbols::Module::WriteProjectDebugInfoFile</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="class_FunctionGroupTypeSymbol_96F59756E91CF117BE8E342A85D9FA6A17F736A4.html">prev</a>
+         | <a href="struct_FunctionRequest_0B0BC85DA979968A766F3919D55F0B6806B2210E.html">next</a>
+    </body>
+</html>

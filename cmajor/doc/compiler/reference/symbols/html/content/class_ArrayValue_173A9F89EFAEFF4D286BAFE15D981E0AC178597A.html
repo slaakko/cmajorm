@@ -69,7 +69,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#function_SetType_5B3AE152B6474679571356C44F3D886312AEF2AB">SetType</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* type_)</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#function_SetType_5B3AE152B6474679571356C44F3D886312AEF2AB">SetType</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* type_) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -115,8 +115,18 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#4021">4021</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">4021</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4022</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a><span class="other">::</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html#enumerator_arrayValue_A9A33258A30A6C40657B80A29B26254E4F54D2C1">arrayValue</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_type_31AF686B7A2869B63BB1EBE98AD43CB39FDD361E">type</a><span class="other">(</span><span class="identifier">type_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">elementValues_</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4023</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4024</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -152,8 +162,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#425">425</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">425</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ArrayValue"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_ClassName_CFF16D1ED1838560F82258BF6D6F0EF46777BCB6">cmajor::symbols::Value::ClassName</a>
@@ -169,6 +183,27 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#4026">4026</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">4027</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4028</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">></span><span class="identifier">clonedElementValues</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4029</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4030</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4031</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4032</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clonedElementValues</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">(</span><a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4033</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4034</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html">ArrayValue</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_type_31AF686B7A2869B63BB1EBE98AD43CB39FDD361E">type</a><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">clonedElementValues</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4035</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -204,8 +239,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#423">423</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">423</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_Elements_525B90FC3B2882CBC79270E3EDB02FEE398C9FE3">Elements Member Function</h3>
@@ -215,8 +254,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#424">424</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">424</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_GetType_3F309E3888F4566E19EEED15A5BDB370869B0FFB">GetType Member Function</h3>
@@ -228,8 +271,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#421">421</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">421</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_type_31AF686B7A2869B63BB1EBE98AD43CB39FDD361E">type</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_GetType_1DE72C8F82EFAF971868BCE8675B04908837611F">cmajor::symbols::Value::GetType</a>
@@ -244,8 +291,28 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#4037">4037</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">4038</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4039</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="kw">void</span><span class="other">*</span><span class="other">></span>&nbsp;<span class="identifier">elementConstants</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4040</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4041</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4042</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4043</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">elementConstants</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">-></span><span class="identifier">IrValue</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4044</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4045</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateIrValueForConstantArray</span><span class="other">(</span><a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_type_31AF686B7A2869B63BB1EBE98AD43CB39FDD361E">type</a><span class="other">-></span><span class="identifier">IrType</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">elementConstants</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4046</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Calls: <a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#function_IrValue_12BED98117A2A28B0B3E011C9D1BD8DB3925AE36">cmajor::symbols::ArrayValue::IrValue</a>
@@ -268,8 +335,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#419">419</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">419</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_IsComplexValue_1E6A94888B565D4B74CC2681774719E7DB5F19DD">cmajor::symbols::Value::IsComplexValue</a>
@@ -285,6 +356,27 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#4059">4059</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">4060</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4061</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">length</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadLong</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4062</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">length</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4063</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4064</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">elementValue</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a><span class="other">*</span><span class="other">></span><span class="other">(</span><a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_type_31AF686B7A2869B63BB1EBE98AD43CB39FDD361E">type</a><span class="other">)</span><span class="other">-></span><span class="identifier">ElementType</span><span class="other">(</span><span class="other">)</span><span class="other">-></span><span class="identifier">MakeValue</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4065</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">elementValue</span><span class="other">-></span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4066</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">(</span><span class="identifier">elementValue</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4067</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4068</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -308,10 +400,20 @@
         <h4>
             <span class="kw">void</span>
              cmajor::symbols::ArrayValue::SetType(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
-            * type_)</h4>
+            * type_) <span class="kw">override</span>
+        </h4>
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#422">422</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">422</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_type_31AF686B7A2869B63BB1EBE98AD43CB39FDD361E">type</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">type_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_SetType_A2D5E4719F463BAB3545B91E577D9C7EF25AC22B">cmajor::symbols::Value::SetType</a>
         </span>
         <br/>
         <br/>
@@ -324,6 +426,27 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#4048">4048</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">4049</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4050</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int64_t</span>&nbsp;<span class="identifier">length</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4051</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">length</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4052</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">int64_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">length</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4053</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4054</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">*</span>&nbsp;<span class="identifier">value</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_ArrayValue_173A9F89EFAEFF4D286BAFE15D981E0AC178597A.html#variable_elementValues_0D2AFFA294DD33F02B266ACFA616DB6A89FA67E6">elementValues</a><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4055</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">value</span><span class="other">-></span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4056</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">4057</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>

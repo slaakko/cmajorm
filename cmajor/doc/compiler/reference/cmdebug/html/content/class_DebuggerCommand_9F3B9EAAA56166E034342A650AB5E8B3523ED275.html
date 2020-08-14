@@ -1,0 +1,206 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>DebuggerCommand Abstract Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html">up</a>
+         | <a href="class_DebuggerBreakpoint_BF749FE37799F74BBE7110B7823F1693651A8F64.html">prev</a>
+         | <a href="class_DebuggerContinueCommand_A3700D134C05D05A1FEE4137270AF905F5764D0B.html">next</a>
+        <hr/>
+        <h1>DebuggerCommand Abstract Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html#201">201</a>
+             of <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html">Debugger.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html#constructor_DebuggerCommand_7EA8DC72225D3AFEC170CA9BC02D29F972E27887">DebuggerCommand</a>(<a href="./enum_Kind_C7891FA0751599A11F106FC2C2AE622670FEC297.html">Kind</a> kind_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html">DebuggerCommand</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html#function_Clone_4BC04872321B94500104F5DE68E2786E81941D3E">Clone</a>() <span class="kw">pure virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html#function_Execute_B46A140516025935515D9F829684890543E6FBB7">Execute</a>(<a href="./class_Debugger_7FE587CCCE2A5D5301F67F076DA4D2D8B1D2572B.html">Debugger</a>&amp; debugger) <span class="kw">pure virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_Kind_C7891FA0751599A11F106FC2C2AE622670FEC297.html">Kind</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html#function_GetKind_E737918E146A9E1C575DB2709A52CD568EF73B0D">GetKind</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html#function_IsRunningCommand_A01139D2B9A22A3D0FF1A35DA4D7DFD26F7A9127">IsRunningCommand</a>(<a href="./class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html">GdbDriver</a>&amp; driver) <span class="kw">const virtual</span></td>
+            </tr>
+        </table>
+        <h2>Enumerations</h2>
+        <table>
+            <tr>
+                <td>
+                    enum class <a href="enum_Kind_C7891FA0751599A11F106FC2C2AE622670FEC297.html">Kind</a>
+                </td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_kind_F1F3CED0FDC83197995FF11DDBCB6ED7289358C1">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_Kind_C7891FA0751599A11F106FC2C2AE622670FEC297.html">Kind</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">kind</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_DebuggerCommand_7EA8DC72225D3AFEC170CA9BC02D29F972E27887">DebuggerCommand Constructor</h3>
+        <h4>
+            cmajor::debug::DebuggerCommand::DebuggerCommand(<a href="./enum_Kind_C7891FA0751599A11F106FC2C2AE622670FEC297.html">Kind</a>
+             kind_)</h4>
+        <span>
+            Definition at line <a href="file/Debugger.cpp_1EFD22F6100682123BC55332A6FA36A7F8592C81.html#2312">2312</a>
+             of <a href="file/Debugger.cpp_1EFD22F6100682123BC55332A6FA36A7F8592C81.html">Debugger.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">2312</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html#variable_kind_F1F3CED0FDC83197995FF11DDBCB6ED7289358C1">kind</a><span class="other">(</span><span class="identifier">kind_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2313</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">2314</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html#208">208</a>
+             of <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html">Debugger.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Clone_4BC04872321B94500104F5DE68E2786E81941D3E">Clone Member Function</h3>
+        <h4>
+            <a href="./class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html">DebuggerCommand</a>
+            * cmajor::debug::DebuggerCommand::Clone() <span class="kw">pure virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html#212">212</a>
+             of <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html">Debugger.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_DebuggerBreakCommand_4C881D0F9B1857F8BA4057B138DAB23422A29241.html#function_Clone_44B0175068D51EE69144779008906ACEFE04E40B">cmajor::debug::DebuggerBreakCommand::Clone</a>
+            , <a href="./class_DebuggerContinueCommand_A3700D134C05D05A1FEE4137270AF905F5764D0B.html#function_Clone_57049D103438329F0189E9F6D6E0708E82499B6F">cmajor::debug::DebuggerContinueCommand::Clone</a>
+            , <a href="./class_DebuggerDeleteCommand_F1A3A26F65926719E92A0A79104E561877663568.html#function_Clone_D21DF8700854DC2070CF62EAFAF03CF1EE030E70">cmajor::debug::DebuggerDeleteCommand::Clone</a>
+            , <a href="./class_DebuggerDepthCommand_3B444A29F9B448CC315B5AA84FCD1D912D7D00AB.html#function_Clone_5651E377DA4A99D2E4A87526FF76D79EFFDD7FFF">cmajor::debug::DebuggerDepthCommand::Clone</a>
+            , <a href="./class_DebuggerExitCommand_8E5AB82B780F8098D42598302A6DD0392567B0FA.html#function_Clone_F95BC3EA36BE0A3EC1F7909A66399F3FC1A649C3">cmajor::debug::DebuggerExitCommand::Clone</a>
+            , <a href="./class_DebuggerFinishCommand_B69DCABD7D5DE99C9B3EF0EB8EFB2ED73D8C847E.html#function_Clone_FE0673BE3968CF41519FB9838E48A723DD3780DB">cmajor::debug::DebuggerFinishCommand::Clone</a>
+            , <a href="./class_DebuggerFramesCommand_A32C283040B1C08B590A2C5B2A1334EC27D2E46F.html#function_Clone_371A3DF3EDDA2F092A0EB23FEA99BA810E234135">cmajor::debug::DebuggerFramesCommand::Clone</a>
+            , <a href="./class_DebuggerHelpCommand_0C4EB195C36B474BBA08FC741A5F79133C9F23A2.html#function_Clone_4ED59027229BE246488EE075F710EF9DA134DFCA">cmajor::debug::DebuggerHelpCommand::Clone</a>
+            , <a href="./class_DebuggerListCommand_FA8131C81DAB734262E70434441A8260D9A94CB5.html#function_Clone_7B40F35A96778460530ED93319FCDC38870F2196">cmajor::debug::DebuggerListCommand::Clone</a>
+            , <a href="./class_DebuggerNextCommand_EEAED2AD20DFC2D68C43472F47AF4FD0404AA24E.html#function_Clone_F61474E90D361190F74B998330DB45264C678B58">cmajor::debug::DebuggerNextCommand::Clone</a>
+            , <a href="./class_DebuggerPrintCommand_EC3C0ED24806EE676217E5DF64FD666384EB96C3.html#function_Clone_BE16471E8D4DF5BB73CBC3769C26607F9998DE77">cmajor::debug::DebuggerPrintCommand::Clone</a>
+            , <a href="./class_DebuggerRepeatLatestCommand_C6A65B911CEFBA3450DD96909D3FC88F78A9C02A.html#function_Clone_FD11501E5D23C388658304E99D2466F86A72FB69">cmajor::debug::DebuggerRepeatLatestCommand::Clone</a>
+            , <a href="./class_DebuggerSetBreakOnThrowCommand_0C3C9CC09EDB1DA4185D65A434EE69C5D25E7949.html#function_Clone_77A653811A9C6FF333BBC877E350449AF55AC68F">cmajor::debug::DebuggerSetBreakOnThrowCommand::Clone</a>
+            , <a href="./class_DebuggerShowBreakpointCommand_AEBECAA0C88AC9547AC7A69E1890E04BB350CE82.html#function_Clone_F3BE4EC3F46198AD0BBE8FEE87A18DAB6D57A1D7">cmajor::debug::DebuggerShowBreakpointCommand::Clone</a>
+            , <a href="./class_DebuggerShowBreakpointsCommand_24D9271CB7713C626110BFFEBEC3D6A1BA99D339.html#function_Clone_6C64EB6504B99C0CE8A884DDB7C53842E5F9B16F">cmajor::debug::DebuggerShowBreakpointsCommand::Clone</a>
+            , <a href="./class_DebuggerStepCommand_52C54E49F2434B352C499705AF84838AD4199003.html#function_Clone_2CE26538C94FE0510683720465EA290AE111E324">cmajor::debug::DebuggerStepCommand::Clone</a>
+            , <a href="./class_DebuggerUntilCommand_B61B8FAFBA7C50DD748FB035EE793DB352B0B2C6.html#function_Clone_C994DA0649BE8429A19D2BFA62797115004D48FD">cmajor::debug::DebuggerUntilCommand::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Execute_B46A140516025935515D9F829684890543E6FBB7">Execute Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::debug::DebuggerCommand::Execute(<a href="./class_Debugger_7FE587CCCE2A5D5301F67F076DA4D2D8B1D2572B.html">Debugger</a>
+            &amp; debugger) <span class="kw">pure virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html#211">211</a>
+             of <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html">Debugger.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_DebuggerBreakCommand_4C881D0F9B1857F8BA4057B138DAB23422A29241.html#function_Execute_0AFB70E08DE5C1E7D1818D341BE90B6E48B7F5AF">cmajor::debug::DebuggerBreakCommand::Execute</a>
+            , <a href="./class_DebuggerContinueCommand_A3700D134C05D05A1FEE4137270AF905F5764D0B.html#function_Execute_25715A3D90002F57B098821BBE2A2E52D32FA0D9">cmajor::debug::DebuggerContinueCommand::Execute</a>
+            , <a href="./class_DebuggerDeleteCommand_F1A3A26F65926719E92A0A79104E561877663568.html#function_Execute_10D2495B2C087F54A0419D5540A03D87C08E7303">cmajor::debug::DebuggerDeleteCommand::Execute</a>
+            , <a href="./class_DebuggerDepthCommand_3B444A29F9B448CC315B5AA84FCD1D912D7D00AB.html#function_Execute_25FD36A3BBB377E0F6155D1A63EF8072BD60FECB">cmajor::debug::DebuggerDepthCommand::Execute</a>
+            , <a href="./class_DebuggerExitCommand_8E5AB82B780F8098D42598302A6DD0392567B0FA.html#function_Execute_A6E7EBC254A0C2B9188E48C2377AD37274A995FB">cmajor::debug::DebuggerExitCommand::Execute</a>
+            , <a href="./class_DebuggerFinishCommand_B69DCABD7D5DE99C9B3EF0EB8EFB2ED73D8C847E.html#function_Execute_55167EEBE963B2D02D407E9227214BFFF7066FE7">cmajor::debug::DebuggerFinishCommand::Execute</a>
+            , <a href="./class_DebuggerFramesCommand_A32C283040B1C08B590A2C5B2A1334EC27D2E46F.html#function_Execute_5FF927D54EEEA8E70A075583E17760428B5C425A">cmajor::debug::DebuggerFramesCommand::Execute</a>
+            , <a href="./class_DebuggerHelpCommand_0C4EB195C36B474BBA08FC741A5F79133C9F23A2.html#function_Execute_9061017B42330E141E9141B59EF064646DD66925">cmajor::debug::DebuggerHelpCommand::Execute</a>
+            , <a href="./class_DebuggerListCommand_FA8131C81DAB734262E70434441A8260D9A94CB5.html#function_Execute_900B4177BAC0FF5A4FCF9E9D26F7AC65BEB8C175">cmajor::debug::DebuggerListCommand::Execute</a>
+            , <a href="./class_DebuggerNextCommand_EEAED2AD20DFC2D68C43472F47AF4FD0404AA24E.html#function_Execute_5F44B0AE0F22CD6EC95FD8F9AE15C0E0838B750A">cmajor::debug::DebuggerNextCommand::Execute</a>
+            , <a href="./class_DebuggerPrintCommand_EC3C0ED24806EE676217E5DF64FD666384EB96C3.html#function_Execute_6765F63FAC77E9302AC1CB10325D3C7FBF6E4457">cmajor::debug::DebuggerPrintCommand::Execute</a>
+            , <a href="./class_DebuggerRepeatLatestCommand_C6A65B911CEFBA3450DD96909D3FC88F78A9C02A.html#function_Execute_4608BAFD8097DDEEE90C27C7165EA05AFFB6E3E5">cmajor::debug::DebuggerRepeatLatestCommand::Execute</a>
+            , <a href="./class_DebuggerSetBreakOnThrowCommand_0C3C9CC09EDB1DA4185D65A434EE69C5D25E7949.html#function_Execute_8C7D8503C99A5D0560365FFBAA86705AA6B83AB6">cmajor::debug::DebuggerSetBreakOnThrowCommand::Execute</a>
+            , <a href="./class_DebuggerShowBreakpointCommand_AEBECAA0C88AC9547AC7A69E1890E04BB350CE82.html#function_Execute_C4C87F6843628720CEDC5B956D18FBDD6E147A03">cmajor::debug::DebuggerShowBreakpointCommand::Execute</a>
+            , <a href="./class_DebuggerShowBreakpointsCommand_24D9271CB7713C626110BFFEBEC3D6A1BA99D339.html#function_Execute_2D1BAC1D3D6B0114A0B7485DCCD597F7250AB948">cmajor::debug::DebuggerShowBreakpointsCommand::Execute</a>
+            , <a href="./class_DebuggerStepCommand_52C54E49F2434B352C499705AF84838AD4199003.html#function_Execute_A046C8AE3C8CF92192680391BBA6DA8F0CC463AC">cmajor::debug::DebuggerStepCommand::Execute</a>
+            , <a href="./class_DebuggerUntilCommand_B61B8FAFBA7C50DD748FB035EE793DB352B0B2C6.html#function_Execute_CEE2E45F0A142AB88F3A585A09A25111CACFBDC7">cmajor::debug::DebuggerUntilCommand::Execute</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetKind_E737918E146A9E1C575DB2709A52CD568EF73B0D">GetKind Member Function</h3>
+        <h4>
+            <a href="./enum_Kind_C7891FA0751599A11F106FC2C2AE622670FEC297.html">Kind</a>
+             cmajor::debug::DebuggerCommand::GetKind() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html#213">213</a>
+             of <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html">Debugger.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DebuggerCommand_9F3B9EAAA56166E034342A650AB5E8B3523ED275.html#variable_kind_F1F3CED0FDC83197995FF11DDBCB6ED7289358C1">kind</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_IsRunningCommand_A01139D2B9A22A3D0FF1A35DA4D7DFD26F7A9127">IsRunningCommand Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::debug::DebuggerCommand::IsRunningCommand(<a href="./class_GdbDriver_570DF3C2D480E77A5461D24A867FB40ADFB7F8DE.html">GdbDriver</a>
+            &amp; driver) <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html#210">210</a>
+             of <a href="file/Debugger.hpp_EB17BD68E504DB5D3DDFA823D2B36E0802B5720F.html">Debugger.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_DebuggerContinueCommand_A3700D134C05D05A1FEE4137270AF905F5764D0B.html#function_IsRunningCommand_4F2A33F259F6A268731BCB92614088844B7ED8A7">cmajor::debug::DebuggerContinueCommand::IsRunningCommand</a>
+            , <a href="./class_DebuggerFinishCommand_B69DCABD7D5DE99C9B3EF0EB8EFB2ED73D8C847E.html#function_IsRunningCommand_18FB9482EE08C15A4B3ED5E50289A11862F3C1EC">cmajor::debug::DebuggerFinishCommand::IsRunningCommand</a>
+            , <a href="./class_DebuggerNextCommand_EEAED2AD20DFC2D68C43472F47AF4FD0404AA24E.html#function_IsRunningCommand_8D7BECFEABEC0CEEFA7656D970521589F2A2BD76">cmajor::debug::DebuggerNextCommand::IsRunningCommand</a>
+            , <a href="./class_DebuggerRepeatLatestCommand_C6A65B911CEFBA3450DD96909D3FC88F78A9C02A.html#function_IsRunningCommand_C42F0E97A4E57A99238A573AD77E89E9ACA73A94">cmajor::debug::DebuggerRepeatLatestCommand::IsRunningCommand</a>
+            , <a href="./class_DebuggerStepCommand_52C54E49F2434B352C499705AF84838AD4199003.html#function_IsRunningCommand_86D68833847513BA120BE111ABAD9B42DA5DE11B">cmajor::debug::DebuggerStepCommand::IsRunningCommand</a>
+            , <a href="./class_DebuggerUntilCommand_B61B8FAFBA7C50DD748FB035EE793DB352B0B2C6.html#function_IsRunningCommand_09D623F659744A6BA3486F4A9AE778E93C4F7B4A">cmajor::debug::DebuggerUntilCommand::IsRunningCommand</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html">up</a>
+         | <a href="class_DebuggerBreakpoint_BF749FE37799F74BBE7110B7823F1693651A8F64.html">prev</a>
+         | <a href="class_DebuggerContinueCommand_A3700D134C05D05A1FEE4137270AF905F5764D0B.html">next</a>
+    </body>
+</html>

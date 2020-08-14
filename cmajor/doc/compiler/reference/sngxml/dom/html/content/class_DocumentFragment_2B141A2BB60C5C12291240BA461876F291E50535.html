@@ -55,6 +55,15 @@
         <span>
             Definition at line <a href="file/DocumentFragment.cpp_0640C313DB9FE8CEE526B24C9442B47581AA8538.html#10">10</a>
              of <a href="file/DocumentFragment.cpp_0640C313DB9FE8CEE526B24C9442B47581AA8538.html">DocumentFragment.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_ParentNode_32EEAAD4A81494D922390069F0D2A62E62F636E6.html">ParentNode</a><span class="other">(</span><a href="./enum_NodeType_5368029CED50AA3E105E71B9D211833D74A20068.html">NodeType</a><span class="other">::</span><a href="./enum_NodeType_5368029CED50AA3E105E71B9D211833D74A20068.html#enumerator_documentFragmentNode_82CFDA7302458E30DD05B13C73C80BE4632752BB">documentFragmentNode</a><span class="other">,&nbsp;</span><span class="string">U"document_fragment"</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -99,6 +108,27 @@
         <span>
             Definition at line <a href="file/DocumentFragment.cpp_0640C313DB9FE8CEE526B24C9442B47581AA8538.html#14">14</a>
              of <a href="file/DocumentFragment.cpp_0640C313DB9FE8CEE526B24C9442B47581AA8538.html">DocumentFragment.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">clonedDocumentFragment</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_DocumentFragment_2B141A2BB60C5C12291240BA461876F291E50535.html">DocumentFragment</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">deep</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ParentNode_32EEAAD4A81494D922390069F0D2A62E62F636E6.html">ParentNode</a><span class="other">*</span>&nbsp;<span class="identifier">parentNode</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./class_ParentNode_32EEAAD4A81494D922390069F0D2A62E62F636E6.html">ParentNode</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">clonedDocumentFragment</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">CloneChildrenTo</span><span class="other">(</span><span class="identifier">parentNode</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clonedDocumentFragment</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>

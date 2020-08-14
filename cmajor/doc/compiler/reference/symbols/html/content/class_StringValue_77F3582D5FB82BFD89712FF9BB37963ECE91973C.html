@@ -87,8 +87,16 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#3646">3646</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">3646</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a><span class="other">::</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html#enumerator_stringValue_D86368E53CA4D4D98419E7332F95AB2CF8547B93">stringValue</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_stringId_F6E2B628825A97A944D956801044309248AAB872">stringId</a><span class="other">(</span><span class="identifier">stringId_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_str_1298278964E8501C0D130EA4F2E524E05EDB09CE">str</a><span class="other">(</span><span class="identifier">str_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3647</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3648</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -123,8 +131,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#327">327</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">327</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"StringValue"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_ClassName_CFF16D1ED1838560F82258BF6D6F0EF46777BCB6">cmajor::symbols::Value::ClassName</a>
@@ -140,8 +152,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#319">319</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">319</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html">StringValue</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_stringId_F6E2B628825A97A944D956801044309248AAB872">stringId</a><span class="other">,&nbsp;</span><a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_str_1298278964E8501C0D130EA4F2E524E05EDB09CE">str</a><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_Clone_62B968BDB2F1127A90D4EADA95E8E660C18710F3">cmajor::symbols::Value::Clone</a>
@@ -163,6 +179,15 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#3691">3691</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">3692</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3693</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">symbolTable</span><span class="other">-></span><span class="identifier">GetTypeByName</span><span class="other">(</span><span class="string">U"char"</span><span class="other">)</span><span class="other">-></span><span class="identifier">AddConst</span><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">-></span><span class="identifier">AddPointer</span><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3694</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -192,8 +217,24 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#3650">3650</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">3651</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3652</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_stringId_F6E2B628825A97A944D956801044309248AAB872">stringId</a><span class="other">&nbsp;==&nbsp;</span><span class="other">-</span><span class="other">1</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3653</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3654</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_stringId_F6E2B628825A97A944D956801044309248AAB872">stringId</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">emitter</span><span class="other">.</span><span class="identifier">Install</span><span class="other">(</span><a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_str_1298278964E8501C0D130EA4F2E524E05EDB09CE">str</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3655</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3656</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">GetGlobalStringPtr</span><span class="other">(</span><a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_stringId_F6E2B628825A97A944D956801044309248AAB872">stringId</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3657</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_Read_96067AA2A725D573BC012B1C15A8BCA46531825A">Read Member Function</h3>
@@ -204,6 +245,15 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#3664">3664</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">3665</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3666</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_str_1298278964E8501C0D130EA4F2E524E05EDB09CE">str</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadUtf8String</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3667</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
@@ -226,8 +276,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#326">326</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">326</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_str_1298278964E8501C0D130EA4F2E524E05EDB09CE">str</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Called by: <a href="./class_StringLengthFunction_E3506646CDDF4E6606AADB2097ECE07162729FB5.html#function_ConstructValue_8D1B4D478E1F9B2E22BFF7D54DDD000488772D4C">cmajor::symbols::StringLengthFunction::ConstructValue</a>
@@ -243,8 +297,12 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#325">325</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">325</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_stringId_F6E2B628825A97A944D956801044309248AAB872">stringId</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_Write_5972C5E7DFBF7678E8639CE390267C6F1D3F1931">Write Member Function</h3>
@@ -255,6 +313,15 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#3659">3659</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">3660</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3661</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_StringValue_77F3582D5FB82BFD89712FF9BB37963ECE91973C.html#variable_str_1298278964E8501C0D130EA4F2E524E05EDB09CE">str</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">3662</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>

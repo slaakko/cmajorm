@@ -59,8 +59,16 @@
         <span>
             Definition at line <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html#31">31</a>
              of <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html">ValueStack.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">back</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./../../../ir/html/content/class_ValueStack_0032454A09E37AB037BC01A9EA549EFC362C7CDA.html#function_Dup_048C183466F0A76C5737974D0A517145488846B4">cmajor::ir::ValueStack::Dup</a>
@@ -76,8 +84,22 @@
         <span>
             Definition at line <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html#24">24</a>
              of <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html">ValueStack.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="other">!</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"value&nbsp;stack&nbsp;is&nbsp;empty"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">llvm</span><span class="other">::</span><span class="identifier">Value</span><span class="other">*</span>&nbsp;<span class="identifier">top</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">back</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">pop_back</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">top</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./../../../ir/html/content/class_ValueStack_0032454A09E37AB037BC01A9EA549EFC362C7CDA.html#function_Pop_B44195092F4C82976CE26EB29AEBA62CDBDF0F0E">cmajor::ir::ValueStack::Pop</a>
@@ -94,8 +116,18 @@
         <span>
             Definition at line <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html#19">19</a>
              of <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html">ValueStack.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">llvm</span><span class="other">::</span><span class="identifier">Value</span><span class="other">*</span>&nbsp;<span class="identifier">value</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">llvm</span><span class="other">::</span><span class="identifier">Value</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">val</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./../../../ir/html/content/class_ValueStack_0032454A09E37AB037BC01A9EA549EFC362C7CDA.html#function_Push_8D144E3532B7210DF2BC0B57064604C5E839BA5E">cmajor::ir::ValueStack::Push</a>
@@ -111,8 +143,18 @@
         <span>
             Definition at line <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html#39">39</a>
              of <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html">ValueStack.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">swap</span><span class="other">(</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">[</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><span class="other">3</span><span class="other">]</span><span class="other">,&nbsp;</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">[</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><span class="other">2</span><span class="other">]</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">swap</span><span class="other">(</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">back</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">[</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><span class="other">2</span><span class="other">]</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./../../../ir/html/content/class_ValueStack_0032454A09E37AB037BC01A9EA549EFC362C7CDA.html#function_Rotate_18EA5BBD9F29262FEDE136FD5E85C015AE6883EA">cmajor::ir::ValueStack::Rotate</a>
@@ -128,8 +170,16 @@
         <span>
             Definition at line <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html#35">35</a>
              of <a href="file/ValueStack.hpp_EEAF958953D00C21053DA4C67E27F9E8C66D2D47.html">ValueStack.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">swap</span><span class="other">(</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">back</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">[</span><a href="./class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html#variable_s_8202B2CD3E70AB66D01B1B57CF81020265F16950">s</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;-&nbsp;</span><span class="other">2</span><span class="other">]</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./../../../ir/html/content/class_ValueStack_0032454A09E37AB037BC01A9EA549EFC362C7CDA.html#function_Swap_AF7A236DB0A8559DB2CDC404AA7EB1CE8C4FFD0C">cmajor::ir::ValueStack::Swap</a>

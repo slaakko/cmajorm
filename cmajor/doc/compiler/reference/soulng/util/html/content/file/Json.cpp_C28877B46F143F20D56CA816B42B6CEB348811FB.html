@@ -16,377 +16,661 @@
   <br/>
   <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Json.hpp></span></span>
   <br/>
-  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/TextUtils.hpp></span></span>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/CodeFormatter.hpp></span></span>
   <br/>
-  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/TextUtils.hpp></span></span>
   <br/>
-  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;</span>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;soulng/util/Unicode.hpp></span></span>
   <br/>
-  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;</span>
   <br/>
-  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;</span>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">util</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">;</span></span>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;</span>
   <br/>
-  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;</span>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">unicode</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">::</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html#constructor_JsonValue_EBB2C991920A55C28367ADB88D6AFF46EA6EF0AB">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a>&nbsp;<span class="identifier">type_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html#variable_type_B8C191268F8EAA52FF281AED36685C9D0EF1603E">type</a><span class="other">(</span><span class="identifier">type_</span><span class="other">)</span></span>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
   <br/>
-  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">::</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html#constructor_JsonValue_EBB2C991920A55C28367ADB88D6AFF46EA6EF0AB">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a>&nbsp;<span class="identifier">type_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html#variable_type_B8C191268F8EAA52FF281AED36685C9D0EF1603E">type</a><span class="other">(</span><span class="identifier">type_</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;</span>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">::</span><span class="other">~</span><span class="identifier">JsonValue</span><span class="other">(</span><span class="other">)</span></span>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;</span>
   <br/>
-  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">::</span><span class="other">~</span><span class="identifier">JsonValue</span><span class="other">(</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;</span>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#constructor_JsonString_E1DCE7F8FEBD00DD22A5F7D5C4DAD62BE6979F2E">JsonString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_string_0DD8B237057550AF12CF1DDD0ABA429A7EDA6558">string</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">(</span><span class="other">)</span></span>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;</span>
   <br/>
-  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">::</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html#function_Write_901A70C62D26C2EE36A9800222864ABC92706303">Write</a><span class="other">(</span><a href="../class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;</span>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#constructor_JsonString_C86D8D92E65FC84CA4FCB833D68937C32350F0C9">JsonString</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_string_0DD8B237057550AF12CF1DDD0ABA429A7EDA6558">string</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;</span>
   <br/>
-  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#constructor_JsonString_E1DCE7F8FEBD00DD22A5F7D5C4DAD62BE6979F2E">JsonString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_string_0DD8B237057550AF12CF1DDD0ABA429A7EDA6558">string</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">(</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;</span>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#function_Append_ED36031BD908BE31217657DCCB8B2B46693EA1F9">Append</a><span class="other">(</span><span class="kw">char32_t</span>&nbsp;<span class="identifier">c</span><span class="other">)</span></span>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;</span>
   <br/>
-  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#constructor_JsonString_C86D8D92E65FC84CA4FCB833D68937C32350F0C9">JsonString</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_string_0DD8B237057550AF12CF1DDD0ABA429A7EDA6558">string</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;</span>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#function_JsonCharStr_A2B8243DC4BE5AA2149EE2BA9D53FD3A26D9A1C8">JsonCharStr</a><span class="other">(</span><span class="kw">char32_t</span>&nbsp;<span class="identifier">c</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;</span>
   <br/>
-  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#function_Clone_FA08B6B456939828E6B81051BCC275C5B7993E84">Clone</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
   <br/>
-  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<span class="identifier">s</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">(</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span>&nbsp;<span class="identifier">t</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ToUtf16</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">char16_t</span>&nbsp;<span class="identifier">x</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">t</span><span class="other">)</span></span>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;</span>
   <br/>
-  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#function_SetValue_1A09ABA979A5279CBDC67DE5BEF55FDC4E13652E">SetValue</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch&nbsp;</span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span></span>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">value_</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'"'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\\""</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\\'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\\\"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;</span>
   <br/>
-  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'/'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\/"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#function_Append_ED36031BD908BE31217657DCCB8B2B46693EA1F9">Append</a><span class="other">(</span><span class="kw">char32_t</span>&nbsp;<span class="identifier">c</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\b'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\b"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\f'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\f"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\n'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\n"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\r'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\r"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;</span>
   <br/>
-  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\t'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\t"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#function_JsonCharStr_A2B8243DC4BE5AA2149EE2BA9D53FD3A26D9A1C8">JsonCharStr</a><span class="other">(</span><span class="kw">char32_t</span>&nbsp;<span class="identifier">c</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
   <br/>
-  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">default</span><span class="other">:</span></span>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>=&nbsp;</span><span class="other">32</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">x</span><span class="other">&nbsp;&lt;=&nbsp;</span><span class="other">126</span><span class="other">)</span></span>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<span class="identifier">s</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span>&nbsp;<span class="identifier">t</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ToUtf16</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">char16_t</span>&nbsp;<span class="identifier">x</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">t</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch&nbsp;</span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\u"</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf16</span><span class="other">(</span><span class="identifier">ToHexString</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint16_t</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'"'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\\""</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\\'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\\\"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'/'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\/"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\b'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\b"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\f'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\f"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\n'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\n"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\r'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\r"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;</span>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="string">'\t'</span><span class="other">:</span>&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\t"</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#function_ToString_DC614D4A4C44D3745BFDE3932BABE7DEB99FCD60">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">default</span><span class="other">:</span></span>
   <br/>
-  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>=&nbsp;</span><span class="other">32</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">x</span><span class="other">&nbsp;&lt;=&nbsp;</span><span class="other">126</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">char32_t</span>&nbsp;<span class="identifier">c</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">)</span></span>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="other">1</span><span class="other">,&nbsp;</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">JsonCharStr</span><span class="other">(</span><span class="identifier">c</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
   <br/>
-  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"\""</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"\""</span><span class="other">;</span></span>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">result</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">u"\\u"</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">ToUtf16</span><span class="other">(</span><span class="identifier">ToHexString</span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="identifier">uint16_t</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;</span>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">JsonNumber</a><span class="other">::</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#constructor_JsonNumber_BEE651228722D0EB6CFA4E24590F0361324F71B3">JsonNumber</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_number_60F82A01BE088EBC9551686CBEB5822B6F85C022">number</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#variable_value_F1B9B8714AB3A935D04E49EDCD2C5B7EDAC03FC2">value</a><span class="other">(</span><span class="other">0.0</span><span class="other">)</span></span>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;</span>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">JsonNumber</a><span class="other">::</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#constructor_JsonNumber_F64C97EE7D2B9AEF9AAEEDE2590B08F3105F2346">JsonNumber</a><span class="other">(</span><span class="kw">double</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_number_60F82A01BE088EBC9551686CBEB5822B6F85C022">number</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#variable_value_F1B9B8714AB3A935D04E49EDCD2C5B7EDAC03FC2">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;</span>
   <br/>
-  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">::</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#function_ToString_DC614D4A4C44D3745BFDE3932BABE7DEB99FCD60">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
   <br/>
-  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;</span>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">JsonNumber</a><span class="other">::</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#function_ToString_08B9C917E05AFB0CB2B5FB07F638C53F175F6F00">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u16string</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">char32_t</span>&nbsp;<span class="identifier">c</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#variable_value_1F47F391143B33E78C91D105DD36755B91D05C76">value</a><span class="other">)</span></span>
   <br/>
-  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#variable_value_F1B9B8714AB3A935D04E49EDCD2C5B7EDAC03FC2">value</a><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">JsonCharStr</span><span class="other">(</span><span class="identifier">c</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;</span>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">::</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#constructor_JsonBool_ED500FD9660F6B53AE90812B8E2BB1FE25AB3C6B">JsonBool</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_boolean_50E01AC2E14FDB986FDBA4C1509AB3B07CFE9DC9">boolean</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#variable_value_00BF9F2A3DBB8AAB2D9D8C3CD1C649E96D9B0F25">value</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"\""</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"\""</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;</span>
   <br/>
-  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;</span>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">JsonNumber</a><span class="other">::</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#constructor_JsonNumber_BEE651228722D0EB6CFA4E24590F0361324F71B3">JsonNumber</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_number_60F82A01BE088EBC9551686CBEB5822B6F85C022">number</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#variable_value_F1B9B8714AB3A935D04E49EDCD2C5B7EDAC03FC2">value</a><span class="other">(</span><span class="other">0.0</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">::</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#constructor_JsonBool_EF020EFBFC50DAC9655816CB8FAC1C7D83BC6B58">JsonBool</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_boolean_50E01AC2E14FDB986FDBA4C1509AB3B07CFE9DC9">boolean</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#variable_value_00BF9F2A3DBB8AAB2D9D8C3CD1C649E96D9B0F25">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;</span>
   <br/>
-  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;</span>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">JsonNumber</a><span class="other">::</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#constructor_JsonNumber_F64C97EE7D2B9AEF9AAEEDE2590B08F3105F2346">JsonNumber</a><span class="other">(</span><span class="kw">double</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_number_60F82A01BE088EBC9551686CBEB5822B6F85C022">number</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#variable_value_F1B9B8714AB3A935D04E49EDCD2C5B7EDAC03FC2">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">::</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#function_ToString_7DB3652EE12A29E8213D73692563BD06E7C673D5">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#variable_value_00BF9F2A3DBB8AAB2D9D8C3CD1C649E96D9B0F25">value</a><span class="other">&nbsp;?&nbsp;</span><span class="string">"true"</span><span class="other">&nbsp;:&nbsp;</span><span class="string">"false"</span><span class="other">;</span></span>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;</span>
   <br/>
-  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">JsonNumber</a><span class="other">::</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#function_Clone_28F515E2F2DEE73EB64007992441A4880A5B5C78">Clone</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
   <br/>
-  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;</span>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#constructor_JsonObject_52589489C0453061432084EAF738F04B3F36331F">JsonObject</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_object_6204AB6B4E50270E7747C8BE7260A8D1B773D119">object</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldValues_2BB6DA8A05719A39D3CB97233B8D4A810FD3F5D3">fieldValues</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">(</span><span class="other">)</span></span>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">JsonNumber</a><span class="other">(</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#variable_value_F1B9B8714AB3A935D04E49EDCD2C5B7EDAC03FC2">value</a><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;</span>
   <br/>
-  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;</span>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">JsonNumber</a><span class="other">::</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#function_ToString_08B9C917E05AFB0CB2B5FB07F638C53F175F6F00">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
   <br/>
-  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_AddField_8EE1F56C2BAD227F1A7CAAC419A5A922A0EA305F">AddField</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fieldName</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">&amp;&amp;</span><span class="identifier">fieldValue</span><span class="other">)</span></span>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="../class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html#variable_value_F1B9B8714AB3A935D04E49EDCD2C5B7EDAC03FC2">value</a><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">[</span><span class="identifier">fieldName</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">fieldValue</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldValues_2BB6DA8A05719A39D3CB97233B8D4A810FD3F5D3">fieldValues</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">fieldValue</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;</span>
   <br/>
-  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">::</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#constructor_JsonBool_ED500FD9660F6B53AE90812B8E2BB1FE25AB3C6B">JsonBool</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_boolean_50E01AC2E14FDB986FDBA4C1509AB3B07CFE9DC9">boolean</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#variable_value_00BF9F2A3DBB8AAB2D9D8C3CD1C649E96D9B0F25">value</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;</span>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_GetField_449B57BCE482A3FBF89ECD72648BEAB9E58C4F6A">GetField</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fieldName</span><span class="other">)</span></span>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;</span>
   <br/>
-  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">fieldName</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">::</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#constructor_JsonBool_EF020EFBFC50DAC9655816CB8FAC1C7D83BC6B58">JsonBool</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_boolean_50E01AC2E14FDB986FDBA4C1509AB3B07CFE9DC9">boolean</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#variable_value_00BF9F2A3DBB8AAB2D9D8C3CD1C649E96D9B0F25">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;</span>
   <br/>
-  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">::</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#function_Clone_40BD7127EF2B7F5E70EE25309BD3E96E0138207E">Clone</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
   <br/>
-  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">(</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#variable_value_00BF9F2A3DBB8AAB2D9D8C3CD1C649E96D9B0F25">value</a><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;</span>
   <br/>
-  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html">JsonBool</a><span class="other">::</span><a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#function_ToString_7DB3652EE12A29E8213D73692563BD06E7C673D5">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
   <br/>
-  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;</span>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_ToString_A232AB4FDA889046E8B4159B4D7DE661089BA18E">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_JsonBool_30F9268A4E6105C61D1253245DA3C4BA7DBB71C9.html#variable_value_00BF9F2A3DBB8AAB2D9D8C3CD1C649E96D9B0F25">value</a><span class="other">&nbsp;?&nbsp;</span><span class="string">"true"</span><span class="other">&nbsp;:&nbsp;</span><span class="string">"false"</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">str</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"{"</span><span class="other">;</span></span>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;</span>
   <br/>
-  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">first</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#constructor_JsonObject_52589489C0453061432084EAF738F04B3F36331F">JsonObject</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_object_6204AB6B4E50270E7747C8BE7260A8D1B773D119">object</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldValues_2BB6DA8A05719A39D3CB97233B8D4A810FD3F5D3">fieldValues</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">(</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">)</span></span>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a>&nbsp;<span class="identifier">s</span><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">first</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;</span>
   <br/>
-  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">&nbsp;*&nbsp;</span><span class="identifier">v</span><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_AddField_8EE1F56C2BAD227F1A7CAAC419A5A922A0EA305F">AddField</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fieldName</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">&amp;&amp;</span><span class="identifier">fieldValue</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">first</span><span class="other">)</span></span>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">[</span><span class="identifier">fieldName</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">fieldValue</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">first</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldValues_2BB6DA8A05719A39D3CB97233B8D4A810FD3F5D3">fieldValues</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">fieldValue</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;</span>
   <br/>
-  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_GetField_449B57BCE482A3FBF89ECD72648BEAB9E58C4F6A">GetField</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fieldName</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">",&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">fieldName</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">s</span><span class="other">.</span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">":"</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">v</span><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"}"</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">str</span><span class="other">;</span></span>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
   <br/>
-  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;</span>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">::</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#constructor_JsonArray_8A16533B37948B9BAB34049041C7C7BF6B9DC681">JsonArray</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_array_581D691AB6C534DA864C1A08DFBDA8CAD5A72BBF">array</a><span class="other">)</span></span>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
   <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;<span class="other">}</span></span>
   <br/>
   <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;</span>
   <br/>
-  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">::</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_AddItem_F0D323321DFDFE10A5F1029246F5A76C82E25E99">AddItem</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">&amp;&amp;</span><span class="identifier">item</span><span class="other">)</span></span>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_GetStringField_6F9F24CE1D7D4768AF55A555B3F3E71E72E698CD">GetStringField</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fieldName</span><span class="other">)</span></span>
   <br/>
   <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#variable_items_B60A14B7DDBFEE0E693D2432EA1052133D39D212">items</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">item</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<span class="identifier">value</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">GetField</span><span class="other">(</span><span class="identifier">fieldName</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">value</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;</span>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<span class="identifier">JsonArray</span><span class="other">::</span><span class="kw">operator</span><span class="other">[]</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">index</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">value</span><span class="other">-></span><span class="identifier">Type</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_string_0DD8B237057550AF12CF1DDD0ABA429A7EDA6558">string</a><span class="other">)</span></span>
   <br/>
-  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#variable_items_B60A14B7DDBFEE0E693D2432EA1052133D39D212">items</a><span class="other">[</span><span class="identifier">index</span><span class="other">]</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">*</span>&nbsp;<span class="identifier">str</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">value</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">str</span><span class="other">-></span><span class="identifier">Value</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;</span>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">::</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_ToString_220E038375FB79E4CA69E42C0756E10AAC918B61">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
   <br/>
-  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">str</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"["</span><span class="other">;</span></span>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"error&nbsp;getting&nbsp;field&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">fieldName</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">":&nbsp;string&nbsp;field&nbsp;expected"</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">first</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">item</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#variable_items_B60A14B7DDBFEE0E693D2432EA1052133D39D212">items</a><span class="other">)</span></span>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
   <br/>
-  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">first</span><span class="other">)</span></span>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">first</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;</span>
   <br/>
-  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_Clone_A7B1CEDA25F062D075D630AD604E0C0E06E87427">Clone</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
   <br/>
-  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">",&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">*</span>&nbsp;<span class="identifier">clone</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">item</span><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">)</span></span>
   <br/>
-  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"]"</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clone</span><span class="other">-></span><span class="identifier">AddField</span><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">first</span><span class="other">,&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">str</span><span class="other">;</span></span>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clone</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;</span>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;<a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html">JsonNull</a><span class="other">::</span><a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html#constructor_JsonNull_C6C7745CA4D15DB99E8BFD37D4E23995C4CA1FB6">JsonNull</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_null_6DED2E38694CD1C49DC96DB7A496BA77C714426B">null</a><span class="other">)</span></span>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;</span>
   <br/>
-  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_ToString_A232AB4FDA889046E8B4159B4D7DE661089BA18E">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
   <br/>
-  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;</span>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">str</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"{"</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html">JsonNull</a><span class="other">::</span><a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html#function_ToString_1F90512E14C7D79088FFE1E46D9D3958DD0D542A">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">first</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;<span class="other">{</span></span>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">)</span></span>
   <br/>
-  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"null"</span><span class="other">;</span></span>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a>&nbsp;<span class="identifier">s</span><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">first</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;</span>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">&nbsp;*&nbsp;</span><span class="identifier">v</span><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">first</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">first</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">",&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">s</span><span class="other">.</span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">":"</span><span class="other">)</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">v</span><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"}"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">str</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html">JsonObject</a><span class="other">::</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_Write_D796E081C39F45FE5461419A8BABA0A37CC42C3F">Write</a><span class="other">(</span><a href="../class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"{"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">IncIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a>&nbsp;<span class="identifier">lastItemType</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_object_6204AB6B4E50270E7747C8BE7260A8D1B773D119">object</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">first</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">JsonString</a>&nbsp;<span class="identifier">s</span><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">first</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">&nbsp;*&nbsp;</span><span class="identifier">v</span><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">first</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">first</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">",&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="string">"&nbsp;:&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">v</span><span class="other">-></span><span class="identifier">Type</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_array_581D691AB6C534DA864C1A08DFBDA8CAD5A72BBF">array</a><span class="other">&nbsp;||&nbsp;</span><span class="identifier">v</span><span class="other">-></span><span class="identifier">Type</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_object_6204AB6B4E50270E7747C8BE7260A8D1B773D119">object</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">s</span><span class="other">.</span><span class="identifier">Value</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="string">U"content"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">BeginContent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">v</span><span class="other">-></span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">s</span><span class="other">.</span><span class="identifier">Value</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="string">U"content"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">EndContent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">lastItemType</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">v</span><span class="other">-></span><span class="identifier">Type</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">DecIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">lastItemType</span><span class="other">&nbsp;!=&nbsp;</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_array_581D691AB6C534DA864C1A08DFBDA8CAD5A72BBF">array</a><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">lastItemType</span><span class="other">&nbsp;!=&nbsp;</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_object_6204AB6B4E50270E7747C8BE7260A8D1B773D119">object</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"}"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">::</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#constructor_JsonArray_8A16533B37948B9BAB34049041C7C7BF6B9DC681">JsonArray</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_array_581D691AB6C534DA864C1A08DFBDA8CAD5A72BBF">array</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">::</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_AddItem_F0D323321DFDFE10A5F1029246F5A76C82E25E99">AddItem</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">&amp;&amp;</span><span class="identifier">item</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#variable_items_B60A14B7DDBFEE0E693D2432EA1052133D39D212">items</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">item</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">::</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_Clone_9236716CAE88CF1768CD72E641CCD58179521843">Clone</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">*</span>&nbsp;<span class="identifier">clone</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">item</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#variable_items_B60A14B7DDBFEE0E693D2432EA1052133D39D212">items</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">clone</span><span class="other">-></span><span class="identifier">AddItem</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">(</span><span class="identifier">item</span><span class="other">-></span><span class="identifier">Clone</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">clone</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<span class="identifier">JsonArray</span><span class="other">::</span><span class="kw">operator</span><span class="other">[]</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">index</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="270" xml:space="preserve"><span class="lineNumber">270</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#variable_items_B60A14B7DDBFEE0E693D2432EA1052133D39D212">items</a><span class="other">[</span><span class="identifier">index</span><span class="other">]</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="271" xml:space="preserve"><span class="lineNumber">271</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="272" xml:space="preserve"><span class="lineNumber">272</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="273" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">::</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_ToString_220E038375FB79E4CA69E42C0756E10AAC918B61">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="274" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="275" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">str</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"["</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="276" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">first</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="277" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">item</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#variable_items_B60A14B7DDBFEE0E693D2432EA1052133D39D212">items</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="278" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="279" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">first</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="280" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="281" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">first</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="282" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="283" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="284" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="285" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">",&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="286" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="287" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="identifier">item</span><span class="other">-></span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="288" xml:space="preserve"><span class="lineNumber">288</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="289" xml:space="preserve"><span class="lineNumber">289</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">str</span><span class="other">.</span><span class="identifier">append</span><span class="other">(</span><span class="string">"]"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="290" xml:space="preserve"><span class="lineNumber">290</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">str</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="291" xml:space="preserve"><span class="lineNumber">291</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="292" xml:space="preserve"><span class="lineNumber">292</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="293" xml:space="preserve"><span class="lineNumber">293</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html">JsonArray</a><span class="other">::</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_Write_69833F0579E24848698884DEC4B4A8C118474427">Write</a><span class="other">(</span><a href="../class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">formatter</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="294" xml:space="preserve"><span class="lineNumber">294</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="295" xml:space="preserve"><span class="lineNumber">295</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"["</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="296" xml:space="preserve"><span class="lineNumber">296</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">IncIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="297" xml:space="preserve"><span class="lineNumber">297</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a>&nbsp;<span class="identifier">lastItemType</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_array_581D691AB6C534DA864C1A08DFBDA8CAD5A72BBF">array</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="298" xml:space="preserve"><span class="lineNumber">298</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">first</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="299" xml:space="preserve"><span class="lineNumber">299</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">></span><span class="other">&amp;</span><span class="identifier">item</span><span class="other">&nbsp;:&nbsp;</span><a href="../class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#variable_items_B60A14B7DDBFEE0E693D2432EA1052133D39D212">items</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="300" xml:space="preserve"><span class="lineNumber">300</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="301" xml:space="preserve"><span class="lineNumber">301</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">first</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="302" xml:space="preserve"><span class="lineNumber">302</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="303" xml:space="preserve"><span class="lineNumber">303</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">first</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="304" xml:space="preserve"><span class="lineNumber">304</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="305" xml:space="preserve"><span class="lineNumber">305</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="306" xml:space="preserve"><span class="lineNumber">306</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="307" xml:space="preserve"><span class="lineNumber">307</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">",&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="308" xml:space="preserve"><span class="lineNumber">308</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="309" xml:space="preserve"><span class="lineNumber">309</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">item</span><span class="other">-></span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="310" xml:space="preserve"><span class="lineNumber">310</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">lastItemType</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">item</span><span class="other">-></span><span class="identifier">Type</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="311" xml:space="preserve"><span class="lineNumber">311</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="312" xml:space="preserve"><span class="lineNumber">312</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">DecIndent</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="313" xml:space="preserve"><span class="lineNumber">313</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">lastItemType</span><span class="other">&nbsp;!=&nbsp;</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_array_581D691AB6C534DA864C1A08DFBDA8CAD5A72BBF">array</a><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">lastItemType</span><span class="other">&nbsp;!=&nbsp;</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_object_6204AB6B4E50270E7747C8BE7260A8D1B773D119">object</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="314" xml:space="preserve"><span class="lineNumber">314</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="315" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="316" xml:space="preserve"><span class="lineNumber">316</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="317" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">formatter</span><span class="other">.</span><span class="identifier">WriteLine</span><span class="other">(</span><span class="string">"]"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="318" xml:space="preserve"><span class="lineNumber">318</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="319" xml:space="preserve"><span class="lineNumber">319</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="320" xml:space="preserve"><span class="lineNumber">320</span>&nbsp;<a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html">JsonNull</a><span class="other">::</span><a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html#constructor_JsonNull_C6C7745CA4D15DB99E8BFD37D4E23995C4CA1FB6">JsonNull</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="../enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_null_6DED2E38694CD1C49DC96DB7A496BA77C714426B">null</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="321" xml:space="preserve"><span class="lineNumber">321</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="322" xml:space="preserve"><span class="lineNumber">322</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="323" xml:space="preserve"><span class="lineNumber">323</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="324" xml:space="preserve"><span class="lineNumber">324</span>&nbsp;<a href="../class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">*</span>&nbsp;<a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html">JsonNull</a><span class="other">::</span><a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html#function_Clone_01CD7F7743097B27B1B2AB1C435162C26D10402F">Clone</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="325" xml:space="preserve"><span class="lineNumber">325</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="326" xml:space="preserve"><span class="lineNumber">326</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html">JsonNull</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="327" xml:space="preserve"><span class="lineNumber">327</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="328" xml:space="preserve"><span class="lineNumber">328</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="329" xml:space="preserve"><span class="lineNumber">329</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html">JsonNull</a><span class="other">::</span><a href="../class_JsonNull_7DB910E13887E29744FB81A9A8886F96CBFCB71A.html#function_ToString_1F90512E14C7D79088FFE1E46D9D3958DD0D542A">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="330" xml:space="preserve"><span class="lineNumber">330</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="331" xml:space="preserve"><span class="lineNumber">331</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"null"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="332" xml:space="preserve"><span class="lineNumber">332</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="333" xml:space="preserve"><span class="lineNumber">333</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="334" xml:space="preserve"><span class="lineNumber">334</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;soulng::util</span></span>
   <br/>
  </body>
 </html>

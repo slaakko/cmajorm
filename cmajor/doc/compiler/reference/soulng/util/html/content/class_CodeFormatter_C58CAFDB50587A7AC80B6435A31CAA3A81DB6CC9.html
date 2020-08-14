@@ -13,7 +13,7 @@
         <h1>CodeFormatter Class</h1>
         <p>Writes indented text to a stream.</p>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#14">14</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#15">15</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
         </span>
         <br/>
@@ -26,12 +26,24 @@
         <h2>Member Functions</h2>
         <table class="functionTable">
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_BeginContent_29F88DDAD0ED6485EA5D800389FD618D9CD99948">BeginContent</a>()</td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_CurrentIndent_46F6B5EAC7981A614CC1FADD9CA49FDFB0D6EA9C">CurrentIndent</a>() <span class="kw">const</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_DecIndent_B36B7F7A6C76F0F622F1B9B00E4F3419DD8E7F9C">DecIndent</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_EndContent_46FAA3121AA26E31E90F0BBAEE5AE996D3CE5876">EndContent</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_Flush_6237259FB43B97DE79D3C4022510B0D0D08463AF">Flush</a>()</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
@@ -71,6 +83,10 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_SetLogging_2B4F1998B96C2FCC24D8147A3389E6BFED29E00B">SetLogging</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_SetPreserveSpace_93294F310C370692C17657646D94A54EC95FDEED">SetPreserveSpace</a>(<span class="kw">bool</span> preserveSpace_)</td>
             </tr>
             <tr>
@@ -101,12 +117,27 @@
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_WriteLine_E18FDC056022CF75C77787ED1B7B1FD9560BF36A">WriteLine</a>(<span class="kw">const </span>std::string&amp; text)</td>
             </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_operator_shift_left_3595F3EB9032671E758FB745ABCFE39A426DAE80">operator&lt;&lt;</a>(StandardEndLine manip)</td>
+            </tr>
+        </table>
+        <h2>Typedefs</h2>
+        <table>
+            <tr id="typedef_CoutType_D3F3055A1C56A4EF389234361F0812C18A3D752F">
+                <td class="functionTableFirstCol" xml:space="preserve">std::basic_ostream&lt;<span class="kw">char</span>, std::char_traits&lt;<span class="kw">char</span>>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">CoutType</td>
+            </tr>
         </table>
         <h2>Member Variables</h2>
         <table>
             <tr id="variable_atBeginningOfLine_FC17D3D22109B98317E9F3B1A1C49FED00D2D949">
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve">atBeginningOfLine</td>
+            </tr>
+            <tr id="variable_contentCount_C5C3AA8E60C2293EB3F94846FA56F0C9BDD6E586">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">contentCount</td>
             </tr>
             <tr id="variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
@@ -119,6 +150,10 @@
             <tr id="variable_line_1742F5AC850B3293850E7975EF8AAA503FD41862">
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
                 <td class="functionTableSecondCol" xml:space="preserve">line</td>
+            </tr>
+            <tr id="variable_logging_527A88D4FF2AD702F01D3F0C90F910CFB08C0615">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">logging</td>
             </tr>
             <tr id="variable_preserveSpace_21D332DAF9D400B24570DCB4A8756061D3009B46">
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -143,28 +178,48 @@
         <h4>
             soulng::util::CodeFormatter::CodeFormatter(std::ostream&amp; stream_)</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#17">17</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#18">18</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_stream_F951BAF08986A765BEB6050F062DF5B68A872D00">stream</a><span class="other">(</span><span class="identifier">stream_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">(</span><span class="other">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indentSize_53B535B71D00935E407F06C1C7BF59126C2DC240">indentSize</a><span class="other">(</span><span class="other">4</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_atBeginningOfLine_FC17D3D22109B98317E9F3B1A1C49FED00D2D949">atBeginningOfLine</a><span class="other">(</span><span class="kw">true</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_line_1742F5AC850B3293850E7975EF8AAA503FD41862">line</a><span class="other">(</span><span class="other">1</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_start_DE4A3E64F1D9C0E8309A28E4F21D365B1C481774">start</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_preserveSpace_21D332DAF9D400B24570DCB4A8756061D3009B46">preserveSpace</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_stream_F951BAF08986A765BEB6050F062DF5B68A872D00">stream</a><span class="other">(</span><span class="identifier">stream_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">(</span><span class="other">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indentSize_53B535B71D00935E407F06C1C7BF59126C2DC240">indentSize</a><span class="other">(</span><span class="other">4</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_atBeginningOfLine_FC17D3D22109B98317E9F3B1A1C49FED00D2D949">atBeginningOfLine</a><span class="other">(</span><span class="kw">true</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_line_1742F5AC850B3293850E7975EF8AAA503FD41862">line</a><span class="other">(</span><span class="other">1</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_start_DE4A3E64F1D9C0E8309A28E4F21D365B1C481774">start</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_preserveSpace_21D332DAF9D400B24570DCB4A8756061D3009B46">preserveSpace</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_contentCount_C5C3AA8E60C2293EB3F94846FA56F0C9BDD6E586">contentCount</a><span class="other">(</span><span class="other">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_logging_527A88D4FF2AD702F01D3F0C90F910CFB08C0615">logging</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
+        <h3 id="function_BeginContent_29F88DDAD0ED6485EA5D800389FD618D9CD99948">BeginContent Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::CodeFormatter::BeginContent()</h4>
+        <span>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#46">46</a>
+             of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">{</span>&nbsp;<span class="other">++</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_contentCount_C5C3AA8E60C2293EB3F94846FA56F0C9BDD6E586">contentCount</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_Write_D796E081C39F45FE5461419A8BABA0A37CC42C3F">soulng::util::JsonObject::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
         <h3 id="function_CurrentIndent_46F6B5EAC7981A614CC1FADD9CA49FDFB0D6EA9C">CurrentIndent Member Function</h3>
         <h4>
             <span class="kw">int</span>
              soulng::util::CodeFormatter::CurrentIndent() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#21">21</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#22">22</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indentSize_53B535B71D00935E407F06C1C7BF59126C2DC240">indentSize</a><span class="other">&nbsp;*&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indentSize_53B535B71D00935E407F06C1C7BF59126C2DC240">indentSize</a><span class="other">&nbsp;*&nbsp;</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -175,18 +230,74 @@
             <span class="kw">void</span>
              soulng::util::CodeFormatter::DecIndent()</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#30">30</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#32">32</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">--</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">--</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_Write_69833F0579E24848698884DEC4B4A8C118474427">soulng::util::JsonArray::Write</a>
+            , <a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_Write_D796E081C39F45FE5461419A8BABA0A37CC42C3F">soulng::util::JsonObject::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_EndContent_46FAA3121AA26E31E90F0BBAEE5AE996D3CE5876">EndContent Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::CodeFormatter::EndContent()</h4>
+        <span>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#47">47</a>
+             of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="other">{</span>&nbsp;<span class="other">--</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_contentCount_C5C3AA8E60C2293EB3F94846FA56F0C9BDD6E586">contentCount</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_Write_D796E081C39F45FE5461419A8BABA0A37CC42C3F">soulng::util::JsonObject::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Flush_6237259FB43B97DE79D3C4022510B0D0D08463AF">Flush Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::CodeFormatter::Flush()</h4>
+        <span>
+            Definition at line <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html#142">142</a>
+             of <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html">CodeFormatter.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_stream_F951BAF08986A765BEB6050F062DF5B68A872D00">stream</a><span class="other">.</span><span class="identifier">flush</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#27">27</a>
+             of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_operator_shift_left_3595F3EB9032671E758FB745ABCFE39A426DAE80">soulng::util::CodeFormatter::operator&lt;&lt;</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_IncIndent_BDA04C54C0FD0E48131D13C12C98C24F0E82085C">IncIndent Member Function</h3>
@@ -194,18 +305,24 @@
             <span class="kw">void</span>
              soulng::util::CodeFormatter::IncIndent()</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#26">26</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#28">28</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_Write_69833F0579E24848698884DEC4B4A8C118474427">soulng::util::JsonArray::Write</a>
+            , <a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_Write_D796E081C39F45FE5461419A8BABA0A37CC42C3F">soulng::util::JsonObject::Write</a>
+        </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_Indent_2B655D0EA6DE64C46E84C8DF0E6AEF0E8220A199">Indent Member Function</h3>
@@ -214,11 +331,11 @@
              soulng::util::CodeFormatter::Indent() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#18">18</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#19">19</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indent_8D78E43363EB74FA477D163072B1A80EEEACA526">indent</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -230,11 +347,11 @@
              soulng::util::CodeFormatter::IndentSize() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#19">19</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#20">20</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indentSize_53B535B71D00935E407F06C1C7BF59126C2DC240">indentSize</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indentSize_53B535B71D00935E407F06C1C7BF59126C2DC240">indentSize</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -246,11 +363,11 @@
              soulng::util::CodeFormatter::Line() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#34">34</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#36">36</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_line_1742F5AC850B3293850E7975EF8AAA503FD41862">line</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_line_1742F5AC850B3293850E7975EF8AAA503FD41862">line</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -261,25 +378,25 @@
             <span class="kw">void</span>
              soulng::util::CodeFormatter::NewLine()</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html#112">112</a>
+            Definition at line <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html#135">135</a>
              of <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html">CodeFormatter.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_stream_F951BAF08986A765BEB6050F062DF5B68A872D00">stream</a><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"\n"</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_stream_F951BAF08986A765BEB6050F062DF5B68A872D00">stream</a><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"\n"</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_atBeginningOfLine_FC17D3D22109B98317E9F3B1A1C49FED00D2D949">atBeginningOfLine</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_atBeginningOfLine_FC17D3D22109B98317E9F3B1A1C49FED00D2D949">atBeginningOfLine</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_line_1742F5AC850B3293850E7975EF8AAA503FD41862">line</a><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">++</span><a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_line_1742F5AC850B3293850E7975EF8AAA503FD41862">line</a><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#24">24</a>
+            Declaration at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#25">25</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
         </span>
         <br/>
@@ -297,11 +414,11 @@
              soulng::util::CodeFormatter::PreserveSpace() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#41">41</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#43">43</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_preserveSpace_21D332DAF9D400B24570DCB4A8756061D3009B46">preserveSpace</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_preserveSpace_21D332DAF9D400B24570DCB4A8756061D3009B46">preserveSpace</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -312,11 +429,11 @@
             <span class="kw">void</span>
              soulng::util::CodeFormatter::ResetStart()</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#38">38</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#40">40</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_start_DE4A3E64F1D9C0E8309A28E4F21D365B1C481774">start</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_start_DE4A3E64F1D9C0E8309A28E4F21D365B1C481774">start</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -328,11 +445,11 @@
              soulng::util::CodeFormatter::SetIndentSize(<span class="kw">int</span>
              indentSize_)</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#20">20</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#21">21</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indentSize_53B535B71D00935E407F06C1C7BF59126C2DC240">indentSize</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">indentSize_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_indentSize_53B535B71D00935E407F06C1C7BF59126C2DC240">indentSize</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">indentSize_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -344,11 +461,26 @@
              soulng::util::CodeFormatter::SetLine(<span class="kw">int</span>
              line_)</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#35">35</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#37">37</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_line_1742F5AC850B3293850E7975EF8AAA503FD41862">line</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">line_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_line_1742F5AC850B3293850E7975EF8AAA503FD41862">line</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">line_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_SetLogging_2B4F1998B96C2FCC24D8147A3389E6BFED29E00B">SetLogging Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::CodeFormatter::SetLogging()</h4>
+        <span>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#45">45</a>
+             of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_logging_527A88D4FF2AD702F01D3F0C90F910CFB08C0615">logging</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -360,11 +492,11 @@
              soulng::util::CodeFormatter::SetPreserveSpace(<span class="kw">bool</span>
              preserveSpace_)</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#42">42</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#44">44</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_preserveSpace_21D332DAF9D400B24570DCB4A8756061D3009B46">preserveSpace</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">preserveSpace_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_preserveSpace_21D332DAF9D400B24570DCB4A8756061D3009B46">preserveSpace</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">preserveSpace_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -375,11 +507,11 @@
             <span class="kw">void</span>
              soulng::util::CodeFormatter::SetStart()</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#37">37</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#39">39</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_start_DE4A3E64F1D9C0E8309A28E4F21D365B1C481774">start</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_start_DE4A3E64F1D9C0E8309A28E4F21D365B1C481774">start</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -391,11 +523,11 @@
              soulng::util::CodeFormatter::SetStartText(<span class="kw">const </span>
             std::string&amp; startText_)</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#39">39</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#41">41</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_startText_DD1116CFBC96936CB06FB9DE6BBCC0CAA516B19F">startText</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">startText_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">{</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_startText_DD1116CFBC96936CB06FB9DE6BBCC0CAA516B19F">startText</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">startText_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -407,11 +539,11 @@
              soulng::util::CodeFormatter::Start() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#36">36</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#38">38</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_start_DE4A3E64F1D9C0E8309A28E4F21D365B1C481774">start</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_start_DE4A3E64F1D9C0E8309A28E4F21D365B1C481774">start</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -423,11 +555,11 @@
             std::string&amp; soulng::util::CodeFormatter::StartText() <span class="kw">const</span>
         </h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#40">40</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#42">42</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_startText_DD1116CFBC96936CB06FB9DE6BBCC0CAA516B19F">startText</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#variable_startText_DD1116CFBC96936CB06FB9DE6BBCC0CAA516B19F">startText</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
@@ -439,18 +571,20 @@
              soulng::util::CodeFormatter::Write(<span class="kw">const </span>
             std::string&amp; text)</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html#93">93</a>
+            Definition at line <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html#109">109</a>
              of <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html">CodeFormatter.cpp</a>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#22">22</a>
+            Declaration at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#23">23</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
         </span>
         <br/>
         <br/>
         <span>
             Called by: <a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_WriteLine_E18FDC056022CF75C77787ED1B7B1FD9560BF36A">soulng::util::CodeFormatter::WriteLine</a>
+            , <a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_Write_D796E081C39F45FE5461419A8BABA0A37CC42C3F">soulng::util::JsonObject::Write</a>
+            , <a href="./class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html#function_Write_901A70C62D26C2EE36A9800222864ABC92706303">soulng::util::JsonValue::Write</a>
         </span>
         <br/>
         <br/>
@@ -460,17 +594,24 @@
             <span class="kw">void</span>
              soulng::util::CodeFormatter::WriteLine()</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#25">25</a>
+            Definition at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#26">26</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">NewLine</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">NewLine</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
             Calls: <a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_NewLine_4D430D57785C3324783579A7B73E2247A62B91AC">soulng::util::CodeFormatter::NewLine</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_operator_shift_left_3595F3EB9032671E758FB745ABCFE39A426DAE80">soulng::util::CodeFormatter::operator&lt;&lt;</a>
+            , <a href="./class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_Write_69833F0579E24848698884DEC4B4A8C118474427">soulng::util::JsonArray::Write</a>
+            , <a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_Write_D796E081C39F45FE5461419A8BABA0A37CC42C3F">soulng::util::JsonObject::Write</a>
         </span>
         <br/>
         <br/>
@@ -481,23 +622,23 @@
              soulng::util::CodeFormatter::WriteLine(<span class="kw">const </span>
             std::string&amp; text)</h4>
         <span>
-            Definition at line <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html#106">106</a>
+            Definition at line <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html#129">129</a>
              of <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html">CodeFormatter.cpp</a>
             :<br/>
             <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">{</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">{</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Write</span><span class="other">(</span><span class="identifier">text</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Write</span><span class="other">(</span><span class="identifier">text</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">NewLine</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">NewLine</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
                 <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">}</span></span>
+                <span class="code" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="other">}</span></span>
             </span>
             <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#23">23</a>
+            Declaration at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#24">24</a>
              of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
         </span>
         <br/>
@@ -505,6 +646,47 @@
         <span>
             Calls: <a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_NewLine_4D430D57785C3324783579A7B73E2247A62B91AC">soulng::util::CodeFormatter::NewLine</a>
             , <a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_Write_CD7775F73D2C0A69FD368A415F86EBB6960314A5">soulng::util::CodeFormatter::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_JsonArray_A69040029AB5D936061CEA58AD537836B0BDF9CC.html#function_Write_69833F0579E24848698884DEC4B4A8C118474427">soulng::util::JsonArray::Write</a>
+            , <a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_Write_D796E081C39F45FE5461419A8BABA0A37CC42C3F">soulng::util::JsonObject::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_operator_shift_left_3595F3EB9032671E758FB745ABCFE39A426DAE80">operator&lt;&lt; Member Function</h3>
+        <h4>
+            <a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a>
+            &amp; soulng::util::CodeFormatter::operator&lt;&lt;(StandardEndLine manip)</h4>
+        <span>
+            Definition at line <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html#147">147</a>
+             of <a href="file/CodeFormatter.cpp_5E241BB51C57D9765ED11B2E1D9AE0F3F3AAFC26.html">CodeFormatter.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">WriteLine</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Flush</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><span class="kw">this</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html#50">50</a>
+             of <a href="file/CodeFormatter.hpp_F11E104262EE7A9ED512D36AA746B0D24925D4E3.html">CodeFormatter.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_Flush_6237259FB43B97DE79D3C4022510B0D0D08463AF">soulng::util::CodeFormatter::Flush</a>
+            , <a href="./class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_WriteLine_98AD881B7A691113AB22B336D14256F0C13FAEAF">soulng::util::CodeFormatter::WriteLine</a>
         </span>
         <br/>
         <br/>

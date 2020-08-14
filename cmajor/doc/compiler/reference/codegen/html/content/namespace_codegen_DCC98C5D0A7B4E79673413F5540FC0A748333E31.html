@@ -47,7 +47,7 @@
             * cmajor::codegen::CreateCodeGenerator(<a href="./../../../ir/html/content/class_EmittingContext_42D38BA76B81697C1A82775FA1B5E641DC51D0DD.html">EmittingContext</a>
             &amp; emittingContext)</h4>
         <span>
-            Definition at line <a href="file/CodeGenerator.cpp_BC24762A4446A321043C94BAD587DC13061FFF2E.html#17">17</a>
+            Definition at line <a href="file/CodeGenerator.cpp_BC24762A4446A321043C94BAD587DC13061FFF2E.html#18">18</a>
              of <a href="file/CodeGenerator.cpp_BC24762A4446A321043C94BAD587DC13061FFF2E.html">CodeGenerator.cpp</a>
         </span>
         <br/>
@@ -59,10 +59,18 @@
              cmajor::codegen::DestroyCodeGenerator(<a href="./../../../codegenbase/html/content/class_CodeGenerator_611D0E692EE68754A3B526D8BE9DAAFE9B87D7F1.html">CodeGenerator</a>
             * codeGenerator)</h4>
         <span>
-            Definition at line <a href="file/CodeGenerator.cpp_BC24762A4446A321043C94BAD587DC13061FFF2E.html#40">40</a>
+            Definition at line <a href="file/CodeGenerator.cpp_BC24762A4446A321043C94BAD587DC13061FFF2E.html#45">45</a>
              of <a href="file/CodeGenerator.cpp_BC24762A4446A321043C94BAD587DC13061FFF2E.html">CodeGenerator.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">delete</span>&nbsp;<span class="identifier">codeGenerator</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Called by: <a href="./class_CodeGenerator_9DEE5E43F7F6A16793659EC0B707E30662BBD3FB.html#destructor_destructor_627B7CE1DE0ACC1542F08BEC01B9E512862965BE">cmajor::codegen::CodeGenerator::destructor</a>
@@ -79,6 +87,21 @@
         <span>
             Definition at line <a href="file/Interface.cpp_499395819C01C5EFAE6C35A28600B320C3B80EA3.html#12">12</a>
              of <a href="file/Interface.cpp_499395819C01C5EFAE6C35A28600B320C3B80EA3.html">Interface.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="./../../../ir/html/content/namespace_ir_CECF80BCF58FD5CC6118CB107FC60F370B770AA3.html">ir</a><span class="other">::</span><a href="./../../../ir/html/content/class_EmittingContext_42D38BA76B81697C1A82775FA1B5E641DC51D0DD.html">EmittingContext</a><span class="other">*</span>&nbsp;<span class="identifier">baseEmittingContext</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">emittingContext</span><span class="other">.</span><span class="identifier">GetBaseEmittingContext</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="./namespace_codegen_DCC98C5D0A7B4E79673413F5540FC0A748333E31.html">codegen</a><span class="other">::</span><a href="./class_CodeGenerator_9DEE5E43F7F6A16793659EC0B707E30662BBD3FB.html">CodeGenerator</a>&nbsp;<span class="identifier">codeGenerator</span><span class="other">(</span><span class="other">*</span><span class="identifier">baseEmittingContext</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_cmajor_FE67894B5124E7B0A2B265772A3D8787174BD568.html">cmajor</a><span class="other">::</span><a href="./../../../codegenbase/html/content/namespace_codegenbase_97F42DC26079093D8D70622ED5AD4B1E740D498D.html">codegenbase</a><span class="other">::</span><a href="./../../../codegenbase/html/content/class_CodeGenerator_611D0E692EE68754A3B526D8BE9DAAFE9B87D7F1.html">CodeGenerator</a><span class="other">*</span>&nbsp;<span class="identifier">baseCodeGenerator</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">codeGenerator</span><span class="other">.</span><span class="identifier">GetBaseCodeGenerator</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">baseCodeGenerator</span><span class="other">-></span><span class="identifier">GenerateCode</span><span class="other">(</span><span class="other">&amp;</span><span class="identifier">boundCompileUnit</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>

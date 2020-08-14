@@ -270,7 +270,8 @@ function drawClassInheritanceDiagram() {
     var classes = [
         { name: "cmajor::binder::AttributeProcessor", id: "class_0", level: 0, subject: true, hasDerivedClasses: true, link: "./class_AttributeProcessor_0A91371F1E463526CB54EFCCF1D80DDB8AC06CF7.html" },
         { name: "cmajor::binder::JsonAttributeProcessor", id: "class_1", level: 1, subject: false, hasDerivedClasses: false, link: "./class_JsonAttributeProcessor_6AB69FA730ECB6FB3611886BE7DB6C74572DF3DC.html" },
-        { name: "cmajor::binder::JsonFieldNameAttributeProcessor", id: "class_2", level: 1, subject: false, hasDerivedClasses: false, link: "./class_JsonFieldNameAttributeProcessor_6BF51292096821F4CD25530C3EE3C84AEC5AB610.html" }];
+        { name: "cmajor::binder::JsonFieldNameAttributeProcessor", id: "class_2", level: 1, subject: false, hasDerivedClasses: false, link: "./class_JsonFieldNameAttributeProcessor_6BF51292096821F4CD25530C3EE3C84AEC5AB610.html" },
+        { name: "cmajor::binder::SystemDefaultAttributeProcessor", id: "class_3", level: 1, subject: false, hasDerivedClasses: false, link: "./class_SystemDefaultAttributeProcessor_339180FFDFC7DB48444E2C859DBBA5B5A061DADB.html" }];
     drawDiagram(classes);
 }
 

@@ -1,0 +1,230 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>DebugExprNode Abstract Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html">up</a>
+         | <a href="class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html">prev</a>
+         | <a href="class_DebugExprVisitor_E73F793F17495CCE1B69EF812D95CDFD35EEBE7F.html">next</a>
+        <hr/>
+        <h1>DebugExprNode Abstract Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html#21">21</a>
+             of <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html">DebugExpr.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html#constructor_DebugExprNode_93EFA2795DF7F89E8681BC99EE4887C6E27B7AB8">DebugExprNode</a>(<a href="./enum_Kind_C91348E631A555609D390AC7D498E71B4382DD60.html">Kind</a> kind_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html#function_Accept_9485C900902EB9DE15C36A42BFB734528CEDABFC">Accept</a>(<a href="./class_DebugExprVisitor_E73F793F17495CCE1B69EF812D95CDFD35EEBE7F.html">DebugExprVisitor</a>&amp; visitor) <span class="kw">pure virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html">DebugExprNode</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html#function_Clone_2270E770772555EBFC4E76C3D33EB7A7A0F30256">Clone</a>() <span class="kw">const pure virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_Kind_C91348E631A555609D390AC7D498E71B4382DD60.html">Kind</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html#function_GetKind_82F023B1A799C0D12DF490C063B01548C0A864EE">GetKind</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html#function_ToString_FFF50EFD4C54591C1EEDE5A6D4A54DD84AF5CFF0">ToString</a>() <span class="kw">const pure virtual</span></td>
+            </tr>
+        </table>
+        <h2>Enumerations</h2>
+        <table>
+            <tr>
+                <td>
+                    enum class <a href="enum_Kind_C91348E631A555609D390AC7D498E71B4382DD60.html">Kind</a>
+                </td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_kind_9746B0B0FD21CEB2AC6D2D800689965403DBAF7A">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./enum_Kind_C91348E631A555609D390AC7D498E71B4382DD60.html">Kind</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">kind</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_DebugExprNode_93EFA2795DF7F89E8681BC99EE4887C6E27B7AB8">DebugExprNode Constructor</h3>
+        <h4>
+            cmajor::debug::DebugExprNode::DebugExprNode(<a href="./enum_Kind_C91348E631A555609D390AC7D498E71B4382DD60.html">Kind</a>
+             kind_)</h4>
+        <span>
+            Definition at line <a href="file/DebugExpr.cpp_4C70D7DF91813AC23AAECB4BDF00DD2C33C5EC62.html#11">11</a>
+             of <a href="file/DebugExpr.cpp_4C70D7DF91813AC23AAECB4BDF00DD2C33C5EC62.html">DebugExpr.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html#variable_kind_9746B0B0FD21CEB2AC6D2D800689965403DBAF7A">kind</a><span class="other">(</span><span class="identifier">kind_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html#28">28</a>
+             of <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html">DebugExpr.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Accept_9485C900902EB9DE15C36A42BFB734528CEDABFC">Accept Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::debug::DebugExprNode::Accept(<a href="./class_DebugExprVisitor_E73F793F17495CCE1B69EF812D95CDFD35EEBE7F.html">DebugExprVisitor</a>
+            &amp; visitor) <span class="kw">pure virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html#31">31</a>
+             of <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html">DebugExpr.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_AddDebugExprNode_B8439FDE61FF318A9A9DD2EA848F19FDD883BA0A.html#function_Accept_C1AF413008F708836EF01BC1AD8E3D262072D10D">cmajor::debug::AddDebugExprNode::Accept</a>
+            , <a href="./class_AddrOfDebugExprNode_B5EA23DF021B13D86DE4C86856D80008B96D4FD8.html#function_Accept_44E5B14A8978A0C912210FE4B47F91E812940082">cmajor::debug::AddrOfDebugExprNode::Accept</a>
+            , <a href="./class_CastDebugExprNode_FA953B0E6886EC3FD89E8D71273C2E4D09BA326B.html#function_Accept_6015C40691EEBF3AD378D73D8C105CA3E237FD3A">cmajor::debug::CastDebugExprNode::Accept</a>
+            , <a href="./class_DerefDebugExprNode_44972610CC26A5DDD1BFABB3FAAB1CEE3F89DE2A.html#function_Accept_82C1FDF92ABE2B22D311B22A3E12B9AF7C523E69">cmajor::debug::DerefDebugExprNode::Accept</a>
+            , <a href="./class_DotDebugExprNode_00B683A0B50AA8B22D6EEB4287D2FCE5BE19B2BF.html#function_Accept_D6A1EECD04BDE3AFD6303C75650E14A8C7D4F290">cmajor::debug::DotDebugExprNode::Accept</a>
+            , <a href="./class_IdentifierDebugExprNode_D16EA8B9BF8965717A0D26964AB569209352A475.html#function_Accept_BA28E98C1A1A0A45A60D678D4725C4F5BBDAF750">cmajor::debug::IdentifierDebugExprNode::Accept</a>
+            , <a href="./class_IntegerDebugExprNode_98D198DE83A3A14BBD2EED242837B2C3508479F5.html#function_Accept_57D2C396021925879BD794732BB5F7627711260B">cmajor::debug::IntegerDebugExprNode::Accept</a>
+            , <a href="./class_ParenthesizedDebugExprNode_4C5A530587CC7F4AD20B28B23CF7B0E08BF18CE5.html#function_Accept_AB07D9957B309332539E876174F04272C38D1D12">cmajor::debug::ParenthesizedDebugExprNode::Accept</a>
+            , <a href="./class_RangeDebugExprNode_7903853BBB12547CBC8AC2B62D5F5BB117DFCFD1.html#function_Accept_5CB8E6744C822A5B0DF4DAB1EF8D2FCACCF74D44">cmajor::debug::RangeDebugExprNode::Accept</a>
+            , <a href="./class_SubDebugExprNode_E517C52DDFD1B4576FFE8F013C6C6DC7DE7D60F0.html#function_Accept_D13488EE267C7ED78AB28B135EB1EDB2FAA34CEB">cmajor::debug::SubDebugExprNode::Accept</a>
+            , <a href="./class_SubscriptDebugExprNode_9EBF7D8DCF0DFFD1FEF5BE5814C105560588BE12.html#function_Accept_BABD3B132B06E217CE780BB178A1FB824CB96646">cmajor::debug::SubscriptDebugExprNode::Accept</a>
+            , <a href="./class_TypeIdDebugExprNode_E0C8D77BB42AC73B095B65414CA3B2EF079E108D.html#function_Accept_20A76B6CC2313E951F1771120812B15B9B149A3F">cmajor::debug::TypeIdDebugExprNode::Accept</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_B7E6E7B68C328B5F6EFDFE8FCAE97718603BA9C4">cmajor::debug::DebugExprBinder::Visit</a>
+            , <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_CA91EA073833CFBFD4906EA479EB4AD42134D5F4">cmajor::debug::DebugExprBinder::Visit</a>
+            , <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_B6BF3EA7F703E2BF638A80A2CA84AA196039BDD5">cmajor::debug::DebugExprBinder::Visit</a>
+            , <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_E5D7AD6E434975442FED49EFB616E8458B35EEEB">cmajor::debug::DebugExprBinder::Visit</a>
+            , <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_6E3BBECC5041D8C8EC63BD1843690AD7ABAEB74D">cmajor::debug::DebugExprBinder::Visit</a>
+            , <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_005B9DF84B0FAB848AF15E2B00D449DFA022C42F">cmajor::debug::DebugExprBinder::Visit</a>
+            , <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_7EF24603B905900EC9F2168A0307F9ABC5116F0C">cmajor::debug::DebugExprBinder::Visit</a>
+            , <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_C90D056ED8B75FAD107194AFFC33AF4D29EF876A">cmajor::debug::DebugExprBinder::Visit</a>
+            , <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_411267A9047568551371B13FC3C78D6CE1D26254">cmajor::debug::DebugExprBinder::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Clone_2270E770772555EBFC4E76C3D33EB7A7A0F30256">Clone Member Function</h3>
+        <h4>
+            <a href="./class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html">DebugExprNode</a>
+            * cmajor::debug::DebugExprNode::Clone() <span class="kw">const pure virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html#30">30</a>
+             of <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html">DebugExpr.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_AddDebugExprNode_B8439FDE61FF318A9A9DD2EA848F19FDD883BA0A.html#function_Clone_D9F6CA13DEDBDB105A2E75B6C3ED42064863127A">cmajor::debug::AddDebugExprNode::Clone</a>
+            , <a href="./class_AddrOfDebugExprNode_B5EA23DF021B13D86DE4C86856D80008B96D4FD8.html#function_Clone_0C8DC08E91C8F2AB5CB3FC8F48230F021D52D673">cmajor::debug::AddrOfDebugExprNode::Clone</a>
+            , <a href="./class_CastDebugExprNode_FA953B0E6886EC3FD89E8D71273C2E4D09BA326B.html#function_Clone_59C229EFEB5E4EC3AA071ED7F32DECE5E9148D3F">cmajor::debug::CastDebugExprNode::Clone</a>
+            , <a href="./class_DerefDebugExprNode_44972610CC26A5DDD1BFABB3FAAB1CEE3F89DE2A.html#function_Clone_48BF4FE6CB10260A47090D3F0D03D9D43C88FC8D">cmajor::debug::DerefDebugExprNode::Clone</a>
+            , <a href="./class_DotDebugExprNode_00B683A0B50AA8B22D6EEB4287D2FCE5BE19B2BF.html#function_Clone_166E7218FB1541C0D8EA9978F3E711DFDDD93E1D">cmajor::debug::DotDebugExprNode::Clone</a>
+            , <a href="./class_IdentifierDebugExprNode_D16EA8B9BF8965717A0D26964AB569209352A475.html#function_Clone_015841F21AFFB7729AEEE3BDFCDF5166EE53C429">cmajor::debug::IdentifierDebugExprNode::Clone</a>
+            , <a href="./class_IntegerDebugExprNode_98D198DE83A3A14BBD2EED242837B2C3508479F5.html#function_Clone_24E56EB5ED9206926F0180438CDF4AAD67A3C250">cmajor::debug::IntegerDebugExprNode::Clone</a>
+            , <a href="./class_ParenthesizedDebugExprNode_4C5A530587CC7F4AD20B28B23CF7B0E08BF18CE5.html#function_Clone_CBDDEEB2D2970599F6956FD05BAD4F9BDE6F8D32">cmajor::debug::ParenthesizedDebugExprNode::Clone</a>
+            , <a href="./class_RangeDebugExprNode_7903853BBB12547CBC8AC2B62D5F5BB117DFCFD1.html#function_Clone_2CB29F17260D9641744CD2B421888A6856E6AA69">cmajor::debug::RangeDebugExprNode::Clone</a>
+            , <a href="./class_SubDebugExprNode_E517C52DDFD1B4576FFE8F013C6C6DC7DE7D60F0.html#function_Clone_A3FAE853123C286820BF0FD5F38377A787B84F42">cmajor::debug::SubDebugExprNode::Clone</a>
+            , <a href="./class_SubscriptDebugExprNode_9EBF7D8DCF0DFFD1FEF5BE5814C105560588BE12.html#function_Clone_02E51959F8A9741231142A21B417BD21CB543436">cmajor::debug::SubscriptDebugExprNode::Clone</a>
+            , <a href="./class_TypeIdDebugExprNode_E0C8D77BB42AC73B095B65414CA3B2EF079E108D.html#function_Clone_0D22645546678CEC21872827C1689C5DE5A97D4C">cmajor::debug::TypeIdDebugExprNode::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_DebugExpressionEvaluator_072E169E6C79BB7B20ECE9D51D9E7E35966FA77D.html#function_EvaluateArrayRange_588DA55B9DA8CA1DF8E3112BB567E4CD88F69865">cmajor::debug::DebugExpressionEvaluator::EvaluateArrayRange</a>
+            , <a href="./class_DebugExpressionEvaluator_072E169E6C79BB7B20ECE9D51D9E7E35966FA77D.html#function_EvaluatePointerRange_5166C4970C8CF6A4D17CA71F36048192F2450F0D">cmajor::debug::DebugExpressionEvaluator::EvaluatePointerRange</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetKind_82F023B1A799C0D12DF490C063B01548C0A864EE">GetKind Member Function</h3>
+        <h4>
+            <a href="./enum_Kind_C91348E631A555609D390AC7D498E71B4382DD60.html">Kind</a>
+             cmajor::debug::DebugExprNode::GetKind() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html#33">33</a>
+             of <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html">DebugExpr.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_DebugExprNode_3B88ED75F34B178BF28060BD3553BE918E387577.html#variable_kind_9746B0B0FD21CEB2AC6D2D800689965403DBAF7A">kind</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html#function_Visit_C90D056ED8B75FAD107194AFFC33AF4D29EF876A">cmajor::debug::DebugExprBinder::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_ToString_FFF50EFD4C54591C1EEDE5A6D4A54DD84AF5CFF0">ToString Member Function</h3>
+        <h4>
+            std::string cmajor::debug::DebugExprNode::ToString() <span class="kw">const pure virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html#32">32</a>
+             of <a href="file/DebugExpr.hpp_14F4D65823D0EC2B57221D1424D113A6379C075E.html">DebugExpr.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_AddDebugExprNode_B8439FDE61FF318A9A9DD2EA848F19FDD883BA0A.html#function_ToString_3A235B6D0FB3ED91795C0056C0A90229D6BFE5A2">cmajor::debug::AddDebugExprNode::ToString</a>
+            , <a href="./class_AddrOfDebugExprNode_B5EA23DF021B13D86DE4C86856D80008B96D4FD8.html#function_ToString_1808D2E0B91D70C3B1A178D13E7F6EE6A551A3EB">cmajor::debug::AddrOfDebugExprNode::ToString</a>
+            , <a href="./class_CastDebugExprNode_FA953B0E6886EC3FD89E8D71273C2E4D09BA326B.html#function_ToString_F7B44AFFC1B59FC4E4E9BEDCE1F7D7A870394E21">cmajor::debug::CastDebugExprNode::ToString</a>
+            , <a href="./class_DerefDebugExprNode_44972610CC26A5DDD1BFABB3FAAB1CEE3F89DE2A.html#function_ToString_A7CF578D6C48E837A4F9D3F75F06FDB4888A12B2">cmajor::debug::DerefDebugExprNode::ToString</a>
+            , <a href="./class_DotDebugExprNode_00B683A0B50AA8B22D6EEB4287D2FCE5BE19B2BF.html#function_ToString_A1EBD98A4D7BC451807ABB2D7B8031100BAF3524">cmajor::debug::DotDebugExprNode::ToString</a>
+            , <a href="./class_IdentifierDebugExprNode_D16EA8B9BF8965717A0D26964AB569209352A475.html#function_ToString_6C7CD78300D48202AD42BCF299746D95C126267B">cmajor::debug::IdentifierDebugExprNode::ToString</a>
+            , <a href="./class_IntegerDebugExprNode_98D198DE83A3A14BBD2EED242837B2C3508479F5.html#function_ToString_8C6622D1AA0DB077735F0EFB172F0850A112AEC5">cmajor::debug::IntegerDebugExprNode::ToString</a>
+            , <a href="./class_ParenthesizedDebugExprNode_4C5A530587CC7F4AD20B28B23CF7B0E08BF18CE5.html#function_ToString_E992A406BB65C05726F4DF136578505E7656B050">cmajor::debug::ParenthesizedDebugExprNode::ToString</a>
+            , <a href="./class_RangeDebugExprNode_7903853BBB12547CBC8AC2B62D5F5BB117DFCFD1.html#function_ToString_50A67665265D79B7FBF611AA5450023B28D65FD3">cmajor::debug::RangeDebugExprNode::ToString</a>
+            , <a href="./class_SubDebugExprNode_E517C52DDFD1B4576FFE8F013C6C6DC7DE7D60F0.html#function_ToString_BCC544C6CD435FF38F0B69C9FF74F8D9AFAC90C9">cmajor::debug::SubDebugExprNode::ToString</a>
+            , <a href="./class_SubscriptDebugExprNode_9EBF7D8DCF0DFFD1FEF5BE5814C105560588BE12.html#function_ToString_72547435067B4284B5A1C87370FFD29F5781EA69">cmajor::debug::SubscriptDebugExprNode::ToString</a>
+            , <a href="./class_TypeIdDebugExprNode_E0C8D77BB42AC73B095B65414CA3B2EF079E108D.html#function_ToString_1DB78DF9B8D32D2F4CD0FF9E464C3C37328E1B76">cmajor::debug::TypeIdDebugExprNode::ToString</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ContainerSubscriptTranslator_1E9461F4438C2D3298EAF37DB2A6F46C896C01B5.html#function_Visit_E86985EA37B6CD480CE28CD070BBE9BD834E94CE">cmajor::debug::ContainerSubscriptTranslator::Visit</a>
+            , <a href="./class_ContainerSubscriptTranslator_1E9461F4438C2D3298EAF37DB2A6F46C896C01B5.html#function_Visit_AE618A9447FCB5511B2777CF077CD0C0D1911E67">cmajor::debug::ContainerSubscriptTranslator::Visit</a>
+            , <a href="./class_ContainerSubscriptTranslator_1E9461F4438C2D3298EAF37DB2A6F46C896C01B5.html#function_Visit_92815E6C994E1654EBF1BAE021D866D042D2FEBA">cmajor::debug::ContainerSubscriptTranslator::Visit</a>
+            , <a href="./class_DebugExpressionEvaluator_072E169E6C79BB7B20ECE9D51D9E7E35966FA77D.html#function_Evaluate_B33B15FED5702CB9EA5E809693C4ECCD46D47DCF">cmajor::debug::DebugExpressionEvaluator::Evaluate</a>
+            , <a href="./class_DebugExpressionEvaluator_072E169E6C79BB7B20ECE9D51D9E7E35966FA77D.html#function_Visit_3609BC013184199C7E4CDF4201C1EFD1909BE15F">cmajor::debug::DebugExpressionEvaluator::Visit</a>
+            , <a href="./class_DebugExpressionEvaluator_072E169E6C79BB7B20ECE9D51D9E7E35966FA77D.html#function_Visit_390FEC24A058D121D70CE3EED3A061DEC94CF12C">cmajor::debug::DebugExpressionEvaluator::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_debug_DFC80A0C4A5AA627571ABD9B24B21D390C01AFF6.html">up</a>
+         | <a href="class_DebugExprBinder_FC9B52198A607108BF5E946E6E65802CCDDDAA7B.html">prev</a>
+         | <a href="class_DebugExprVisitor_E73F793F17495CCE1B69EF812D95CDFD35EEBE7F.html">next</a>
+    </body>
+</html>

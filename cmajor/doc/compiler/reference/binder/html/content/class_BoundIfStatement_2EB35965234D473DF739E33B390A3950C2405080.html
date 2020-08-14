@@ -9,14 +9,14 @@
         <a href="../../../compiler-projects.html">top</a>
          | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
          | <a href="class_BoundGotoStatement_FCFCCD2D9BADF935C7D7DE2684A43343B1AAD43C.html">prev</a>
-         | <a href="class_BoundIsExpression_F285D49EF42A61F29AF03EE57616326ED7354E31.html">next</a>
+         | <a href="class_BoundInitializationStatement_EDA41FE9A17314981F0AA0CC25E5F38E152AB506.html">next</a>
         <hr/>
         <h1>BoundIfStatement Class</h1>
         <div class="diagram">
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#105">105</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#118">118</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -70,10 +70,30 @@
             >&amp;&amp; thenS_, std::unique_ptr&lt;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             >&amp;&amp; elseS_)</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#89">89</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#94">94</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a><span class="other">(</span><span class="identifier">module_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a><span class="other">::</span><a href="./enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html#enumerator_boundIfStatement_40FABF55FA0C8FC0724B60552B00A55486307F8B">boundIfStatement</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html#variable_condition_21ED793E783579168287FFE31B89655F39143B59">condition</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">condition_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html#variable_thenS_05584563B2AA7556E39EC3C682AFC2CC2C27CB8A">thenS</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">thenS_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html#variable_elseS_419D69A13B01D667D9B8683481311D8D8A393591">elseS</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">elseS_</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html#variable_thenS_05584563B2AA7556E39EC3C682AFC2CC2C27CB8A">thenS</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html#variable_elseS_419D69A13B01D667D9B8683481311D8D8A393591">elseS</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html#variable_elseS_419D69A13B01D667D9B8683481311D8D8A393591">elseS</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
@@ -84,12 +104,21 @@
             &amp; visitor) <span class="kw">override</span>
         </h4>
         <span>
-            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#99">99</a>
+            Definition at line <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html#104">104</a>
              of <a href="file/BoundStatement.cpp_900D9EBECB9DFF728D1CEAE2BFD53696AA24E933.html">BoundStatement.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><span class="identifier">Visit</span><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#109">109</a>
+            Declaration at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#122">122</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
         </span>
         <br/>
@@ -110,10 +139,14 @@
             <a href="./class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
             * cmajor::binder::BoundIfStatement::Condition()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#110">110</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#123">123</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html#variable_condition_21ED793E783579168287FFE31B89655F39143B59">condition</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_ElseS_58BC15F681EB797BFCAC27CE0C23BD3B5C52887B">ElseS Member Function</h3>
@@ -121,10 +154,14 @@
             <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             * cmajor::binder::BoundIfStatement::ElseS()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#112">112</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#125">125</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html#variable_elseS_419D69A13B01D667D9B8683481311D8D8A393591">elseS</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_C57DD454263F760E28F6757B58686636C32E06F0">cmajor::binder::ControlFlowAnalyzer::Visit</a>
@@ -137,10 +174,14 @@
             <a href="./class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">BoundStatement</a>
             * cmajor::binder::BoundIfStatement::ThenS()</h4>
         <span>
-            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#111">111</a>
+            Definition at line <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html#124">124</a>
              of <a href="file/BoundStatement.hpp_4BC5FA2578FCE95218FC4B3E1CF88A923D433985.html">BoundStatement.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_BoundIfStatement_2EB35965234D473DF739E33B390A3950C2405080.html#variable_thenS_05584563B2AA7556E39EC3C682AFC2CC2C27CB8A">thenS</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <span>
             Called by: <a href="./class_ControlFlowAnalyzer_3FCB421729E3D744CC480D8E995DAEB945EB8AEA.html#function_Visit_C57DD454263F760E28F6757B58686636C32E06F0">cmajor::binder::ControlFlowAnalyzer::Visit</a>
@@ -151,6 +192,6 @@
         <a href="../../../compiler-projects.html">top</a>
          | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
          | <a href="class_BoundGotoStatement_FCFCCD2D9BADF935C7D7DE2684A43343B1AAD43C.html">prev</a>
-         | <a href="class_BoundIsExpression_F285D49EF42A61F29AF03EE57616326ED7354E31.html">next</a>
+         | <a href="class_BoundInitializationStatement_EDA41FE9A17314981F0AA0CC25E5F38E152AB506.html">next</a>
     </body>
 </html>

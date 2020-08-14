@@ -1,0 +1,185 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Base/MemoryWriter.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html">MemoryWriter</a></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#constructor_MemoryWriter_09A42E08674C35F83C128E2E02CB7853D4FF130D">MemoryWriter</a><span class="other">(</span><span class="kw">byte</span><span class="other">*</span>&nbsp;<span class="identifier">ptr_</span><span class="other">,&nbsp;</span><span class="kw">long</span>&nbsp;<span class="identifier">count_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">ptr</span><span class="other">(</span><span class="identifier">ptr_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">pos</span><span class="other">(</span><a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_variable_ptr_2FEB658BC8B830427ED9603206D2E322FC28FFE0">ptr</a><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">count</span><span class="other">(</span><span class="identifier">count_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="kw">byte</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_variable_pos_F66218CD3CC4E8D863A77483DA80F8ED0C8D0C54">pos</a><span class="other">&nbsp;-&nbsp;</span><a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_variable_ptr_2FEB658BC8B830427ED9603206D2E322FC28FFE0">ptr</a><span class="other">&nbsp;>=&nbsp;</span><a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_variable_count_D3F960ED91543F8C955E0A2331643747ACEF3340">count</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989.html#constructor_Exception_A65EEDA06AE7D97BE82E1650263EE003A2A82C65">Exception</a><span class="other">(</span><span class="string">"memory&nbsp;writer:&nbsp;end&nbsp;of&nbsp;space"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_variable_pos_F66218CD3CC4E8D863A77483DA80F8ED0C8D0C54">pos</a><span class="other">++</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">x</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_2CDBF6FDE45C46B45AAFC543549A15D24059839A">Write</a><span class="other">(</span><span class="kw">sbyte</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_A559719F4F9E7F0E792D2A0E10A650DD5EED1058">Write</a><span class="other">(</span><span class="kw">ushort</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b0</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">8u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b1</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b0</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b1</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_64511882CC676E453116A1559D739910C5D04D1C">Write</a><span class="other">(</span><span class="kw">short</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_A559719F4F9E7F0E792D2A0E10A650DD5EED1058">Write</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">ushort</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_770B4F19657B0CD5BD94F9C472C44C17FC14C72F">Write</a><span class="other">(</span><span class="kw">uint</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b0</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">24u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b1</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">16u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b2</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">8u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b3</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b0</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b1</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b2</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b3</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_36DF7B856C7893FD68E8784D6E47F3FE2241BC1C">Write</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_770B4F19657B0CD5BD94F9C472C44C17FC14C72F">Write</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">uint</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_D77C28BDDFA08D186F4D530DDE80FCD1A4C73140">Write</a><span class="other">(</span><span class="kw">ulong</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b0</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">56u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b1</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">48u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b2</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">40u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b3</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">32u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b4</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">24u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b5</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">16u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b6</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">&nbsp;>>&nbsp;</span><span class="number">8u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">byte</span>&nbsp;<span class="identifier">b7</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b0</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b1</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b2</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b3</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b4</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b5</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b6</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_02E50CA2B595DD6A81B9D7A8BF92EED299452D62">Write</a><span class="other">(</span><span class="identifier">b7</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_09B48A15B713DA1E20A5F8A070CE181FFBDCDFDE">Write</a><span class="other">(</span><span class="kw">long</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_D77C28BDDFA08D186F4D530DDE80FCD1A4C73140">Write</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">ulong</span><span class="other">></span><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_5DF0D4381261BD857150889411AB621281A00394">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">dt</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Date_351EEEABF504E83A9336BC83CE10D3450072F1E8.html">Date</a>&nbsp;<span class="identifier">d</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">dt</span><span class="other">.</span><a href="../doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html#member_function_GetDate_DateTime_A6B28B2F2FC69D6C812228BC8DE885A1880F8E33">GetDate</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_64511882CC676E453116A1559D739910C5D04D1C">Write</a><span class="other">(</span><span class="identifier">d</span><span class="other">.</span><a href="../doc/class_Date_351EEEABF504E83A9336BC83CE10D3450072F1E8.html#member_function_Year_Date_F5CA5464B5BEBE2FD0F3FB502B0100676D984D64">Year</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_2CDBF6FDE45C46B45AAFC543549A15D24059839A">Write</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">sbyte</span><span class="other">></span><span class="other">(</span><span class="identifier">d</span><span class="other">.</span><a href="../doc/class_Date_351EEEABF504E83A9336BC83CE10D3450072F1E8.html#member_function_GetMonth_Date_49707BD468285D2A7E9BEAA167E31170A624020D">GetMonth</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_2CDBF6FDE45C46B45AAFC543549A15D24059839A">Write</a><span class="other">(</span><span class="identifier">d</span><span class="other">.</span><a href="../doc/class_Date_351EEEABF504E83A9336BC83CE10D3450072F1E8.html#member_function_Day_Date_6D27B3F3D13A35635455D20B3116E5237EFA2D0F">Day</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_MemoryWriter_F807A1DF64C5C16BD89FE21EBE1FF8D3B9F07DA6.html#member_function_Write_MemoryWriter_36DF7B856C7893FD68E8784D6E47F3FE2241BC1C">Write</a><span class="other">(</span><span class="identifier">dt</span><span class="other">.</span><a href="../doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html#member_function_Seconds_DateTime_DA6481BBB70D3685792313B7E31FF0464BCF22B7">Seconds</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">byte</span><span class="other">*</span>&nbsp;<span class="identifier">ptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">byte</span><span class="other">*</span>&nbsp;<span class="identifier">pos</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">long</span>&nbsp;<span class="identifier">count</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">86</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

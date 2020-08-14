@@ -269,8 +269,9 @@ function drawDiagram(classes) {
 function drawClassInheritanceDiagram() {
     var classes = [
         { name: "cmajor::mid::BackEnd", id: "class_0", level: 0, subject: true, hasDerivedClasses: true, link: "./class_BackEnd_DE73FF9607F8CD0F62A32ACC018DD49D3BCA6A88.html" },
-        { name: "cmajor::mid::CmsxBackEnd", id: "class_1", level: 1, subject: false, hasDerivedClasses: false, link: "./class_CmsxBackEnd_A5CDA4F22ADDDDDB0E49041E6B17E1BFF3DBE585.html" },
-        { name: "cmajor::mid::LLvmBackEnd", id: "class_2", level: 1, subject: false, hasDerivedClasses: false, link: "./class_LLvmBackEnd_2F10B9CF37D68BBA98D1C977BFB20A73CA12B1B4.html" }];
+        { name: "cmajor::mid::CmcppBackEnd", id: "class_1", level: 1, subject: false, hasDerivedClasses: false, link: "./class_CmcppBackEnd_C17BCE7F6CD01A98B03EB88609A4E711906D46D3.html" },
+        { name: "cmajor::mid::CmsxBackEnd", id: "class_2", level: 1, subject: false, hasDerivedClasses: false, link: "./class_CmsxBackEnd_A5CDA4F22ADDDDDB0E49041E6B17E1BFF3DBE585.html" },
+        { name: "cmajor::mid::LLvmBackEnd", id: "class_3", level: 1, subject: false, hasDerivedClasses: false, link: "./class_LLvmBackEnd_2F10B9CF37D68BBA98D1C977BFB20A73CA12B1B4.html" }];
     drawDiagram(classes);
 }
 

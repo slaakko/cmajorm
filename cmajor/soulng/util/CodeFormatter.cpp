@@ -157,6 +157,12 @@ CodeFormatter& operator<<(CodeFormatter& f, const std::string& s)
     return f;
 }
 
+UTIL_API CodeFormatter& operator<<(CodeFormatter& f, const char* s)
+{
+    f.Write(s);
+    return f;
+}
+
 CodeFormatter& operator<<(CodeFormatter& f, char c)
 {
     f.Write(std::string(1, c));

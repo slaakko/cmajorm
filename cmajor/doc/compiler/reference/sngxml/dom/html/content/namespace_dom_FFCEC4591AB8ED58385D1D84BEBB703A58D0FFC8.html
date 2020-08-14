@@ -140,6 +140,14 @@
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html#function_ReadDocument_68B115CF7670494066CCE4B804F85ACFE2A84D2C">ReadDocument</a>(<span class="kw">const </span>std::string&amp; fileName, <a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a> flags)</td>
             </tr>
             <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_Document_9CEA9DAB3595565B8E56A6B7B91E605E7C0C524F.html">Document</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html#function_ReceiveDocument_36410EFAFC28E16A17B2A93D0BA869883CF77FD2">ReceiveDocument</a>(soulng::util::TcpSocket&amp; socket)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html#function_SendDocument_424C49095BBB44BED42B665A0E302609E6DBAE08">SendDocument</a>(soulng::util::TcpSocket&amp; socket, <a href="./class_Document_9CEA9DAB3595565B8E56A6B7B91E605E7C0C524F.html">Document</a>&amp; document)</td>
+            </tr>
+            <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
                 <td class="functionTableSecondCol" xml:space="preserve"><a href="namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html#function_XmlCharDataEscape_06589426BE963ADABB4AEDA05BCBD808CEA87548">XmlCharDataEscape</a>(<span class="kw">const </span>std::u32string&amp; charData)</td>
             </tr>
@@ -227,12 +235,21 @@
             std::u32string&amp; content, <span class="kw">const </span>
             std::string&amp; systemId)</h4>
         <span>
-            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#190">190</a>
+            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#191">191</a>
              of <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html">Parser.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ParseDocument</span><span class="other">(</span><span class="identifier">content</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a><span class="other">::</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html#enumerator_none_C56B0EC88C370D08E5A3A17C2A815B20DF86BB29">none</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#32">32</a>
+            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#33">33</a>
              of <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html">Parser.hpp</a>
         </span>
         <br/>
@@ -246,12 +263,35 @@
             std::string&amp; systemId, <a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a>
              flags)</h4>
         <span>
-            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#195">195</a>
+            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#196">196</a>
              of <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html">Parser.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_DomDocumentHandler_7C2AF71693FA6CEE15727951BF3ED7B4FE6C834D.html">DomDocumentHandler</a>&nbsp;<span class="identifier">domDocumentHandler</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../xml/html/content/namespace_xml_E70FE776A7D0201102722B6526198D965E74ED7B.html">xml</a><span class="other">::</span><a href="./../../../xml/html/content/enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a>&nbsp;<span class="identifier">xmlFlags</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../xml/html/content/namespace_xml_E70FE776A7D0201102722B6526198D965E74ED7B.html">xml</a><span class="other">::</span><a href="./../../../xml/html/content/enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a><span class="other">::</span><a href="./../../../xml/html/content/enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html#enumerator_none_D9090845DC123DAE8EF2F152836B8839B2B2D1CA">none</a><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">(</span><span class="identifier">flags</span><span class="other">&nbsp;&amp;&nbsp;</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a><span class="other">::</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html#enumerator_debug_3C6579391DFE62A6C22B20628D1FF85C367BD885">debug</a><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a><span class="other">::</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html#enumerator_none_C56B0EC88C370D08E5A3A17C2A815B20DF86BB29">none</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">xmlFlags</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">xmlFlags</span><span class="other">&nbsp;|&nbsp;</span><a href="./namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../xml/html/content/namespace_xml_E70FE776A7D0201102722B6526198D965E74ED7B.html">xml</a><span class="other">::</span><a href="./../../../xml/html/content/enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html">Flags</a><span class="other">::</span><a href="./../../../xml/html/content/enum_Flags_F91598584093410819012531B66EFF8438D2EDD3.html#enumerator_debug_F83D0663CD98B42ABE6D0EFBC4A56A6103B08B86">debug</a><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ParseXmlContent</span><span class="other">(</span><span class="identifier">content</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">domDocumentHandler</span><span class="other">,&nbsp;</span><span class="identifier">xmlFlags</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">domDocumentHandler</span><span class="other">.</span><span class="identifier">GetDocument</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#33">33</a>
+            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#34">34</a>
              of <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html">Parser.hpp</a>
         </span>
         <br/>
@@ -268,12 +308,21 @@
             > sngxml::dom::ReadDocument(<span class="kw">const </span>
             std::string&amp; fileName)</h4>
         <span>
-            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#207">207</a>
+            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#208">208</a>
              of <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html">Parser.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ReadDocument</span><span class="other">(</span><span class="identifier">fileName</span><span class="other">,&nbsp;</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a><span class="other">::</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html#enumerator_none_C56B0EC88C370D08E5A3A17C2A815B20DF86BB29">none</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#34">34</a>
+            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#35">35</a>
              of <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html">Parser.hpp</a>
         </span>
         <br/>
@@ -286,13 +335,94 @@
             std::string&amp; fileName, <a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a>
              flags)</h4>
         <span>
-            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#212">212</a>
+            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#213">213</a>
              of <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html">Parser.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<span class="identifier">content</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">ReadFile</span><span class="other">(</span><span class="identifier">fileName</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ParseDocument</span><span class="other">(</span><span class="identifier">content</span><span class="other">,&nbsp;</span><span class="identifier">fileName</span><span class="other">,&nbsp;</span><span class="identifier">flags</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
         <br/>
         <span>
-            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#35">35</a>
+            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#36">36</a>
              of <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html">Parser.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_ReceiveDocument_36410EFAFC28E16A17B2A93D0BA869883CF77FD2">ReceiveDocument Function</h3>
+        <h4>
+            std::unique_ptr&lt;<a href="./class_Document_9CEA9DAB3595565B8E56A6B7B91E605E7C0C524F.html">Document</a>
+            > sngxml::dom::ReceiveDocument(soulng::util::TcpSocket&amp; socket)</h4>
+        <span>
+            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#227">227</a>
+             of <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html">Parser.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">str</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ReadStr</span><span class="other">(</span><span class="identifier">socket</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">str</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Document_9CEA9DAB3595565B8E56A6B7B91E605E7C0C524F.html">Document</a><span class="other">></span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">u32string</span>&nbsp;<span class="identifier">content</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">str</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_Document_9CEA9DAB3595565B8E56A6B7B91E605E7C0C524F.html">Document</a><span class="other">></span>&nbsp;<span class="identifier">doc</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ParseDocument</span><span class="other">(</span><span class="identifier">content</span><span class="other">,&nbsp;</span><span class="string">"socket"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">doc</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#38">38</a>
+             of <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html">Parser.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SendDocument_424C49095BBB44BED42B665A0E302609E6DBAE08">SendDocument Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngxml::dom::SendDocument(soulng::util::TcpSocket&amp; socket, <a href="./class_Document_9CEA9DAB3595565B8E56A6B7B91E605E7C0C524F.html">Document</a>
+            &amp; document)</h4>
+        <span>
+            Definition at line <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html#219">219</a>
+             of <a href="file/Parser.cpp_1DE61BBC72B8C2CDBD05CD93B3F3679BA6BF6FD2.html">Parser.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">stringstream</span>&nbsp;<span class="identifier">sstream</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./../../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a>&nbsp;<span class="identifier">formatter</span><span class="other">(</span><span class="identifier">sstream</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">document</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Write</span><span class="other">(</span><span class="identifier">socket</span><span class="other">,&nbsp;</span><span class="identifier">sstream</span><span class="other">.</span><span class="identifier">str</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#37">37</a>
+             of <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html">Parser.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Document_9CEA9DAB3595565B8E56A6B7B91E605E7C0C524F.html#function_Write_02E093389B33FC1D57B6A0165A320E3D29DCC85B">sngxml::dom::Document::Write</a>
         </span>
         <br/>
         <br/>
@@ -326,10 +456,18 @@
              flag) <span class="kw">inline</span>
         </h4>
         <span>
-            Definition at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#17">17</a>
+            Definition at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#18">18</a>
              of <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html">Parser.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a><span class="other">></span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">flags</span><span class="other">)</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">flag</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_operator_or_FD13B170A5BC9A7C438417D3444906796E62A3E3">operator| Function</h3>
@@ -340,10 +478,18 @@
              flag) <span class="kw">inline</span>
         </h4>
         <span>
-            Definition at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#22">22</a>
+            Definition at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#23">23</a>
              of <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html">Parser.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a><span class="other">></span><span class="other">(</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">flags</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">flag</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <h3 id="function_operator_complement_B0288AF18D9B71FF8181FFB8CBDBCD6DA0DEB204">operator~ Function</h3>
@@ -353,10 +499,18 @@
              flags) <span class="kw">inline</span>
         </h4>
         <span>
-            Definition at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#27">27</a>
+            Definition at line <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html#28">28</a>
              of <a href="file/Parser.hpp_4645428CCF6A5D01CB492BC1120BD2C59C7C9A37.html">Parser.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="./enum_Flags_4C8F907F7156BEC198ECD7DA5F2053B422F35F37.html">Flags</a><span class="other">></span><span class="other">(</span><span class="other">~</span><span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">flags</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
         </span>
-        <br/>
         <br/>
         <hr/>
         <a href="../../../../compiler-projects.html">top</a>

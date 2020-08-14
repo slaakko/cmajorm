@@ -72,7 +72,7 @@
   <br/>
   <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">filePath</span><span class="other">.</span><span class="identifier">substr</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"$CMAJOR$"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">filePath</span><span class="other">.</span><span class="identifier">substr</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
   <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
@@ -86,11 +86,11 @@
   <br/>
   <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../../../../soulng/util/html/content/class_Path_4B3DE54C4207046D89CC15C18C3336BA3FDCEA6F.html">Path</a><span class="other">::</span><span class="identifier">IsRelative</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">)</span></span>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">filePath</span><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="string">"$CMAJOR$"</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
   <br/>
   <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
-  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../soulng/util/html/content/class_Path_4B3DE54C4207046D89CC15C18C3336BA3FDCEA6F.html">Path</a><span class="other">::</span><span class="identifier">Combine</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../soulng/util/html/content/class_Path_4B3DE54C4207046D89CC15C18C3336BA3FDCEA6F.html">Path</a><span class="other">::</span><span class="identifier">Combine</span><span class="other">(</span><span class="identifier">cmajorRootDir</span><span class="other">,&nbsp;</span><span class="identifier">filePath</span><span class="other">.</span><span class="identifier">substr</span><span class="other">(</span><span class="other">8</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
   <br/>
   <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>

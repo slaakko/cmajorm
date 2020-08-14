@@ -139,6 +139,8 @@ xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\codegencpp.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\codegencpp.lib ..\lib
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cppcmcd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cppcmc.exe ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cppcmcconfigd.exe ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cppcmcconfig.exe ..\bin
 
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmtoolchaind.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmtoolchaind.lib ..\lib
