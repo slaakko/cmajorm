@@ -1217,10 +1217,10 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
     args.push_back("/debug");
     args.push_back("/out:" + QuotedPath(executableFilePath));
     args.push_back("/stack:16777216");
-    std::string cmrtLibName = "cmrt360.lib";
+    std::string cmrtLibName = "cmrt370.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
-        cmrtLibName = "cmrt360d.lib";
+        cmrtLibName = "cmrt370d.lib";
     }
     args.push_back(QuotedPath(GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName))));
     args.push_back(QuotedPath(mainObjectFilePath));

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>supd</title>
+    <link rel="stylesheet" type="text/css" href="../../../style/tool.css" />
+</head>
+<body>
+    <h1>supd</h1>
+
+    <p>
+        <strong>supd</strong> is a source file update utility that copies files from a source directory tree to a target directory tree.
+        The files to be copied are specified in an XML file that is by default named <strong>supd.xml</strong> 
+        and located in the current directory. Thus <strong>supd</strong> can be thought to pull files from the 
+        source directory tree to the current directory and its subdirectories.
+    </p>
+    
+    <pre>
+    C:\source
+       |
+       .--- doc
+       |    |
+       |    .--- file
+       |    |    |
+       |    |    .--- hello.cpp.html
+       |    |    .--- hello.hpp.html
+       |    |
+       |    .--- html
+       |         |
+       |         .--- hello.html
+       |
+       .--- hello
+            |
+            .--- hello.cpp
+            .--- hello.hpp
+            .--- hello.vcxproj
+    </pre>
+    
+    <pre>
+    C:\target 
+       |
+       .--- doc
+       |
+       .--- hello
+            |
+            .--- hello.hpp
+            .--- hello.vcxproj
+    </pre>
+    
+    <pre>
+    C:\source>supd --make --verbose
+    make: C:/source/supd.xml
+    add: doc
+    add: hello
+    ==> C:/source/supd.xml    
+    </pre>
+    
+    <pre>
+    &lt;supd>
+     &lt;dir name="doc"/>
+     &lt;dir name="hello"/>
+    &lt;/supd>
+    </pre>
+</body>
+</html>

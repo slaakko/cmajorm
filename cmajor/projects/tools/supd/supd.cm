@@ -1,77 +1,609 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
 using System;
 using System.Collections;
 using System.IO;
 using System.Dom;
 using System.XPath;
+using System.RegularExpressions;
+using System.Text;
 
-void ReadPatterns(Document* doc)
+void Make(const List<string>& files, bool force, bool verbose, bool colors)
 {
-    UniquePtr<XPathObject> patternsObject = Evaluate(u"/supd/patterns", doc);
-    if (!patternsObject.IsNull())
+    for (const string& file : files)
     {
-        if (patternsObject.Get() is XPathNodeSet*)
+        if (File.Exists(file))
         {
-            XPathNodeSet* nodeSet = cast<XPathNodeSet*>(patternsObject.Get());
+            if (!force)
+            {
+                throw Exception("cannot make: file '" + file + "' already exists and no --force option specified");
+            }
+        }
+        if (verbose)
+        {
+            if (colors)
+            {
+                Console.Out() << TextColor.darkCyan << "make" << Color.reset << ": " << TextColor.white << file << Color.reset << endl();
+            }
+            else
+            {
+                Console.Out() << "make" << ": " << file << endl();
+            }
+        }
+        string dir = Path.GetDirectoryName(file);
+        Document doc;
+        Element* supdElement = new Element(u"supd");
+        doc.AppendChild(UniquePtr<Node>(supdElement));
+        List<string> directories = Directory.GetDirectories(dir);
+        for (const string& directory : directories)
+        {
+            string dirName = Path.GetFileName(directory);
+            if (verbose)
+            {
+                Console.Out() << TextColor.green << "add" << Color.reset << ": " << TextColor.white << dirName << Color.reset << endl();
+            }
+            Element* dirElement = new Element(u"dir");
+            dirElement->SetAttribute(u"name", ToUtf32(dirName));
+            supdElement->AppendChild(UniquePtr<Node>(dirElement));
+        }
+        StreamWriter writer(File.CreateText(file));
+        CodeFormatter formatter(writer);
+        formatter.SetIndentSize(1);
+        doc.Write(formatter);
+        if (verbose)
+        {
+            Console.Out() << TextColor.yellow << "==> " << Color.reset << TextColor.white << file << Color.reset << endl();
+        }
+    }
+}
+
+class FileMask
+{
+    public enum Kind
+    {
+        include, exclude
+    }
+    public nothrow FileMask(Context& context, Kind kind_, const ustring& mask_) : kind(kind_), mask(mask_)
+    {
+        nfa = CompileFilePattern(context, mask);
+    }
+    public void Match(const ustring& filename, bool& include)
+    {
+        bool match = PatternMatch(filename, nfa);
+        if (kind == Kind.include)
+        {
+            if (match)
+            {
+                include = true;
+            }
+        }
+        else if (kind == Kind.exclude)
+        {
+            if (match)
+            {
+                include = false;
+            }
+        }
+    }
+    private Kind kind;
+    private ustring mask;
+    private Nfa nfa;
+}
+
+class DirMask
+{
+    public enum Kind
+    {
+        include, exclude
+    }
+    public nothrow DirMask(Context& context, Kind kind_, const ustring& mask_) : kind(kind_), mask(mask_)
+    {
+        nfa = CompileFilePattern(context, mask);
+    }
+    public void Match(const ustring& dirName, bool& include)
+    {
+        bool match = PatternMatch(dirName, nfa);
+        if (kind == Kind.include)
+        {
+            if (match)
+            {
+                include = true;
+            }
+        }
+        else if (kind == Kind.exclude)
+        {
+            if (match)
+            {
+                include = false;
+            }
+        }
+    }
+    private Kind kind;
+    private ustring mask;
+    private Nfa nfa;
+}
+
+class Pattern
+{
+    public nothrow Pattern(const string& name_) : name(name_)
+    {
+    }
+    public nothrow void AddFileMask(FileMask* fileMask)
+    {
+        fileMasks.Add(UniquePtr<FileMask>(fileMask));
+    }
+    public nothrow void AddDirMask(DirMask* dirMask)
+    {
+        dirMasks.Add(UniquePtr<DirMask>(dirMask));
+    }
+    public nothrow const string& Name() const
+    {
+        return name;
+    }
+    public bool MatchFile(const ustring& fileName) const
+    {
+        bool include = false;
+        for (const UniquePtr<FileMask>& fileMask : fileMasks)
+        {
+            fileMask->Match(fileName, include);
+        }
+        return include;
+    }
+    public bool MatchDir(const ustring& dirName) const
+    {
+        bool include = false;
+        for (const UniquePtr<DirMask>& dirMask : dirMasks)
+        {
+            dirMask->Match(dirName, include);
+        }
+        return include;
+    }
+    private string name;
+    private List<UniquePtr<FileMask>> fileMasks;
+    private List<UniquePtr<DirMask>> dirMasks;
+}
+
+class PatternSet
+{
+    public nothrow PatternSet()
+    {
+    }
+    public void AddPattern(Pattern* pattern)
+    {
+        Pattern* prev = GetPattern(pattern->Name());
+        if (prev != null)
+        {
+            throw Exception("already has pattern '" + pattern->Name() + "'");
+        }
+        patternMap[pattern->Name()] = pattern;
+        patterns.Add(UniquePtr<Pattern>(pattern));
+    }
+    public Pattern* GetPattern(const string& name) const
+    {
+        Map<string, Pattern*>.ConstIterator it = patternMap.CFind(name);
+        if (it != patternMap.CEnd())
+        {
+            return it->second;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    private Map<string, Pattern*> patternMap;
+    private List<UniquePtr<Pattern>> patterns;
+}
+
+class Dir
+{
+    public nothrow Dir(const string& name_, Pattern* pattern_, bool includeSubdirs_) : name(name_), pattern(pattern_), includeSubdirs(includeSubdirs_)
+    {
+    }
+    public inline nothrow const string& Name() const
+    {
+        return name;
+    }
+    public inline nothrow Pattern* GetPattern() const
+    {
+        return pattern;
+    }
+    public inline nothrow bool IncludeSubdirs() const
+    {
+        return includeSubdirs;
+    }
+    private string name;
+    private Pattern* pattern;
+    private bool includeSubdirs;
+}
+
+class DirSet
+{
+    public nothrow DirSet()
+    {
+    }
+    public nothrow Dir* GetDir(const string& dirName) const
+    {
+        Map<string, Dir*>.ConstIterator it = dirMap.CFind(dirName);
+        if (it != dirMap.CEnd())
+        {
+            return it->second;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public void AddDir(Dir* dir)
+    {
+        Dir* prev = GetDir(dir->Name());
+        if (prev != null)
+        {
+            throw Exception("already has dir '" + dir->Name() + "'");
+        }
+        dirMap[dir->Name()] = dir;
+        dirs.Add(UniquePtr<Dir>(dir));
+    }
+    private Map<string, Dir*> dirMap;
+    private List<UniquePtr<Dir>> dirs;
+}
+
+PatternSet ReadPatterns(Context& context, Document* doc, const string& file, bool verbose, bool colors)
+{
+    if (verbose)
+    {
+        if (colors)
+        {
+            Console.Out() << TextColor.darkCyan << "reading" << Color.reset << " patterns from " << TextColor.white << file << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << "reading" << " patterns from " << file << endl();
+        }
+    }
+    PatternSet patterns;
+    UniquePtr<XPathObject> patternObject = Evaluate(u"/supd/pattern", doc);
+    if (!patternObject.IsNull())
+    {
+        if (patternObject.Get() is XPathNodeSet*)
+        {
+            XPathNodeSet* nodeSet = cast<XPathNodeSet*>(patternObject.Get());
             for (int i = 0; i < nodeSet->Length(); ++i)
             {
                 Node* node = (*nodeSet)[i];
                 if (node is Element*)
                 {
-                    Element* patternsElement = cast<Element*>(node);
-                    string id = ToUtf8(patternsElement->GetAttribute(u"id"));
-                    if (id.IsEmpty())
+                    Element* patternElement = cast<Element*>(node);
+                    string name = ToUtf8(patternElement->GetAttribute(u"name"));
+                    if (name.IsEmpty())
                     {
-                        throw Exception("'supd/patterns' element index " + ToString(i) + " has no 'id' attribute");
+                        throw Exception("'supd/pattern' element index " + ToString(i) + " has no 'name' attribute");
                     }
-                    UniquePtr<XPathObject> patternObject = Evaluate(u"pattern", patternsElement);
-                    if (!patternObject.IsNull())
+                    UniquePtr<Pattern> pattern(new Pattern(name));
+                    UniquePtr<XPathObject> fileObject = Evaluate(u"file", patternElement);
+                    if (!fileObject.IsNull())
                     {
-                        if (patternObject.Get() is XPathNodeSet*)
+                        if (fileObject.Get() is XPathNodeSet*)
                         {
-                            XPathNodeSet* nodeSet = cast<XPathNodeSet*>(patternObject.Get());
+                            XPathNodeSet* nodeSet = cast<XPathNodeSet*>(fileObject.Get());
                             for (int i = 0; i < nodeSet->Length(); ++i)
                             {
                                 Node* node = (*nodeSet)[i];
                                 if (node is Element*)
                                 {
-                                    Element* patternElement = cast<Element*>(node);
-                                    string include = ToUtf8(patternElement->GetAttribute(u"include"));
-                                    if (include.IsEmpty())
+                                    Element* fileElement = cast<Element*>(node);
+                                    ustring mask = fileElement->GetAttribute(u"include");
+                                    if (mask.IsEmpty())
                                     {
-                                        string exclude = ToUtf8(patternElement->GetAttribute(u"exclude"));
-                                        if (exclude.IsEmpty())
+                                        mask = fileElement->GetAttribute(u"exclude");
+                                        if (mask.IsEmpty())
                                         {
-                                            
+                                            throw Exception("file element index " + ToString(i) + " in pattern '" + pattern->Name() + "' has no include/exclude attribute");
                                         }
                                         else
                                         {
-
+                                            pattern->AddFileMask(new FileMask(context, FileMask.Kind.exclude, mask));
                                         }
                                     }
                                     else
                                     {
-                                        
+                                        pattern->AddFileMask(new FileMask(context, FileMask.Kind.include, mask));
                                     }
                                 }
                             }
                         }
                     }
+                    UniquePtr<XPathObject> dirObject = Evaluate(u"dir", patternElement);
+                    if (!dirObject.IsNull())
+                    {
+                        if (dirObject.Get() is XPathNodeSet*)
+                        {
+                            XPathNodeSet* nodeSet = cast<XPathNodeSet*>(dirObject.Get());
+                            for (int i = 0; i < nodeSet->Length(); ++i)
+                            {
+                                Node* node = (*nodeSet)[i];
+                                if (node is Element*)
+                                {
+                                    Element* dirElement = cast<Element*>(node);
+                                    ustring mask = dirElement->GetAttribute(u"include");
+                                    if (mask.IsEmpty())
+                                    {
+                                        mask = dirElement->GetAttribute(u"exclude");
+                                        if (mask.IsEmpty())
+                                        {
+                                            throw Exception("dir element index " + ToString(i) + " in pattern '" + pattern->Name() + "' has no include/exclude attribute");
+                                        }
+                                        else
+                                        {
+                                            pattern->AddDirMask(new DirMask(context, DirMask.Kind.exclude, mask));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        pattern->AddDirMask(new DirMask(context, DirMask.Kind.include, mask));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    patterns.AddPattern(pattern.Release());
                 }
+            }
+        }
+    }
+    return patterns;
+}
+
+DirSet ReadDirs(Document* doc, const PatternSet& patterns, const string& file, bool verbose, bool colors)
+{
+    if (verbose)
+    {
+        if (colors)
+        {
+            Console.Out() << TextColor.darkCyan << "reading" << Color.reset << " dirs from " << TextColor.white << file << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << "reading" << " dirs from " << file << endl();
+        }
+    }
+    DirSet dirs;
+    UniquePtr<XPathObject> dirObject = Evaluate(u"/supd/dir", doc);
+    if (!dirObject.IsNull())
+    {
+        if (dirObject.Get() is XPathNodeSet*)
+        {
+            XPathNodeSet* nodeSet = cast<XPathNodeSet*>(dirObject.Get());
+            int n = nodeSet->Length();
+            for (int i = 0; i < n; ++i)
+            {
+                Node* node = (*nodeSet)[i];
+                if (node is Element*)
+                {
+                    Element* dirElement = cast<Element*>(node);
+                    string name = ToUtf8(dirElement->GetAttribute(u"name"));
+                    if (name.IsEmpty())
+                    {
+                        throw Exception("dir element index " + ToString(i) + " has no name attribute");
+                    }
+                    string patternName = ToUtf8(dirElement->GetAttribute(u"pattern"));
+                    if (patternName.IsEmpty())
+                    {
+                        throw Exception("dir element '" + name + "' has no pattern attribute");
+                    }
+                    Pattern* pattern = patterns.GetPattern(patternName);
+                    if (pattern == null)
+                    {
+                        throw Exception("pattern '" + patternName + "' referenced by dir '" + name + "' not found");
+                    }
+                    bool includeSubdirs = false;
+                    string includeSubdirsAttr = ToUtf8(dirElement->GetAttribute(u"includeSubdirs"));
+                    if (!includeSubdirsAttr.IsEmpty())
+                    {
+                        includeSubdirs = ParseBool(includeSubdirsAttr);
+                    }
+                    UniquePtr<Dir> dir(new Dir(name, pattern, includeSubdirs));
+                    dirs.AddDir(dir.Release());
+                }
+            }
+        }
+    }
+    return dirs;
+}
+
+bool FilesDiffer(const string& sourceFilePath, const string& targetFilePath)
+{
+    ulong size = File.Size(sourceFilePath);
+    if (size != File.Size(targetFilePath))
+    {
+        return true;
+    }
+    BinaryReader sourceReader = File.OpenBinary(sourceFilePath);
+    BinaryReader targetReader = File.OpenBinary(targetFilePath);
+    for (ulong i = 0u; i < size; ++i)
+    {
+        byte sourceByte = sourceReader.ReadByte();
+        byte targetByte = targetReader.ReadByte();
+        if (sourceByte != targetByte)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void UpdateFile(const string& sourceFilePath, const string& targetFilePath, bool update, int& updateCount, bool colors)
+{
+    if (update)
+    {
+        File.Remove(targetFilePath);
+        File.Copy(sourceFilePath, targetFilePath);
+        if (colors)
+        {
+            Console.Out() << TextColor.yellow << "updated" << Color.reset << ": " << TextColor.white << targetFilePath << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << "updated" << ": " << targetFilePath << endl();
+        }
+    }
+    else
+    {
+        if (colors)
+        {
+            Console.Out() << "to be " << TextColor.yellow << "updated" << Color.reset << ": " << TextColor.white << targetFilePath << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << "to be " << "updated" << ": " << targetFilePath << endl();
+        }
+    }
+    ++updateCount;
+}
+
+void AddFile(const string& sourceFilePath, const string& targetFilePath, bool add, int& addCount, bool colors)
+{
+    if (add)
+    {
+        File.Copy(sourceFilePath, targetFilePath);
+        if (colors)
+        {
+            Console.Out() << TextColor.green << "added" << Color.reset << ": " << TextColor.white << targetFilePath << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << "to be " << "updated" << ": " << targetFilePath << endl();
+        }
+    }
+    else
+    {
+        if (colors)
+        {
+            Console.Out() << "to be " << TextColor.green << "added" << Color.reset << ": " << TextColor.white << targetFilePath << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << "to be " << "added" << ": " << targetFilePath << endl();
+        }
+    }
+    ++addCount;
+}
+
+void ProcessDir(const string& sourceDir, const string& targetDir, Pattern* pattern, bool includeSubdirs, bool verbose, bool add, bool update, int& updateCount, int& addCount, bool colors)
+{
+    if (verbose)
+    {
+        if (colors)
+        {
+            Console.Out() << TextColor.darkCyan << "from " << Color.reset << TextColor.white << sourceDir << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << "from " << sourceDir << endl();
+        }
+    }
+    bool targetDirExists = false;
+    List<string> sourceFiles = Directory.GetFiles(sourceDir);
+    for (const string& sourceFile : sourceFiles)
+    {
+        string fileName = Path.GetFileName(sourceFile);
+        ustring fname;
+        try
+        {
+            fname = ToUtf32(fileName);
+        }
+        catch (const Exception& ex)
+        {
+            if (colors)
+            {
+                Console.Out() << TextColor.magenta << "warning" << Color.reset << ": invalid file name" << ": could not convert file name to UTF-32" << endl();
+            }
+            else
+            {
+                Console.Out() << "warning" << ": invalid file name" << ": could not convert file name to UTF-32" << endl();
+            }
+        }
+        if (!fname.IsEmpty())
+        {
+            if (pattern->MatchFile(fname))
+            {
+                string targetFile = Path.Combine(targetDir, fileName);
+                if (!targetDirExists && (add || update))
+                {
+                    targetDirExists = Directory.Exists(targetDir);
+                    if (!targetDirExists)
+                    {
+                        targetDirExists = true;
+                        Directory.CreateDirectories(targetDir);
+                        if (colors)
+                        {
+                            Console.Out() << TextColor.green << "added" << Color.reset << ": " << TextColor.white << targetDir << Color.reset << endl();
+                        }
+                        else
+                        {
+                            Console.Out() << "added" << ": " << targetDir << endl();
+                        }
+                    }
+                }
+                if (File.Exists(targetFile))
+                {
+                    if (FilesDiffer(sourceFile, targetFile))
+                    {
+                        UpdateFile(sourceFile, targetFile, update, updateCount, colors);
+                    }
+                }
+                else
+                {
+                    AddFile(sourceFile, targetFile, add, addCount, colors);
+                }
+            }
+        }
+    }
+    if (includeSubdirs)
+    {
+        List<string> sourceSubdirs = Directory.GetDirectories(sourceDir);
+        for (const string& sourceSubdir : sourceSubdirs)
+        {
+            string dirName = Path.GetFileName(sourceSubdir);
+            ustring dname;
+            try
+            {
+                dname = ToUtf32(dirName);
+            }
+            catch (const Exception& ex)
+            {
+                if (colors)
+                {
+                    Console.Out() << TextColor.magenta << "warning" << Color.reset << ": invalid directory name" << ": could not convert file name to UTF-32" << endl();
+                }
+                else
+                {
+                    Console.Out() << "warning" << ": invalid file name" << ": could not convert directory name to UTF-32" << endl();
+                }
+            }
+            string targetSubdir = Path.Combine(targetDir, dirName);
+            if (pattern->MatchDir(dname))
+            {
+                ProcessDir(sourceSubdir, targetSubdir, pattern, includeSubdirs, verbose, add, update, updateCount, addCount, colors);
             }
         }
     }
 }
 
-void Process(const string& file, const string& from, bool verbose, bool update)
+void Process(const string& file, const string& from, bool verbose, bool add, bool update, bool colors)
 {
+    int updateCount = 0;
+    int addCount = 0;
     if (!File.Exists(file))
     {
         throw Exception("file '" + file + "' does not exist");
     }
-    string root = Path.GetDirectoryName(file);
+    string targetRoot = Path.GetDirectoryName(file);
     UniquePtr<Document> doc = ReadDocument(file);
-    string fromRoot = from;
-    if (fromRoot.IsEmpty())
+    string sourceRoot = from;
+    if (sourceRoot.IsEmpty())
     {
         UniquePtr<XPathObject> supdObject = Evaluate(u"/supd", doc.Get());
         if (!supdObject.IsNull())
@@ -85,43 +617,142 @@ void Process(const string& file, const string& from, bool verbose, bool update)
                     if (node is Element*)
                     {
                         Element* element = cast<Element*>(node);
-                        fromRoot = ToUtf8(element->GetAttribute(u"from"));
+                        sourceRoot = ToUtf8(element->GetAttribute(u"from"));
                     }
                 }
             }
         }
     }
-    if (fromRoot.IsEmpty())
+    if (sourceRoot.IsEmpty())
     {
-        throw Exception("error: '" + file + "' does not contain 'supd' element with from=\"FROM_DIR_PATH\" attribute set and no --from FROM_DIR_PATH option specified. stop.");
+        throw Exception("'" + file + "' does not contain 'supd' element with from=\"FROM_DIR_PATH\" attribute set and no --from=FROM_DIR_PATH option specified. stop.");
     }
-    if (!Directory.Exists(fromRoot))
+    if (!Directory.Exists(sourceRoot))
     {
-        throw Exception("error: from root directory '" + fromRoot + "' not found. stop.");
+        throw Exception("source root directory '" + sourceRoot + "' not found. stop.");
     }
+    Context context;
+    PatternSet patterns = ReadPatterns(context, doc.Get(), file, verbose, colors);
+    DirSet dirs = ReadDirs(doc.Get(), patterns, file, verbose, colors);
+    List<string> sourceDirs = Directory.GetDirectories(sourceRoot);
+    for (const string& sourceDir : sourceDirs)
+    {
+        string dirName = Path.GetFileName(sourceDir);
+        Dir* dir = dirs.GetDir(dirName);
+        if (dir != null)
+        {
+            string targetDir = Path.Combine(targetRoot, dirName);
+            ProcessDir(sourceDir, targetDir, dir->GetPattern(), dir->IncludeSubdirs(), verbose, add, update, updateCount, addCount, colors);
+        }
+    }
+    if (add)
+    {
+        if (colors)
+        {
+            Console.Out() << addCount << " files " << TextColor.green << "added" << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << addCount << " files " << "added" << endl();
+        }
+    }
+    else
+    {
+        if (colors)
+        {
+            Console.Out() << addCount << " files to be " << TextColor.green << "added" << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << addCount << " files to be " << "added" << endl();
+        }
+    }
+    if (update)
+    {
+        if (colors)
+        {
+            Console.Out() << updateCount << " files " << TextColor.yellow << "updated" << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << updateCount << " files " << "updated" << endl();
+        }
+    }
+    else
+    {
+        if (colors)
+        {
+            Console.Out() << updateCount << " files to be " << TextColor.yellow << "updated" << Color.reset << endl();
+        }
+        else
+        {
+            Console.Out() << updateCount << " files to be " << "updated" << endl();
+        }
+    }
+}
+
+const char* Version()
+{
+    return "3.7.0";
 }
 
 void PrintHelp()
 {
-    Console.WriteLine("usage: supd [options] [file.xml]");
-    Console.WriteLine("options:");
+    Console.WriteLine("Usage: supd [options] [file.xml ...]");
+    Console.Out() << "Source file update utility version " << Version() << endl();
+    Console.WriteLine();
+    Console.WriteLine("If the program is run without --add and --update options,");
+    Console.WriteLine("it shows additions and updates to be made without making any changes.");
+    Console.WriteLine();
+    Console.WriteLine("If the program is run without 'file.xml' is uses 'supd.xml' from the current directory.");
+    Console.WriteLine();
+    Console.WriteLine("The program copies files from a source root directory and its subdirectories ");
+    Console.WriteLine("to the current directory and its subdirectories,");
+    Console.WriteLine("if the current directory contains the default 'supd.xml',");
+    Console.WriteLine("or to the target directory that contains a 'file.xml'.");
+    Console.WriteLine();
+    Console.WriteLine("Files to be copied are specified in the file.xml|supd.xml.");
+    Console.WriteLine();
+    Console.WriteLine("Options:");
+    Console.WriteLine();
     Console.WriteLine("--verbose | -v");
-    Console.WriteLine(" Be verbose.");
+    Console.WriteLine("  Be verbose.");
+    Console.WriteLine();
+    Console.WriteLine("--make | -m");
+    Console.WriteLine("  Make supd.xml");
+    Console.WriteLine();
+    Console.WriteLine("--force | -f");
+    Console.WriteLine("  Force make.");
+    Console.WriteLine();
+    Console.WriteLine("--add | -a");
+    Console.WriteLine("  Add new files.");
+    Console.WriteLine();
     Console.WriteLine("--update | -u");
-    Console.WriteLine(" Make changes.");
-    Console.WriteLine("--from DIR | -f DIR");
-    Console.WriteLine(" Set from directory.");
+    Console.WriteLine("  Update changed files.");
+    Console.WriteLine();
+    Console.WriteLine("--colors=(true|false) | -c=(true|false)");
+    Console.WriteLine("  Write logging output in colors.");
+    Console.WriteLine();
+    Console.WriteLine("--from=DIR");
+    Console.WriteLine("  Set source root directory.");
+    Console.WriteLine();
     Console.WriteLine("--help | -h");
-    Console.WriteLine(" Print help and exit.");
+    Console.WriteLine("  Print help and exit.");
 }
 
 int main(int argc, const char** argv)
 {
+    bool outColors = IsConsoleHandle(1);
+    bool errorColors = IsConsoleHandle(2);
     try
     {
         bool verbose = false;
+        bool force = false;
+        bool make = false;
+        bool add = false;
         bool update = false;
-        bool prevWasFrom = false;
+        bool hasColorsOption = false;
+        bool colors = false;
         string from;
         List<string> files;
         for (int i = 1; i < argc; ++i)
@@ -129,82 +760,167 @@ int main(int argc, const char** argv)
             string arg = argv[i];
             if (arg.StartsWith("--"))
             {
-                if (arg == "--verbose")
+                if (arg.Find('=') != -1)
                 {
-                    verbose = true;
-                }
-                else if (arg == "--update")
-                {
-                    update = true;
-                }
-                else if (arg == "--from")
-                {
-                    prevWasFrom = true;
-                }
-                else if (arg == "--help")
-                {
-                    PrintHelp();
-                    return 1;
+                    List<string> components = arg.Split('=');
+                    if (components.Count() == 2)
+                    {
+                        if (components[0] == "--colors")
+                        {
+                            colors = ParseBool(components[1]);
+                            hasColorsOption = true;
+                        }
+                        else if (components[0] == "--from")
+                        {
+                            from = GetFullPath(components[1]);
+                        }
+                        else
+                        {
+                            throw Exception("unknown argument '" + arg + "'");
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("unknown argument '" + arg + "'");
+                    }
                 }
                 else
                 {
-                    throw Exception("unknown argument '" + arg + "'");
+                    if (arg == "--verbose")
+                    {
+                        verbose = true;
+                    }
+                    else if (arg == "--force")
+                    {
+                        force = false;
+                    }
+                    else if (arg == "--make")
+                    {
+                        make = true;
+                    }
+                    else if (arg == "--add")
+                    {
+                        add = true;
+                    }
+                    else if (arg == "--update")
+                    {
+                        update = true;
+                    }
+                    else if (arg == "--help")
+                    {
+                        PrintHelp();
+                        return 1;
+                    }
+                    else
+                    {
+                        throw Exception("unknown argument '" + arg + "'");
+                    }
                 }
             }
             else if (arg.StartsWith("-"))
             {
-                string options = arg.Substring(1);
-                for (char o : options)
+                if (arg.Find('=') != -1)
                 {
-                    bool fail = false;
-                    switch (o)
+                    List<string> components = arg.Split('=');
+                    if (components.Count() == 2)
                     {
-                        case 'v': verbose = true; break;
-                        case 'u': update = true; break;
-                        case 'h': PrintHelp(); return 1;
-                        case 'f': prevWasFrom = true; break;
-                        default:
+                        if (components[0] == "-c")
                         {
-                            fail = true;
-                            break;
+                            colors = ParseBool(components[1]);
+                            hasColorsOption = true;
+                        }
+                        else
+                        {
+                            throw Exception("unknown argument '" + arg + "'");
                         }
                     }
-                    if (fail)
+                    else
                     {
-                        throw Exception("unknown option '-" + string(o) + "'");
+                        throw Exception("unknown argument '" + arg + "'");
                     }
                 }
-            }
-            else if (prevWasFrom)
-            {
-                prevWasFrom = false;
-                from = GetFullPath(arg);
+                else
+                {
+                    string options = arg.Substring(1);
+                    for (char o : options)
+                    {
+                        bool fail = false;
+                        switch (o)
+                        {
+                            case 'v': verbose = true; break;
+                            case 'm': make = true; break;
+                            case 'a': add = true; break;
+                            case 'u': update = true; break;
+                            case 'f': force = true; break;
+                            case 'h': PrintHelp(); return 1;
+                            default:
+                            {
+                                fail = true;
+                                break;
+                            }
+                        }
+                        if (fail)
+                        {
+                            throw Exception("unknown option '-" + string(o) + "'");
+                        }
+                    }
+                }
             }
             else 
             {
                 files.Add(GetFullPath(arg));
             }
         }
-        if (files.IsEmpty())
+        if (hasColorsOption)
         {
-            string defaultFile = GetFullPath("supd.xml");
-            if (File.Exists(defaultFile))
+            outColors = colors;
+            errorColors = colors;
+        }
+        if (make)
+        {
+            if (add || update)
             {
+                throw Exception("cannot add or update when making files");
+            }
+            if (files.IsEmpty())
+            {
+                string defaultFile = GetFullPath("supd.xml");
                 files.Add(defaultFile);
             }
-            else
-            {
-                throw Exception("error: no supd.xml found ('" + defaultFile + "' and no files given. stop.");
-            }
+            Make(files, force, verbose, outColors);
         }
-        for (const string& file : files)
+        else
         {
-            Process(file, from, verbose, update);
+            if (files.IsEmpty())
+            {
+                string defaultFile = GetFullPath("supd.xml");
+                if (File.Exists(defaultFile))
+                {
+                    files.Add(defaultFile);
+                }
+                else
+                {
+                    throw Exception("no supd.xml found ('" + defaultFile + "') and no files given. stop.");
+                }
+            }
+            for (const string& file : files)
+            {
+                Process(file, from, verbose, add, update, outColors);
+            }
         }
     }
     catch (const Exception& ex)
     {
-        Console.Error() << ex.Message() << endl();
+        if (errorColors)
+        {
+            Console.Error() << TextColor.red << "error" << Color.reset << ": " << ex.Message() << endl();
+        }
+        else
+        {
+            Console.Error() << "error" << ": " << ex.Message() << endl();
+        }
+        StreamWriter errorTxt = File.CreateText("error.txt");
+        errorTxt.WriteLine(ex.ToString());
         return 1;
     }
     return 0;

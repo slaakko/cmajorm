@@ -18,7 +18,7 @@ struct Iteration
 {
     boost::filesystem::directory_iterator directoryIterator;
     std::string directoryName;
-    std::string filePath;
+    std::string path;
 };
 
 class DirectoryIterationTable
@@ -28,7 +28,8 @@ public:
     static void Done();
     static DirectoryIterationTable& Instance() { return *instance; }
     int32_t BeginIterate(const char* directoryPath);
-    const char* Iterate(int32_t handle);
+    const char* IterateFiles(int32_t handle);
+    const char* IterateDirectories(int32_t handle);
     void EndIterate(int32_t handle);
 private:
     static std::unique_ptr<DirectoryIterationTable> instance;
@@ -71,7 +72,7 @@ void DirectoryIterationTable::EndIterate(int32_t handle)
     iterationMap.erase(handle);
 }
 
-const char* DirectoryIterationTable::Iterate(int32_t handle)
+const char* DirectoryIterationTable::IterateFiles(int32_t handle)
 {
     std::lock_guard<std::mutex> lock(mtx);
     auto it = iterationMap.find(handle);
@@ -84,9 +85,35 @@ const char* DirectoryIterationTable::Iterate(int32_t handle)
         }
         if (iteration.directoryIterator != boost::filesystem::directory_iterator())
         {
-            iteration.filePath = GetFullPath(Path::Combine(iteration.directoryName, boost::filesystem::path(*iteration.directoryIterator).generic_string()));
+            iteration.path = GetFullPath(Path::Combine(iteration.directoryName, boost::filesystem::path(*iteration.directoryIterator).generic_string()));
             ++iteration.directoryIterator;
-            return iteration.filePath.c_str();
+            return iteration.path.c_str();
+        }
+        return nullptr;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+const char* DirectoryIterationTable::IterateDirectories(int32_t handle)
+{
+    std::lock_guard<std::mutex> lock(mtx);
+    auto it = iterationMap.find(handle);
+    if (it != iterationMap.cend())
+    {
+        Iteration& iteration = it->second;
+        while (iteration.directoryIterator != boost::filesystem::directory_iterator() &&
+            (!boost::filesystem::is_directory(*iteration.directoryIterator) || iteration.directoryIterator->path() == "." || iteration.directoryIterator->path() == ".."))
+        {
+            ++iteration.directoryIterator;
+        }
+        if (iteration.directoryIterator != boost::filesystem::directory_iterator())
+        {
+            iteration.path = GetFullPath(Path::Combine(iteration.directoryName, boost::filesystem::path(*iteration.directoryIterator).generic_string()));
+            ++iteration.directoryIterator;
+            return iteration.path.c_str();
         }
         return nullptr;
     }
@@ -125,7 +152,12 @@ extern "C" RT_API int32_t RtBeginIterateDirectory(const char* directoryPath)
 
 extern "C" RT_API const char* RtGetNextFilePath(int32_t directoryIterationHandle)
 {
-    return cmajor::rt::DirectoryIterationTable::Instance().Iterate(directoryIterationHandle);
+    return cmajor::rt::DirectoryIterationTable::Instance().IterateFiles(directoryIterationHandle);
+}
+
+extern "C" RT_API const char* RtGetNextDirectoryPath(int32_t directoryIterationHandle)
+{
+    return cmajor::rt::DirectoryIterationTable::Instance().IterateDirectories(directoryIterationHandle);
 }
 
 extern "C" RT_API void RtEndIterateDirectory(int32_t directoryIterationHandle)

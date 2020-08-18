@@ -13,8 +13,6 @@ xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmdb2xml.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmupdd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmupd.exe ..\bin
 
-xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gmp\cmrt360gmp.dll ..\bin
-xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gmp\cmrt360gmp.lib ..\lib
 xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gnutls\bin\*.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gnutls\libgnutls-30.lib ..\lib
 
@@ -179,10 +177,10 @@ xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmcmd.lib ..\lib
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmcm.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmcm.lib ..\lib
 
-xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmrt360d.dll ..\bin
-xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmrt360d.lib ..\lib
-xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmrt360.dll ..\bin
-xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmrt360.lib ..\lib
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmrt370d.dll ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmrt370d.lib ..\lib
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmrt370.dll ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmrt370.lib ..\lib
 
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmrtsd.lib ..\lib\vs
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmrts.lib ..\lib\vs
@@ -257,5 +255,6 @@ xcopy /Y /D D:\work\cmajorm\cmajor\projects\cmsx\cmsxlink\bin\release\cmsxlink.e
 xcopy /Y /D D:\work\cmajorm\cmajor\projects\cmsx\cmsxar\bin\release\cmsxar.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\projects\cmsx\cmsxpg\cmsxpg\bin\release\cmsxpg.exe ..\bin
 
+xcopy /Y /D D:\work\cmajorm\cmajor\projects\tools\supd\bin\release\supd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\projects\tools\spring\bin\release\spring.exe ..\bin
 

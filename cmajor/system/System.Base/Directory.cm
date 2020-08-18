@@ -32,5 +32,18 @@ namespace System.IO
             RtEndIterateDirectory(directoryIterationHandle);
             return files;
         }
+        public static List<string> GetDirectories(const string& directoryPath)
+        {
+            List<string> directories;
+            int directoryIterationHandle = RtBeginIterateDirectory(directoryPath.Chars());
+            const char* dirPath = RtGetNextDirectoryPath(directoryIterationHandle);
+            while (dirPath != null)
+            {
+                directories.Add(dirPath);
+                dirPath = RtGetNextDirectoryPath(directoryIterationHandle);
+            }
+            RtEndIterateDirectory(directoryIterationHandle);
+            return directories;
+        }
     }
 }
