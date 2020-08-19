@@ -54,6 +54,253 @@ std::string IntegerDebugExprNode::ToString() const
     return std::to_string(value);
 }
 
+DisjunctionDebugExprNode::DisjunctionDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::disjunction), left(left_), right(right_)
+{
+}
+
+DebugExprNode* DisjunctionDebugExprNode::Clone() const
+{
+    return new DisjunctionDebugExprNode(left->Clone(), right->Clone());
+}
+
+void DisjunctionDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string DisjunctionDebugExprNode::ToString() const
+{
+    return left->ToString() + "||" + right->ToString();
+}
+
+ConjunctionDebugExprNode::ConjunctionDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::conjunction), left(left_), right(right_)
+{
+}
+
+DebugExprNode* ConjunctionDebugExprNode::Clone() const
+{
+    return new ConjunctionDebugExprNode(left->Clone(), right->Clone());
+}
+
+void ConjunctionDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string ConjunctionDebugExprNode::ToString() const
+{
+    return left->ToString() + "&&" + right->ToString();
+}
+
+BitOrDebugExprNode::BitOrDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::bitOr), left(left_), right(right_)
+{
+}
+
+DebugExprNode* BitOrDebugExprNode::Clone() const
+{
+    return new BitOrDebugExprNode(left->Clone(), right->Clone());
+}
+
+void BitOrDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BitOrDebugExprNode::ToString() const
+{
+    return left->ToString() + "|" + right->ToString();
+}
+
+BitXorDebugExprNode::BitXorDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::bitXor), left(left_), right(right_)
+{
+}
+
+DebugExprNode* BitXorDebugExprNode::Clone() const
+{
+    return new BitXorDebugExprNode(left->Clone(), right->Clone());
+}
+
+void BitXorDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BitXorDebugExprNode::ToString() const
+{
+    return left->ToString() + "^" + right->ToString();
+}
+
+BitAndDebugExprNode::BitAndDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::bitAnd), left(left_), right(right_)
+{
+}
+
+DebugExprNode* BitAndDebugExprNode::Clone() const
+{
+    return new BitAndDebugExprNode(left->Clone(), right->Clone());
+}
+
+void BitAndDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BitAndDebugExprNode::ToString() const
+{
+    return left->ToString() + "&" + right->ToString();
+}
+
+EqualDebugExprNode::EqualDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::eq), left(left_), right(right_)
+{
+}
+
+DebugExprNode* EqualDebugExprNode::Clone() const
+{
+    return new EqualDebugExprNode(left->Clone(), right->Clone());
+}
+
+void EqualDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string EqualDebugExprNode::ToString() const
+{
+    return left->ToString() + "==" + right->ToString();
+}
+
+NotEqualDebugExprNode::NotEqualDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::neq), left(left_), right(right_)
+{
+}
+
+DebugExprNode* NotEqualDebugExprNode::Clone() const
+{
+    return new NotEqualDebugExprNode(left->Clone(), right->Clone());
+}
+
+void NotEqualDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string NotEqualDebugExprNode::ToString() const
+{
+    return left->ToString() + "!=" + right->ToString();
+}
+
+LessEqualDebugExprNode::LessEqualDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::leq), left(left_), right(right_)
+{
+}
+
+DebugExprNode* LessEqualDebugExprNode::Clone() const
+{
+    return new LessEqualDebugExprNode(left->Clone(), right->Clone());
+}
+
+void LessEqualDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string LessEqualDebugExprNode::ToString() const
+{
+    return left->ToString() + "<=" + right->ToString();
+}
+
+GreaterEqualDebugExprNode::GreaterEqualDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::geq), left(left_), right(right_)
+{
+}
+
+DebugExprNode* GreaterEqualDebugExprNode::Clone() const
+{
+    return new GreaterEqualDebugExprNode(left->Clone(), right->Clone());
+}
+
+void GreaterEqualDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string GreaterEqualDebugExprNode::ToString() const
+{
+    return left->ToString() + ">=" + right->ToString();
+}
+
+LessDebugExprNode::LessDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::less), left(left_), right(right_)
+{
+}
+
+DebugExprNode* LessDebugExprNode::Clone() const
+{
+    return new LessDebugExprNode(left->Clone(), right->Clone());
+}
+
+void LessDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string LessDebugExprNode::ToString() const
+{
+    return left->ToString() + "<" + right->ToString();
+}
+
+GreaterDebugExprNode::GreaterDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::greater), left(left_), right(right_)
+{
+}
+
+DebugExprNode* GreaterDebugExprNode::Clone() const
+{
+    return new GreaterDebugExprNode(left->Clone(), right->Clone());
+}
+
+void GreaterDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string GreaterDebugExprNode::ToString() const
+{
+    return left->ToString() + ">" + right->ToString();
+}
+
+ShiftLeftDebugExprNode::ShiftLeftDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::shiftLeft), left(left_), right(right_)
+{
+}
+
+DebugExprNode* ShiftLeftDebugExprNode::Clone() const
+{
+    return new ShiftLeftDebugExprNode(left->Clone(), right->Clone());
+}
+
+void ShiftLeftDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string ShiftLeftDebugExprNode::ToString() const
+{
+    return left->ToString() + "<<" + right->ToString();
+}
+
+ShiftRightDebugExprNode::ShiftRightDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::shiftRight), left(left_), right(right_)
+{
+}
+
+DebugExprNode* ShiftRightDebugExprNode::Clone() const
+{
+    return new ShiftRightDebugExprNode(left->Clone(), right->Clone());
+}
+
+void ShiftRightDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string ShiftRightDebugExprNode::ToString() const
+{
+    return left->ToString() + ">>" + right->ToString();
+}
+
 AddDebugExprNode::AddDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::add), left(left_), right(right_)
 {
 }
@@ -90,6 +337,63 @@ void SubDebugExprNode::Accept(DebugExprVisitor& visitor)
 std::string SubDebugExprNode::ToString() const
 {
     return left->ToString() + "-" + right->ToString();
+}
+
+MulDebugExprNode::MulDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::mul), left(left_), right(right_)
+{
+}
+
+DebugExprNode* MulDebugExprNode::Clone() const
+{
+    return new MulDebugExprNode(left->Clone(), right->Clone());
+}
+
+void MulDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string MulDebugExprNode::ToString() const
+{
+    return left->ToString() + "*" + right->ToString();
+}
+
+DivDebugExprNode::DivDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::div), left(left_), right(right_)
+{
+}
+
+DebugExprNode* DivDebugExprNode::Clone() const
+{
+    return new DivDebugExprNode(left->Clone(), right->Clone());
+}
+
+void DivDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string DivDebugExprNode::ToString() const
+{
+    return left->ToString() + "/" + right->ToString();
+}
+
+ModDebugExprNode::ModDebugExprNode(DebugExprNode* left_, DebugExprNode* right_) : DebugExprNode(Kind::mod), left(left_), right(right_)
+{
+}
+
+DebugExprNode* ModDebugExprNode::Clone() const
+{
+    return new ModDebugExprNode(left->Clone(), right->Clone());
+}
+
+void ModDebugExprNode::Accept(DebugExprVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string ModDebugExprNode::ToString() const
+{
+    return left->ToString() + "%" + right->ToString();
 }
 
 ParenthesizedDebugExprNode::ParenthesizedDebugExprNode(DebugExprNode* exprNode_) : DebugExprNode(Kind::parenExpr), exprNode(exprNode_)

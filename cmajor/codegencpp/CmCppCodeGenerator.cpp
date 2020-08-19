@@ -142,6 +142,8 @@ void CmCppCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     }
     TypeSymbol* longType = module->GetSymbolTable().GetTypeByName(U"long");
     module->GetTypeIndex().AddType(longType->TypeId(), longType, *emitter);
+    TypeSymbol* boolType = module->GetSymbolTable().GetTypeByName(U"bool");
+    module->GetTypeIndex().AddType(boolType->TypeId(), boolType, *emitter);
     emitter->SetCompileUnitId(compileUnitId);
     emitter->SetCurrentSourceSpan(0, 0, 0);
     generateLineNumbers = false;

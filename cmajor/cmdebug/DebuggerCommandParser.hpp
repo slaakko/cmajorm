@@ -30,6 +30,7 @@ struct DEBUG_API DebuggerCommandParser
     static soulng::parser::Match DebuggerShowBreakpointsCommand(DebuggerCommandLexer& lexer);
     static soulng::parser::Match DebuggerListCommand(DebuggerCommandLexer& lexer, std::string* currentSourceFilePath);
     static soulng::parser::Match DebuggerPrintCommand(DebuggerCommandLexer& lexer);
+    static soulng::parser::Match DebuggerSetConditionCommand(DebuggerCommandLexer& lexer);
     static soulng::parser::Match DebuggerSetBreakOnThrowCommand(DebuggerCommandLexer& lexer);
     static soulng::parser::Match DebuggerRepeatLatestCommand(DebuggerCommandLexer& lexer);
     static soulng::parser::Match SourceLocation(DebuggerCommandLexer& lexer, std::string* currentSourceFilePath);

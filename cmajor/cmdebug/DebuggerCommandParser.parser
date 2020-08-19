@@ -33,6 +33,7 @@ parser api(DEBUG_API) DebuggerCommandParser
         |   DebuggerShowBreakpointsCommand:showBreakpointsCommand{ return showBreakpointsCommand; }
         |   DebuggerListCommand(currentSourceFilePath):listCommand{ return listCommand; }
         |   DebuggerPrintCommand:printCommand{ return printCommand; }
+        |   DebuggerSetConditionCommand:setConditionCommand{ return setConditionCommand; }
         |   DebuggerSetBreakOnThrowCommand:setBreakOnThrowCommand{ return setBreakOnThrowCommand; } 
         |   DebuggerRepeatLatestCommand:latestCommand{ return latestCommand; }
         ;
@@ -131,6 +132,23 @@ parser api(DEBUG_API) DebuggerCommandParser
         )
         {
             return new cmajor::debug::DebuggerPrintCommand(expression);
+        }
+        ;
+
+    DebuggerSetConditionCommand(var int breakpointNumber, var std::string expression) : cmajor::debug::DebuggerCommand*
+        ::=
+        (
+            SET CONDITION INTEGER{ std::string numberStr = ToUtf8(lexer.GetToken(pos).match.ToString()); breakpointNumber = cmajor::debug::ParseInt(numberStr); }
+            (
+                (any - NL)
+                {
+                    expression.append(ToUtf8(lexer.GetToken(pos).match.ToString()));
+                }
+            )+
+            NL
+        )
+        {
+            return new cmajor::debug::DebuggerSetConditionCommand(breakpointNumber, expression);
         }
         ;
 

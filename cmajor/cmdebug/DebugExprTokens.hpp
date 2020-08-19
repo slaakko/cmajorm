@@ -27,6 +27,18 @@ namespace DebugExprTokens
     const int COMMA = 16;
     const int PLUS = 17;
     const int MINUS = 18;
+    const int DISJUNCTION = 19;
+    const int CONJUNCTION = 20;
+    const int BITOR = 21;
+    const int BITXOR = 22;
+    const int EQUAL = 23;
+    const int NOTEQUAL = 24;
+    const int LESSEQUAL = 25;
+    const int GREATEREQUAL = 26;
+    const int SHIFTLEFT = 27;
+    const int SHIFTRIGHT = 28;
+    const int SLASH = 29;
+    const int PERCENT = 30;
 
     DEBUG_API void InitTokenIdMap();
     DEBUG_API int GetTokenId(const std::u32string& tokenName);

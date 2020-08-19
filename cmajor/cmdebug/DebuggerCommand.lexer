@@ -33,6 +33,7 @@ tokens DebuggerCommandTokens
     (BASE, "'base'"),
     (SET, "'set'"),
     (BREAKONTHROW, "'breakOnThrow'"),
+    (CONDITION, "'condition'"),
     (TRUE, "'true'"),
     (FALSE, "'false'"),
     (ID, "id"),
@@ -52,7 +53,19 @@ tokens DebuggerCommandTokens
     (COMMA, "','"),
     (PLUS, "'+'"),
     (MINUS, "'-'"),
-    (EQ, "'='")
+    (EQ, "'='"),
+    (DISJUNCTION, "'||'"),
+    (CONJUNCTION, "'&&'"),
+    (BITOR, "'|'"),
+    (BITXOR, "'^'"),
+    (EQUAL, "'=='"),
+    (NOTEQUAL, "'!='"),
+    (LESSEQUAL, "'<='"),
+    (GREATEREQUAL, "'>='"),
+    (SHIFTLEFT, "'<<'"),
+    (SHIFTRIGHT, "'>>'"),
+    (SLASH, "'/'"),
+    (PERCENT, "'%'")
 }
 
 keywords DebuggerCommandKeywords
@@ -78,6 +91,7 @@ keywords DebuggerCommandKeywords
     ("base", BASE),
     ("set", SET),
     ("breakOnThrow", BREAKONTHROW),
+    ("condition", CONDITION),
     ("true", TRUE),
     ("false", FALSE)
 }
@@ -109,9 +123,21 @@ lexer api(DEBUG_API) DebuggerCommandLexer
     "{path}"{ return PATH; }
     "{integer}"{ return INTEGER; }
     "{string}"{ return STRING; }
+    "\|\|"{ return DISJUNCTION; }
+    "\&\&"{ return CONJUNCTION; }
+    "\|"{ return BITOR; }
+    "\^"{ return BITXOR; }
     ":"{ return COLON; }
     "\*"{ return AST; }
+    "/"{ return SLASH; }
+    "%"{ return PERCENT; }
     "\&"{ return AMP; }
+    "=="{ return EQUAL; }
+    "!="{ return NOTEQUAL; }
+    "<="{ return LESSEQUAL; }
+    ">="{ return GREATEREQUAL; }
+    "<<"{ return SHIFTLEFT; }
+    ">>"{ return SHIFTRIGHT; }
     "\("{ return LPAREN; }
     "\)"{ return RPAREN; }
     "<"{ return LANGLE; }

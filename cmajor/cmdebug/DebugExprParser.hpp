@@ -13,7 +13,16 @@ struct DEBUG_API DebugExprParser
 {
     static std::unique_ptr<cmajor::debug::DebugExprNode> Parse(DebugExprLexer& lexer);
     static soulng::parser::Match DebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match DisjunctiveDebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match ConjunctiveDebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match BitOrDebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match BitXorDebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match BitAndDebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match EqualityDebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match RelationalDebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match ShiftDebugExpr(DebugExprLexer& lexer);
     static soulng::parser::Match AdditiveDebugExpr(DebugExprLexer& lexer);
+    static soulng::parser::Match MultiplicativeDebugExpr(DebugExprLexer& lexer);
     static soulng::parser::Match PrefixDebugExpr(DebugExprLexer& lexer);
     static soulng::parser::Match PostfixDebugExpr(DebugExprLexer& lexer);
     static soulng::parser::Match PrimaryDebugExpr(DebugExprLexer& lexer);

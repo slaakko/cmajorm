@@ -31,7 +31,9 @@ class DEBUG_API BoundDebugNode
 public:
     enum class Kind : int8_t
     {
-        variableReferenceNode, integerLiteralNode, addNode, subNode, derefNode, addrOfNode, dotNode, subscriptNode, rangeNode, parenExprNode,
+        variableReferenceNode, integerLiteralNode,
+        disjunctionNode, conjunctionNode, bitOrNode, bitXorNode, bitAndNode, equalNode, notEqualNode, lessEqualNode, greaterEqualNode, lessNode, greaterNode,
+        shiftLeftNode, shiftRightNode, addNode, subNode, mulNode, divNode, modNode, derefNode, addrOfNode, dotNode, subscriptNode, rangeNode, parenExprNode,
         typeNode, castNode, debugExpression
     };
     BoundDebugNode(Kind kind_, DIType* type_, DebugExprNode* sourceNode_);
@@ -80,6 +82,201 @@ private:
     int64_t value;
 };
 
+class DEBUG_API BoundDisjunctionNode : public BoundDebugNode
+{
+public:
+    BoundDisjunctionNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundConjunctionNode : public BoundDebugNode
+{
+public:
+    BoundConjunctionNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundBitOrNode : public BoundDebugNode
+{
+public:
+    BoundBitOrNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundBitXorNode : public BoundDebugNode
+{
+public:
+    BoundBitXorNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundBitAndNode : public BoundDebugNode
+{
+public:
+    BoundBitAndNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundEqualNode : public BoundDebugNode
+{
+public:
+    BoundEqualNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundNotEqualNode : public BoundDebugNode
+{
+public:
+    BoundNotEqualNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundLessEqualNode : public BoundDebugNode
+{
+public:
+    BoundLessEqualNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundGreaterEqualNode : public BoundDebugNode
+{
+public:
+    BoundGreaterEqualNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundLessNode : public BoundDebugNode
+{
+public:
+    BoundLessNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundGreaterNode : public BoundDebugNode
+{
+public:
+    BoundGreaterNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundShiftLeftNode : public BoundDebugNode
+{
+public:
+    BoundShiftLeftNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundShiftRightNode : public BoundDebugNode
+{
+public:
+    BoundShiftRightNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
 class DEBUG_API BoundAddNode : public BoundDebugNode
 {
 public:
@@ -99,6 +296,51 @@ class DEBUG_API BoundSubNode : public BoundDebugNode
 {
 public:
     BoundSubNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundMulNode : public BoundDebugNode
+{
+public:
+    BoundMulNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundDivNode : public BoundDebugNode
+{
+public:
+    BoundDivNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
+    void Accept(BoundDebugNodeVisitor& visitor) override;
+    std::string ToString() const override;
+    BoundDebugNode* Clone() const override;
+    BoundDebugNode* Left() const { return left.get(); }
+    BoundDebugNode* Right() const { return right.get(); }
+    std::string GdbExprString() const override;
+private:
+    std::unique_ptr<BoundDebugNode> left;
+    std::unique_ptr<BoundDebugNode> right;
+};
+
+class DEBUG_API BoundModNode : public BoundDebugNode
+{
+public:
+    BoundModNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode);
     void Accept(BoundDebugNodeVisitor& visitor) override;
     std::string ToString() const override;
     BoundDebugNode* Clone() const override;

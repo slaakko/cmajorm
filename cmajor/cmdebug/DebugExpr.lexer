@@ -28,7 +28,19 @@ tokens DebugExprTokens
     (DOT, "'.'"),
     (COMMA, "','"),
     (PLUS, "'+'"),
-    (MINUS, "'-'")
+    (MINUS, "'-'"),
+    (DISJUNCTION, "'||'"),
+    (CONJUNCTION, "'&&'"),
+    (BITOR, "'|'"),
+    (BITXOR, "'^'"),
+    (EQUAL, "'=='"),
+    (NOTEQUAL, "'!='"),
+    (LESSEQUAL, "'<='"),
+    (GREATEREQUAL, "'>='"),
+    (SHIFTLEFT, "'<<'"),
+    (SHIFTRIGHT, "'>>'"),
+    (SLASH, "'/'"),
+    (PERCENT, "'%'")
 }
 
 keywords DebugExprKeywords
@@ -60,8 +72,20 @@ lexer api(DEBUG_API) DebugExprLexer
     "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
     "{integer}"{ return INTEGER; }
     "{string}"{ return STRING; }
+    "\|\|"{ return DISJUNCTION; }
+    "\&\&"{ return CONJUNCTION; }
+    "\|"{ return BITOR; }
+    "\^"{ return BITXOR; }
     "\*"{ return AST; }
+    "/"{ return SLASH; }
+    "%"{ return PERCENT; }
     "\&"{ return AMP; }
+    "=="{ return EQUAL; }
+    "!="{ return NOTEQUAL; }
+    "<="{ return LESSEQUAL; }
+    ">="{ return GREATEREQUAL; }
+    "<<"{ return SHIFTLEFT; }
+    ">>"{ return SHIFTRIGHT; }
     "\("{ return LPAREN; }
     "\)"{ return RPAREN; }
     "<"{ return LANGLE; }

@@ -16,19 +16,170 @@ parser api(DEBUG_API) DebugExprParser
     main;
 
     DebugExpr : cmajor::debug::DebugExprNode*
-        ::= AdditiveDebugExpr:expr{ return expr; }
+        ::= DisjunctiveDebugExpr:expr{ return expr; }
+        ;
+
+    DisjunctiveDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr) : cmajor::debug::DebugExprNode*
+        ::=
+        (   ConjunctiveDebugExpr:left{ expr.reset(left); }
+            (   DISJUNCTION
+                ConjunctiveDebugExpr:right{ expr.reset(new cmajor::debug::DisjunctionDebugExprNode(expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    ConjunctiveDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr) : cmajor::debug::DebugExprNode*
+        ::=
+        (   BitOrDebugExpr:left{ expr.reset(left); }
+            (   CONJUNCTION
+                BitOrDebugExpr:right{ expr.reset(new cmajor::debug::ConjunctionDebugExprNode(expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    BitOrDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr) : cmajor::debug::DebugExprNode*
+        ::=
+        (   BitXorDebugExpr:left{ expr.reset(left); }
+            (   BITOR
+                BitXorDebugExpr:right{ expr.reset(new cmajor::debug::BitOrDebugExprNode(expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    BitXorDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr) : cmajor::debug::DebugExprNode*
+        ::=
+        (   BitAndDebugExpr:left{ expr.reset(left); }
+            (   BITXOR
+                BitAndDebugExpr:right{ expr.reset(new cmajor::debug::BitXorDebugExprNode(expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    BitAndDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr) : cmajor::debug::DebugExprNode*
+        ::=
+        (   EqualityDebugExpr:left{ expr.reset(left); }
+            (   AMP
+                EqualityDebugExpr:right{ expr.reset(new cmajor::debug::BitAndDebugExprNode(expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    EqualityDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr, var cmajor::debug::Operator op) : cmajor::debug::DebugExprNode*
+        ::=
+        (   RelationalDebugExpr:left{ expr.reset(left); }
+            (
+                (EQUAL{ op = cmajor::debug::Operator::eq; } | NOTEQUAL{ op = cmajor::debug::Operator::neq; })
+                RelationalDebugExpr:right
+                {
+                    switch (op)
+                    {
+                        case cmajor::debug::Operator::eq: expr.reset(new cmajor::debug::EqualDebugExprNode(expr.release(), right)); break;
+                        case cmajor::debug::Operator::neq: expr.reset(new cmajor::debug::NotEqualDebugExprNode(expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    RelationalDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr, var cmajor::debug::Operator op) : cmajor::debug::DebugExprNode*
+        ::=
+        (   ShiftDebugExpr:left{ expr.reset(left); }
+            (
+                (   LESSEQUAL{ op = cmajor::debug::Operator::leq; }
+                |   GREATEREQUAL{ op = cmajor::debug::Operator::geq; }
+                |   LANGLE{ op = cmajor::debug::Operator::less; }
+                |   RANGLE{ op = cmajor::debug::Operator::greater; }
+                )
+                ShiftDebugExpr:right
+                {
+                    switch (op)
+                    {
+                        case cmajor::debug::Operator::leq: expr.reset(new cmajor::debug::LessEqualDebugExprNode(expr.release(), right)); break;
+                        case cmajor::debug::Operator::geq: expr.reset(new cmajor::debug::GreaterEqualDebugExprNode(expr.release(), right)); break;
+                        case cmajor::debug::Operator::less: expr.reset(new cmajor::debug::LessDebugExprNode(expr.release(), right)); break;
+                        case cmajor::debug::Operator::greater: expr.reset(new cmajor::debug::GreaterDebugExprNode(expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    ShiftDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr, var cmajor::debug::Operator op) : cmajor::debug::DebugExprNode*
+        ::=
+        (   AdditiveDebugExpr:left{ expr.reset(left); }
+            (
+                (   SHIFTLEFT{ op = cmajor::debug::Operator::shiftLeft; }
+                |   SHIFTRIGHT{ op = cmajor::debug::Operator::shiftRight; }
+                )
+                AdditiveDebugExpr:right
+                {
+                    switch (op)
+                    {
+                        case cmajor::debug::Operator::shiftLeft: expr.reset(new cmajor::debug::ShiftLeftDebugExprNode(expr.release(), right)); break;
+                        case cmajor::debug::Operator::shiftRight: expr.reset(new cmajor::debug::ShiftRightDebugExprNode(expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
         ;
 
     AdditiveDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr, var cmajor::debug::Operator op) : cmajor::debug::DebugExprNode*
         ::=
-        (   PrefixDebugExpr:left{ expr.reset(left); }
+        (   MultiplicativeDebugExpr:left{ expr.reset(left); }
             (   (PLUS{ op = cmajor::debug::Operator::plus; } | MINUS{ op = cmajor::debug::Operator::minus; })
-                PrefixDebugExpr:right
+                MultiplicativeDebugExpr:right
                 {
                     switch (op)
                     {
                         case cmajor::debug::Operator::plus: expr.reset(new cmajor::debug::AddDebugExprNode(expr.release(), right)); break;
                         case cmajor::debug::Operator::minus: expr.reset(new cmajor::debug::SubDebugExprNode(expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    MultiplicativeDebugExpr(var std::unique_ptr<cmajor::debug::DebugExprNode> expr, var cmajor::debug::Operator op) : cmajor::debug::DebugExprNode*
+        ::=
+        (   PrefixDebugExpr:left{ expr.reset(left); }
+            (   (   AST{ op = cmajor::debug::Operator::mul; }
+                |   SLASH{ op = cmajor::debug::Operator::div; }
+                |   PERCENT{ op = cmajor::debug::Operator::mod; }
+                )
+                PrefixDebugExpr:right
+                {
+                    switch (op)
+                    {
+                        case cmajor::debug::Operator::mul: expr.reset(new cmajor::debug::MulDebugExprNode(expr.release(), right)); break;
+                        case cmajor::debug::Operator::div: expr.reset(new cmajor::debug::DivDebugExprNode(expr.release(), right)); break;
+                        case cmajor::debug::Operator::mod: expr.reset(new cmajor::debug::ModDebugExprNode(expr.release(), right)); break;
                     }
                 }
             )*

@@ -91,10 +91,12 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.2.12 <a href="#cast-expression">Cast expression</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.3 <a href="#print-command-containers">Containers</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.13.4 <a href="#print-command-type-identifiers">Type identifiers</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;3.14 <a href="#set-command">Set command</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.14.1 <a href="#set-command-syntax">Syntax</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;3.15 <a href="#exit-command">Exit command</a><br />
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.15.1 <a href="#exit-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.14 <a href="#set-condition-command">Set condition command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.14.1 <a href="#set-condition-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.15 <a href="#set-variable-command">Set debugger variable command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.15.1 <a href="#set-command-syntax">Syntax</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;3.16 <a href="#exit-command">Exit command</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.16.1 <a href="#exit-command-syntax">Syntax</a><br />
         4 <a href="#common-results">Common results</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;4.1 <a href="#stopped-result">Stopped result</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;4.2 <a href="#error-result">Error result</a><br />
@@ -1964,10 +1966,164 @@
         It uniquely identifies a Cmajor type.
     </p>
 
-        <h3 id="set-command">3.14 Set command</h3>
+    <h3 id="set-condition-command">3.14 Set condition command</h3>
     
     <p>
-        The set command sets the state of a debugger variable.
+        The set condition command sets a breakpoint as a conditional breakpoint and sets the condition of that breakpoint.
+    </p>
+    
+    <h4 id="set-condition-command-syntax">3.14.1 Syntax</h4>
+
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.set-command">set&#8209;condition&#8209;command</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">set</span> <span class="kw">condition</span> 
+                <span class="rule"><a href="#rule.breakpoint-id">breakpoint&#8209;id</a></span> 
+                <span class="rule"><a href="#rule.condition">condition</a></span> 
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.breakpoint-id">breakpoint&#8209;id</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.integer">integer</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.condition">condition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.disjunctive-expr">disjunctive&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.disjunctive-expr">disjunctive&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.conjunctive-expr">conjunctive&#8209;expr</a></span>
+                (<span class="mono">||</span>
+                 <span class="rule"><a href="#rule.conjunctive-expr">conjunctive&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.conjunctive-expr">conjunctive&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.bit-or-expr">bit&#8209;or&#8209;expr</a></span>
+                (<span class="mono">&&</span>
+                <span class="rule"><a href="#rule.bit-or-expr">bit&#8209;or&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.bit-or-expr">bit&#8209;or&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.bit-xor-expr">bit&#8209;xor&#8209;expr</a></span>
+                (<span class="mono">|</span>
+                <span class="rule"><a href="#rule.bit-xor-expr">bit&#8209;xor&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.bit-xor-expr">bit&#8209;xor&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.bit-and-expr">bit&#8209;and&#8209;expr</a></span>
+                (<span class="mono">^</span>
+                <span class="rule"><a href="#rule.bit-and-expr">bit&#8209;and&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.bit-and-expr">bit&#8209;and&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.equality-expr">equality&#8209;expr</a></span>
+                (<span class="mono">&</span>
+                <span class="rule"><a href="#rule.equality-expr">equality&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.equality-expr">equality&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.relational-expr">relational&#8209;expr</a></span>
+                ((<span class="mono">==</span> | <span class="mono">!=</span>)
+                <span class="rule"><a href="#rule.relational-expr">relational&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.relational-expr">relational&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.shift-expr">shift&#8209;expr</a></span>
+                ((<span class="mono">&lt;=</span> | <span class="mono">>=</span> | <span class="mono">&lt;</span> | <span class="mono">></span>)
+                <span class="rule"><a href="#rule.shift-expr">shift&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.shift-expr">shift&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.additive-expr">additive&#8209;expr</a></span>
+                ((<span class="mono">&lt;&lt;</span> | <span class="mono">>></span>)
+                <span class="rule"><a href="#rule.additive-expr">additive&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.additive-expr">additive&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.multiplicative-expr">multiplicative&#8209;expr</a></span>
+                ((<span class="mono">+</span> | <span class="mono">-</span>)
+                <span class="rule"><a href="#rule.multiplicative-expr">multiplicative&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.multiplicative-expr">multiplicative&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.prefix-expr">prefix&#8209;expr</a></span>
+                ((<span class="mono">*</span> | <span class="mono">/</span> | <span class="mono">%</span>)
+                <span class="rule"><a href="#rule.prefix-expr">prefix&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.prefix-expr">prefix&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">*</span>
+                <span class="rule"><a href="#rule.prefix-expr">prefix&#8209;expr</a></span> |
+                <span class="mono">&</span>
+                <span class="rule"><a href="#rule.prefix-expr">prefix&#8209;expr</a></span> |
+                <span class="rule"><a href="#rule.postfix-expr">postfix&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.postfix-expr">postfix&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.primary-expr">primary&#8209;expr</a></span>
+                (<span class="mono">.</span> <span class="rule"><a href="#rule.identifier">identifier</a></span> |
+                <span class="mono">.</span> <span class="kw">base</span> |
+                <span class="mono">[</span> <span class="rule"><a href="#rule.additive-expr">additive&#8209;expr</a></span> <span class="mono">]</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.primary-expr">primary&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.identifier">identifier</a></span> |
+                <span class="rule"><a href="#rule.integer">integer</a></span> |
+                <span class="mono">(</span> <span class="rule"><a href="#rule.disjunctive-expr">disjunctive&#8209;expr</a></span> <span class="mono">)</span>
+             </td>
+        </tr>
+    </table>   
+
+    <h3 id="set-variable-command">3.15 Set debugger variable command</h3>
+    
+    <p>
+        The set debugger variable command sets the state of a debugger variable.
         There's just one debugger variable defined at the moment:
         <em>breakOnThrow</em>.
     </p>
@@ -1984,11 +2140,11 @@
         stops the program.
     </p>
     
-    <h4 id="set-command-syntax">3.14.1 Syntax</h4>
+    <h4 id="set-command-syntax">3.15.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
-            <td class="rule" id="rule.set-command">set&#8209;command</td>
+            <td class="rule" id="rule.set-debugger-var-command">set&#8209;debugger&#8209;var&#8209;command</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="kw">set</span> breakOnThrow <span class="mono">=</span> (<span class="kw">true</span> | <span class="kw">false</span>)
@@ -1996,13 +2152,13 @@
         </tr>
     </table>   
 
-    <h3 id="exit-command">3.15 Exit command</h3>
+    <h3 id="exit-command">3.16 Exit command</h3>
     
     <p>
         The exit command exists the debugger.
     </p>
     
-    <h4 id="exit-command-syntax">3.15.1 Syntax</h4>
+    <h4 id="exit-command-syntax">3.16.1 Syntax</h4>
     
     <table class="grammar">
         <tr>
@@ -2089,7 +2245,8 @@
                 <span class="rule"><a href="#summary.rule.depth-command">depth&#8209;command</a></span> |<br/>
                 <span class="rule"><a href="#summary.rule.frames-command">frames&#8209;command</a></span> |<br/>
                 <span class="rule"><a href="#summary.rule.print-command">print&#8209;command</a></span> |<br/>
-                <span class="rule"><a href="#summary.rule.set-command">set&#8209;command</a></span> |<br/>
+                <span class="rule"><a href="#summary.rule.set-condition-command">set&#8209;condition&#8209;command</a></span> |<br/>
+                <span class="rule"><a href="#summary.rule.set-debugger-var-command">set&#8209;debugger&#8209;var&#8209;command</a></span> |<br/>
                 <span class="rule"><a href="#summary.rule.exit-command">exit&#8209;command</a></span>
             </td>
         </tr>
@@ -2473,7 +2630,150 @@
             </td>
         </tr>
         <tr>
-            <td class="rule" id="summary.rule.set-command">set&#8209;command</td>
+            <td class="rule" id="summary.rule.set-condition-command">set&#8209;condition&#8209;command</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="kw">set</span> <span class="kw">condition</span> 
+                <span class="rule"><a href="#summary.rule.breakpoint-id">breakpoint&#8209;id</a></span> 
+                <span class="rule"><a href="#summary.rule.condition">condition</a></span> 
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.breakpoint-id">breakpoint&#8209;id</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.integer">integer</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.condition">condition</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.disjunctive-expr">disjunctive&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.disjunctive-expr">disjunctive&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.conjunctive-expr">conjunctive&#8209;expr</a></span>
+                (<span class="mono">||</span>
+                 <span class="rule"><a href="#summary.rule.conjunctive-expr">conjunctive&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.conjunctive-expr">conjunctive&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.bit-or-expr">bit&#8209;or&#8209;expr</a></span>
+                (<span class="mono">&&</span>
+                <span class="rule"><a href="#summary.rule.bit-or-expr">bit&#8209;or&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.bit-or-expr">bit&#8209;or&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.bit-xor-expr">bit&#8209;xor&#8209;expr</a></span>
+                (<span class="mono">|</span>
+                <span class="rule"><a href="#summary.rule.bit-xor-expr">bit&#8209;xor&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.bit-xor-expr">bit&#8209;xor&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.bit-and-expr">bit&#8209;and&#8209;expr</a></span>
+                (<span class="mono">^</span>
+                <span class="rule"><a href="#summary.rule.bit-and-expr">bit&#8209;and&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.bit-and-expr">bit&#8209;and&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.equality-expr">equality&#8209;expr</a></span>
+                (<span class="mono">&</span>
+                <span class="rule"><a href="#summary.rule.equality-expr">equality&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.equality-expr">equality&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.relational-expr">relational&#8209;expr</a></span>
+                ((<span class="mono">==</span> | <span class="mono">!=</span>)
+                <span class="rule"><a href="#summary.rule.relational-expr">relational&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.relational-expr">relational&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.shift-expr">shift&#8209;expr</a></span>
+                ((<span class="mono">&lt;=</span> | <span class="mono">>=</span> | <span class="mono">&lt;</span> | <span class="mono">></span>)
+                <span class="rule"><a href="#summary.rule.shift-expr">shift&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.shift-expr">shift&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.additive-expr">additive&#8209;expr</a></span>
+                ((<span class="mono">&lt;&lt;</span> | <span class="mono">>></span>)
+                <span class="rule"><a href="#summary.rule.additive-expr">additive&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.additive-expr">additive&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.multiplicative-expr">multiplicative&#8209;expr</a></span>
+                ((<span class="mono">+</span> | <span class="mono">-</span>)
+                <span class="rule"><a href="#summary.rule.multiplicative-expr">multiplicative&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.multiplicative-expr">multiplicative&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.prefix-expr">prefix&#8209;expr</a></span>
+                ((<span class="mono">*</span> | <span class="mono">/</span> | <span class="mono">%</span>)
+                <span class="rule"><a href="#summary.rule.prefix-expr">prefix&#8209;expr</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.prefix-expr">prefix&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">*</span>
+                <span class="rule"><a href="#summary.rule.prefix-expr">prefix&#8209;expr</a></span> |
+                <span class="mono">&</span>
+                <span class="rule"><a href="#summary.rule.prefix-expr">prefix&#8209;expr</a></span> |
+                <span class="rule"><a href="#summary.rule.postfix-expr">postfix&#8209;expr</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.postfix-expr">postfix&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.primary-expr">primary&#8209;expr</a></span>
+                (<span class="mono">.</span> <span class="rule"><a href="#summary.rule.identifier">identifier</a></span> |
+                <span class="mono">.</span> <span class="kw">base</span> |
+                <span class="mono">[</span> <span class="rule"><a href="#summary.rule.additive-expr">additive&#8209;expr</a></span> <span class="mono">]</span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="summary.rule.primary-expr">primary&#8209;expr</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#summary.rule.identifier">identifier</a></span> |
+                <span class="rule"><a href="#summary.rule.integer">integer</a></span> |
+                <span class="mono">(</span> <span class="rule"><a href="#summary.rule.disjunctive-expr">disjunctive&#8209;expr</a></span> <span class="mono">)</span>
+             </td>
+        </tr>
+            <tr>
+            <td class="rule" id="summary.rule.set-debugger-var-command">set&#8209;debugger&#8209;var&#8209;command</td>
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="kw">set</span> breakOnThrow <span class="mono">=</span> (<span class="kw">true</span> | <span class="kw">false</span>)

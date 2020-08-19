@@ -44,6 +44,7 @@ namespace DebuggerCommandKeywords
         {U"base", BASE}, 
         {U"set", SET}, 
         {U"breakOnThrow", BREAKONTHROW}, 
+        {U"condition", CONDITION}, 
         {U"true", TRUE}, 
         {U"false", FALSE},
         {nullptr, -1}

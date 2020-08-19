@@ -15,7 +15,7 @@ class DebugExprVisitor;
 
 enum class Operator
 {
-    plus, minus
+    plus, minus, mul, div, mod, eq, neq, geq, leq, less, greater, shiftLeft, shiftRight
 };
 
 class DEBUG_API DebugExprNode
@@ -23,7 +23,9 @@ class DEBUG_API DebugExprNode
 public:
     enum class Kind : int8_t
     {
-        identifier, integer, parenExpr, add, sub, deref, addrOf, dot, subscript, range, typeId, cast_
+        identifier, integer, parenExpr,
+        disjunction, conjunction, bitOr, bitXor, bitAnd, eq, neq, leq, geq, less, greater, shiftLeft, shiftRight, add, sub, mul, div, mod,
+        deref, addrOf, dot, subscript, range, typeId, cast_
     };
     DebugExprNode(Kind kind_);
     virtual ~DebugExprNode();
@@ -59,6 +61,188 @@ private:
     int64_t value;
 };
 
+class DEBUG_API DisjunctionDebugExprNode : public DebugExprNode
+{
+public:
+    DisjunctionDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API ConjunctionDebugExprNode : public DebugExprNode
+{
+public:
+    ConjunctionDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API BitOrDebugExprNode : public DebugExprNode
+{
+public:
+    BitOrDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API BitXorDebugExprNode : public DebugExprNode
+{
+public:
+    BitXorDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API BitAndDebugExprNode : public DebugExprNode
+{
+public:
+    BitAndDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API EqualDebugExprNode : public DebugExprNode
+{
+public:
+    EqualDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API NotEqualDebugExprNode : public DebugExprNode
+{
+public:
+    NotEqualDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API LessEqualDebugExprNode : public DebugExprNode
+{
+public:
+    LessEqualDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API GreaterEqualDebugExprNode : public DebugExprNode
+{
+public:
+    GreaterEqualDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API LessDebugExprNode : public DebugExprNode
+{
+public:
+    LessDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API GreaterDebugExprNode : public DebugExprNode
+{
+public:
+    GreaterDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API ShiftLeftDebugExprNode : public DebugExprNode
+{
+public:
+    ShiftLeftDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API ShiftRightDebugExprNode : public DebugExprNode
+{
+public:
+    ShiftRightDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
 class DEBUG_API AddDebugExprNode : public DebugExprNode
 {
 public:
@@ -77,6 +261,48 @@ class DEBUG_API SubDebugExprNode : public DebugExprNode
 {
 public:
     SubDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API MulDebugExprNode : public DebugExprNode
+{
+public:
+    MulDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API DivDebugExprNode : public DebugExprNode
+{
+public:
+    DivDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
+    DebugExprNode* Left() const { return left.get(); }
+    DebugExprNode* Right() const { return right.get(); }
+    DebugExprNode* Clone() const override;
+    void Accept(DebugExprVisitor& visitor) override;
+    std::string ToString() const override;
+private:
+    std::unique_ptr<DebugExprNode> left;
+    std::unique_ptr<DebugExprNode> right;
+};
+
+class DEBUG_API ModDebugExprNode : public DebugExprNode
+{
+public:
+    ModDebugExprNode(DebugExprNode* left_, DebugExprNode* right_);
     DebugExprNode* Left() const { return left.get(); }
     DebugExprNode* Right() const { return right.get(); }
     DebugExprNode* Clone() const override;

@@ -24,11 +24,27 @@ class DIClassTemplateSpecializationType;
 class DEBUG_API DebugExprBinder : public DebugExprVisitor
 {
 public:
-    DebugExprBinder(Debugger& debugger_, DebugInfo* debugInfo_, Scope* scope_);
+    DebugExprBinder(Debugger& debugger_, DebugInfo* debugInfo_, Scope* scope_, bool isBreakConditionExpr_);
     void Visit(IdentifierDebugExprNode& node) override;
     void Visit(IntegerDebugExprNode& node) override;
+    void Visit(DisjunctionDebugExprNode& node) override;
+    void Visit(ConjunctionDebugExprNode& node) override;
+    void Visit(BitOrDebugExprNode& node) override;
+    void Visit(BitXorDebugExprNode& node) override;
+    void Visit(BitAndDebugExprNode& node) override;
+    void Visit(EqualDebugExprNode& node) override;
+    void Visit(NotEqualDebugExprNode& node) override;
+    void Visit(LessEqualDebugExprNode& node) override;
+    void Visit(GreaterEqualDebugExprNode& node) override;
+    void Visit(LessDebugExprNode& node) override;
+    void Visit(GreaterDebugExprNode& node) override;
+    void Visit(ShiftLeftDebugExprNode& node) override;
+    void Visit(ShiftRightDebugExprNode& node) override;
     void Visit(AddDebugExprNode& node) override;
     void Visit(SubDebugExprNode& node) override;
+    void Visit(MulDebugExprNode& node) override;
+    void Visit(DivDebugExprNode& node) override;
+    void Visit(ModDebugExprNode& node) override;
     void Visit(ParenthesizedDebugExprNode& node) override;
     void Visit(DerefDebugExprNode& node) override;
     void Visit(AddrOfDebugExprNode& node) override;
@@ -47,6 +63,7 @@ private:
     std::unique_ptr<BoundDebugExpression> expression;
     bool hasContainerSubscript;
     InitializationStatus status;
+    bool isBreakConditionExpr;
 };
 
 } } // namespace cmajor::debug

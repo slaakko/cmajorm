@@ -12,8 +12,24 @@ namespace cmajor { namespace debug {
 class DebugExpression;
 class IdentifierDebugExprNode;
 class IntegerDebugExprNode;
+class DisjunctionDebugExprNode;
+class ConjunctionDebugExprNode;
+class BitOrDebugExprNode;
+class BitXorDebugExprNode;
+class BitAndDebugExprNode;
+class EqualDebugExprNode;
+class NotEqualDebugExprNode;
+class LessEqualDebugExprNode;
+class GreaterEqualDebugExprNode;
+class LessDebugExprNode;
+class GreaterDebugExprNode;
+class ShiftLeftDebugExprNode;
+class ShiftRightDebugExprNode;
 class AddDebugExprNode;
 class SubDebugExprNode;
+class MulDebugExprNode;
+class DivDebugExprNode;
+class ModDebugExprNode;
 class ParenthesizedDebugExprNode;
 class DerefDebugExprNode;
 class AddrOfDebugExprNode;
@@ -31,8 +47,24 @@ public:
     virtual void Visit(DebugExpression& expr) {}
     virtual void Visit(IdentifierDebugExprNode& node) {}
     virtual void Visit(IntegerDebugExprNode& node) {}
+    virtual void Visit(DisjunctionDebugExprNode& node) {}
+    virtual void Visit(ConjunctionDebugExprNode& node) {}
+    virtual void Visit(BitOrDebugExprNode& node) {}
+    virtual void Visit(BitXorDebugExprNode& node) {}
+    virtual void Visit(BitAndDebugExprNode& node) {}
+    virtual void Visit(EqualDebugExprNode& node) {}
+    virtual void Visit(NotEqualDebugExprNode& node) {}
+    virtual void Visit(LessEqualDebugExprNode& node) {}
+    virtual void Visit(GreaterEqualDebugExprNode& node) {}
+    virtual void Visit(LessDebugExprNode& node) {}
+    virtual void Visit(GreaterDebugExprNode& node) {}
+    virtual void Visit(ShiftLeftDebugExprNode& node) {}
+    virtual void Visit(ShiftRightDebugExprNode& node) {}
     virtual void Visit(AddDebugExprNode& node) {}
     virtual void Visit(SubDebugExprNode& node) {}
+    virtual void Visit(MulDebugExprNode& node) {}
+    virtual void Visit(DivDebugExprNode& node) {}
+    virtual void Visit(ModDebugExprNode& node) {}
     virtual void Visit(ParenthesizedDebugExprNode& node) {}
     virtual void Visit(DerefDebugExprNode& node) {}
     virtual void Visit(AddrOfDebugExprNode& node) {}

@@ -394,7 +394,7 @@ Function::Function(const boost::uuids::uuid& id_, const std::string& fullName_, 
 }
 
 Project::Project(DebugInfo* debugInfo_, const std::string& name_, const std::string& directoryPath_) :
-    debugInfo(debugInfo_), name(name_), directoryPath(directoryPath_), mainFunction(nullptr), longType(nullptr)
+    debugInfo(debugInfo_), name(name_), directoryPath(directoryPath_), mainFunction(nullptr), longType(nullptr), boolType(nullptr)
 {
 }
 
@@ -494,6 +494,10 @@ void Project::AddType(DIType* type)
         if (primitiveType->GetPrimitiveTypeKind() == DIPrimitiveType::Kind::longType)
         {
             longType = primitiveType;
+        }
+        else if (primitiveType->GetPrimitiveTypeKind() == DIPrimitiveType::Kind::boolType)
+        {
+            boolType = primitiveType;
         }
     }
     typeMap[type->Id()] = type;

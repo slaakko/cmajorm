@@ -8,12 +8,43 @@
 </head>
 <body>
     <h1>supd</h1>
+    
+    <h2>Table of contents</h2>
+    
+    <div class="toc">
+        1 <a href="#tutorial">Tutorial</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.1 <a href="#make">Making supd.xml</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.2 <a href="#creating-patterns">Creating pattern elements</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.3 <a href="#connecting">Connecting top-level directories to patterns</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.4 <a href="#changes">Finding out changes to be made</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;1.5 <a href="#copying">Copying files</a><br />
+        2 <a href="#reference">Reference</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="#supd.xml">supd.xml</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.1 <a href="#patterns">Patterns</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.2 <a href="#pattern-expressions">Pattern expressions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1.3 <a href="#directories">Directories</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.2 <a href="#usage">Usage</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;2.3 <a href="#ref-docs">Reference documentation</a><br />
+    </div>
 
     <p>
         <strong>supd</strong> is a source file update utility that copies files from a source directory tree to a target directory tree.
         The files to be copied are specified in an XML file that is by default named <strong>supd.xml</strong> 
         and located in the current directory. Thus <strong>supd</strong> can be thought to pull files from the 
         source directory tree to the current directory and its subdirectories.
+    </p>
+
+    <h2 id="tutorial">1 Tutorial</h2>
+    
+    <p>
+        If we have a source directory tree and a target directory tree and we want to update target directory tree from the source directory tree,
+        but we have made local changes to the project files in the target directory tree that we want not to be overwritten, 
+        we can use supd to copy just the source files and leave the project files as is.
+    </p>
+    
+    <p>
+        Thus we may have the following situation where <strong>C:\source</strong> represents the source directory tree and <strong>C:\target</strong>
+        represents the target directory tree:
     </p>
     
     <pre>
@@ -48,6 +79,12 @@
             .--- hello.vcxproj
     </pre>
     
+    <h3 id="make">1.1 Making supd.xml</h3>
+    
+    <p>
+        First of all we can create a skeleton <strong>supd.xml</strong> from the contents of the source directory by running <strong>supd</strong> with the --make option:
+    </p>
+    
     <pre>
     C:\source>supd --make --verbose
     make: C:/source/supd.xml
@@ -56,11 +93,400 @@
     ==> C:/source/supd.xml    
     </pre>
     
+    <p>
+        The contents of the resulting <strong>supd.xml</strong> is as follows:
+    </p>
+    
     <pre>
     &lt;supd>
      &lt;dir name="doc"/>
      &lt;dir name="hello"/>
     &lt;/supd>
     </pre>
+    
+    <h3 id="creating-patterns">1.2 Creating pattern elements</h3>
+    
+    <p>
+        Since the source directory tree contains two kinds of directories: C++ source file directories and HTML documentation directories,
+        we create <em>pattern</em> elements to <strong>supd.xml</strong> that reflect this:
+    </p>
+
+    <pre>
+    &lt;supd>
+     &lt;pattern name="c++">
+      &lt;file include="*.cpp"/>
+      &lt;file include="*.hpp"/>
+     &lt;/pattern>
+     &lt;pattern name="html">
+      &lt;file include="*.html"/>
+      &lt;dir include="*"/>
+     &lt;/pattern>
+     &lt;dir name="doc"/>
+     &lt;dir name="hello"/>
+    &lt;/supd>
+    </pre>
+    
+    <p>
+        The pattern elements can contain <strong>file</strong> patterns and <strong>directory</strong> patterns.
+        Since we want to include *.cpp and *.hpp files we write those file patterns as values of the <strong>include</strong> attributes of the <strong>file</strong> child elements of the <strong>c++</strong> pattern element.
+        Since we want to include *.html files we write *.html as the value of the <strong>include</strong> attribute of the <strong>file</strong> child element of the <strong>html</strong> pattern element. 
+        Since we want to include all HTML directories we write "*" directory pattern as the value of the <strong>include</strong> attribute of the <strong>dir</strong> child element of the <strong>html</strong> pattern element.
+    </p>
+    
+    <h3 id="connecting">1.3 Connecting top-level directories to patterns</h3>
+    
+    <p>
+        Next we set the top-level <strong>dir</strong> elements to refer to these patterns by adding <strong>pattern</strong> attributes to the <strong>dir</strong> elements:
+    </p>
+
+    <pre>
+    &lt;supd>
+     &lt;pattern name="c++">
+      &lt;file include="*.cpp"/>
+      &lt;file include="*.hpp"/>
+     &lt;/pattern>
+     &lt;pattern name="html">
+      &lt;file include="*.html"/>
+      &lt;dir include="*"/>
+     &lt;/pattern>
+     &lt;dir name="doc" pattern="html" includeSubdirs="true"/>
+     &lt;dir name="hello" pattern="c++"/>
+    &lt;/supd>
+    </pre>
+    
+    <p>
+        Since we want to include subdirectories of the doc directory we add an <strong>includeSubdirs</strong> attribute with value <strong>true</strong> to the 
+        doc dir element.
+    </p>
+    
+    <h3 id="changes">1.4 Finding out changes to be made</h3>
+    
+    <p>
+        Now we copy the <strong>supd.xml</strong> to the <strong>C:\target</strong> directory.
+        We run <strong>supd</strong> with the --verbose and --from options
+        from the <strong>C:\target</strong> directory to find out what changes would be made without making any changes:
+    </p>
+    
+    <pre>
+    C:\target>supd --verbose --from=C:\source
+    </pre>
+    
+    <p>
+        The <strong>supd</strong> program generates the following log output:
+    </p>
+    
+    <pre>
+    reading patterns from C:/target/supd.xml
+    reading dirs from C:/target/supd.xml
+    from C:/source/doc
+    from C:/source/doc/file
+    to be added: C:/target/doc/file/hello.cpp.html
+    to be added: C:/target/doc/file/hello.hpp.html
+    from C:/source/doc/html
+    to be added: C:/target/doc/html/hello.html
+    from C:/source/hello
+    to be added: C:/target/hello/hello.cpp
+    to be updated: C:/target/hello/hello.hpp
+    4 files to be added
+    1 files to be updated    
+    </pre>
+    
+    <h3 id="copying">1.5 Copying files</h3>
+    
+    <p>
+        Since we want these changes to be made, we now run the <strong>supd</strong> program with --add and --update options:
+    </p>
+    
+    <pre>
+    C:\target>supd --verbose --add --update --from=C:\source    
+    </pre>
+    
+    <p>
+        <strong>supd</strong> copies files, creates directories to the target directory tree and generates the following log output:
+    </p>
+    
+    <pre>
+    reading patterns from C:/target/supd.xml
+    reading dirs from C:/target/supd.xml
+    from C:/source/doc
+    from C:/source/doc/file
+    added: C:/target/doc/file
+    added: C:/target/doc/file/hello.cpp.html
+    added: C:/target/doc/file/hello.hpp.html
+    from C:/source/doc/html
+    added: C:/target/doc/html
+    added: C:/target/doc/html/hello.html
+    from C:/source/hello
+    added: C:/target/hello/hello.cpp
+    updated: C:/target/hello/hello.hpp
+    4 files added
+    1 files updated
+    </pre>
+
+    <p>
+        Now the target directory tree is in sync with the source directory tree:
+    </p>
+
+    <pre>
+    C:\target
+       |
+       .--- doc
+       |    |
+       |    .--- file
+       |    |    |
+       |    |    .--- hello.cpp.html
+       |    |    .--- hello.hpp.html
+       |    |
+       |    .--- html
+       |         |
+       |         .--- hello.html
+       |
+       .--- hello
+            |
+            .--- hello.cpp
+            .--- hello.hpp
+            .--- hello.vcxproj
+    </pre>
+
+    <h2 id="reference">2 Reference</h2>
+    
+    <h3 id="supd.xml">2.1 supd.xml</h3>
+    
+    <p>
+        The root element of the supd.xml is named <strong>supd</strong>.
+    </p>
+    
+    <p>
+        The root element can contain:
+        <ul>
+            <li><strong>pattern</strong>, and</li>
+            <li><strong>dir</strong></li>
+       </ul>
+       elements.
+    </p>
+
+    <h4 id="patterns">2.1.1 Patterns</h4>
+    
+    <p>
+        The <strong>pattern</strong> element must have a <strong>name</strong> attribute with any value. 
+        The name of the pattern is used to connect it to any number of top-level <strong>dir</strong> elements.
+    </p>
+    
+    <p>
+        The <strong>pattern</strong> element can have 
+        <ul>
+            <li><strong>file</strong>, and</li>
+            <li><strong>dir</strong></li>
+        </ul>
+        child elements.
+    </p>
+    
+    <p>
+        A <strong>file</strong> child element must have either an <strong>include</strong> or an <strong>exclude</strong> attribute 
+        whose value is a <em><a href="#pattern-expressions">pattern expression</a></em>.
+        The file child elements are matched from top to bottom against file names of a source directory.
+        Initially no file name is included. 
+        If the name of a source file matches the pattern expression of a file child element, then if the pattern expression is as the value of an 
+        <ul>
+            <li><strong>include</strong> attribute, the file will be included, or an</li>
+            <li><strong>exclude</strong> attribute, the file will be excluded.</li>
+        </ul>
+        The last matching file pattern stays in effect. Thus is a file name first matches an include pattern and then an exclude pattern it will be excluded,
+        not copied.
+    </p>
+    
+    <p>
+        A <strong>dir</strong> child element must also have either an <strong>include</strong> or an <strong>exclude</strong> attribute
+        whose value is a pattern expression.
+        The dir child elements are matched from top to bottom against subdirectory names of a source directory.
+        Initially no subdirectory name is included and the last matching directory pattern stays in effect in the same way as for file patterns.
+    </p>
+    
+    <h5>Example</h5>
+    
+    <pre>
+     &lt;pattern name="source">
+      &lt;file include="*.cpp"/>
+      &lt;file include="*.hpp"/>
+      &lt;dir include="*"/>
+      &lt;dir exclude="x64"/>
+      &lt;dir exclude="Debug"/>
+      &lt;dir exclude="Release"/>
+     &lt;/pattern>
+    </pre>
+    
+    <p>
+        The <em>source</em> pattern would match *.cpp and *.hpp files and 
+        all subdirectories except <strong>x64</strong>, <strong>Debug</strong> and <strong>Release</strong>.
+    </p>
+
+    <h4 id="pattern-expressions">2.1.2 Pattern expressions</h4>
+    
+    <p>
+        A pattern expression is limited form of a regular expression, where '*' matches any number of any characters and '.' matches '.' literally.
+        In addition regular expression operator characters '*', '|', '+', '?', '(' and ')' must be escaped with a backslash if their literal meaning 
+        is intended.
+    </p>
+    
+    <table class="grammar">
+        <tr>
+            <td class="rule" id="rule.pattern-expression">pattern&#8209;expression</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.alternative">alternative</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.alternative">alternative</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.catenation">catenation</a></span> 
+                (<span class="mono">|</span> <span class="rule"><a href="#rule.catenation">catenation</a></span>)*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.catenation">catenation</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.repetition">rep</a></span> 
+                <span class="rule"><a href="#rule.repetition">rep</a></span>*
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.repetition">rep</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="rule"><a href="#rule.primary">primary</a></span> |
+                <span class="rule"><a href="#rule.primary">escape</a></span> |
+                <span class="rule"><a href="#rule.any">anything</a></span>
+            </td>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.any">primary</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                'any character except '*', '|', '+', '?', '(', ')''
+            </td>
+        </tr>
+            <td class="rule" id="rule.any">escape</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">\</span>
+                'any character'
+            </td>
+        <tr>
+        </tr>
+        <tr>
+            <td class="rule" id="rule.any">anything</td>
+            <td class="sep">&rarr;</td>
+            <td class="rcontent">
+                <span class="mono">*</span>
+            </td>
+        </tr>
+    </table>
+
+    <h4 id="directories">2.1.3 Directories</h4>
+    
+    <p>
+        A top-level <strong>dir</strong> element must have a <strong>name</strong> attribute.
+        Then a subdirectory of the root source directory tree having that name is included for processing. 
+        Note that the value of the name attribute must be single subdirectory name - no pattern expression is accepted in this case.
+    </p>
+    
+    <p>
+        A top-level <strong>dir</strong> element must also have a <strong>pattern</strong> attribute whose value connects it with a pattern of that name.
+        This means that the source files and subdirectories are matched according to the file and dir elements contained by that pattern.
+    </p>
+    
+    <p>
+        A top-level <strong>dir</strong> element can have an <strong>includeSubdirs</strong> attribute with value <strong>true</strong> or <strong>false</strong>.
+        By default subdirectories are not included.
+    </p>
+
+    <h5>Example</h5>
+    
+    <pre>
+    &lt;dir name="code" pattern="source" includeSubdirs="true"/>
+    </pre>
+    
+    <p>
+        The <em>code </em> subdirectory of the root source directory is processed according to the pattern whose name is <em>source</em> and 
+        its subdirectories are also processed according to that pattern.
+    </p>
+    
+    <h3 id="usage">2.2 Usage</h3>
+    
+    <strong>supd [options] [file.xml ...]</strong>
+    
+    <p>
+        If the program is run without --add and --update options,
+        it shows additions and updates to be made without making changes.
+    </p>
+    
+    <p>
+        If the program is run without 'file.xml' is uses 'supd.xml' from the current directory.
+    </p>
+
+    <p>
+        The program copies files from a source root directory and its subdirectories
+        to the current directory and its subdirectories,
+        if the current directory contains the default 'supd.xml',
+        or to the target directory that contains a 'file.xml'.
+    </p>
+
+    <p>
+        Files to be copied are specified in the file.xml|supd.xml.
+    </p>
+    
+    Options:
+    
+    <table class="opt">
+        <tr>
+            <td class="opt">--verbose</td>
+            <td class="opt">-v</td>
+            <td class="opt">Be verbose.</td>
+        </tr>
+        <tr>
+            <td class="opt">--make</td>
+            <td class="opt">-m</td>
+            <td class="opt">Make supd.xml.</td>
+        </tr>
+        <tr>
+            <td class="opt">--force</td>
+            <td class="opt">-f</td>
+            <td class="opt">Force make.</td>
+        </tr>
+        <tr>
+            <td class="opt">--add</td>
+            <td class="opt">-a</td>
+            <td class="opt">Add new files.</td>
+        </tr>
+        <tr>
+            <td class="opt">--update</td>
+            <td class="opt">-u</td>
+            <td class="opt">Update changed files.</td>
+        </tr>
+        <tr>
+            <td class="opt">--colors=(<strong>true</strong>|<strong>false</strong>)</td>
+            <td class="opt">-c=(<strong>true</strong>|<strong>false</strong>)</td>
+            <td class="opt">Use colors in log output.</td>
+        </tr>
+        <tr>
+            <td class="opt">--from</td>
+            <td/>
+            <td class="opt">Set source root directory.</td>
+        </tr>
+        <tr>
+            <td class="opt">--help</td>
+            <td class="opt">-h</td>
+            <td class="opt">Print help and exit.</td>
+        </tr>
+    </table>
+
+    <h3 id="ref-docs">2.3 Reference documentation</h3>
+    
+    <p>
+        HTML <a href="reference/index.html">reference</a> documentation.
+    </p>
 </body>
 </html>

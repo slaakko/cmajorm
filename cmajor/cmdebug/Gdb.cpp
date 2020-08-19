@@ -34,6 +34,11 @@ GdbBreakDeleteCommand::GdbBreakDeleteCommand(const std::string& breakpoints) : G
 {
 }
 
+GdbBreakConditionCommand::GdbBreakConditionCommand(int gdbBreakpointNumber, const std::string& condition) :
+    GdbCommand(Kind::breakCondition, "-break-condition " + std::to_string(gdbBreakpointNumber) + " " + condition)
+{
+}
+
 GdbDeleteAllBreakpointsCommand::GdbDeleteAllBreakpointsCommand() : GdbCommand(Kind::deleteAll, "delete")
 {
 }

@@ -109,6 +109,7 @@ public:
     void Until(const SourceLocation& location);
     bool Break(std::unique_ptr<DebuggerBreakpoint>&& bp, const std::vector<Instruction*>& instructions);
     void Break(const SourceLocation& location);
+    void SetBreakCondition(int breakpointId, const std::string& condition);
     void Delete(const std::string& breakpointId);
     void Delete(const std::string& breakpointId, bool printResult);
     void Depth();
@@ -137,6 +138,7 @@ public:
     void ProcessStackInfoDepthReply(GdbReply* reply);
     void ProcessStackListFramesReply(GdbReply* reply);
     void ProcessVarCreateReply(GdbReply* reply);
+    void ProcessBreakConditionReply(GdbReply* reply);
     void ProcessVarEvaluateReply(GdbReply* reply);
     bool ProcessExecStoppedRecord(GdbExecStoppedRecord* execStoppedRecord);
     void StartProgram(bool breakOnThrow_);
@@ -203,7 +205,8 @@ class DEBUG_API DebuggerCommand
 public:
     enum class Kind
     {
-        exit, help, next, step, continue_, finish, until, break_, delete_, depth, frames, showBreakpoint, showBreakpoints, list, print, setBreakOnThrow, repeatLatest
+        exit, help, next, step, continue_, finish, until, break_, delete_, depth, frames, showBreakpoint, showBreakpoints, list, print, setCondition,
+        setBreakOnThrow, repeatLatest
     };
     DebuggerCommand(Kind kind_);
     virtual ~DebuggerCommand();
@@ -353,6 +356,19 @@ public:
     DebuggerCommand* Clone() override;
     const std::string& Expression() const { return expression; }
 private:
+    std::string expression;
+};
+
+class DEBUG_API DebuggerSetConditionCommand : public DebuggerCommand
+{
+public:
+    DebuggerSetConditionCommand(int breakpointNumber_, const std::string& expression_);
+    void Execute(Debugger& debugger) override;
+    DebuggerCommand* Clone() override;
+    int BreakpointNumber() const { return breakpointNumber; }
+    const std::string& Expression() const { return expression; }
+private:
+    int breakpointNumber;
     std::string expression;
 };
 

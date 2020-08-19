@@ -81,6 +81,331 @@ std::string BoundIntegerLiteralNode::GdbExprString() const
     return std::to_string(value);
 }
 
+BoundDisjunctionNode::BoundDisjunctionNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::disjunctionNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundDisjunctionNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundDisjunctionNode::ToString() const
+{
+    return left->ToString() + "||" + right->ToString();
+}
+
+BoundDebugNode* BoundDisjunctionNode::Clone() const
+{
+    return new BoundDisjunctionNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundDisjunctionNode::GdbExprString() const
+{
+    return left->GdbExprString() + "||" + right->GdbExprString();
+}
+
+BoundConjunctionNode::BoundConjunctionNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::conjunctionNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundConjunctionNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundConjunctionNode::ToString() const
+{
+    return left->ToString() + "&&" + right->ToString();
+}
+
+BoundDebugNode* BoundConjunctionNode::Clone() const
+{
+    return new BoundConjunctionNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundConjunctionNode::GdbExprString() const
+{
+    return left->GdbExprString() + "&&" + right->GdbExprString();
+}
+
+BoundBitOrNode::BoundBitOrNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::bitOrNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundBitOrNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundBitOrNode::ToString() const
+{
+    return left->ToString() + "|" + right->ToString();
+}
+
+BoundDebugNode* BoundBitOrNode::Clone() const
+{
+    return new BoundBitOrNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundBitOrNode::GdbExprString() const
+{
+    return left->GdbExprString() + "|" + right->GdbExprString();
+}
+
+BoundBitXorNode::BoundBitXorNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::bitXorNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundBitXorNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundBitXorNode::ToString() const
+{
+    return left->ToString() + "^" + right->ToString();
+}
+
+BoundDebugNode* BoundBitXorNode::Clone() const
+{
+    return new BoundBitXorNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundBitXorNode::GdbExprString() const
+{
+    return left->GdbExprString() + "^" + right->GdbExprString();
+}
+
+BoundBitAndNode::BoundBitAndNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::bitAndNode , type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundBitAndNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundBitAndNode::ToString() const
+{
+    return left->ToString() + "&" + right->ToString();
+}
+
+BoundDebugNode* BoundBitAndNode::Clone() const
+{
+    return new BoundBitAndNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundBitAndNode::GdbExprString() const
+{
+    return left->GdbExprString() + "&" + right->GdbExprString();
+}
+
+BoundEqualNode::BoundEqualNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::equalNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundEqualNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundEqualNode::ToString() const
+{
+    return left->ToString() + "==" + right->ToString();
+}
+
+BoundDebugNode* BoundEqualNode::Clone() const
+{
+    return new BoundEqualNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundEqualNode::GdbExprString() const
+{
+    return left->GdbExprString() + "==" + right->GdbExprString();
+}
+
+BoundNotEqualNode::BoundNotEqualNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::notEqualNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundNotEqualNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundNotEqualNode::ToString() const
+{
+    return left->ToString() + "!=" + right->ToString();
+}
+
+BoundDebugNode* BoundNotEqualNode::Clone() const
+{
+    return new BoundNotEqualNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundNotEqualNode::GdbExprString() const
+{
+    return left->GdbExprString() + "!=" + right->GdbExprString();
+}
+
+BoundLessEqualNode::BoundLessEqualNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::lessEqualNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundLessEqualNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundLessEqualNode::ToString() const
+{
+    return left->ToString() + "<=" + right->ToString();
+}
+
+BoundDebugNode* BoundLessEqualNode::Clone() const
+{
+    return new BoundLessEqualNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundLessEqualNode::GdbExprString() const
+{
+    return left->GdbExprString() + "<=" + right->GdbExprString();
+}
+
+BoundGreaterEqualNode::BoundGreaterEqualNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::greaterEqualNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundGreaterEqualNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundGreaterEqualNode::ToString() const
+{
+    return left->ToString() + ">=" + right->ToString();
+}
+
+BoundDebugNode* BoundGreaterEqualNode::Clone() const
+{
+    return new BoundGreaterEqualNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundGreaterEqualNode::GdbExprString() const
+{
+    return left->GdbExprString() + ">=" + right->GdbExprString();
+}
+
+BoundLessNode::BoundLessNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::lessNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundLessNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundLessNode::ToString() const
+{
+    return left->ToString() + "<" + right->ToString();
+}
+
+BoundDebugNode* BoundLessNode::Clone() const
+{
+    return new BoundLessNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundLessNode::GdbExprString() const
+{
+    return left->GdbExprString() + "<" + right->GdbExprString();
+}
+
+BoundGreaterNode::BoundGreaterNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::greaterNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundGreaterNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundGreaterNode::ToString() const
+{
+    return left->ToString() + ">" + right->ToString();
+}
+
+BoundDebugNode* BoundGreaterNode::Clone() const
+{
+    return new BoundGreaterNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundGreaterNode::GdbExprString() const
+{
+    return left->GdbExprString() + ">" + right->GdbExprString();
+}
+
+BoundShiftLeftNode::BoundShiftLeftNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::shiftLeftNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundShiftLeftNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundShiftLeftNode::ToString() const
+{
+    return left->ToString() + "<<" + right->ToString();
+}
+
+BoundDebugNode* BoundShiftLeftNode::Clone() const
+{
+    return new BoundShiftLeftNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundShiftLeftNode::GdbExprString() const
+{
+    return left->GdbExprString() + "<<" + right->GdbExprString();
+}
+
+BoundShiftRightNode::BoundShiftRightNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::shiftRightNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundShiftRightNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundShiftRightNode::ToString() const
+{
+    return left->ToString() + ">>" + right->ToString();
+}
+
+BoundDebugNode* BoundShiftRightNode::Clone() const
+{
+    return new BoundShiftRightNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundShiftRightNode::GdbExprString() const
+{
+    return left->GdbExprString() + ">>" + right->GdbExprString();
+}
+
 BoundAddNode::BoundAddNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
     BoundDebugNode(Kind::addNode, type, sourceNode), left(left_), right(right_)
 {
@@ -129,6 +454,81 @@ BoundDebugNode* BoundSubNode::Clone() const
 std::string BoundSubNode::GdbExprString() const
 {
     return left->GdbExprString() + "-" + right->GdbExprString();
+}
+
+BoundMulNode::BoundMulNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::mulNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundMulNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundMulNode::ToString() const
+{
+    return left->ToString() + "*" + right->ToString();
+}
+
+BoundDebugNode* BoundMulNode::Clone() const
+{
+    return new BoundMulNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundMulNode::GdbExprString() const
+{
+    return left->GdbExprString() + "*" + right->GdbExprString();
+}
+
+BoundDivNode::BoundDivNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::divNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundDivNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundDivNode::ToString() const
+{
+    return left->ToString() + "/" + right->ToString();
+}
+
+BoundDebugNode* BoundDivNode::Clone() const
+{
+    return new BoundDivNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundDivNode::GdbExprString() const
+{
+    return left->GdbExprString() + "/" + right->GdbExprString();
+}
+
+BoundModNode::BoundModNode(DIType* type, BoundDebugNode* left_, BoundDebugNode* right_, DebugExprNode* sourceNode) :
+    BoundDebugNode(Kind::modNode, type, sourceNode), left(left_), right(right_)
+{
+}
+
+void BoundModNode::Accept(BoundDebugNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+std::string BoundModNode::ToString() const
+{
+    return left->ToString() + "%" + right->ToString();
+}
+
+BoundDebugNode* BoundModNode::Clone() const
+{
+    return new BoundModNode(Type(), left->Clone(), right->Clone(), SourceNode());
+}
+
+std::string BoundModNode::GdbExprString() const
+{
+    return left->GdbExprString() + "%" + right->GdbExprString();
 }
 
 BoundDerefNode::BoundDerefNode(DIType* type, BoundDebugNode* subject_, DebugExprNode* sourceNode) : BoundDebugNode(Kind::derefNode, type, sourceNode), subject(subject_)

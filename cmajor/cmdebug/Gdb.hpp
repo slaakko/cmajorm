@@ -47,7 +47,7 @@ class DEBUG_API GdbCommand
 public:
     enum class Kind
     {
-        exit, breakInsert, breakDelete, execContinue, execFinish, execNext, execStep, execUntil, execRun, stackInfoDepth, stackListFrames,
+        exit, breakInsert, breakDelete, breakCondition, execContinue, execFinish, execNext, execStep, execUntil, execRun, stackInfoDepth, stackListFrames,
         varCreate, varDelete, varSetFormat, varShowFormat, varInfoNumChildren, varListChildren, varInfoType, varInfoExpression,
         varInfoPathExpression, varShowAttributes, varEvaluateExpression, varAssign, varUpdate, varSetFrozen, varSetUpdateRange,
         varSetVisualizer, print, deleteAll
@@ -75,6 +75,12 @@ class DEBUG_API GdbBreakDeleteCommand : public GdbCommand
 {
 public:
     GdbBreakDeleteCommand(const std::string& breakpoints);
+};
+
+class DEBUG_API GdbBreakConditionCommand : public GdbCommand
+{
+public:
+    GdbBreakConditionCommand(int gdbBreakpointNumber, const std::string& condition);
 };
 
 class DEBUG_API GdbDeleteAllBreakpointsCommand : public GdbCommand

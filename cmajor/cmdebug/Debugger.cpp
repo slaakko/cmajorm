@@ -327,6 +327,25 @@ bool GetVarCreateResult(GdbResults* results, std::unique_ptr<JsonValue>& result)
     return false;
 }
 
+bool GetBreakConditionResult(GdbResults* results, std::unique_ptr<JsonValue>& result)
+{
+    try
+    {
+        JsonObject* resultObject = new JsonObject();
+        resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(true)));
+        result.reset(resultObject);
+        return true;
+    }
+    catch (const std::exception& ex)
+    {
+        JsonObject* resultObject = new JsonObject();
+        resultObject->AddField(U"success", std::unique_ptr<JsonValue>(new JsonBool(false)));
+        resultObject->AddField(U"error", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.what()))));
+        result.reset(resultObject);
+    }
+    return false;
+}
+
 bool GetVarEvaluateResult(GdbResults* results, std::unique_ptr<JsonValue>& result)
 {
     try
@@ -1161,6 +1180,56 @@ void Debugger::Break(const SourceLocation& location)
     result->Write(formatter);
 }
 
+void Debugger::SetBreakCondition(int breakpointId, const std::string& expression)
+{
+    JsonObject* resultObject = new JsonObject();
+    result.reset(resultObject);
+    if (!stoppedInstruction)
+    {
+        throw std::runtime_error("error: not stopped");
+    }
+    DebugExprLexer lexer(ToUtf32(expression), "", 0);
+    std::unique_ptr<DebugExprNode> node = DebugExprParser::Parse(lexer);
+    DebugExprBinder binder(*this, debugInfo.get(), stoppedInstruction->GetScope(), true);
+    node->Accept(binder);
+    BoundDebugExpression* boundExpression = binder.BoundExpression(node.get());
+    std::string condition;
+    if (boundExpression->HasContainerSubscript())
+    {
+        ContainerSubscriptTranslator translator(*this);
+        boundExpression->Accept(translator);
+        SetBreakCondition(breakpointId, translator.Expression());
+    }
+    else
+    {
+        condition = boundExpression->GdbExprString();
+    }
+    auto it = debuggerBreakpointMap.find(std::to_string(breakpointId));
+    if (it != debuggerBreakpointMap.cend())
+    {
+        DebuggerBreakpoint* bp = it->second;
+        bool succeeded = true;
+        for (int gdbBreakpointNumber : bp->GdbBreakpointNumbers())
+        {
+            GdbBreakConditionCommand breakConditionCommand(gdbBreakpointNumber, condition);
+            succeeded = ExecuteGDBCommand(breakConditionCommand);
+            if (!succeeded)
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        throw std::runtime_error("breakpoint id " + std::to_string(breakpointId) + " not found");
+    }
+    std::lock_guard<std::recursive_mutex> lock(outputMutex);
+    if (result)
+    {
+        result->Write(formatter);
+    }
+}
+
 void Debugger::Delete(const std::string& breakpointId)
 {
     Delete(breakpointId, true);
@@ -1623,7 +1692,7 @@ void Debugger::Evaluate(const std::string& expression)
     result.reset(new JsonObject());
     DebugExprLexer lexer(ToUtf32(expression), "", 0);
     std::unique_ptr<DebugExprNode> node = DebugExprParser::Parse(lexer);
-    DebugExprBinder binder(*this, debugInfo.get(), stoppedInstruction->GetScope());
+    DebugExprBinder binder(*this, debugInfo.get(), stoppedInstruction->GetScope(), false);
     node->Accept(binder);
     BoundDebugExpression* boundExpression = binder.BoundExpression(node.get());
     if (boundExpression->HasContainerSubscript())
@@ -1644,7 +1713,7 @@ DIType* Debugger::GetType(const std::string& expression)
 {
     DebugExprLexer lexer(ToUtf32(expression), "", 0);
     std::unique_ptr<DebugExprNode> node = DebugExprParser::Parse(lexer);
-    DebugExprBinder binder(*this, debugInfo.get(), stoppedInstruction->GetScope());
+    DebugExprBinder binder(*this, debugInfo.get(), stoppedInstruction->GetScope(), false);
     node->Accept(binder);
     BoundDebugExpression* boundExpression = binder.BoundExpression(node.get());
     return boundExpression->Type();
@@ -1761,6 +1830,11 @@ void Debugger::ProcessReply(GdbCommand::Kind commandKind, GdbReply* reply)
         case GdbCommand::Kind::varCreate:
         {
             ProcessVarCreateReply(reply);
+            break;
+        }
+        case GdbCommand::Kind::breakCondition:
+        {
+            ProcessBreakConditionReply(reply);
             break;
         }
         case GdbCommand::Kind::varEvaluateExpression:
@@ -2225,6 +2299,28 @@ void Debugger::ProcessVarCreateReply(GdbReply* reply)
     }
 }
 
+void Debugger::ProcessBreakConditionReply(GdbReply* reply)
+{
+    bool success = false;
+    cmajor::debug::GdbResultRecord* resultRecord = reply->GetResultRecord();
+    if (resultRecord)
+    {
+        if (resultRecord->GetClass() == GdbResultRecord::Class::done)
+        {
+            success = GetBreakConditionResult(resultRecord->Results(), result);
+        }
+    }
+    if (!success)
+    {
+        if (result->Type() == JsonValueType::object)
+        {
+            JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+            jsonObject->AddField(U"command", std::unique_ptr<JsonValue>(new JsonString(U"-break-condition")));
+            jsonObject->AddField(U"reply", reply->ToJson());
+        }
+    }
+}
+
 void Debugger::ProcessVarEvaluateReply(GdbReply* reply)
 {
     bool success = false;
@@ -2525,6 +2621,34 @@ void DebuggerPrintCommand::Execute(Debugger& debugger)
 DebuggerCommand* DebuggerPrintCommand::Clone()
 {
     return new DebuggerPrintCommand(expression);
+}
+
+std::string RemoveWhiteSpace(const std::string& expression)
+{
+    std::string expr;
+    for (char c : expression)
+    {
+        if (c != ' ' && c != '\t')
+        {
+            expr.append(1, c);
+        }
+    }
+    return expr;
+}
+
+DebuggerSetConditionCommand::DebuggerSetConditionCommand(int breakpointNumber_, const std::string& expression_) :
+    DebuggerCommand(Kind::setCondition), breakpointNumber(breakpointNumber_), expression(RemoveWhiteSpace(expression_))
+{
+}
+
+void DebuggerSetConditionCommand::Execute(Debugger& debugger)
+{
+    debugger.SetBreakCondition(breakpointNumber, expression);
+}
+
+DebuggerCommand* DebuggerSetConditionCommand::Clone()
+{
+    return new DebuggerSetConditionCommand(breakpointNumber, expression);
 }
 
 DebuggerSetBreakOnThrowCommand::DebuggerSetBreakOnThrowCommand(bool breakOnThrow_) : DebuggerCommand(Kind::setBreakOnThrow), breakOnThrow(breakOnThrow_)

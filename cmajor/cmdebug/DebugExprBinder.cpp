@@ -11,8 +11,9 @@
 
 namespace cmajor { namespace debug {
 
-DebugExprBinder::DebugExprBinder(Debugger& debugger_, DebugInfo* debugInfo_, Scope* scope_) :
-    debugger(debugger_), debugInfo(debugInfo_), scope(scope_), hasContainerSubscript(false), status(InitializationStatus::unknown)
+DebugExprBinder::DebugExprBinder(Debugger& debugger_, DebugInfo* debugInfo_, Scope* scope_, bool isBreakConditionExpr_) :
+    debugger(debugger_), debugInfo(debugInfo_), scope(scope_), hasContainerSubscript(false), status(InitializationStatus::unknown),
+    isBreakConditionExpr(isBreakConditionExpr_)
 {
 }
 
@@ -50,41 +51,165 @@ void DebugExprBinder::Visit(IntegerDebugExprNode& node)
     currentNode.reset(new BoundIntegerLiteralNode(debugInfo->GetMainProject()->GetLongType(), node.Value(), &node));
 }
 
+void DebugExprBinder::Visit(DisjunctionDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundDisjunctionNode(debugInfo->GetMainProject()->GetBoolType(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(ConjunctionDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundConjunctionNode(debugInfo->GetMainProject()->GetBoolType(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(BitOrDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundBitOrNode(left->Type(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(BitXorDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundBitXorNode(left->Type(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(BitAndDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundBitAndNode(left->Type(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(EqualDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundEqualNode(debugInfo->GetMainProject()->GetBoolType(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(NotEqualDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundNotEqualNode(debugInfo->GetMainProject()->GetBoolType(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(LessEqualDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundLessEqualNode(debugInfo->GetMainProject()->GetBoolType(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(GreaterEqualDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundGreaterEqualNode(debugInfo->GetMainProject()->GetBoolType(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(LessDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundLessNode(debugInfo->GetMainProject()->GetBoolType(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(GreaterDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundGreaterNode(debugInfo->GetMainProject()->GetBoolType(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(ShiftLeftDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundShiftLeftNode(left->Type(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(ShiftRightDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundShiftRightNode(left->Type(), left.release(), right.release(), &node));
+}
+
 void DebugExprBinder::Visit(AddDebugExprNode& node)
 {
     node.Left()->Accept(*this);
     std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
     node.Right()->Accept(*this);
     std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
-    bool valid = false;
-    if (left->Type()->GetKind() == DIType::Kind::primitiveType)
+    if (isBreakConditionExpr)
     {
-        DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(left->Type());
-        if (primitiveType->IsIntegerType())
-        {
-            if (right->Type()->GetKind() == DIType::Kind::pointerType)
-            {
-                currentNode.reset(new BoundAddNode(right->Type(), left.release(), right.release(), &node));
-                valid = true;
-            }
-        }
+        currentNode.reset(new BoundAddNode(left->Type(), left.release(), right.release(), &node));
     }
-    else if (left->Type()->GetKind() == DIType::Kind::pointerType)
+    else
     {
-        if (right->Type()->GetKind() == DIType::Kind::primitiveType)
+        bool valid = false;
+        if (left->Type()->GetKind() == DIType::Kind::primitiveType)
         {
-            DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(right->Type());
+            DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(left->Type());
             if (primitiveType->IsIntegerType())
             {
-                DIType* type = left->Type();
-                currentNode.reset(new BoundAddNode(type, left.release(), right.release(), &node));
-                valid = true;
+                if (right->Type()->GetKind() == DIType::Kind::pointerType)
+                {
+                    currentNode.reset(new BoundAddNode(right->Type(), left.release(), right.release(), &node));
+                    valid = true;
+                }
             }
         }
-    }
-    if (!valid)
-    {
-        throw std::runtime_error("add expression not valid: (pointer + integer) | (integer + pointer) expected: " + node.ToString());
+        else if (left->Type()->GetKind() == DIType::Kind::pointerType)
+        {
+            if (right->Type()->GetKind() == DIType::Kind::primitiveType)
+            {
+                DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(right->Type());
+                if (primitiveType->IsIntegerType())
+                {
+                    DIType* type = left->Type();
+                    currentNode.reset(new BoundAddNode(type, left.release(), right.release(), &node));
+                    valid = true;
+                }
+            }
+        }
+        if (!valid)
+        {
+            throw std::runtime_error("add expression not valid: (pointer + integer) | (integer + pointer) expected: " + node.ToString());
+        }
     }
 }
 
@@ -94,34 +219,68 @@ void DebugExprBinder::Visit(SubDebugExprNode& node)
     std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
     node.Right()->Accept(*this);
     std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
-    bool valid = false;
-    if (left->Type()->GetKind() == DIType::Kind::pointerType)
+    if (isBreakConditionExpr)
     {
-        DIPointerType* leftPtrType = static_cast<DIPointerType*>(left->Type());
-        if (right->Type()->GetKind() == DIType::Kind::pointerType)
+        currentNode.reset(new BoundSubNode(left->Type(), left.release(), right.release(), &node));
+    }
+    else
+    {
+        bool valid = false;
+        if (left->Type()->GetKind() == DIType::Kind::pointerType)
         {
-            DIPointerType* rightPtrType = static_cast<DIPointerType*>(right->Type());
-            if (leftPtrType->Id() == rightPtrType->Id())
+            DIPointerType* leftPtrType = static_cast<DIPointerType*>(left->Type());
+            if (right->Type()->GetKind() == DIType::Kind::pointerType)
             {
-                currentNode.reset(new BoundSubNode(debugInfo->GetMainProject()->GetLongType(), left.release(), right.release(), &node));
-                valid = true;
+                DIPointerType* rightPtrType = static_cast<DIPointerType*>(right->Type());
+                if (leftPtrType->Id() == rightPtrType->Id())
+                {
+                    currentNode.reset(new BoundSubNode(debugInfo->GetMainProject()->GetLongType(), left.release(), right.release(), &node));
+                    valid = true;
+                }
+            }
+            else if (right->Type()->GetKind() == DIType::Kind::primitiveType)
+            {
+                DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(right->Type());
+                if (primitiveType->IsIntegerType())
+                {
+                    DIType* type = left->Type();
+                    currentNode.reset(new BoundSubNode(type, left.release(), right.release(), &node));
+                    valid = true;
+                }
             }
         }
-        else if (right->Type()->GetKind() == DIType::Kind::primitiveType)
+        if (!valid)
         {
-            DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(right->Type());
-            if (primitiveType->IsIntegerType())
-            {
-                DIType* type = left->Type();
-                currentNode.reset(new BoundSubNode(type, left.release(), right.release(), &node));
-                valid = true;
-            }
+            throw std::runtime_error("subtract expression not valid: (pointer - integer) | (pointer - pointer) expected: " + node.ToString());
         }
     }
-    if (!valid)
-    {
-        throw std::runtime_error("subtract expression not valid: (pointer - integer) | (pointer - pointer) expected: " + node.ToString());
-    }
+}
+
+void DebugExprBinder::Visit(MulDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundMulNode(left->Type(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(DivDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundDivNode(left->Type(), left.release(), right.release(), &node));
+}
+
+void DebugExprBinder::Visit(ModDebugExprNode& node)
+{
+    node.Left()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> left(std::move(currentNode));
+    node.Right()->Accept(*this);
+    std::unique_ptr<BoundDebugNode> right(std::move(currentNode));
+    currentNode.reset(new BoundModNode(left->Type(), left.release(), right.release(), &node));
 }
 
 void DebugExprBinder::Visit(ParenthesizedDebugExprNode& node)

@@ -294,6 +294,7 @@ public:
     DIReferenceType* GetReferenceType(DIType* referredToType);
     DIConstType* GetConstType(DIType* baseType);
     DIType* GetLongType() const { return longType; }
+    DIType* GetBoolType() const { return boolType; }
 private:
     DebugInfo* debugInfo;
     std::string name;
@@ -311,6 +312,7 @@ private:
     std::unordered_map<boost::uuids::uuid, DIConstType*, boost::hash<boost::uuids::uuid>> constTypeMap;
     CompileUnitFunction* mainFunction;
     DIType* longType;
+    DIType* boolType;
 };
 
 class DEBUG_API SourceFile
