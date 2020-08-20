@@ -24,10 +24,6 @@ void CompileUnit::SetId(const std::string& id_)
 void CompileUnit::SetSourceFilePath(const std::string& sourceFilePath_)
 {
     sourceFilePath = sourceFilePath_;
-    if (sourceFilePath.find("BinaryReader") != std::string::npos)
-    {
-        int x = 0;
-    }
 }
 
 void CompileUnit::Write()

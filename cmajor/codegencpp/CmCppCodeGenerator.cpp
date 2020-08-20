@@ -208,10 +208,6 @@ void CmCppCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->MangledName() == U"member_function_SetCharacterClass_CharClassTable_F6EC4C3D8DE56CE384A6B7D60702F69286C9B2C2")
-    {
-        int x = 0;
-    }
     if (compileUnit->CodeGenerated(functionSymbol)) return;
     compileUnit->SetCodeGenerated(functionSymbol);
     void* functionType = functionSymbol->IrType(*emitter);
@@ -798,10 +794,6 @@ void CmCppCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
 
 void CmCppCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
 {
-    if (boundIfStatement.IsAssertNode())
-    {
-        int x = 0;
-    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;

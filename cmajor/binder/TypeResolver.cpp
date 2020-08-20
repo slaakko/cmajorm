@@ -363,6 +363,10 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
         classTemplateRepository.ResolveDefaultTemplateArguments(templateArgumentTypes, classTemplate, containerScope, templateIdNode.GetSpan());
     }
     ClassTemplateSpecializationSymbol* classTemplateSpecialization = symbolTable.MakeClassTemplateSpecialization(classTemplate, templateArgumentTypes, templateIdNode.GetSpan());
+    if (classTemplateSpecialization->GetModule()->IsImmutable())
+    {
+        classTemplateSpecialization = boundCompileUnit.GetSymbolTable().CopyClassTemplateSpecialization(classTemplateSpecialization);
+    }
     if (!classTemplateSpecialization->IsBound())
     {
         classTemplateRepository.BindClassTemplateSpecialization(classTemplateSpecialization, containerScope, templateIdNode.GetSpan());

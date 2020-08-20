@@ -77,9 +77,35 @@
   <br/>
   <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
   <br/>
-  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><a href="../doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">string</a><span class="other">></span>&nbsp;<a href="../doc/class_Directory_BC859E3181032FEF203267BDB17523BD8C99C7E4.html#member_function_GetDirectories_Directory_65AE3E544E2D506C377E1404520BFF71F03F2CC2">GetDirectories</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">directoryPath</span><span class="other">)</span></span>
   <br/>
-  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><a href="../doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">string</a><span class="other">></span>&nbsp;<span class="identifier">directories</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">directoryIterationHandle</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#RtBeginIterateDirectory">RtBeginIterateDirectory</a><span class="other">(</span><span class="identifier">directoryPath</span><span class="other">.</span><a href="../doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Chars_String_CharT_F23E248DC46A5AA9215CDB25B6779E94681FBAB6">Chars</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">dirPath</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#RtGetNextDirectoryPath">RtGetNextDirectoryPath</a><span class="other">(</span><span class="identifier">directoryIterationHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while</span>&nbsp;<span class="other">(</span><span class="identifier">dirPath</span><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">directories</span><span class="other">.</span><a href="../doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Add_List_T_0CEB0F989B58359D06357C988DF595C83DA28430">Add</a><span class="other">(</span><span class="identifier">dirPath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">dirPath</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#RtGetNextDirectoryPath">RtGetNextDirectoryPath</a><span class="other">(</span><span class="identifier">directoryIterationHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#RtEndIterateDirectory">RtEndIterateDirectory</a><span class="other">(</span><span class="identifier">directoryIterationHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">directories</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="other">}</span></span>
   <br/>
  </body>
 </html>

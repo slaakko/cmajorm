@@ -613,10 +613,6 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&memberFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::memberFunctionSymbol, "member function symbol expected");
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
-    if (memberFunctionSymbol->MangledName() == U"member_function_Write_BinaryWriter_42759A137A9CCC36E5D886D61C3CFD42E1EEE7E8")
-    {
-        int x = 0;
-    }
     if (!dontCheckDuplicateFunctionSymbols)
     {
         memberFunctionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
