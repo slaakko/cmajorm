@@ -23,9 +23,9 @@ namespace System.Windows
         return Color.White();
     }
 
-    public nothrow Color DefaultCloseBoxSelectedColor()
+    public nothrow Color DefaultTabCloseBoxSelectedColor()
     {
-        return Color(28u, 151u, 234u);
+        return Color(222u, 238u, 245u);
     }
 
     public nothrow inline int DefaultTabLeadingWidth()
@@ -65,7 +65,12 @@ namespace System.Windows
 
     internal class Tab
     {
+        public enum State
+        {
+            normal, closeBoxSelected
+        }
         public bool visible;
+        public State state;
         public float textHeight;
         public float textWidth;
         public float closeBoxWidth;
@@ -95,7 +100,8 @@ namespace System.Windows
             topMarginHeight(DefaultTabControlTopMarginHeight()), headerHeight(0), tabPadding(DefaultTabPadding()), tabCloseBoxPadding(DefaultTabCloseBoxPadding()),
             overlapWidth(DefaultTabOverlapWidth()), roundingRadius(DefaultTabRoundingRadius()), stringFormat(),
             centerFormat(StringAlignment.center, StringAlignment.center), framePen(frameColor), textBrush(textColor), tabBackgroundColor(DefaultTabBackgroundColor()),
-            tabBackgroundBrush(tabBackgroundColor), closeBoxPenWidth(DefaultTabCloseBoxPenWidth()), closeBoxPen(textColor, closeBoxPenWidth)
+            tabBackgroundBrush(tabBackgroundColor), closeBoxPenWidth(DefaultTabCloseBoxPenWidth()), closeBoxPen(textColor, closeBoxPenWidth), closeStateTabPage(null),
+            closeBoxSelectedColor(DefaultTabCloseBoxSelectedColor()), closeBoxSelectedBrush(closeBoxSelectedColor)
         {
             SetChanged();
         }
@@ -206,6 +212,51 @@ namespace System.Windows
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnMouseEnter()
+        {
+            base->OnMouseEnter();
+            closeStateTabPage = null;
+        }
+        protected override void OnMouseLeave()
+        {
+            base->OnMouseLeave();
+            if (closeStateTabPage != null)
+            {
+                closeStateTabPage->tab.state = Tab.State.normal;
+                Invalidate(closeStateTabPage->tab.closeRect.ToWinRect());
+                closeStateTabPage = null;
+            }
+        }
+        protected override void OnMouseMove(MouseEventArgs& args)
+        {
+            base->OnMouseMove(args);
+            Component* component = tabPages.FirstChild();
+            while (component != null)
+            {
+                TabPage* tabPage = cast<TabPage*>(component);
+                if (tabPage->tab.closeRect.Contains(args.location))
+                {
+                    if (tabPage->tab.state == Tab.State.normal)
+                    {
+                        tabPage->tab.state = Tab.State.closeBoxSelected;
+                        closeStateTabPage = tabPage;
+                        Invalidate(tabPage->tab.closeRect.ToWinRect());
+                        return;
+                    }
+                }
+                else if (closeStateTabPage != null)
+                {
+                    if (tabPage->tab.state == Tab.State.closeBoxSelected)
+                    {
+                        closeStateTabPage->tab.state = Tab.State.normal;
+                        Invalidate(closeStateTabPage->tab.closeRect.ToWinRect());
+                        closeStateTabPage = null;
+                        return;
+                    }
+                }
+                component = component->NextSibling();
             }
         }
         protected override void OnMouseDown(MouseEventArgs& args)
@@ -404,6 +455,10 @@ namespace System.Windows
         {
             return tabBackgroundBrush;
         }
+        internal nothrow inline const SolidBrush& CloseBoxSelectedBrush() const
+        {
+            return closeBoxSelectedBrush;
+        }
         internal nothrow inline int LeadingWidth() const
         {
             return leadingWidth;
@@ -478,6 +533,9 @@ namespace System.Windows
         private Pen closeBoxPen;
         private SolidBrush textBrush;
         private SolidBrush tabBackgroundBrush;
+        private Color closeBoxSelectedColor;
+        private SolidBrush closeBoxSelectedBrush;
+        private TabPage* closeStateTabPage;
     }
 
     public class TabPage : Panel
@@ -578,7 +636,7 @@ namespace System.Windows
                 SizeF(tab.closeBoxWidth, tab.closeBoxWidth));
             tab.closeRect = Rect(Point(cast<int>(tab.closeBoxRect.location.x), cast<int>(tab.closeBoxRect.location.y)),
                 Size(cast<int>(tab.closeBoxRect.size.w), cast<int>(tab.closeBoxRect.size.h)));
-            tab.closeRect.Inflate(2, 2);
+            tab.closeRect.Inflate(3, 3);
             tab.closeBoxRect.Inflate(-1, -1);
             left = left + tab.width - tabControl->OverlapWidth();
         }
@@ -604,6 +662,19 @@ namespace System.Windows
             graphics.DrawLineChecked(framePen,
                 PointF(tab.left + tab.width, tab.bottomRect.location.y),
                 PointF(tab.left + tab.width, tab.bottomRect.location.y + tab.bottomRect.size.h - 1));
+            if (tab.state == Tab.State.normal)
+            {
+                RectF r = tab.closeBoxRect;
+                r.Inflate(3, 3);
+                graphics.FillRectangleChecked(backgroundBrush, r);
+            }
+            else if (tab.state == Tab.State.closeBoxSelected)
+            {
+                RectF r = tab.closeBoxRect;
+                r.Inflate(3, 3);
+                const Brush& selectedBrush = tabControl->CloseBoxSelectedBrush();
+                graphics.FillRectangleChecked(selectedBrush, r);
+            }
             graphics.DrawLineChecked(closeBoxPen,
                 tab.closeBoxRect.location, PointF(tab.closeBoxRect.location.x + tab.closeBoxRect.size.w, tab.closeBoxRect.location.y + tab.closeBoxRect.size.h));
             graphics.DrawLineChecked(closeBoxPen,
