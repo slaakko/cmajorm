@@ -11,12 +11,11 @@ namespace System.Windows
     public class Panel : ContainerControl
     {
         public Panel(const char* windowClassName, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, const Color& backgroundColor) :
-            base(windowClassName, DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor,
-            text, location, size, dock, anchors)
+            base(windowClassName, DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, text, location, size, dock, anchors)
         {
         }
-        public Panel(const Point& location, const Size& size, Dock dock, Anchors anchors) : this("System.Windows.Panel", "panel", location, size, dock, anchors,
-            DefaultControlBackgroundColor())
+        public Panel(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this("System.Windows.Panel", "panel", location, size, dock, anchors, DefaultControlBackgroundColor())
         {
         }
         public override void PrintWindowTree(int level)

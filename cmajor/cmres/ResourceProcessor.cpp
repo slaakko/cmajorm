@@ -236,7 +236,6 @@ void AddResourcesInProjectToCurrentModule(sngcm::ast::Project& project, cmajor::
 
 void ProcessResourcesInProject(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule)
 {
-    if (project.ResourceFilePaths().empty()) return;
     AddResourcesInProjectToCurrentModule(project, currentModule);
     if (project.GetTarget() == Target::program || project.GetTarget() == Target::winapp || project.GetTarget() == Target::winguiapp)
     {
