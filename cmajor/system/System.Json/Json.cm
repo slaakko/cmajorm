@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using System.Text;
 
 namespace System.Json
 {
@@ -12,6 +13,10 @@ namespace System.Json
     {
         public default virtual ~JsonValue();
         public abstract string ToString() const;
+        public virtual void Write(CodeFormatter& formatter)
+        {
+            formatter.Write(ToString());
+        }
     }
     
     public class JsonNull : JsonValue
@@ -33,6 +38,10 @@ namespace System.Json
         public override string ToString() const
         {
             return System.ToString(value);
+        }
+        public override void Write(CodeFormatter& formatter)
+        {
+            formatter.Write(ToString());
         }
         public nothrow inline double Value() const
         {
@@ -222,6 +231,44 @@ namespace System.Json
             s.Append("}");
             return s;
         }
+        public override void Write(CodeFormatter& formatter)
+        {
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            bool first = true;
+            bool lastWasArrayOrObject = false;
+            for (const Pair<ustring, JsonValue*>& p : fieldMap)
+            {
+                JsonString s(p.first);
+                JsonValue* v(p.second);
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.WriteLine(", ");
+                }
+                s.Write(formatter);
+                formatter.Write(" : ");
+                if ((v is JsonArray*) || (v is JsonObject*))
+                {
+                    formatter.WriteLine();
+                    lastWasArrayOrObject = true;
+                }
+                else
+                {
+                    lastWasArrayOrObject = false;
+                }
+                v->Write(formatter);
+            }
+            formatter.DecIndent();
+            if (!lastWasArrayOrObject)
+            {
+                formatter.WriteLine();
+            }
+            formatter.WriteLine("}");
+        }
         private List<UniquePtr<JsonValue>> fieldValues;
         private Map<ustring, JsonValue*> fieldMap;
     }
@@ -265,6 +312,39 @@ namespace System.Json
             }
             s.Append("]");
             return s;
+        }
+        public override void Write(CodeFormatter& formatter)
+        {
+            formatter.WriteLine("[");
+            formatter.IncIndent();
+            bool first = true;
+            bool lastWasArrayOrObject = false;
+            for (const UniquePtr<JsonValue>& item : items)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.WriteLine(", ");
+                }
+                item->Write(formatter);
+                if ((item.Get() is JsonArray*) || (item.Get() is JsonObject*))
+                {
+                    lastWasArrayOrObject = true;
+                }
+                else
+                {
+                    lastWasArrayOrObject = false;
+                }
+            }
+            formatter.DecIndent();
+            if (!lastWasArrayOrObject)
+            {
+                formatter.WriteLine();
+            }
+            formatter.WriteLine("]");
         }
         private List<UniquePtr<JsonValue>> items;
     }

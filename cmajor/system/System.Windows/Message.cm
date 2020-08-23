@@ -9,6 +9,7 @@ namespace System.Windows
 {
     public const uint WM_DESTROY = 0x2u;
     public const uint WM_SIZE = 0x0005u;
+    public const uint WM_MOVE = 0x0003u;
     public const uint WM_SETFOCUS = 0x0007u;
     public const uint WM_KILLFOCUS = 0x0008u;
     public const uint WM_PAINT = 0x000Fu;
@@ -235,6 +236,13 @@ namespace System.Windows
             ushort sw = cast<ushort>(s);
             ushort sh = cast<ushort>(s >> 16u);
             return Size(cast<int>(sw), cast<int>(sh));
+        }
+        public nothrow inline Point LParamLocation() const
+        {
+            uint s = LParamLoDWord();
+            ushort sx = cast<ushort>(s);
+            ushort sy = cast<ushort>(s >> 16u);
+            return Point(cast<int>(sx), cast<int>(sy));
         }
         public void* windowHandle;
         public uint msg;

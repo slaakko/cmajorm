@@ -1,0 +1,281 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Windows;
+using cmcode;
+
+public const uint defaultConfigSaveTimerPeriod = 3000u; // 3 seconds
+
+public Point MainWindowLocation()
+{
+    try
+    {
+        if (MainConfiguration.Instance().Loaded())
+        {
+            return MainConfiguration.Instance().GetMainWindowLocation();
+        }
+        else
+        {
+            return Point.Default();
+        }
+    }
+    catch (const Exception& ex)
+    {
+    }
+    return Point.Default();
+}
+
+public Size MainWindowSize()
+{
+    try
+    {
+        if (MainConfiguration.Instance().Loaded())
+        {
+            return MainConfiguration.Instance().GetMainWindowSize();
+        }
+        else
+        {
+            return Size.Default();
+        }
+    }
+    catch (const Exception& ex)
+    {
+    }
+    return Size.Default();
+}
+
+int MainWindowVerticalSplitterDistance()
+{
+    try
+    {
+        if (MainConfiguration.Instance().Loaded())
+        {
+            int distance = MainConfiguration.Instance().GetMainWindowVerticalSplitterDistance();
+            if (distance == 0)
+            {
+                return 2 * MainWindowSize().h / 3;
+            }
+            else
+            {
+                return distance;
+            }
+        }
+        else
+        {
+            return 2 * MainWindowSize().h / 3;
+        }
+    }
+    catch (const Exception& ex)
+    {
+    }
+    return 2 * MainWindowSize().h / 3;
+}
+
+int MainWindowHorizontalSplitterDistance()
+{
+    try
+    {
+        if (MainConfiguration.Instance().Loaded())
+        {
+            int distance = MainConfiguration.Instance().GetMainWindowHorizontalSplitterDistance();
+            if (distance == 0)
+            {
+                return 2 * MainWindowSize().w / 3;
+            }
+            else
+            {
+                return distance;
+            }
+        }
+        else
+        {
+            return 2 * MainWindowSize().w / 3;
+        }
+    }
+    catch (const Exception& ex)
+    {
+    }
+    return 2 * MainWindowSize().w / 3;
+
+}
+
+class MainWindow : Window
+{
+    public MainWindow() : base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "cmcode", MainWindowLocation(), MainWindowSize(),
+        Dock.none, Anchors.none)
+    {
+        UniquePtr<MenuBar> menuBar(new MenuBar());
+        UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
+        UniquePtr<MenuItem> newMenuItem(new MenuItem("&New Project..."));
+        newMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.n));
+        newMenuItem->ClickEvent().AddHandler(NewProjectClick);
+        fileMenuItem->AddMenuItem(newMenuItem.Release());
+        UniquePtr<MenuItem> openMenuItem(new MenuItem("&Open Project/Solution..."));
+        openMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.o));
+        openMenuItem->ClickEvent().AddHandler(OpenProjectClick);
+        fileMenuItem->AddMenuItem(openMenuItem.Release());
+        UniquePtr<MenuItem> saveMenuItem(new MenuItem("&Save"));
+        saveMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.s));
+        saveMenuItem->ClickEvent().AddHandler(SaveClick);
+        fileMenuItem->AddMenuItem(saveMenuItem.Release());
+        UniquePtr<MenuItem> exitMenuItem(new MenuItem("E&xit"));
+        exitMenuItem->SetShortcut(cast<Keys>(Keys.altModifier | Keys.f4));
+        exitMenuItem->ClickEvent().AddHandler(ExitClick);
+        fileMenuItem->AddMenuItem(exitMenuItem.Release());
+        menuBar->AddMenuItem(fileMenuItem.Release());
+        AddChild(menuBar.Release());
+        UniquePtr<SplitContainer> verticalSplitContainerPtr(new SplitContainer(Orientation.vertical, MainWindowVerticalSplitterDistance(),
+            Point(), Size(), Dock.fill, Anchors.none));
+        verticalSplitContainer = verticalSplitContainerPtr.Get();
+        verticalSplitContainer->SplitterDistanceChangedEvent().AddHandler(VerticalSplitterDistanceChanged);
+        UniquePtr<SplitContainer> horizontalSplitContainerPtr(new SplitContainer(Orientation.horizontal, MainWindowHorizontalSplitterDistance(),
+            Point(), Size(), Dock.fill, Anchors.none));
+        horizontalSplitContainer = horizontalSplitContainerPtr.Get();
+        horizontalSplitContainer->SplitterDistanceChangedEvent().AddHandler(HorizontalSplitterDistanceChanged);
+        UniquePtr<TabControl> codeTabControl(new TabControl(Point(), Size(), Dock.fill, Anchors.none));
+        codeTabControl->SetBackgroundColor(Color.White());
+        UniquePtr<TreeView> solutionExplorer(new TreeView(Point(), Size(), Dock.fill, Anchors.none));
+        horizontalSplitContainer->Pane1Container()->AddChild(codeTabControl.Release());
+        horizontalSplitContainer->Pane2Container()->AddChild(solutionExplorer.Release());
+        verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.Release());
+        UniquePtr<TabControl> outputTabControl(new TabControl(Point(), Size(), Dock.fill, Anchors.none));
+        UniquePtr<TabPage> debugLogTabPage(new TabPage("Debug log", "debugLog"));
+        UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.fill, Anchors.none));
+        Application.SetLogView(logView.Get());
+        debugLogTabPage->AddChild(logView.Release());
+        outputTabControl->AddTabPage(debugLogTabPage.Release());
+        verticalSplitContainer->Pane2Container()->AddChild(outputTabControl.Release());
+        AddChild(verticalSplitContainerPtr.Release());
+    }
+    public override void OnShown()
+    {
+        try
+        {
+            base->OnShown();
+            MainConfiguration.Instance().SetMainWindowLocation(Location());
+            MainConfiguration.Instance().SetMainWindowSize(GetSize());
+            SetTimer(1u, defaultConfigSaveTimerPeriod);
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
+        }
+    }
+    protected override void OnWindowClosing(bool& cancelClose)
+    {
+        try
+        {
+            Application.SetLogView(null);
+            base->OnWindowClosing(cancelClose);
+            MainConfiguration.Instance().Save(true);
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
+        }
+    }
+    protected override void OnTimer(TimerEventArgs& args)
+    {
+        try
+        {
+            MainConfiguration.Instance().Save(false);
+        }
+        catch (const Exception& ex)
+        {
+        }
+    }
+    public override void OnSizeChanged()
+    {
+        try
+        {
+            base->OnSizeChanged();
+            MainConfiguration.Instance().SetMainWindowSize(GetSize());
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
+        }
+    }
+    public override void OnLocationChanged()
+    {
+        try
+        {
+            base->OnLocationChanged();
+            MainConfiguration.Instance().SetMainWindowLocation(Location());
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
+        }
+    }
+    private void VerticalSplitterDistanceChanged()
+    {
+        try
+        {
+            MainConfiguration.Instance().SetMainWindowVerticalSplitterDistance(verticalSplitContainer->SplitterDistance());
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
+        }
+    }
+    private void HorizontalSplitterDistanceChanged()
+    {
+        try
+        {
+            MainConfiguration.Instance().SetMainWindowHorizontalSplitterDistance(horizontalSplitContainer->SplitterDistance());
+        }
+        catch (const Exception& ex)
+        {
+            MessageBox.Show(ex.Message());
+        }
+    }
+    private void NewProjectClick()
+    {
+        MessageBox.Show("New project");
+    }
+    private void OpenProjectClick()
+    {
+        MessageBox.Show("Open project");
+    }
+    private void SaveClick()
+    {
+        MessageBox.Show("Save");
+    }
+    private void ExitClick()
+    {
+        Close();
+    }
+    private SplitContainer* verticalSplitContainer;
+    private SplitContainer* horizontalSplitContainer;
+}
+
+int main()
+{
+    try
+    {
+        MainConfiguration.Instance().Load();
+        MainWindow mainWindow;
+        mainWindow.SetSmallIcon(Application.GetResourceManager().GetIcon("cmcode.small.icon"));
+        int exitCode = Application.Run(mainWindow);
+        return exitCode;
+    }
+    catch (const Exception& ex)
+    {
+        MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+        try
+        {
+            StreamWriter errorWriter = File.CreateText("error.txt");
+            errorWriter << ex.ToString() << endl();
+        }
+        catch (const Exception&)
+        {
+        }
+        return 1;
+    }
+    return 0;
+}

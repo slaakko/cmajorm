@@ -8,6 +8,8 @@ using System.Collections;
 
 namespace System.Windows
 {
+    public class delegate void SplitterEventHandler();
+
     public enum Orientation
     {
         horizontal, vertical
@@ -33,6 +35,11 @@ namespace System.Windows
         return Size();
     }
 
+    public nothrow Color DefaultSplitterEdgeColor()
+    {
+        return Color(204u, 206u, 219u);
+    }
+
     public const int defaultSplitterWidth = 5;
 
     public class Splitter : Control
@@ -41,14 +48,16 @@ namespace System.Windows
         {
             none = 0, moveSplitter = 1 << 0
         }
-        public Splitter(Orientation orientation_, const Color& backgroundColor, const Point& location, int width) :
+        public Splitter(Orientation orientation_, const Color& backgroundColor, const Color& edgeColor_, const Point& location, int width) :
             base("System.Windows.Splitter", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
             backgroundColor, "splitter", location, SplitSize(orientation_, width), SplitDock(orientation_), Anchors.none), orientation(orientation_),
             horizontalSplitterCursor(Application.GetResourceManager().GetCursor("horizontal.splitter.system.windows.cursor")),
-            verticalSplitterCursor(Application.GetResourceManager().GetCursor("vertical.splitter.system.windows.cursor")), flags(), container(null)
+            verticalSplitterCursor(Application.GetResourceManager().GetCursor("vertical.splitter.system.windows.cursor")), flags(), container(null),
+            edgeColor(edgeColor_), edgePen(edgeColor)
         {
         }
-        public Splitter(Orientation orientation, const Point& location) : this(orientation, DefaultControlBackgroundColor(), location, defaultSplitterWidth)
+        public Splitter(Orientation orientation, const Point& location) :
+            this(orientation, DefaultControlBackgroundColor(), DefaultSplitterEdgeColor(), location, defaultSplitterWidth)
         {
         }
         public nothrow void SetContainer(SplitContainer* container_)
@@ -76,8 +85,25 @@ namespace System.Windows
                         log->WriteLine("Splitter.OnPaint: " + r.ToString());
                     }
                 }
-                base->OnPaint(args);
                 args.graphics.Clear(BackgroundColor());
+                Point loc = Location();
+                Size size = GetSize();
+                switch (orientation)
+                {
+                    case Orientation.horizontal:
+                    {
+                        args.graphics.DrawLineChecked(edgePen, Point(loc.x, loc.y), Point(loc.x + size.w, loc.y));
+                        args.graphics.DrawLineChecked(edgePen, Point(loc.x, loc.y + size.h), Point(loc.x + size.w, loc.y + size.h));
+                        break;
+                    }
+                    case Orientation.vertical:
+                    {
+                        args.graphics.DrawLineChecked(edgePen, Point(loc.x, loc.y), Point(loc.x, loc.y + size.h));
+                        args.graphics.DrawLineChecked(edgePen, Point(size.w, loc.y), Point(loc.x + size.w, loc.y + size.h));
+                        break;
+                    }
+                }
+                base->OnPaint(args);
             }
             catch (const Exception& ex)
             {
@@ -199,6 +225,8 @@ namespace System.Windows
         private int x;
         private int y;
         private SplitContainer* container;
+        private Color edgeColor;
+        private Pen edgePen;
     }
 
     public class SplitContainer : ContainerControl
@@ -266,6 +294,7 @@ namespace System.Windows
         }
         public void SetSplitterDistance(int splitterDistance_)
         {
+            int prevSplitterDistance = splitterDistance;
             splitterDistance = splitterDistance_;
             switch (orientation)
             {
@@ -274,11 +303,24 @@ namespace System.Windows
             }
             DockChildren();
             Invalidate();
+            if (prevSplitterDistance != splitterDistance)
+            {
+                OnSplitterDistanceChanged();
+            }
+        }
+        public virtual void OnSplitterDistanceChanged()
+        {
+            splitterDistanceChangedEvent.Fire();
+        }
+        public nothrow Event<SplitterEventHandler>& SplitterDistanceChangedEvent() const
+        {
+            return splitterDistanceChangedEvent;
         }
         private Orientation orientation;
         private int splitterDistance;
         private Control* pane1;
         private Splitter* splitter;
         private Control* pane2;
+        private Event<SplitterEventHandler> splitterDistanceChangedEvent;
     }
 }

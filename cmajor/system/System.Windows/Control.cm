@@ -453,6 +453,14 @@ namespace System.Windows
                 OnLocationChanged();
             }
         }
+        internal  void SetLocationInternal(const Point& loc)
+        {
+            if (location != loc)
+            {
+                location = loc;
+                OnLocationChanged();
+            }
+        }
         protected virtual void OnLocationChanged()
         {
             locationChangedEvent.Fire();
@@ -964,6 +972,28 @@ namespace System.Windows
                 case WM_CLIPBOARDUPDATE:
                 {
                     DoClipboardUpdate();
+                    message.result = 0;
+                    return true;
+                }
+                case WM_MOVE:
+                {
+                    Point newLocation = message.LParamLocation();
+                    Point oldLocation = Location();
+                    if (newLocation != oldLocation)
+                    {
+                        SetLocationInternal(newLocation);
+                    }
+                    message.result = 0;
+                    return true;
+                }
+                case WM_SIZE:
+                {
+                    Size newSize = message.LParamSize();
+                    Size oldSize = GetSize();
+                    if (newSize != oldSize)
+                    {
+                        SetSizeInternal(newSize);
+                    }
                     message.result = 0;
                     return true;
                 }
