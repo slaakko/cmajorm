@@ -180,6 +180,23 @@ namespace System.Windows
             SetChanged();
             Invalidate();
         }
+        public void CloseAllTabPages()
+        {
+            if (selectedTabPage != null)
+            {
+                selectedTabPage->Hide();
+                selectedTabPage = null;
+            }
+            Component* component = tabPages.FirstChild();
+            while (component != null)
+            {
+                Component* next = component->NextSibling();
+                tabPages.RemoveChild(component);
+                component = next;
+            }
+            SetChanged();
+            Invalidate();
+        }
         public nothrow int IndexOf(TabPage* tabPage) const
         {
             int index = 0;

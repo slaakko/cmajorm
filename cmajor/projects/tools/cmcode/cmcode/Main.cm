@@ -261,7 +261,7 @@ namespace cmcode
 
     class MainWindow : Window
     {
-        public MainWindow() : base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "cmcode", MainWindowLocation(), MainWindowSize(),
+        public MainWindow() : base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
             Dock.none, Anchors.none, MainWindowWindowState())
         {
             Debug.SetPaint();
@@ -284,6 +284,11 @@ namespace cmcode
             exitMenuItem->ClickEvent().AddHandler(ExitClick);
             fileMenuItem->AddMenuItem(exitMenuItem.Release());
             menuBar->AddMenuItem(fileMenuItem.Release());
+            UniquePtr<MenuItem> windowMenuItem(new MenuItem("&Window"));
+            UniquePtr<MenuItem> closeAllTabsMenuItem(new MenuItem("&Close All Tabs"));
+            closeAllTabsMenuItem->ClickEvent().AddHandler(CloseAllTabsClick);
+            windowMenuItem->AddMenuItem(closeAllTabsMenuItem.Release());
+            menuBar->AddMenuItem(windowMenuItem.Release());
             AddChild(menuBar.Release());
             UniquePtr<SplitContainer> verticalSplitContainerPtr(new SplitContainer(Orientation.vertical, MainWindowVerticalSplitterDistance(),
                 Point(), Size(), Dock.fill, Anchors.none));
@@ -417,44 +422,64 @@ namespace cmcode
         }
         private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
         {
-            TreeViewNode* node = args.node;
-            TreeViewNodeData* data = cast<TreeViewNodeData*>(node->Data());
-            switch (data->kind)
+            try
             {
-                case TreeViewNodeData.Kind.solution:
-                case TreeViewNodeData.Kind.project:
+                TreeViewNode* node = args.node;
+                TreeViewNodeData* data = cast<TreeViewNodeData*>(node->Data());
+                if (data->kind == TreeViewNodeData.Kind.solution || data->kind == TreeViewNodeData.Kind.project)
                 {
                     switch (node->GetState())
                     {
                         case TreeViewNode.State.collapsed: node->ExpandAll(); break;
                         case TreeViewNode.State.expanded: node->CollapseAll(); break;
                     }
-                    break;
                 }
-                case TreeViewNodeData.Kind.file:
+                else if (data->kind == TreeViewNodeData.Kind.file)
                 {
                     string ext = Path.GetExtension(data->fileName);
                     if (ext == ".cm")
                     {
-                        UniquePtr<TabPage> tabPage(new TabPage(data->fileName, data->key));
-                        Cm.Views.CmajorSourceCodeView* sourceCodeView = new Cm.Views.CmajorSourceCodeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
-                        UniquePtr<Control> paddedControl(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
-                        UniquePtr<Control> borderedControl(new BorderedControl(paddedControl.Release(), BorderStyle.style3D, DefaultTabControlFrameColor(),
-                            TabControlSelectedBorderColor(), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
-                        UniquePtr<Control> scrollableSourceCodeView(new ScrollableControl(borderedControl.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-                        tabPage->AddChild(scrollableSourceCodeView.Release());
-                        codeTabControl->AddTabPage(tabPage.Release());
-                        ustring content = ToUtf32(File.ReadAllText(data->filePath));
-                        sourceCodeView->SetTextContent(content);
-                        sourceCodeView->SetFocus();
+                        TabPage* prevTabPage = codeTabControl->GetTabPageByKey(data->key);
+                        if (prevTabPage != null)
+                        {
+                            codeTabControl->SetSelectedTabPage(prevTabPage);
+                        }
+                        else
+                        {
+                            UniquePtr<TabPage> tabPage(new TabPage(data->fileName, data->key));
+                            Cm.Views.CmajorSourceCodeView* sourceCodeView = new Cm.Views.CmajorSourceCodeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
+                            UniquePtr<Control> paddedControl(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+                            UniquePtr<Control> borderedControl(new BorderedControl(paddedControl.Release(), BorderStyle.style3D, DefaultTabControlFrameColor(),
+                                TabControlSelectedBorderColor(), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+                            UniquePtr<Control> scrollableSourceCodeView(new ScrollableControl(borderedControl.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+                            tabPage->AddChild(scrollableSourceCodeView.Release());
+                            codeTabControl->AddTabPage(tabPage.Release());
+                            ustring content = ToUtf32(File.ReadAllText(data->filePath));
+                            sourceCodeView->SetTextContent(content);
+                            sourceCodeView->SetFocus();
+                        }
                     }
-                    break;
+                    else
+                    {
+                        throw Exception("no editor for '" + ext + "' file implemented");
+                    }
                 }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
             }
         }
         private void NewProjectClick()
         {
-            MessageBox.Show("New project");
+            try
+            {
+                MessageBox.Show("New project");
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
         }
         private void OpenProjectClick()
         {
@@ -500,6 +525,7 @@ namespace cmcode
                     }
                     UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), treeViewData, treeViewDataMap);
                     solutionExplorerTreeView->SetRoot(root.Release());
+                    codeTabControl->CloseAllTabPages();
                 }
             }
             catch (const Exception& ex)
@@ -509,11 +535,29 @@ namespace cmcode
         }
         private void SaveClick()
         {
-            MessageBox.Show("Save");
+            try
+            {
+                MessageBox.Show("Save");
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+            }
         }
         private void ExitClick()
         {
             Close();
+        }
+        private void CloseAllTabsClick()
+        {
+            try
+            {
+                codeTabControl->CloseAllTabPages();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+            }
         }
         private SplitContainer* verticalSplitContainer;
         private SplitContainer* horizontalSplitContainer;
