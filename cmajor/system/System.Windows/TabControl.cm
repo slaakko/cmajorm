@@ -18,9 +18,14 @@ namespace System.Windows
         return Color.Black();
     }
 
-    public nothrow Color DefaultTabBackgroundColor()
+    public nothrow Color DefaultTabNormalBackgroundColor()
     {
         return Color.White();
+    }
+
+    public nothrow Color DefaultTabSelectedBackgroundColor()
+    {
+        return Color(255u, 255u, 215u);
     }
 
     public nothrow Color DefaultTabCloseBoxSelectedColor()
@@ -99,8 +104,10 @@ namespace System.Windows
             textColor(DefaultTabTextColor()), tabPages(this), selectedTabPage(null), leadingWidth(DefaultTabLeadingWidth()),
             topMarginHeight(DefaultTabControlTopMarginHeight()), headerHeight(0), tabPadding(DefaultTabPadding()), tabCloseBoxPadding(DefaultTabCloseBoxPadding()),
             overlapWidth(DefaultTabOverlapWidth()), roundingRadius(DefaultTabRoundingRadius()), stringFormat(),
-            centerFormat(StringAlignment.center, StringAlignment.center), framePen(frameColor), textBrush(textColor), tabBackgroundColor(DefaultTabBackgroundColor()),
-            tabBackgroundBrush(tabBackgroundColor), closeBoxPenWidth(DefaultTabCloseBoxPenWidth()), closeBoxPen(textColor, closeBoxPenWidth), closeStateTabPage(null),
+            centerFormat(StringAlignment.center, StringAlignment.center), framePen(frameColor), textBrush(textColor),
+            tabNormalBackgroundColor(DefaultTabNormalBackgroundColor()), tabNormalBackgroundBrush(tabNormalBackgroundColor),
+            tabSelectedBackgroundColor(DefaultTabSelectedBackgroundColor()), tabSelectedBackgroundBrush(tabSelectedBackgroundColor),
+            closeBoxPenWidth(DefaultTabCloseBoxPenWidth()), closeBoxPen(textColor, closeBoxPenWidth), closeStateTabPage(null),
             closeBoxSelectedColor(DefaultTabCloseBoxSelectedColor()), closeBoxSelectedBrush(closeBoxSelectedColor)
         {
             SetChanged();
@@ -118,13 +125,21 @@ namespace System.Windows
                 Invalidate();
             }
         }
-        public void SetTabBackgroundColor(const Color& tabBackgroundColor_)
+        public void SetTabNormalBackgroundColor(const Color& tabNormalBackgroundColor_)
         {
-            if (tabBackgroundColor_ != tabBackgroundColor)
+            if (tabNormalBackgroundColor_ != tabNormalBackgroundColor)
             {
-                tabBackgroundColor = tabBackgroundColor_;
-                tabBackgroundBrush = SolidBrush(tabBackgroundColor);
+                tabNormalBackgroundColor = tabNormalBackgroundColor_;
+                tabNormalBackgroundBrush = SolidBrush(tabNormalBackgroundColor);
                 Invalidate();
+            }
+        }
+        public void SetTabSelectedBackgroundColor(const Color& tabSelectedBackgroundColor_)
+        {
+            if (tabSelectedBackgroundColor_ != tabSelectedBackgroundColor)
+            {
+                tabSelectedBackgroundColor = tabSelectedBackgroundColor_;
+                tabSelectedBackgroundBrush = SolidBrush(tabSelectedBackgroundColor);
             }
         }
         public void AddTabPage(TabPage* tabPage)
@@ -214,7 +229,7 @@ namespace System.Windows
                 }
                 args.graphics.Clear(BackgroundColor());
                 DrawTabs(args.graphics);
-                DrawSelectedTabPage();
+                DrawSelectedTabPage(args.clipRect);
                 DrawFrame(args.graphics);
                 args.graphics.SetSmoothingModeChecked(prevSmoothingMode);
                 base->OnPaint(args);
@@ -332,9 +347,9 @@ namespace System.Windows
             base->OnLocationChanged();
             SetSelectedTabPagePos();
         }
-        protected override void OnSizeChanged()
+        protected override void OnSizeChanged(uint windowState)
         {
-            base->OnSizeChanged();
+            base->OnSizeChanged(windowState);
             SetSelectedTabPagePos();
         }
         private void SetSelectedTabPagePos()
@@ -352,12 +367,13 @@ namespace System.Windows
             {
                 control->SetFocus();
             }
-            selectedTabPage->Invalidate();
         }
-        private void DrawSelectedTabPage()
+        private void DrawSelectedTabPage(const Rect& clipRect)
         {
             if (selectedTabPage == null) return;
             SetSelectedTabPagePos();
+            Rect r(selectedTabPage->Location(), selectedTabPage->GetSize());
+            if (!r.IntersectsWith(clipRect)) return;
             selectedTabPage->Invalidate();
         }
         private void DrawFrame(Graphics& graphics)
@@ -484,9 +500,13 @@ namespace System.Windows
         {
             return textBrush;
         }
-        internal nothrow inline const SolidBrush& TabBackgroundBrush() const
+        internal nothrow inline const SolidBrush& TabNormalBackgroundBrush() const
         {
-            return tabBackgroundBrush;
+            return tabNormalBackgroundBrush;
+        }
+        internal nothrow inline const SolidBrush& TabSelectedBackgroundBrush() const
+        {
+            return tabSelectedBackgroundBrush;
         }
         internal nothrow inline const SolidBrush& CloseBoxSelectedBrush() const
         {
@@ -560,12 +580,14 @@ namespace System.Windows
         private float roundingRadius;
         private StringFormat stringFormat;
         private StringFormat centerFormat;
-        private Color tabBackgroundColor;
+        private Color tabNormalBackgroundColor;
+        private Color tabSelectedBackgroundColor;
         private Pen framePen;
         private float closeBoxPenWidth;
         private Pen closeBoxPen;
         private SolidBrush textBrush;
-        private SolidBrush tabBackgroundBrush;
+        private SolidBrush tabNormalBackgroundBrush;
+        private SolidBrush tabSelectedBackgroundBrush;
         private Color closeBoxSelectedColor;
         private SolidBrush closeBoxSelectedBrush;
         private TabPage* closeStateTabPage;
@@ -623,9 +645,9 @@ namespace System.Windows
         {
             base->OnLocationChanged();
         }
-        protected override void OnSizeChanged()
+        protected override void OnSizeChanged(uint windowState)
         {
-            base->OnSizeChanged();
+            base->OnSizeChanged(windowState);
         }
         protected override void OnTextChanged()
         {
@@ -684,15 +706,25 @@ namespace System.Windows
         internal void DrawTab(Graphics& graphics, TabControl* tabControl)
         {
             if (!tab.visible) return;
-            const Brush& backgroundBrush = tabControl->TabBackgroundBrush();
+            Brush* backgroundBrush = null;
+            if (this == tabControl->SelectedTabPage())
+            {
+                const Brush& brush = tabControl->TabSelectedBackgroundBrush();
+                backgroundBrush = &brush;
+            }
+            else
+            {
+                const Brush& brush = tabControl->TabNormalBackgroundBrush();
+                backgroundBrush = &brush;
+            }
             const Pen& framePen = tabControl->FramePen();
             const Pen& closeBoxPen = tabControl->CloseBoxPen();
             int topMarginHeight = tabControl->TopMarginHeight();
             float roundingRadius = tabControl->RoundingRadius();
-            graphics.FillEllipseChecked(backgroundBrush, tab.leftRoundingRect);
-            graphics.FillEllipseChecked(backgroundBrush, tab.rightRoundingRect);
-            graphics.FillRectangleChecked(backgroundBrush, tab.topRect);
-            graphics.FillRectangleChecked(backgroundBrush, tab.bottomRect);
+            graphics.FillEllipseChecked(*backgroundBrush, tab.leftRoundingRect);
+            graphics.FillEllipseChecked(*backgroundBrush, tab.rightRoundingRect);
+            graphics.FillRectangleChecked(*backgroundBrush, tab.topRect);
+            graphics.FillRectangleChecked(*backgroundBrush, tab.bottomRect);
             graphics.DrawLineChecked(framePen, PointF(tab.left, tab.bottomRect.location.y + tab.bottomRect.size.h), PointF(tab.left, tab.bottomRect.location.y));
             graphics.DrawArcChecked(framePen, tab.leftRoundingRect, -180.0f, 90.0f);
             graphics.DrawStringChecked(Text(), tabControl->GetFont(), tab.textRect, tabControl->CenterFormat(), tabControl->TextBrush());
@@ -707,7 +739,7 @@ namespace System.Windows
             {
                 RectF r = tab.closeBoxRect;
                 r.Inflate(3, 3);
-                graphics.FillRectangleChecked(backgroundBrush, r);
+                graphics.FillRectangleChecked(*backgroundBrush, r);
             }
             else if (tab.state == Tab.State.closeBoxSelected)
             {

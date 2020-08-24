@@ -28,9 +28,9 @@ namespace System.Windows
             child->SetLocation(Point());
             child->SetSize(GetSize());
         }
-        protected override void OnSizeChanged()
+        protected override void OnSizeChanged(uint windowState)
         {
-            base->OnSizeChanged();
+            base->OnSizeChanged(windowState);
             child->SetLocation(Point());
             child->SetSize(GetSize());
         }

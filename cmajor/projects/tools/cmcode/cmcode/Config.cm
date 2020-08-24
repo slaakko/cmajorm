@@ -54,8 +54,38 @@ namespace cmcode
     [json]
     public class MainConfig
     {
-        public nothrow MainConfig() : verticalSplitterDistance(0), horizontalSplitterDistance(0)
+        public enum JsonWindowState : sbyte
         {
+            normal, maximized
+        }
+        public nothrow MainConfig() : mainWindowWindowState(JsonWindowState.normal), verticalSplitterDistance(0), horizontalSplitterDistance(0)
+        {
+        }
+        public System.Windows.WindowState GetMainWindowWindowState()
+        {
+            if (mainWindowWindowState == JsonWindowState.normal)
+            {
+                return System.Windows.WindowState.normal;
+            }
+            else if (mainWindowWindowState == JsonWindowState.maximized)
+            {
+                return System.Windows.WindowState.maximized;
+            }
+            else
+            {
+                return System.Windows.WindowState.normal;
+            }
+        }
+        public void SetMainWindowWindowState(System.Windows.WindowState mainWindowWindowState_)
+        {
+            if (mainWindowWindowState_ == System.Windows.WindowState.maximized)
+            {
+                mainWindowWindowState = JsonWindowState.maximized;
+            }
+            else
+            {
+                mainWindowWindowState = JsonWindowState.normal;
+            }
         }
         public System.Windows.Point GetMainWindowLocation() const
         {
@@ -89,6 +119,7 @@ namespace cmcode
         {
             horizontalSplitterDistance = horizontalSplitterDistance_;
         }
+        private JsonWindowState mainWindowWindowState;
         private JsonPoint mainWindowLocation;
         private JsonSize mainWindowSize;
         private int verticalSplitterDistance;
@@ -173,6 +204,18 @@ namespace cmcode
         public nothrow bool Loaded() const
         {
             return loaded;
+        }
+        public System.Windows.WindowState GetMainWindowWindowState() const
+        {
+            return mainConfig.GetMainWindowWindowState();
+        }
+        public void SetMainWindowWindowState(System.Windows.WindowState mainWindowWindowState_)
+        {
+            if (GetMainWindowWindowState() != mainWindowWindowState_)
+            {
+                mainConfig.SetMainWindowWindowState(mainWindowWindowState_);
+                SetChanged();
+            }
         }
         public System.Windows.Point GetMainWindowLocation() const
         {

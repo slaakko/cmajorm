@@ -172,10 +172,11 @@ namespace System.Windows
                                 }
                             }   
                             child = child->NextSibling();
-                        }                
-                        SetSizeInternal(newSize);
+                        }
+                        uint windowState = message.wparam;
+                        SetSizeInternal(newSize, windowState);
                         DockChildren();
-                        OnSizeChanged();
+                        OnSizeChanged(windowState);
                     }
                     message.result = 0;
                     return true;

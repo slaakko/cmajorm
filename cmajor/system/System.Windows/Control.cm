@@ -22,7 +22,7 @@ namespace System.Windows
     public class delegate void ShownEventHandler();
     public class delegate void EnabledChangedEventHandler();
     public class delegate void VisibleChangedEventHandler();
-    public class delegate void SizeChangedEventHandler();
+    public class delegate void SizeChangedEventHandler(uint windowState);
     public class delegate void LocationChangedEventHandler();
     public class delegate void ContentChangedEventHandler();
     public class delegate void ChildContentChangedEventHandler(ControlEventArgs& controlEventArgs);
@@ -469,19 +469,19 @@ namespace System.Windows
         {
             return size;
         }
-        internal nothrow void SetSizeInternal(const Size& sz)
+        internal nothrow void SetSizeInternal(const Size& sz, uint windowState)
         {
             if (size != sz)
             {
                 size = sz;
-                OnSizeChanged();
+                OnSizeChanged(windowState);
             }
         }
         public void SetSize(const Size& sz)
         {
             if (size != sz)
             {
-                SetSizeInternal(sz);
+                SetSizeInternal(sz, SIZE_RESTORED);
                 if (handle != null)
                 {
                     MoveWindow(handle, location, size, true);
@@ -495,9 +495,9 @@ namespace System.Windows
                 WinSendMessage(Handle(), WM_SETFONT, cast<uint>(cast<ulong>(fontHandle.HFont())), 0);
             }
         }
-        protected virtual void OnSizeChanged()
+        protected virtual void OnSizeChanged(uint windowState)
         {
-            sizeChangedEvent.Fire();
+            sizeChangedEvent.Fire(windowState);
         }
         public void SetContentChanged()
         {
@@ -990,9 +990,10 @@ namespace System.Windows
                 {
                     Size newSize = message.LParamSize();
                     Size oldSize = GetSize();
+                    uint windowState = message.wparam;
                     if (newSize != oldSize)
                     {
-                        SetSizeInternal(newSize);
+                        SetSizeInternal(newSize, windowState);
                     }
                     message.result = 0;
                     return true;
@@ -1830,7 +1831,7 @@ namespace System.Windows
         {
             return clickEvent;
         }
-        public nothrow Event<SizeChangedEventHandler>& SizeChangedEvent() const
+        public nothrow Event<SizeChangedEventHandler, uint>& SizeChangedEvent() const
         {
             return sizeChangedEvent;
         }
@@ -2073,7 +2074,7 @@ namespace System.Windows
         private Event<ShownEventHandler> shownEvent;
         private Event<EnabledChangedEventHandler> enabledChangedEvent;
         private Event<VisibleChangedEventHandler> visibleChangedEvent;
-        private Event<SizeChangedEventHandler> sizeChangedEvent;
+        private Event<SizeChangedEventHandler, uint> sizeChangedEvent;
         private Event<LocationChangedEventHandler> locationChangedEvent;
         private Event<ContentChangedEventHandler> contentChangedEvent;
         private Event<ChildContentChangedEventHandler, ControlEventArgs> childContentChangedEvent;

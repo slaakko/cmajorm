@@ -55,8 +55,8 @@ namespace System.Windows
         }
         public Window(const char* windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle, 
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
-            const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_) : 
-            base(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors), flags(Flags.none), state(WindowState.normal),
+            const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_, WindowState state_) : 
+            base(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors), flags(Flags.none), state(state_),
             menuBar(null), contextMenu(null), defaultButton(null), cancelButton(null), focusedControl(null), dialogResult(DialogResult.none), keyPreviewMethod(), currentKeyPreviewModifierKeys(Keys.none),
             fontFamilyName(fontFamilyName_), fontSize(fontSize_), fontStyle(fontStyle_)
         {
@@ -71,23 +71,24 @@ namespace System.Windows
             }
         }
         public Window(const char* windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle, 
-            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
-            this(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors, DefaultWindowFontFamilyName(), DefaultWindowFontSize(), FontStyle.regular)
+            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, WindowState state) : 
+            this(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors,
+                DefaultWindowFontFamilyName(), DefaultWindowFontSize(), FontStyle.regular, state)
         {
         }
         public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
-            const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_) : 
+            const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_, WindowState state) : 
             this(windowClassName, cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW), style, exStyle, DefaultWindowBackgroundColor(),
-            text, location, size, dock, anchors, fontFamilyName_, fontSize_, fontStyle_)
+            text, location, size, dock, anchors, fontFamilyName_, fontSize_, fontStyle_, state)
         {
         }
-        public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors) : 
-            this(windowClassName, style, exStyle, text, location, size, dock, anchors, DefaultWindowFontFamilyName(), DefaultWindowFontSize(), FontStyle.regular)
+        public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, WindowState state) : 
+            this(windowClassName, style, exStyle, text, location, size, dock, anchors, DefaultWindowFontFamilyName(), DefaultWindowFontSize(), FontStyle.regular, state)
         {
         }
         public Window(const string& caption, const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_) :
             this("System.Windows.Window", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(),
-            caption, Point.Default(), Size.Default(), Dock.none, Anchors.none, fontFamilyName_, fontSize_, fontStyle_)
+            caption, Point.Default(), Size.Default(), Dock.none, Anchors.none, fontFamilyName_, fontSize_, fontStyle_, WindowState.normal)
         {
         }
         public Window(const string& caption) :

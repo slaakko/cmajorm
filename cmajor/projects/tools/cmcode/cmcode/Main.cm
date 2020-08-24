@@ -13,6 +13,25 @@ namespace cmcode
 {
     public const uint defaultConfigSaveTimerPeriod = 3000u; // 3 seconds
 
+    public System.Windows.WindowState MainWindowWindowState()
+    {
+        try
+        {
+            if (MainConfiguration.Instance().Loaded())
+            {
+                return MainConfiguration.Instance().GetMainWindowWindowState();
+            }
+            else
+            {
+                return System.Windows.WindowState.normal;
+            }
+        }
+        catch (const Exception& ex)
+        {
+        }
+        return System.Windows.WindowState.normal;
+    }
+
     public Point MainWindowLocation()
     {
         try
@@ -243,7 +262,7 @@ namespace cmcode
     class MainWindow : Window
     {
         public MainWindow() : base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "cmcode", MainWindowLocation(), MainWindowSize(),
-            Dock.none, Anchors.none)
+            Dock.none, Anchors.none, MainWindowWindowState())
         {
             Debug.SetPaint();
             UniquePtr<MenuBar> menuBar(new MenuBar());
@@ -291,6 +310,7 @@ namespace cmcode
             verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.Release());
             UniquePtr<TabControl> outputTabControlPtr(new TabControl(Point(), Size(), Dock.none, Anchors.none));
             outputTabControl = outputTabControlPtr.Get();
+            outputTabControl->SetTabSelectedBackgroundColor(Color.White());
             UniquePtr<Control> paddedOutputTabControl(new PaddedControl(outputTabControlPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> borderedOutputTabControl(new BorderedControl(paddedOutputTabControl.Release(), BorderStyle.single, DefaultTabControlFrameColor(),
                 TabControlSelectedBorderColor(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
@@ -341,12 +361,20 @@ namespace cmcode
             {
             }
         }
-        public override void OnSizeChanged()
+        public override void OnSizeChanged(uint windowState)
         {
             try
             {
-                base->OnSizeChanged();
-                MainConfiguration.Instance().SetMainWindowSize(GetSize());
+                base->OnSizeChanged(windowState);
+                if (windowState == SIZE_MAXIMIZED)
+                {
+                    MainConfiguration.Instance().SetMainWindowWindowState(WindowState.maximized);
+                }
+                else
+                {
+                    MainConfiguration.Instance().SetMainWindowWindowState(WindowState.normal);
+                    MainConfiguration.Instance().SetMainWindowSize(GetSize());
+                }
             }
             catch (const Exception& ex)
             {
@@ -433,14 +461,14 @@ namespace cmcode
             try
             {
                 List<Pair<string, string>> descriptionFilterPairs;
-                descriptionFilterPairs.Add(Pair<string, string>("Cmajor Project Files (*.cmp)", "*.cmp"));
                 descriptionFilterPairs.Add(Pair<string, string>("Cmajor Solution Files (*.cms)", "*.cms"));
+                descriptionFilterPairs.Add(Pair<string, string>("Cmajor Project Files (*.cmp)", "*.cmp"));
                 string initialDirectory = CmajorProjectDirectory();
                 string filePath;
                 string currentDirectory;
                 List<string> fileNames;
                 string defaultFilePath;
-                bool selected = System.Windows.API.GetOpenFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".cmp",
+                bool selected = System.Windows.API.GetOpenFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".cms",
                     OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
                 if (selected)
                 {
