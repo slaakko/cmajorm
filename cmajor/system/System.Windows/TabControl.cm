@@ -341,6 +341,40 @@ namespace System.Windows
                 Invalidate();
             }
         }
+        public void SelectNextTabPage()
+        {
+            if (selectedTabPage == null) return;
+            TabPage* nextTabPage = cast<TabPage*>(selectedTabPage->NextSibling());
+            if (nextTabPage != null)
+            {
+                SetSelectedTabPage(nextTabPage);
+            }
+            else
+            {
+                TabPage* firstTabPage = cast<TabPage*>(tabPages.FirstChild());
+                if (firstTabPage != null)
+                {
+                    SetSelectedTabPage(firstTabPage);
+                }
+            }
+        }
+        public void SelectPreviousTabPage()
+        {
+            if (selectedTabPage == null) return;
+            TabPage* prevTabPage = cast<TabPage*>(selectedTabPage->PrevSibling());
+            if (prevTabPage != null)
+            {
+                SetSelectedTabPage(prevTabPage);
+            }
+            else
+            {
+                TabPage* lastTabPage = cast<TabPage*>(tabPages.LastChild());
+                if (lastTabPage != null)
+                {
+                    SetSelectedTabPage(lastTabPage);
+                }
+            }
+        }
         private void DrawTabs(Graphics& graphics)
         {
             Component* component = tabPages.FirstChild();
@@ -649,6 +683,22 @@ namespace System.Windows
                 tabControl->CloseTabPage(this);
             }
         }
+        public void SelectNextTabPage()
+        {
+            TabControl* tabControl = GetTabControl();
+            if (tabControl != null)
+            {
+                tabControl->SelectNextTabPage();
+            }
+        }
+        public void SelectPreviousTabPage()
+        {
+            TabControl* tabControl = GetTabControl();
+            if (tabControl != null)
+            {
+                tabControl->SelectPreviousTabPage();
+            }
+        }
         public nothrow TabControl* GetTabControl() const
         {
             Control* parentControl = ParentControl();
@@ -675,6 +725,34 @@ namespace System.Windows
             {
                 tabControl->SetChanged();
                 tabControl->Invalidate();
+            }
+        }
+        protected override void OnKeyDown(KeyEventArgs& args)
+        {
+            base->OnKeyDown(args);
+            if (!args.handled)
+            {
+                switch (args.keyData)
+                {
+                    case cast<Keys>(Keys.controlModifier | Keys.f4):
+                    {
+                        Close();
+                        args.handled = true;
+                        break;
+                    }
+                    case cast<Keys>(Keys.controlModifier | Keys.tab):
+                    {
+                        SelectNextTabPage();
+                        args.handled = true;
+                        break;
+                    }
+                    case cast<Keys>(Keys.controlModifier | Keys.shiftModifier | Keys.tab):
+                    {
+                        SelectPreviousTabPage();
+                        args.handled = true;
+                        break;
+                    }
+                }
             }
         }
         internal void MeasureWidthAndHeight(Graphics& graphics, TabControl* tabControl)

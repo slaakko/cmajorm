@@ -159,7 +159,6 @@ void CmdbSession::Stop()
         }
         catch (...)
         {
-
         }
         thread.join();
     }

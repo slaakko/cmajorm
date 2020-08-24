@@ -369,6 +369,7 @@ namespace System.Windows
         protected override void OnMouseDown(MouseEventArgs& args)
         {
             base->OnMouseDown(args);
+            SetFocus(this);
             if (charHeight != 0 && charWidth != 0)
             {
                 if (args.buttons == MouseButtons.lbutton && args.clicks == 1)

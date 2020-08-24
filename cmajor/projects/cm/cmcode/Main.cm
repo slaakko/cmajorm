@@ -206,22 +206,30 @@ namespace cmcode
         }
     }
 
-    UniquePtr<TreeViewNode> BuildSolutionTree(Cm.Ast.Solution* solution, List<UniquePtr<TreeViewNodeData>>& treeViewData, HashMap<string, TreeViewNodeData*>& treeViewDataMap)
+    class SolutionExplorerData
     {
-        treeViewData.Clear();
-        treeViewDataMap.Clear();
+        public nothrow SolutionExplorerData()
+        {
+        }
+        public List<UniquePtr<TreeViewNodeData>> treeViewData;
+        public HashMap<string, TreeViewNodeData*> treeViewDataMap;
+    }
+
+    UniquePtr<TreeViewNode> BuildSolutionTree(Cm.Ast.Solution* solution, UniquePtr<SolutionExplorerData>& solutionExplorerData)
+    {
+        UniquePtr<SolutionExplorerData> newSolutionExplorerData(new SolutionExplorerData());
         string solutionName = ToUtf8(solution->Name());
         UniquePtr<TreeViewNode> solutionNode(new TreeViewNode(solutionName));
         UniquePtr<TreeViewNodeData> solutionData(new TreeViewNodeData(TreeViewNodeData.Kind.solution, solution, null, string(), string()));
         solutionNode->SetData(solutionData.Get());
-        treeViewData.Add(Rvalue(solutionData));
+        newSolutionExplorerData->treeViewData.Add(Rvalue(solutionData));
         for (const UniquePtr<Cm.Ast.Project>& project : solution->Projects())
         {
             string projectName = ToUtf8(project->Name());
             UniquePtr<TreeViewNode> projectNode(new TreeViewNode(projectName));
             UniquePtr<TreeViewNodeData> projectData(new TreeViewNodeData(TreeViewNodeData.Kind.project, solution, project.Get(), string(), string()));
             projectNode->SetData(projectData.Get());
-            treeViewData.Add(Rvalue(projectData));
+            newSolutionExplorerData->treeViewData.Add(Rvalue(projectData));
             List<UniquePtr<TreeViewNodeData>> fileData;
             for (const string& sourceFilePath : project->SourceFilePaths())
             {
@@ -247,15 +255,16 @@ namespace cmcode
             }
             for (UniquePtr<TreeViewNodeData>& file : fileData)
             {
-                treeViewData.Add(Rvalue(file));
+                newSolutionExplorerData->treeViewData.Add(Rvalue(file));
             }
             solutionNode->AddChild(projectNode.Release());
         }
         solutionNode->Expand();
-        for (const UniquePtr<TreeViewNodeData>& nodeData : treeViewData)
+        for (const UniquePtr<TreeViewNodeData>& nodeData : newSolutionExplorerData->treeViewData)
         {
-            treeViewDataMap[nodeData->key] = nodeData.Get();
+            newSolutionExplorerData->treeViewDataMap[nodeData->key] = nodeData.Get();
         }
+        solutionExplorerData.Reset(newSolutionExplorerData.Release());
         return solutionNode;
     }
 
@@ -275,6 +284,9 @@ namespace cmcode
             openMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.o));
             openMenuItem->ClickEvent().AddHandler(OpenProjectClick);
             fileMenuItem->AddMenuItem(openMenuItem.Release());
+            UniquePtr<MenuItem> closeMenuItem(new MenuItem("&Close Solution"));
+            closeMenuItem->ClickEvent().AddHandler(CloseSolutionClick);
+            fileMenuItem->AddMenuItem(closeMenuItem.Release());
             UniquePtr<MenuItem> saveMenuItem(new MenuItem("&Save"));
             saveMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.s));
             saveMenuItem->ClickEvent().AddHandler(SaveClick);
@@ -523,10 +535,24 @@ namespace cmcode
                     {
                         throw Exception("file path is empty or does not exist");
                     }
-                    UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), treeViewData, treeViewDataMap);
+                    UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData);
                     solutionExplorerTreeView->SetRoot(root.Release());
                     codeTabControl->CloseAllTabPages();
                 }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+            }
+        }
+        private void CloseSolutionClick()
+        {
+            try
+            {
+                codeTabControl->CloseAllTabPages();
+                solutionExplorerTreeView->SetRoot(null);
+                solutionExplorerData.Reset();
+                Invalidate();
             }
             catch (const Exception& ex)
             {
@@ -565,8 +591,7 @@ namespace cmcode
         private TabControl* codeTabControl;
         private TabControl* outputTabControl;
         private TreeView* solutionExplorerTreeView;
-        private List<UniquePtr<TreeViewNodeData>> treeViewData;
-        private HashMap<string, TreeViewNodeData*> treeViewDataMap;
+        private UniquePtr<SolutionExplorerData> solutionExplorerData;
     }
 }
 

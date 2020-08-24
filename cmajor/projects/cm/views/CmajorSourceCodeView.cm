@@ -26,12 +26,7 @@ namespace Cm.Views
         }
         protected override TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
         {
-            //LogView* logView = Application.GetLogView();
             TokenLine tokenLine = lexer.TokenizeLine(line, lineNumber, startState);
-            //if (logView != null)
-            //{
-                //logView->WriteLine("endState=" + ToString(tokenLine.endState));
-            //}
             int tokenIndex = 0;
             for (Token& token : tokenLine.tokens)
             {
@@ -78,10 +73,6 @@ namespace Cm.Views
                         break;
                     }
                 }
-                //if (logView != null)
-                //{
-                    //logView->WriteLine("lexeme=" + sl + ", token=" + ToUtf8(GetTokenName(token.id)) + ", startState=" + ToString(startState));
-                //}
                 startState = 0;
                 ++tokenIndex;
             }
