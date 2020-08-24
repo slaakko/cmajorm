@@ -104,6 +104,16 @@ namespace cmcode
         return System.Windows.Color.Blue();
     }
 
+    nothrow System.Windows.Color SourceCodeViewNormalFrameColor()
+    {
+        return System.Windows.Color(204u, 206u, 219u);
+    }
+
+    nothrow System.Windows.Color SourceCodeViewSelectedFrameColor()
+    {
+        return System.Windows.Color.Blue();
+    }
+
     string CmajorProjectDirectory()
     {
         string cmajorRootDir = GetFullPath(Cm.Ast.CmajorRootDir());
@@ -279,11 +289,19 @@ namespace cmcode
             horizontalSplitContainer->Pane1Container()->AddChild(borderedTabControl.Release());
             horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeView.Release());
             verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.Release());
-            UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.fill, Anchors.none));
+            UniquePtr<TabControl> outputTabControlPtr(new TabControl(Point(), Size(), Dock.none, Anchors.none));
+            outputTabControl = outputTabControlPtr.Get();
+            UniquePtr<Control> paddedOutputTabControl(new PaddedControl(outputTabControlPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> borderedOutputTabControl(new BorderedControl(paddedOutputTabControl.Release(), BorderStyle.single, DefaultTabControlFrameColor(),
+                TabControlSelectedBorderColor(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            UniquePtr<TabPage> logTabPage(new TabPage("Log", "log"));
+            UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.none, Anchors.none));
             Application.SetLogView(logView.Get());
-            UniquePtr<Control> borderedLogView(new BorderedControl(logView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> borderedLogView(new BorderedControl(logView.Release(), BorderStyle.single, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> scrollableLogView(new ScrollableControl(borderedLogView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-            verticalSplitContainer->Pane2Container()->AddChild(scrollableLogView.Release());
+            logTabPage->AddChild(scrollableLogView.Release());
+            outputTabControl->AddTabPage(logTabPage.Release());
+            verticalSplitContainer->Pane2Container()->AddChild(borderedOutputTabControl.Release());
             AddChild(verticalSplitContainerPtr.Release());
         }
         public override void OnShown()
@@ -391,10 +409,11 @@ namespace cmcode
                     if (ext == ".cm")
                     {
                         UniquePtr<TabPage> tabPage(new TabPage(data->fileName, data->key));
-                        Cm.Views.CmajorSourceCodeView* sourceCodeView = new Cm.Views.CmajorSourceCodeView(Point(0, 0), Size(0, 0), Dock.fill, Anchors.none);
-                        UniquePtr<Control> paddedSourceCodeView(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
-                        UniquePtr<Control> borderedSourceCodeView(new BorderedControl(paddedSourceCodeView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
-                        UniquePtr<Control> scrollableSourceCodeView(new ScrollableControl(borderedSourceCodeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+                        Cm.Views.CmajorSourceCodeView* sourceCodeView = new Cm.Views.CmajorSourceCodeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
+                        UniquePtr<Control> paddedControl(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+                        UniquePtr<Control> borderedControl(new BorderedControl(paddedControl.Release(), BorderStyle.style3D, DefaultTabControlFrameColor(),
+                            TabControlSelectedBorderColor(), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+                        UniquePtr<Control> scrollableSourceCodeView(new ScrollableControl(borderedControl.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
                         tabPage->AddChild(scrollableSourceCodeView.Release());
                         codeTabControl->AddTabPage(tabPage.Release());
                         ustring content = ToUtf32(File.ReadAllText(data->filePath));
@@ -472,6 +491,7 @@ namespace cmcode
         private SplitContainer* horizontalSplitContainer;
         private UniquePtr<Cm.Ast.Solution> solution;
         private TabControl* codeTabControl;
+        private TabControl* outputTabControl;
         private TreeView* solutionExplorerTreeView;
         private List<UniquePtr<TreeViewNodeData>> treeViewData;
         private HashMap<string, TreeViewNodeData*> treeViewDataMap;

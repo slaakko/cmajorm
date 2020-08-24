@@ -327,14 +327,37 @@ namespace System.Windows
                 selectedTabPage->DrawTab(graphics, this);
             }
         }
-        private void DrawSelectedTabPage()
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+            SetSelectedTabPagePos();
+        }
+        protected override void OnSizeChanged()
+        {
+            base->OnSizeChanged();
+            SetSelectedTabPagePos();
+        }
+        private void SetSelectedTabPagePos()
         {
             if (selectedTabPage == null) return;
-            selectedTabPage->SetLocation(Point(1, headerHeight + 1));
+            Point loc(1, headerHeight + 1);
+            selectedTabPage->SetLocation(loc);
             Size size = GetSize();
             size.w = size.w - 2;
             size.h = size.h - headerHeight - 2;
             selectedTabPage->SetSize(size);
+            selectedTabPage->DockChildren();
+            Control* control = selectedTabPage->GetFirstEnabledTabStopControl();
+            if (control != null)
+            {
+                control->SetFocus();
+            }
+            selectedTabPage->Invalidate();
+        }
+        private void DrawSelectedTabPage()
+        {
+            if (selectedTabPage == null) return;
+            SetSelectedTabPagePos();
             selectedTabPage->Invalidate();
         }
         private void DrawFrame(Graphics& graphics)
@@ -595,6 +618,14 @@ namespace System.Windows
                 return cast<TabControl*>(parentControl);
             }
             return null;
+        }
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+        }
+        protected override void OnSizeChanged()
+        {
+            base->OnSizeChanged();
         }
         protected override void OnTextChanged()
         {
