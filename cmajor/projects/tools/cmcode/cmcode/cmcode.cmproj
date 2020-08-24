@@ -2,18 +2,22 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>03140fc6-0989-4e99-b05d-6389be77bfb2</ProjectGuid>
+  <ProjectGuid>eae174dd-c5bd-4f39-a8fd-8d789c235ee3</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>winguiapp</TargetType>
  </PropertyGroup>
  <ItemGroup>
+  <CmCompile Include="Config.cm"/>
   <CmCompile Include="Main.cm"/>
   <CmCompile Include="Resources.xml"/>
  </ItemGroup>
  <ItemGroup/>
  <ItemGroup>
-  <ProjectReference Include="../config/config.cmproj"/>
+  <ProjectReference Include="../../../cm/ast/Cm.Ast.cmproj"/>
+  <ProjectReference Include="../../../cm/lexer/Cm.Lexer.cmproj"/>
+  <ProjectReference Include="../../../cm/parser/Cm.Parser.cmproj"/>
+  <ProjectReference Include="../../../cm/views/Cm.Views.cmproj"/>
  </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

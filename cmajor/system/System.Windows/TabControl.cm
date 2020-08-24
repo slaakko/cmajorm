@@ -30,7 +30,7 @@ namespace System.Windows
 
     public nothrow inline int DefaultTabLeadingWidth()
     {
-        return 4;
+        return 0;
     }
 
     public nothrow inline int DefaultTabControlTopMarginHeight()
@@ -132,6 +132,7 @@ namespace System.Windows
             AddTabPageToTabPageMap(tabPage);
             tabPages.AddChild(tabPage);
             SetSelectedTabPage(tabPage);
+            SetChanged();
         }
         public void AddTabPage(const string& text, const string& key)
         {
@@ -195,6 +196,15 @@ namespace System.Windows
         {
             try
             {
+                if (Debug.Paint())
+                {
+                    Rect r(Point(), GetSize());
+                    LogView* log = Application.GetLogView();
+                    if (log != null)
+                    {
+                        log->WriteLine("TabControl.OnPaint: " + r.ToString());
+                    }
+                }
                 SmoothingMode prevSmoothingMode = args.graphics.GetSmoothingModeChecked();
                 args.graphics.SetSmoothingModeChecked(SmoothingMode.highQuality);
                 if (Changed())

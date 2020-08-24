@@ -4,254 +4,478 @@
 // =================================
 
 using System;
+using System.Collections;
 using System.IO;
 using System.Windows;
 using cmcode;
 
-public const uint defaultConfigSaveTimerPeriod = 3000u; // 3 seconds
-
-public Point MainWindowLocation()
+namespace cmcode
 {
-    try
-    {
-        if (MainConfiguration.Instance().Loaded())
-        {
-            return MainConfiguration.Instance().GetMainWindowLocation();
-        }
-        else
-        {
-            return Point.Default();
-        }
-    }
-    catch (const Exception& ex)
-    {
-    }
-    return Point.Default();
-}
+    public const uint defaultConfigSaveTimerPeriod = 3000u; // 3 seconds
 
-public Size MainWindowSize()
-{
-    try
+    public Point MainWindowLocation()
     {
-        if (MainConfiguration.Instance().Loaded())
+        try
         {
-            return MainConfiguration.Instance().GetMainWindowSize();
-        }
-        else
-        {
-            return Size.Default();
-        }
-    }
-    catch (const Exception& ex)
-    {
-    }
-    return Size.Default();
-}
-
-int MainWindowVerticalSplitterDistance()
-{
-    try
-    {
-        if (MainConfiguration.Instance().Loaded())
-        {
-            int distance = MainConfiguration.Instance().GetMainWindowVerticalSplitterDistance();
-            if (distance == 0)
+            if (MainConfiguration.Instance().Loaded())
             {
-                return 2 * MainWindowSize().h / 3;
+                return MainConfiguration.Instance().GetMainWindowLocation();
             }
             else
             {
-                return distance;
+                return Point.Default();
             }
         }
-        else
+        catch (const Exception& ex)
         {
-            return 2 * MainWindowSize().h / 3;
         }
+        return Point.Default();
     }
-    catch (const Exception& ex)
-    {
-    }
-    return 2 * MainWindowSize().h / 3;
-}
 
-int MainWindowHorizontalSplitterDistance()
-{
-    try
+    public Size MainWindowSize()
     {
-        if (MainConfiguration.Instance().Loaded())
+        try
         {
-            int distance = MainConfiguration.Instance().GetMainWindowHorizontalSplitterDistance();
-            if (distance == 0)
+            if (MainConfiguration.Instance().Loaded())
             {
-                return 2 * MainWindowSize().w / 3;
+                return MainConfiguration.Instance().GetMainWindowSize();
             }
             else
             {
-                return distance;
+                return Size.Default();
             }
         }
-        else
+        catch (const Exception& ex)
         {
-            return 2 * MainWindowSize().w / 3;
         }
+        return Size.Default();
     }
-    catch (const Exception& ex)
-    {
-    }
-    return 2 * MainWindowSize().w / 3;
 
-}
+    int MainWindowVerticalSplitterDistance()
+    {
+        try
+        {
+            if (MainConfiguration.Instance().Loaded())
+            {
+                return MainConfiguration.Instance().GetMainWindowVerticalSplitterDistance();
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        catch (const Exception& ex)
+        {
+        }
+        return 0;
+    }
 
-class MainWindow : Window
-{
-    public MainWindow() : base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "cmcode", MainWindowLocation(), MainWindowSize(),
-        Dock.none, Anchors.none)
-    {
-        UniquePtr<MenuBar> menuBar(new MenuBar());
-        UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
-        UniquePtr<MenuItem> newMenuItem(new MenuItem("&New Project..."));
-        newMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.n));
-        newMenuItem->ClickEvent().AddHandler(NewProjectClick);
-        fileMenuItem->AddMenuItem(newMenuItem.Release());
-        UniquePtr<MenuItem> openMenuItem(new MenuItem("&Open Project/Solution..."));
-        openMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.o));
-        openMenuItem->ClickEvent().AddHandler(OpenProjectClick);
-        fileMenuItem->AddMenuItem(openMenuItem.Release());
-        UniquePtr<MenuItem> saveMenuItem(new MenuItem("&Save"));
-        saveMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.s));
-        saveMenuItem->ClickEvent().AddHandler(SaveClick);
-        fileMenuItem->AddMenuItem(saveMenuItem.Release());
-        UniquePtr<MenuItem> exitMenuItem(new MenuItem("E&xit"));
-        exitMenuItem->SetShortcut(cast<Keys>(Keys.altModifier | Keys.f4));
-        exitMenuItem->ClickEvent().AddHandler(ExitClick);
-        fileMenuItem->AddMenuItem(exitMenuItem.Release());
-        menuBar->AddMenuItem(fileMenuItem.Release());
-        AddChild(menuBar.Release());
-        UniquePtr<SplitContainer> verticalSplitContainerPtr(new SplitContainer(Orientation.vertical, MainWindowVerticalSplitterDistance(),
-            Point(), Size(), Dock.fill, Anchors.none));
-        verticalSplitContainer = verticalSplitContainerPtr.Get();
-        verticalSplitContainer->SplitterDistanceChangedEvent().AddHandler(VerticalSplitterDistanceChanged);
-        UniquePtr<SplitContainer> horizontalSplitContainerPtr(new SplitContainer(Orientation.horizontal, MainWindowHorizontalSplitterDistance(),
-            Point(), Size(), Dock.fill, Anchors.none));
-        horizontalSplitContainer = horizontalSplitContainerPtr.Get();
-        horizontalSplitContainer->SplitterDistanceChangedEvent().AddHandler(HorizontalSplitterDistanceChanged);
-        UniquePtr<TabControl> codeTabControl(new TabControl(Point(), Size(), Dock.fill, Anchors.none));
-        codeTabControl->SetBackgroundColor(Color.White());
-        UniquePtr<TreeView> solutionExplorer(new TreeView(Point(), Size(), Dock.fill, Anchors.none));
-        horizontalSplitContainer->Pane1Container()->AddChild(codeTabControl.Release());
-        horizontalSplitContainer->Pane2Container()->AddChild(solutionExplorer.Release());
-        verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.Release());
-        UniquePtr<TabControl> outputTabControl(new TabControl(Point(), Size(), Dock.fill, Anchors.none));
-        UniquePtr<TabPage> debugLogTabPage(new TabPage("Debug log", "debugLog"));
-        UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.fill, Anchors.none));
-        Application.SetLogView(logView.Get());
-        debugLogTabPage->AddChild(logView.Release());
-        outputTabControl->AddTabPage(debugLogTabPage.Release());
-        verticalSplitContainer->Pane2Container()->AddChild(outputTabControl.Release());
-        AddChild(verticalSplitContainerPtr.Release());
-    }
-    public override void OnShown()
+    int MainWindowHorizontalSplitterDistance()
     {
         try
         {
-            base->OnShown();
-            MainConfiguration.Instance().SetMainWindowLocation(Location());
-            MainConfiguration.Instance().SetMainWindowSize(GetSize());
-            SetTimer(1u, defaultConfigSaveTimerPeriod);
-        }
-        catch (const Exception& ex)
-        {
-            MessageBox.Show(ex.Message());
-        }
-    }
-    protected override void OnWindowClosing(bool& cancelClose)
-    {
-        try
-        {
-            Application.SetLogView(null);
-            base->OnWindowClosing(cancelClose);
-            MainConfiguration.Instance().Save(true);
-        }
-        catch (const Exception& ex)
-        {
-            MessageBox.Show(ex.Message());
-        }
-    }
-    protected override void OnTimer(TimerEventArgs& args)
-    {
-        try
-        {
-            MainConfiguration.Instance().Save(false);
+            if (MainConfiguration.Instance().Loaded())
+            {
+                return MainConfiguration.Instance().GetMainWindowHorizontalSplitterDistance();
+            }
+            else
+            {
+                return 0;
+            }
         }
         catch (const Exception& ex)
         {
         }
+        return 0;
     }
-    public override void OnSizeChanged()
+
+    nothrow System.Windows.Color TreeViewNormalBorderColor()
     {
-        try
-        {
-            base->OnSizeChanged();
-            MainConfiguration.Instance().SetMainWindowSize(GetSize());
-        }
-        catch (const Exception& ex)
-        {
-            MessageBox.Show(ex.Message());
-        }
+        return System.Windows.Color(204u, 206u, 219u);
     }
-    public override void OnLocationChanged()
+
+    nothrow System.Windows.Color TreeViewSelectedBorderColor()
     {
-        try
-        {
-            base->OnLocationChanged();
-            MainConfiguration.Instance().SetMainWindowLocation(Location());
-        }
-        catch (const Exception& ex)
-        {
-            MessageBox.Show(ex.Message());
-        }
+        return System.Windows.Color.Blue();
     }
-    private void VerticalSplitterDistanceChanged()
+
+    nothrow System.Windows.Color TabControlSelectedBorderColor()
     {
-        try
+        return System.Windows.Color.Blue();
+    }
+
+    string CmajorProjectDirectory()
+    {
+        string cmajorRootDir = GetFullPath(Cm.Ast.CmajorRootDir());
+        return Path.Combine(cmajorRootDir, "projects");
+    }
+
+    UniquePtr<Cm.Ast.Project> ReadProject(const string& projectFilePath)
+    {
+        ustring content = ToUtf32(File.ReadAllText(projectFilePath));
+        ContainerFileLexer lexer(content, projectFilePath, 0);
+        UniquePtr<Cm.Ast.Project> project = ProjectFileParser.Parse(lexer, "debug", Cm.Ast.BackEnd.llvm);
+        project->ResolveDeclarations();
+        return project;
+    }
+
+    UniquePtr<Cm.Ast.Solution> ReadSolution(const string& solutionFilePath)
+    {
+        ustring content = ToUtf32(File.ReadAllText(solutionFilePath));
+        ContainerFileLexer lexer(content, solutionFilePath, 0);
+        UniquePtr<Cm.Ast.Solution> solution = SolutionFileParser.Parse(lexer);
+        solution->ResolveDeclarations();
+        for (const string& projectFilePath : solution->ProjectFilePaths())
         {
-            MainConfiguration.Instance().SetMainWindowVerticalSplitterDistance(verticalSplitContainer->SplitterDistance());
+            UniquePtr<Cm.Ast.Project> project = ReadProject(projectFilePath);
+            solution->AddProject(Rvalue(project));
         }
-        catch (const Exception& ex)
+        return solution;
+    }
+
+    class TreeViewNodeData
+    {
+        public enum Kind
         {
-            MessageBox.Show(ex.Message());
+            solution, project, file
         }
-    }
-    private void HorizontalSplitterDistanceChanged()
-    {
-        try
+        public nothrow TreeViewNodeData(Kind kind_, Cm.Ast.Solution* solution_, Cm.Ast.Project* project_, const string& filePath_, const string& fileName_) :
+            kind(kind_), solution(solution_), project(project_), filePath(filePath_), fileName(fileName_)
         {
-            MainConfiguration.Instance().SetMainWindowHorizontalSplitterDistance(horizontalSplitContainer->SplitterDistance());
+            switch (kind)
+            {
+                case Kind.solution:
+                {
+                    key = System.Security.GetSha1MessageDigest("solution." + ToUtf8(solution->Name()));
+                    break;
+                }
+                case Kind.project:
+                {
+                    key = System.Security.GetSha1MessageDigest("solution." + ToUtf8(solution->Name()) + ".project." + ToUtf8(project->Name()));
+                    break;
+                }
+                case Kind.file:
+                {
+                    key = System.Security.GetSha1MessageDigest("solution." + ToUtf8(solution->Name()) + ".project." + ToUtf8(project->Name()) + ".file." + filePath);
+                    break;
+                }
+            }
         }
-        catch (const Exception& ex)
+        public Kind kind;
+        public Cm.Ast.Solution* solution;
+        public Cm.Ast.Project* project;
+        public string filePath;
+        public string fileName;
+        public string key;
+    }
+
+    class ByFileName : Rel<UniquePtr<TreeViewNodeData>>
+    {
+        public nothrow bool operator()(const UniquePtr<TreeViewNodeData>& left, const UniquePtr<TreeViewNodeData>& right) const
         {
-            MessageBox.Show(ex.Message());
+            return left->fileName < right->fileName;
         }
     }
-    private void NewProjectClick()
+
+    UniquePtr<TreeViewNode> BuildSolutionTree(Cm.Ast.Solution* solution, List<UniquePtr<TreeViewNodeData>>& treeViewData, HashMap<string, TreeViewNodeData*>& treeViewDataMap)
     {
-        MessageBox.Show("New project");
+        treeViewData.Clear();
+        treeViewDataMap.Clear();
+        string solutionName = ToUtf8(solution->Name());
+        UniquePtr<TreeViewNode> solutionNode(new TreeViewNode(solutionName));
+        UniquePtr<TreeViewNodeData> solutionData(new TreeViewNodeData(TreeViewNodeData.Kind.solution, solution, null, string(), string()));
+        solutionNode->SetData(solutionData.Get());
+        treeViewData.Add(Rvalue(solutionData));
+        for (const UniquePtr<Cm.Ast.Project>& project : solution->Projects())
+        {
+            string projectName = ToUtf8(project->Name());
+            UniquePtr<TreeViewNode> projectNode(new TreeViewNode(projectName));
+            UniquePtr<TreeViewNodeData> projectData(new TreeViewNodeData(TreeViewNodeData.Kind.project, solution, project.Get(), string(), string()));
+            projectNode->SetData(projectData.Get());
+            treeViewData.Add(Rvalue(projectData));
+            List<UniquePtr<TreeViewNodeData>> fileData;
+            for (const string& sourceFilePath : project->SourceFilePaths())
+            {
+                UniquePtr<TreeViewNodeData> file(new TreeViewNodeData(TreeViewNodeData.Kind.file, solution, project.Get(), sourceFilePath, Path.GetFileName(sourceFilePath)));
+                fileData.Add(Rvalue(file));
+            }
+            for (const string& resourceFilePath : project->ResourceFilePaths())
+            {
+                UniquePtr<TreeViewNodeData> file(new TreeViewNodeData(TreeViewNodeData.Kind.file, solution, project.Get(), resourceFilePath, Path.GetFileName(resourceFilePath)));
+                fileData.Add(Rvalue(file));
+            }
+            for (const string& textFilePath : project->TextFilePaths())
+            {
+                UniquePtr<TreeViewNodeData> file(new TreeViewNodeData(TreeViewNodeData.Kind.file, solution, project.Get(), textFilePath, Path.GetFileName(textFilePath)));
+                fileData.Add(Rvalue(file));
+            }
+            Sort(fileData.Begin(), fileData.End(), ByFileName());
+            for (const UniquePtr<TreeViewNodeData>& file : fileData)
+            {
+                UniquePtr<TreeViewNode> fileNode(new TreeViewNode(file->fileName));
+                fileNode->SetData(file.Get());
+                projectNode->AddChild(fileNode.Release());
+            }
+            for (UniquePtr<TreeViewNodeData>& file : fileData)
+            {
+                treeViewData.Add(Rvalue(file));
+            }
+            solutionNode->AddChild(projectNode.Release());
+        }
+        solutionNode->Expand();
+        for (const UniquePtr<TreeViewNodeData>& nodeData : treeViewData)
+        {
+            treeViewDataMap[nodeData->key] = nodeData.Get();
+        }
+        return solutionNode;
     }
-    private void OpenProjectClick()
+
+    class MainWindow : Window
     {
-        MessageBox.Show("Open project");
+        public MainWindow() : base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "cmcode", MainWindowLocation(), MainWindowSize(),
+            Dock.none, Anchors.none)
+        {
+            Debug.SetPaint();
+            UniquePtr<MenuBar> menuBar(new MenuBar());
+            UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
+            UniquePtr<MenuItem> newMenuItem(new MenuItem("&New Project..."));
+            newMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.n));
+            newMenuItem->ClickEvent().AddHandler(NewProjectClick);
+            fileMenuItem->AddMenuItem(newMenuItem.Release());
+            UniquePtr<MenuItem> openMenuItem(new MenuItem("&Open Project/Solution..."));
+            openMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.o));
+            openMenuItem->ClickEvent().AddHandler(OpenProjectClick);
+            fileMenuItem->AddMenuItem(openMenuItem.Release());
+            UniquePtr<MenuItem> saveMenuItem(new MenuItem("&Save"));
+            saveMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.s));
+            saveMenuItem->ClickEvent().AddHandler(SaveClick);
+            fileMenuItem->AddMenuItem(saveMenuItem.Release());
+            UniquePtr<MenuItem> exitMenuItem(new MenuItem("E&xit"));
+            exitMenuItem->SetShortcut(cast<Keys>(Keys.altModifier | Keys.f4));
+            exitMenuItem->ClickEvent().AddHandler(ExitClick);
+            fileMenuItem->AddMenuItem(exitMenuItem.Release());
+            menuBar->AddMenuItem(fileMenuItem.Release());
+            AddChild(menuBar.Release());
+            UniquePtr<SplitContainer> verticalSplitContainerPtr(new SplitContainer(Orientation.vertical, MainWindowVerticalSplitterDistance(),
+                Point(), Size(), Dock.fill, Anchors.none));
+            verticalSplitContainer = verticalSplitContainerPtr.Get();
+            verticalSplitContainer->SplitterDistanceChangedEvent().AddHandler(VerticalSplitterDistanceChanged);
+            UniquePtr<SplitContainer> horizontalSplitContainerPtr(new SplitContainer(Orientation.horizontal, MainWindowHorizontalSplitterDistance(),
+                Point(), Size(), Dock.fill, Anchors.none));
+            horizontalSplitContainer = horizontalSplitContainerPtr.Get();
+            horizontalSplitContainer->SplitterDistanceChangedEvent().AddHandler(HorizontalSplitterDistanceChanged);
+            UniquePtr<TabControl> codeTabControlPtr(new TabControl(Point(), Size(), Dock.fill, Anchors.none));
+            codeTabControl = codeTabControlPtr.Get();
+            UniquePtr<Control> paddedTabControl(new PaddedControl(codeTabControlPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> borderedTabControl(new BorderedControl(paddedTabControl.Release(), BorderStyle.single, DefaultTabControlFrameColor(), TabControlSelectedBorderColor(),
+                Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            UniquePtr<TreeView> solutionExplorerTreeViewPtr(new TreeView(Point(), Size(), Dock.fill, Anchors.none));
+            solutionExplorerTreeView = solutionExplorerTreeViewPtr.Get();
+            solutionExplorerTreeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
+            UniquePtr<Control> paddedTreeView(new PaddedControl(solutionExplorerTreeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> borderedTreeView(new BorderedControl(paddedTreeView.Release(), BorderStyle.single, TreeViewNormalBorderColor(), TreeViewSelectedBorderColor(),
+                Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> scrollableTreeView(new ScrollableControl(borderedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            horizontalSplitContainer->Pane1Container()->AddChild(borderedTabControl.Release());
+            horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeView.Release());
+            verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.Release());
+            UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.fill, Anchors.none));
+            Application.SetLogView(logView.Get());
+            UniquePtr<Control> borderedLogView(new BorderedControl(logView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> scrollableLogView(new ScrollableControl(borderedLogView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            verticalSplitContainer->Pane2Container()->AddChild(scrollableLogView.Release());
+            AddChild(verticalSplitContainerPtr.Release());
+        }
+        public override void OnShown()
+        {
+            try
+            {
+                base->OnShown();
+                MainConfiguration.Instance().SetMainWindowLocation(Location());
+                MainConfiguration.Instance().SetMainWindowSize(GetSize());
+                SetTimer(1u, defaultConfigSaveTimerPeriod);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnWindowClosing(bool& cancelClose)
+        {
+            try
+            {
+                Application.SetLogView(null);
+                base->OnWindowClosing(cancelClose);
+                MainConfiguration.Instance().Save(true);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnTimer(TimerEventArgs& args)
+        {
+            try
+            {
+                MainConfiguration.Instance().Save(false);
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        public override void OnSizeChanged()
+        {
+            try
+            {
+                base->OnSizeChanged();
+                MainConfiguration.Instance().SetMainWindowSize(GetSize());
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        public override void OnLocationChanged()
+        {
+            try
+            {
+                base->OnLocationChanged();
+                MainConfiguration.Instance().SetMainWindowLocation(Location());
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        private void VerticalSplitterDistanceChanged()
+        {
+            try
+            {
+                MainConfiguration.Instance().SetMainWindowVerticalSplitterDistance(verticalSplitContainer->SplitterDistance());
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        private void HorizontalSplitterDistanceChanged()
+        {
+            try
+            {
+                MainConfiguration.Instance().SetMainWindowHorizontalSplitterDistance(horizontalSplitContainer->SplitterDistance());
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
+        {
+            TreeViewNode* node = args.node;
+            TreeViewNodeData* data = cast<TreeViewNodeData*>(node->Data());
+            switch (data->kind)
+            {
+                case TreeViewNodeData.Kind.solution:
+                case TreeViewNodeData.Kind.project:
+                {
+                    switch (node->GetState())
+                    {
+                        case TreeViewNode.State.collapsed: node->ExpandAll(); break;
+                        case TreeViewNode.State.expanded: node->CollapseAll(); break;
+                    }
+                    break;
+                }
+                case TreeViewNodeData.Kind.file:
+                {
+                    string ext = Path.GetExtension(data->fileName);
+                    if (ext == ".cm")
+                    {
+                        UniquePtr<TabPage> tabPage(new TabPage(data->fileName, data->key));
+                        Cm.Views.CmajorSourceCodeView* sourceCodeView = new Cm.Views.CmajorSourceCodeView(Point(0, 0), Size(0, 0), Dock.fill, Anchors.none);
+                        UniquePtr<Control> paddedSourceCodeView(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+                        UniquePtr<Control> borderedSourceCodeView(new BorderedControl(paddedSourceCodeView.Release(), BorderStyle.style3D, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+                        UniquePtr<Control> scrollableSourceCodeView(new ScrollableControl(borderedSourceCodeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+                        tabPage->AddChild(scrollableSourceCodeView.Release());
+                        codeTabControl->AddTabPage(tabPage.Release());
+                        ustring content = ToUtf32(File.ReadAllText(data->filePath));
+                        sourceCodeView->SetTextContent(content);
+                        sourceCodeView->SetFocus();
+                    }
+                    break;
+                }
+            }
+        }
+        private void NewProjectClick()
+        {
+            MessageBox.Show("New project");
+        }
+        private void OpenProjectClick()
+        {
+            try
+            {
+                List<Pair<string, string>> descriptionFilterPairs;
+                descriptionFilterPairs.Add(Pair<string, string>("Cmajor Project Files (*.cmp)", "*.cmp"));
+                descriptionFilterPairs.Add(Pair<string, string>("Cmajor Solution Files (*.cms)", "*.cms"));
+                string initialDirectory = CmajorProjectDirectory();
+                string filePath;
+                string currentDirectory;
+                List<string> fileNames;
+                string defaultFilePath;
+                bool selected = System.Windows.API.GetOpenFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".cmp",
+                    OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
+                if (selected)
+                {
+                    if (!fileNames.IsEmpty())
+                    {
+                        filePath = Path.Combine(currentDirectory, fileNames[0]);
+                    }
+                    if (!filePath.IsEmpty() && File.Exists(filePath))
+                    {
+                        string ext = Path.GetExtension(filePath);
+                        if (ext == ".cms")
+                        {
+                            solution = ReadSolution(filePath);
+                        }
+                        else if (ext == ".cmp")
+                        {
+                            UniquePtr<Cm.Ast.Project> project = ReadProject(filePath);
+                            solution.Reset(new Cm.Ast.Solution(project->Name(), Path.ChangeExtension(filePath, ".cms")));
+                            solution->AddProject(Rvalue(project));
+                        }
+                        else
+                        {
+                            throw Exception("invalid extension (not .cmp or .cms)");
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("file path is empty or does not exist");
+                    }
+                    UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), treeViewData, treeViewDataMap);
+                    solutionExplorerTreeView->SetRoot(root.Release());
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+            }
+        }
+        private void SaveClick()
+        {
+            MessageBox.Show("Save");
+        }
+        private void ExitClick()
+        {
+            Close();
+        }
+        private SplitContainer* verticalSplitContainer;
+        private SplitContainer* horizontalSplitContainer;
+        private UniquePtr<Cm.Ast.Solution> solution;
+        private TabControl* codeTabControl;
+        private TreeView* solutionExplorerTreeView;
+        private List<UniquePtr<TreeViewNodeData>> treeViewData;
+        private HashMap<string, TreeViewNodeData*> treeViewDataMap;
     }
-    private void SaveClick()
-    {
-        MessageBox.Show("Save");
-    }
-    private void ExitClick()
-    {
-        Close();
-    }
-    private SplitContainer* verticalSplitContainer;
-    private SplitContainer* horizontalSplitContainer;
 }
 
 int main()

@@ -86,20 +86,20 @@ namespace System.Windows
                     }
                 }
                 args.graphics.Clear(BackgroundColor());
-                Point loc = Location();
                 Size size = GetSize();
+                LogView* log = Application.GetLogView();
                 switch (orientation)
                 {
                     case Orientation.horizontal:
                     {
-                        args.graphics.DrawLineChecked(edgePen, Point(loc.x, loc.y), Point(loc.x + size.w, loc.y));
-                        args.graphics.DrawLineChecked(edgePen, Point(loc.x, loc.y + size.h), Point(loc.x + size.w, loc.y + size.h));
+                        args.graphics.DrawLineChecked(edgePen, Point(0, 0), Point(0, size.h - 1));
+                        args.graphics.DrawLineChecked(edgePen, Point(size.w - 1, 0), Point(size.w - 1, size.h - 1));
                         break;
                     }
                     case Orientation.vertical:
                     {
-                        args.graphics.DrawLineChecked(edgePen, Point(loc.x, loc.y), Point(loc.x, loc.y + size.h));
-                        args.graphics.DrawLineChecked(edgePen, Point(size.w, loc.y), Point(loc.x + size.w, loc.y + size.h));
+                        args.graphics.DrawLineChecked(edgePen, Point(0, 0), Point(size.w - 1, 0));
+                        args.graphics.DrawLineChecked(edgePen, Point(0, size.h - 1), Point(size.w - 1, size.h - 1));
                         break;
                     }
                 }
@@ -253,6 +253,22 @@ namespace System.Windows
                 new Panel(location, SplitSize(orientation, splitterDistance), SplitDock(orientation), Anchors.none),
                 defaultSplitterWidth, splitterDistance, location, size, dock, anchors)
         {
+        }
+        public override void OnPaint(PaintEventArgs& args)
+        {
+            Size size = GetSize();
+            if (splitterDistance == 0)
+            {
+                int s = 0;
+                switch (orientation)
+                {
+                    case Orientation.horizontal: s = size.w; break;
+                    case Orientation.vertical: s = size.h; break;
+                }
+                int d = cast<int>((2.0 / 3.0) * s);
+                SetSplitterDistance(d);
+            }
+            base->OnPaint(args);
         }
         public override void PrintWindowTree(int level)
         {
