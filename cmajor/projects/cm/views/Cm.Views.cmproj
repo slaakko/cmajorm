@@ -2,17 +2,20 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>464a3a38-4329-4188-8507-2cd22d4a8efa</ProjectGuid>
+  <ProjectGuid>dbeb9309-cc26-4235-a1b9-82827a528445</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>winlib</TargetType>
  </PropertyGroup>
  <ItemGroup>
+  <CmCompile Include="DebugStrip.cm"/>
+  <CmCompile Include="CmajorEditor.cm"/>
   <CmCompile Include="CmajorSourceCodeView.cm"/>
  </ItemGroup>
  <ItemGroup/>
  <ItemGroup>
   <ProjectReference Include="../ast/Cm.Ast.cmproj"/>
+  <ProjectReference Include="../debug/Cm.Debug.cmproj"/>
   <ProjectReference Include="../lexer/Cm.Lexer.cmproj"/>
   <ProjectReference Include="../parser/Cm.Parser.cmproj"/>
  </ItemGroup>

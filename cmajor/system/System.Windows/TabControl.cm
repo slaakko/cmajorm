@@ -177,6 +177,8 @@ namespace System.Windows
                 }
             }
             tabPages.RemoveChild(tabPage);
+            ControlEventArgs args(tabPage);
+            OnControlRemoved(args);
             SetChanged();
             Invalidate();
         }
@@ -192,6 +194,9 @@ namespace System.Windows
             {
                 Component* next = component->NextSibling();
                 tabPages.RemoveChild(component);
+                TabPage* tabPage = cast<TabPage*>(component);
+                ControlEventArgs args(tabPage);
+                OnControlRemoved(args);
                 component = next;
             }
             SetChanged();

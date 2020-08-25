@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Windows;
+using Cm.Debug;
 using cmcode;
 
 namespace cmcode
@@ -185,7 +186,7 @@ namespace cmcode
                 }
                 case Kind.file:
                 {
-                    key = System.Security.GetSha1MessageDigest("solution." + ToUtf8(solution->Name()) + ".project." + ToUtf8(project->Name()) + ".file." + filePath);
+                    key = filePath;
                     break;
                 }
             }
@@ -213,6 +214,7 @@ namespace cmcode
         }
         public List<UniquePtr<TreeViewNodeData>> treeViewData;
         public HashMap<string, TreeViewNodeData*> treeViewDataMap;
+        public BreakpointCollection breakpointCollection;
     }
 
     UniquePtr<TreeViewNode> BuildSolutionTree(Cm.Ast.Solution* solution, UniquePtr<SolutionExplorerData>& solutionExplorerData)
@@ -284,13 +286,17 @@ namespace cmcode
             openMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.o));
             openMenuItem->ClickEvent().AddHandler(OpenProjectClick);
             fileMenuItem->AddMenuItem(openMenuItem.Release());
-            UniquePtr<MenuItem> closeMenuItem(new MenuItem("&Close Solution"));
+            UniquePtr<MenuItem> closeMenuItemPtr(new MenuItem("&Close Solution"));
+            closeMenuItem = closeMenuItemPtr.Get();
+            closeMenuItem->Disable();
             closeMenuItem->ClickEvent().AddHandler(CloseSolutionClick);
-            fileMenuItem->AddMenuItem(closeMenuItem.Release());
-            UniquePtr<MenuItem> saveMenuItem(new MenuItem("&Save"));
+            fileMenuItem->AddMenuItem(closeMenuItemPtr.Release());
+            UniquePtr<MenuItem> saveMenuItemPtr(new MenuItem("&Save"));
+            saveMenuItem = saveMenuItemPtr.Get();
             saveMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.s));
+            saveMenuItem->Disable();
             saveMenuItem->ClickEvent().AddHandler(SaveClick);
-            fileMenuItem->AddMenuItem(saveMenuItem.Release());
+            fileMenuItem->AddMenuItem(saveMenuItemPtr.Release());
             UniquePtr<MenuItem> exitMenuItem(new MenuItem("E&xit"));
             exitMenuItem->SetShortcut(cast<Keys>(Keys.altModifier | Keys.f4));
             exitMenuItem->ClickEvent().AddHandler(ExitClick);
@@ -312,6 +318,7 @@ namespace cmcode
             horizontalSplitContainer->SplitterDistanceChangedEvent().AddHandler(HorizontalSplitterDistanceChanged);
             UniquePtr<TabControl> codeTabControlPtr(new TabControl(Point(), Size(), Dock.fill, Anchors.none));
             codeTabControl = codeTabControlPtr.Get();
+            codeTabControl->ControlRemovedEvent().AddHandler(CodeTabPageRemoved);
             UniquePtr<Control> paddedTabControl(new PaddedControl(codeTabControlPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> borderedTabControl(new BorderedControl(paddedTabControl.Release(), BorderStyle.single, DefaultTabControlFrameColor(), TabControlSelectedBorderColor(),
                 Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
@@ -340,6 +347,10 @@ namespace cmcode
             outputTabControl->AddTabPage(logTabPage.Release());
             verticalSplitContainer->Pane2Container()->AddChild(borderedOutputTabControl.Release());
             AddChild(verticalSplitContainerPtr.Release());
+            StatusBar* statusBar = new StatusBar();
+            lineNumberStatusBarItem = new StatusBarItem("0", StatusBarItem.BorderStyle.sunken);
+            statusBar->AddItem(lineNumberStatusBarItem);
+            AddChild(statusBar);
         }
         public override void OnShown()
         {
@@ -432,6 +443,26 @@ namespace cmcode
                 MessageBox.Show(ex.Message());
             }
         }
+        private void CodeTabPageRemoved(ControlEventArgs& args)
+        {
+            Control* removedControl = args.control;
+            if (removedControl is TabPage*)
+            {
+                editorByTabPageMap.Remove(cast<TabPage*>(removedControl));
+            }
+        }
+        private void CaretPosChanged()
+        {
+            TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+            if (selectedTabPage != null)
+            {
+                Cm.Views.CmajorEditor* currentEditor = GetEditorByTabPage(selectedTabPage);
+                if (currentEditor != null)
+                {
+                    lineNumberStatusBarItem->SetText(ToString(currentEditor->GetSourceCodeView()->CaretLine()));
+                }
+            }
+        }
         private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
         {
             try
@@ -459,16 +490,13 @@ namespace cmcode
                         else
                         {
                             UniquePtr<TabPage> tabPage(new TabPage(data->fileName, data->key));
-                            Cm.Views.CmajorSourceCodeView* sourceCodeView = new Cm.Views.CmajorSourceCodeView(Point(0, 0), Size(0, 0), Dock.none, Anchors.none);
-                            UniquePtr<Control> paddedControl(new PaddedControl(sourceCodeView, Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
-                            UniquePtr<Control> borderedControl(new BorderedControl(paddedControl.Release(), BorderStyle.style3D, DefaultTabControlFrameColor(),
-                                TabControlSelectedBorderColor(), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
-                            UniquePtr<Control> scrollableSourceCodeView(new ScrollableControl(borderedControl.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
-                            tabPage->AddChild(scrollableSourceCodeView.Release());
+                            UniquePtr<Cm.Views.CmajorEditor> editorPtr(new Cm.Views.CmajorEditor(data->filePath,
+                                solutionExplorerData->breakpointCollection.GetBreakpointList(data->filePath)));
+                            Cm.Views.CmajorEditor* editor = editorPtr.Get();
+                            editorByTabPageMap[tabPage.Get()] = editor;
+                            editor->GetSourceCodeView()->CaretPosChangedEvent().AddHandler(CaretPosChanged);
+                            tabPage->AddChild(editorPtr.Release());
                             codeTabControl->AddTabPage(tabPage.Release());
-                            ustring content = ToUtf32(File.ReadAllText(data->filePath));
-                            sourceCodeView->SetTextContent(content);
-                            sourceCodeView->SetFocus();
                         }
                     }
                     else
@@ -535,9 +563,11 @@ namespace cmcode
                     {
                         throw Exception("file path is empty or does not exist");
                     }
+                    codeTabControl->CloseAllTabPages();
                     UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData);
                     solutionExplorerTreeView->SetRoot(root.Release());
-                    codeTabControl->CloseAllTabPages();
+                    closeMenuItem->Enable();
+                    saveMenuItem->Enable();
                 }
             }
             catch (const Exception& ex)
@@ -552,6 +582,8 @@ namespace cmcode
                 codeTabControl->CloseAllTabPages();
                 solutionExplorerTreeView->SetRoot(null);
                 solutionExplorerData.Reset();
+                closeMenuItem->Disable();
+                saveMenuItem->Disable();
                 Invalidate();
             }
             catch (const Exception& ex)
@@ -585,6 +617,18 @@ namespace cmcode
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
             }
         }
+        private nothrow Cm.Views.CmajorEditor* GetEditorByTabPage(TabPage* tabPage) const
+        {
+            HashMap<TabPage*, Cm.Views.CmajorEditor*>.ConstIterator it = editorByTabPageMap.CFind(tabPage);
+            if (it != editorByTabPageMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
         private SplitContainer* verticalSplitContainer;
         private SplitContainer* horizontalSplitContainer;
         private UniquePtr<Cm.Ast.Solution> solution;
@@ -592,6 +636,10 @@ namespace cmcode
         private TabControl* outputTabControl;
         private TreeView* solutionExplorerTreeView;
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
+        private MenuItem* closeMenuItem;
+        private MenuItem* saveMenuItem;
+        private StatusBarItem* lineNumberStatusBarItem;
+        private HashMap<TabPage*, Cm.Views.CmajorEditor*> editorByTabPageMap;
     }
 }
 

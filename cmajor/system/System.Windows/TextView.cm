@@ -10,8 +10,18 @@ namespace System.Windows
 {
     public const uint defaultCaretTimerPeriod = 5000u; // 5 seconds
 
+    public class TextViewChangedEventArgs
+    {
+        public nothrow TextViewChangedEventArgs(int topLineNumber_, const Point& newOrigin_) : topLineNumber(topLineNumber_), newOrigin(newOrigin_)
+        {
+        }
+        public int topLineNumber;
+        public Point newOrigin;
+    }
+
     public class delegate void CaretPosChangedEventHandler();
     public class delegate void LinesChangedEventHandler();
+    public class delegate void TextViewChangedEventHandler(TextViewChangedEventArgs& args);
 
     public class TextView : Control
     {
@@ -108,6 +118,22 @@ namespace System.Windows
         public nothrow inline int CaretColumn() const
         {
             return caretColumn - LineNumberFieldLength();
+        }
+        public void SetTopLineCol(int line, int column)
+        {
+            Point newOrigin(cast<int>((column - 1) * charWidth), cast<int>((line - 1) * charHeight));
+            SetContentLocation(newOrigin);
+            Invalidate();
+        }
+        public nothrow int GetVisibleLineCount() const
+        {
+            Size size = GetSize();
+            return cast<int>(size.h / charHeight);
+        }
+        public nothrow int GetVisibleColumnCount() const
+        {
+            Size size = GetSize();
+            return cast<int>(size.w / charWidth);
         }
         public void SetTextContent(const ustring& textContent)
         {
@@ -596,6 +622,8 @@ namespace System.Windows
                 Point newOrigin(cast<int>((leftColNumber - 1) * charWidth), cast<int>((topLineNumber - 1) * charHeight));
                 SetContentLocation(newOrigin);
                 SetCaretLocation();
+                TextViewChangedEventArgs args(topLineNumber, newOrigin);
+                OnTextViewChanged(args);
                 Invalidate();
             }
         }
@@ -653,6 +681,10 @@ namespace System.Windows
         {
             linesChangedEvent.Fire();
         }
+        protected virtual void OnTextViewChanged(TextViewChangedEventArgs& args)
+        {
+            textViewChangedEvent.Fire(args);
+        }
         private void SetMaxLineLength()
         {
             int n = cast<int>(lines.Count());
@@ -698,6 +730,10 @@ namespace System.Windows
         {
             return linesChangedEvent;
         }
+        public nothrow Event<TextViewChangedEventHandler, TextViewChangedEventArgs>& TextViewChangedEvent() const
+        {
+            return textViewChangedEvent;
+        }
         private Flags flags;
         private List<ustring> lines;
         private List<int> lineStartIndeces;
@@ -719,6 +755,7 @@ namespace System.Windows
         private bool update;
         private Event<CaretPosChangedEventHandler> caretPosChangedEvent;
         private Event<LinesChangedEventHandler> linesChangedEvent;
+        private Event<TextViewChangedEventHandler, TextViewChangedEventArgs> textViewChangedEvent;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)

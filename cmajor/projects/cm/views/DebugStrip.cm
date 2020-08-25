@@ -1,0 +1,92 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+using Cm.Debug;
+
+namespace Cm.Views
+{
+    public nothrow System.Windows.Color DefaultBreakpointColor()
+    {
+        return System.Windows.Color(228u, 20u, 0u);
+    }
+
+    public class DebugStrip : Control
+    {
+        public DebugStrip(int width, const Color& backgroundColor, BreakpointList& breakpointList_, TextView* view_) :
+            base("Cm.Views.DebugStrip", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+                backgroundColor, "debugStrip", Point(), Size(width, 0), Dock.left, Anchors.none), breakpointList(breakpointList_), view(view_),
+                breakpointColor(DefaultBreakpointColor()), brush(breakpointColor), topLineNumber(1), origin()
+        {
+            view->TextViewChangedEvent().AddHandler(ViewChanged);
+        }
+        private void ViewChanged(TextViewChangedEventArgs& args)
+        {
+            topLineNumber = args.topLineNumber;
+            origin = args.newOrigin;
+            Invalidate();
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            try
+            {
+                args.graphics.Clear(BackgroundColor());
+                if (breakpointList.IsEmpty()) return;
+                SmoothingMode prevSmoothingMode = args.graphics.GetSmoothingModeChecked();
+                args.graphics.SetSmoothingModeChecked(SmoothingMode.highQuality);
+                Point myOrigin = origin;
+                view->TranslateContentLocation(myOrigin);
+                LogView* logView = Application.GetLogView();
+                int visibleLineCount = view->GetVisibleLineCount();
+                logView->WriteLine("debugStrip: topLine=" + ToString(topLineNumber) + ", origin=" + myOrigin.ToString() + ", visibleLines=" + ToString(visibleLineCount));
+                PointF o(myOrigin.x, myOrigin.y);
+                float charHeight = view->CharHeight();
+                Size s = GetSize();
+                SizeF size(s.w, s.w);
+                for (int line = topLineNumber; line < topLineNumber + visibleLineCount; ++line)
+                {
+                    Breakpoint* bp = GetBreakpoint(line);
+                    if (bp != null)
+                    {
+                        RectF r(o, size);
+                        r.Inflate(-2, -2);
+                        args.graphics.FillEllipseChecked(brush, r);
+                        if (bp->hit)
+                        {
+                            // todo
+                        }
+                    }
+                    o.y = o.y + charHeight;
+                }
+                args.graphics.SetSmoothingModeChecked(prevSmoothingMode);
+                base->OnPaint(args);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+            }
+        }
+        public nothrow Breakpoint* GetBreakpoint(int line) const
+        {
+            return breakpointList.GetBreakpoint(line);
+        }
+        public void AddBreakpoint(Breakpoint* breakpoint)
+        {
+            breakpointList.AddBreakpoint(breakpoint);
+        }
+        public void RemoveBreakpoint(Breakpoint* breakpoint)
+        {
+            breakpointList.RemoveBreakpoint(breakpoint);
+        }
+        private BreakpointList& breakpointList;
+        private TextView* view;
+        private System.Windows.Color breakpointColor;
+        private SolidBrush brush;
+        private int topLineNumber;
+        private Point origin;
+    }
+}

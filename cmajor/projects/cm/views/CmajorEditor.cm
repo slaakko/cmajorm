@@ -1,0 +1,54 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+using Cm.Debug;
+
+namespace Cm.Views
+{
+    public nothrow int DefaultDebugStripWidth()
+    {
+        return 16;
+    }
+
+    public nothrow System.Windows.Color DefaultDebugStripBackgroundColor()
+    {
+        return System.Windows.Color(230u, 231u, 232u);
+    }
+
+    public class CmajorEditor : ContainerControl
+    {
+        public CmajorEditor(const string& filePath_, BreakpointList& breakpointList, int debugStripWidth, const System.Windows.Color& debugStripBackgroundColor) :
+            base("Cm.Views.CmajorEditor", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            DefaultControlBackgroundColor(), "editor", Point(), Size(), Dock.fill, Anchors.none), filePath(filePath_)
+        {
+            UniquePtr<CmajorSourceCodeView> sourceCodeViewPtr(new CmajorSourceCodeView(Point(), Size(), Dock.none, Anchors.none));
+            sourceCodeView = sourceCodeViewPtr.Get();
+            UniquePtr<DebugStrip> debugStrip(new DebugStrip(debugStripWidth, debugStripBackgroundColor, breakpointList, sourceCodeView));
+            sourceCodeView->SetDebugStrip(debugStrip.Get());
+            AddChild(debugStrip.Release());
+            UniquePtr<ScrollableControl> scrollableSourceCodeView(new ScrollableControl(sourceCodeViewPtr.Release(), Point(), Size(), Dock.fill, Anchors.none));
+            AddChild(scrollableSourceCodeView.Release());
+            ustring content = ToUtf32(File.ReadAllText(filePath));
+            sourceCodeView->SetTextContent(content);
+            sourceCodeView->SetFocus();
+        }
+        public CmajorEditor(const string& filePath, BreakpointList& breakpointList) :
+            this(filePath, breakpointList, DefaultDebugStripWidth(), DefaultDebugStripBackgroundColor())
+        {
+        }
+        public nothrow inline const string& FilePath() const
+        {
+            return filePath;
+        }
+        public nothrow inline CmajorSourceCodeView* GetSourceCodeView() const
+        {
+            return sourceCodeView;
+        }
+        private string filePath;
+        private CmajorSourceCodeView* sourceCodeView;
+    }
+}

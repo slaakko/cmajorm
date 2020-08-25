@@ -9,6 +9,21 @@ using System.Lex;
 
 namespace System.Windows
 {
+    public class SourceSpan
+    {
+        public nothrow SourceSpan(int line_, short scol_, short ecol_) : line(line_), scol(scol_), ecol(ecol_)
+        {
+        }
+        public int line;
+        public short scol;
+        public short ecol;
+    }
+
+    public nothrow inline bool operator=(const SourceSpan& left, const SourceSpan& right)
+    {
+        return left.line == right.line && left.scol == right.scol && left.ecol == right.ecol;
+    }
+
     public enum SourceCodeTokenKind : int
     {
         plain, keyword, identifier, string, character, number, comment, lineNumber
@@ -141,6 +156,12 @@ namespace System.Windows
                 pt.x = pt.x + CharWidth() * tokenStr.Length();
                 startState = -1;
             }
+            PointF hiliteOrigin(origin);
+            hiliteOrigin.x = hiliteOrigin.x + CharWidth() * (numLineNumberDigits + 1);
+            DrawHilites(graphics, lineIndex, hiliteOrigin);
+        }
+        protected virtual void DrawHilites(Graphics& graphics, int lineIndex, const PointF& origin)
+        {
         }
         private SourceCodeTextStyle* GetTextStyle(SourceCodeTokenKind tokenKind)
         {

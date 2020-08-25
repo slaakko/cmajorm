@@ -9,6 +9,7 @@ using System.Windows;
 using System.Lex;
 using Cm.Lexer;
 using CmajorTokens;
+using Cm.Debug;
 
 namespace Cm.Views
 {
@@ -23,6 +24,38 @@ namespace Cm.Views
             blockCommentStates.Insert(126);
             blockCommentStates.Insert(127);
             lexer.SetBlockCommentStates(blockCommentStates);
+        }
+        public nothrow void SetDebugStrip(DebugStrip* debugStrip_)
+        {
+            debugStrip = debugStrip_;
+        }
+        protected override void OnKeyDown(KeyEventArgs& args)
+        {
+            base->OnKeyDown(args);
+            if (!args.handled)
+            {
+                switch (args.keyData)
+                {
+                    case Keys.f9:
+                    {
+                        int line = CaretLine();
+                        Breakpoint* bp = debugStrip->GetBreakpoint(line);
+                        if (bp != null)
+                        {
+                            debugStrip->RemoveBreakpoint(bp);
+                            debugStrip->Invalidate();
+                        }
+                        else
+                        {
+                            Breakpoint* bp = new Breakpoint(line);
+                            debugStrip->AddBreakpoint(bp);
+                            debugStrip->Invalidate();
+                        }
+                        args.handled = true;
+                        break;
+                    }
+                }
+            }
         }
         protected override TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
         {
@@ -134,5 +167,6 @@ namespace Cm.Views
             return SourceCodeTokenKind.plain;
         }
         private CmajorLexer lexer;
+        private DebugStrip* debugStrip;
     }
 }
