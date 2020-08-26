@@ -65,7 +65,7 @@ namespace System.Windows
             if (scrolledChildContentSize.h > scrolledChildClientSize.h)
             {
                 vmin = 0;
-                vmax = scrolledChildContentSize.h / verticalScrollUnit;
+                vmax = cast<int>(scrolledChildContentSize.h / verticalScrollUnit);
                 vpage = cast<uint>(scrolledChildClientSize.h / verticalScrollUnit);
                 SetScrollInfo(Handle(), ScrollBar.SB_VERT, cast<ScrollInfoMask>(ScrollInfoMask.SIF_POS | ScrollInfoMask.SIF_PAGE | ScrollInfoMask.SIF_RANGE), true,
                     vpage, vpos, vmin, vmax);
@@ -80,7 +80,7 @@ namespace System.Windows
             if (scrolledChildContentSize.w > scrolledChildClientSize.w)
             {
                 hmin = 0;
-                hmax = scrolledChildContentSize.w / horizontalScrollUnit;
+                hmax = cast<int>(scrolledChildContentSize.w / horizontalScrollUnit);
                 hpage = cast<uint>(scrolledChildClientSize.w / horizontalScrollUnit);
                 SetScrollInfo(Handle(), ScrollBar.SB_HORZ, cast<ScrollInfoMask>(ScrollInfoMask.SIF_POS | ScrollInfoMask.SIF_PAGE | ScrollInfoMask.SIF_RANGE), true,
                     hpage, hpos, hmin, hmax);

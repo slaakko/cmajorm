@@ -31,30 +31,65 @@ namespace Cm.Views
         }
         protected override void OnKeyDown(KeyEventArgs& args)
         {
-            base->OnKeyDown(args);
-            if (!args.handled)
+            try
             {
-                switch (args.keyData)
+                base->OnKeyDown(args);
+                if (!args.handled)
                 {
-                    case Keys.f9:
+                    switch (args.keyData)
                     {
-                        int line = CaretLine();
-                        Breakpoint* bp = debugStrip->GetBreakpoint(line);
-                        if (bp != null)
+                        case Keys.f9:
                         {
-                            debugStrip->RemoveBreakpoint(bp);
-                            debugStrip->Invalidate();
+                            int line = CaretLine();
+                            Breakpoint* bp = debugStrip->GetBreakpoint(line);
+                            if (bp != null)
+                            {
+                                debugStrip->RemoveBreakpoint(bp);
+                                debugStrip->Invalidate();
+                            }
+                            else
+                            {
+                                Breakpoint* bp = new Breakpoint(line);
+                                debugStrip->AddBreakpoint(bp);
+                                debugStrip->Invalidate();
+                            }
+                            args.handled = true;
+                            break;
                         }
-                        else
+                        case Keys.f11:
                         {
-                            Breakpoint* bp = new Breakpoint(line);
-                            debugStrip->AddBreakpoint(bp);
+                            int line = CaretLine();
+                            SourceSpan debugLocation(line, 0, 0);
+                            if (debugStrip->GetDebugLocation() == debugLocation)
+                            {
+                                debugStrip->ResetDebugLocation();
+                            }
+                            else
+                            {
+                                debugStrip->SetDebugLocation(debugLocation);
+                            }
                             debugStrip->Invalidate();
+                            args.handled = true;
+                            break;
                         }
-                        args.handled = true;
-                        break;
+                        case Keys.f2:
+                        {
+                            int line = CaretLine();
+                            Breakpoint* bp = debugStrip->GetBreakpoint(line);
+                            if (bp != null)
+                            {
+                                bp->disabled = !bp->disabled;
+                                debugStrip->Invalidate();
+                            }
+                            args.handled = true;
+                            break;
+                        }
                     }
                 }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
             }
         }
         protected override TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)

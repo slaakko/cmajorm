@@ -418,11 +418,6 @@ namespace System.Windows
             size.h = size.h - headerHeight - 2;
             selectedTabPage->SetSize(size);
             selectedTabPage->DockChildren();
-            Control* control = selectedTabPage->GetFirstEnabledTabStopControl();
-            if (control != null)
-            {
-                control->SetFocus();
-            }
         }
         private void DrawSelectedTabPage(const Rect& clipRect)
         {

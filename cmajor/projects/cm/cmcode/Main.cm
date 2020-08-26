@@ -371,6 +371,7 @@ namespace cmcode
             try
             {
                 Application.SetLogView(null);
+                Cm.Views.Bitmaps.Instance().Clear();
                 base->OnWindowClosing(cancelClose);
                 MainConfiguration.Instance().Save(true);
             }
@@ -497,6 +498,7 @@ namespace cmcode
                             editor->GetSourceCodeView()->CaretPosChangedEvent().AddHandler(CaretPosChanged);
                             tabPage->AddChild(editorPtr.Release());
                             codeTabControl->AddTabPage(tabPage.Release());
+                            editor->GetSourceCodeView()->SetFocus();
                         }
                     }
                     else
@@ -655,6 +657,8 @@ int main()
     }
     catch (const Exception& ex)
     {
+        Application.SetLogView(null);
+        Cm.Views.Bitmaps.Instance().Clear();
         MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
         try
         {

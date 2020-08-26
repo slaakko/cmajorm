@@ -10,18 +10,8 @@ namespace System.Windows
 {
     public const uint defaultCaretTimerPeriod = 5000u; // 5 seconds
 
-    public class TextViewChangedEventArgs
-    {
-        public nothrow TextViewChangedEventArgs(int topLineNumber_, const Point& newOrigin_) : topLineNumber(topLineNumber_), newOrigin(newOrigin_)
-        {
-        }
-        public int topLineNumber;
-        public Point newOrigin;
-    }
-
     public class delegate void CaretPosChangedEventHandler();
     public class delegate void LinesChangedEventHandler();
-    public class delegate void TextViewChangedEventHandler(TextViewChangedEventArgs& args);
 
     public class TextView : Control
     {
@@ -34,7 +24,7 @@ namespace System.Windows
             base("System.Windows.TextView", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP), DefaultExtendedWindowStyle(), backgroundColor,
             "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
             charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(0), caretColumn(0),
-            caretTimerPeriod(defaultCaretTimerPeriod), brush(Color.Black()), update(false)
+            caretTimerPeriod(defaultCaretTimerPeriod), brush(Color.Black()), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f)
         {
             uint caretTimeOut = 0u;
             bool succeeded = ReadCaretTimeoutFromRegistry(caretTimeOut);
@@ -111,6 +101,22 @@ namespace System.Windows
                 SetCaretLocation();
             }
         }
+        public nothrow inline int TopLine() const
+        {
+            return topLine;
+        }
+        public nothrow inline float TopLineDiff() const
+        {
+            return topLineDiff;
+        }
+        public nothrow inline int LeftColumn() const
+        {
+            return leftCol;
+        }
+        public nothrow inline float LeftColumnDiff() const
+        {
+            return leftColDiff;
+        }
         public nothrow inline int CaretLine() const
         {
             return caretLine;
@@ -125,15 +131,23 @@ namespace System.Windows
             SetContentLocation(newOrigin);
             Invalidate();
         }
-        public nothrow int GetVisibleLineCount() const
+        public nothrow inline int GetVisibleLineCount() const
         {
             Size size = GetSize();
             return cast<int>(size.h / charHeight);
         }
-        public nothrow int GetVisibleColumnCount() const
+        public nothrow inline int GetVisibleColumnCount() const
         {
             Size size = GetSize();
             return cast<int>(size.w / charWidth);
+        }
+        public nothrow inline bool IsLinePartiallyVisible(int line) const
+        {
+            return line >= (topLine - 1) && line < (topLine + GetVisibleLineCount() + 1);
+        }
+        public nothrow inline bool IsLineVisible(int line) const
+        {
+            return line >= topLine && line < topLine + GetVisibleLineCount();
         }
         public void SetTextContent(const ustring& textContent)
         {
@@ -346,7 +360,10 @@ namespace System.Windows
                 PointF origin(0, 0);
                 for (int i = 0; i < n; ++i)
                 {
-                    DrawLine(args.graphics, i, origin);
+                    if (IsLinePartiallyVisible(i + 1))
+                    {
+                        DrawLine(args.graphics, i, origin);
+                    }
                     origin.y = origin.y + charHeight;
                 }
                 args.graphics.SetTextRenderingHintChecked(prevRenderingHint);
@@ -572,6 +589,14 @@ namespace System.Windows
                 }
             }
         }
+        protected override nothrow void SetContentLocationInternal(const Point& contentLocation)
+        {
+            topLine = cast<int>(contentLocation.y / charHeight + 1.5f);
+            topLineDiff = (topLine - 1) * charHeight - contentLocation.y;
+            leftCol = cast<int>(contentLocation.x / charWidth + 1.5f);
+            leftColDiff = (leftCol - 1) * charWidth - contentLocation.x;
+            base->SetContentLocationInternal(contentLocation);
+        }
         public void ScrollToCaret()
         {
             if (lines.IsEmpty() || charHeight == 0) return;
@@ -620,10 +645,12 @@ namespace System.Windows
             {
                 update = false;
                 Point newOrigin(cast<int>((leftColNumber - 1) * charWidth), cast<int>((topLineNumber - 1) * charHeight));
+                topLine = topLineNumber;
+                topLineDiff = 0.0f;
+                leftCol = leftColNumber;
+                leftColDiff = 0.0f;
                 SetContentLocation(newOrigin);
                 SetCaretLocation();
-                TextViewChangedEventArgs args(topLineNumber, newOrigin);
-                OnTextViewChanged(args);
                 Invalidate();
             }
         }
@@ -681,10 +708,6 @@ namespace System.Windows
         {
             linesChangedEvent.Fire();
         }
-        protected virtual void OnTextViewChanged(TextViewChangedEventArgs& args)
-        {
-            textViewChangedEvent.Fire(args);
-        }
         private void SetMaxLineLength()
         {
             int n = cast<int>(lines.Count());
@@ -730,10 +753,6 @@ namespace System.Windows
         {
             return linesChangedEvent;
         }
-        public nothrow Event<TextViewChangedEventHandler, TextViewChangedEventArgs>& TextViewChangedEvent() const
-        {
-            return textViewChangedEvent;
-        }
         private Flags flags;
         private List<ustring> lines;
         private List<int> lineStartIndeces;
@@ -751,11 +770,14 @@ namespace System.Windows
         private Cursor cursor;
         private int caretLine;
         private int caretColumn;
+        private int topLine;
+        private int leftCol;
+        private float topLineDiff;
+        private float leftColDiff;
         private uint caretTimerPeriod;
         private bool update;
         private Event<CaretPosChangedEventHandler> caretPosChangedEvent;
         private Event<LinesChangedEventHandler> linesChangedEvent;
-        private Event<TextViewChangedEventHandler, TextViewChangedEventArgs> textViewChangedEvent;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)

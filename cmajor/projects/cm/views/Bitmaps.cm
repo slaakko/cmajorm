@@ -1,0 +1,46 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace Cm.Views
+{
+    public class Bitmaps
+    {
+        static Bitmaps() : instance(new Bitmaps())
+        {
+        }
+        public static nothrow Bitmaps& Instance()
+        {
+            return *instance;
+        }
+        public void Clear()
+        {
+            bitmaps.Clear();
+            bitmapMap.Clear();
+        }
+        public Bitmap* GetBitmap(const string& bitmapName)
+        {
+            HashMap<string, Bitmap*>.ConstIterator it = bitmapMap.CFind(bitmapName);
+            if (it != bitmapMap.CEnd())
+            {
+                return it->second;
+            }
+            UniquePtr<Bitmap> bitmapPtr(new Bitmap(Bitmap.FromResource(bitmapName)));
+            Bitmap* bitmap = bitmapPtr.Get();
+            bitmapMap[bitmapName] = bitmap;
+            bitmaps.Add(Rvalue(bitmapPtr));
+            return bitmap;
+        }
+        private nothrow Bitmaps()
+        {
+        }
+        private static UniquePtr<Bitmaps> instance;
+        private HashMap<string, Bitmap*> bitmapMap;
+        private List<UniquePtr<Bitmap>> bitmaps;
+    }
+}

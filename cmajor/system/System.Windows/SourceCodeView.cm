@@ -11,6 +11,9 @@ namespace System.Windows
 {
     public class SourceSpan
     {
+        public nothrow SourceSpan() : line(0), scol(0), ecol(0)
+        {
+        }
         public nothrow SourceSpan(int line_, short scol_, short ecol_) : line(line_), scol(scol_), ecol(ecol_)
         {
         }
@@ -19,7 +22,7 @@ namespace System.Windows
         public short ecol;
     }
 
-    public nothrow inline bool operator=(const SourceSpan& left, const SourceSpan& right)
+    public nothrow inline bool operator==(const SourceSpan& left, const SourceSpan& right)
     {
         return left.line == right.line && left.scol == right.scol && left.ecol == right.ecol;
     }

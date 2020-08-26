@@ -11,7 +11,7 @@ namespace Cm.Views
 {
     public nothrow int DefaultDebugStripWidth()
     {
-        return 16;
+        return 20;
     }
 
     public nothrow System.Windows.Color DefaultDebugStripBackgroundColor()
@@ -34,7 +34,6 @@ namespace Cm.Views
             AddChild(scrollableSourceCodeView.Release());
             ustring content = ToUtf32(File.ReadAllText(filePath));
             sourceCodeView->SetTextContent(content);
-            sourceCodeView->SetFocus();
         }
         public CmajorEditor(const string& filePath, BreakpointList& breakpointList) :
             this(filePath, breakpointList, DefaultDebugStripWidth(), DefaultDebugStripBackgroundColor())

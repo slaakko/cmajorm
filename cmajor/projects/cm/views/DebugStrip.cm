@@ -15,34 +15,87 @@ namespace Cm.Views
         return System.Windows.Color(228u, 20u, 0u);
     }
 
+    public nothrow System.Windows.Color TransparentColor()
+    {
+        return System.Windows.Color(0u, 128u, 128u);
+    }
+
+    public nothrow Point DefaultArrowOffset()
+    {
+        return Point(1, 1);
+    }
+
+    public nothrow Point DefaultBreakpointOffset()
+    {
+        return Point(0, -2);
+    }
+
+    public nothrow Size DefaultBreakpointInflate()
+    {
+        return Size(-4, -4);
+    }
+
     public class DebugStrip : Control
     {
         public DebugStrip(int width, const Color& backgroundColor, BreakpointList& breakpointList_, TextView* view_) :
             base("Cm.Views.DebugStrip", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
                 backgroundColor, "debugStrip", Point(), Size(width, 0), Dock.left, Anchors.none), breakpointList(breakpointList_), view(view_),
-                breakpointColor(DefaultBreakpointColor()), brush(breakpointColor), topLineNumber(1), origin()
+                breakpointColor(DefaultBreakpointColor()), redBrush(breakpointColor), whiteBrush(Color.White()), redPen(breakpointColor),
+                topLineNumber(1), origin(), arrowBitmap(Bitmaps.Instance().GetBitmap("cm.views.arrow.bitmap")),
+                arrowBitmapSize(Size(cast<int>(arrowBitmap->GetWidth()), cast<int>(arrowBitmap->GetHeight())))
         {
-            view->TextViewChangedEvent().AddHandler(ViewChanged);
+            view->ContentLocationChangedEvent().AddHandler(ViewContentLocationChanged);
         }
-        private void ViewChanged(TextViewChangedEventArgs& args)
+        private void ViewContentLocationChanged()
         {
-            topLineNumber = args.topLineNumber;
-            origin = args.newOrigin;
+            topLineNumber = view->TopLine();
+            origin = view->ContentLocation();
             Invalidate();
+        }
+        protected override void OnMouseDown(MouseEventArgs& args)
+        {
+            try
+            {
+                Point location = args.location;
+                view->TranslateMousePos(location);
+                int line = cast<int>(location.y / view->CharHeight() + 1);
+                if (args.buttons == MouseButtons.lbutton && args.clicks == 1)
+                {
+                    Breakpoint* bp = GetBreakpoint(line);
+                    if (bp != null)
+                    {
+                        RemoveBreakpoint(bp);
+                        Invalidate();
+                    }
+                    else
+                    {
+                        Breakpoint* bp = new Breakpoint(line);
+                        AddBreakpoint(bp);
+                        Invalidate();
+                    }
+                }
+                else if (args.buttons == MouseButtons.rbutton && args.clicks == 1)
+                {
+                    // todo    
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+            }
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
             try
             {
                 args.graphics.Clear(BackgroundColor());
-                if (breakpointList.IsEmpty()) return;
+                if (breakpointList.IsEmpty() && debugLocation == SourceSpan()) return;
                 SmoothingMode prevSmoothingMode = args.graphics.GetSmoothingModeChecked();
                 args.graphics.SetSmoothingModeChecked(SmoothingMode.highQuality);
                 Point myOrigin = origin;
                 view->TranslateContentLocation(myOrigin);
-                LogView* logView = Application.GetLogView();
                 int visibleLineCount = view->GetVisibleLineCount();
-                logView->WriteLine("debugStrip: topLine=" + ToString(topLineNumber) + ", origin=" + myOrigin.ToString() + ", visibleLines=" + ToString(visibleLineCount));
+                float topLineDiff = view->TopLineDiff();
                 PointF o(myOrigin.x, myOrigin.y);
                 float charHeight = view->CharHeight();
                 Size s = GetSize();
@@ -50,15 +103,27 @@ namespace Cm.Views
                 for (int line = topLineNumber; line < topLineNumber + visibleLineCount; ++line)
                 {
                     Breakpoint* bp = GetBreakpoint(line);
+                    RectF r(o, size);
+                    Size inflate = DefaultBreakpointInflate();
+                    r.Inflate(inflate.w, inflate.h);
+                    Point offset = DefaultBreakpointOffset();
+                    r.Offset(offset.x, offset.y);
+                    r.Offset(0.0f, topLineDiff);
                     if (bp != null)
                     {
-                        RectF r(o, size);
-                        r.Inflate(-2, -2);
-                        args.graphics.FillEllipseChecked(brush, r);
-                        if (bp->hit)
+                        if (bp->disabled)
                         {
-                            // todo
+                            args.graphics.FillEllipseChecked(whiteBrush, r);
+                            args.graphics.DrawEllipseChecked(redPen, r);
                         }
+                        else
+                        {
+                            args.graphics.FillEllipseChecked(redBrush, r);
+                        }
+                    }
+                    if (debugLocation.line == line)
+                    {
+                        DrawArrow(args.graphics, r.location);
                     }
                     o.y = o.y + charHeight;
                 }
@@ -82,11 +147,40 @@ namespace Cm.Views
         {
             breakpointList.RemoveBreakpoint(breakpoint);
         }
+        public nothrow const SourceSpan& GetDebugLocation() const
+        {
+            return debugLocation;
+        }
+        public nothrow void SetDebugLocation(const SourceSpan& debugLocation_)
+        {
+            debugLocation = debugLocation_;
+        }
+        public nothrow void ResetDebugLocation()
+        {
+            debugLocation = SourceSpan();
+        }
+        private void DrawArrow(Graphics& graphics, const PointF& location)
+        {
+            PointF bitmapLocation(location);
+            Point offset = DefaultArrowOffset();
+            bitmapLocation.x = bitmapLocation.x + offset.x;
+            bitmapLocation.y = bitmapLocation.y + offset.y;
+            RectF r(bitmapLocation, SizeF(arrowBitmapSize.w, arrowBitmapSize.h));
+            ImageAttributes attributes;
+            attributes.SetColorKey(TransparentColor(), TransparentColor(), ColorAdjustType.default_);
+            RectF s(PointF(), SizeF(arrowBitmapSize.w, arrowBitmapSize.h));
+            graphics.DrawImageChecked(*arrowBitmap, r, s, Unit.pixel, attributes);
+        }
         private BreakpointList& breakpointList;
+        private SourceSpan debugLocation;
         private TextView* view;
         private System.Windows.Color breakpointColor;
-        private SolidBrush brush;
+        private SolidBrush redBrush;
+        private SolidBrush whiteBrush;
+        private Pen redPen;
         private int topLineNumber;
         private Point origin;
+        private Bitmap* arrowBitmap;
+        private Size arrowBitmapSize;
     }
 }

@@ -397,6 +397,10 @@ namespace System.Windows
             {
                 window->SetFocusedControl(this);
             }
+            if (this == Application.GetLogView())
+            {
+                int x = 0;
+            }
         }
         public nothrow const string& Text() const
         {
@@ -521,9 +525,10 @@ namespace System.Windows
         {
             return contentLocation;
         }
-        internal nothrow void SetContentLocationInternal(const Point& contentLocation_)
+        internal virtual nothrow void SetContentLocationInternal(const Point& contentLocation_)
         {
             contentLocation = contentLocation_;
+            OnContentLocationChanged();
         }
         public void SetContentLocation(const Point& contentLocation_)
         {

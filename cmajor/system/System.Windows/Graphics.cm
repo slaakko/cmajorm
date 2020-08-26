@@ -989,6 +989,11 @@ namespace System.Windows
         public float h;
     }
 
+    public nothrow inline bool operator==(const SizeF& left, const SizeF& right)
+    {
+        return left.w == right.w && left.h == right.h;
+    }
+
     public class Rect
     {
         public nothrow Rect() : location(), size()

@@ -199,6 +199,13 @@ namespace System.IO
             }
             return uuid;
         }
+        public void Read(byte* buffer, int size)
+        {
+            for (int i = 0; i < size; ++i)
+            {
+                buffer[i] = ReadByte();
+            }
+        }
         public void Seek(long pos, Origin origin)
         {
             stream->Seek(pos, origin);
