@@ -391,15 +391,18 @@ namespace System.Windows
         }
         public void SetFocus()
         {
+            Control* focusedControl = Application.GetFocusedControl();
+            if (focusedControl != null)
+            {
+                currentModifierKeys = focusedControl->currentModifierKeys;
+                Keys emptyModifierKeys;
+                focusedControl->currentModifierKeys = emptyModifierKeys;
+            }
             WinSetFocus(Handle());
             Window* window = GetWindow();
             if (window != null)
             {
                 window->SetFocusedControl(this);
-            }
-            if (this == Application.GetLogView())
-            {
-                int x = 0;
             }
         }
         public nothrow const string& Text() const

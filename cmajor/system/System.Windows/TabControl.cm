@@ -342,6 +342,11 @@ namespace System.Windows
                 if (selectedTabPage != null)
                 {
                     selectedTabPage->Show();
+                    Control* control = selectedTabPage->GetFirstEnabledTabStopControl();
+                    if (control != null)
+                    {
+                        control->SetFocus();
+                    }
                 }
                 Invalidate();
             }
