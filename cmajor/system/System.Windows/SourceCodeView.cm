@@ -17,6 +17,10 @@ namespace System.Windows
         public nothrow SourceSpan(int line_, short scol_, short ecol_) : line(line_), scol(scol_), ecol(ecol_)
         {
         }
+        public nothrow inline bool IsEmpty() const
+        {
+            return line == 0 && scol == 0 && ecol == 0;
+        }
         public int line;
         public short scol;
         public short ecol;
@@ -130,6 +134,36 @@ namespace System.Windows
                 tokenLines.Add(Rvalue(tokenLine));
             }
         }
+        public nothrow ustring GetText(const SourceSpan& span) const
+        {
+            if (span.line >= 1 && span.line <= Lines().Count())
+            {
+                const ustring& line = Lines()[span.line - 1];
+                if (span.scol >= 1 && span.scol <= line.Length())
+                {
+                    int n = span.ecol - span.scol;
+                    if (n > 0)
+                    {
+                        return line.Substring(span.scol - 1, n);
+                    }
+                }
+            }
+            return ustring();
+        }
+        public override nothrow void GetLineColumn(const Point& contentLocation, int& line, short& column) const
+        {
+            base->GetLineColumn(contentLocation, line, column);
+            column = column - cast<short>(LineNumberFieldLength());
+        }
+        public nothrow Pair<Token*, short> GetToken(int lineNumber, short columnNumber) const
+        {
+            if (lineNumber >= 1 && lineNumber <= tokenLines.Count())
+            {
+                const TokenLine& tokenLine = tokenLines[lineNumber - 1];
+                return tokenLine.GetTokenByColumn(columnNumber);
+            }
+            return MakePair(cast<Token*>(null), cast<short>(0));
+        }
         protected virtual TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
         {
             return System.Windows.DefaultTokenizeLine(line, lineNumber, startState);
@@ -160,7 +194,7 @@ namespace System.Windows
                 startState = -1;
             }
             PointF hiliteOrigin(origin);
-            hiliteOrigin.x = hiliteOrigin.x + CharWidth() * (numLineNumberDigits + 1);
+            hiliteOrigin.x = hiliteOrigin.x + CharWidth() * LineNumberFieldLength();
             DrawHilites(graphics, lineIndex, hiliteOrigin);
         }
         protected virtual void DrawHilites(Graphics& graphics, int lineIndex, const PointF& origin)
@@ -226,7 +260,7 @@ namespace System.Windows
             tokenStyleTextStyleMap[sourceCodeTokenStyle] = textStyle;
             return sourceCodeTokenStyle;
         }
-        private Brush* GetOrInsertBrush(const Color& color)
+        public Brush* GetOrInsertBrush(const Color& color)
         {
             HashMap<Color, Brush*>.ConstIterator it = colorBrushMap.CFind(color);
             if (it != colorBrushMap.CEnd())
@@ -238,7 +272,7 @@ namespace System.Windows
             colorBrushMap[color] = brush;
             return brush;
         }
-        private Font* GetOrInsertFont(FontStyle fontStyle)
+        public Font* GetOrInsertFont(FontStyle fontStyle)
         {
             Map<FontStyle, Font*>.ConstIterator it = fontStyleFontMap.CFind(fontStyle);
             if (it != fontStyleFontMap.CEnd())
@@ -250,7 +284,7 @@ namespace System.Windows
             fontStyleFontMap[fontStyle] = font;
             return font;
         }
-        private SourceCodeTextStyle* GetOrInsertTextStyle(Brush* brush, Font* font)
+        public SourceCodeTextStyle* GetOrInsertTextStyle(Brush* brush, Font* font)
         {
             SourceCodeTextStyle style(font, brush);
             HashMap<SourceCodeTextStyle, SourceCodeTextStyle*>.ConstIterator it = textStyleMap.CFind(style);

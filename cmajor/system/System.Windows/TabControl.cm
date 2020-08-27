@@ -8,6 +8,8 @@ using System.Collections;
 
 namespace System.Windows
 {
+    public class delegate void TabPageSelectedEventHandler();
+
     public nothrow Color DefaultTabControlFrameColor()
     {
         return Color(204u, 206u, 219u);
@@ -141,6 +143,10 @@ namespace System.Windows
                 tabSelectedBackgroundColor = tabSelectedBackgroundColor_;
                 tabSelectedBackgroundBrush = SolidBrush(tabSelectedBackgroundColor);
             }
+        }
+        public const Container& TabPages() const
+        {
+            return tabPages;
         }
         public void AddTabPage(TabPage* tabPage)
         {
@@ -347,6 +353,7 @@ namespace System.Windows
                     {
                         control->SetFocus();
                     }
+                    OnTabPageSelected();
                 }
                 Invalidate();
             }
@@ -384,6 +391,14 @@ namespace System.Windows
                     SetSelectedTabPage(lastTabPage);
                 }
             }
+        }
+        protected virtual void OnTabPageSelected()
+        {
+            tabPageSelectedEvent.Fire();
+        }
+        public Event<TabPageSelectedEventHandler>& TabPageSelectedEvent()
+        {
+            return tabPageSelectedEvent;
         }
         private void DrawTabs(Graphics& graphics)
         {
@@ -647,6 +662,7 @@ namespace System.Windows
         private Color closeBoxSelectedColor;
         private SolidBrush closeBoxSelectedBrush;
         private TabPage* closeStateTabPage;
+        private Event<TabPageSelectedEventHandler> tabPageSelectedEvent;
     }
 
     public class TabPage : Panel

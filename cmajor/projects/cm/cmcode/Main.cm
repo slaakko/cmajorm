@@ -318,6 +318,7 @@ namespace cmcode
             horizontalSplitContainer->SplitterDistanceChangedEvent().AddHandler(HorizontalSplitterDistanceChanged);
             UniquePtr<TabControl> codeTabControlPtr(new TabControl(Point(), Size(), Dock.fill, Anchors.none));
             codeTabControl = codeTabControlPtr.Get();
+            codeTabControl->TabPageSelectedEvent().AddHandler(CodeTabPageSelected);
             codeTabControl->ControlRemovedEvent().AddHandler(CodeTabPageRemoved);
             UniquePtr<Control> paddedTabControl(new PaddedControl(codeTabControlPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> borderedTabControl(new BorderedControl(paddedTabControl.Release(), BorderStyle.single, DefaultTabControlFrameColor(), TabControlSelectedBorderColor(),
@@ -348,8 +349,8 @@ namespace cmcode
             verticalSplitContainer->Pane2Container()->AddChild(borderedOutputTabControl.Release());
             AddChild(verticalSplitContainerPtr.Release());
             StatusBar* statusBar = new StatusBar();
-            lineNumberStatusBarItem = new StatusBarItem("0", StatusBarItem.BorderStyle.sunken);
-            statusBar->AddItem(lineNumberStatusBarItem);
+            sourceFilePathStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
+            statusBar->AddItem(sourceFilePathStatusBarItem);
             AddChild(statusBar);
         }
         public override void OnShown()
@@ -444,24 +445,39 @@ namespace cmcode
                 MessageBox.Show(ex.Message());
             }
         }
+        private void CodeTabPageSelected()
+        {
+            TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+            Cm.Views.CmajorEditor* editor = GetEditorByTabPage(selectedTabPage);
+            if (editor != null)
+            {
+                sourceFilePathStatusBarItem->SetText(editor->FilePath());
+            }
+        }
         private void CodeTabPageRemoved(ControlEventArgs& args)
         {
             Control* removedControl = args.control;
             if (removedControl is TabPage*)
             {
-                editorByTabPageMap.Remove(cast<TabPage*>(removedControl));
+                TabPage* removedTabPage = cast<TabPage*>(removedControl);
+                editorByTabPageMap.Remove(removedTabPage);
+            }
+            if (codeTabControl->TabPages().IsEmpty())
+            {
+                sourceFilePathStatusBarItem->SetText("");
             }
         }
-        private void CaretPosChanged()
+        private void IdentifierHovered(Cm.Views.IdentifierHoverEventArgs& args)
         {
             TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
-            if (selectedTabPage != null)
+            Cm.Views.CmajorEditor* editor = GetEditorByTabPage(selectedTabPage);
+            if (editor != null)
             {
-                Cm.Views.CmajorEditor* currentEditor = GetEditorByTabPage(selectedTabPage);
-                if (currentEditor != null)
-                {
-                    lineNumberStatusBarItem->SetText(ToString(currentEditor->GetSourceCodeView()->CaretLine()));
-                }
+                Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
+                SourceSpan span(args.lineNumber, args.columnNumber, args.columnNumber + cast<short>(args.identifier.Length()));
+                sourceCodeView->GetDebugStrip()->SetDebugLocation(span);
+                sourceCodeView->GetDebugStrip()->Invalidate();
+                sourceCodeView->Invalidate();
             }
         }
         private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
@@ -495,9 +511,10 @@ namespace cmcode
                                 solutionExplorerData->breakpointCollection.GetBreakpointList(data->filePath)));
                             Cm.Views.CmajorEditor* editor = editorPtr.Get();
                             editorByTabPageMap[tabPage.Get()] = editor;
-                            editor->GetSourceCodeView()->CaretPosChangedEvent().AddHandler(CaretPosChanged);
                             tabPage->AddChild(editorPtr.Release());
                             codeTabControl->AddTabPage(tabPage.Release());
+                            editor->GetSourceCodeView()->DoGenerateIdentifierHoverEvents();
+                            editor->GetSourceCodeView()->IdentifierHoverEvent().AddHandler(IdentifierHovered);
                             editor->GetSourceCodeView()->SetFocus();
                         }
                     }
@@ -640,7 +657,7 @@ namespace cmcode
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
         private MenuItem* closeMenuItem;
         private MenuItem* saveMenuItem;
-        private StatusBarItem* lineNumberStatusBarItem;
+        private StatusBarItem* sourceFilePathStatusBarItem;
         private HashMap<TabPage*, Cm.Views.CmajorEditor*> editorByTabPageMap;
     }
 }

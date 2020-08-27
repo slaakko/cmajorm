@@ -149,6 +149,11 @@ namespace System.Windows
         {
             return line >= topLine && line < topLine + GetVisibleLineCount();
         }
+        public virtual nothrow void GetLineColumn(const Point& contentLocation, int& line, short& column) const
+        {
+            line = cast<int>(contentLocation.y / charHeight + 1);
+            column = cast<short>(contentLocation.x / charWidth + 1);
+        }
         public void SetTextContent(const ustring& textContent)
         {
             maxLineLength = 0;
@@ -418,9 +423,9 @@ namespace System.Windows
                 if (args.buttons == MouseButtons.lbutton && args.clicks == 1)
                 {
                     Point loc = args.location;
-                    int lineNumber = cast<int>(loc.y / charHeight + 1);
+                    int lineNumber = cast<int>(loc.y / charHeight + 1.5);
                     lineNumber = Min(lineNumber, cast<int>(lines.Count()));
-                    int columnNumber = cast<int>(loc.x / charWidth + 1);
+                    int columnNumber = cast<int>(loc.x / charWidth + 1.5);
                     columnNumber = Max(columnNumber, 1 + LineNumberFieldLength());
                     int lineLength = GetLineLength(lineNumber);
                     columnNumber = Min(columnNumber, lineLength + 1 + LineNumberFieldLength());

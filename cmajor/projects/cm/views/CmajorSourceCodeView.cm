@@ -13,9 +13,44 @@ using Cm.Debug;
 
 namespace Cm.Views
 {
+    public class IdentifierHoverEventArgs
+    {
+        public nothrow IdentifierHoverEventArgs(const ustring& identifier_, int lineNumber_, short columnNumber_) :
+            identifier(identifier_), lineNumber(lineNumber_), columnNumber(columnNumber_)
+        {
+        }
+        public ustring identifier;
+        public int lineNumber;
+        public short columnNumber;
+    }
+
+    public class delegate void IdentifierHoverEventHandler(IdentifierHoverEventArgs& args);
+
+    public nothrow inline System.Windows.Color DefaultDebugLocationBackgroundColor()
+    {
+        return System.Windows.Color(255u, 241u, 129u);
+    }
+
+    public nothrow inline System.Windows.Color DefaultDebugLocationTextColor()
+    {
+        return System.Windows.Color.Black();
+    }
+
+    public nothrow inline Padding DebugLocationPadding()
+    {
+        return Padding(0, 2, 4, 0);
+    }
+
     public class CmajorSourceCodeView : SourceCodeView
     {
-        public CmajorSourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) : base(location, size, dock, anchors), lexer(null, null, string(), 0)
+        private enum Flags : sbyte
+        {
+            none = 0, generateIdentifierHoverEvents = 1 << 0
+        }
+
+        public CmajorSourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base(location, size, dock, anchors), lexer(null, null, string(), 0), flags(Flags.none), prevTokenPointed(null),
+            debugLocationBackgroundColor(DefaultDebugLocationBackgroundColor()), debugLocationTextColor(DefaultDebugLocationTextColor())
         {
             lexer.SetCommentTokenId(COMMENT);
             Set<int> blockCommentStates;
@@ -25,9 +60,17 @@ namespace Cm.Views
             blockCommentStates.Insert(127);
             lexer.SetBlockCommentStates(blockCommentStates);
         }
-        public nothrow void SetDebugStrip(DebugStrip* debugStrip_)
+        public nothrow void SetDebugLocationBackgroundColor(const System.Windows.Color& debugLocationBackgroundColor_)
         {
-            debugStrip = debugStrip_;
+            debugLocationBackgroundColor = debugLocationBackgroundColor_;
+        }
+        public nothrow void SetDebugLocationTextColor(const System.Windows.Color& debugLocationTextColor_)
+        {
+            debugLocationTextColor = debugLocationTextColor_;
+        }
+        public nothrow inline DebugStrip* GetDebugStrip() const
+        {
+            return debugStrip;
         }
         protected override void OnKeyDown(KeyEventArgs& args)
         {
@@ -60,7 +103,7 @@ namespace Cm.Views
                         {
                             int line = CaretLine();
                             SourceSpan debugLocation(line, 0, 0);
-                            if (debugStrip->GetDebugLocation() == debugLocation)
+                            if (debugStrip->DebugLocation() == debugLocation)
                             {
                                 debugStrip->ResetDebugLocation();
                             }
@@ -90,6 +133,77 @@ namespace Cm.Views
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+            }
+        }
+        protected override void OnMouseMove(MouseEventArgs& args)
+        {
+            try
+            {
+                base->OnMouseMove(args);
+                if (GenerateIdentifierHoverEvents())
+                {
+                    int lineNumber = 0;
+                    short columnNumber = 0;
+                    GetLineColumn(args.location, lineNumber, columnNumber);
+                    if (lineNumber >= 1 && lineNumber <= Lines().Count() && columnNumber >= 1 && columnNumber <= GetLineLength(lineNumber))
+                    {
+                        Pair<Token*, short> tokenColumn = GetToken(lineNumber, columnNumber);
+                        Token* token = tokenColumn.first;
+                        if (token != null)
+                        {
+                            if (token != prevTokenPointed)
+                            {
+                                prevTokenPointed = token;
+                                SourceCodeTokenKind tokenKind = GetTokenKind(*token);
+                                if (tokenKind == SourceCodeTokenKind.identifier)
+                                {
+                                    OnIdentifierHovered(token->match.ToString(), lineNumber, tokenColumn.second);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            prevTokenPointed = null;
+                        }
+                    }
+                    else
+                    {
+                        prevTokenPointed = null;
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+            }
+        }
+        protected virtual void OnIdentifierHovered(const ustring& identifier, int lineNumber, short columnNumber)
+        {
+            IdentifierHoverEventArgs args(identifier, lineNumber, columnNumber);
+            identifierHoverEvent.Fire(args);
+        }
+        protected override void DrawHilites(Graphics& graphics, int lineIndex, const PointF& origin)
+        {
+            SourceSpan debugLocation = debugStrip->DebugLocation();
+            if (!debugLocation.IsEmpty() && debugLocation.line == lineIndex + 1)
+            {
+                DrawDebugLocationHilite(graphics, debugLocation, origin);
+            }
+        }
+        private void DrawDebugLocationHilite(Graphics& graphics, const SourceSpan& debugLocation, const PointF& origin)
+        {
+            string hiliteText = ToUtf8(GetText(debugLocation));
+            int n = Max(cast<int>(0), cast<int>(debugLocation.ecol - debugLocation.scol));
+            RectF r(PointF(origin.x + CharWidth() * (debugLocation.scol - 1), origin.y), SizeF(CharWidth() * n, CharHeight()));
+            Brush* backgroundBrush = GetOrInsertBrush(debugLocationBackgroundColor);
+            Padding padding = DebugLocationPadding();
+            RectF f(PointF(r.location.x - padding.left, r.location.y - padding.top), SizeF(r.size.w + padding.Horizontal(), r.size.h + padding.Vertical()));
+            graphics.FillRectangleChecked(*backgroundBrush, f);
+            if (!hiliteText.IsEmpty())
+            {
+                Brush* textBrush = GetOrInsertBrush(debugLocationTextColor);
+                Font* font = GetOrInsertFont(FontStyle.regular);
+                graphics.DrawStringChecked(hiliteText, *font, r.location, *textBrush);
             }
         }
         protected override TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
@@ -201,7 +315,44 @@ namespace Cm.Views
             }
             return SourceCodeTokenKind.plain;
         }
+        public nothrow inline void DoGenerateIdentifierHoverEvents()
+        {
+            SetFlag(Flags.generateIdentifierHoverEvents);
+        }
+        public nothrow inline void DontGenerateIdentifierHoverEvents()
+        {
+            ResetFlag(Flags.generateIdentifierHoverEvents);
+        }
+        public nothrow inline Event<IdentifierHoverEventHandler, IdentifierHoverEventArgs>& IdentifierHoverEvent()
+        {
+            return identifierHoverEvent;
+        }
+        private nothrow inline bool GenerateIdentifierHoverEvents() const
+        {
+            return GetFlag(Flags.generateIdentifierHoverEvents);
+        }
+        internal nothrow void SetDebugStrip(DebugStrip* debugStrip_)
+        {
+            debugStrip = debugStrip_;
+        }
+        private inline nothrow bool GetFlag(Flags flag) const
+        {
+            return (flags & flag) != Flags.none;
+        }
+        private inline nothrow void SetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags | flag);
+        }
+        private inline nothrow void ResetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags & ~flag);
+        }
+        private Flags flags;
         private CmajorLexer lexer;
         private DebugStrip* debugStrip;
+        private Token* prevTokenPointed;
+        private Event<IdentifierHoverEventHandler, IdentifierHoverEventArgs> identifierHoverEvent;
+        private System.Windows.Color debugLocationBackgroundColor;
+        private System.Windows.Color debugLocationTextColor;
     }
 }

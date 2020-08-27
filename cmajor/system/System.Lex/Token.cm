@@ -43,6 +43,20 @@ namespace System.Lex
         public nothrow TokenLine() : tokens(), startState(0), endState(0)
         {
         }
+        public nothrow Pair<Token*, short> GetTokenByColumn(short columnNumber) const
+        {
+            short startCol = 1;
+            for (const Token& token : tokens)
+            {
+                short endCol = startCol + cast<short>(token.match.end - token.match.begin);
+                if (columnNumber >= startCol && columnNumber < endCol)
+                {
+                    return MakePair(&token, startCol);
+                }
+                startCol = endCol;
+            }
+            return MakePair(null, 0);
+        }
         public List<Token> tokens;
         public int startState;
         public int endState;
