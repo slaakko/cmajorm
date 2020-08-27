@@ -329,22 +329,27 @@ namespace cmcode
             ToolBar* toolBar = toolBarPtr.Get();
             UniquePtr<BorderedControl> borderedToolBar(new BorderedControl(
                 toolBarPtr.Release(), BorderStyle.single, ToolBarBorderColor(), ToolBarBorderColor(), Point(), toolBar->GetSize(), Dock.top, Anchors.none));
-            UniquePtr<ToolButton> saveButton(new ToolButton("cmcode.debug.save.bitmap"));
+            UniquePtr<ToolButton> saveButton(new ToolButton("cmcode.save.bitmap"));
             saveButton->SetToolTip("Save all");
             saveButton->SetPadding(Padding(8, 8, 8, 8));
-            //saveButton->Disable();
+            saveButton->Disable();
             toolBar->AddToolButton(saveButton.Release());
+            UniquePtr<ToolButton> buildButton(new ToolButton("cmcode.build.bitmap"));
+            buildButton->SetToolTip("Build current project");
+            buildButton->SetPadding(Padding(8, 8, 8, 8));
+            buildButton->Disable();
+            toolBar->AddToolButton(buildButton.Release());
             UniquePtr<ToolButtonSeparator> separator1(new ToolButtonSeparator());
             toolBar->AddToolButton(separator1.Release());
             UniquePtr<ToolButton> startButton(new ToolButton("cmcode.debug.start.bitmap"));
             startButton->SetToolTip("Start debugging");
             startButton->SetPadding(Padding(8, 8, 8, 8));
-            //startButton->Disable();
+            startButton->Disable();
             toolBar->AddToolButton(startButton.Release());
             UniquePtr<ToolButton> stopButton(new ToolButton("cmcode.debug.stop.bitmap"));
             stopButton->SetToolTip("Stop debugging");
             stopButton->SetPadding(Padding(8, 8, 8, 8));
-            //stopButton->Disable();
+            stopButton->Disable();
             toolBar->AddToolButton(stopButton.Release());
             AddChild(borderedToolBar.Release());
             UniquePtr<SplitContainer> verticalSplitContainerPtr(new SplitContainer(Orientation.vertical, MainWindowVerticalSplitterDistance(),
