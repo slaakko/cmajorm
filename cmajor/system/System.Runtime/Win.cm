@@ -157,6 +157,9 @@ public extern cdecl nothrow void* WinGraphicsCreateBitmapWidthHeight(int w, int 
 public extern cdecl nothrow void* WinGraphicsCreateBitmapWinBitmap(void* winBitmap, void* palette);
 public extern cdecl nothrow void* WinGraphicsCreateBitmapIcon(void* icon);
 public extern cdecl nothrow void* WinGraphicsCreateBitmapResource(const char* resourceName);
+public extern cdecl nothrow void* WinGraphicsCloneBitmap(void* nativeBitmap, int x, int y, int w, int h, int pixelFormat);
+public extern cdecl nothrow int WinGraphicsBitmapGetPixel(void* nativeBitmap, int x, int y, byte& alpha, byte& red, byte& green, byte& blue);
+public extern cdecl nothrow int WinGraphicsBitmapSetPixel(void* nativeBitmap, int x, int y, byte alpha, byte red, byte green, byte blue);
 public extern cdecl nothrow uint WinGraphicsSave(void* graphics);
 public extern cdecl nothrow int WinGraphicsRestore(void* graphics, uint graphicsState);
 public extern cdecl nothrow void* WinGraphicsCreateDefaultImageAttributes();

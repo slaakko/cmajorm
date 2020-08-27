@@ -18,22 +18,50 @@ namespace System.Windows
         {
             regular = 0, radioButtonGroup = 1
         }
-        public ToolBar(const Color& backgroundColor, const Color& toolButtonTransparentColor_, const Point& location, const Size& size, Dock dock, Anchors anchors, int toolButtonSize_, Style style_) :
-            base("System.Windows.ToolBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, "toolBar", location, size, dock, anchors),
-            flags(Flags.none), toolButtonTransparentColor(toolButtonTransparentColor_), toolButtonSize(toolButtonSize_),
-            darkColor(Color(100u, 100u, 100u)), lightColor(Color.White()), mediumLightColor(227u, 227u, 227u), mediumDarkColor(160u, 160u, 160u),
-            mouseInToolButton(null), mouseDownToolButton(null), pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip())
+        public ToolBar(const Color& backgroundColor, const Color& toolButtonTransparentColor_, const Point& location, const Size& size, Dock dock, Anchors anchors,
+            int toolButtonHeight_, Style style_, const Padding& padding_, const Padding& buttonPadding_) :
+            base("System.Windows.ToolBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            backgroundColor, "toolBar", location, size, dock, anchors), flags(Flags.none), toolButtonTransparentColor(toolButtonTransparentColor_),
+            toolButtonHeight(toolButtonHeight_), darkColor(Color(100u, 100u, 100u)), lightColor(Color.White()), mediumLightColor(227u, 227u, 227u),
+            mediumDarkColor(160u, 160u, 160u), disabledColor(Color(204u, 204u, 207u)),
+            toolButtonSeparatorColor1(204u, 206u, 219u), toolButtonSeparatorColor2(245u, 245u, 245u), mouseInToolButton(null), mouseDownToolButton(null),
+            pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip()), padding(padding_), buttonPadding(buttonPadding_), toolButtons(this)
         {
         }
-        public ToolBar(int toolButtonSize, const Color& toolButtonTransparentColor, Style style) :
-            this(DefaultControlBackgroundColor(), toolButtonTransparentColor, Point(), Size(0, toolButtonSize), Dock.top, Anchors.none, toolButtonSize, style)
+        public ToolBar(int toolButtonHeight, const Color& toolButtonTransparentColor, Style style, const Padding& padding, const Padding& buttonPadding) :
+            this(DefaultControlBackgroundColor(), toolButtonTransparentColor, Point(padding.left, padding.top),
+                Size(0, toolButtonHeight + padding.Vertical() + buttonPadding.Vertical()), Dock.top, Anchors.none, toolButtonHeight, style, padding, buttonPadding)
         {
         }
-        public ToolBar(Style style) : this(38, Color(0u, 128u, 128u), style)
+        public ToolBar(Style style) : this(38, Color.DefaultBitmapTransparent(), style, DefaultPadding(), DefaultButtonPadding())
         {
         }
         public ToolBar() : this(Style.regular)
         {
+        }
+        public nothrow inline const int ToolButtonHeight() const
+        {
+            return toolButtonHeight;
+        }
+        public nothrow Padding DefaultPadding() const
+        {
+            return Padding(0, 0, 0, 0);
+        }
+        public nothrow Padding DefaultButtonPadding()
+        {
+            return Padding(0, 0, 0, 0);
+        }
+        public nothrow const Padding& GetPadding() const
+        {
+            return padding;
+        }
+        public nothrow const Padding& GetButtonPadding()
+        {
+            return buttonPadding;
+        }
+        public nothrow void SetButtonPadding(const Padding& buttonPadding_)
+        {
+            buttonPadding = buttonPadding_;
         }
         public ~ToolBar()
         {
@@ -84,23 +112,62 @@ namespace System.Windows
         {
             mediumDarkColor = mediumDarkColor_;
         }
-        public void AddToolButton(ToolButton* toolButton)
+        public nothrow inline const Color& DisabledColor() const
+        {
+            return disabledColor;
+        }
+        public nothrow void SetDisabledColor(const Color& disabledColor_)
+        {
+            disabledColor = disabledColor_;
+        }
+        public nothrow inline const Color& ToolButtonSeparatorColor1() const
+        {
+           return toolButtonSeparatorColor1;
+        }
+        public nothrow void SetToolButtonSeparatorColor1(const Color& toolButtonSeparatorColor1_)
+        {
+            toolButtonSeparatorColor1 = toolButtonSeparatorColor1_;
+        }
+        public nothrow inline const Color& ToolButtonSeparatorColor2() const
+        {
+           return toolButtonSeparatorColor2;
+        }
+        public nothrow void SetToolButtonSeparatorColor2(const Color& toolButtonSeparatorColor2_)
+        {
+            toolButtonSeparatorColor2 = toolButtonSeparatorColor2_;
+        }
+        public void AddToolButton(ToolButtonBase* toolButton)
         {
             toolButton->SetToolBar(this);
-            toolButtons.Add(UniquePtr<ToolButton>(toolButton));
-            toolButton->SetTransparentColor(toolButtonTransparentColor);
-            SetToolButtonBitmap(toolButton);
-            if (style == Style.radioButtonGroup)
+            toolButtons.AddChild(toolButton);
+            if (toolButton is ToolButton*)
             {
-                if (pressedStateToolButton == null)
+                ToolButton* tb = cast<ToolButton*>(toolButton);
+                tb->SetTransparentColor(toolButtonTransparentColor);
+                SetToolButtonBitmaps(tb);
+                if (style == Style.radioButtonGroup)
                 {
-                    SetPressedStateToolButton(toolButton);
+                    if (pressedStateToolButton == null)
+                    {
+                        SetPressedStateToolButton(tb);
+                    }
                 }
             }
         }
         public nothrow ToolButton* GetToolButton(int toolButtonIndex) const
         {
-            return toolButtons[toolButtonIndex].Get();
+            Component* component = toolButtons.FirstChild();
+            int index = 0;
+            while (component != null)
+            {
+                if (component is ToolButton*)
+                {
+                    if (index == toolButtonIndex) return cast<ToolButton*>(component);
+                    ++index;
+                }
+                component = component->NextSibling();
+            }
+            return null;
         }
         public nothrow inline ToolButton* PressedStateToolButton() const
         {
@@ -150,14 +217,21 @@ namespace System.Windows
                 }
             }
             args.graphics.Clear(BackgroundColor());
-            Point origin;
-            long n = toolButtons.Count();
-            for (long i = 0; i < n; ++i)
+            Point origin(padding.left, padding.top);
+            Component* component = toolButtons.FirstChild();
+            while (component != null)
             {
-                ToolButton* toolButton = toolButtons[i].Get();
-                toolButton->SetLocation(origin);
-                toolButton->Draw(args.graphics, origin);
-                origin.x = origin.x + toolButtonSize;
+                if (component is ToolButtonBase*)
+                {
+                    ToolButtonBase* toolButton = cast<ToolButtonBase*>(component);
+                    Size toolButtonSize = toolButton->GetSize();
+                    Point toolButtonLocation = origin;
+                    toolButtonLocation.Offset(buttonPadding.left, buttonPadding.top + (toolButtonHeight - toolButtonSize.h) / 2);
+                    toolButton->SetLocation(toolButtonLocation);
+                    toolButton->Draw(args.graphics, origin);
+                    origin.x = origin.x + toolButtonSize.w + buttonPadding.Horizontal();
+                }
+                component = component->NextSibling();
             }
             base->OnPaint(args);
         }
@@ -204,14 +278,21 @@ namespace System.Windows
                 ToolButton* toolButton = GetToolButtonAt(args.location);
                 if (toolButton != null)
                 {
-                    if (args.buttons == MouseButtons.lbutton)
+                    if (toolButton->GetState() == ToolButton.State.normal)
                     {
-                        mouseDownToolButton = toolButton;
+                        if (args.buttons == MouseButtons.lbutton)
+                        {
+                            mouseDownToolButton = toolButton;
+                        }
+                        toolButton->MouseDownInternal(args);
+                        if (args.buttons == MouseButtons.lbutton)
+                        {
+                            toolButton->SetState(ToolButton.State.pressed);
+                        }
                     }
-                    toolButton->MouseDownInternal(args);
-                    if (args.buttons == MouseButtons.lbutton)
+                    else
                     {
-                        toolButton->SetState(ToolButton.State.pressed);
+                        return;
                     }
                 }
                 WinSetCapture(Handle());
@@ -237,12 +318,15 @@ namespace System.Windows
                 ToolButton* toolButton = GetToolButtonAt(args.location);
                 if (toolButton != null)
                 {
-                    toolButton->MouseUpInternal(args);
-                    if (args.buttons == MouseButtons.lbutton)
+                    if (toolButton->GetState() == ToolButton.State.pressed)
                     {
-                        if (toolButton == mouseDownToolButton)
+                        toolButton->MouseUpInternal(args);
+                        if (args.buttons == MouseButtons.lbutton)
                         {
-                            toolButton->DoClick();
+                            if (toolButton == mouseDownToolButton)
+                            {
+                                toolButton->DoClick();
+                            }
                         }
                     }
                 }
@@ -289,42 +373,54 @@ namespace System.Windows
         {
             toolTipWindow->Hide();
         }
-        private void SetToolButtonBitmap(ToolButton* toolButton)
+        private void SetToolButtonBitmaps(ToolButton* toolButton)
         {
-            Bitmap* toolBitmap = GetOrCreateBitmap(toolButton->ToolBitmapName());
-            toolButton->SetToolBitmap(toolBitmap);
+            Pair<Bitmap*, Bitmap*> toolBitmapPair = GetOrCreateBitmaps(toolButton->ToolBitmapName());
+            toolButton->SetToolBitmaps(toolBitmapPair.first, toolBitmapPair.second);
         }
-        private Bitmap* GetOrCreateBitmap(const string& bitmapName)
+        private Pair<Bitmap*, Bitmap*> GetOrCreateBitmaps(const string& bitmapName)
         {
-            Bitmap* bitmap = null;
+            Pair<Bitmap*, Bitmap*> bitmapPair;
             try
             {
-                HashMap<string, Bitmap*>.ConstIterator it = bitmapMap.CFind(bitmapName);
+                HashMap<string, Pair<Bitmap*, Bitmap*>>.ConstIterator it = bitmapMap.CFind(bitmapName);
                 if (it != bitmapMap.CEnd())
                 {
                     return it->second;
                 }
                 UniquePtr<Bitmap> bitmapPtr(new Bitmap(Bitmap.FromResource(bitmapName)));
-                bitmap = bitmapPtr.Get();
-                bitmapMap[bitmapName] = bitmap;
+                Bitmap* bitmap = bitmapPtr.Get();
+                UniquePtr<Bitmap> disabledBitmapPtr(new Bitmap(bitmap->ToGrayBitmap()));
+                Bitmap* disabledBitmap = disabledBitmapPtr.Get();
+                bitmapPair = MakePair(bitmap, disabledBitmap);
+                bitmapMap[bitmapName] = bitmapPair;
                 bitmaps.Add(Rvalue(bitmapPtr));
-                return bitmap;
+                bitmaps.Add(Rvalue(disabledBitmapPtr));
+                return bitmapPair;
             }        
             catch (const Exception& ex)
             {
                 throw Exception("could not load bitmap '" + bitmapName + "': " + ex.Message());
             }
-            return bitmap;
+            return bitmapPair;
         }
         private nothrow ToolButton* GetToolButtonAt(const Point& location) const
         {
             Size size = GetSize();
             if (location.y >= 0 && location.y < size.h && location.x >= 0 && location.x < size.w)
             {
-                int buttonIndex = location.x / toolButtonSize;
-                if (buttonIndex >= 0 && buttonIndex < toolButtons.Count())
+                Component* component = toolButtons.FirstChild();
+                while (component != null)
                 {
-                    return toolButtons[buttonIndex].Get();
+                    if (component is ToolButton*)
+                    {
+                        ToolButton* toolButton = cast<ToolButton*>(component);
+                        if (location.x >= toolButton->Location().x && location.x <= toolButton->Location().x + toolButton->GetSize().w)
+                        {
+                            return toolButton;
+                        }
+                    }
+                    component = component->NextSibling();
                 }
             }
             return null;
@@ -342,47 +438,135 @@ namespace System.Windows
             flags = cast<Flags>(flags & ~Flags.toolTipWindowAdded);
         }
         private Flags flags;
-        private List<UniquePtr<ToolButton>> toolButtons;
+        private Container toolButtons;
         private Color toolButtonTransparentColor;
-        private int toolButtonSize;
+        private int toolButtonHeight;
         private List<UniquePtr<Bitmap>> bitmaps;
-        private HashMap<string, Bitmap*> bitmapMap;
+        private HashMap<string, Pair<Bitmap*, Bitmap*>> bitmapMap;
         private Color darkColor;
         private Color lightColor;
         private Color mediumLightColor;
         private Color mediumDarkColor;
+        private Color disabledColor;
+        private Color toolButtonSeparatorColor1;
+        private Color toolButtonSeparatorColor2;
         private ToolButton* mouseInToolButton;
         private ToolButton* mouseDownToolButton;
         private ToolButton* pressedStateToolButton;
         private Style style;
         private ToolTip* toolTipWindow;
+        private Padding padding;
+        private Padding buttonPadding;
     }
 
-    public class ToolButton
+    public abstract class ToolButtonBase : Component
     {
-        public enum State
-        {
-            normal, pressed
-        }
-
-        public nothrow ToolButton(const string& toolBitmapName_) : state(State.normal), toolBitmapName(toolBitmapName_), toolBitmap(null), transparentColor(Color(0u, 128u, 128u))
+        public nothrow ToolButtonBase() : location(), size()
         {
         }
-        public default virtual ~ToolButton();
-        internal nothrow Padding GetPadding() const
-        {
-            return DefaultPadding();
-        }
-        protected virtual nothrow Padding DefaultPadding()
-        {
-            return Padding(3, 3, 3, 3);
-        }
-        public nothrow void SetToolBar(ToolBar* toolBar_)
+        public virtual nothrow void SetToolBar(ToolBar* toolBar_)
         {
             toolBar = toolBar_;
         }
+        public nothrow inline ToolBar* GetToolBar() const
+        {
+            return toolBar;
+        }
+        public abstract void Draw(Graphics& graphics, const Point& origin)
+        {
+        }
+        public nothrow inline const Point& Location() const
+        {
+            return location;
+        }
+        public nothrow inline void SetLocation(const Point& location_)
+        {
+            location = location_;
+        }
+        public nothrow inline const Size& GetSize() const
+        {
+            return size;
+        }
+        public nothrow inline void SetSize(const Size& size_)
+        {
+            size = size_;
+        }
+        private ToolBar* toolBar;
+        private Point location;
+        private Size size;
+    }
+
+    public class ToolButtonSeparator : ToolButtonBase
+    {
+        public nothrow ToolButtonSeparator() : base()
+        {
+        }
+        public override nothrow void SetToolBar(ToolBar* toolBar)
+        {
+            base->SetToolBar(toolBar);
+            SetSize(Size(2, toolBar->ToolButtonHeight() - 4));
+        }
+        public override void Draw(Graphics& graphics, const Point& origin)
+        {
+            ToolBar* toolBar = GetToolBar();
+            Point location = Location();
+            Size size = GetSize();
+            Point firstLineStart(origin.x, origin.y);
+            Point firstLineEnd(firstLineStart.x, firstLineStart.y + size.h);
+            Pen firstLinePen(toolBar->ToolButtonSeparatorColor1());
+            graphics.DrawLineChecked(firstLinePen, firstLineStart, firstLineEnd);
+            Point secondLineStart(origin.x + 1, origin.y + location.y);
+            Point secondLineEnd(secondLineStart.x, secondLineStart.y + size.h);
+            Pen secondLinePen(toolBar->ToolButtonSeparatorColor2());
+            graphics.DrawLineChecked(secondLinePen, secondLineStart, secondLineEnd);
+        }
+    }
+
+    public class ToolButton : ToolButtonBase
+    {
+        public enum State : sbyte
+        {
+            normal = 0, pressed = 1, disabled = 2
+        }
+        public nothrow ToolButton(const string& toolBitmapName_) :
+            base(), state(State.normal), toolBitmapName(toolBitmapName_), toolBitmap(null), transparentColor(Color.DefaultBitmapTransparent()),
+            padding(DefaultPadding())
+        {
+        }
+        public default virtual ~ToolButton();
+        public nothrow void Enable()
+        {
+            if (state == State.disabled)
+            {
+                SetState(State.normal);
+            }
+        }
+        public nothrow void Disable()
+        {
+            if (state == State.normal)
+            {
+                SetState(State.disabled);
+            }
+        }
+        public nothrow Padding GetPadding() const
+        {
+            return padding;
+        }
+        public void SetPadding(const Padding& padding_)
+        {
+            padding = padding_;
+        }
+        protected nothrow Padding DefaultPadding()
+        {
+            return Padding(3, 3, 3, 3);
+        }
+        public nothrow inline State GetState() const
+        {
+            return state;
+        }
         public void SetState(State state_)
         {
+            ToolBar* toolBar = GetToolBar();
             if (state != state_)
             {
                 if (state_ == State.pressed)
@@ -421,18 +605,6 @@ namespace System.Windows
         {
             return toolTip;
         }
-        public nothrow inline const Point& Location() const
-        {
-            return location;
-        }
-        public nothrow void SetLocation(const Point& location_)
-        {
-            location = location_;
-        }
-        public nothrow inline const Size& GetSize() const
-        {
-            return size;
-        }
         public nothrow void SetTransparentColor(const Color& transparentColor_)
         {
             transparentColor = transparentColor_;
@@ -440,6 +612,7 @@ namespace System.Windows
         internal void MouseEnterInternal()
         {
             OnMouseEnter();
+            ToolBar* toolBar = GetToolBar();
             if (!toolTip.IsEmpty() && toolBar != null)
             {
                 toolBar->ShowToolTipWindow(this);
@@ -456,6 +629,7 @@ namespace System.Windows
         internal void MouseLeaveInternal()
         {
             OnMouseLeave();
+            ToolBar* toolBar = GetToolBar();
             if (!toolTip.IsEmpty() && toolBar != null)
             {
                 toolBar->HideToolTipWindow();
@@ -517,14 +691,14 @@ namespace System.Windows
         {
             return clickEvent;
         }
-        public virtual void Draw(Graphics& graphics, const Point& location)
+        public override void Draw(Graphics& graphics, const Point& location)
         {
-            Rect bounds(location, size);
             switch (state)
             {
                 case State.normal:
+                case State.disabled:
                 {
-                    DrawNormal(graphics, location);
+                    DrawNormalOrDisabled(graphics, location);
                     break;
                 }
                 case State.pressed:
@@ -534,9 +708,11 @@ namespace System.Windows
                 }
             }
         }
-        private void DrawNormal(Graphics& graphics, const Point& location)
+        private void DrawNormalOrDisabled(Graphics& graphics, const Point& location)
         {
+            ToolBar* toolBar = GetToolBar();
             Pen darkPen(toolBar->DarkColor(), 1.0f);
+            Size size = GetSize();
             Rect rect(location, size);
             rect.size.w = rect.size.w - 1;
             rect.size.h = rect.size.h - 1;
@@ -603,7 +779,9 @@ namespace System.Windows
         }
         private void DrawPressed(Graphics& graphics, const Point& location)
         {
+            ToolBar* toolBar = GetToolBar();
             Pen darkPen(toolBar->DarkColor(), 1.0f);
+            Size size = GetSize();
             Rect rect(location, size);
             rect.size.w = rect.size.w - 1;
             rect.size.h = rect.size.h - 1;
@@ -647,41 +825,47 @@ namespace System.Windows
         private void DrawToolBitmap(Graphics& graphics, const Point& location)
         {
             Point bitmapLocation(location);
-            Padding padding = DefaultPadding();
             bitmapLocation.x = bitmapLocation.x + padding.left;
             bitmapLocation.y = bitmapLocation.y + padding.top;
             Rect r(bitmapLocation, toolBitmapSize);
             ImageAttributes attributes;
             attributes.SetColorKey(transparentColor, transparentColor, ColorAdjustType.default_);
-            graphics.DrawImageChecked(*toolBitmap, r, 0, 0, toolBitmapSize.w, toolBitmapSize.h, Unit.pixel, attributes);
+            if (state == State.normal || state == State.pressed)
+            {
+                graphics.DrawImageChecked(*toolBitmap, r, 0, 0, toolBitmapSize.w, toolBitmapSize.h, Unit.pixel, attributes);
+            }
+            else if (state == State.disabled)
+            {
+                graphics.DrawImageChecked(*disabledToolBitmap, r, 0, 0, toolBitmapSize.w, toolBitmapSize.h, Unit.pixel, attributes);
+            }
         }
         public nothrow inline const string& ToolBitmapName() const
         {
             return toolBitmapName;
         }
-        internal nothrow void SetToolBitmap(Bitmap* toolBitmap_)
+        internal nothrow void SetToolBitmaps(Bitmap* toolBitmap_, Bitmap* disabledToolBitmap_)
         {
             toolBitmap = toolBitmap_;
+            disabledToolBitmap = disabledToolBitmap_;
             toolBitmapSize = Size(cast<int>(toolBitmap->GetWidth()), cast<int>(toolBitmap->GetHeight()));
-            Padding padding = DefaultPadding();
-            size = Size(padding.Horizontal() + toolBitmapSize.w, padding.Vertical() + toolBitmapSize.h);
+            SetSize(Size(padding.Horizontal() + toolBitmapSize.w, padding.Vertical() + toolBitmapSize.h));
         }
         private nothrow void Invalidate()
         {
+            ToolBar* toolBar = GetToolBar();
             if (toolBar != null)
             {
                 toolBar->Invalidate();
             }
         }
-        private ToolBar* toolBar;
         private State state;
         private string toolBitmapName;
         private Bitmap* toolBitmap;
+        private Bitmap* disabledToolBitmap;
         private Color transparentColor;
-        private Point location;
         private Size toolBitmapSize;
-        private Size size;
         private string toolTip;
+        private Padding padding;
         private Event<MouseEnterEventHandler> mouseEnterEvent;
         private Event<MouseLeaveEventHandler> mouseLeaveEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseMoveEvent;

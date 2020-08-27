@@ -84,6 +84,17 @@ namespace System.Windows
         public nothrow Color(byte red_, byte green_, byte blue_) : alpha(255u), red(red_), green(green_), blue(blue_)
         {
         }
+        public nothrow Color ToGray(const Color& transparentColor) const
+        {
+            if (*this == transparentColor) return *this;
+            int s = cast<int>(red) * 299 + cast<int>(green) * 587 + cast<int>(blue) * 114;
+            byte g = cast<byte>(s / 1000);
+            return Color(alpha, g, g, g);
+        }
+        public nothrow Color ToGray() const
+        {
+            return ToGray(Color(0u, 255u, 255u, 255u));
+        }
         public nothrow string ToString() const
         {
             string s = System.ToString(alpha);
@@ -653,6 +664,10 @@ namespace System.Windows
         public static nothrow Color YellowGreen()
         {
             return Color(0x9Au, 0xCDu, 0x32u);
+        }
+        public static nothrow Color DefaultBitmapTransparent()
+        {
+            return Color(0u, 128u, 128u);
         }
         public byte alpha;
         public byte red;
@@ -2075,6 +2090,33 @@ namespace System.Windows
         private void* nativeImage;
     }
 
+    public const int pixelFormatIndexed = 0x00010000;
+    public const int pixelFormatGDI = 0x00020000;
+    public const int pixelFormatAlpha = 0x00040000;
+    public const int pixelFormatPAlpha = 0x00080000;
+    public const int pixelFormatExtended = 0x00100000;
+    public const int pixelFormatCanonical = 0x00200000;
+
+    public enum PixelFormat : int
+    {
+        pixelFormat1bppIndexed = 1 | (1 << 8) | pixelFormatIndexed | pixelFormatGDI,
+        pixelFormat4bppIndexed = 2 | (4 << 8) | pixelFormatIndexed | pixelFormatGDI,
+        pixelFormat8bppIndexed = 3 | ( 8 << 8) | pixelFormatIndexed | pixelFormatGDI,
+        pixelFormat16bppGrayScale = 4 | (16 << 8) | pixelFormatExtended,
+        pixelFormat16bppRGB555 = 5 | (16 << 8) | pixelFormatGDI,
+        pixelFormat16bppRGB565 = 6 | (16 << 8) | pixelFormatGDI,
+        pixelFormat16bppARGB1555 = 7 | (16 << 8) | pixelFormatAlpha | pixelFormatGDI,
+        pixelFormat24bppRGB = 8 | (24 << 8) | pixelFormatGDI,
+        pixelFormat32bppRGB = 9 | (32 << 8) | pixelFormatGDI,
+        pixelFormat32bppARGB = 10 | (32 << 8) | pixelFormatAlpha | pixelFormatGDI | pixelFormatCanonical,
+        pixelFormat32bppPARGB = 11 | (32 << 8) | pixelFormatAlpha | pixelFormatPAlpha | pixelFormatGDI,
+        pixelFormat48bppRGB = 12 | (48 << 8) | pixelFormatExtended,
+        pixelFormat64bppARGB = 13 | (64 << 8) | pixelFormatAlpha | pixelFormatCanonical | pixelFormatExtended,
+        pixelFormat64bppPARGB = 14 | (64 << 8) | pixelFormatAlpha | pixelFormatPAlpha | pixelFormatExtended,
+        pixelFormat32bppCMYK = 15 | (32 << 8),
+        pixelFormatMax = 16
+    }
+
     public class Bitmap : Image
     {
         public nothrow Bitmap() : base()
@@ -2104,6 +2146,44 @@ namespace System.Windows
             Bitmap bitmap(WinGraphicsCreateBitmapResource(resourceName.Chars()));
             CheckGraphicsStatus(cast<GraphicsStatus>(WinGraphicsImageGetLastStatus(bitmap.NativeImage())));
             return bitmap;
+        }
+        public nothrow GraphicsStatus GetPixel(int x, int y, Color& color) const
+        {
+            return cast<GraphicsStatus>(WinGraphicsBitmapGetPixel(NativeImage(), x, y, color.alpha, color.red, color.green, color.blue));
+        }
+        public Color GetPixelChecked(int x, int y) const
+        {
+            Color color;
+            CheckGraphicsStatus(GetPixel(x, y, color));
+            return color;
+        }
+        public nothrow GraphicsStatus SetPixel(int x, int y, const Color& color)
+        {
+            return cast<GraphicsStatus>(WinGraphicsBitmapSetPixel(NativeImage(), x, y, color.alpha, color.red, color.green, color.blue));
+        }
+        public void SetPixelChecked(int x, int y, const Color& color)
+        {
+            CheckGraphicsStatus(SetPixel(x, y, color));
+        }
+        public Bitmap ToGrayBitmap(PixelFormat pixelFormat, const Color& bitmapTransparentColor)
+        {
+            int w = cast<int>(GetWidth());
+            int h = cast<int>(GetHeight());
+            Bitmap grayBitmap(WinGraphicsCloneBitmap(NativeImage(), 0, 0, w, h, pixelFormat));
+            for (int y = 0; y < h; ++y)
+            {
+                for(int x = 0; x < w; ++x)
+                {
+                    Color color = grayBitmap.GetPixelChecked(x, y);
+                    Color gray = color.ToGray(bitmapTransparentColor);
+                    grayBitmap.SetPixelChecked(x, y, gray); 
+                }
+            }
+            return grayBitmap;
+        }
+        public Bitmap ToGrayBitmap()
+        {
+            return ToGrayBitmap(PixelFormat.pixelFormat24bppRGB, Color.DefaultBitmapTransparent());
         }
         public ~Bitmap()
         {

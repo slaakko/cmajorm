@@ -12,6 +12,18 @@ using cmcode;
 
 namespace cmcode
 {
+    public void LogException(const Exception& ex)
+    {
+        try
+        {
+            StreamWriter errorWriter = File.CreateText("error.txt");
+            errorWriter << ex.ToString() << endl();
+        }
+        catch (const Exception&)
+        {
+        }
+    }
+
     public const uint defaultConfigSaveTimerPeriod = 3000u; // 3 seconds
 
     public System.Windows.WindowState MainWindowWindowState()
@@ -132,6 +144,11 @@ namespace cmcode
     nothrow System.Windows.Color SourceCodeViewSelectedFrameColor()
     {
         return System.Windows.Color.Blue();
+    }
+
+    nothrow System.Windows.Color ToolBarBorderColor()
+    {
+        return System.Windows.Color(204u, 206u, 219u);
     }
 
     string CmajorProjectDirectory()
@@ -308,6 +325,28 @@ namespace cmcode
             windowMenuItem->AddMenuItem(closeAllTabsMenuItem.Release());
             menuBar->AddMenuItem(windowMenuItem.Release());
             AddChild(menuBar.Release());
+            UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, Color.DefaultBitmapTransparent(), ToolBar.Style.regular, Padding(4, 4, 4, 4), Padding(2, 0, 2, 0)));
+            ToolBar* toolBar = toolBarPtr.Get();
+            UniquePtr<BorderedControl> borderedToolBar(new BorderedControl(
+                toolBarPtr.Release(), BorderStyle.single, ToolBarBorderColor(), ToolBarBorderColor(), Point(), toolBar->GetSize(), Dock.top, Anchors.none));
+            UniquePtr<ToolButton> saveButton(new ToolButton("cmcode.debug.save.bitmap"));
+            saveButton->SetToolTip("Save all");
+            saveButton->SetPadding(Padding(8, 8, 8, 8));
+            //saveButton->Disable();
+            toolBar->AddToolButton(saveButton.Release());
+            UniquePtr<ToolButtonSeparator> separator1(new ToolButtonSeparator());
+            toolBar->AddToolButton(separator1.Release());
+            UniquePtr<ToolButton> startButton(new ToolButton("cmcode.debug.start.bitmap"));
+            startButton->SetToolTip("Start debugging");
+            startButton->SetPadding(Padding(8, 8, 8, 8));
+            //startButton->Disable();
+            toolBar->AddToolButton(startButton.Release());
+            UniquePtr<ToolButton> stopButton(new ToolButton("cmcode.debug.stop.bitmap"));
+            stopButton->SetToolTip("Stop debugging");
+            stopButton->SetPadding(Padding(8, 8, 8, 8));
+            //stopButton->Disable();
+            toolBar->AddToolButton(stopButton.Release());
+            AddChild(borderedToolBar.Release());
             UniquePtr<SplitContainer> verticalSplitContainerPtr(new SplitContainer(Orientation.vertical, MainWindowVerticalSplitterDistance(),
                 Point(), Size(), Dock.fill, Anchors.none));
             verticalSplitContainer = verticalSplitContainerPtr.Get();
@@ -365,6 +404,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+                LogException(ex);
             }
         }
         protected override void OnWindowClosing(bool& cancelClose)
@@ -379,6 +419,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+                LogException(ex);
             }
         }
         protected override void OnTimer(TimerEventArgs& args)
@@ -409,6 +450,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+                LogException(ex);
             }
         }
         public override void OnLocationChanged()
@@ -421,6 +463,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+                LogException(ex);
             }
         }
         private void VerticalSplitterDistanceChanged()
@@ -432,6 +475,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+                LogException(ex);
             }
         }
         private void HorizontalSplitterDistanceChanged()
@@ -443,6 +487,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+                LogException(ex);
             }
         }
         private void CodeTabPageSelected()
@@ -527,6 +572,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+                LogException(ex);
             }
         }
         private void NewProjectClick()
@@ -538,6 +584,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
+                LogException(ex);
             }
         }
         private void OpenProjectClick()
@@ -592,6 +639,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
             }
         }
         private void CloseSolutionClick()
@@ -608,6 +656,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
             }
         }
         private void SaveClick()
@@ -619,6 +668,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
             }
         }
         private void ExitClick()
@@ -634,6 +684,7 @@ namespace cmcode
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
             }
         }
         private nothrow Cm.Views.CmajorEditor* GetEditorByTabPage(TabPage* tabPage) const
@@ -677,14 +728,7 @@ int main()
         Application.SetLogView(null);
         Cm.Views.Bitmaps.Instance().Clear();
         MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
-        try
-        {
-            StreamWriter errorWriter = File.CreateText("error.txt");
-            errorWriter << ex.ToString() << endl();
-        }
-        catch (const Exception&)
-        {
-        }
+        LogException(ex);
         return 1;
     }
     return 0;

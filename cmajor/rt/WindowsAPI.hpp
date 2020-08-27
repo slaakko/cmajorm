@@ -161,6 +161,9 @@ extern "C" RT_API void* WinGraphicsCreateBitmapWidthHeight(int w, int h, void* g
 extern "C" RT_API void* WinGraphicsCreateBitmapWinBitmap(void* winBitmap, void* palette);
 extern "C" RT_API void* WinGraphicsCreateBitmapIcon(void* icon);
 extern "C" RT_API void* WinGraphicsCreateBitmapResource(const char* resourceName);
+extern "C" RT_API void* WinGraphicsCloneBitmap(void* nativeBitmap, int x, int y, int w, int h, int pixelFormat);
+extern "C" RT_API int WinGraphicsBitmapGetPixel(void* nativeBitmap, int x, int y, uint8_t& alpha, uint8_t& red, uint8_t& green, uint8_t& blue);
+extern "C" RT_API int WinGraphicsBitmapSetPixel(void* nativeBitmap, int x, int y, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue);
 extern "C" RT_API uint32_t WinGraphicsSave(void* graphics);
 extern "C" RT_API int WinGraphicsRestore(void* graphics, uint32_t graphicsState);
 extern "C" RT_API void* WinGraphicsCreateDefaultImageAttributes();

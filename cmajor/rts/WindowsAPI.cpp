@@ -1105,6 +1105,29 @@ void* WinGraphicsCreateBitmapResource(const char* resourceName)
     return Bitmap::FromResource(applicationInstance, (const WCHAR*)rname.c_str());
 }
 
+void* WinGraphicsCloneBitmap(void* nativeBitmap, int x, int y, int w, int h, int pixelFormat)
+{
+    Gdiplus::PixelFormat format = static_cast<Gdiplus::PixelFormat>(pixelFormat);
+    return static_cast<Bitmap*>(nativeBitmap)->Clone(x, y, w, h, format);
+}
+
+int WinGraphicsBitmapGetPixel(void* nativeBitmap, int x, int y, uint8_t& alpha, uint8_t& red, uint8_t& green, uint8_t& blue)
+{
+    Gdiplus::Color color;
+    int status = static_cast<Bitmap*>(nativeBitmap)->GetPixel(x, y, &color);
+    alpha = color.GetAlpha();
+    red = color.GetRed();
+    green = color.GetGreen();
+    blue = color.GetBlue();
+    return status;
+}
+
+int WinGraphicsBitmapSetPixel(void* nativeBitmap, int x, int y, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue)
+{
+    Gdiplus::Color color(alpha, red, green, blue);
+    return static_cast<Bitmap*>(nativeBitmap)->SetPixel(x, y, color);
+}
+
 uint32_t WinGraphicsSave(void* graphics)
 {
     return static_cast<Graphics*>(graphics)->Save();
