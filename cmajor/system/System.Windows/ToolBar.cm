@@ -330,7 +330,7 @@ namespace System.Windows
                         }
                     }
                 }
-                if (mouseDownToolButton != null)
+                if (mouseDownToolButton != null && mouseDownToolButton->GetStyle() == ToolButton.Style.automatic)
                 {
                     mouseDownToolButton->SetState(ToolButton.State.normal);
                 }
@@ -528,12 +528,23 @@ namespace System.Windows
         {
             normal = 0, pressed = 1, disabled = 2
         }
-        public nothrow ToolButton(const string& toolBitmapName_) :
-            base(), state(State.normal), toolBitmapName(toolBitmapName_), toolBitmap(null), transparentColor(Color.DefaultBitmapTransparent()),
-            padding(DefaultPadding())
+        public enum Style : sbyte
+        {
+            automatic, manual
+        }
+        public nothrow ToolButton(const string& toolBitmapName_, Style style_) :
+            base(), state(State.normal), toolBitmapName(toolBitmapName_), toolBitmap(null), transparentColor(Color.DefaultBitmapTransparent()), padding(DefaultPadding()),
+            style(style_)
+        {
+        }
+        public nothrow ToolButton(const string& toolBitmapName) : this(toolBitmapName, Style.automatic)
         {
         }
         public default virtual ~ToolButton();
+        public nothrow inline Style GetStyle() const
+        {
+            return style;
+        }
         public nothrow void Enable()
         {
             if (state == State.disabled)
@@ -859,6 +870,7 @@ namespace System.Windows
             }
         }
         private State state;
+        private Style style;
         private string toolBitmapName;
         private Bitmap* toolBitmap;
         private Bitmap* disabledToolBitmap;
