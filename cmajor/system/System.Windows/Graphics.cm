@@ -87,10 +87,18 @@ namespace System.Windows
         public nothrow Color ToGray(const Color& transparentColor) const
         {
             if (*this == transparentColor) return *this;
+            byte g = cast<byte>((cast<int>(red) + cast<int>(green) + cast<int>(blue) + 2 * 255) / 5);
+            return Color(alpha, g, g, g);
+        }
+/*
+        public nothrow Color ToGray(const Color& transparentColor) const
+        {
+            if (*this == transparentColor) return *this;
             int s = cast<int>(red) * 299 + cast<int>(green) * 587 + cast<int>(blue) * 114;
             byte g = cast<byte>(s / 1000);
             return Color(alpha, g, g, g);
         }
+*/
         public nothrow Color ToGray() const
         {
             return ToGray(Color(0u, 255u, 255u, 255u));

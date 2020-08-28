@@ -1,0 +1,36 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace cmcode
+{
+    public class SetActiveProjectAction : ClickAction
+    {
+        public nothrow SetActiveProjectAction(Window* window_, TreeView* treeView_, SolutionExplorerData* solutionExplorerData_, Cm.Ast.Solution* solution_,
+            Cm.Ast.Project* project_, TreeViewNode* newActiveProjectNode_) :
+            base(), window(window_), treeView(treeView_), solutionExplorerData(solutionExplorerData_), solution(solution_), project(project_),
+            newActiveProjectNode(newActiveProjectNode_)
+        {
+        }
+        public override void Execute()
+        {
+            TreeViewNode* activeProjectNode = solutionExplorerData->GetActiveProjectNode();
+            activeProjectNode->SetActive(false);
+            newActiveProjectNode->SetActive(true);
+            solutionExplorerData->SetActiveProjectNode(newActiveProjectNode);
+            solution->SetActiveProject(project);
+            window->HideContextMenu();
+            treeView->Invalidate();
+        }
+        private Window* window;
+        private TreeView* treeView;
+        private SolutionExplorerData* solutionExplorerData;
+        private Cm.Ast.Solution* solution;
+        private Cm.Ast.Project* project;
+        private TreeViewNode* newActiveProjectNode;
+    }
+}

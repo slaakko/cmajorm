@@ -157,26 +157,30 @@ namespace cmcode
         return Path.Combine(cmajorRootDir, "projects");
     }
 
-    UniquePtr<Cm.Ast.Project> ReadProject(const string& projectFilePath)
+    UniquePtr<Cm.Ast.Project> ReadProject(const string& projectFilePath, List<UniquePtr<ustring>>& contents)
     {
-        ustring content = ToUtf32(File.ReadAllText(projectFilePath));
-        ContainerFileLexer lexer(content, projectFilePath, 0);
+        UniquePtr<ustring> content(new ustring(ToUtf32(File.ReadAllText(projectFilePath))));
+        ContainerFileLexer lexer(content->Chars(), content->Chars() + content->Length(), projectFilePath, 0);
         UniquePtr<Cm.Ast.Project> project = ProjectFileParser.Parse(lexer, "debug", Cm.Ast.BackEnd.llvm);
         project->ResolveDeclarations();
+        contents.Add(Rvalue(content));
         return project;
     }
 
-    UniquePtr<Cm.Ast.Solution> ReadSolution(const string& solutionFilePath)
+    UniquePtr<Cm.Ast.Solution> ReadSolution(const string& solutionFilePath, List<UniquePtr<ustring>>& contents)
     {
-        ustring content = ToUtf32(File.ReadAllText(solutionFilePath));
-        ContainerFileLexer lexer(content, solutionFilePath, 0);
-        UniquePtr<Cm.Ast.Solution> solution = SolutionFileParser.Parse(lexer);
+        UniquePtr<ustring> content(new ustring(ToUtf32(File.ReadAllText(solutionFilePath))));
+        LogView* logView = Application.GetLogView();
+        logView->WriteLine(ToUtf8(*content));
+        ContainerFileLexer lexer(content->Chars(), content->Chars() + content->Length(), solutionFilePath, 0);
+        UniquePtr<Cm.Ast.Solution> solution(SolutionFileParser.Parse(lexer));
         solution->ResolveDeclarations();
         for (const string& projectFilePath : solution->ProjectFilePaths())
         {
-            UniquePtr<Cm.Ast.Project> project = ReadProject(projectFilePath);
+            UniquePtr<Cm.Ast.Project> project = ReadProject(projectFilePath, contents);
             solution->AddProject(Rvalue(project));
         }
+        contents.Add(Rvalue(content));
         return solution;
     }
 
@@ -229,13 +233,52 @@ namespace cmcode
         public nothrow SolutionExplorerData()
         {
         }
+        public nothrow inline TreeViewNode* GetActiveProjectNode() const
+        {
+            return activeProjectNode;
+        }
+        public nothrow void SetActiveProjectNode(TreeViewNode* activeProjectNode_)
+        {
+            activeProjectNode = activeProjectNode_;
+        }
         public List<UniquePtr<TreeViewNodeData>> treeViewData;
         public HashMap<string, TreeViewNodeData*> treeViewDataMap;
         public BreakpointCollection breakpointCollection;
+        private TreeViewNode* activeProjectNode;
     }
 
-    UniquePtr<TreeViewNode> BuildSolutionTree(Cm.Ast.Solution* solution, UniquePtr<SolutionExplorerData>& solutionExplorerData)
+    void SetActiveProject(Cm.Ast.Solution* solution)
     {
+        if (solution->ActiveProjectName().IsEmpty())
+        {
+            if (!solution->Projects().IsEmpty())
+            {
+                solution->SetActiveProject(solution->Projects()[0].Get());
+            }
+        }
+        else
+        {
+            for (const UniquePtr<Cm.Ast.Project>& project : solution->Projects())
+            {
+                if (project->Name() == solution->ActiveProjectName())
+                {
+                    solution->SetActiveProject(project.Get());
+                    break;
+                }
+            }
+        }
+        if (solution->ActiveProject() == null)
+        {
+            if (!solution->Projects().IsEmpty())
+            {
+                solution->SetActiveProject(solution->Projects()[0].Get());
+            }
+        }
+    }
+
+    UniquePtr<TreeViewNode> BuildSolutionTree(Cm.Ast.Solution* solution, UniquePtr<SolutionExplorerData>& solutionExplorerData, const List<UniquePtr<ustring>>& contents)
+    {
+        SetActiveProject(solution);
         UniquePtr<SolutionExplorerData> newSolutionExplorerData(new SolutionExplorerData());
         string solutionName = ToUtf8(solution->Name());
         UniquePtr<TreeViewNode> solutionNode(new TreeViewNode(solutionName));
@@ -248,6 +291,11 @@ namespace cmcode
             UniquePtr<TreeViewNode> projectNode(new TreeViewNode(projectName));
             UniquePtr<TreeViewNodeData> projectData(new TreeViewNodeData(TreeViewNodeData.Kind.project, solution, project.Get(), string(), string()));
             projectNode->SetData(projectData.Get());
+            if (project.Get() == solution->ActiveProject())
+            {
+                newSolutionExplorerData->SetActiveProjectNode(projectNode.Get());
+                projectNode->SetActive(true);
+            }
             newSolutionExplorerData->treeViewData.Add(Rvalue(projectData));
             List<UniquePtr<TreeViewNodeData>> fileData;
             for (const string& sourceFilePath : project->SourceFilePaths())
@@ -303,17 +351,18 @@ namespace cmcode
             openMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.o));
             openMenuItem->ClickEvent().AddHandler(OpenProjectClick);
             fileMenuItem->AddMenuItem(openMenuItem.Release());
-            UniquePtr<MenuItem> closeMenuItemPtr(new MenuItem("&Close Solution"));
-            closeMenuItem = closeMenuItemPtr.Get();
-            closeMenuItem->Disable();
-            closeMenuItem->ClickEvent().AddHandler(CloseSolutionClick);
-            fileMenuItem->AddMenuItem(closeMenuItemPtr.Release());
+            UniquePtr<MenuItem> closeSolutionMenuItemPtr(new MenuItem("&Close Solution"));
+            closeSolutionMenuItem = closeSolutionMenuItemPtr.Get();
+            closeSolutionMenuItem->ClickEvent().AddHandler(CloseSolutionClick);
+            fileMenuItem->AddMenuItem(closeSolutionMenuItemPtr.Release());
             UniquePtr<MenuItem> saveMenuItemPtr(new MenuItem("&Save"));
             saveMenuItem = saveMenuItemPtr.Get();
             saveMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.s));
-            saveMenuItem->Disable();
             saveMenuItem->ClickEvent().AddHandler(SaveClick);
-            fileMenuItem->AddMenuItem(saveMenuItemPtr.Release());
+            UniquePtr<MenuItem> saveAllMenuItemPtr(new MenuItem("Save A&ll"));
+            saveAllMenuItem = saveAllMenuItemPtr.Get();
+            saveAllMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.shiftModifier | Keys.s));
+            fileMenuItem->AddMenuItem(saveAllMenuItemPtr.Release());
             UniquePtr<MenuItem> exitMenuItem(new MenuItem("E&xit"));
             exitMenuItem->SetShortcut(cast<Keys>(Keys.altModifier | Keys.f4));
             exitMenuItem->ClickEvent().AddHandler(ExitClick);
@@ -326,31 +375,60 @@ namespace cmcode
             menuBar->AddMenuItem(windowMenuItem.Release());
             AddChild(menuBar.Release());
             UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, Color.DefaultBitmapTransparent(), ToolBar.Style.regular, Padding(4, 4, 4, 4), Padding(2, 0, 2, 0)));
-            ToolBar* toolBar = toolBarPtr.Get();
+            toolBar = toolBarPtr.Get();
             UniquePtr<BorderedControl> borderedToolBar(new BorderedControl(
                 toolBarPtr.Release(), BorderStyle.single, ToolBarBorderColor(), ToolBarBorderColor(), Point(), toolBar->GetSize(), Dock.top, Anchors.none));
-            UniquePtr<ToolButton> saveButton(new ToolButton("cmcode.save.bitmap"));
-            saveButton->SetToolTip("Save all");
-            saveButton->SetPadding(Padding(8, 8, 8, 8));
-            saveButton->Disable();
-            toolBar->AddToolButton(saveButton.Release());
-            UniquePtr<ToolButton> buildButton(new ToolButton("cmcode.build.bitmap"));
-            buildButton->SetToolTip("Build current project");
-            buildButton->SetPadding(Padding(8, 8, 8, 8));
-            buildButton->Disable();
-            toolBar->AddToolButton(buildButton.Release());
+            UniquePtr<ToolButton> saveToolButtonPtr(new ToolButton("cmcode.save.bitmap"));
+            saveToolButton = saveToolButtonPtr.Get();
+            saveToolButton->SetToolTip("Save (Ctrl+S)");
+            saveToolButton->SetPadding(Padding(8, 8, 8, 8));
+            toolBar->AddToolButton(saveToolButtonPtr.Release());
+
+            UniquePtr<ToolButton> saveAllToolButtonPtr(new ToolButton("cmcode.save.all.bitmap"));
+            saveAllToolButton = saveAllToolButtonPtr.Get();
+            saveAllToolButton->SetToolTip("Save all (Ctrl+Shift+S)");
+            saveAllToolButton->SetPadding(Padding(6, 6, 6, 6));
+            toolBar->AddToolButton(saveAllToolButtonPtr.Release());
+
             UniquePtr<ToolButtonSeparator> separator1(new ToolButtonSeparator());
             toolBar->AddToolButton(separator1.Release());
-            UniquePtr<ToolButton> startButton(new ToolButton("cmcode.debug.start.bitmap"));
-            startButton->SetToolTip("Start debugging");
-            startButton->SetPadding(Padding(8, 8, 8, 8));
-            startButton->Disable();
-            toolBar->AddToolButton(startButton.Release());
-            UniquePtr<ToolButton> stopButton(new ToolButton("cmcode.debug.stop.bitmap"));
-            stopButton->SetToolTip("Stop debugging");
-            stopButton->SetPadding(Padding(8, 8, 8, 8));
-            stopButton->Disable();
-            toolBar->AddToolButton(stopButton.Release());
+
+            UniquePtr<ToolButton> buildSolutionToolButtonPtr(new ToolButton("cmcode.build.solution.bitmap"));
+            buildSolutionToolButton = buildSolutionToolButtonPtr.Get();
+            buildSolutionToolButton->SetToolTip("Build solution (F7)");
+            buildSolutionToolButton->SetPadding(Padding(8, 8, 8, 8));
+            toolBar->AddToolButton(buildSolutionToolButtonPtr.Release());
+
+            UniquePtr<ToolButton> buildProjectToolButtonPtr(new ToolButton("cmcode.build.project.bitmap"));
+            buildProjectToolButton = buildProjectToolButtonPtr.Get();
+            buildProjectToolButton->SetToolTip("Build active project (Ctrl+B)");
+            buildProjectToolButton->SetPadding(Padding(8, 8, 8, 8));
+            toolBar->AddToolButton(buildProjectToolButtonPtr.Release());
+
+            UniquePtr<ToolButtonSeparator> separator2(new ToolButtonSeparator());
+            toolBar->AddToolButton(separator2.Release());
+
+            UniquePtr<ToolButton> startDebuggingToolButtonPtr(new ToolButton("cmcode.debug.start.bitmap"));
+            startDebuggingToolButton = startDebuggingToolButtonPtr.Get();
+            startDebuggingToolButton->SetToolTip("Start debugging (F5)");
+            startDebuggingToolButton->SetPadding(Padding(8, 8, 8, 8));
+            toolBar->AddToolButton(startDebuggingToolButtonPtr.Release());
+
+            UniquePtr<ToolButton> stopDebuggingToolButtonPtr(new ToolButton("cmcode.debug.stop.bitmap"));
+            stopDebuggingToolButton = stopDebuggingToolButtonPtr.Get();
+            stopDebuggingToolButton->SetToolTip("Stop debugging (Shift+F5)");
+            stopDebuggingToolButton->SetPadding(Padding(8, 8, 8, 8));
+            toolBar->AddToolButton(stopDebuggingToolButtonPtr.Release());
+
+            UniquePtr<ToolButtonSeparator> separator3(new ToolButtonSeparator());
+            toolBar->AddToolButton(separator3.Release());
+
+            UniquePtr<ToolButton> showNextStatementToolButtonPtr(new ToolButton("cmcode.debug.show.next.statement.bitmap"));
+            showNextStatementToolButton = showNextStatementToolButtonPtr.Get();
+            showNextStatementToolButton->SetToolTip("Show next statement");
+            showNextStatementToolButton->SetPadding(Padding(8, 8, 8, 8));
+            toolBar->AddToolButton(showNextStatementToolButtonPtr.Release());
+
             AddChild(borderedToolBar.Release());
             UniquePtr<SplitContainer> verticalSplitContainerPtr(new SplitContainer(Orientation.vertical, MainWindowVerticalSplitterDistance(),
                 Point(), Size(), Dock.fill, Anchors.none));
@@ -369,6 +447,7 @@ namespace cmcode
                 Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             UniquePtr<TreeView> solutionExplorerTreeViewPtr(new TreeView(Point(), Size(), Dock.fill, Anchors.none));
             solutionExplorerTreeView = solutionExplorerTreeViewPtr.Get();
+            solutionExplorerTreeView->NodeClickEvent().AddHandler(TreeViewNodeClick);
             solutionExplorerTreeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
             UniquePtr<Control> paddedTreeView(new PaddedControl(solutionExplorerTreeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> borderedTreeView(new BorderedControl(paddedTreeView.Release(), BorderStyle.single, TreeViewNormalBorderColor(), TreeViewSelectedBorderColor(),
@@ -396,21 +475,10 @@ namespace cmcode
             sourceFilePathStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
             statusBar->AddItem(sourceFilePathStatusBarItem);
             AddChild(statusBar);
-        }
-        public override void OnShown()
-        {
-            try
-            {
-                base->OnShown();
-                MainConfiguration.Instance().SetMainWindowLocation(Location());
-                MainConfiguration.Instance().SetMainWindowSize(GetSize());
-                SetTimer(1u, defaultConfigSaveTimerPeriod);
-            }
-            catch (const Exception& ex)
-            {
-                MessageBox.Show(ex.Message());
-                LogException(ex);
-            }
+            SetControlStatus();
+            MainConfiguration.Instance().SetMainWindowLocation(Location());
+            MainConfiguration.Instance().SetMainWindowSize(GetSize());
+            SetTimer(1u, defaultConfigSaveTimerPeriod);
         }
         protected override void OnWindowClosing(bool& cancelClose)
         {
@@ -437,7 +505,7 @@ namespace cmcode
             {
             }
         }
-        public override void OnSizeChanged(uint windowState)
+        protected override void OnSizeChanged(uint windowState)
         {
             try
             {
@@ -458,12 +526,52 @@ namespace cmcode
                 LogException(ex);
             }
         }
-        public override void OnLocationChanged()
+        protected override void OnLocationChanged()
         {
             try
             {
                 base->OnLocationChanged();
                 MainConfiguration.Instance().SetMainWindowLocation(Location());
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+                LogException(ex);
+            }
+        }
+        protected override void OnKeyDown(KeyEventArgs& args)
+        {
+            try
+            {
+                base->OnKeyDown(args);
+                if (!args.handled)
+                {
+                    switch (args.keyData)
+                    {
+                        case Keys.escape:
+                        {
+                            RemoveContextMenu();
+                            args.handled = true;
+                            break;
+                        }
+                    }
+
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+                LogException(ex);
+            }
+        }
+        protected override void MouseUpNotification(MouseEventArgs& args)
+        {
+            try
+            {
+                if (args.buttons == MouseButtons.lbutton)
+                {
+                    RemoveContextMenu();
+                }
             }
             catch (const Exception& ex)
             {
@@ -528,6 +636,39 @@ namespace cmcode
                 sourceCodeView->GetDebugStrip()->SetDebugLocation(span);
                 sourceCodeView->GetDebugStrip()->Invalidate();
                 sourceCodeView->Invalidate();
+            }
+        }
+        private void TreeViewNodeClick(TreeViewNodeMouseClickEventArgs& args)
+        {
+            try
+            {
+                if (args.buttons == MouseButtons.rbutton)
+                {
+                    TreeViewNode* node = args.node;
+                    TreeViewNodeData* data = cast<TreeViewNodeData*>(node->Data());
+                    if (data->kind == TreeViewNodeData.Kind.project)
+                    {
+                        Cm.Ast.Project* project = data->project;
+                        UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+                        if (solution->ActiveProject() != project)
+                        {
+                            MenuItem* setActiveMenuItem = new MenuItem("Set Active");
+                            contextMenu->AddMenuItemAction(setActiveMenuItem, new SetActiveProjectAction(this, solutionExplorerTreeView, solutionExplorerData.Get(),
+                                solution.Get(), project, node)); 
+                        }
+                        if (contextMenu->HasMenuItems())
+                        {
+                            Point loc = args.location;
+                            Point screenLoc = solutionExplorerTreeView->ClientToScreen(loc);
+                            ShowContextMenu(contextMenu.Release(), screenLoc);
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+                LogException(ex);
             }
         }
         private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
@@ -608,6 +749,7 @@ namespace cmcode
                     OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
                 if (selected)
                 {
+                    List<UniquePtr<ustring>> contents;
                     if (!fileNames.IsEmpty())
                     {
                         filePath = Path.Combine(currentDirectory, fileNames[0]);
@@ -617,12 +759,13 @@ namespace cmcode
                         string ext = Path.GetExtension(filePath);
                         if (ext == ".cms")
                         {
-                            solution = ReadSolution(filePath);
+                            solution = ReadSolution(filePath, contents);
                         }
                         else if (ext == ".cmp")
                         {
-                            UniquePtr<Cm.Ast.Project> project = ReadProject(filePath);
+                            UniquePtr<Cm.Ast.Project> project = ReadProject(filePath, contents);
                             solution.Reset(new Cm.Ast.Solution(project->Name(), Path.ChangeExtension(filePath, ".cms")));
+                            solution->SetActiveProject(project.Get());
                             solution->AddProject(Rvalue(project));
                         }
                         else
@@ -635,10 +778,9 @@ namespace cmcode
                         throw Exception("file path is empty or does not exist");
                     }
                     codeTabControl->CloseAllTabPages();
-                    UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData);
+                    UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData, contents);
                     solutionExplorerTreeView->SetRoot(root.Release());
-                    closeMenuItem->Enable();
-                    saveMenuItem->Enable();
+                    SetControlStatus();
                 }
             }
             catch (const Exception& ex)
@@ -654,8 +796,7 @@ namespace cmcode
                 codeTabControl->CloseAllTabPages();
                 solutionExplorerTreeView->SetRoot(null);
                 solutionExplorerData.Reset();
-                closeMenuItem->Disable();
-                saveMenuItem->Disable();
+                SetControlStatus();
                 Invalidate();
             }
             catch (const Exception& ex)
@@ -704,17 +845,70 @@ namespace cmcode
                 return null;
             }
         }
+
+        private void SetControlStatus()
+        {
+            saveToolButton->Disable();
+            saveAllToolButton->Disable();
+            buildSolutionToolButton->Disable();
+            buildProjectToolButton->Disable();
+            startDebuggingToolButton->Disable();
+            stopDebuggingToolButton->Disable();
+            showNextStatementToolButton->Disable();
+
+            closeSolutionMenuItem->Disable();
+            saveAllMenuItem->Disable();
+
+            bool solutionOpen = !solutionExplorerData.IsNull();
+            if (solutionOpen)
+            {
+                saveAllToolButton->Enable();
+                buildSolutionToolButton->Enable();
+                buildProjectToolButton->Enable();
+                startDebuggingToolButton->Enable();
+                closeSolutionMenuItem->Enable();
+                saveAllMenuItem->Enable();
+            }
+
+            TabPage* selectedCodeTabPage = codeTabControl->SelectedTabPage();
+            if (selectedCodeTabPage != null)
+            {
+                Cm.Views.CmajorEditor* editor = GetEditorByTabPage(selectedCodeTabPage);
+                if (editor != null)
+                {
+                    if (editor->Dirty())
+                    {
+                        saveToolButton->Enable();
+                        saveMenuItem->Enable();
+                    }
+                }
+            }
+
+            toolBar->Invalidate();
+        }
+
         private SplitContainer* verticalSplitContainer;
         private SplitContainer* horizontalSplitContainer;
         private UniquePtr<Cm.Ast.Solution> solution;
         private TabControl* codeTabControl;
         private TabControl* outputTabControl;
+        private ToolBar* toolBar;
         private TreeView* solutionExplorerTreeView;
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
-        private MenuItem* closeMenuItem;
-        private MenuItem* saveMenuItem;
         private StatusBarItem* sourceFilePathStatusBarItem;
         private HashMap<TabPage*, Cm.Views.CmajorEditor*> editorByTabPageMap;
+
+        private MenuItem* closeSolutionMenuItem;
+        private MenuItem* saveMenuItem;
+        private MenuItem* saveAllMenuItem;
+
+        private ToolButton* saveToolButton;
+        private ToolButton* saveAllToolButton;
+        private ToolButton* buildSolutionToolButton;
+        private ToolButton* buildProjectToolButton;
+        private ToolButton* startDebuggingToolButton;
+        private ToolButton* stopDebuggingToolButton;
+        private ToolButton* showNextStatementToolButton;
     }
 }
 

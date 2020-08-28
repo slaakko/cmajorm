@@ -27,6 +27,7 @@ namespace System.Windows
         public static int Run(Window& mainWindow)
         {
             mainWindow.SetAsMainWindow();
+            SetMainWindow(&mainWindow);
             switch (mainWindow.GetWindowState())
             {
                 case WindowState.normal:
@@ -115,9 +116,18 @@ namespace System.Windows
         {
             activeWindow = activeWindow_;
         }
+        public static nothrow Window* MainWindow()
+        {
+            return mainWindow;
+        }
+        public static nothrow void SetMainWindow(Window* w)
+        {
+            mainWindow = w;
+        }
         private static WindowManager windowManager;
         private static ResourceManager resourceManager;
         private static LogView* logView;
         private static Window* activeWindow;
+        private static Window* mainWindow;
     }
 }

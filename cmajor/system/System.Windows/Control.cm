@@ -1587,6 +1587,11 @@ namespace System.Windows
                     this->OnClick();
                 }
             }
+            Window* mainWindow = Application.MainWindow();
+            if (mainWindow != null)
+            {
+                mainWindow->MouseUpNotificationInternal(args);
+            }
         }
         private void DoMouseDoubleClick(MouseEventArgs& args)
         {

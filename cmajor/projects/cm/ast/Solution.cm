@@ -129,6 +129,15 @@ namespace Cm.Ast
         {
             return activeProjectName;
         }
+        public void SetActiveProject(Project* activeProject_)
+        {
+            activeProject = activeProject_;
+            activeProjectName = activeProject->Name();
+        }
+        public nothrow Project* ActiveProject() const
+        {
+            return activeProject;
+        }
         public void AddProject(UniquePtr<Project>&& project)
         {
             projects.Add(Rvalue(project));
@@ -269,6 +278,7 @@ namespace Cm.Ast
         private List<string> projectFilePaths;
         private List<string> relativeProjectFilePaths;
         private ustring activeProjectName;
+        private Project* activeProject;
         private List<UniquePtr<Project>> projects;
         private List<UniquePtr<SolutionDeclaration>> declarations;
         private HashMap<ustring, ProjectDependencyDeclaration*> dependencyMap;

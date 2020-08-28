@@ -17,17 +17,20 @@ namespace System.Windows
         {
             none = 0, changed = 1 << 0, treeViewNodeChanged = 1 << 1, treeViewNodeStateChanged = 1 << 2, toolTipWindowAdded = 1 << 3
         }
-        public TreeView(const Font& font_, const Color& backgroundColor, const Color& stateIndicatorColor_, const Color& nodeSelectedColor_, const Color& textColor_,
+        public TreeView(const Font& normalNodeFont_, const Font& activeNodeFont_,
+            const Color& backgroundColor, const Color& stateIndicatorColor_, const Color& nodeSelectedColor_, const Color& textColor_,
             const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.TreeView", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, "treeView",
-                location, size, dock, anchors), flags(Flags.none), root(), font(font_), textHeight(0), stateIndicatorPercentage(50.0f),
+                location, size, dock, anchors), flags(Flags.none), root(), normalNodeFont(normalNodeFont_), activeNodeFont(activeNodeFont_),
+                textHeight(0), stateIndicatorPercentage(50.0f),
                 stateIndicatorColor(stateIndicatorColor_), nodeSelectedColor(nodeSelectedColor_), nodeSelectedBrush(nodeSelectedColor), textColor(textColor_), textBrush(textColor), 
                 format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5), selectedNode(null), trackedNode(null), toolTipWindow(new ToolTip())
         {
             SetChanged();
         }
         public TreeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            this(Font(FontFamily("Segoe UI"), 9.0f), Color.White(), Color.Red(), Color(201u, 222u, 245u), Color.Black(), location, size, dock, anchors)
+            this(Font(FontFamily("Segoe UI"), 9.0f), Font(FontFamily("Segoe UI"), 9.0f, FontStyle.bold, Unit.point),
+            Color.White(), Color.Red(), Color(201u, 222u, 245u), Color.Black(), location, size, dock, anchors)
         {
         }
         public ~TreeView()
@@ -168,13 +171,22 @@ namespace System.Windows
             }
             Invalidate();
         }
-        public nothrow inline const Font& GetFont() const
+        public nothrow inline const Font& GetNormalNodeFont() const
         {
-            return font;
+            return normalNodeFont;
         }
-        public nothrow void SetFont(const Font& font_)
+        public nothrow inline const Font& GetActiveNodeFont() const
         {
-            font = font_;
+            return activeNodeFont;
+        }
+        public nothrow void SetNormalNodeFont(const Font& normalNodeFont_)
+        {
+            normalNodeFont = normalNodeFont_;
+            SetChanged();
+        }
+        public nothrow void SetActiveNodeFont(const Font& activeNodeFont_)
+        {
+            activeNodeFont = activeNodeFont_;
             SetChanged();
         }
         public nothrow inline const SolidBrush& TextBrush() const
@@ -431,8 +443,10 @@ namespace System.Windows
         private void Measure(Graphics& graphics)
         {
             string s = "RootNode";
-            RectF textRect = graphics.MeasureStringChecked(s, font, PointF(0, 0), format);
-            textHeight = textRect.size.h;
+            RectF normalTextRect = graphics.MeasureStringChecked(s, normalNodeFont, PointF(0, 0), format);
+            textHeight = normalTextRect.size.h;
+            RectF activeTextRect = graphics.MeasureStringChecked(s, activeNodeFont, PointF(0, 0), format);
+            textHeight = Max(textHeight, activeTextRect.size.h);
             stateIndicatorHeight = stateIndicatorPercentage * textHeight / 100.0f;
             SetScrollUnits(cast<int>(textHeight), cast<int>(textHeight));
         }
@@ -621,7 +635,8 @@ namespace System.Windows
         }
         private Flags flags;
         private UniquePtr<TreeViewNode> root;
-        private Font font;
+        private Font normalNodeFont;
+        private Font activeNodeFont;
         private float textHeight;
         private float stateIndicatorPercentage;
         private float stateIndicatorHeight;
@@ -652,7 +667,7 @@ namespace System.Windows
         }
         private enum Flags : sbyte
         {
-            none = 0, mouseEntered = 1 << 0, selected = 1 << 1
+            none = 0, mouseEntered = 1 << 0, selected = 1 << 1, active = 1 << 2
         }
         public nothrow TreeViewNode(const string& text_) : treeView(null), text(text_), children(this), state(State.collapsed), flags(Flags.none)
         {
@@ -718,7 +733,7 @@ namespace System.Windows
         }
         internal nothrow void MeasureSize(Graphics& graphics, TreeView* treeView)
         {
-            RectF textRect = graphics.MeasureStringChecked(text, treeView->GetFont(), PointF(0, 0), treeView->Format());
+            RectF textRect = graphics.MeasureStringChecked(text, treeView->GetNormalNodeFont(), PointF(0, 0), treeView->Format());
             size = Size(cast<int>(textRect.size.w), cast<int>(textRect.size.h));
             Component* child = children.FirstChild();
             while (child != null)
@@ -931,6 +946,14 @@ namespace System.Windows
                     }
                 }
             }
+            else if (args.buttons == MouseButtons.rbutton)
+            {
+                TreeView* view = GetTreeView();
+                if (view != null)
+                {
+                    view->NodeClick(args.location, args.buttons, this);
+                }
+            }
         }
         private void OnMouseDoubleClick(MouseEventArgs& args)
         {
@@ -1133,7 +1156,14 @@ namespace System.Windows
                 Rect rect(loc, size);
                 graphics.FillRectangleChecked(treeView->NodeSelectedBrush(), rect);
             }
-            graphics.DrawStringChecked(text, treeView->GetFont(), PointF(loc.x, loc.y), treeView->TextBrush());
+            if (Active())
+            {
+                graphics.DrawStringChecked(text, treeView->GetActiveNodeFont(), PointF(loc.x, loc.y), treeView->TextBrush());
+            }
+            else
+            {
+                graphics.DrawStringChecked(text, treeView->GetNormalNodeFont(), PointF(loc.x, loc.y), treeView->TextBrush());
+            }
             if (state == State.expanded)
             {
                 Component* child = children.FirstChild();
@@ -1171,6 +1201,29 @@ namespace System.Windows
         internal nothrow inline void ResetSelected()
         {
             flags = cast<Flags>(flags & ~Flags.selected);
+        }
+        public nothrow inline bool Active() const
+        {
+            return (flags & Flags.active) != Flags.none;
+        }
+        public nothrow void SetActive(bool active)
+        {
+            if (Active() != active)
+            {
+                if (active)
+                {
+                    flags = cast<Flags>(flags | Flags.active);
+                }
+                else
+                {
+                    flags = cast<Flags>(flags & ~Flags.active);
+                }
+                TreeView* view = GetTreeView();
+                if (view != null)
+                {
+                    view->SetTreeViewNodeStateChanged();
+                }
+            }
         }
         private TreeView* treeView;
         private string text;

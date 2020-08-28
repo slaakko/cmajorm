@@ -531,9 +531,22 @@ namespace System.Windows
         public nothrow void ShowContextMenu(ContextMenu* contextMenu_, const Point& ptInScreenCoords)
         {
             SetContextMenu(contextMenu_);
+            Point windowLoc = Location();
+            Size windowSize = GetSize();
+            Point windowEdgeLoc(windowLoc.x + windowSize.w, windowLoc.y + windowSize.h);
+            Point screenWindowEdgeLoc = ClientToScreen(windowEdgeLoc);
+            contextMenu->CalculateSize();
+            Size contextMenuSize = contextMenu->GetSize();
+            if (ptInScreenCoords.x + contextMenuSize.w >= screenWindowEdgeLoc.x)
+            {
+                ptInScreenCoords.Offset(-contextMenuSize.w, 0);
+            }
+            if (ptInScreenCoords.y + contextMenuSize.h >= screenWindowEdgeLoc.y)
+            {
+                ptInScreenCoords.Offset(0, -contextMenuSize.h);
+            }
             Point loc = ScreenToClient(ptInScreenCoords);
             contextMenu->SetLocation(loc);
-            contextMenu->CalculateSize();
             contextMenu->BringToFront();
             contextMenu->Show();
             contextMenu->Invalidate();
@@ -764,6 +777,13 @@ namespace System.Windows
         public nothrow void SetCancelButton(Button* cancelButton_)
         {
             cancelButton = cancelButton_;
+        }
+        internal void MouseUpNotificationInternal(MouseEventArgs& args)
+        {
+            MouseUpNotification(args);
+        }
+        protected virtual void MouseUpNotification(MouseEventArgs& args)
+        {
         }
         private nothrow inline bool ShowingDialog() const
         {
