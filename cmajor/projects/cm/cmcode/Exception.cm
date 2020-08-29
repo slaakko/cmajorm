@@ -1,0 +1,22 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace cmcode
+{
+    public void LogException(const Exception& ex)
+    {
+        try
+        {
+            StreamWriter errorWriter = File.CreateText("error.txt");
+            errorWriter << ex.ToString() << endl();
+        }
+        catch (const Exception&)
+        {
+        }
+    }
+}

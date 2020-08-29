@@ -25,7 +25,8 @@ namespace System.Windows
             toolButtonHeight(toolButtonHeight_), darkColor(Color(100u, 100u, 100u)), lightColor(Color.White()), mediumLightColor(227u, 227u, 227u),
             mediumDarkColor(160u, 160u, 160u), disabledColor(Color(204u, 204u, 207u)),
             toolButtonSeparatorColor1(204u, 206u, 219u), toolButtonSeparatorColor2(245u, 245u, 245u), mouseInToolButton(null), mouseDownToolButton(null),
-            pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip()), padding(padding_), buttonPadding(buttonPadding_), toolButtons(this)
+            pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip()), padding(padding_), buttonPadding(buttonPadding_), toolButtons(this),
+            centerFormat(StringAlignment.center, StringAlignment.center)
         {
         }
         public ToolBar(int toolButtonHeight, const Color& toolButtonTransparentColor, Style style, const Padding& padding, const Padding& buttonPadding) :
@@ -38,6 +39,18 @@ namespace System.Windows
         }
         public ToolBar() : this(Style.regular)
         {
+        }
+        public void SetTextToolButtonFont(const Font& textToolButtonFont_)
+        {
+            textToolButtonFont = textToolButtonFont_;
+        }
+        public nothrow inline const Font& GetTextToolButtonFont() const
+        {
+            return textToolButtonFont;
+        }
+        public nothrow inline const StringFormat& CenterFormat() const
+        {
+            return centerFormat;
         }
         public nothrow inline const int ToolButtonHeight() const
         {
@@ -373,6 +386,22 @@ namespace System.Windows
         {
             toolTipWindow->Hide();
         }
+        internal SolidBrush* GetOrInsertSolidBrush(const Color& color)
+        {
+            HashMap<Color, SolidBrush*>.ConstIterator it = textBrushMap.CFind(color);
+            if (it != textBrushMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                UniquePtr<SolidBrush> brushPtr(new SolidBrush(color));
+                SolidBrush* brush = brushPtr.Get();
+                textBrushMap[color] = brushPtr.Get();
+                textBrushes.Add(Rvalue(brushPtr));
+                return brush;
+            }
+        }
         private void SetToolButtonBitmaps(ToolButton* toolButton)
         {
             Pair<Bitmap*, Bitmap*> toolBitmapPair = GetOrCreateBitmaps(toolButton->ToolBitmapName());
@@ -381,6 +410,7 @@ namespace System.Windows
         private Pair<Bitmap*, Bitmap*> GetOrCreateBitmaps(const string& bitmapName)
         {
             Pair<Bitmap*, Bitmap*> bitmapPair;
+            if (bitmapName.IsEmpty()) return bitmapPair;
             try
             {
                 HashMap<string, Pair<Bitmap*, Bitmap*>>.ConstIterator it = bitmapMap.CFind(bitmapName);
@@ -457,6 +487,10 @@ namespace System.Windows
         private ToolTip* toolTipWindow;
         private Padding padding;
         private Padding buttonPadding;
+        private Font textToolButtonFont;
+        private StringFormat centerFormat;
+        private HashMap<Color, SolidBrush*> textBrushMap;
+        private List<UniquePtr<SolidBrush>> textBrushes;
     }
 
     public abstract class ToolButtonBase : Component
@@ -520,6 +554,21 @@ namespace System.Windows
             Pen secondLinePen(toolBar->ToolButtonSeparatorColor2());
             graphics.DrawLineChecked(secondLinePen, secondLineStart, secondLineEnd);
         }
+    }
+
+    public class ClickGuard
+    {
+        public nothrow ClickGuard(ToolButton* toolButton_) : toolButton(toolButton_)
+        {
+        }
+        public ~ClickGuard()
+        {
+            if (toolButton->GetStyle() == ToolButton.Style.automatic)
+            {
+                toolButton->SetState(ToolButton.State.normal);
+            }
+        }
+        private ToolButton* toolButton;
     }
 
     public class ToolButton : ToolButtonBase
@@ -696,6 +745,7 @@ namespace System.Windows
         }
         protected virtual void OnClick()
         {
+            ClickGuard guard(this);
             clickEvent.Fire();
         }
         public nothrow Event<ClickEventHandler>& ClickEvent() const
@@ -786,7 +836,7 @@ namespace System.Windows
             endBottomInnerMediumDarkLoc.x = endBottomInnerMediumDarkLoc.x + size.w - 3;
             endBottomInnerMediumDarkLoc.y = endBottomInnerMediumDarkLoc.y + size.h - 3;
             graphics.DrawLineChecked(mediumDarkPen, startBottomInnerMediumDarkLoc, endBottomInnerMediumDarkLoc);
-            DrawToolBitmap(graphics, location);
+            DrawContent(graphics, location);
         }
         private void DrawPressed(Graphics& graphics, const Point& location)
         {
@@ -831,10 +881,15 @@ namespace System.Windows
             endLeftInnerMediumDarkLoc.y = endLeftInnerMediumDarkLoc.y + size.h - 2;
             graphics.DrawLineChecked(mediumDarkPen, startLeftInnerMediumDarkLoc, endLeftInnerMediumDarkLoc);
 
-            DrawToolBitmap(graphics, Point(location.x + 1, location.y + 1));
+            DrawContent(graphics, Point(location.x + 1, location.y + 1));
+        }
+        protected virtual void DrawContent(Graphics& graphics, const Point& location)
+        {
+            DrawToolBitmap(graphics, location);
         }
         private void DrawToolBitmap(Graphics& graphics, const Point& location)
         {
+            if (toolBitmap == null) return;
             Point bitmapLocation(location);
             bitmapLocation.x = bitmapLocation.x + padding.left;
             bitmapLocation.y = bitmapLocation.y + padding.top;
@@ -858,8 +913,11 @@ namespace System.Windows
         {
             toolBitmap = toolBitmap_;
             disabledToolBitmap = disabledToolBitmap_;
-            toolBitmapSize = Size(cast<int>(toolBitmap->GetWidth()), cast<int>(toolBitmap->GetHeight()));
-            SetSize(Size(padding.Horizontal() + toolBitmapSize.w, padding.Vertical() + toolBitmapSize.h));
+            if (toolBitmap != null && disabledToolBitmap != null)
+            {
+                toolBitmapSize = Size(cast<int>(toolBitmap->GetWidth()), cast<int>(toolBitmap->GetHeight()));
+                SetSize(Size(padding.Horizontal() + toolBitmapSize.w, padding.Vertical() + toolBitmapSize.h));
+            }
         }
         private nothrow void Invalidate()
         {
@@ -884,5 +942,46 @@ namespace System.Windows
         private Event<MouseEventHandler, MouseEventArgs> mouseDownEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseUpEvent;
         private Event<ClickEventHandler> clickEvent;
+    }
+
+    public class TextToolButton : ToolButton
+    {
+        public nothrow TextToolButton(const string& text_, const Size& size, const Color& textColor_, ToolButton.Style style)  :
+            base("", style), text(text_), textColor(textColor_)
+        {
+            SetSize(size);
+        }
+        public nothrow TextToolButton(const string& text) : this(text, Size(12, 12), Color.Black(), ToolButton.Style.automatic)
+        {
+        }
+        protected override nothrow void SetToolBar(ToolBar* toolBar)
+        {
+            base->SetToolBar(toolBar);
+            Padding padding = GetPadding();
+            Size size = GetSize();
+            SetSize(Size(padding.Horizontal() + size.w, padding.Vertical() + size.h));
+            normalBrush = toolBar->GetOrInsertSolidBrush(textColor);
+            disabledBrush = toolBar->GetOrInsertSolidBrush(textColor.ToGray());
+        }
+        protected override void DrawContent(Graphics& graphics, const Point& location)
+        {
+            DrawText(graphics, location);
+        }
+        private void DrawText(Graphics& graphics, const Point& location)
+        {
+            ToolBar* toolBar = GetToolBar();
+            Brush* brush = normalBrush;
+            if (GetState() == State.disabled)
+            {
+                brush = disabledBrush;
+            }
+            Size size = GetSize();
+            RectF r(PointF(location.x, location.y), SizeF(size.w, size.h));
+            graphics.DrawStringChecked(text, toolBar->GetTextToolButtonFont(), r, toolBar->CenterFormat(), *brush);
+        }
+        private string text;
+        private Color textColor;
+        private SolidBrush* normalBrush;
+        private SolidBrush* disabledBrush;
     }
 }

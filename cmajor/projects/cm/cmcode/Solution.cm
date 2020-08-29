@@ -1,0 +1,196 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+using Cm.Debug;
+
+namespace cmcode
+{
+    string CmajorProjectDirectory()
+    {
+        string cmajorRootDir = GetFullPath(Cm.Ast.CmajorRootDir());
+        return Path.Combine(cmajorRootDir, "projects");
+    }
+
+    UniquePtr<Cm.Ast.Project> ReadProject(const string& projectFilePath, List<UniquePtr<ustring>>& contents)
+    {
+        UniquePtr<ustring> content(new ustring(ToUtf32(File.ReadAllText(projectFilePath))));
+        ContainerFileLexer lexer(content->Chars(), content->Chars() + content->Length(), projectFilePath, 0);
+        UniquePtr<Cm.Ast.Project> project = ProjectFileParser.Parse(lexer, "debug", Cm.Ast.BackEnd.llvm);
+        project->ResolveDeclarations();
+        contents.Add(Rvalue(content));
+        return project;
+    }
+
+    UniquePtr<Cm.Ast.Solution> ReadSolution(const string& solutionFilePath, List<UniquePtr<ustring>>& contents)
+    {
+        UniquePtr<ustring> content(new ustring(ToUtf32(File.ReadAllText(solutionFilePath))));
+        LogView* logView = Application.GetLogView();
+        logView->WriteLine(ToUtf8(*content));
+        ContainerFileLexer lexer(content->Chars(), content->Chars() + content->Length(), solutionFilePath, 0);
+        UniquePtr<Cm.Ast.Solution> solution(SolutionFileParser.Parse(lexer));
+        solution->ResolveDeclarations();
+        for (const string& projectFilePath : solution->ProjectFilePaths())
+        {
+            UniquePtr<Cm.Ast.Project> project = ReadProject(projectFilePath, contents);
+            solution->AddProject(Rvalue(project));
+        }
+        contents.Add(Rvalue(content));
+        return solution;
+    }
+
+    class TreeViewNodeData
+    {
+        public enum Kind
+        {
+            solution, project, file
+        }
+        public nothrow TreeViewNodeData(Kind kind_, Cm.Ast.Solution* solution_, Cm.Ast.Project* project_, const string& filePath_, const string& fileName_) :
+            kind(kind_), solution(solution_), project(project_), filePath(filePath_), fileName(fileName_)
+        {
+            switch (kind)
+            {
+                case Kind.solution:
+                {
+                    key = System.Security.GetSha1MessageDigest("solution." + ToUtf8(solution->Name()));
+                    break;
+                }
+                case Kind.project:
+                {
+                    key = System.Security.GetSha1MessageDigest("solution." + ToUtf8(solution->Name()) + ".project." + ToUtf8(project->Name()));
+                    break;
+                }
+                case Kind.file:
+                {
+                    key = filePath;
+                    break;
+                }
+            }
+        }
+        public Kind kind;
+        public Cm.Ast.Solution* solution;
+        public Cm.Ast.Project* project;
+        public string filePath;
+        public string fileName;
+        public string key;
+    }
+
+    class ByFileName : Rel<UniquePtr<TreeViewNodeData>>
+    {
+        public nothrow bool operator()(const UniquePtr<TreeViewNodeData>& left, const UniquePtr<TreeViewNodeData>& right) const
+        {
+            return left->fileName < right->fileName;
+        }
+    }
+
+    class SolutionExplorerData
+    {
+        public nothrow SolutionExplorerData()
+        {
+        }
+        public nothrow inline TreeViewNode* GetActiveProjectNode() const
+        {
+            return activeProjectNode;
+        }
+        public nothrow void SetActiveProjectNode(TreeViewNode* activeProjectNode_)
+        {
+            activeProjectNode = activeProjectNode_;
+        }
+        public List<UniquePtr<TreeViewNodeData>> treeViewData;
+        public HashMap<string, TreeViewNodeData*> treeViewDataMap;
+        public BreakpointCollection breakpointCollection;
+        private TreeViewNode* activeProjectNode;
+    }
+
+    void SetActiveProject(Cm.Ast.Solution* solution)
+    {
+        if (solution->ActiveProjectName().IsEmpty())
+        {
+            if (!solution->Projects().IsEmpty())
+            {
+                solution->SetActiveProject(solution->Projects()[0].Get());
+            }
+        }
+        else
+        {
+            for (const UniquePtr<Cm.Ast.Project>& project : solution->Projects())
+            {
+                if (project->Name() == solution->ActiveProjectName())
+                {
+                    solution->SetActiveProject(project.Get());
+                    break;
+                }
+            }
+        }
+        if (solution->ActiveProject() == null)
+        {
+            if (!solution->Projects().IsEmpty())
+            {
+                solution->SetActiveProject(solution->Projects()[0].Get());
+            }
+        }
+    }
+
+    UniquePtr<TreeViewNode> BuildSolutionTree(Cm.Ast.Solution* solution, UniquePtr<SolutionExplorerData>& solutionExplorerData, const List<UniquePtr<ustring>>& contents)
+    {
+        SetActiveProject(solution);
+        UniquePtr<SolutionExplorerData> newSolutionExplorerData(new SolutionExplorerData());
+        string solutionName = ToUtf8(solution->Name());
+        UniquePtr<TreeViewNode> solutionNode(new TreeViewNode(solutionName));
+        UniquePtr<TreeViewNodeData> solutionData(new TreeViewNodeData(TreeViewNodeData.Kind.solution, solution, null, string(), string()));
+        solutionNode->SetData(solutionData.Get());
+        newSolutionExplorerData->treeViewData.Add(Rvalue(solutionData));
+        for (const UniquePtr<Cm.Ast.Project>& project : solution->Projects())
+        {
+            string projectName = ToUtf8(project->Name());
+            UniquePtr<TreeViewNode> projectNode(new TreeViewNode(projectName));
+            UniquePtr<TreeViewNodeData> projectData(new TreeViewNodeData(TreeViewNodeData.Kind.project, solution, project.Get(), string(), string()));
+            projectNode->SetData(projectData.Get());
+            if (project.Get() == solution->ActiveProject())
+            {
+                newSolutionExplorerData->SetActiveProjectNode(projectNode.Get());
+                projectNode->SetActive(true);
+            }
+            newSolutionExplorerData->treeViewData.Add(Rvalue(projectData));
+            List<UniquePtr<TreeViewNodeData>> fileData;
+            for (const string& sourceFilePath : project->SourceFilePaths())
+            {
+                UniquePtr<TreeViewNodeData> file(new TreeViewNodeData(TreeViewNodeData.Kind.file, solution, project.Get(), sourceFilePath, Path.GetFileName(sourceFilePath)));
+                fileData.Add(Rvalue(file));
+            }
+            for (const string& resourceFilePath : project->ResourceFilePaths())
+            {
+                UniquePtr<TreeViewNodeData> file(new TreeViewNodeData(TreeViewNodeData.Kind.file, solution, project.Get(), resourceFilePath, Path.GetFileName(resourceFilePath)));
+                fileData.Add(Rvalue(file));
+            }
+            for (const string& textFilePath : project->TextFilePaths())
+            {
+                UniquePtr<TreeViewNodeData> file(new TreeViewNodeData(TreeViewNodeData.Kind.file, solution, project.Get(), textFilePath, Path.GetFileName(textFilePath)));
+                fileData.Add(Rvalue(file));
+            }
+            Sort(fileData.Begin(), fileData.End(), ByFileName());
+            for (const UniquePtr<TreeViewNodeData>& file : fileData)
+            {
+                UniquePtr<TreeViewNode> fileNode(new TreeViewNode(file->fileName));
+                fileNode->SetData(file.Get());
+                projectNode->AddChild(fileNode.Release());
+            }
+            for (UniquePtr<TreeViewNodeData>& file : fileData)
+            {
+                newSolutionExplorerData->treeViewData.Add(Rvalue(file));
+            }
+            solutionNode->AddChild(projectNode.Release());
+        }
+        solutionNode->Expand();
+        for (const UniquePtr<TreeViewNodeData>& nodeData : newSolutionExplorerData->treeViewData)
+        {
+            newSolutionExplorerData->treeViewDataMap[nodeData->key] = nodeData.Get();
+        }
+        solutionExplorerData.Reset(newSolutionExplorerData.Release());
+        return solutionNode;
+    }
+}

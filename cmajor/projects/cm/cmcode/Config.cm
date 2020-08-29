@@ -58,7 +58,10 @@ namespace cmcode
         {
             normal, maximized
         }
-        public nothrow MainConfig() : mainWindowWindowState(JsonWindowState.normal), verticalSplitterDistance(0), horizontalSplitterDistance(0)
+        public nothrow MainConfig() :
+            mainWindowWindowState(JsonWindowState.normal),
+            normalVerticalSplitterDistance(0), normalHorizontalSplitterDistance(0),
+            maximizedVerticalSplitterDistance(0), maximizedHorizontalSplitterDistance(0)
         {
         }
         public System.Windows.WindowState GetMainWindowWindowState()
@@ -87,43 +90,79 @@ namespace cmcode
                 mainWindowWindowState = JsonWindowState.normal;
             }
         }
-        public System.Windows.Point GetMainWindowLocation() const
+        public System.Windows.Point GetMainWindowNormalLocation() const
         {
-            return mainWindowLocation.ToPoint();
+            return mainWindowNormalLocation.ToPoint();
         }
-        public void SetMainWindowLocation(const System.Windows.Point& location)
+        public void SetMainWindowNormalLocation(const System.Windows.Point& location)
         {
-            mainWindowLocation = JsonPoint(location);
+            mainWindowNormalLocation = JsonPoint(location);
         }
-        public System.Windows.Size GetMainWindowSize() const
+        public System.Windows.Size GetMainWindowNormalSize() const
         {
-            return mainWindowSize.ToSize();
+            return mainWindowNormalSize.ToSize();
         }
-        public void SetMainWindowSize(const System.Windows.Size& size)
+        public void SetMainWindowNormalSize(const System.Windows.Size& size)
         {
-            mainWindowSize = JsonSize(size);
+            mainWindowNormalSize = JsonSize(size);
         }
-        public int GetMainWindowVerticalSplitterDistance() const
+        public System.Windows.Point GetMainWindowMaximizedLocation() const
         {
-            return verticalSplitterDistance;
+            return mainWindowMaximizedLocation.ToPoint();
         }
-        public void SetMainWindowVerticalSplitterDistance(int verticalSplitterDistance_)
+        public void SetMainWindowMaximizedLocation(const System.Windows.Point& location)
         {
-            verticalSplitterDistance = verticalSplitterDistance_;
+            mainWindowMaximizedLocation = JsonPoint(location);
         }
-        public int GetMainWindowHorizontalSplitterDistance() const
+        public System.Windows.Size GetMainWindowMaximizedSize() const
         {
-            return horizontalSplitterDistance;
+            return mainWindowMaximizedSize.ToSize();
         }
-        public void SetMainWindowHorizontalSplitterDistance(int horizontalSplitterDistance_)
+        public void SetMainWindowMaximizedSize(const System.Windows.Size& size)
         {
-            horizontalSplitterDistance = horizontalSplitterDistance_;
+            mainWindowMaximizedSize = JsonSize(size);
+        }
+        public int GetMainWindowNormalVerticalSplitterDistance() const
+        {
+            return normalVerticalSplitterDistance;
+        }
+        public void SetMainWindowNormalVerticalSplitterDistance(int verticalSplitterDistance_)
+        {
+            normalVerticalSplitterDistance = verticalSplitterDistance_;
+        }
+        public int GetMainWindowNormalHorizontalSplitterDistance() const
+        {
+            return normalHorizontalSplitterDistance;
+        }
+        public void SetMainWindowNormalHorizontalSplitterDistance(int horizontalSplitterDistance_)
+        {
+            normalHorizontalSplitterDistance = horizontalSplitterDistance_;
+        }
+        public int GetMainWindowMaximizedVerticalSplitterDistance() const
+        {
+            return maximizedVerticalSplitterDistance;
+        }
+        public void SetMainWindowMaximizedVerticalSplitterDistance(int verticalSplitterDistance_)
+        {
+            maximizedVerticalSplitterDistance = verticalSplitterDistance_;
+        }
+        public int GetMainWindowMaximizedHorizontalSplitterDistance() const
+        {
+            return maximizedHorizontalSplitterDistance;
+        }
+        public void SetMainWindowMaximizedHorizontalSplitterDistance(int horizontalSplitterDistance_)
+        {
+            maximizedHorizontalSplitterDistance = horizontalSplitterDistance_;
         }
         private JsonWindowState mainWindowWindowState;
-        private JsonPoint mainWindowLocation;
-        private JsonSize mainWindowSize;
-        private int verticalSplitterDistance;
-        private int horizontalSplitterDistance;
+        private JsonPoint mainWindowNormalLocation;
+        private JsonPoint mainWindowMaximizedLocation;
+        private JsonSize mainWindowNormalSize;
+        private JsonSize mainWindowMaximizedSize;
+        private int normalVerticalSplitterDistance;
+        private int normalHorizontalSplitterDistance;
+        private int maximizedVerticalSplitterDistance;
+        private int maximizedHorizontalSplitterDistance;
     }
 
     public class MainConfiguration
@@ -219,50 +258,138 @@ namespace cmcode
         }
         public System.Windows.Point GetMainWindowLocation() const
         {
-            return mainConfig.GetMainWindowLocation();
+            if (GetMainWindowWindowState() == System.Windows.WindowState.normal)
+            {
+                return mainConfig.GetMainWindowNormalLocation();
+            }
+            else if (GetMainWindowWindowState() == System.Windows.WindowState.maximized)
+            {
+                return mainConfig.GetMainWindowMaximizedLocation();
+            }
+            else
+            {
+                return mainConfig.GetMainWindowNormalLocation();
+            }
         }
         public System.Windows.Size GetMainWindowSize() const
         {
-            return mainConfig.GetMainWindowSize();
+            if (GetMainWindowWindowState() == System.Windows.WindowState.normal)
+            {
+                return mainConfig.GetMainWindowNormalSize();
+            }
+            else if (GetMainWindowWindowState() == System.Windows.WindowState.maximized)
+            {
+                return mainConfig.GetMainWindowMaximizedSize();
+            }
+            else
+            {
+                return mainConfig.GetMainWindowNormalSize();
+            }
         }
         public void SetMainWindowLocation(const System.Windows.Point& location)
         {
-            if (GetMainWindowLocation() != location)
+            if (GetMainWindowWindowState() == System.Windows.WindowState.normal)
             {
-                mainConfig.SetMainWindowLocation(location);
-                SetChanged();
+                if (GetMainWindowLocation() != location)
+                {
+                    mainConfig.SetMainWindowNormalLocation(location);
+                    SetChanged();
+                }
+            }
+            else if (GetMainWindowWindowState() == System.Windows.WindowState.maximized)
+            {
+                if (GetMainWindowLocation() != location)
+                {
+                    mainConfig.SetMainWindowMaximizedLocation(location);
+                    SetChanged();
+                }
             }
         }
         public void SetMainWindowSize(const System.Windows.Size& size)
         {
-            if (GetMainWindowSize() != size)
+            if (GetMainWindowWindowState() == System.Windows.WindowState.normal)
             {
-                mainConfig.SetMainWindowSize(size);
-                SetChanged();
+                if (GetMainWindowSize() != size)
+                {
+                    mainConfig.SetMainWindowNormalSize(size);
+                    SetChanged();
+                }
+            }
+            else if (GetMainWindowWindowState() == System.Windows.WindowState.maximized)
+            {
+                if (GetMainWindowSize() != size)
+                {
+                    mainConfig.SetMainWindowMaximizedSize(size);
+                    SetChanged();
+                }
             }
         }
         public int GetMainWindowVerticalSplitterDistance() const
         {
-            return mainConfig.GetMainWindowVerticalSplitterDistance();
+            if (GetMainWindowWindowState() == System.Windows.WindowState.normal)
+            {
+                return mainConfig.GetMainWindowNormalVerticalSplitterDistance();
+            }
+            else if (GetMainWindowWindowState() == System.Windows.WindowState.maximized)
+            {
+                return mainConfig.GetMainWindowMaximizedVerticalSplitterDistance();
+            }
+            else
+            {
+                return mainConfig.GetMainWindowNormalVerticalSplitterDistance();
+            }
         }
         public void SetMainWindowVerticalSplitterDistance(int verticalSplitterDistance)
         {
-            if (GetMainWindowVerticalSplitterDistance() != verticalSplitterDistance)
+            if (GetMainWindowWindowState() == System.Windows.WindowState.normal)
             {
-                mainConfig.SetMainWindowVerticalSplitterDistance(verticalSplitterDistance);
-                SetChanged();
+                if (GetMainWindowVerticalSplitterDistance() != verticalSplitterDistance)
+                {
+                    mainConfig.SetMainWindowNormalVerticalSplitterDistance(verticalSplitterDistance);
+                    SetChanged();
+                }
+            }
+            else if (GetMainWindowWindowState() == System.Windows.WindowState.maximized)
+            {
+                if (GetMainWindowVerticalSplitterDistance() != verticalSplitterDistance)
+                {
+                    mainConfig.SetMainWindowMaximizedVerticalSplitterDistance(verticalSplitterDistance);
+                    SetChanged();
+                }
             }
         }
         public int GetMainWindowHorizontalSplitterDistance() const
         {
-            return mainConfig.GetMainWindowHorizontalSplitterDistance();
+            if (GetMainWindowWindowState() == System.Windows.WindowState.normal)
+            {
+                return mainConfig.GetMainWindowNormalHorizontalSplitterDistance();
+            }
+            else if (GetMainWindowWindowState() == System.Windows.WindowState.maximized)
+            {
+                return mainConfig.GetMainWindowMaximizedHorizontalSplitterDistance();
+            }
+            else
+            {
+                return mainConfig.GetMainWindowNormalHorizontalSplitterDistance();
+            }
         }
         public void SetMainWindowHorizontalSplitterDistance(int horizontalSplitterDistance)
         {
-            if (GetMainWindowHorizontalSplitterDistance() != horizontalSplitterDistance)
+            if (GetMainWindowWindowState() == System.Windows.WindowState.normal)
             {
-                mainConfig.SetMainWindowHorizontalSplitterDistance(horizontalSplitterDistance);
-                SetChanged();
+                if (GetMainWindowHorizontalSplitterDistance() != horizontalSplitterDistance)
+                {
+                    mainConfig.SetMainWindowNormalHorizontalSplitterDistance(horizontalSplitterDistance);
+                    SetChanged();
+                }
+            }
+            else if (GetMainWindowWindowState() == System.Windows.WindowState.maximized)
+            {
+                if (GetMainWindowHorizontalSplitterDistance() != horizontalSplitterDistance)
+                {
+                    mainConfig.SetMainWindowMaximizedHorizontalSplitterDistance(horizontalSplitterDistance);
+                    SetChanged();
+                }
             }
         }
         private void SetChanged()
@@ -277,5 +404,102 @@ namespace cmcode
         private TimePoint configChangedTime;
         private bool loaded;
         private bool dirty;
+    }
+
+    public const uint defaultConfigSaveTimerPeriod = 3000u; // 3 seconds
+
+    public System.Windows.WindowState MainWindowWindowState()
+    {
+        try
+        {
+            if (MainConfiguration.Instance().Loaded())
+            {
+                return MainConfiguration.Instance().GetMainWindowWindowState();
+            }
+            else
+            {
+                return System.Windows.WindowState.normal;
+            }
+        }
+        catch (const Exception& ex)
+        {
+        }
+        return System.Windows.WindowState.normal;
+    }
+
+    public Point MainWindowLocation()
+    {
+        try
+        {
+            if (MainConfiguration.Instance().Loaded())
+            {
+                return MainConfiguration.Instance().GetMainWindowLocation();
+            }
+            else
+            {
+                return Point.Default();
+            }
+        }
+        catch (const Exception& ex)
+        {
+        }
+        return Point.Default();
+    }
+
+    public Size MainWindowSize()
+    {
+        try
+        {
+            if (MainConfiguration.Instance().Loaded())
+            {
+                return MainConfiguration.Instance().GetMainWindowSize();
+            }
+            else
+            {
+                return Size.Default();
+            }
+        }
+        catch (const Exception& ex)
+        {
+        }
+        return Size.Default();
+    }
+
+    int MainWindowVerticalSplitterDistance()
+    {
+        try
+        {
+            if (MainConfiguration.Instance().Loaded())
+            {
+                return MainConfiguration.Instance().GetMainWindowVerticalSplitterDistance();
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        catch (const Exception& ex)
+        {
+        }
+        return 0;
+    }
+
+    int MainWindowHorizontalSplitterDistance()
+    {
+        try
+        {
+            if (MainConfiguration.Instance().Loaded())
+            {
+                return MainConfiguration.Instance().GetMainWindowHorizontalSplitterDistance();
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        catch (const Exception& ex)
+        {
+        }
+        return 0;
     }
 }
