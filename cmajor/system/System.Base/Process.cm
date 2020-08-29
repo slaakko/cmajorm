@@ -28,7 +28,7 @@ namespace System.Threading
             {
                 string errorString = RtGetString(errorStringHandle);
                 RtDisposeString(errorStringHandle);
-                throw ThreadingException(errorString);
+                throw ThreadingException("Could not run " + command + ": " + errorString);
             }
         }
         public ~Process()

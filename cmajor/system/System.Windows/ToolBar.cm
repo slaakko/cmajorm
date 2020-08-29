@@ -969,6 +969,8 @@ namespace System.Windows
         }
         private void DrawText(Graphics& graphics, const Point& location)
         {
+            TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
+            graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
             ToolBar* toolBar = GetToolBar();
             Brush* brush = normalBrush;
             if (GetState() == State.disabled)
@@ -978,6 +980,7 @@ namespace System.Windows
             Size size = GetSize();
             RectF r(PointF(location.x, location.y), SizeF(size.w, size.h));
             graphics.DrawStringChecked(text, toolBar->GetTextToolButtonFont(), r, toolBar->CenterFormat(), *brush);
+            graphics.SetTextRenderingHintChecked(prevRenderingHint);
         }
         private string text;
         private Color textColor;

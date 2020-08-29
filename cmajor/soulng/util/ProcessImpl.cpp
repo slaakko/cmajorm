@@ -7,86 +7,94 @@
 #ifdef _WIN32
 #include <boost/process/windows.hpp>
 #endif
+#include <stdexcept>
 
 namespace soulng { namespace util {
 
 ProcessImpl::ProcessImpl(const std::string& command, Process::Redirections redirections_) : redirections(redirections_), stdOutEof(false), stdErrEof(false)
 {
-    switch (redirections)
+    try
     {
-        case Process::Redirections::none:
+        switch (redirections)
         {
-#ifdef _WIN32
-            process = boost::process::child(command, boost::process::windows::hide);
-#else
-            process = boost::process::child(command);
-#endif
-            break;
+            case Process::Redirections::none:
+            {
+    #ifdef _WIN32
+                process = boost::process::child(command, boost::process::windows::hide);
+    #else
+                process = boost::process::child(command);
+    #endif
+                break;
+            }
+            case Process::Redirections::processStdIn:
+            {
+    #ifdef _WIN32
+                process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::windows::hide);
+    #else
+                process = boost::process::child(command, boost::process::std_in < processStdIn);
+    #endif
+                break;
+            }
+            case Process::Redirections::processStdOut:
+            {
+    #ifdef _WIN32
+                process = boost::process::child(command, boost::process::std_out > processStdOut, boost::process::windows::hide);
+    #else
+                process = boost::process::child(command, boost::process::std_out > processStdOut);
+    #endif
+                break;
+            }
+            case Process::Redirections::processStdErr:
+            {
+    #ifdef _WIN32
+                process = boost::process::child(command, boost::process::std_err > processStdErr, boost::process::windows::hide);
+    #else
+                process = boost::process::child(command, boost::process::std_err > processStdErr);
+    #endif
+                break;
+            }
+            case Process::Redirections::processStdIn | Process::Redirections::processStdOut:
+            {
+    #ifdef _WIN32
+                process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_out > processStdOut, boost::process::windows::hide);
+    #else
+                process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_out > processStdOut);
+    #endif
+                break;
+            }
+            case Process::Redirections::processStdIn | Process::Redirections::processStdErr:
+            {
+    #ifdef _WIN32
+                process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_err > processStdErr, boost::process::windows::hide);
+    #else
+                process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_err > processStdErr);
+    #endif
+                break;
+            }
+            case Process::Redirections::processStdOut | Process::Redirections::processStdErr:
+            {
+    #ifdef _WIN32
+                process = boost::process::child(command, boost::process::std_out > processStdOut, boost::process::std_err > processStdErr, boost::process::windows::hide);
+    #else
+                process = boost::process::child(command, boost::process::std_out > processStdOut, boost::process::std_err > processStdErr);
+    #endif
+                break;
+            }
+            case Process::Redirections::processStdIn | Process::Redirections::processStdOut | Process::Redirections::processStdErr:
+            {
+    #ifdef _WIN32
+                process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_out > processStdOut, boost::process::std_err > processStdErr,
+                    boost::process::windows::hide);
+    #else
+                process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_out > processStdOut, boost::process::std_err > processStdErr);
+    #endif
+                break;
+            }
         }
-        case Process::Redirections::processStdIn:
-        {
-#ifdef _WIN32
-            process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::windows::hide);
-#else
-            process = boost::process::child(command, boost::process::std_in < processStdIn);
-#endif
-            break;
-        }
-        case Process::Redirections::processStdOut:
-        {
-#ifdef _WIN32
-            process = boost::process::child(command, boost::process::std_out > processStdOut, boost::process::windows::hide);
-#else
-            process = boost::process::child(command, boost::process::std_out > processStdOut);
-#endif
-            break;
-        }
-        case Process::Redirections::processStdErr:
-        {
-#ifdef _WIN32
-            process = boost::process::child(command, boost::process::std_err > processStdErr, boost::process::windows::hide);
-#else
-            process = boost::process::child(command, boost::process::std_err > processStdErr);
-#endif
-            break;
-        }
-        case Process::Redirections::processStdIn | Process::Redirections::processStdOut:
-        {
-#ifdef _WIN32
-            process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_out > processStdOut, boost::process::windows::hide);
-#else
-            process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_out > processStdOut);
-#endif
-            break;
-        }
-        case Process::Redirections::processStdIn | Process::Redirections::processStdErr:
-        {
-#ifdef _WIN32
-            process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_err > processStdErr, boost::process::windows::hide);
-#else
-            process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_err > processStdErr);
-#endif
-            break;
-        }
-        case Process::Redirections::processStdOut | Process::Redirections::processStdErr:
-        {
-#ifdef _WIN32
-            process = boost::process::child(command, boost::process::std_out > processStdOut, boost::process::std_err > processStdErr, boost::process::windows::hide);
-#else
-            process = boost::process::child(command, boost::process::std_out > processStdOut, boost::process::std_err > processStdErr);
-#endif
-            break;
-        }
-        case Process::Redirections::processStdIn | Process::Redirections::processStdOut | Process::Redirections::processStdErr:
-        {
-#ifdef _WIN32
-            process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_out > processStdOut, boost::process::std_err > processStdErr,
-                boost::process::windows::hide);
-#else
-            process = boost::process::child(command, boost::process::std_in < processStdIn, boost::process::std_out > processStdOut, boost::process::std_err > processStdErr);
-#endif
-            break;
-        }
+    }
+    catch (const std::exception& ex)
+    {
+        throw std::runtime_error("error running command '" + command + "': " + ex.what());
     }
 }
 

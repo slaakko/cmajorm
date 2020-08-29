@@ -127,7 +127,7 @@ namespace cmcode
 
             UniquePtr<ToolButton> saveAllToolButtonPtr(new ToolButton("cmcode.save.all.bitmap"));
             saveAllToolButton = saveAllToolButtonPtr.Get();
-            saveAllToolButton->SetToolTip("Save all (Ctrl+Shift+S)");
+            saveAllToolButton->SetToolTip("Save All (Ctrl+Shift+S)");
             saveAllToolButton->SetPadding(Padding(6, 6, 6, 6));
             toolBar->AddToolButton(saveAllToolButtonPtr.Release());
 
@@ -138,14 +138,14 @@ namespace cmcode
 
             UniquePtr<TextToolButton> cppToolButtonPtr(new TextToolButton("C++", textButtonSize, TextButtonColor(), ToolButton.Style.manual));
             cppToolButton = cppToolButtonPtr.Get();
-            cppToolButton->SetToolTip("Compile using C++ backend");
+            cppToolButton->SetToolTip("Compile using C++ Backend");
             cppToolButton->SetPadding(Padding(8, 8, 8, 8));
             cppToolButton->ClickEvent().AddHandler(CppButtonClick);
             toolBar->AddToolButton(cppToolButtonPtr.Release());
 
             UniquePtr<TextToolButton> llvmToolButtonPtr(new TextToolButton("LLVM", textButtonSize, TextButtonColor(), ToolButton.Style.manual));
             llvmToolButton = llvmToolButtonPtr.Get();
-            llvmToolButton->SetToolTip("Compile using LLVM backend");
+            llvmToolButton->SetToolTip("Compile using LLVM Backend");
             llvmToolButton->SetPadding(Padding(8, 8, 8, 8));
             llvmToolButton->ClickEvent().AddHandler(LLVMButtonClick);
             toolBar->AddToolButton(llvmToolButtonPtr.Release());
@@ -155,14 +155,14 @@ namespace cmcode
 
             UniquePtr<TextToolButton> debugToolButtonPtr(new TextToolButton("Debug", textButtonSize, TextButtonColor(), ToolButton.Style.manual));
             debugToolButton = debugToolButtonPtr.Get();
-            debugToolButton->SetToolTip("Compile using debug configuration");
+            debugToolButton->SetToolTip("Compile using Debug Configuration");
             debugToolButton->SetPadding(Padding(8, 8, 8, 8));
             debugToolButton->ClickEvent().AddHandler(DebugButtonClick);
             toolBar->AddToolButton(debugToolButtonPtr.Release());
 
             UniquePtr<TextToolButton> releaseToolButtonPtr(new TextToolButton("Release", textButtonSize, TextButtonColor(), ToolButton.Style.manual));
             releaseToolButton = releaseToolButtonPtr.Get();
-            releaseToolButton->SetToolTip("Compile using release configuration");
+            releaseToolButton->SetToolTip("Compile using Release Configuration");
             releaseToolButton->SetPadding(Padding(8, 8, 8, 8));
             releaseToolButton->ClickEvent().AddHandler(ReleaseButtonClick);
             toolBar->AddToolButton(releaseToolButtonPtr.Release());
@@ -172,13 +172,13 @@ namespace cmcode
 
             UniquePtr<ToolButton> buildSolutionToolButtonPtr(new ToolButton("cmcode.build.solution.bitmap"));
             buildSolutionToolButton = buildSolutionToolButtonPtr.Get();
-            buildSolutionToolButton->SetToolTip("Build solution (F7)");
+            buildSolutionToolButton->SetToolTip("Build Solution (F7)");
             buildSolutionToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(buildSolutionToolButtonPtr.Release());
 
             UniquePtr<ToolButton> buildProjectToolButtonPtr(new ToolButton("cmcode.build.project.bitmap"));
             buildProjectToolButton = buildProjectToolButtonPtr.Get();
-            buildProjectToolButton->SetToolTip("Build active project (Ctrl+B)");
+            buildProjectToolButton->SetToolTip("Build Active Project (Ctrl+B)");
             buildProjectToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(buildProjectToolButtonPtr.Release());
 
@@ -187,14 +187,14 @@ namespace cmcode
 
             UniquePtr<ToolButton> startDebuggingToolButtonPtr(new ToolButton("cmcode.debug.start.bitmap"));
             startDebuggingToolButton = startDebuggingToolButtonPtr.Get();
-            startDebuggingToolButton->SetToolTip("Start debugging (F5)");
+            startDebuggingToolButton->SetToolTip("Start Debugging (F5)");
             startDebuggingToolButton->SetPadding(Padding(8, 8, 8, 8));
             startDebuggingToolButton->ClickEvent().AddHandler(StartDebuggingClick);
             toolBar->AddToolButton(startDebuggingToolButtonPtr.Release());
 
             UniquePtr<ToolButton> stopDebuggingToolButtonPtr(new ToolButton("cmcode.debug.stop.bitmap"));
             stopDebuggingToolButton = stopDebuggingToolButtonPtr.Get();
-            stopDebuggingToolButton->SetToolTip("Stop debugging (Shift+F5)");
+            stopDebuggingToolButton->SetToolTip("Stop Debugging (Shift+F5)");
             stopDebuggingToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(stopDebuggingToolButtonPtr.Release());
 
@@ -203,25 +203,25 @@ namespace cmcode
 
             UniquePtr<ToolButton> showNextStatementToolButtonPtr(new ToolButton("cmcode.debug.show.next.statement.bitmap"));
             showNextStatementToolButton = showNextStatementToolButtonPtr.Get();
-            showNextStatementToolButton->SetToolTip("Show next statement (Ctrl+J)");
+            showNextStatementToolButton->SetToolTip("Show Next Statement (Ctrl+J)");
             showNextStatementToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(showNextStatementToolButtonPtr.Release());
 
             UniquePtr<ToolButton> stepOverToolButtonPtr(new ToolButton("cmcode.debug.step.over.bitmap"));
             stepOverToolButton = stepOverToolButtonPtr.Get();
-            stepOverToolButton->SetToolTip("Step over (F10)");
+            stepOverToolButton->SetToolTip("Step Over (F10)");
             stepOverToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(stepOverToolButtonPtr.Release());
 
             UniquePtr<ToolButton> stepIntoToolButtonPtr(new ToolButton("cmcode.debug.step.into.bitmap"));
             stepIntoToolButton = stepIntoToolButtonPtr.Get();
-            stepIntoToolButton->SetToolTip("Step into (F11)");
+            stepIntoToolButton->SetToolTip("Step Into (F11)");
             stepIntoToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(stepIntoToolButtonPtr.Release());
 
             UniquePtr<ToolButton> stepOutToolButtonPtr(new ToolButton("cmcode.debug.step.out.bitmap"));
             stepOutToolButton = stepOutToolButtonPtr.Get();
-            stepOutToolButton->SetToolTip("Step out (F12)");
+            stepOutToolButton->SetToolTip("Step Out (F12)");
             stepOutToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(stepOutToolButtonPtr.Release());
 
