@@ -2,24 +2,18 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>9e7f769a-86e3-48e5-82cd-b95b13633a2f</ProjectGuid>
+  <ProjectGuid>d309ac06-97b0-4bde-9ee1-1a3554f3f20e</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
-  <TargetType>winlib</TargetType>
+  <TargetType>library</TargetType>
  </PropertyGroup>
  <ItemGroup>
-  <CmCompile Include="Bitmaps.cm"/>
-  <CmCompile Include="CmajorEditor.cm"/>
-  <CmCompile Include="CmajorSourceCodeView.cm"/>
-  <CmCompile Include="DebugStrip.cm"/>
-  <CmCompile Include="Resources.xml"/>
+  <CmCompile Include="BuildServerMessage.cm"/>
+  <CmCompile Include="Service.cm"/>
  </ItemGroup>
  <ItemGroup/>
  <ItemGroup>
   <ProjectReference Include="../ast/Cm.Ast.cmproj"/>
-  <ProjectReference Include="../debug/Cm.Debug.cmproj"/>
-  <ProjectReference Include="../lexer/Cm.Lexer.cmproj"/>
-  <ProjectReference Include="../parser/Cm.Parser.cmproj"/>
  </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

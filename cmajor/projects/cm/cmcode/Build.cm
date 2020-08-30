@@ -1,0 +1,25 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using Cm.Build;
+
+namespace cmcode
+{
+    BuildRequest MakeBuildRequest(const string& backend, const string& config, const string& filePath, bool rebuild, bool buildAllDependencies)
+    {
+        BuildRequest buildRequest;
+        buildRequest.backend = backend;
+        buildRequest.config = config;
+        buildRequest.optimizationLevel = "default";
+        buildRequest.filePath = filePath;
+        buildRequest.numBuildThreads = "default";
+        buildRequest.toolChain = "default";
+        buildRequest.verbose = true;
+        buildRequest.rebuild = rebuild;
+        buildRequest.buildAllDependencies = buildAllDependencies;
+        return buildRequest;
+    }
+}

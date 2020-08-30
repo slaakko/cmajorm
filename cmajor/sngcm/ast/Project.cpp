@@ -502,6 +502,13 @@ bool Project::IsUpToDate(const std::string& systemModuleFilePath) const
             return false;
         }
     }
+    for (const std::string& resourceFilePath : resourceFilePaths)
+    {
+        if (boost::filesystem::last_write_time(resourceFilePath) > boost::filesystem::last_write_time(moduleFilePath))
+        {
+            return false;
+        }
+    }
     for (const std::string& referenceFilePath : references)
     {
         if (boost::filesystem::last_write_time(referenceFilePath) > boost::filesystem::last_write_time(moduleFilePath))

@@ -21,8 +21,8 @@ UTIL_API void EndLog();
 UTIL_API void LogMessage(int logStreamId, const std::string& message);
 UTIL_API void LogMessage(int logStreamId, const std::string& message, int indent);
 UTIL_API int WaitForLogMessage();
-UTIL_API std::string FetchLogMessage();
 UTIL_API int FetchLogMessage(char16_t* buf, int size);
+UTIL_API std::string FetchLogMessage(bool& endOfLog);
 
 } } // namespace soulng::util
 

@@ -19,7 +19,6 @@ public:
     virtual ~CodeGenerator();
     virtual void GenerateCode(void* boundCompileUnit) = 0;
 private:
-    void* emittingContext;
     cmajor::ir::Emitter* emitter;
 };
 

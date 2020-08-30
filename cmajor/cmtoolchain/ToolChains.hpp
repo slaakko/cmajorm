@@ -16,6 +16,7 @@ CMTOOLCHAIN_API void ReadToolChains(bool verbose);
 CMTOOLCHAIN_API void WriteToolChains(bool verbose);
 CMTOOLCHAIN_API void SetToolChain(const std::string& toolChain_);
 CMTOOLCHAIN_API std::string GetToolChain();
+CMTOOLCHAIN_API void ResetToolChain();
 CMTOOLCHAIN_API const Configuration& GetToolConfiguration(const Tool& tool, const std::string& config);
 CMTOOLCHAIN_API const Tool& GetCompilerTool(const std::string& platform, const std::string& toolChain);
 CMTOOLCHAIN_API const Tool& GetLibraryManagerTool(const std::string& platform, const std::string& toolChain);

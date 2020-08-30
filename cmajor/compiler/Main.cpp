@@ -89,9 +89,9 @@ const char* version = "3.7.0";
 void PrintHelp()
 {
 #ifdef _WIN32
-    std::cout << "Cmajor compiler version " << version << " for Windows x64" << std::endl; 
+    std::cout << "Cmajor with LLVM backend compiler version " << version << " for Windows x64" << std::endl; 
 #else
-    std::cout << "Cmajor compiler version " << version << std::endl;
+    std::cout << "Cmajor with LLVM backend compiler version " << version << std::endl;
 #endif
     std::cout << "Usage: cmc [options] { project.cmp | solution.cms }" << std::endl;
     std::cout << "Compiles given Cmajor solutions and projects." << std::endl;
@@ -471,9 +471,9 @@ int main(int argc, const char** argv)
             if (GetGlobalFlag(GlobalFlags::verbose))
             {
 #ifdef _WIN32
-                std::cout << "Cmajor compiler version " << version << " for Windows x64" << std::endl;
+                std::cout << "Cmajor with LLVM backend compiler version " << version << " for Windows x64" << std::endl;
 #else
-                std::cout << "Cmajor compiler version " << version << std::endl;
+                std::cout << "Cmajor with LLVM backend compiler version " << version << std::endl;
 #endif
             }
 #ifndef _WIN32

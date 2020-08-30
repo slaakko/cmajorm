@@ -7,6 +7,7 @@
 #include <sngjson/json/JsonLexer.hpp>
 #include <sngjson/json/JsonParser.hpp>
 #include <sngjson/json/JsonImport.hpp>
+#include <soulng/util/Log.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -552,7 +553,7 @@ void ReadToolChains(bool verbose)
     std::string toolChainConfigFilePath = GetFullPath(ToolChainConfigFilePath());
     if (verbose)
     {
-        std::cout << "> " << toolChainConfigFilePath << std::endl;
+        LogMessage(-1, "> " + toolChainConfigFilePath);
     }
     std::u32string jsonStr = ToUtf32(ReadFile(toolChainConfigFilePath));
     JsonLexer lexer(jsonStr, toolChainConfigFilePath, 0);
@@ -590,6 +591,11 @@ void SetToolChain(const std::string& toolChain_)
 std::string GetToolChain()
 {
     return toolChain;
+}
+
+void ResetToolChain()
+{
+    toolChain = "gcc";
 }
 
 const Configuration& GetToolConfiguration(const Tool& tool, const std::string& config)

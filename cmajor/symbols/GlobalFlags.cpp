@@ -181,6 +181,7 @@ void AddAssertionLineNumber(int32_t lineNumber)
 
 void ResetGlobalFlags()
 {
+    backend = BackEnd::llvm;
     globalFlags = GlobalFlags::none;
     optimizationLevel = -1;
     numBuildThreads = -1;

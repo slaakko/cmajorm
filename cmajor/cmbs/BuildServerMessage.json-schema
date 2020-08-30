@@ -1,0 +1,61 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+struct BuildRequest
+{
+    string messageKind;
+    string backend;
+    string config;
+    string optimizationLevel;
+    string filePath;
+    string[] defines;
+    string numBuildThreads;
+    string toolChain;
+    bool verbose;
+    bool quiet;
+    bool clean;
+    bool strictNothrow;
+    bool emitIR;
+    bool emitOptIR;
+    bool linkWithDebugRuntime;
+    bool linkUsingMsLink;
+    bool rebuild;
+    bool buildAllDependencies;
+    bool forceDebugInfo;
+    bool forceNoDebugInfo;
+    bool disableModuleCache;
+    bool singleThreadedCompile;
+    bool disableCodeGen;
+    bool justMyCode;
+}
+
+struct BuildReply
+{
+    string messageKind;
+    bool requestValid;
+    string requestErrorMessage;
+    string logException;
+    string time;
+    bool success;
+    string error;
+}
+
+struct LogMessageRequest
+{
+    string messageKind;
+    string message;
+}
+
+struct LogMessageReply
+{
+    string messageKind;
+    bool ok;
+}
+
+struct GenericErrorReply
+{
+    string messageKind;
+    string error;
+}

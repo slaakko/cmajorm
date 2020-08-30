@@ -1,6 +1,8 @@
 @echo off
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmcd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmc.exe ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmbsd.exe ..\bin
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmbs.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmclientd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmclient.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmserverd.exe ..\bin

@@ -76,6 +76,19 @@ namespace System.Threading
             }
             return exitCode;
         }
+        public void Terminate()
+        {
+            int errorStringHandle = -1;
+            if (!RtProcessTerminate(nativeProcess, errorStringHandle))
+            {
+                if (errorStringHandle != -1)
+                {
+                    string errorString = RtGetString(errorStringHandle);
+                    RtDisposeString(errorStringHandle);
+                    throw ThreadingException(errorString);
+                }
+            }
+        }
         public bool Eof(StdHandle handle)
         {
             int errorStringHandle = -1;

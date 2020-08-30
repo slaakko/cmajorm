@@ -27,6 +27,7 @@ BUILD_API void GenerateLibrary(Module* module, const std::vector<std::string>& o
 BUILD_API void Link(Target target,const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths,
     const std::string& mainObjectFilePath, cmajor::symbols::Module& module);
 BUILD_API void StopBuild();
+BUILD_API void ResetStopBuild();
 BUILD_API std::unique_ptr<Project> ReadProject(const std::string& projectFilePath);
 BUILD_API ProjectInfo ReadPojectInfo(Project* project, const std::string& projectInfoFilePath);
 

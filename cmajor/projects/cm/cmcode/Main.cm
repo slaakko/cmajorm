@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Windows;
+using Cm.Build;
 using Cm.Debug;
 using cmcode;
 
@@ -15,7 +16,7 @@ namespace cmcode
     class MainWindow : Window
     {
         public MainWindow() : base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
-            Dock.none, Anchors.none, MainWindowWindowState())
+            Dock.none, Anchors.none, MainWindowWindowState()), buildService(Cm.Build.defaultPort, true)
         {
             Debug.SetPaint();
             UniquePtr<MenuBar> menuBar(new MenuBar());
@@ -66,6 +67,7 @@ namespace cmcode
             buildMenuItem->AddMenuItem(new MenuItemSeparator());
             UniquePtr<MenuItem> buildActiveProjectMenuItemPtr(new MenuItem("Build &Active Project"));
             buildActiveProjectMenuItem = buildActiveProjectMenuItemPtr.Get();
+            buildActiveProjectMenuItem->ClickEvent().AddHandler(BuildActiveProjectClick);
             buildActiveProjectMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.b));
             buildMenuItem->AddMenuItem(buildActiveProjectMenuItemPtr.Release());
             UniquePtr<MenuItem> rebuildActiveProjectMenuItemPtr(new MenuItem("Reb&uild Active Project"));
@@ -178,6 +180,7 @@ namespace cmcode
 
             UniquePtr<ToolButton> buildProjectToolButtonPtr(new ToolButton("cmcode.build.project.bitmap"));
             buildProjectToolButton = buildProjectToolButtonPtr.Get();
+            buildProjectToolButton->ClickEvent().AddHandler(BuildActiveProjectClick);
             buildProjectToolButton->SetToolTip("Build Active Project (Ctrl+B)");
             buildProjectToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(buildProjectToolButtonPtr.Release());
@@ -271,6 +274,7 @@ namespace cmcode
             sourceFilePathStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
             statusBar->AddItem(sourceFilePathStatusBarItem);
             AddChild(statusBar);
+            buildService.SetLogMessageNotificationFunction(LogMessageAvailable);
             SetControlStatus();
             MainConfiguration.Instance().SetMainWindowLocation(Location());
             MainConfiguration.Instance().SetMainWindowSize(GetSize());
@@ -669,6 +673,62 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private string GetBackend() const
+        {
+            if (cppToolButton->GetState() == ToolButton.State.pressed)
+            {
+                return "cpp";
+            }
+            else if (llvmToolButton->GetState() == ToolButton.State.pressed)
+            {
+                return "llvm";
+            }
+            else
+            {
+                throw Exception("Either C++ or LLVM backend must be selected");
+            }
+        }
+        private string GetConfig() const
+        {
+            if (debugToolButton->GetState() == ToolButton.State.pressed)
+            {
+                return "debug";
+            }
+            else if (releaseToolButton->GetState() == ToolButton.State.pressed)
+            {
+                return "release";
+            }
+            else
+            {
+                throw Exception("Either Debug or Release configuration must be selected");
+            }
+        }
+        private void BuildActiveProjectClick()
+        {
+            try
+            {
+                if (solution.IsNull()) throw Exception("no solution is open");
+                Cm.Ast.Project* activeProject = solution->ActiveProject();
+                if (activeProject != null)
+                {
+                    BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), activeProject->FilePath(), false, true);
+                    buildService.ProcessBuildRequest(buildRequest);
+                }
+                else
+                {
+                    throw Exception("no active project set for the solution");
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void LogMessageAvailable()
+        {
+            // todo
+        }
         private void SaveClick()
         {
             try
@@ -871,6 +931,8 @@ namespace cmcode
         private ToolButton* stepOverToolButton;
         private ToolButton* stepIntoToolButton;
         private ToolButton* stepOutToolButton;
+
+        private Cm.Build.Service buildService;
     }
 }
 

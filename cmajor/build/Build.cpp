@@ -90,6 +90,11 @@ void StopBuild()
     stopBuild = true;
 }
 
+void ResetStopBuild()
+{
+    stopBuild = false;
+}
+
 Solution* currentSolution = nullptr;
 
 std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(Module* module, const std::vector<std::string>& sourceFilePaths, bool& stop)

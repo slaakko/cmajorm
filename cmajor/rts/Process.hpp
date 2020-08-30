@@ -14,6 +14,7 @@ extern "C" RT_API const char* RtGetString(int32_t stringHandle);
 extern "C" RT_API void RtDisposeString(int32_t stringHandle);
 extern "C" RT_API bool RtProcessRunning(void* process, int32_t& errorStringHandle);
 extern "C" RT_API bool RtProcessWaitForExit(void* process, int32_t& errorStringHandle);
+extern "C" RT_API bool RtProcessTerminate(void* process, int32_t& errorStringHandle);
 extern "C" RT_API int RtProcessExitCode(void* process, int32_t& errorStringHandle);
 extern "C" RT_API bool RtProcessEof(void* process, int handle, int32_t& errorStringHandle);
 extern "C" RT_API int32_t RtProcessReadLine(void* process, int handle, int32_t& errorStringHandle);

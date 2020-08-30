@@ -266,7 +266,7 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
         }
         if (cmajor::symbols::GetGlobalFlag(cmajor::symbols::GlobalFlags::verbose))
         {
-            LogMessage(-1, "Cmajor compiler version " + std::string(version) + " for Windows x64");
+            LogMessage(-1, "Cmajor compiler with LLVM backend version " + std::string(version) + " for Windows x64");
         }
         if (!cmajor::symbols::GetGlobalFlag(cmajor::symbols::GlobalFlags::release) && !noDebugInfo)
         {

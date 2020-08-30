@@ -2,24 +2,28 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>9e7f769a-86e3-48e5-82cd-b95b13633a2f</ProjectGuid>
+  <ProjectGuid>6f686d88-8e97-499e-ae8d-b764bb4fcdb5</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
-  <TargetType>winlib</TargetType>
+  <TargetType>winguiapp</TargetType>
  </PropertyGroup>
  <ItemGroup>
-  <CmCompile Include="Bitmaps.cm"/>
-  <CmCompile Include="CmajorEditor.cm"/>
-  <CmCompile Include="CmajorSourceCodeView.cm"/>
-  <CmCompile Include="DebugStrip.cm"/>
+  <CmCompile Include="Action.cm"/>
+  <CmCompile Include="Build.cm"/>
+  <CmCompile Include="Color.cm"/>
+  <CmCompile Include="Config.cm"/>
+  <CmCompile Include="Main.cm"/>
+  <CmCompile Include="Solution.cm"/>
   <CmCompile Include="Resources.xml"/>
  </ItemGroup>
  <ItemGroup/>
  <ItemGroup>
   <ProjectReference Include="../ast/Cm.Ast.cmproj"/>
+  <ProjectReference Include="../build/Cm.Build.cmproj"/>
   <ProjectReference Include="../debug/Cm.Debug.cmproj"/>
   <ProjectReference Include="../lexer/Cm.Lexer.cmproj"/>
   <ProjectReference Include="../parser/Cm.Parser.cmproj"/>
+  <ProjectReference Include="../views/Cm.Views.cmproj"/>
  </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

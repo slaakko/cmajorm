@@ -1,0 +1,87 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace Cm.Build
+{
+    [json]
+    public class BuildRequest
+    {
+        public nothrow BuildRequest() : messageKind("buildRequest")
+        {
+        }
+        public string messageKind;
+        public string backend;
+        public string config;
+        public string optimizationLevel;
+        public string filePath;
+        public List<string> defines;
+        public string numBuildThreads;
+        public string toolChain;
+        public bool verbose;
+        public bool quiet;
+        public bool clean;
+        public bool strictNothrow;
+        public bool emitIR;
+        public bool emitOptIR;
+        public bool linkWithDebugRuntime;
+        public bool linkUsingMsLink;
+        public bool rebuild;
+        public bool buildAllDependencies;
+        public bool forceDebugInfo;
+        public bool forceNoDebugInfo;
+        public bool disableModuleCache;
+        public bool singleThreadedCompile;
+        public bool disableCodeGen;
+        public bool justMyCode;
+    }
+
+    [json]
+    public class BuildReply
+    {
+        public nothrow BuildReply() : messageKind("buildReply")
+        {
+        }
+        public string messageKind;
+        public bool requestValid;
+        public string requestErrorMessage;
+        public string logException;
+        public string time;
+        public bool success;
+        public string error;
+    }
+
+    [json]
+    public class LogMessageRequest
+    {
+        public nothrow LogMessageRequest() : messageKind("logMessageRequest")
+        {
+        }
+        public string messageKind;
+        public string message;
+    }
+
+    [json]
+    public class LogMessageReply
+    {
+        public nothrow LogMessageReply() : messageKind("logMessageReply")
+        {
+        }
+        public string messageKind;
+        public bool ok;
+    }
+
+    [json]
+    public class GenericErrorReply
+    {
+        public nothrow GenericErrorReply() : messageKind("genericErrorReply")
+        {
+        }
+        public string messageKind;
+        public string error;
+    }
+}

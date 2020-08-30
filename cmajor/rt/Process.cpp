@@ -81,6 +81,21 @@ int RtProcessExitCode(void* process, int32_t& errorStringHandle)
     }
 }
 
+bool RtProcessTerminate(void* process, int32_t& errorStringHandle)
+{
+    try
+    {
+        errorStringHandle = -1;
+        static_cast<soulng::util::Process*>(process)->Terminate();
+    }
+    catch (const std::exception& ex)
+    {
+        errorStringHandle = cmajor::rt::InstallString(ex.what());
+        return false;
+    }
+    return true;
+}
+
 bool RtProcessEof(void* process, int handle, int32_t& errorStringHandle)
 {
     try

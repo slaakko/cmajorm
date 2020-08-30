@@ -12,6 +12,7 @@
 #include <condition_variable>
 #include <thread>
 #include <chrono>
+#include <atomic>
 
 namespace soulng { namespace util {
 
@@ -19,7 +20,7 @@ using namespace soulng::unicode;
 
 std::mutex logMutex;
 LogMode logMode = LogMode::console;
-bool endLog = false;
+std::atomic<bool> endLog = false;
 std::list<std::string> log;
 std::condition_variable messageEnqueuedOrEndLog;
 
@@ -113,6 +114,21 @@ int FetchLogMessage(char16_t* buf, int size)
         buf[n] = u'\0';
         return n;
     }
+}
+
+std::string FetchLogMessage(bool& endOfLog)
+{
+    endOfLog = false;
+    std::unique_lock<std::mutex> lock(logMutex);
+    messageEnqueuedOrEndLog.wait(lock, [] { return !log.empty() || endLog; });
+    if (!log.empty())
+    {
+        logMessage = log.front();
+        log.pop_front();
+        return logMessage;
+    }
+    endOfLog = true;
+    return std::string();
 }
 
 } } // namespace soulng::util
