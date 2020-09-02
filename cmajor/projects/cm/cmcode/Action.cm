@@ -5,9 +5,103 @@
 
 using System;
 using System.Windows;
+using Cm.Build;
 
 namespace cmcode
 {
+    public class BuildSolutionAction : ClickAction
+    {
+        public nothrow BuildSolutionAction(MainWindow* mainWindow_, Cm.Ast.Solution* solution_) : base(), mainWindow(mainWindow_), solution(solution_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            BuildRequest buildRequest = MakeBuildRequest(mainWindow->GetBackend(), mainWindow->GetConfig(), solution->FilePath(), BuildRequestKind.build);
+            mainWindow->StartBuild(buildRequest);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Solution* solution;
+    }
+
+    public class RebuildSolutionAction : ClickAction
+    {
+        public nothrow RebuildSolutionAction(MainWindow* mainWindow_, Cm.Ast.Solution* solution_) : base(), mainWindow(mainWindow_), solution(solution_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            BuildRequest buildRequest = MakeBuildRequest(mainWindow->GetBackend(), mainWindow->GetConfig(), solution->FilePath(), BuildRequestKind.rebuild);
+            mainWindow->StartBuild(buildRequest);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Solution* solution;
+    }
+
+    public class CleanSolutionAction : ClickAction
+    {
+        public nothrow CleanSolutionAction(MainWindow* mainWindow_, Cm.Ast.Solution* solution_) : base(), mainWindow(mainWindow_), solution(solution_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            BuildRequest buildRequest = MakeBuildRequest(mainWindow->GetBackend(), mainWindow->GetConfig(), solution->FilePath(), BuildRequestKind.clean);
+            mainWindow->StartBuild(buildRequest);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Solution* solution;
+    }
+
+    public class BuildProjectAction : ClickAction
+    {
+        public nothrow BuildProjectAction(MainWindow* mainWindow_, Cm.Ast.Project* project_) : base(), mainWindow(mainWindow_), project(project_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            BuildRequest buildRequest = MakeBuildRequest(mainWindow->GetBackend(), mainWindow->GetConfig(), project->FilePath(),
+                cast<BuildRequestKind>(BuildRequestKind.build | BuildRequestKind.buildDependencies));
+            mainWindow->StartBuild(buildRequest);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+    }
+
+    public class RebuildProjectAction : ClickAction
+    {
+        public nothrow RebuildProjectAction(MainWindow* mainWindow_, Cm.Ast.Project* project_) : base(), mainWindow(mainWindow_), project(project_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            BuildRequest buildRequest = MakeBuildRequest(mainWindow->GetBackend(), mainWindow->GetConfig(), project->FilePath(),
+                cast<BuildRequestKind>(BuildRequestKind.rebuild | BuildRequestKind.buildDependencies));
+            mainWindow->StartBuild(buildRequest);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+    }
+
+    public class CleanProjectAction : ClickAction
+    {
+        public nothrow CleanProjectAction(MainWindow* mainWindow_, Cm.Ast.Project* project_) : base(), mainWindow(mainWindow_), project(project_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            BuildRequest buildRequest = MakeBuildRequest(mainWindow->GetBackend(), mainWindow->GetConfig(), project->FilePath(),
+                cast<BuildRequestKind>(BuildRequestKind.clean | BuildRequestKind.buildDependencies));
+            mainWindow->StartBuild(buildRequest);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+    }
+
     public class SetActiveProjectAction : ClickAction
     {
         public nothrow SetActiveProjectAction(Window* window_, TreeView* treeView_, SolutionExplorerData* solutionExplorerData_, Cm.Ast.Solution* solution_,

@@ -932,6 +932,10 @@ namespace System.Windows
                     }
                 }
             }
+            else if (args.buttons == MouseButtons.rbutton)
+            {
+                Select();
+            }
         }
         private void OnMouseUp(MouseEventArgs& args)
         {
@@ -948,10 +952,13 @@ namespace System.Windows
             }
             else if (args.buttons == MouseButtons.rbutton)
             {
-                TreeView* view = GetTreeView();
-                if (view != null)
+                if (Selected())
                 {
-                    view->NodeClick(args.location, args.buttons, this);
+                    TreeView* view = GetTreeView();
+                    if (view != null)
+                    {
+                        view->NodeClick(args.location, args.buttons, this);
+                    }
                 }
             }
         }
