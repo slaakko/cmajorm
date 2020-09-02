@@ -451,8 +451,8 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
     }
     else
     {
-        cmajor::build::SetNumBuildThreads(1);
-        cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::singleThreadedCompile);
+        //SetNumBuildThreads(1); !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //SetGlobalFlag(GlobalFlags::singleThreadedCompile);!!!!!!!!!!!!!!!!!!!!!!!
     }
     cmajor::symbols::SetUseModuleCache(useModuleCache);
     BackendSelector backend(cmajor::symbols::GetBackEnd());

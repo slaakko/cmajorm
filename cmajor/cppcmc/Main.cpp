@@ -385,8 +385,8 @@ int main(int argc, const char** argv)
             }
             else
             {
-                SetNumBuildThreads(1);
-                SetGlobalFlag(GlobalFlags::singleThreadedCompile);
+                //SetNumBuildThreads(1); !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //SetGlobalFlag(GlobalFlags::singleThreadedCompile);!!!!!!!!!!!!!!!!!!!!!!!
             }
             for (const std::string& file : files)
             {
