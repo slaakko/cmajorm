@@ -66,9 +66,20 @@ class FileMask
     {
         include, exclude
     }
-    public nothrow FileMask(Context& context, Kind kind_, const ustring& mask_) : kind(kind_), mask(mask_)
+    public enum Actions
+    {
+        none = 0, add = 1 << 0, update = 1 << 1
+    }
+    public nothrow FileMask(Context& context, Kind kind_, const ustring& mask_, Actions actions_) : kind(kind_), mask(mask_), actions(actions_)
     {
         nfa = CompileFilePattern(context, mask);
+    }
+    public nothrow FileMask(Context& context, Kind kind, const ustring& mask) : this(context, kind, mask, cast<Actions>(Actions.update | Actions.add))
+    {
+    }
+    public nothrow bool Enabled(Actions action) const
+    {
+        return (actions & action) != Actions.none;
     }
     public void Match(const ustring& filename, bool& include)
     {
@@ -88,9 +99,14 @@ class FileMask
             }
         }
     }
+    public nothrow Kind GetKind() const
+    {
+        return kind;
+    }
     private Kind kind;
     private ustring mask;
     private Nfa nfa;
+    private Actions actions;
 }
 
 class DirMask
@@ -160,6 +176,22 @@ class Pattern
             dirMask->Match(dirName, include);
         }
         return include;
+    }
+    public bool Enabled(const ustring& fileName, FileMask.Actions action) const
+    {
+        for (const UniquePtr<FileMask>& fileMask : fileMasks)
+        {
+            bool include = false;
+            fileMask->Match(fileName, include);
+            if (include)
+            {
+                if (fileMask->GetKind() == FileMask.Kind.include)
+                {
+                    if (!fileMask->Enabled(action)) return false;
+                }
+            }
+        }
+        return true;
     }
     private string name;
     private List<UniquePtr<FileMask>> fileMasks;
@@ -294,6 +326,7 @@ PatternSet ReadPatterns(Context& context, Document* doc, const string& file, boo
                                 if (node is Element*)
                                 {
                                     Element* fileElement = cast<Element*>(node);
+                                    ustring action = fileElement->GetAttribute(u"action");
                                     ustring mask = fileElement->GetAttribute(u"include");
                                     if (mask.IsEmpty())
                                     {
@@ -309,7 +342,23 @@ PatternSet ReadPatterns(Context& context, Document* doc, const string& file, boo
                                     }
                                     else
                                     {
-                                        pattern->AddFileMask(new FileMask(context, FileMask.Kind.include, mask));
+                                        if (action.IsEmpty())
+                                        {
+                                            pattern->AddFileMask(new FileMask(context, FileMask.Kind.include, mask));
+                                        }
+                                        else
+                                        {
+                                            FileMask.Actions actions = FileMask.Actions.none;
+                                            if (action == u"add")
+                                            {
+                                                actions = cast<FileMask.Actions>(actions | FileMask.Actions.add);
+                                            }
+                                            else if (action == u"update")
+                                            {
+                                                actions = cast<FileMask.Actions>(actions | FileMask.Actions.update);
+                                            }
+                                            pattern->AddFileMask(new FileMask(context, FileMask.Kind.include, mask, actions));
+                                        }
                                     }
                                 }
                             }
@@ -549,14 +598,20 @@ void ProcessDir(const string& sourceDir, const string& targetDir, Pattern* patte
                 }
                 if (File.Exists(targetFile))
                 {
-                    if (FilesDiffer(sourceFile, targetFile))
+                    if (pattern->Enabled(fname, FileMask.Actions.update))
                     {
-                        UpdateFile(sourceFile, targetFile, update, updateCount, colors);
+                        if (FilesDiffer(sourceFile, targetFile))
+                        {
+                            UpdateFile(sourceFile, targetFile, update, updateCount, colors);
+                        }
                     }
                 }
                 else
                 {
-                    AddFile(sourceFile, targetFile, add, addCount, colors);
+                    if (pattern->Enabled(fname, FileMask.Actions.add))
+                    {
+                        AddFile(sourceFile, targetFile, add, addCount, colors);
+                    }
                 }
             }
         }

@@ -10,13 +10,17 @@
 #ifdef _WIN32
 #include <cmajor/symbols/Trap.hpp>
 #endif
+#include <sngcm/ast/Project.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Log.hpp>
+#include <soulng/util/Path.hpp>
+#include <boost/filesystem.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace soulng::unicode;
 using namespace soulng::util;
+using namespace sngcm::ast;
 
 bool useModuleCache = false;
 

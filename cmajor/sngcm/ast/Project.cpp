@@ -128,6 +128,14 @@ std::string CmajorResourceDir()
     return GetFullPath(rd.generic_string());
 }
 
+std::string CmajorLogFileDir()
+{
+    std::string cmajorRooDir = CmajorRootDir();
+    std::string logFileDir = Path::Combine(cmajorRooDir, "log");
+    boost::filesystem::create_directories(logFileDir);
+    return logFileDir;
+}
+
 std::string outDir;
 
 void SetOutDir(const std::string& outDir_)

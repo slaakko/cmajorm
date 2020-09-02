@@ -9,6 +9,24 @@ using System.Collections;
 namespace Cm.Build
 {
     [json]
+    public class StopRequest
+    {
+        public nothrow StopRequest() : messageKind("stopRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class KeepAliveRequest
+    {
+        public nothrow KeepAliveRequest() : messageKind("keepAliveRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
     public class BuildRequest
     {
         public nothrow BuildRequest() : messageKind("buildRequest")

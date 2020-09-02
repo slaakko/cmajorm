@@ -40,23 +40,19 @@ void ProcessBuildReply(const BuildReply& buildReply)
 {
     if (!buildReply.requestValid)
     {
-        std::cout << "buildReply.requestValid=false: " << buildReply.requestErrorMessage << std::endl;;
+        std::cout << "buildReply.requestValid=false:\n" << buildReply.requestErrorMessage << std::endl;;
     }
     if (!buildReply.success)
     {
-        std::cout << "buildReply.success=false: " << buildReply.error << std::endl;
+        std::cout << "buildReply.success=false:\n" << buildReply.error << std::endl;
     }
     if (!buildReply.logException.empty())
     {
-        std::cout << "buildReply.logException: " << buildReply.logException << std::endl;
+        std::cout << "buildReply.logException:\n" << buildReply.logException << std::endl;
     }
     if (buildReply.success)
     {
         std::cout << "buildReply.success=true" << std::endl;
-    }
-    if (!buildReply.time.empty())
-    {
-        std::cout << "buildReply.time=" << buildReply.time << std::endl;
     }
 }
 

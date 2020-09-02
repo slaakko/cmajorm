@@ -3041,6 +3041,23 @@ void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& r
     std::unique_ptr<Project> project = ReadProject(projectFilePath);
     if (GetGlobalFlag(GlobalFlags::clean))
     {
+        if (!GetGlobalFlag(GlobalFlags::msbuild))
+        {
+            for (const std::string& referencedProjectFilePath : project->ReferencedProjectFilePaths())
+            {
+                SystemDirKind systemDirKind = SystemDirKind::regular;
+                if (GetGlobalFlag(GlobalFlags::repository))
+                {
+                    systemDirKind = SystemDirKind::repository;
+                }
+                std::unique_ptr<Project> referencedProject = ReadProject(referencedProjectFilePath);
+                project->AddDependsOnId(referencedProject->Id());
+                if (currentSolution == nullptr && GetGlobalFlag(GlobalFlags::buildAll))
+                {
+                    BuildProject(referencedProjectFilePath, rootModule, builtProjects);
+                }
+            }
+        }
         CleanProject(project.get());
     }
     else

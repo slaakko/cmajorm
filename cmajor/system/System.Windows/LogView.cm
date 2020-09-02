@@ -10,15 +10,12 @@ namespace System.Windows
 {
     public class LogView : TextView
     {
-        private enum Flags : sbyte
-        {
-            none = 0, frozen = 1 << 0
-        }
         public LogView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base(fontFamily, fontSize, backgroundColor, location, size, dock, anchors), flags(Flags.none)
+            base(fontFamily, fontSize, backgroundColor, location, size, dock, anchors)
         {
         }
-        public LogView(const Point& location, const Size& size, Dock dock, Anchors anchors) : this(FontFamily("Consolas"), 9.0f, Color.White(), location, size, dock, anchors)
+        public LogView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(FontFamily("Consolas"), 9.0f, Color.White(), location, size, dock, anchors)
         {
         }
         public LogView() : this(Point(0, 0), Size(0, 0), Dock.bottom, Anchors.none)
@@ -26,7 +23,8 @@ namespace System.Windows
         }
         public void Clear()
         {
-            Lines().Clear();
+            ustring newContent;
+            SetTextContent(newContent);
             Invalidate();
         }
         public virtual void WriteLine(const string& text)
@@ -36,13 +34,10 @@ namespace System.Windows
             {
                 AddLine(line);
             }
-            if (!Frozen())
-            {
-                SetCaretLineCol(cast<int>(Lines().Count()), 1);
-                ScrollToCaret();
-                SetChanged();
-                Invalidate();
-            }
+            SetCaretLineCol(cast<int>(Lines().Count()), 1);
+            ScrollToCaret();
+            SetChanged();
+            Invalidate();
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
@@ -50,7 +45,6 @@ namespace System.Windows
         }
         protected override void OnMouseDown(MouseEventArgs& args)
         {
-            SetFrozen();
             base->OnMouseDown(args);
         }
         protected override void OnKeyDown(KeyEventArgs& args)
@@ -58,26 +52,8 @@ namespace System.Windows
             base->OnKeyDown(args);
             if (CaretLine() == Lines().Count())
             {
-                ResetFrozen();
                 Invalidate();
             }
-            else
-            {
-                SetFrozen();
-            }
         }
-        private nothrow inline bool Frozen() const
-        {
-            return (flags & Flags.frozen) != Flags.none;
-        }
-        private nothrow inline void SetFrozen()
-        {
-            flags = cast<Flags>(flags | Flags.frozen);
-        }
-        private nothrow inline void ResetFrozen()
-        {
-            flags = cast<Flags>(flags & ~Flags.frozen);
-        }
-        private Flags flags;
     }
 }

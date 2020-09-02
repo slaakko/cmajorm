@@ -21,6 +21,7 @@
 #include <soulng/util/CodeFormatter.hpp>
 #include <mutex>
 #include <set>
+#include <time.h>
 
 namespace cmajor { namespace symbols {
 

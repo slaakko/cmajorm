@@ -5,6 +5,22 @@
 #include <vector>
 #include <memory>
 
+struct StopRequest
+{
+    StopRequest();
+    StopRequest(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+};
+
+struct KeepAliveRequest
+{
+    KeepAliveRequest();
+    KeepAliveRequest(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+};
+
 struct BuildRequest
 {
     BuildRequest();

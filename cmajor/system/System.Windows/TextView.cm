@@ -19,7 +19,7 @@ namespace System.Windows
         {
             none = 0, changed = 1 << 0, painting = 1 << 1
         }
-
+        
         public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("System.Windows.TextView", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP), DefaultExtendedWindowStyle(), backgroundColor,
             "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),

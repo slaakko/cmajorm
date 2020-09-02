@@ -20,7 +20,7 @@ using namespace soulng::unicode;
 
 std::mutex logMutex;
 LogMode logMode = LogMode::console;
-std::atomic<bool> endLog = false;
+bool endLog = false;
 std::list<std::string> log;
 std::condition_variable messageEnqueuedOrEndLog;
 
@@ -36,10 +36,17 @@ void StartLog()
 
 void EndLog()
 {
-    while (!log.empty())
+    for (int i = 0; i < 10; ++i)
     {
-        messageEnqueuedOrEndLog.notify_one();
-        std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+        if (!log.empty())
+        {
+            messageEnqueuedOrEndLog.notify_one();
+            std::this_thread::sleep_for(std::chrono::milliseconds{ 500 });
+        }
+        else
+        {
+            break;
+        }
     }
     endLog = true;
     messageEnqueuedOrEndLog.notify_one();
@@ -120,7 +127,7 @@ std::string FetchLogMessage(bool& endOfLog)
 {
     endOfLog = false;
     std::unique_lock<std::mutex> lock(logMutex);
-    messageEnqueuedOrEndLog.wait(lock, [] { return !log.empty() || endLog; });
+    messageEnqueuedOrEndLog.wait(lock, []{ return !log.empty() || endLog; });
     if (!log.empty())
     {
         logMessage = log.front();

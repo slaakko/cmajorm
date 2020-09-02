@@ -28,15 +28,16 @@ inline ConnectOptions operator|(ConnectOptions left, ConnectOptions right)
     return ConnectOptions(int32_t(left) | int32_t(right));
 }
 
-extern "C" RT_API int32_t RtCreateSocket();
-extern "C" RT_API int32_t RtBindSocket(int32_t socketHandle, int32_t port);
-extern "C" RT_API int32_t RtListenSocket(int32_t socketHandle, int32_t backLog);
-extern "C" RT_API int32_t RtAcceptSocket(int32_t socketHandle);
-extern "C" RT_API int32_t RtCloseSocket(int32_t socketHandle);
-extern "C" RT_API int32_t RtShutdownSocket(int32_t socketHandle, ShutdownMode mode);
-extern "C" RT_API int32_t RtConnectSocket(const char* node, const char* service, ConnectOptions options);
-extern "C" RT_API int32_t RtSendSocket(int32_t socketHandle, uint8_t* buf, int32_t len, int32_t flags);
-extern "C" RT_API int32_t RtReceiveSocket(int32_t socketHandle, uint8_t* buf, int32_t len, int32_t flags);
+extern "C" RT_API void* RtCreateSocket(int32_t& errorStringHandle);
+extern "C" RT_API bool RtBindSocket(void* socketHandle, int32_t port, int32_t& errorStringHandle);
+extern "C" RT_API bool RtListenSocket(void* socketHandle, int32_t backLog, int32_t& errorStringHandle);
+extern "C" RT_API void* RtAcceptSocket(void* socketHandle, int32_t& errorStringHandle);
+extern "C" RT_API bool RtCloseSocket(void* socketHandle, int32_t& errorStringHandle);
+extern "C" RT_API bool RtShutdownSocket(void* socketHandle, ShutdownMode mode, int32_t& errorStringHandle);
+extern "C" RT_API void* RtConnectSocket(const char* node, const char* service, ConnectOptions options, int32_t& errorStringHandle);
+extern "C" RT_API int32_t RtSendSocket(void* socketHandle, uint8_t * buf, int32_t len, int32_t flags, int32_t& errorStringHandle);
+extern "C" RT_API int32_t RtReceiveSocket(void* socketHandle, uint8_t * buf, int32_t len, int32_t flags, int32_t& errorStringHandle);
+extern "C" RT_API void RtDestroySocket(void* socketHandle);
 
 namespace cmajor { namespace rt {
 

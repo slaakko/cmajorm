@@ -23,28 +23,28 @@ namespace System.Net.Sockets
         {
         }
     }
-    
+
     public class TcpSocket
     {
-        public TcpSocket() : handle(RtCreateSocket()), connected(false), shutdown(false)
+        public TcpSocket() : handle(null), connected(false), shutdown(false)
         {
-            if (handle < 0)
+            int errorStringHandle = -1;
+            handle = RtCreateSocket(errorStringHandle);
+            if (handle == null)
             {
-                string errorMessage = RtGetError(handle);
-                RtDisposeError(handle);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
                 throw SocketException(errorMessage);
             }
         }
-        public TcpSocket(const string& node_, const string& service_) : this(node_, service_, ConnectOptions.none)
+        public TcpSocket(const string& node, const string& service, ConnectOptions options) : handle(null), connected(false), shutdown(false)
         {
-        }
-        public TcpSocket(const string& node_, const string& service_, ConnectOptions options_) : 
-            handle(RtConnectSocket(node_.Chars(), service_.Chars(), cast<int>(options_))), connected(false), shutdown(false)
-        {
-            if (handle < 0)
+            int errorStringHandle = -1;
+            handle = RtConnectSocket(node.Chars(), service.Chars(), cast<int>(options), errorStringHandle);
+            if (handle == null)
             {
-                string errorMessage = RtGetError(handle);
-                RtDisposeError(handle);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
                 throw SocketException(errorMessage);
             }
             else
@@ -52,24 +52,29 @@ namespace System.Net.Sockets
                 connected = true;
             }            
         }
-        public nothrow TcpSocket(int handle_) : handle(handle_)
+        public TcpSocket(const string& node, const string& service) : this(node, service, ConnectOptions.none)
+        {
+        }
+        public nothrow TcpSocket(void* handle_) : handle(handle_), connected(true), shutdown(false)
         {
         }
         suppress TcpSocket(const TcpSocket&);
         suppress void operator=(const TcpSocket&);
-        public nothrow TcpSocket(TcpSocket&& that) : handle(that.handle)
+        public nothrow TcpSocket(TcpSocket&& that) : handle(that.handle), connected(that.connected), shutdown(that.shutdown)
         {
-            that.handle = -1;
+            that.handle = null;
             that.connected = false;
             that.shutdown = false;
         }
         public nothrow void operator=(TcpSocket&& that) 
         {
             Swap(handle, that.handle);
+            Swap(connected, that.connected);
+            Swap(shutdown, that.shutdown);
         }
         public ~TcpSocket()
         {
-            if (handle > 0)
+            if (handle != null)
             {
                 if (connected && !shutdown)
                 {
@@ -81,25 +86,30 @@ namespace System.Net.Sockets
                     {
                     }                
                 }
-                RtCloseSocket(handle);
+                if (connected)
+                {
+                    int errorStringHandle = -1;
+                    RtCloseSocket(handle, errorStringHandle);
+                }
+                RtDestroySocket(handle);
             }
         }
         public void Close()
         {
-            if (handle > 0)
+            if (handle != null)
             {
                 if (connected && !shutdown)
                 {
                     Shutdown(ShutdownMode.both);
                 }
-                int result = RtCloseSocket(handle);
-                if (result < 0)
+                int errorStringHandle = -1;
+                if (!RtCloseSocket(handle, errorStringHandle))
                 {
-                    string errorMessage = RtGetError(result);
-                    RtDisposeError(result);
+                    string errorMessage = RtGetError(errorStringHandle);
+                    RtDisposeError(errorStringHandle);
                     throw SocketException(errorMessage);
                 }
-                handle = -1;
+                handle = null;
                 connected = false;
             }
         }
@@ -110,11 +120,12 @@ namespace System.Net.Sockets
         public void Connect(const string& node, const string& service, ConnectOptions options)
         {
             Close();
-            handle = RtConnectSocket(node.Chars(), service.Chars(), cast<int>(options));
-            if (handle < 0)
+            int errorStringHandle = -1;
+            handle = RtConnectSocket(node.Chars(), service.Chars(), cast<int>(options), errorStringHandle);
+            if (handle == null)
             {
-                string errorMessage = RtGetError(handle);
-                RtDisposeError(handle);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
                 throw SocketException(errorMessage);
             }
             else
@@ -124,31 +135,32 @@ namespace System.Net.Sockets
         }
         public void Bind(int port)
         {
-            int result = RtBindSocket(handle, port);
-            if (result < 0)
+            int errorStringHandle = -1;
+            if (!RtBindSocket(handle, port, errorStringHandle))
             {
-                string errorMessage = RtGetError(result);
-                RtDisposeError(result);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
                 throw SocketException(errorMessage);
             }
         }
         public void Listen(int backLog)
         {
-            int result = RtListenSocket(handle, backLog);
-            if (result < 0)
+            int errorStringHandle = -1;
+            if (!RtListenSocket(handle, backLog, errorStringHandle))
             {
-                string errorMessage = RtGetError(result);
-                RtDisposeError(result);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
                 throw SocketException(errorMessage);
             }
         }
         public TcpSocket Accept()
         {
-            int acceptedHandle = RtAcceptSocket(handle);
-            if (acceptedHandle < 0)
+            int errorStringHandle = -1;
+            void* acceptedHandle = RtAcceptSocket(handle, errorStringHandle);
+            if (acceptedHandle == null)
             {
-                string errorMessage = RtGetError(acceptedHandle);
-                RtDisposeError(acceptedHandle);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
                 throw SocketException(errorMessage);
             }
             return TcpSocket(acceptedHandle);
@@ -156,37 +168,39 @@ namespace System.Net.Sockets
         public void Shutdown(ShutdownMode mode)
         {
             shutdown = true;
-            int result = RtShutdownSocket(handle, cast<int>(mode));
-            if (result < 0)
+            int errorStringHandle = -1;
+            if (!RtShutdownSocket(handle, cast<int>(mode), errorStringHandle))
             {
-                string errorMessage = RtGetError(result);
-                RtDisposeError(result);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
                 throw SocketException(errorMessage);
             }
         }
         public int Send(byte* buffer, int count)
         {
-            int result = RtSendSocket(handle, buffer, count, 0);
+            int errorStringHandle = -1;
+            int result = RtSendSocket(handle, buffer, count, 0, errorStringHandle);
             if (result < 0)
             {
-                string errorMessage = RtGetError(result);
-                RtDisposeError(result);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
                 throw SocketException(errorMessage);
             }
             return result;
         }
         public int Receive(byte* buffer, int count)
         {
-            int result = RtReceiveSocket(handle, buffer, count, 0);
+            int errorStringHandle = -1;
+            int result = RtReceiveSocket(handle, buffer, count, 0, errorStringHandle);
             if (result < 0)
             {
-                string errorMessage = RtGetError(result);
-                RtDisposeError(result);
+                string errorMessage = RtGetError(errorStringHandle);
+                RtDisposeError(errorStringHandle);
                 throw SocketException(errorMessage);
             }
             return result;
         }
-        private int handle;
+        private void* handle;
         private bool connected;
         private bool shutdown;
     }

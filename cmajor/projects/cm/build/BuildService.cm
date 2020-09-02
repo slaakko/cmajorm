@@ -1,0 +1,367 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Threading;
+using System.Net.Sockets;
+using System.Json;
+using System.IO;
+using System.Text;
+using Cm.Ast;
+
+namespace Cm.Build
+{
+    public int defaultPort = 54325;
+
+    public class delegate void LogMessageNotificationFunction();
+
+    public string CmCodeLogDir()
+    {
+        string cmajorRootDir = CmajorRootDir();
+        string logDir = Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cm"), "cmcode"), "log");
+        Directory.CreateDirectories(logDir);
+        return logDir;
+    }
+
+    public class BuildServiceArgs
+    {
+        public BuildServiceArgs() :
+            port(defaultPort), log(false), keepAliveIntervalSeconds(5), serverStartWaitSeconds(1), serverStopWaitSeconds(10),
+            serverTimeoutSeconds(0), saveRequestOnly(false)
+        {
+        }
+        public nothrow BuildServiceArgs& Port(int port_)
+        {
+            port = port_;
+            return *this;
+        }
+        public nothrow BuildServiceArgs& Log(bool log_)
+        {
+            log = log_;
+            return *this;
+        }
+        public nothrow BuildServiceArgs& KeepAliveIntervalSeconds(int keepAliveIntervalSeconds_)
+        {
+            keepAliveIntervalSeconds = keepAliveIntervalSeconds_;
+            return *this;
+        }
+        public nothrow BuildServiceArgs& ServerStartWaitSeconds(int serverStartWaitSeconds_)
+        {
+            serverStartWaitSeconds = serverStartWaitSeconds_;
+            return *this;
+        }
+        public nothrow BuildServiceArgs& ServerStopWaitSeconds(int serverStopWaitSeconds_)
+        {
+            serverStopWaitSeconds = serverStopWaitSeconds_;
+            return *this;
+        }
+        public nothrow BuildServiceArgs& ServerTimeoutSeconds(int serverTimeoutSeconds_)
+        {
+            serverTimeoutSeconds = serverTimeoutSeconds_;
+            return *this;
+        }
+        public nothrow BuildServiceArgs& SaveRequestOnly(bool saveRequestOnly_)
+        {
+            saveRequestOnly = saveRequestOnly_;
+            return *this;
+        }
+        public nothrow BuildServiceArgs& DebugServer(bool debugServer_)
+        {
+            debugServer = debugServer_;
+            return *this;
+        }
+        public int port;
+        public bool log;
+        public bool saveRequestOnly;
+        public int keepAliveIntervalSeconds;
+        public int serverStartWaitSeconds;
+        public int serverStopWaitSeconds;
+        public int serverTimeoutSeconds;
+        public bool debugServer;
+    }
+
+    public class BuildService
+    {
+        public nothrow BuildService(BuildServiceArgs& args) :
+            port(args.port), log(args.log),
+            serverStartWaitSeconds(args.serverStartWaitSeconds), serverStopWaitSeconds(args.serverStopWaitSeconds),
+            keepAliveIntervalSeconds(args.keepAliveIntervalSeconds), saveRequestOnly(args.saveRequestOnly),
+            notifyLogMessageAvailable(), serverMutex()
+        {
+            serverStartCommand = "cmbs";
+            if (args.debugServer)
+            {
+                serverStartCommand = "cmbsd";
+            }
+            serverStartCommand.Append(" --port=" + ToString(port));
+            if (log)
+            {
+                serverStartCommand.Append(" --log");
+            }
+            if (args.serverTimeoutSeconds != 0)
+            {
+                serverStartCommand.Append(" --timeoutSecs=" + ToString(args.serverTimeoutSeconds));
+            }
+        }
+        public nothrow void SetLogMessageNotificationFunction(const LogMessageNotificationFunction& notifyLogMessageAvailable_)
+        {
+            notifyLogMessageAvailable = notifyLogMessageAvailable_;
+        }
+        public nothrow bool ServerRunning() const
+        {
+            if (buildServer.IsNull()) return false;
+            return buildServer->Running();
+        }
+        public bool StartServer()
+        {
+            try
+            {
+                if (ServerRunning())
+                {
+                    StopServer(true);
+                }
+                LogMessage("BuildService: Starting Build Server (port=" + ToString(port) + ")...");
+                buildServer.Reset(
+                    new Process(serverStartCommand,
+                    cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr)));
+                string line = buildServer->ReadLine(Process.StdHandle.stdOut);
+                if (line == "build-server-error")
+                {
+                    line = buildServer->ReadLine(Process.StdHandle.stdOut);
+                    throw Exception("BuildServer failed: " + line);
+                }
+                LogMessage(line);
+                Sleep(Duration.FromSeconds(serverStartWaitSeconds));
+                sendKeepAlives = true;
+                keepAliveThread = Thread.StartMethod(KeepAliveServer);
+                LogMessage("BuildService: Build Server started.");
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+                LogMessage("BuildService: " + ex.Message());
+                return false;
+            }
+            return true;
+        }
+        public void StopServer(bool log)
+        {
+            try
+            {
+                if (!ServerRunning()) return;
+                sendKeepAlives = false;
+                keepAliveThread.Join();
+                if (log)
+                {
+                    LogMessage("Cm.Build.Service: Stopping Build Server...");
+                }
+                SendStopRequest();
+                bool serverStopped = false;
+                for (int i = 0; i < serverStopWaitSeconds; ++i)
+                {
+                    if (buildServer->Running())
+                    {
+                        Sleep(Duration.FromSeconds(1));
+                    }
+                    else
+                    {
+                        serverStopped = true;
+                        break;
+                    }
+                }
+                if (!serverStopped)
+                {
+                    if (log)
+                    {
+                        LogMessage("Cm.Build.Service: Build Server not stopped after " + ToString(serverStopWaitSeconds) + " seconds, terminating server process...");
+                    }
+                    buildServer->Terminate();
+                }
+                int exitCode = buildServer->ExitCode();
+                string exitCodeStr;
+                if (exitCode != 0)
+                {
+                    exitCodeStr.Append(" Exit code=" + ToString(exitCode));
+                }
+                if (log)
+                {
+                    LogMessage("Cm.Build.Service: Build Server stopped." + exitCodeStr);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+                if (log)
+                {
+                    LogMessage("Cm.Build.Service.StopServer: " + ex.Message());
+                }
+            }
+        }
+        public void KeepAliveServer()
+        {
+            try
+            {
+                while (sendKeepAlives && ServerRunning())
+                {
+                    Sleep(Duration.FromSeconds(keepAliveIntervalSeconds));
+                    SendKeepAliveRequest();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+            }
+        }
+        public void SendStopRequest()
+        {
+            LockGuard<RecursiveMutex> lock(serverMutex);
+            StopRequest stopRequest;
+            UniquePtr<JsonValue> requestJsonValue = stopRequest.ToJson();
+            TcpSocket socket("localhost", ToString(port));
+            string requestStr = requestJsonValue->ToString();
+            Write(socket, requestStr);
+        }
+        public void SendKeepAliveRequest()
+        {
+            LockGuard<RecursiveMutex> lock(serverMutex);
+            KeepAliveRequest keepAliveRequest;
+            UniquePtr<JsonValue> requestJsonValue = keepAliveRequest.ToJson();
+            TcpSocket socket("localhost", ToString(port));
+            string requestStr = requestJsonValue->ToString();
+            Write(socket, requestStr);
+        }
+        public void ProcessBuildRequest(const BuildRequest& request)
+        {
+            try
+            {
+                if (!ServerRunning())
+                {
+                    if (!StartServer())
+                    {
+                        return;
+                    }
+                }
+                UniquePtr<JsonValue> requestJsonValue = request.ToJson();
+                StreamWriter requestWriter(File.CreateText(Path.Combine(CmCodeLogDir(), "build-request.json")));
+                CodeFormatter requestFormatter(requestWriter);
+                requestJsonValue->Write(requestFormatter);
+                if (saveRequestOnly) return;
+                LockGuard<RecursiveMutex> lock(serverMutex);
+                TcpSocket socket("localhost", ToString(port));
+                string requestStr = requestJsonValue->ToString();
+                Write(socket, requestStr);
+                string replyStr = ReadStr(socket);
+                UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
+                string messageKind = GetMessageKind(replyJsonValue.Get());
+                while (messageKind == "logMessageRequest")
+                {
+                    LogMessageRequest logMessageRequest(replyJsonValue.Get());
+                    string message = logMessageRequest.message;
+                    LogMessage(message);
+                    LogMessageReply logMessageReply;
+                    logMessageReply.ok = true;
+                    UniquePtr<JsonValue> logMessageReplyJsonValue = logMessageReply.ToJson();
+                    string logMessageReplyStr = logMessageReplyJsonValue->ToString();
+                    Write(socket, logMessageReplyStr);
+                    replyStr = ReadStr(socket);
+                    replyJsonValue = ParseJson(replyStr);
+                    messageKind = GetMessageKind(replyJsonValue.Get());
+                }
+                if (messageKind == "buildReply")
+                {
+                    StreamWriter replyWriter(File.CreateText(Path.Combine(CmCodeLogDir(), "build-reply.json")));
+                    CodeFormatter replyFormatter(replyWriter);
+                    replyJsonValue->Write(replyFormatter);
+                    BuildReply buildReply(replyJsonValue.Get());
+                    ProcessBuildReply(buildReply);
+                }
+                else if (messageKind == "genericErrorReply")
+                {
+                    GenericErrorReply genericErrorReply(replyJsonValue.Get());
+                    LogMessage("Build.Service.ProcessBuildRequest: generic error reply received: " + genericErrorReply.error);
+                }
+                else
+                {
+                    throw Exception("unknown reply message kind received");
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+                LogMessage("Cm.Build.Service.ProcessBuildRequest: " + ex.Message());
+            }
+        }
+        private void ProcessBuildReply(const BuildReply& buildReply)
+        {
+            // todo
+        }
+        private string GetMessageKind(JsonValue* jsonValue)
+        {
+            if (jsonValue is JsonObject*)
+            {
+                JsonObject* jsonObject = cast<JsonObject*>(jsonValue);
+                JsonValue* messageKindValue = jsonObject->GetField(u"messageKind");
+                if (messageKindValue is JsonString*)
+                {
+                    JsonString* messageKindStr = cast<JsonString*>(messageKindValue);
+                    string messageKind = ToUtf8(messageKindStr->Value());
+                    return messageKind;
+                }
+            }
+            return string();
+        }
+        private void LogMessage(const string& message)
+        {
+            {
+                LockGuard<RecursiveMutex> lock(messageLogMutex);
+                messageLog.Add(message);
+            }
+            notifyLogMessageAvailable();
+        }
+        public nothrow bool MessageLogEmpty() const
+        {
+            LockGuard<RecursiveMutex> lock(messageLogMutex);
+            return messageLog.IsEmpty();
+        }
+        public string FetchLogMessage()
+        {
+            LockGuard<RecursiveMutex> lock(messageLogMutex);
+            if (!messageLog.IsEmpty())
+            {
+                string message = messageLog.Front();
+                messageLog.RemoveFirst();
+                return message;
+            }
+            return string();
+        }
+        private int port;
+        private bool sendKeepAlives;
+        private bool log;
+        private bool saveRequestOnly;
+        private int keepAliveIntervalSeconds;
+        private int serverStartWaitSeconds;
+        private int serverStopWaitSeconds;
+        private LogMessageNotificationFunction notifyLogMessageAvailable;
+        private string serverStartCommand;
+        private UniquePtr<Process> buildServer;
+        private Thread keepAliveThread;
+        private LinkedList<string> messageLog;
+        private RecursiveMutex messageLogMutex;
+        private RecursiveMutex serverMutex;
+    }
+
+    public void LogException(const Exception& ex)
+    {
+        try
+        {
+            StreamWriter errorWriter = File.CreateText(Path.Combine(CmCodeLogDir(), "error.txt"));
+            errorWriter << ex.ToString() << endl();
+        }
+        catch (const Exception&)
+        {
+        }
+    }
+}

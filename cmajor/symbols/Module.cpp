@@ -1177,11 +1177,10 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
 #ifdef RESOURCE_DEBUG
             LogMessage(rootModule->LogStreamId(), "ReadHeader: " + ToUtf8(name) + ": resource name=" + ToUtf8(resource.name) + ", file=" + resource.filePath);
 #endif 
-            if (rootModule->globalResourceTable.Contains(resource.name))
+            if (!rootModule->globalResourceTable.Contains(resource.name))
             {
-                throw std::runtime_error("duplicate resource name '" + ToUtf8(resource.name) + " read from file '" + reader.GetBinaryReader().FileName() + "'");
+                rootModule->globalResourceTable.AddResource(resource);
             }
-            rootModule->globalResourceTable.AddResource(resource);
         }
 #endif
         if (dependencyMap.find(originalFilePath) == dependencyMap.cend())
@@ -1318,11 +1317,10 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
 #ifdef RESOURCE_DEBUG
         LogMessage(rootModule->LogStreamId(), "ReadHeader: " + ToUtf8(name) + ": resource name=" + ToUtf8(resource.name) + ", file=" + resource.filePath);
 #endif 
-        if (rootModule->globalResourceTable.Contains(resource.name))
+        if (!rootModule->globalResourceTable.Contains(resource.name))
         {
-            throw std::runtime_error("duplicate resource name '" + ToUtf8(resource.name) + " read from file '" + reader.GetBinaryReader().FileName() + "'");
+            rootModule->globalResourceTable.AddResource(resource);
         }
-        rootModule->globalResourceTable.AddResource(resource);
     }
 #endif
     exportedFunctions.clear();

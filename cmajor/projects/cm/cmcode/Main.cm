@@ -13,10 +13,12 @@ using cmcode;
 
 namespace cmcode
 {
+    public const uint CMCODE_LOG_MESSAGE_NOTIFICATION = WM_USER + 1u;
+
     class MainWindow : Window
     {
         public MainWindow() : base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
-            Dock.none, Anchors.none, MainWindowWindowState()), buildService(Cm.Build.defaultPort, true)
+            Dock.none, Anchors.none, MainWindowWindowState()), buildService()
         {
             Debug.SetPaint();
             UniquePtr<MenuBar> menuBar(new MenuBar());
@@ -55,6 +57,7 @@ namespace cmcode
             UniquePtr<MenuItem> buildMenuItem(new MenuItem("&Build"));
             UniquePtr<MenuItem> buildSolutionMenuItemPtr(new MenuItem("&Build Solution"));
             buildSolutionMenuItem = buildSolutionMenuItemPtr.Get();
+            buildSolutionMenuItem->ClickEvent().AddHandler(BuildSolutionClick);
             buildSolutionMenuItem->SetShortcut(Keys.f7);
             buildMenuItem->AddMenuItem(buildSolutionMenuItemPtr.Release());
             UniquePtr<MenuItem> rebuildSolutionMenuItemPtr(new MenuItem("&Rebuild Solution"));
@@ -75,6 +78,7 @@ namespace cmcode
             buildMenuItem->AddMenuItem(rebuildActiveProjectMenuItemPtr.Release());
             UniquePtr<MenuItem> cleanActiveProjectMenuItemPtr(new MenuItem("C&lean Active Project"));
             cleanActiveProjectMenuItem = cleanActiveProjectMenuItemPtr.Get();
+            cleanActiveProjectMenuItem->ClickEvent().AddHandler(CleanActiveProjectClick);
             buildMenuItem->AddMenuItem(cleanActiveProjectMenuItemPtr.Release());
             menuBar->AddMenuItem(buildMenuItem.Release());
 
@@ -174,6 +178,7 @@ namespace cmcode
 
             UniquePtr<ToolButton> buildSolutionToolButtonPtr(new ToolButton("cmcode.build.solution.bitmap"));
             buildSolutionToolButton = buildSolutionToolButtonPtr.Get();
+            buildSolutionToolButton ->ClickEvent().AddHandler(BuildSolutionClick);
             buildSolutionToolButton->SetToolTip("Build Solution (F7)");
             buildSolutionToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(buildSolutionToolButtonPtr.Release());
@@ -261,11 +266,17 @@ namespace cmcode
             UniquePtr<Control> paddedOutputTabControl(new PaddedControl(outputTabControlPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> borderedOutputTabControl(new BorderedControl(paddedOutputTabControl.Release(), BorderStyle.single, DefaultTabControlFrameColor(),
                 TabControlSelectedBorderColor(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            UniquePtr<TabPage> outputTabPagePtr(new TabPage("Output", "output"));
+            outputTabPage = outputTabPagePtr.Get();
+            UniquePtr<LogView> outputLogViewPtr(new LogView(Point(), Size(), Dock.none, Anchors.none));
+            outputLogView = outputLogViewPtr.Get();
+            UniquePtr<Control> scrollableOutputLogView(new ScrollableControl(outputLogViewPtr.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            outputTabPage->AddChild(scrollableOutputLogView.Release());
+            outputTabControl->AddTabPage(outputTabPagePtr.Release());
             UniquePtr<TabPage> logTabPage(new TabPage("Log", "log"));
             UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.none, Anchors.none));
             Application.SetLogView(logView.Get());
-            UniquePtr<Control> borderedLogView(new BorderedControl(logView.Release(), BorderStyle.single, Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
-            UniquePtr<Control> scrollableLogView(new ScrollableControl(borderedLogView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            UniquePtr<Control> scrollableLogView(new ScrollableControl(logView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             logTabPage->AddChild(scrollableLogView.Release());
             outputTabControl->AddTabPage(logTabPage.Release());
             verticalSplitContainer->Pane2Container()->AddChild(borderedOutputTabControl.Release());
@@ -274,16 +285,21 @@ namespace cmcode
             sourceFilePathStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
             statusBar->AddItem(sourceFilePathStatusBarItem);
             AddChild(statusBar);
-            buildService.SetLogMessageNotificationFunction(LogMessageAvailable);
             SetControlStatus();
             MainConfiguration.Instance().SetMainWindowLocation(Location());
             MainConfiguration.Instance().SetMainWindowSize(GetSize());
             SetTimer(1u, defaultConfigSaveTimerPeriod);
+            outputTabPage->Select();
         }
         protected override void OnWindowClosing(bool& cancelClose)
         {
             try
             {
+                if (!buildService.IsNull())
+                {
+                    buildService->StopServer(false);
+                    buildService.Reset();
+                }
                 Application.SetLogView(null);
                 Cm.Views.Bitmaps.Instance().Clear();
                 base->OnWindowClosing(cancelClose);
@@ -703,16 +719,49 @@ namespace cmcode
                 throw Exception("Either Debug or Release configuration must be selected");
             }
         }
+        private BuildService& GetBuildService()
+        {
+            if (buildService.IsNull())
+            {
+                buildService.Reset(new BuildService(BuildServiceArgs().
+                    Log(true).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false)));
+                buildService->SetLogMessageNotificationFunction(LogMessagesAvailable);
+            }
+            return *buildService;
+        }
+        private void BuildSolutionClick()
+        {
+            try
+            {
+                if (solution.IsNull())
+                {
+                    throw Exception("no solution is open");
+                }
+                BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), solution->FilePath(), BuildRequestKind.build);
+                outputLogView->Clear();
+                outputTabPage->Select();
+                GetBuildService().ProcessBuildRequest(buildRequest);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void BuildActiveProjectClick()
         {
             try
             {
-                if (solution.IsNull()) throw Exception("no solution is open");
+                if (solution.IsNull())
+                {
+                    throw Exception("no solution is open");
+                }
                 Cm.Ast.Project* activeProject = solution->ActiveProject();
                 if (activeProject != null)
                 {
-                    BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), activeProject->FilePath(), false, true);
-                    buildService.ProcessBuildRequest(buildRequest);
+                    BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), activeProject->FilePath(), BuildRequestKind.buildDependencies);
+                    outputTabPage->Select();
+                    GetBuildService().ProcessBuildRequest(buildRequest);
                 }
                 else
                 {
@@ -725,9 +774,49 @@ namespace cmcode
                 LogException(ex);
             }
         }
-        private void LogMessageAvailable()
+        private void CleanActiveProjectClick()
         {
-            // todo
+            try
+            {
+                if (solution.IsNull()) throw Exception("no solution is open");
+                Cm.Ast.Project* activeProject = solution->ActiveProject();
+                if (activeProject != null)
+                {
+                    BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), activeProject->FilePath(),
+                        cast<BuildRequestKind>(BuildRequestKind.clean | BuildRequestKind.buildDependencies));
+                    outputTabPage->Select();
+                    GetBuildService().ProcessBuildRequest(buildRequest);
+                }
+                else
+                {
+                    throw Exception("no active project set for the solution");
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void LogMessagesAvailable()
+        {
+            try
+            {
+                while (!GetBuildService().MessageLogEmpty())
+                {
+                    string logMessage = GetBuildService().FetchLogMessage();
+                    if (!logMessage.IsEmpty())
+                    {
+                        outputLogView->WriteLine(logMessage);
+                        outputLogView->Update();
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
         }
         private void SaveClick()
         {
@@ -892,6 +981,8 @@ namespace cmcode
         private UniquePtr<Cm.Ast.Solution> solution;
         private TabControl* codeTabControl;
         private TabControl* outputTabControl;
+        private LogView* outputLogView;
+        private TabPage* outputTabPage;
         private ToolBar* toolBar;
         private TreeView* solutionExplorerTreeView;
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
@@ -932,7 +1023,8 @@ namespace cmcode
         private ToolButton* stepIntoToolButton;
         private ToolButton* stepOutToolButton;
 
-        private Cm.Build.Service buildService;
+        private UniquePtr<Cm.Build.BuildService> buildService;
+        private bool notificationMessageInProgress;
     }
 }
 

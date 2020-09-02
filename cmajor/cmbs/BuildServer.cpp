@@ -6,25 +6,33 @@
 #include <cmajor/cmbs/BuildServer.hpp>
 #include <cmajor/cmbs/BuildServerMessage.hpp>
 #include <cmajor/build/Build.hpp>
+#include <sngcm/ast/Project.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
+#include <cmajor/symbols/Exception.hpp>
 #include <cmajor/cmmid/InitDone.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Log.hpp>
+#include <soulng/util/LogFileWriter.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/lexer/ParsingException.hpp>
 #include <sngjson/json/JsonImport.hpp>
 #include <sngjson/json/JsonLexer.hpp>
 #include <sngjson/json/JsonParser.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 #include <thread>
 #include <mutex>
 #include <atomic>
 #include <iostream>
 #include <stdexcept>
+#include <time.h>
 
 namespace cmbs {
 
+using namespace sngcm::ast;
 using namespace soulng::util;
 using namespace soulng::unicode;
 using namespace sngjson::json;
@@ -59,13 +67,17 @@ struct BackendSelector
     }
 };
 
+std::string CmbsLogFilePath()
+{
+    return Path::Combine(CmajorLogFileDir(), "cmbs.log");
+}
 
 class BuildServer
 {
 public:
-    BuildServer();
+    BuildServer(int timeOutSecs_, bool log_);
     ~BuildServer();
-    void Start(int port, bool verbose, const std::string& version);
+    void Start(int port, const std::string& version);
     void Stop();
     void Run();
     BuildReply ProcessRequest(const BuildRequest& buildRequest);
@@ -81,24 +93,61 @@ public:
     void StartLogging();
     void EndLogging();
     void StartLogThread();
-    void Log();
+    void RunLog();
     void StopLogThread();
     std::string GetMessageKind(JsonValue* message) const;
+    void SetLastActionTime();
+    void SetRequestInProgress();
+    void ResetRequestInProgress();
+    bool TimeOut() const;
+    bool StopRequested() const { return stopRequested; }
+    const std::string& LogFilePath() const { return logFilePath; }
+    bool Log() const { return log; }
 private:
     int port;
-    bool verbose;
+    bool log;
     std::string version;
     std::atomic_bool exiting;
+    bool running;
     std::thread serverThread;
     std::thread logThread;
     TcpSocket listenSocket;
     TcpSocket socket;
     std::exception_ptr runException;
     std::exception_ptr logException;
+    bool requestInProgress;
+    int timeoutSecs;
+    time_t lastActionTime;
+    bool stopRequested;
+    std::string logFilePath;
 };
 
-BuildServer::BuildServer() : port(54325), verbose(false), version(), exiting(false), listenSocket(), socket()
+struct RequestGuard
 {
+    RequestGuard(BuildServer* server_) : server(server_)
+    {
+        server->SetRequestInProgress();
+    }
+    ~RequestGuard()
+    {
+        server->ResetRequestInProgress();
+    }
+    BuildServer* server;
+};
+
+BuildServer::BuildServer(int timeoutSecs_, bool log_) :
+    port(54325), log(log_), version(), exiting(false), listenSocket(), socket(), requestInProgress(false), timeoutSecs(timeoutSecs_),
+    lastActionTime(), stopRequested(false), logFilePath(CmbsLogFilePath()), running(false)
+{
+    SetLastActionTime();
+    if (log)
+    {
+        LogFileWriter writer(logFilePath);
+        writer.WriteLine("================================================================================");
+        writer.WriteCurrentDateTime();
+        writer << "build server created" << std::endl;
+        writer << "timeout=" << timeoutSecs << ", log=" << log << std::endl;
+    }
 }
 
 BuildServer::~BuildServer()
@@ -109,39 +158,100 @@ void BuildServer::Run()
 {
     try
     {
+        running = true;
+        LogFileWriter writer(logFilePath, log);
+        if (log)
+        {
+            writer.WriteLine("================================================================================");
+            writer.WriteCurrentDateTime();
+            writer << "build server run: port=" << port << std::endl;
+        }
         listenSocket.Bind(port);
         listenSocket.Listen(10);
         while (!exiting)
         {
+            std::cout << "build-server-ready" << std::endl;
             socket = listenSocket.Accept();
-            if (exiting) return;
+            if (exiting)
+            {
+                if (log)
+                {
+                    writer << "exiting" << std::endl;
+                }
+                return;
+            }
+            RequestGuard requestGuard(this);
             std::string request = ReadStr(socket);
             std::u32string content = ToUtf32(request);
             JsonLexer lexer(content, "", 0);
             std::unique_ptr<JsonValue> requestJsonValue(JsonParser::Parse(lexer));
             std::string messageKind = GetMessageKind(requestJsonValue.get());
-            if (messageKind == "buildRequest")
+            if (messageKind == "stopRequest")
             {
+                stopRequested = true;
+                if (log)
+                {
+                    LogFileWriter writer(logFilePath);
+                    writer.WriteLine("================================================================================");
+                    writer.WriteCurrentDateTime();
+                    writer << "stop request received:" << std::endl;
+                    CodeFormatter formatter(writer.LogFile());
+                    requestJsonValue->Write(formatter);
+                }
+            }
+            else if (messageKind == "keepAliveRequest")
+            {
+                SetLastActionTime();
+            }
+            else if (messageKind == "buildRequest")
+            {
+                LogFileWriter writer(logFilePath, log);
+                if (log)
+                {
+                    writer.WriteLine("================================================================================");
+                    writer.WriteCurrentDateTime();
+                    writer << "build request received:" << std::endl;
+                    CodeFormatter formatter(writer.LogFile());
+                    requestJsonValue->Write(formatter);
+                }
                 BuildRequest buildRequest(requestJsonValue.get());
                 BuildReply buildReply = ProcessRequest(buildRequest);
                 std::unique_ptr<JsonValue> replyJsonValue = buildReply.ToJson();
+                if (log)
+                {
+                    writer << "build reply:" << std::endl;
+                    CodeFormatter formatter(writer.LogFile());
+                    replyJsonValue->Write(formatter);
+                }
                 std::string reply = replyJsonValue->ToString();
                 Write(socket, reply);
             }
             else
             {
+                if (log)
+                {
+                    LogFileWriter writer(logFilePath);
+                    writer.WriteLine("================================================================================");
+                    writer.WriteCurrentDateTime();
+                    writer << "error: unknown message kind received: " << messageKind << std::endl;
+                }
                 WriteGenericErrorReply(messageKind);
             }
         }
     }
     catch (const std::exception& ex)
     {
+        running = false;
+        std::cout << "build-server-error" << std::endl;
+        std::cout << ex.what() << std::endl;
         std::cerr << "BuildServer::Run: " << ex.what() << std::endl;
-        runException = std::current_exception();
-    }
-    catch (...)
-    {
-        std::cerr << "BuildServer::Run: " << "unknown exception" << std::endl;
+        if (log)
+        {
+            LogFileWriter writer(logFilePath);
+            writer.WriteLine("================================================================================");
+            writer.WriteCurrentDateTime();
+            writer << "error: BuildServer::Run got exception: " << ex.what() << std::endl;
+        }
         runException = std::current_exception();
     }
 }
@@ -527,10 +637,23 @@ void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector
         cmajor::build::BuildSolution(solutionFilePath, rootModules);
         reply.success = true;
     }
+    catch (const soulng::lexer::ParsingException& ex)
+    {
+        reply.success = false;
+        reply.error = ex.what();
+        LogMessage(-1, ex.what());
+    }
+    catch (const cmajor::symbols::Exception& ex)
+    {
+        reply.success = false;
+        reply.error = ex.What();
+        LogMessage(-1, ex.What());
+    }
     catch (const std::exception& ex)
     {
         reply.success = false;
         reply.error = ex.what();
+        LogMessage(-1, ex.what());
     }
 }
 
@@ -542,10 +665,23 @@ void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_p
         cmajor::build::BuildProject(projectFilePath, rootModule, builtProjects);
         reply.success = true;
     }
+    catch (const soulng::lexer::ParsingException& ex)
+    {
+        reply.success = false;
+        reply.error = ex.what();
+        LogMessage(-1, ex.what());
+    }
+    catch (const cmajor::symbols::Exception& ex)
+    {
+        reply.success = false;
+        reply.error = ex.What();
+        LogMessage(-1, ex.What());
+    }
     catch (const std::exception& ex)
     {
         reply.success = false;
         reply.error = ex.what();
+        LogMessage(-1, ex.what());
     }
 }
 
@@ -573,15 +709,17 @@ void BuildServer::SetLogExceptionToReply(BuildReply& reply)
     {
         reply.logException = ex.what();
     }
-    catch (...)
-    {
-        reply.logException = "unknown exception occurred";
-    }
 }
 
 void BuildServer::StartLogging()
 {
-    //soulng::util::SetLogMode(soulng::util::LogMode::console);
+    if (log)
+    {
+        LogFileWriter writer(logFilePath);
+        writer.WriteLine("================================================================================");
+        writer.WriteCurrentDateTime();
+        writer << "start logging" << std::endl;
+    }
     soulng::util::SetLogMode(soulng::util::LogMode::queue);
     soulng::util::StartLog();
     StartLogThread();
@@ -589,11 +727,18 @@ void BuildServer::StartLogging()
 
 void BuildServer::EndLogging()
 {
+    if (log)
+    {
+        LogFileWriter writer(logFilePath);
+        writer.WriteLine("================================================================================");
+        writer.WriteCurrentDateTime();
+        writer << "end logging" << std::endl;
+    }
     EndLog();
     StopLogThread();
 }
 
-void BuildServer::Log()
+void BuildServer::RunLog()
 {
     while (true)
     {
@@ -639,16 +784,11 @@ void RunLogThread(BuildServer* server)
 {
     try
     {
-        server->Log();
+        server->RunLog();
     }
     catch (const std::exception& ex)
     {
         std::cerr << "RunLogThread: " << ex.what() << std::endl;
-        server->SetLogException(std::current_exception());
-    }
-    catch (...)
-    {
-        std::cerr << "RunLogThread: " << "unknown exception" << std::endl;
         server->SetLogException(std::current_exception());
     }
 }
@@ -662,11 +802,13 @@ void BuildServer::StartLogThread()
     catch (const std::exception& ex)
     {
         std::cerr << "BuildServer::StartLogThread: " << ex.what() << std::endl;
-        logException = std::current_exception();
-    }
-    catch (...)
-    {
-        std::cerr << "BuildServer::StartLogThread: " << "unknown exception" << std::endl;
+        if (log)
+        {
+            LogFileWriter writer(logFilePath);
+            writer.WriteLine("================================================================================");
+            writer.WriteCurrentDateTime();
+            writer << "StartLogThread got exception: " << ex.what() << std::endl;
+        }
         logException = std::current_exception();
     }
 }
@@ -680,11 +822,13 @@ void BuildServer::StopLogThread()
     catch (const std::exception& ex)
     {
         std::cerr << "BuildServer::StopLogThread: " << ex.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cerr << "BuildServer::StopLogThread: " << "unknown exception" << std::endl;
-        logException = std::current_exception();
+        if (log)
+        {
+            LogFileWriter writer(logFilePath);
+            writer.WriteLine("================================================================================");
+            writer.WriteCurrentDateTime();
+            writer << "StopLogThread got exception: " << ex.what() << std::endl;
+        }
     }
 }
 
@@ -706,27 +850,40 @@ void RunServer(BuildServer* server)
     }
     catch (const std::exception& ex)
     {
+        std::cout << "build-server-error" << std::endl;
+        std::cout << ex.what() << std::endl;
         std::cerr << "RunServer: exception from BuildServer::Run: " << ex.what() << std::endl;
-        server->SetRunException(std::current_exception());
-    }
-    catch (...)
-    {
-        std::cerr << "RunServer: exception from BuildServer::Run: " << "unknown exception" << std::endl;
+        if (server->Log())
+        {
+            LogFileWriter writer(server->LogFilePath());
+            writer.WriteLine("================================================================================");
+            writer.WriteCurrentDateTime();
+            writer << "RunServer got exception: " << ex.what() << std::endl;
+        }
         server->SetRunException(std::current_exception());
     }
 }
 
-void BuildServer::Start(int port, bool verbose, const std::string& version)
+void BuildServer::Start(int port, const std::string& version)
 {
     try
     {
+        SetLastActionTime();
+        if (log)
+        {
+            LogFileWriter writer(logFilePath);
+            writer.WriteLine("================================================================================");
+            writer.WriteCurrentDateTime();
+            writer << "build server start: port=" << port << ", version=" << version << std::endl;
+        }
         this->port = port;
-        this->verbose = verbose;
         this->version = version;
         serverThread = std::thread{ RunServer, this };
     }
     catch (const std::exception& ex)
     {
+        std::cout << "build-server-error" << std::endl;
+        std::cout << ex.what() << std::endl;
         std::cerr << "exception from BuildServer::Start: " << ex.what() << std::endl;
         throw;
     }
@@ -736,16 +893,26 @@ void BuildServer::Stop()
 {
     try
     {
-        exiting = true;
-        cmajor::build::StopBuild();
-        if (runException)
+        if (log)
         {
-            serverThread.join();
-            std::rethrow_exception(runException);
+            LogFileWriter writer(logFilePath);
+            writer.WriteLine("================================================================================");
+            writer.WriteCurrentDateTime();
+            writer << "build server stop" << std::endl;
         }
-        else
+        exiting = true;
+        if (running)
         {
-            TcpSocket socket("localhost", std::to_string(port));
+            cmajor::build::StopBuild();
+            if (runException)
+            {
+                serverThread.join();
+                std::rethrow_exception(runException);
+            }
+            else
+            {
+                TcpSocket socket("localhost", std::to_string(port));
+            }
         }
         serverThread.join();
     }
@@ -756,16 +923,69 @@ void BuildServer::Stop()
     }
 }
 
-BuildServer buildServer;
-
-void StartBuildServer(int port, bool verbose, const std::string& version)
+void BuildServer::SetLastActionTime()
 {
-    buildServer.Start(port, verbose, version);
+    time(&lastActionTime);
+}
+
+void BuildServer::SetRequestInProgress()
+{
+    requestInProgress = true;
+    SetLastActionTime();
+}
+
+void BuildServer::ResetRequestInProgress()
+{
+    requestInProgress = false;
+    SetLastActionTime();
+}
+
+bool BuildServer::TimeOut() const
+{
+    if (requestInProgress)
+    {
+        return false;
+    }
+    time_t now;
+    time(&now);
+    if (now - lastActionTime > timeoutSecs)
+    {
+        if (log)
+        {
+            LogFileWriter writer(logFilePath);
+            writer.WriteLine("================================================================================");
+            writer.WriteCurrentDateTime();
+            writer << "build server timeout" << std::endl;
+        }
+        return true;
+    }
+    return false;
+}
+
+BuildServer* buildServer = nullptr;
+
+void StartBuildServer(int port, const std::string& version, int timeoutSecs, bool log)
+{
+    if (!buildServer)
+    {
+        buildServer = new BuildServer(timeoutSecs, log);
+    }
+    buildServer->Start(port, version);
 }
 
 void StopBuildServer()
 {
-    buildServer.Stop();
+    buildServer->Stop();
+}
+
+bool BuildServerTimeOut()
+{
+    return buildServer->TimeOut();
+}
+
+bool BuildServerStopRequested()
+{
+    return buildServer->StopRequested();
 }
 
 } // namespace cmbs

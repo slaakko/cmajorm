@@ -14,9 +14,11 @@
 #include <cmajor/cmres/InitDone.hpp>
 #endif
 #include <sngxml/xpath/InitDone.hpp>
+#include <soulng/util/LogFileWriter.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/lexical_cast.hpp>
+#include <thread>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -61,11 +63,12 @@ void PrintHelp()
     std::cout << "--help | -h" << std::endl;
     std::cout << "  Print help and exit." << std::endl;
     std::cout << std::endl;
-    std::cout << "--verbose | -v" << std::endl;
-    std::cout << "  Be verbose." << std::endl;
+    std::cout << "--log | -l" << std::endl;
+    std::cout << "  Write log to %CMAJOR_ROOT%/log/cmbs.log (by default C:\\cmajor\\log\\cmbs.log)." << std::endl;
     std::cout << std::endl;
-    std::cout << "--machine | -m" << std::endl;
-    std::cout << "  Machine interface." << std::endl;
+    std::cout << "--timeoutSecs=SECS | -t=SECS" << std::endl;
+    std::cout << "  Set timeout in seconds." << std::endl;
+    std::cout << "  Default timeout is 15 seconds." << std::endl;
     std::cout << std::endl;
     std::cout << "--port=PORT | -p=PORT" << std::endl;
     std::cout << "  Set server port number to PORT." << std::endl;
@@ -77,42 +80,25 @@ void PrintHelp()
 
 struct BuildServerRun
 {
-    BuildServerRun(int port, bool verbose_, const std::string& version) : verbose(verbose_)
+    BuildServerRun(int port, const std::string& version, int timeoutSecs, bool log)
     {
-        if (verbose)
-        {
-            std::cout << "Build server starting..." << std::endl;
-        }
-        cmbs::StartBuildServer(port, verbose, version);
-        if (verbose)
-        {
-            std::cout << "Build server started." << std::endl;
-        }
+        cmbs::StartBuildServer(port, version, timeoutSecs, log);
     }
     ~BuildServerRun()
     {
-        if (verbose)
-        {
-            std::cout << "Build server stopping..." << std::endl;
-        }
         cmbs::StopBuildServer();
-        if (verbose)
-        {
-            std::cout << "Build server stopped." << std::endl;
-        }
     }
-    bool verbose;
 };
 
 int main(int argc, const char** argv)
 {
     InitDone initDone;
+    bool log = false;
     try
     {
-        bool verbose = false;
-        bool machine = false;
         int port = 54325;
         std::string requestFilePath;
+        int timeoutSecs = 15;
         for (int i = 1; i < argc; ++i)
         {
             std::string arg = argv[i];
@@ -123,13 +109,9 @@ int main(int argc, const char** argv)
                     PrintHelp();
                     return 1;
                 }
-                else if (arg == "--verbose")
+                else if (arg == "--log")
                 {
-                    verbose = true;
-                }
-                else if (arg == "--machine")
-                {
-                    machine = true;
+                    log = true;
                 }
                 else if (arg.find('=') != std::string::npos)
                 {
@@ -145,6 +127,10 @@ int main(int argc, const char** argv)
                         else if (option == "--request")
                         {
                             requestFilePath = GetFullPath(value);
+                        }
+                        else if (option == "--timeoutSecs")
+                        {
+                            timeoutSecs = boost::lexical_cast<int>(value);
                         }
                         else
                         {
@@ -176,6 +162,10 @@ int main(int argc, const char** argv)
                     {
                         requestFilePath = GetFullPath(value);
                     }
+                    else if (option == "-t")
+                    {
+                        timeoutSecs = boost::lexical_cast<int>(value);
+                    }
                     else
                     {
                         throw std::runtime_error("unknown option '" + arg + "'");
@@ -193,14 +183,9 @@ int main(int argc, const char** argv)
                                 PrintHelp();
                                 return 1;
                             }
-                            case 'v':
+                            case 'l':
                             {
-                                verbose = true;
-                                break;
-                            }
-                            case 'm':
-                            {
-                                machine = true;
+                                log = true;
                                 break;
                             }
                             default:
@@ -216,27 +201,20 @@ int main(int argc, const char** argv)
                 throw std::runtime_error("unknown argument '" + arg + "'");
             }
         }
-        BuildServerRun runBuildServer(port, verbose, version);
+        BuildServerRun runBuildServer(port, version, timeoutSecs, log);
         if (requestFilePath.empty())
         {
-            std::string line;
-            if (!machine)
+            while (!cmbs::BuildServerStopRequested() && !cmbs::BuildServerTimeOut())
             {
-                std::cout << "Enter 'exit' or 'quit' to exit.." << std::endl;
-                std::cout << "> ";
+                std::this_thread::sleep_for(std::chrono::duration{ std::chrono::seconds{ 1 } });
             }
-            while (std::getline(std::cin, line))
+            if (cmbs::BuildServerStopRequested())
             {
-                if (line == "quit" || line == "exit")
-                {
-                    std::cout << "bye" << std::endl;
-                    break;
-                }
-                else
-                {
-                    std::cout << "Build server: unknown command: " << line << std::endl;
-                    std::cout << "Enter 'exit' or 'quit' to exit.." << std::endl;
-                }
+                std::cout << "Build server stop request received." << std::endl;
+            }
+            else if (cmbs::BuildServerTimeOut())
+            {
+                std::cout << "Build server timeout." << std::endl;
             }
         }
         else
@@ -246,7 +224,17 @@ int main(int argc, const char** argv)
     }
     catch (const std::exception& ex)
     {
+        std::cout << "build-server-error" << std::endl;
+        std::cout << ex.what() << std::endl;
         std::cerr << ex.what() << std::endl;
+        if (log)
+        {
+            std::string logFilePath = cmbs::CmbsLogFilePath();
+            soulng::util::LogFileWriter writer(logFilePath);
+            writer.WriteLine("================================================================================");
+            writer.WriteCurrentDateTime();
+            writer << "main got exception: " << ex.what() << std::endl;
+        }
         return 1;
     }
     return 0;

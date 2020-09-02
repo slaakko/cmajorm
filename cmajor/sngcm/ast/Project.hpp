@@ -37,6 +37,7 @@ enum class SystemDirKind : int
 SNGCM_AST_API std::string CmajorRootDir();
 SNGCM_AST_API std::string CmajorSystemLibDir(const std::string& config, BackEnd backend, const std::string& toolChain, SystemDirKind systemDirKind);
 SNGCM_AST_API std::string CmajorResourceDir();
+SNGCM_AST_API std::string CmajorLogFileDir();
 SNGCM_AST_API std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend, const std::string& toolChain, SystemDirKind systemDirKind);
 SNGCM_AST_API std::string CmajorSystemWindowsModuleFilePath(const std::string& config, const std::string& toolChanin, SystemDirKind systemDirKind);
 SNGCM_AST_API void SetOutDir(const std::string& outDir_);

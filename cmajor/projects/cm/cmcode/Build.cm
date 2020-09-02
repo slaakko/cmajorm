@@ -8,7 +8,12 @@ using Cm.Build;
 
 namespace cmcode
 {
-    BuildRequest MakeBuildRequest(const string& backend, const string& config, const string& filePath, bool rebuild, bool buildAllDependencies)
+    enum BuildRequestKind
+    {
+        none = 0, build = 1 << 0, clean = 1 << 1, rebuild = 1 << 2, buildDependencies = 1 << 3
+    }
+
+    BuildRequest MakeBuildRequest(const string& backend, const string& config, const string& filePath, BuildRequestKind buildRequestKind)
     {
         BuildRequest buildRequest;
         buildRequest.backend = backend;
@@ -18,8 +23,18 @@ namespace cmcode
         buildRequest.numBuildThreads = "default";
         buildRequest.toolChain = "default";
         buildRequest.verbose = true;
-        buildRequest.rebuild = rebuild;
-        buildRequest.buildAllDependencies = buildAllDependencies;
+        if ((buildRequestKind & BuildRequestKind.clean) != BuildRequestKind.none)
+        {
+            buildRequest.clean = true;
+        }
+        if ((buildRequestKind & BuildRequestKind.rebuild) != BuildRequestKind.none)
+        {
+            buildRequest.rebuild = true;
+        }
+        if ((buildRequestKind & BuildRequestKind.buildDependencies) != BuildRequestKind.none)
+        {
+            buildRequest.buildAllDependencies = true;
+        }
         return buildRequest;
     }
 }

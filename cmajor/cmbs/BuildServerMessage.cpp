@@ -3,6 +3,40 @@
 #include <sngjson/json/JsonExport.hpp>
 #include <utility>
 
+StopRequest::StopRequest() : messageKind()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> StopRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    return object;
+}
+
+StopRequest::StopRequest(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+}
+
+KeepAliveRequest::KeepAliveRequest() : messageKind()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> KeepAliveRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    return object;
+}
+
+KeepAliveRequest::KeepAliveRequest(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+}
+
 BuildRequest::BuildRequest() : messageKind(), backend(), config(), optimizationLevel(), filePath(), defines(), numBuildThreads(), toolChain(), verbose(), quiet(), clean(), strictNothrow(), emitIR(), emitOptIR(), linkWithDebugRuntime(), linkUsingMsLink(), rebuild(), buildAllDependencies(), forceDebugInfo(), forceNoDebugInfo(), disableModuleCache(), singleThreadedCompile(), disableCodeGen(), justMyCode()
 {
 }
