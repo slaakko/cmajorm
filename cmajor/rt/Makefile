@@ -16,10 +16,10 @@ CXXFLAGS += -L../lib
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ifeq ($(config),debug)
-soname=libcmrtd.so.3.6.0
+soname=libcmrtd.so.3.7.0
 sobasename=libcmrtd
 else
-soname=libcmrt.so.3.6.0
+soname=libcmrt.so.3.7.0
 sobasename=libcmrt
 endif
 

@@ -56,15 +56,15 @@ install:
 	mkdir -p $(prefix)/bin
 	cp bin/* $(prefix)/bin
 	mkdir -p $(prefix)/lib
-	cp lib/$(cmrtsoname).so.3.6.0 $(prefix)/lib
-	ln -f $(prefix)/lib/$(cmrtsoname).so.3.6.0 $(prefix)/lib/$(cmrtsoname).so.3
-	ln -f $(prefix)/lib/$(cmrtsoname).so.3.6.0 $(prefix)/lib/$(cmrtsoname).so
+	cp lib/$(cmrtsoname).so.3.7.0 $(prefix)/lib
+	ln -f $(prefix)/lib/$(cmrtsoname).so.3.7.0 $(prefix)/lib/$(cmrtsoname).so.3
+	ln -f $(prefix)/lib/$(cmrtsoname).so.3.7.0 $(prefix)/lib/$(cmrtsoname).so
 
 sys:
 	cmc --verbose system/platform/linux/System.cms
 	cmc --verbose --config=release system/platform/linux/System.cms
 
-BINDISTDIR = ~/cmajor-3.6.0
+BINDISTDIR = ~/cmajor-3.7.0
 
 bindist:
 	mkdir -p $(BINDISTDIR)
@@ -83,22 +83,24 @@ bindist:
 	cp -r system/* $(BINDISTDIR)/system
 	cp -r projects/* $(BINDISTDIR)/projects
 	cp  unicode/cmajor_ucd.bin $(BINDISTDIR)/unicode
-	mkdir -p $(BINDISTDIR)/eh
+	mkdir -p $(BINDISTDIR)/cmajor/eh
 	rm -f eh/*.o
-	cp -r eh/* $(BINDISTDIR)/eh
-	mkdir -p $(BINDISTDIR)/rts
+	cp -r eh/* $(BINDISTDIR)/cmajor/eh
+	mkdir -p $(BINDISTDIR)/cmajor/rts
 	rm -f rts/*.o
-	cp -r rts/* $(BINDISTDIR)/rts
-	mkdir -p $(BINDISTDIR)/sngxml
+	cp -r rts/* $(BINDISTDIR)/cmajor/rts
+	mkdir -p $(BINDISTDIR)/cmajor/sngxml
 	rm -f sngxml/dom/*.o
 	rm -f sngxml/xml/*.o
 	rm -f sngxml/xpath/*.o
-	cp -r sngxml/* $(BINDISTDIR)/sngxml
-	mkdir -p $(BINDISTDIR)/soulng
+	cp -r sngxml/* $(BINDISTDIR)/cmajor/sngxml
+	mkdir -p $(BINDISTDIR)/cmajor/soulng
 	rm -f soulng/util/*.o
 	rm -f soulng/lexer/*.o
 	rm -f soulng/parser/*.o
-	cp -r soulng/* $(BINDISTDIR)/soulng
+	cp -r soulng/* $(BINDISTDIR)/cmajor/soulng
+	cd $(BINDISTDIR)/cmajor && ln -s ../system
+	cd $(BINDISTDIR)/cmajor && ln -s ../lib
 	
 clean:
 	$(MAKE) -C soulng clean

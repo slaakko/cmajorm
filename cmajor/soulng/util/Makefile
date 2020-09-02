@@ -1,6 +1,7 @@
 include ../Makefile.common
 
-OBJECTS = Ansi.o BinaryReader.o BinaryWriter.o CodeFormatter.o Fiber.o InitDone.o Json.o Log.o MappedInputFile.o MemoryReader.o MemoryWriter.o Multiprecision.o Mutex.o Path.o Prime.o \
+OBJECTS = Ansi.o BinaryReader.o BinaryWriter.o CodeFormatter.o Fiber.o InitDone.o Json.o Log.o LogFileWriter.o \
+MappedInputFile.o MemoryReader.o MemoryWriter.o Multiprecision.o Mutex.o Path.o Prime.o \
 Process.o ProcessImpl.o Random.o Sha1.o Socket.o SocketFwd.o System.o TextUtils.o Time.o Unicode.o Uuid.o
 
 %.o: %.cpp
