@@ -268,13 +268,14 @@ void CreateWindowsGccToolChain(bool verbose)
     linkerDebugConfig.name = "debug";
     linkerDebugConfig.args.push_back("$LIBRARY_PATH_FLAG$-L");
     linkerDebugConfig.args.push_back(std::string("$RUNTIME_LIBS$") +
-        "-lcmrtsd;-lcmsnglexerd;-lcmsngparserd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmsngutild;-lpdcursesd;" +
-        "-lbz2d;-lzd;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-sd-x64-1_73;-lboost_iostreams-mgw8-mt-sd-x64-1_73;-lboost_system-mgw8-mt-sd-x64-1_73");
+        "-lcmrtsd;-lcmsngcmparserd;-lcmsngcmlexerd;-lcmsnglexerd;-lcmsngparserd;-lcmsngcmastd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmcommond;-lcmsngutild;-lpdcursesd;" +
+        "-lbz2d;-lzd;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-sd-x64-1_73;-lboost_iostreams-mgw8-mt-sd-x64-1_73;-lboost_system-mgw8-mt-sd-x64-1_73;-lgdiplus");
     linkerDebugConfig.args.push_back("$LIBRARY_DIRECTORIES$");
     linkerDebugConfig.args.push_back("$MAIN_OBJECT_FILE$");
     linkerDebugConfig.args.push_back("-Xlinker --start-group");
     linkerDebugConfig.args.push_back("$LIBRARY_FILES$");
     linkerDebugConfig.args.push_back("-Xlinker --end-group");
+    linkerDebugConfig.args.push_back("-m$SUBSYSTEM$");
     linkerDebugConfig.args.push_back("-o");
     linkerDebugConfig.args.push_back("$EXECUTABLE_FILE$");
     linker.configurations.push_back(linkerDebugConfig);
@@ -283,13 +284,14 @@ void CreateWindowsGccToolChain(bool verbose)
     linkerReleaseConfig.name = "release";
     linkerReleaseConfig.args.push_back("$LIBRARY_PATH_FLAG$-L");
     linkerReleaseConfig.args.push_back(std::string("$RUNTIME_LIBS$") +
-        "-lcmrts;-lcmsnglexer;-lcmsngparser;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmsngutil;-lpdcurses;" +
-        "-lbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73");
+        "-lcmrts;-lcmsngcmparser;-lcmsngcmlexer;-lcmsnglexer;-lcmsngparser;-lcmsngcmast;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmcommon;-lcmsngutil;-lpdcurses;" +
+        "-lbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73;-lgdiplus");
     linkerReleaseConfig.args.push_back("$LIBRARY_DIRECTORIES$");
     linkerReleaseConfig.args.push_back("$MAIN_OBJECT_FILE$");
     linkerReleaseConfig.args.push_back("-Xlinker --start-group");
     linkerReleaseConfig.args.push_back("$LIBRARY_FILES$");
     linkerReleaseConfig.args.push_back("-Xlinker --end-group");
+    linkerReleaseConfig.args.push_back("-m$SUBSYSTEM$");
     linkerReleaseConfig.args.push_back("-o");
     linkerReleaseConfig.args.push_back("$EXECUTABLE_FILE$");
     linker.configurations.push_back(linkerReleaseConfig);

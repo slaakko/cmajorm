@@ -137,9 +137,9 @@ std::vector<std::string> CommandLineProcessor::ExpandArguments()
 std::vector<std::string> CommandLineProcessor::ExpandArgument(const std::string& arg)
 {
     std::vector<std::string> expandedArg;
-    WIN32_FIND_DATA findData;
+    WIN32_FIND_DATAW findData;
     std::u16string filePath = ToUtf16(GetFullPath(arg));
-    HANDLE findHandle = FindFirstFile((LPCWSTR)filePath.c_str(), &findData);
+    HANDLE findHandle = FindFirstFileW(reinterpret_cast<LPCWSTR>(filePath.c_str()), &findData);
     if (findHandle == INVALID_HANDLE_VALUE)
     {
         expandedArg.push_back(arg);
@@ -148,7 +148,7 @@ std::vector<std::string> CommandLineProcessor::ExpandArgument(const std::string&
     {
         std::u16string directory = ToUtf16(Path::GetDirectoryName(ToUtf8(filePath)));
         expandedArg.push_back(Path::Combine(ToUtf8(directory), ToUtf8(std::u16string((const char16_t*)(&findData.cFileName[0])))));
-        while (FindNextFile(findHandle, &findData))
+        while (FindNextFileW(findHandle, &findData))
         {
             expandedArg.push_back(Path::Combine(ToUtf8(directory), ToUtf8(std::u16string((const char16_t*)(&findData.cFileName[0])))));
         }

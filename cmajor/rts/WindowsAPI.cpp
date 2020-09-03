@@ -6,6 +6,9 @@
 #include <cmajor/rts/WindowsAPI.hpp>
 #include <soulng/util/Unicode.hpp>
 #define OEMRESOURCE
+#ifdef __MINGW32__
+#define WINVER 0x0600
+#endif
 #include <Windows.h>
 #include <map>
 #include <string>
@@ -195,7 +198,8 @@ bool WinFindCloseChangeNotification(void* handle)
 
 bool WinShellExecute(const char* filePath, int64_t& errorCode)
 {
-    int code = (int)ShellExecuteA(NULL, "open", filePath, NULL, NULL, SW_SHOWNORMAL);
+    HINSTANCE instance = ShellExecuteA(NULL, "open", filePath, NULL, NULL, SW_SHOWNORMAL);
+    int code = *reinterpret_cast<int*>(&instance);
     if (code > 32)
     {
         errorCode = 0;
@@ -234,7 +238,10 @@ LRESULT CALLBACK CommandSubClassWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
 void* WinSubClassCommandWndProc(void* windowHandle)
 {
-    return (WNDPROC)SetWindowLongPtrW((HWND)windowHandle, GWLP_WNDPROC, (LONG_PTR)CommandSubClassWndProc);
+    LONG_PTR r = SetWindowLongPtrW((HWND)windowHandle, GWLP_WNDPROC, (LONG_PTR)CommandSubClassWndProc);
+    WNDPROC wndproc = *reinterpret_cast<WNDPROC*>(&r);
+    void* result = *reinterpret_cast<void**>(&wndproc);
+    return result;
 }
 
 void WinRestoreOriginalWndProc(void* windowHandle, void* originalWndProc)
@@ -254,8 +261,8 @@ GdiplusStartupInput gdiplusStartupInput;
 
 int WinInit(void* messageProcessorFunctionAddress, void* keyPreviewFunctionAddress)
 {
-    messageProcessor = static_cast<messageProcessorFunction>(messageProcessorFunctionAddress);
-    keyPreview = static_cast<keyPreviewFunction>(keyPreviewFunctionAddress);
+    messageProcessor = reinterpret_cast<messageProcessorFunction>(messageProcessorFunctionAddress);
+    keyPreview = reinterpret_cast<keyPreviewFunction>(keyPreviewFunctionAddress);
     Status status = GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
     return static_cast<int>(status);
 }
@@ -305,8 +312,8 @@ typedef void (*dialogKeyPreviewFunction)(void* dialogWindowPtr, uint32_t keyCode
 int WinMessageLoop(void* windowHandle, void* parentWindowHandle, void* getDialogResultFunc, void* keyPreviewFunc, void* dialogWindowPtr)
 {
     int dialogResult = 0;
-    getDialogResultFunction dialogResultFun = static_cast<getDialogResultFunction>(getDialogResultFunc);
-    dialogKeyPreviewFunction keyPreviewFun = static_cast<dialogKeyPreviewFunction>(keyPreviewFunc);
+    getDialogResultFunction dialogResultFun = reinterpret_cast<getDialogResultFunction>(getDialogResultFunc);
+    dialogKeyPreviewFunction keyPreviewFun = reinterpret_cast<dialogKeyPreviewFunction>(keyPreviewFunc);
     EnableWindow((HWND)parentWindowHandle, false);
     ShowWindow((HWND)windowHandle, SW_SHOW);
     BringWindowToTop((HWND)windowHandle);
@@ -350,7 +357,7 @@ int WinMessageLoop(void* windowHandle, void* parentWindowHandle, void* getDialog
     return dialogResult;
 }
 
- uint16_t WinRegisterWindowClass(const char* windowClassName, uint32_t style, int backgroundColor)
+uint16_t WinRegisterWindowClass(const char* windowClassName, uint32_t style, int backgroundColor)
 {
     std::u16string className = ToUtf16(windowClassName);
     WNDCLASSEXW wc;
@@ -362,7 +369,9 @@ int WinMessageLoop(void* windowHandle, void* parentWindowHandle, void* getDialog
     wc.hInstance = applicationInstance;
     wc.hIcon = LoadIcon(applicationInstance, IDI_APPLICATION);
     wc.hCursor = nullptr;
-    wc.hbrBackground = (HBRUSH)(backgroundColor + 1);
+    int64_t c = backgroundColor + 1;
+    HBRUSH bgc = *reinterpret_cast<HBRUSH*>(&c);
+    wc.hbrBackground = bgc;
     wc.lpszMenuName = nullptr;
     wc.lpszClassName = (LPWSTR)className.c_str();
     wc.hIconSm = LoadIcon(applicationInstance, IDI_APPLICATION);
@@ -393,7 +402,8 @@ int WinShowMessageBoxWithType(const char* text, const char* caption, void* owner
         cap = ToUtf16(caption);
         captionStr = (LPCWSTR)cap.c_str();
     }
-    return MessageBoxW((HWND)ownerWindowHandle, (LPCWSTR)str.c_str(), captionStr, type);
+    const char16_t* s = str.c_str();
+    return MessageBoxW((HWND)ownerWindowHandle, reinterpret_cast<LPCWSTR>(s), captionStr, type);
 }
 
 bool WinMessageBeep(uint32_t messageBeepType)
@@ -404,7 +414,9 @@ bool WinMessageBeep(uint32_t messageBeepType)
 void* WinCreateWindowByClassAtom(uint16_t windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle)
 {
     std::u16string name = ToUtf16(windowName);
-    HWND handle = CreateWindowExW(exStyle, (LPCWSTR)windowClass, (LPCWSTR)name.c_str(), style, x, y, w, h, (HWND)parentHandle, nullptr, applicationInstance, nullptr);
+    uint64_t wc = windowClass;
+    LPCWSTR wcs = *reinterpret_cast<LPWSTR*>(&wc);
+    HWND handle = CreateWindowExW(exStyle, wcs, (LPCWSTR)name.c_str(), style, x, y, w, h, (HWND)parentHandle, nullptr, applicationInstance, nullptr);
     return handle;
 }
 
@@ -526,7 +538,7 @@ void* WinBeginPaint(void* windowHandle, void*& paintStruct)
 void WinEndPaint(void* windowHandle, void* paintStruct)
 {
     EndPaint((HWND)windowHandle, (const PAINTSTRUCT*)paintStruct);
-    delete paintStruct;
+    delete static_cast<PAINTSTRUCT*>(paintStruct);
 }
 
 void WinGetClipRect(void* paintStruct, int& x, int& y, int& w, int& h)
@@ -607,7 +619,12 @@ int WinGraphicsPenSetAlignment(void* pen, int alignment)
 
 void* WinGraphicsPenGetBrush(void* pen)
 {
+#ifdef __MINGW32__
+    #warning GetBrush not implemented in mingw gdipluspen.h!!!!!!!
+        return nullptr;
+#else
     return static_cast<Pen*>(pen)->GetBrush();
+#endif
 }
 
 int WinGraphicsPenSetBrush(void* pen, void* brush)
@@ -1407,7 +1424,11 @@ int WinGraphicsGetEncoderClsId(const char* imageFormat, void* clsid)
 int WinGraphicsImageSave(void* image, const char* fileName, const void* encoderClsId)
 {
     std::u16string fileNameStr = ToUtf16(fileName);
+#ifdef __MINGW32__
+    return static_cast<Image*>(image)->Save((const WCHAR*)fileNameStr.c_str(), static_cast<const CLSID*>(encoderClsId), nullptr);
+#else
     return static_cast<Image*>(image)->Save((const WCHAR*)fileNameStr.c_str(), static_cast<const CLSID*>(encoderClsId));
+#endif
 }
 
 void WinGetSysColor(int index, uint8_t& red, uint8_t& green, uint8_t& blue)
@@ -1467,11 +1488,11 @@ bool WinGetOpenFileName(void* windowHandle, const char16_t* filter, const char16
     openFileName.lStructSize = sizeof(openFileName);
     openFileName.hwndOwner = (HWND)windowHandle;
     openFileName.hInstance = applicationInstance;
-    openFileName.lpstrFilter = (LPCTSTR)filter;
+    openFileName.lpstrFilter = (LPCWSTR)filter;
     openFileName.lpstrCustomFilter = nullptr;
     openFileName.nMaxCustFilter = 0;
     openFileName.nFilterIndex = 0;
-    openFileName.lpstrFile = (LPTSTR)fileNameBuffer;
+    openFileName.lpstrFile = reinterpret_cast<LPWSTR>(fileNameBuffer);
     openFileName.nMaxFile = fileNameBufferSize;
     openFileName.lpstrFileTitle = nullptr;
     openFileName.nMaxFileTitle = 0;
@@ -1480,7 +1501,7 @@ bool WinGetOpenFileName(void* windowHandle, const char16_t* filter, const char16
     openFileName.Flags = flags;
     openFileName.nFileOffset = 0;
     openFileName.nFileExtension = 0;
-    openFileName.lpstrDefExt = (LPCTSTR)defaultExtension;
+    openFileName.lpstrDefExt = (LPCWSTR)defaultExtension;
     openFileName.lCustData = 0;
     openFileName.lpfnHook = nullptr;
     openFileName.lpTemplateName = nullptr;
@@ -1496,11 +1517,11 @@ bool WinGetSaveFileName(void* windowHandle, const char16_t* filter, const char16
     openFileName.lStructSize = sizeof(openFileName);
     openFileName.hwndOwner = (HWND)windowHandle;
     openFileName.hInstance = applicationInstance;
-    openFileName.lpstrFilter = (LPCTSTR)filter;
+    openFileName.lpstrFilter = (LPCWSTR)filter;
     openFileName.lpstrCustomFilter = nullptr;
     openFileName.nMaxCustFilter = 0;
     openFileName.nFilterIndex = 0;
-    openFileName.lpstrFile = (LPTSTR)fileNameBuffer;
+    openFileName.lpstrFile = reinterpret_cast<LPWSTR>(fileNameBuffer);
     openFileName.nMaxFile = fileNameBufferSize;
     openFileName.lpstrFileTitle = nullptr;
     openFileName.nMaxFileTitle = 0;
@@ -1509,7 +1530,7 @@ bool WinGetSaveFileName(void* windowHandle, const char16_t* filter, const char16
     openFileName.Flags = flags;
     openFileName.nFileOffset = 0;
     openFileName.nFileExtension = 0;
-    openFileName.lpstrDefExt = (LPCTSTR)defaultExtension;
+    openFileName.lpstrDefExt = (LPCWSTR)defaultExtension;
     openFileName.lCustData = 0;
     openFileName.lpfnHook = nullptr;
     openFileName.lpTemplateName = nullptr;
@@ -1841,4 +1862,3 @@ uint64_t WinGlobalSize(void* memHandle)
 {
     return GlobalSize((HGLOBAL)memHandle);
 }
-
