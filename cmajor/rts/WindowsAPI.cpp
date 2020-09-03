@@ -8,6 +8,8 @@
 #define OEMRESOURCE
 #ifdef __MINGW32__
 #define WINVER 0x0600
+#define UNICODE
+#define _UNICODE
 #endif
 #include <Windows.h>
 #include <map>

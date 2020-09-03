@@ -813,7 +813,7 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
             {
                 if (target == Target::winguiapp)
                 {
-                    linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$ENTRY$", "WinMain"));
+                    linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$ENTRY$", "wWinMain"));
                 }
                 else
                 {
@@ -2046,7 +2046,7 @@ void CreateMainUnitCppWindowsGUI(std::vector<std::string>& objectFilePaths, Modu
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"__polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"__staticClassArray"));
-    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_ | Specifiers::winapi, new IntNode(Span()), U"WinMain", nullptr));
+    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_ | Specifiers::winapi, new IntNode(Span()), U"wWinMain", nullptr));
     mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new VoidNode(Span())), new IdentifierNode(Span(), U"instance")));
     mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new VoidNode(Span())), new IdentifierNode(Span(), U"prevInstance")));
     mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new CharNode(Span())), new IdentifierNode(Span(), U"commandLine")));

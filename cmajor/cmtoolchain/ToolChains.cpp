@@ -276,6 +276,7 @@ void CreateWindowsGccToolChain(bool verbose)
     linkerDebugConfig.args.push_back("$LIBRARY_FILES$");
     linkerDebugConfig.args.push_back("-Xlinker --end-group");
     linkerDebugConfig.args.push_back("-m$SUBSYSTEM$");
+    linkerDebugConfig.args.push_back("-municode");
     linkerDebugConfig.args.push_back("-o");
     linkerDebugConfig.args.push_back("$EXECUTABLE_FILE$");
     linker.configurations.push_back(linkerDebugConfig);
@@ -292,6 +293,7 @@ void CreateWindowsGccToolChain(bool verbose)
     linkerReleaseConfig.args.push_back("$LIBRARY_FILES$");
     linkerReleaseConfig.args.push_back("-Xlinker --end-group");
     linkerReleaseConfig.args.push_back("-m$SUBSYSTEM$");
+    linkerReleaseConfig.args.push_back("-municode");
     linkerReleaseConfig.args.push_back("-o");
     linkerReleaseConfig.args.push_back("$EXECUTABLE_FILE$");
     linker.configurations.push_back(linkerReleaseConfig);
