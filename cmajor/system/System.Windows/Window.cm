@@ -105,7 +105,7 @@ namespace System.Windows
             SetDialogResult(DialogResult.none);
             GetDialogResultFunction dialogResultFunction = System.Windows.GetDialogResult;
             DialogWindowKeyPreviewFunction keyPreviewFunction = System.Windows.DialogWindowKeyPreview;
-            int result = WinMessageLoop(Handle(), parentWindow.Handle(), cast<void*>(dialogResultFunction), cast<void*>(keyPreviewFunction), this);
+            int result = WinDialogWindowMessageLoop(Handle(), parentWindow.Handle(), cast<void*>(dialogResultFunction), cast<void*>(keyPreviewFunction), this);
             return cast<DialogResult>(result);
         }
         protected override void OnCreated() 

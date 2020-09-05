@@ -198,6 +198,23 @@ LogMessageReply::LogMessageReply(soulng::util::JsonValue* value)
     sngjson::json::FromJson(value, "ok", ok);
 }
 
+ProgressMessage::ProgressMessage() : messageKind()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> ProgressMessage::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    return object;
+}
+
+ProgressMessage::ProgressMessage(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+}
+
 GenericErrorReply::GenericErrorReply() : messageKind(), error()
 {
 }

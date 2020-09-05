@@ -298,6 +298,36 @@ int WinRun()
     return msg.wParam;
 }
 
+int WinApplicationMessageLoop()
+{
+    DWORD queueStatus = GetQueueStatus(QS_ALLEVENTS);
+    bool messageWaiting = HIWORD(queueStatus) != 0;
+    if (messageWaiting)
+    {
+        MSG msg;
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            bool handled = false;
+            if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+            {
+                if (keyPreview)
+                {
+                    uint32_t keyCode = msg.wParam;
+                    bool keyDown = msg.message == WM_KEYDOWN;
+                    keyPreview(keyCode, keyDown, handled);
+                }
+            }
+            if (!handled)
+            {
+                DispatchMessage(&msg);
+            }
+        }
+        return msg.wParam;
+    }
+    return 1;
+}
+
 void* WinGetForegroundWindow()
 {
     return GetForegroundWindow();
@@ -311,7 +341,7 @@ bool WinEnableWindow(void* windowHandle, bool enable)
 typedef int (*getDialogResultFunction)(void* dialogWindowPtr);
 typedef void (*dialogKeyPreviewFunction)(void* dialogWindowPtr, uint32_t keyCode, bool keyDown, bool& handled);
 
-int WinMessageLoop(void* windowHandle, void* parentWindowHandle, void* getDialogResultFunc, void* keyPreviewFunc, void* dialogWindowPtr)
+int WinDialogWindowMessageLoop(void* windowHandle, void* parentWindowHandle, void* getDialogResultFunc, void* keyPreviewFunc, void* dialogWindowPtr)
 {
     int dialogResult = 0;
     getDialogResultFunction dialogResultFun = reinterpret_cast<getDialogResultFunction>(getDialogResultFunc);

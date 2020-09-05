@@ -17,6 +17,7 @@ namespace Cm.Build
     public int defaultPort = 54325;
 
     public class delegate void LogMessageNotificationFunction();
+    public class delegate void ProgressNotificationFunction();
 
     public string CmCodeLogDir()
     {
@@ -89,7 +90,7 @@ namespace Cm.Build
             port(args.port), log(args.log),
             serverStartWaitSeconds(args.serverStartWaitSeconds), serverStopWaitSeconds(args.serverStopWaitSeconds),
             keepAliveIntervalSeconds(args.keepAliveIntervalSeconds), saveRequestOnly(args.saveRequestOnly),
-            notifyLogMessageAvailable(), serverMutex()
+            notifyLogMessageAvailable(), notifyProgress(), serverMutex(), terminating(false)
         {
             serverStartCommand = "cmbs";
             if (args.debugServer)
@@ -109,6 +110,10 @@ namespace Cm.Build
         public nothrow void SetLogMessageNotificationFunction(const LogMessageNotificationFunction& notifyLogMessageAvailable_)
         {
             notifyLogMessageAvailable = notifyLogMessageAvailable_;
+        }
+        public nothrow void SetProgressNotificationFunction(const ProgressNotificationFunction& notifyProgress_)
+        {
+            notifyProgress = notifyProgress_;
         }
         public nothrow bool ServerRunning() const
         {
@@ -200,13 +205,49 @@ namespace Cm.Build
                 }
             }
         }
+        public void TerminateServer(bool logTerminate)
+        {
+            try
+            {
+                if (!ServerRunning()) return;
+                terminating = true;
+                sendKeepAlives = false;
+                buildServer->Terminate();
+                terminatingVar.NotifyOne();
+                if (logTerminate)
+                {
+                    LogMessage("Cm.Build.Service: Build Server stopped.");
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+                if (logTerminate && log)
+                {
+                    LogMessage("Cm.Build.Service.TerminateServer: " + ex.Message());
+                }
+            }
+        }
+        private bool Terminating(void* arg) 
+        {
+            return terminating;
+        }
+        public void Quit()
+        {
+            TerminateServer(false);
+            keepAliveThread.Join();
+        }
         public void KeepAliveServer()
         {
             try
             {
                 while (sendKeepAlives && ServerRunning())
                 {
-                    Sleep(Duration.FromSeconds(keepAliveIntervalSeconds));
+                    {
+                        LockGuard<RecursiveMutex> lock(terminateMutex);
+                        terminatingVar.WaitFor(terminateMutex, Terminating, null, Duration.FromSeconds(keepAliveIntervalSeconds));
+                        if (terminating) return;
+                    }
                     SendKeepAliveRequest();
                 }
             }
@@ -237,6 +278,7 @@ namespace Cm.Build
         {
             try
             {
+                terminating = false;
                 if (!ServerRunning())
                 {
                     if (!StartServer())
@@ -256,16 +298,24 @@ namespace Cm.Build
                 string replyStr = ReadStr(socket);
                 UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
                 string messageKind = GetMessageKind(replyJsonValue.Get());
-                while (messageKind == "logMessageRequest")
+                while (messageKind == "logMessageRequest" || messageKind == "progressMessage")
                 {
-                    LogMessageRequest logMessageRequest(replyJsonValue.Get());
-                    string message = logMessageRequest.message;
-                    LogMessage(message);
-                    LogMessageReply logMessageReply;
-                    logMessageReply.ok = true;
-                    UniquePtr<JsonValue> logMessageReplyJsonValue = logMessageReply.ToJson();
-                    string logMessageReplyStr = logMessageReplyJsonValue->ToString();
-                    Write(socket, logMessageReplyStr);
+                    if (messageKind == "logMessageRequest")
+                    {
+                        LogMessageRequest logMessageRequest(replyJsonValue.Get());
+                        string message = logMessageRequest.message;
+                        LogMessage(message);
+                        LogMessageReply logMessageReply;
+                        logMessageReply.ok = true;
+                        UniquePtr<JsonValue> logMessageReplyJsonValue = logMessageReply.ToJson();
+                        string logMessageReplyStr = logMessageReplyJsonValue->ToString();
+                        Write(socket, logMessageReplyStr);
+                    }
+                    else if (messageKind == "progressMessage")
+                    {
+                        ProgressMessage progressMessage(replyJsonValue.Get());
+                        notifyProgress();
+                    }
                     replyStr = ReadStr(socket);
                     replyJsonValue = ParseJson(replyStr);
                     messageKind = GetMessageKind(replyJsonValue.Get());
@@ -290,8 +340,11 @@ namespace Cm.Build
             }
             catch (const Exception& ex)
             {
-                LogException(ex);
-                LogMessage("Cm.Build.Service.ProcessBuildRequest: " + ex.Message());
+                if (!terminating)
+                {
+                    LogException(ex);
+                    LogMessage("Cm.Build.Service.ProcessBuildRequest: " + ex.Message());
+                }
             }
         }
         private void ProcessBuildReply(const BuildReply& buildReply)
@@ -321,6 +374,10 @@ namespace Cm.Build
             }
             notifyLogMessageAvailable();
         }
+        private void Progress()
+        {
+            notifyProgress();
+        }
         public nothrow bool MessageLogEmpty() const
         {
             LockGuard<RecursiveMutex> lock(messageLogMutex);
@@ -341,16 +398,20 @@ namespace Cm.Build
         private bool sendKeepAlives;
         private bool log;
         private bool saveRequestOnly;
+        private bool terminating;
+        private ConditionVariable terminatingVar;
         private int keepAliveIntervalSeconds;
         private int serverStartWaitSeconds;
         private int serverStopWaitSeconds;
         private LogMessageNotificationFunction notifyLogMessageAvailable;
+        private ProgressNotificationFunction notifyProgress;
         private string serverStartCommand;
         private UniquePtr<Process> buildServer;
         private Thread keepAliveThread;
         private LinkedList<string> messageLog;
         private RecursiveMutex messageLogMutex;
         private RecursiveMutex serverMutex;
+        private RecursiveMutex terminateMutex;
     }
 
     public void LogException(const Exception& ex)

@@ -120,6 +120,7 @@ private:
     time_t lastActionTime;
     bool stopRequested;
     std::string logFilePath;
+    int progressIntervalMs;
 };
 
 struct RequestGuard
@@ -137,7 +138,7 @@ struct RequestGuard
 
 BuildServer::BuildServer(int timeoutSecs_, bool log_) :
     port(54325), log(log_), version(), exiting(false), listenSocket(), socket(), requestInProgress(false), timeoutSecs(timeoutSecs_),
-    lastActionTime(), stopRequested(false), logFilePath(CmbsLogFilePath()), running(false)
+    lastActionTime(), stopRequested(false), logFilePath(CmbsLogFilePath()), running(false), progressIntervalMs(250)
 {
     SetLastActionTime();
     if (log)
@@ -746,8 +747,18 @@ void BuildServer::RunLog()
     while (true)
     {
         bool endOfLog = false;
-        std::string message = soulng::util::FetchLogMessage(endOfLog);
+        bool timeout = false;
+        std::string message = soulng::util::FetchLogMessage(endOfLog, progressIntervalMs, timeout);
         if (endOfLog) return;
+        if (timeout)
+        {
+            ProgressMessage progressMessage;
+            progressMessage.messageKind = "progressMessage";
+            std::unique_ptr<JsonValue> progress = progressMessage.ToJson();
+            std::string message = progress->ToString();
+            Write(socket, message);
+            continue;
+        }
         LogMessageRequest logMessageRequest;
         logMessageRequest.messageKind = "logMessageRequest";
         logMessageRequest.message = message;

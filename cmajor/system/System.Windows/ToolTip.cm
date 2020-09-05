@@ -20,7 +20,10 @@ namespace System.Windows
         {
             SetChanged();
         }
-        public ToolTip() : this(Color.FloralWhite(), Color.Black(), Color.Black(), "", Point(0, 0), Font(FontFamily("Segoe UI"), 9.0f))
+        public ToolTip(const Color& backgroundColor) : this(backgroundColor, Color.Black(), Color.Black(), "", Point(0, 0), Font(FontFamily("Segoe UI"), 9.0f))
+        {
+        }
+        public ToolTip() : this(Color.FloralWhite())
         {
         }
         public void SetTextColor(const Color& textColor)

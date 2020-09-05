@@ -13,7 +13,23 @@ using cmcode;
 
 namespace cmcode
 {
-    public const uint CMCODE_LOG_MESSAGE_NOTIFICATION = WM_USER + 1u;
+    enum UserInterfaceAction
+    {
+        none = 0, build = 1
+    }
+
+    class BuildGuard
+    {
+        public nothrow BuildGuard(MainWindow* mainWindow_) : mainWindow(mainWindow_)
+        {
+            mainWindow->SetControlStatus(UserInterfaceAction.build);
+        }
+        public ~BuildGuard()
+        {
+            mainWindow->SetControlStatus(UserInterfaceAction.none);
+        }
+        private MainWindow* mainWindow;
+    }
 
     class MainWindow : Window
     {
@@ -123,7 +139,8 @@ namespace cmcode
             windowMenuItem->AddMenuItem(closeAllTabsMenuItem.Release());
             menuBar->AddMenuItem(windowMenuItem.Release());
             AddChild(menuBar.Release());
-            UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, Color.DefaultBitmapTransparent(), ToolBar.Style.regular, Padding(4, 4, 4, 4), Padding(2, 0, 2, 0)));
+            UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, ToolButtonToolTipColor(), Color.DefaultBitmapTransparent(), ToolBar.Style.regular,
+                Padding(4, 4, 4, 4), Padding(2, 0, 2, 0)));
             toolBar = toolBarPtr.Get();
             toolBar->SetTextToolButtonFont(Font(FontFamily("Segoe UI"), 9.0f));
             UniquePtr<BorderedControl> borderedToolBar(new BorderedControl(
@@ -193,6 +210,13 @@ namespace cmcode
             buildProjectToolButton->SetToolTip("Build Active Project (Ctrl+B)");
             buildProjectToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(buildProjectToolButtonPtr.Release());
+
+            UniquePtr<ToolButton> cancelBuildToolButtonPtr(new ToolButton("cmcode.cancel.build.bitmap"));
+            cancelBuildToolButton = cancelBuildToolButtonPtr.Get();
+            cancelBuildToolButton->ClickEvent().AddHandler(CancelBuildClick);
+            cancelBuildToolButton->SetToolTip("Cancel Build");
+            cancelBuildToolButton->SetPadding(Padding(8, 8, 8, 8));
+            toolBar->AddToolButton(cancelBuildToolButtonPtr.Release());
 
             UniquePtr<ToolButtonSeparator> separator4(new ToolButtonSeparator());
             toolBar->AddToolButton(separator4.Release());
@@ -289,7 +313,7 @@ namespace cmcode
             sourceFilePathStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
             statusBar->AddItem(sourceFilePathStatusBarItem);
             AddChild(statusBar);
-            SetControlStatus();
+            SetControlStatus(UserInterfaceAction.none);
             MainConfiguration.Instance().SetMainWindowLocation(Location());
             MainConfiguration.Instance().SetMainWindowSize(GetSize());
             SetTimer(1u, defaultConfigSaveTimerPeriod);
@@ -305,7 +329,7 @@ namespace cmcode
             {
                 if (!buildService.IsNull())
                 {
-                    buildService->StopServer(false);
+                    buildService->Quit();
                     buildService.Reset();
                 }
                 Application.SetLogView(null);
@@ -625,7 +649,7 @@ namespace cmcode
                 codeTabControl->CloseAllTabPages();
                 UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData, contents);
                 solutionExplorerTreeView->SetRoot(root.Release());
-                SetControlStatus();
+                SetControlStatus(UserInterfaceAction.none);
             }
             catch (const Exception& ex)
             {
@@ -669,7 +693,7 @@ namespace cmcode
                 codeTabControl->CloseAllTabPages();
                 solutionExplorerTreeView->SetRoot(null);
                 solutionExplorerData.Reset();
-                SetControlStatus();
+                SetControlStatus(UserInterfaceAction.none);
                 Invalidate();
             }
             catch (const Exception& ex)
@@ -776,6 +800,8 @@ namespace cmcode
             {
                 outputLogView->Clear();
                 outputTabPage->Select();
+                BuildGuard buildGuard(this);
+                Application.ProcessMessages();
                 GetBuildService().ProcessBuildRequest(buildRequest);
             }
             catch (const Exception& ex)
@@ -791,6 +817,7 @@ namespace cmcode
                 buildService.Reset(new BuildService(BuildServiceArgs().
                     Log(true).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false)));
                 buildService->SetLogMessageNotificationFunction(LogMessagesAvailable);
+                buildService->SetProgressNotificationFunction(BuildServiceProgress);
             }
             return *buildService;
         }
@@ -920,6 +947,18 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private void CancelBuildClick()
+        {
+            try
+            {
+                GetBuildService().TerminateServer(true);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void LogMessagesAvailable()
         {
             try
@@ -930,9 +969,21 @@ namespace cmcode
                     if (!logMessage.IsEmpty())
                     {
                         outputLogView->WriteLine(logMessage);
-                        outputLogView->Update();
                     }
                 }
+                Application.ProcessMessages();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void BuildServiceProgress()
+        {
+            try
+            {
+                Application.ProcessMessages();
             }
             catch (const Exception& ex)
             {
@@ -1015,7 +1066,7 @@ namespace cmcode
             }
         }
 
-        private void SetControlStatus()
+        internal void SetControlStatus(UserInterfaceAction action)
         {
             saveToolButton->Disable();
             saveAllToolButton->Disable();
@@ -1029,6 +1080,7 @@ namespace cmcode
             releaseToolButton->SetState(ToolButton.State.disabled);
             buildSolutionToolButton->Disable();
             buildProjectToolButton->Disable();
+            cancelBuildToolButton->Disable();
             startDebuggingToolButton->Disable();
             stopDebuggingToolButton->Disable();
             showNextStatementToolButton->Disable();
@@ -1050,6 +1102,12 @@ namespace cmcode
             stepOverMenuItem->Disable();
             stepIntoMenuItem->Disable();
             stepOutMenuItem->Disable();
+
+            if (action == UserInterfaceAction.build)
+            {
+                cancelBuildToolButton->Enable();
+                return;
+            }
 
             bool solutionOpen = !solutionExplorerData.IsNull();
             if (solutionOpen)
@@ -1138,6 +1196,7 @@ namespace cmcode
         private ToolButton* releaseToolButton;
         private ToolButton* buildSolutionToolButton;
         private ToolButton* buildProjectToolButton;
+        private ToolButton* cancelBuildToolButton;
         private ToolButton* startDebuggingToolButton;
         private ToolButton* stopDebuggingToolButton;
         private ToolButton* showNextStatementToolButton;
@@ -1155,7 +1214,7 @@ int main(int argc, const char** argv)
     try
     {
         string filePath;
-        if (argc >= 1)
+        if (argc > 1)
         {
             filePath = GetFullPath(argv[1]);
         }

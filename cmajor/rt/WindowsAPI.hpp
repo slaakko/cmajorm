@@ -24,11 +24,12 @@ extern "C" RT_API bool WinShellExecute(const char* filePath, int64_t& errorCode)
 extern "C" RT_API int WinInit(void* messageProcessorFunctionAddress, void* keyPreviewFunctionAddress);
 extern "C" RT_API int WinRun();
 extern "C" RT_API void WinDone();
+extern "C" RT_API int WinApplicationMessageLoop();
 extern "C" RT_API void* WinSubClassCommandWndProc(void* windowHandle);
 extern "C" RT_API void WinRestoreOriginalWndProc(void* windowHandle, void* originalWndProc);
 extern "C" RT_API void* WinGetForegroundWindow();
 extern "C" RT_API bool WinEnableWindow(void* windowHandle, bool enable);
-extern "C" RT_API int WinMessageLoop(void* windowHandle, void* parentWindowHandle, void* getDialogResultFunc, void* keyPreviewFunc, void* dialogWindowPtr);
+extern "C" RT_API int WinDialogWindowMessageLoop(void* windowHandle, void* parentWindowHandle, void* getDialogResultFunc, void* keyPreviewFunc, void* dialogWindowPtr);
 extern "C" RT_API uint16_t WinRegisterWindowClass(const char* windowClassName, uint32_t style, int backgroundColor);
 extern "C" RT_API void* WinCreateWindowByClassAtom(uint16_t windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle);
 extern "C" RT_API void* WinCreateWindowByClassName(const char* windowClass, const char* windowName, int64_t style, int64_t exStyle, int x, int y, int w, int h, void* parentHandle);

@@ -94,6 +94,15 @@ namespace Cm.Build
     }
 
     [json]
+    public class ProgressMessage
+    {
+        public nothrow ProgressMessage() : messageKind("progressMessage")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
     public class GenericErrorReply
     {
         public nothrow GenericErrorReply() : messageKind("genericErrorReply")

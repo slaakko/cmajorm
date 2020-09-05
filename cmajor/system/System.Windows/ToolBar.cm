@@ -18,23 +18,24 @@ namespace System.Windows
         {
             regular = 0, radioButtonGroup = 1
         }
-        public ToolBar(const Color& backgroundColor, const Color& toolButtonTransparentColor_, const Point& location, const Size& size, Dock dock, Anchors anchors,
+        public ToolBar(const Color& backgroundColor, const Color& toolTipWindowColor, const Color& toolButtonTransparentColor_, const Point& location, const Size& size, Dock dock, Anchors anchors,
             int toolButtonHeight_, Style style_, const Padding& padding_, const Padding& buttonPadding_) :
             base("System.Windows.ToolBar", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
             backgroundColor, "toolBar", location, size, dock, anchors), flags(Flags.none), toolButtonTransparentColor(toolButtonTransparentColor_),
             toolButtonHeight(toolButtonHeight_), darkColor(Color(100u, 100u, 100u)), lightColor(Color.White()), mediumLightColor(227u, 227u, 227u),
             mediumDarkColor(160u, 160u, 160u), disabledColor(Color(204u, 204u, 207u)),
             toolButtonSeparatorColor1(204u, 206u, 219u), toolButtonSeparatorColor2(245u, 245u, 245u), mouseInToolButton(null), mouseDownToolButton(null),
-            pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip()), padding(padding_), buttonPadding(buttonPadding_), toolButtons(this),
+            pressedStateToolButton(null), style(style_), toolTipWindow(new ToolTip(toolTipWindowColor)), padding(padding_), buttonPadding(buttonPadding_), toolButtons(this),
             centerFormat(StringAlignment.center, StringAlignment.center)
         {
         }
-        public ToolBar(int toolButtonHeight, const Color& toolButtonTransparentColor, Style style, const Padding& padding, const Padding& buttonPadding) :
-            this(DefaultControlBackgroundColor(), toolButtonTransparentColor, Point(padding.left, padding.top),
+        public ToolBar(int toolButtonHeight, const Color& toolTipWindowColor, const Color& toolButtonTransparentColor, Style style, const Padding& padding,
+            const Padding& buttonPadding) :
+            this(DefaultControlBackgroundColor(), toolTipWindowColor, toolButtonTransparentColor, Point(padding.left, padding.top),
                 Size(0, toolButtonHeight + padding.Vertical() + buttonPadding.Vertical()), Dock.top, Anchors.none, toolButtonHeight, style, padding, buttonPadding)
         {
         }
-        public ToolBar(Style style) : this(38, Color.DefaultBitmapTransparent(), style, DefaultPadding(), DefaultButtonPadding())
+        public ToolBar(Style style) : this(38, Color.FloralWhite(), Color.DefaultBitmapTransparent(), style, DefaultPadding(), DefaultButtonPadding())
         {
         }
         public ToolBar() : this(Style.regular)
@@ -263,6 +264,7 @@ namespace System.Windows
             }
             mouseInToolButton = null;
             mouseDownToolButton = null;
+            HideToolTipWindow();
         }
         protected override void OnMouseMove(MouseEventArgs& args)
         {
@@ -286,6 +288,7 @@ namespace System.Windows
         protected override void OnMouseDown(MouseEventArgs& args)
         {
             base->OnMouseDown(args);
+            HideToolTipWindow();
             if (style == Style.regular)
             {
                 ToolButton* toolButton = GetToolButtonAt(args.location);
@@ -358,7 +361,7 @@ namespace System.Windows
             Size size = toolButton->GetSize();
             toolTipWindow->SetText(toolButton->GetToolTip());
             toolTipWindow->MeasureExtent();
-            Point pt(loc.x + size.w + toolButton->GetPadding().left, loc.y + (size.h - toolTipWindow->GetSize().h) / 2);
+            Point pt(loc.x, loc.y + size.h + 8);
             pt = ClientToScreen(pt);
             Window* window = GetWindow();
             if (window != null)

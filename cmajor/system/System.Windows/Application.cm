@@ -59,6 +59,10 @@ namespace System.Windows
         {
             Exit(0);
         }
+        public static void ProcessMessages()
+        {
+            int retval = WinApplicationMessageLoop();
+        }
         private static bool ProcessMessage(void* windowHandle, uint msg, uint wparam, long lparam, long& result, void*& originalWndProc)
         {
             Control* window = windowManager.GetWindow(windowHandle);

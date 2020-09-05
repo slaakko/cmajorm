@@ -84,6 +84,14 @@ struct LogMessageReply
     bool ok;
 };
 
+struct ProgressMessage
+{
+    ProgressMessage();
+    ProgressMessage(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+};
+
 struct GenericErrorReply
 {
     GenericErrorReply();
