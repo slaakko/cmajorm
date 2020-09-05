@@ -345,7 +345,7 @@ public:
     void PutModule(Module* module);
     void RemoveModule(Module* module);
 private:
-    std::mutex mtx;
+    std::recursive_mutex mtx;
     static std::unique_ptr<ModuleMap> instance;
     std::unordered_map<boost::uuids::uuid, Module*, boost::hash<boost::uuids::uuid>> moduleMap;
     std::unordered_map<boost::uuids::uuid, std::string, boost::hash<boost::uuids::uuid>> moduleFilePathMap;
@@ -366,6 +366,7 @@ void ModuleMap::Done()
 
 Module* ModuleMap::GetModule(const boost::uuids::uuid& moduleId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     auto it = moduleMap.find(moduleId);
     if (it != moduleMap.cend())
     {
@@ -392,11 +393,13 @@ Module* ModuleMap::GetModule(const boost::uuids::uuid& moduleId)
 
 void ModuleMap::PutModule(Module* module)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     moduleMap[module->Id()] = module;
 }
 
 void ModuleMap::RemoveModule(Module* module)
 {
+    std::lock_guard<std::recursive_mutex> lock(mtx);
     moduleMap.erase(module->Id());
     moduleFilePathMap[module->Id()] = module->OriginalFilePath();
 }
@@ -1094,13 +1097,15 @@ void Module::Write(SymbolWriter& writer)
     writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~(ModuleFlags::root | ModuleFlags::immutable | ModuleFlags::compiling)));
     writer.GetBinaryWriter().Write(name);
     writer.GetBinaryWriter().Write(id);
-    writer.GetBinaryWriter().Write(originalFilePath);
+    std::string cmajorRootRelativeFilePath = MakeCmajorRootRelativeFilePath(originalFilePath);
+    writer.GetBinaryWriter().Write(cmajorRootRelativeFilePath);
     uint32_t nr = referencedModules.size();
     writer.GetBinaryWriter().WriteULEB128UInt(nr);
     for (uint32_t i = 0; i < nr; ++i)
     {
         Module* referencedModule = referencedModules[i];
-        writer.GetBinaryWriter().Write(referencedModule->OriginalFilePath());
+        std::string cmajorRootRelativeReferenceFilePath = MakeCmajorRootRelativeFilePath(referencedModule->OriginalFilePath());
+        writer.GetBinaryWriter().Write(cmajorRootRelativeReferenceFilePath);
     }
     fileTable.Write(writer.GetBinaryWriter(), IsSystemModule());
     int16_t nmnt = moduleNameTable.size();
@@ -1227,8 +1232,9 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
 #ifdef MODULE_READING_DEBUG
     LogMessage(rootModule->LogStreamId(), "ReadHeader: read begin " + ToUtf8(name), rootModule->DebugLogIndent());
     rootModule->IncDebugLogIndent();
-#endif 
-    originalFilePath = reader.GetBinaryReader().ReadUtf8String();
+#endif
+    std::string cmajorRootRelativeFilePath = reader.GetBinaryReader().ReadUtf8String();
+    originalFilePath = ExpandCmajorRootRelativeFilePath(cmajorRootRelativeFilePath);
     if (dependencyMap.find(originalFilePath) == dependencyMap.cend())
     {
         modules.push_back(this);
@@ -1239,7 +1245,9 @@ void Module::ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module*
     uint32_t nr = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < nr; ++i)
     {
-        referenceFilePaths.push_back(reader.GetBinaryReader().ReadUtf8String());
+        std::string cmajorRootRelativeReferenceFilePath = reader.GetBinaryReader().ReadUtf8String();
+        std::string referenceFilePath = ExpandCmajorRootRelativeFilePath(cmajorRootRelativeReferenceFilePath);
+        referenceFilePaths.push_back(referenceFilePath);
     }
     fileTable.Read(reader.GetBinaryReader(), IsSystemModule());
     if (!fileTable.IsEmpty())

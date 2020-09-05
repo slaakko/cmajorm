@@ -209,7 +209,7 @@
                 }
                 , 
                 {
-                    "name" : "gcc", 
+                    "name" : "gcc-static", 
                     "tools" : 
                     [
                         {
@@ -302,6 +302,7 @@
                                         "$RUNTIME_LIBS$-lcmrtsd;-lcmsngcmparserd;-lcmsngcmlexerd;-lcmsnglexerd;-lcmsngparserd;-lcmsngcmastd;-lcmsngxmldomd;-lcmsngxmlxmld;-lcmsngxmlxpathd;-lcmehd;-lcmcommond;-lcmsngutild;-lpdcursesd;-lbz2d;-lzd;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-sd-x64-1_73;-lboost_iostreams-mgw8-mt-sd-x64-1_73;-lboost_system-mgw8-mt-sd-x64-1_73;-lgdiplus", 
                                         "$LIBRARY_DIRECTORIES$", 
                                         "$MAIN_OBJECT_FILE$", 
+                                        "$RESOURCE_FILE$", 
                                         "-Xlinker --start-group", 
                                         "$LIBRARY_FILES$", 
                                         "-Xlinker --end-group", 
@@ -322,6 +323,144 @@
                                         "$RUNTIME_LIBS$-lcmrts;-lcmsngcmparser;-lcmsngcmlexer;-lcmsnglexer;-lcmsngparser;-lcmsngcmast;-lcmsngxmldom;-lcmsngxmlxml;-lcmsngxmlxpath;-lcmeh;-lcmcommon;-lcmsngutil;-lpdcurses;-lbz2;-lz;-lwsock32;-lws2_32;-lboost_filesystem-mgw8-mt-s-x64-1_73;-lboost_iostreams-mgw8-mt-s-x64-1_73;-lboost_system-mgw8-mt-s-x64-1_73;-lgdiplus", 
                                         "$LIBRARY_DIRECTORIES$", 
                                         "$MAIN_OBJECT_FILE$", 
+                                        "$RESOURCE_FILE$", 
+                                        "-Xlinker --start-group", 
+                                        "$LIBRARY_FILES$", 
+                                        "-Xlinker --end-group", 
+                                        "-m$SUBSYSTEM$", 
+                                        "-municode", 
+                                        "-o", 
+                                        "$EXECUTABLE_FILE$"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : ""
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "linker", 
+                            "outputFileExtension" : ".exe"
+                        }
+                    ]
+                }
+                , 
+                {
+                    "name" : "gcc", 
+                    "tools" : 
+                    [
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "g++", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "-std=c++17", 
+                                        "-c", 
+                                        "$SOURCE_FILE$", 
+                                        "-o", 
+                                        "$OBJECT_FILE$", 
+                                        "-g", 
+                                        "-O0"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : "."
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "-std=c++17", 
+                                        "-c", 
+                                        "$SOURCE_FILE$", 
+                                        "-o", 
+                                        "$OBJECT_FILE$", 
+                                        "-g", 
+                                        "-O2"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : "."
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "compiler", 
+                            "outputFileExtension" : ".o"
+                        }
+                        , 
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "ar", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "rv", 
+                                        "$LIBRARY_FILE$", 
+                                        "$OBJECT_FILES$"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : "."
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "rv", 
+                                        "$LIBRARY_FILE$", 
+                                        "$OBJECT_FILES$"
+                                    ]
+                                    , 
+                                    "name" : "release", 
+                                    "outputDirectory" : "."
+                                }
+                            ]
+                            , 
+                            "debugInformationFileExtension" : "", 
+                            "name" : "library-manager", 
+                            "outputFileExtension" : ".a"
+                        }
+                        , 
+                        {
+                            "assemblyFileExtension" : "", 
+                            "commandName" : "g++", 
+                            "configurations" : 
+                            [
+                                {
+                                    "args" : 
+                                    [
+                                        "$LIBRARY_PATH_FLAG$-L", 
+                                        "$RUNTIME_LIBS$DYNAMIC", 
+                                        "$LIBRARY_DIRECTORIES$", 
+                                        "$MAIN_OBJECT_FILE$", 
+                                        "$RESOURCE_FILE$", 
+                                        "-Xlinker --start-group", 
+                                        "$LIBRARY_FILES$", 
+                                        "-Xlinker --end-group", 
+                                        "-m$SUBSYSTEM$", 
+                                        "-municode", 
+                                        "-o", 
+                                        "$EXECUTABLE_FILE$"
+                                    ]
+                                    , 
+                                    "name" : "debug", 
+                                    "outputDirectory" : ""
+                                }
+                                , 
+                                {
+                                    "args" : 
+                                    [
+                                        "$LIBRARY_PATH_FLAG$-L", 
+                                        "$RUNTIME_LIBS$DYNAMIC", 
+                                        "$LIBRARY_DIRECTORIES$", 
+                                        "$MAIN_OBJECT_FILE$", 
+                                        "$RESOURCE_FILE$", 
                                         "-Xlinker --start-group", 
                                         "$LIBRARY_FILES$", 
                                         "-Xlinker --end-group", 

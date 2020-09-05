@@ -430,7 +430,7 @@ void SymbolTable::BeginFunction(FunctionNode& functionNode, int32_t functionInde
         cloneContext.SetSpanMapper(&spanMapper);
         functionSymbol->SetConstraint(static_cast<WhereConstraintNode*>(functionNode.WhereConstraint()->Clone(cloneContext)));
     }
-    if (functionSymbol->GroupName() == U"main" || functionSymbol->GroupName() == U"WinMain" || functionSymbol->GroupName() == U"wWinMain")
+    if (functionSymbol->GroupName() == U"main" || functionSymbol->GroupName() == U"wmain" || functionSymbol->GroupName() == U"WinMain" || functionSymbol->GroupName() == U"wWinMain")
     {
         if (functionNode.IsProgramMain())
         {

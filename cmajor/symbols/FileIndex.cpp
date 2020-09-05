@@ -17,10 +17,6 @@ void FileIndex::AddFile(int32_t fileIndex, Module* module)
     if (fileMap.find(fileIndex) == fileMap.cend())
     {
         std::string filePath = module->GetFilePath(fileIndex);
-        if (filePath.empty())
-        {
-            filePath = module->GetFilePath(fileIndex);
-        }
         fileMap[fileIndex] = filePath;
     }
 }

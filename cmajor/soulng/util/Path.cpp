@@ -16,6 +16,7 @@
 #elif defined(__linux) || defined(__unix) || defined(__posix) || defined(__unix__)
     #include <unistd.h>
 #endif
+#include <algorithm>
 
 namespace soulng { namespace util {
 
@@ -258,6 +259,20 @@ std::string Path::GetExtension(const std::string& path)
     }
 }
 
+std::string Path::GetDrive(const std::string& path)
+{
+#ifdef _WIN32
+    if (path.length() >= 2 && std::isalpha(path[0]) && path[1] == ':')
+    {
+        unsigned char c = std::toupper(static_cast<unsigned char>(path[0]));
+        std::string s(1, c);
+        s.append(1, ':');
+        return s;
+    }
+#endif
+    return std::string();
+}
+
 std::string Path::GetFileName(const std::string& path)
 {
     if (path.empty())
@@ -437,6 +452,41 @@ std::string GetFullPath(const std::string& path)
             result.append(1, '/');
         }
         result.append(components[i]);
+    }
+    return result;
+}
+
+std::string MakeRelativeDirPath(const std::string& dirPath, const std::string& referenceDirPath)
+{
+    std::string p = GetFullPath(dirPath);
+    std::string r = GetFullPath(referenceDirPath);
+    if (p == r)
+    {
+        return std::string();
+    }
+    if (Path::GetDrive(p) != Path::GetDrive(r))
+    {
+        return p;
+    }
+    std::vector<std::string> pc = Split(p, '/');
+    std::vector<std::string> rc = Split(r, '/');
+    int n = std::min(pc.size(), rc.size());
+    int m = 0;
+    for (; m < n; ++m)
+    {
+        if (pc[m] != rc[m])
+        {
+            break;
+        }
+    }
+    std::string result;
+    for (int i = m; i < rc.size(); ++i)
+    {
+        result = Path::Combine(result, "..");
+    }
+    for (int i = m; i < pc.size(); ++i)
+    {
+        result = Path::Combine(result, pc[i]);
     }
     return result;
 }

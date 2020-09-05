@@ -367,6 +367,12 @@ int main(int argc, const char** argv)
 #ifndef _WIN32
             SetNumBuildThreads(1);
             SetGlobalFlag(GlobalFlags::singleThreadedCompile);
+#else
+            int n = GetNumBuildThreads();
+            if (n == -1)
+            {
+                SetNumBuildThreads(1);
+            }
 #endif
             ReadToolChains(GetGlobalFlag(GlobalFlags::verbose));
             if (GetGlobalFlag(GlobalFlags::verbose))
@@ -382,11 +388,6 @@ int main(int argc, const char** argv)
                     std::cout << "Note: Native code generation for 'vs' tool chain is disabled. Just generating C++ source files and Visual Studio C++ project and solution files. " <<
                         "You can generate native code by compiling those project and solution files using Visual Studio or msbuild." << std::endl;
                 }
-            }
-            else
-            {
-                //SetNumBuildThreads(1); !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //SetGlobalFlag(GlobalFlags::singleThreadedCompile);!!!!!!!!!!!!!!!!!!!!!!!
             }
             for (const std::string& file : files)
             {

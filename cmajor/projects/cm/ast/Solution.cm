@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Text;
 
 namespace Cm.Ast
 {
@@ -270,6 +271,34 @@ namespace Cm.Ast
                         }
                     }
                 }
+            }
+        }
+        public void Save()
+        {
+            StreamWriter writer = File.CreateText(filePath);
+            CodeFormatter formatter(writer);
+            formatter.WriteLine("solution " + ToUtf8(name) + ";");
+            string solutionDir = Path.GetDirectoryName(filePath);
+            relativeProjectFilePaths.Clear();
+            for (const UniquePtr<Project>& project : projects)
+            {
+                string projectFilePath = project->FilePath();
+                string projectDir = Path.GetDirectoryName(projectFilePath);
+                string relativeProjectDir = MakeRelativeDirPath(projectDir, solutionDir);
+                string relativeProjectFilePath = Path.Combine(relativeProjectDir, Path.GetFileName(projectFilePath));
+                relativeProjectFilePaths.Add(relativeProjectFilePath);
+            }
+            for (const string& relativeProjectFilePath : relativeProjectFilePaths)
+            {
+                formatter.WriteLine("project <" + relativeProjectFilePath + ">;");
+            }
+            if (activeProject != null)
+            {
+                formatter.WriteLine("activeProject " + ToUtf8(activeProject->Name()) + ";");
+            }
+            for (const UniquePtr<Project>& project : projects)
+            {
+                project->Save();
             }
         }
         private ustring name;

@@ -61,6 +61,7 @@ bool ContainsWildCard(const std::string& filePath)
 
 CommandLineProcessor::CommandLineProcessor() : commandLine(ToUtf32(std::u16string((char16_t*)GetCommandLineW()))), argc(0), argv(nullptr) 
 {
+    commandLine = Trim(commandLine);
     commandLine.append(1, '\n');
     TrivialLexer lexer(commandLine, "", 0);
     args = CommandLineParser::Parse(lexer);
@@ -157,16 +158,6 @@ std::vector<std::string> CommandLineProcessor::ExpandArgument(const std::string&
     return expandedArg;
 }
 
-extern "C" RT_API int32_t RtArgc()
-{
-    return cmajor::rt::CommandLineProcessor::Instance().Argc();
-}
-
-extern "C" RT_API const char** RtArgv()
-{
-    return cmajor::rt::CommandLineProcessor::Instance().Argv();
-}
-
 void InitCommandLine()
 {
     CommandLineProcessor::Init();
@@ -178,3 +169,13 @@ void DoneCommandLine()
 }
 
 } } // namespace cmajor::rt
+
+int32_t RtArgc()
+{
+    return cmajor::rt::CommandLineProcessor::Instance().Argc();
+}
+
+const char** RtArgv()
+{
+    return cmajor::rt::CommandLineProcessor::Instance().Argv();
+}

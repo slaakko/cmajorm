@@ -148,7 +148,7 @@ void PrintHelp()
         "--msbuild (-b)\n" <<
         "   set MSBuild mode: this mode is for Visual Studio and MSBuild.\n" <<
         "--build-threads=N (-bt=N)\n" <<
-        "   set number of build threads to N\n" <<
+        "   set number of build threads to N, default=1\n" <<
         "--disable-module-cache (-dm)\n" <<
         "   do not cache recently built modules\n" <<
         "--single-threaded-compile (-st)\n" <<
@@ -487,7 +487,13 @@ int main(int argc, const char** argv)
             }
 #ifndef _WIN32
             SetNumBuildThreads(1);
-            SetGlobalFlag(GlobalFlags::singleThreadedCompile); 
+            SetGlobalFlag(GlobalFlags::singleThreadedCompile);
+#else
+            int n = GetNumBuildThreads();
+            if (n == -1)
+            {
+                SetNumBuildThreads(1);
+            }
 #endif
             for (const std::string& file : files)
             {

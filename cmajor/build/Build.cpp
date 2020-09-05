@@ -714,6 +714,9 @@ std::string MakeGccLibraryName(const std::string& libraryFilePath)
     return libraryFilePath;
 }
 
+const char* dynamicRuntimeArg = "-lcmrt370cpp";
+const char* dynamicDebugRuntimeArg = "-lcmrt370cppd";
+
 void LinkCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::disableCodeGen)) return;
@@ -729,10 +732,12 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
     const Tool& linkerTool = GetLinkerTool(platform, toolChain);
     const Configuration& configuration = GetToolConfiguration(linkerTool, GetConfig());
     std::string toolChainDir = GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), toolChain));
+    std::string binDir = GetFullPath(Path::Combine(CmajorRootDir(), "bin"));
     std::string linkCommandLine;
     linkCommandLine = linkerTool.commandName;
     std::set<std::string> libraryDirectories;
     libraryDirectories.insert(toolChainDir);
+    libraryDirectories.insert(binDir);
     std::set<std::string> libraryNames;
     for (const std::string& libraryFilePath : libraryFilePaths)
     {
@@ -776,10 +781,24 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
             else if (arg.find("$RUNTIME_LIBS$") != std::string::npos)
             {
                 std::string libs = soulng::util::Replace(arg, "$RUNTIME_LIBS$", "");
-                std::vector<std::string> runtimeLibs = Split(libs, ';');
-                for (const std::string& runtimeLib : runtimeLibs)
+                if (libs == "DYNAMIC")
                 {
-                    libraryNames.insert(runtimeLib);
+                    if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
+                    {
+                        libraryNames.insert(dynamicDebugRuntimeArg);
+                    }
+                    else
+                    {
+                        libraryNames.insert(dynamicRuntimeArg);
+                    }
+                }
+                else
+                {
+                    std::vector<std::string> runtimeLibs = Split(libs, ';');
+                    for (const std::string& runtimeLib : runtimeLibs)
+                    {
+                        libraryNames.insert(runtimeLib);
+                    }
                 }
             }
             else if (arg.find("$LIBRARY_FILES$") != std::string::npos)
@@ -790,6 +809,13 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
                     libFilesArg.append(1, ' ').append(QuotedPath(libraryName));
                 }
                 linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$LIBRARY_FILES$", libFilesArg));
+            }
+            else if (arg.find("$RESOURCE_FILE$") != std::string::npos)
+            {
+                if (!module.ResourceFilePath().empty())
+                {
+                    linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$RESOURCE_FILE$", QuotedPath(module.ResourceFilePath())));
+                }
             }
             else if (arg.find("$MAIN_OBJECT_FILE$") != std::string::npos)
             {
@@ -817,7 +843,7 @@ void LinkCpp(Target target, const std::string& executableFilePath, const std::st
                 }
                 else
                 {
-                    linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$ENTRY$", "main"));
+                    linkCommandLine.append(1, ' ').append(soulng::util::Replace(arg, "$ENTRY$", "wmain"));
                 }
             }
             else if (arg.find("$SUBSYSTEM$") != std::string::npos)
@@ -1717,7 +1743,16 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
     mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     mainCompileUnit.GlobalNs()->AddMember(MakePolymorphicClassArray(module.GetSymbolTable().PolymorphicClasses(), U"__polymorphicClassArray"));
     mainCompileUnit.GlobalNs()->AddMember(MakeStaticClassArray(module.GetSymbolTable().ClassesHavingStaticConstructor(), U"__staticClassArray"));
-    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
+    std::string platform = GetPlatform();
+    FunctionNode* mainFunction = nullptr;
+    if (platform == "windows")
+    {
+        mainFunction = new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"wmain", nullptr);
+    }
+    else
+    {
+        mainFunction = new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr);
+    }
     if (!vsToolChain)
     {
         mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
@@ -2762,17 +2797,17 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             project->SetSystemProject();
         }
         bool upToDate = false;
+        sngcm::ast::BackEnd astBackEnd = sngcm::ast::BackEnd::llvm;
+        if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+        {
+            astBackEnd = sngcm::ast::BackEnd::cmsx;
+        }
+        else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
+        {
+            astBackEnd = sngcm::ast::BackEnd::cppcm;
+        }
         if (!GetGlobalFlag(GlobalFlags::rebuild))
         {
-            sngcm::ast::BackEnd astBackEnd = sngcm::ast::BackEnd::llvm;
-            if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
-            {
-                astBackEnd = sngcm::ast::BackEnd::cmsx;
-            }
-            else if (GetBackEnd() == cmajor::symbols::BackEnd::cmcpp)
-            {
-                astBackEnd = sngcm::ast::BackEnd::cppcm;
-            }
             SystemDirKind systemDirKind = SystemDirKind::regular;
             if (GetGlobalFlag(GlobalFlags::repository))
             {
@@ -2933,7 +2968,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                     GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
                 }
 #ifdef _WIN32
-                cmajor::resources::ProcessResourcesInProject(*project, *rootModule);
+                cmajor::resources::ProcessResourcesInProject(*project, *rootModule, astBackEnd);
 #endif
                 if (GetBackEnd() == BackEnd::cmcpp)
                 {

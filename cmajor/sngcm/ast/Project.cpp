@@ -9,6 +9,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Sha1.hpp>
 #include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 
@@ -160,6 +161,33 @@ std::string CmajorSystemWindowsModuleFilePath(const std::string& config, const s
     boost::filesystem::path smfp(CmajorSystemLibDir(config, BackEnd::llvm, toolChain, systemDirKind));
     smfp /= "System.Windows.cmm";
     return GetFullPath(smfp.generic_string());
+}
+
+std::string MakeCmajorRootRelativeFilePath(const std::string& filePath)
+{
+    std::string cmajorRootDir = GetFullPath(CmajorRootDir());
+    std::string fullPath = GetFullPath(filePath);
+    if (StartsWith(fullPath, cmajorRootDir))
+    {
+        return "$CMAJOR_ROOT$" + fullPath.substr(cmajorRootDir.length());
+    }
+    else
+    {
+        return fullPath;
+    }
+}
+
+std::string ExpandCmajorRootRelativeFilePath(const std::string& filePath)
+{
+    if (StartsWith(filePath, "$CMAJOR_ROOT$"))
+    {
+        std::string cmajorRootDir = GetFullPath(CmajorRootDir());
+        return cmajorRootDir + filePath.substr(std::string("$CMAJOR_ROOT$").length());
+    }
+    else
+    {
+        return GetFullPath(filePath);
+    }
 }
 
 ProjectDeclaration::ProjectDeclaration(ProjectDeclarationType declarationType_) : declarationType(declarationType_)

@@ -18,7 +18,6 @@
 #include <cmajor/rts/Thread.hpp>
 #include <cmajor/rts/Memory.hpp>
 #include <cmajor/rts/Screen.hpp>
-//#if defined(_WIN32) && !defined(__MINGW32__)
 #if defined(_WIN32) 
 #include <cmajor/rts/CommandLine.hpp>
 #include <Windows.h>
@@ -108,7 +107,7 @@ void Done()
 {
     DoneCmdbSession();
     DoneUnwind();
-#if defined(_WIN32) && !defined(__MINGW32__)
+#if defined(_WIN32)
     DoneCommandLine();
 #endif
     DoneClasses();

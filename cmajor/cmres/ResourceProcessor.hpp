@@ -11,7 +11,7 @@
 
 namespace cmajor { namespace resources {
 
-CMRES_API void ProcessResourcesInProject(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule);
+CMRES_API void ProcessResourcesInProject(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule, sngcm::ast::BackEnd backend);
 CMRES_API void InitResources();
 CMRES_API void DoneResources();
 

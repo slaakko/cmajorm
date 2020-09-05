@@ -413,6 +413,10 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
                 ex.what() + ", accepted values are 0-256");
         }
     }
+    else
+    {
+        cmajor::symbols::SetNumBuildThreads(1);
+    }
     if (!cppBuildRequest.optimizationLevel.empty() && cppBuildRequest.optimizationLevel != "default")
     {
         try
@@ -448,11 +452,6 @@ void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, 
             LogMessage(-1, "Note: Native code generation for 'vs' tool chain is disabled. Just generating C++ source files and Visual Studio C++ project and solution files. "
                 "You can generate native code by compiling those project and solution files using Visual Studio or msbuild.");
         }
-    }
-    else
-    {
-        //SetNumBuildThreads(1); !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //SetGlobalFlag(GlobalFlags::singleThreadedCompile);!!!!!!!!!!!!!!!!!!!!!!!
     }
     cmajor::symbols::SetUseModuleCache(useModuleCache);
     BackendSelector backend(cmajor::symbols::GetBackEnd());
@@ -580,6 +579,10 @@ void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest
             throw std::runtime_error("buildserver: error processing build request: invalid number of build threads '" + llvmBuildRequest.numBuildThreads + "': " +
                 ex.what() + ", accepted values are 0-256");
         }
+    }
+    else
+    {
+        cmajor::symbols::SetNumBuildThreads(1);
     }
     if (!llvmBuildRequest.optimizationLevel.empty() && llvmBuildRequest.optimizationLevel != "default")
     {

@@ -110,14 +110,23 @@ void CreateResourceScriptFile(cmajor::symbols::Module& currentModule, const std:
     }
 }
 
-void CompileResourceScriptFile(cmajor::symbols::Module& currentModule, const std::string& resourceScriptFileName)
+void CompileResourceScriptFile(cmajor::symbols::Module& currentModule, const std::string& resourceScriptFileName, sngcm::ast::BackEnd backend)
 {
     if (currentModule.GetGlobalResourceTable().Resources().empty()) return;
-    std::string resourceFilePath = Path::ChangeExtension(currentModule.LibraryFilePath(), ".res");
+    std::string resourceFilePath;
     std::string commandLine;
     std::string errors;
-    commandLine.append("llvm-rc /V /FO ").append(QuotedPath(resourceFilePath));
-    commandLine.append(1, ' ').append(QuotedPath(resourceScriptFileName));
+    if (backend == sngcm::ast::BackEnd::llvm)
+    {
+        resourceFilePath = Path::ChangeExtension(currentModule.LibraryFilePath(), ".res");
+        commandLine.append("llvm-rc /V /FO ").append(QuotedPath(resourceFilePath));
+        commandLine.append(1, ' ').append(QuotedPath(resourceScriptFileName));
+    }
+    else if (backend == sngcm::ast::BackEnd::cppcm)
+    {
+        resourceFilePath = Path::ChangeExtension(currentModule.LibraryFilePath(), ".res.o");
+        commandLine.append("windres --verbose ").append(QuotedPath(resourceScriptFileName)).append(1, ' ').append(QuotedPath(resourceFilePath));
+    }
     try
     {
         Process::Redirections redirections = Process::Redirections::processStdErr;
@@ -234,14 +243,14 @@ void AddResourcesInProjectToCurrentModule(sngcm::ast::Project& project, cmajor::
     }
 }
 
-void ProcessResourcesInProject(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule)
+void ProcessResourcesInProject(sngcm::ast::Project& project, cmajor::symbols::Module& currentModule, sngcm::ast::BackEnd backend)
 {
     AddResourcesInProjectToCurrentModule(project, currentModule);
     if (project.GetTarget() == Target::program || project.GetTarget() == Target::winapp || project.GetTarget() == Target::winguiapp)
     {
         std::string resourceScriptFileName = Path::ChangeExtension(project.ModuleFilePath(), ".rc");
         CreateResourceScriptFile(currentModule, resourceScriptFileName);
-        CompileResourceScriptFile(currentModule, resourceScriptFileName);
+        CompileResourceScriptFile(currentModule, resourceScriptFileName, backend);
     }
 }
 

@@ -94,7 +94,44 @@ namespace System.IO
             return result;
         }            
     }
-    
+
+    public nothrow string MakeRelativeDirPath(const string& dirPath, const string& referenceDirPath)
+    {
+        string p = GetFullPath(dirPath);
+        string r = GetFullPath(referenceDirPath);
+        if (p == r)
+        {
+            return string();
+        }
+        if (Path.GetDrive(p) != Path.GetDrive(r))
+        {
+            return p;
+        }
+        List<string> pc = p.Split('/');
+        List<string> rc = r.Split('/');
+        int n = cast<int>(Min(pc.Count(), rc.Count()));
+        int m = 0;
+        for (; m < n; ++m)
+        {
+            if (pc[m] != rc[m])
+            {
+                break;
+            }
+        }
+        string result;
+        int rn = cast<int>(rc.Count());
+        for (int i = m; i < rn; ++i)
+        {
+            result = Path.Combine(result, "..");
+        }
+        int pn = cast<int>(pc.Count());
+        for (int i = m; i < pn; ++i)
+        {
+            result = Path.Combine(result, pc[i]);
+        }
+        return result;
+    }
+
     public static class Path
     {
         public static nothrow string MakeCanonical(const string& path)
@@ -244,6 +281,20 @@ namespace System.IO
                 return string();
             }
         }
+        public static nothrow string GetDrive(const string& path)
+        {
+            #if (WINDOWS)
+                if (path.Length() >= 2 && IsAlpha(path[0]) && path[1] == ':')
+                {
+                    char c = AsciiToUpper(path[0]);
+                    string s(c);
+                    s.Append(':');
+                    return s;
+                }
+            #endif
+            return string();
+        }
+
         public static nothrow string GetFileName(const string& path)
         {
             if (path.IsEmpty())

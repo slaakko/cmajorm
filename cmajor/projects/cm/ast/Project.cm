@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Text;
 
 namespace Cm.Ast
 {
@@ -145,6 +146,20 @@ namespace Cm.Ast
     public enum Target 
     {
         program, winguiapp, winapp, library, winlib, unitTest
+    }
+
+    public nothrow string TargetStr(Target target)
+    {
+        switch (target)
+        {
+            case Target.program: return "program";
+            case Target.winguiapp: return "winguiapp";
+            case Target.winapp: return "winapp";
+            case Target.library: return "library";
+            case Target.winlib: return "winlib";
+            case Target.unitTest: return "unitTest";
+        }
+        return "program";
     }
     
     public class TargetDeclaration : ProjectDeclaration
@@ -309,6 +324,29 @@ namespace Cm.Ast
         public nothrow void SetLibraryFilePath(const string& libraryFilePath_)
         {
             libraryFilePath = libraryFilePath_;
+        }
+        public void Save()
+        {
+            StreamWriter writer = File.CreateText(filePath);
+            CodeFormatter formatter(writer);
+            formatter.WriteLine("project " + ToUtf8(name) + ";");
+            formatter.WriteLine("target=" + TargetStr(target) + ";");
+            for (const string& relativeReferenceFilePath : relativeReferencedProjectFilePaths)
+            {
+                formatter.WriteLine("reference <" + relativeReferenceFilePath + ">;");
+            }
+            for (const string& relativeSourceFilePath : relativeSourceFilePaths)
+            {
+                formatter.WriteLine("source <" + relativeSourceFilePath + ">;");
+            }
+            for (const string& relativeResourceFilePath : relativeResourceFilePaths)
+            {
+                formatter.WriteLine("resource <" + relativeResourceFilePath + ">;");
+            }
+            for (const string& relativeTextFilePath : relativeTextFilePaths)
+            {
+                formatter.WriteLine("text <" + relativeTextFilePath + ">;");
+            }
         }
         public bool IsUpToDate(const string& systemModuleFilePath) const
         {

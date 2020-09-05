@@ -21,6 +21,7 @@ UTIL_API bool FileExists(const std::string& filePath);
 UTIL_API bool DirectoryExists(const std::string& directoryPath);
 UTIL_API bool PathExists(const std::string& path);
 UTIL_API std::string GetFullPath(const std::string& path);
+UTIL_API std::string MakeRelativeDirPath(const std::string& dirPath, const std::string& referenceDirPath);
 
 class UTIL_API Path
 {
@@ -29,6 +30,7 @@ public:
     static std::string ChangeExtension(const std::string& path, const std::string& extension);
     static bool HasExtension(const std::string& path);
     static std::string GetExtension(const std::string& path);
+    static std::string GetDrive(const std::string& path);
     static std::string GetFileName(const std::string& path);
     static std::string GetFileNameWithoutExtension(const std::string& path);
     static std::string GetDirectoryName(const std::string& path);

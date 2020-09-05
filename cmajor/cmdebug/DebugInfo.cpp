@@ -1020,7 +1020,7 @@ Instruction* DebugInfo::GetMainFunctionEntryInstruction() const
 
 Instruction* DebugInfo::GetInstruction(const Frame& frame, CodeFormatter& formatter) const
 {
-    if (frame.func == "main" || frame.func == "WinMain" || frame.func == "wWinMain")
+    if (frame.func == "main" || frame.func == "wmain" || frame.func == "WinMain" || frame.func == "wWinMain")
     {
         return nullptr;
     }

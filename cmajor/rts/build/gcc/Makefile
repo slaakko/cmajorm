@@ -1,17 +1,23 @@
 include Makefile.common
 
 all:
-	$(MAKE) -C debug
-	$(MAKE) -C release
+	$(MAKE) -C debug_static
+	$(MAKE) -C debug_shared
+	$(MAKE) -C release_static
+	$(MAKE) -C release_shared
 	
 clean:
-	$(MAKE) -C debug clean
-	$(MAKE) -C release clean
+	$(MAKE) -C debug_static clean
+	$(MAKE) -C debug_shared clean
+	$(MAKE) -C release_static clean
+	$(MAKE) -C release_shared clean
 	
 install: $(PLATFORM)
 
 windows:
 	$(CP) lib\*.a ..\..\..\lib\gcc
+	$(CP) bin\* ..\..\..\bin
 	
 linux:
 	$(CP) lib/*.a ../../../lib/gcc
+	$(CP) bin/* ../../../bin

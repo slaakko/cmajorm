@@ -1,12 +1,16 @@
 // =================================
+// =================================
 // Copyright (c) 2020 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 #include <cmajor/cmdebug/DebugInfoIo.hpp>
+#include <sngcm/ast/Project.hpp>
 #include <stdexcept>
 
 namespace cmajor { namespace debug {
+
+using namespace sngcm::ast;
 
 void WriteCmdbFileTag(BinaryWriter& writer)
 {
@@ -68,7 +72,8 @@ void WriteProjectTableHeader(BinaryWriter& writer, const std::string& projectNam
     const boost::uuids::uuid& mainFunctionId)
 {
     writer.Write(projectName);
-    writer.Write(projectDirectoryPath);
+    std::string cmajorRootRelativeDirectoryPath = MakeCmajorRootRelativeFilePath(projectDirectoryPath);
+    writer.Write(cmajorRootRelativeDirectoryPath);
     writer.Write(numCompileUnits);
     writer.Write(mainFunctionId);
 }
@@ -76,7 +81,8 @@ void WriteProjectTableHeader(BinaryWriter& writer, const std::string& projectNam
 void ReadProjectTableHeader(BinaryReader& reader, std::string& projectName, std::string& projectDirectoryPath, int32_t& numCompileUnits, boost::uuids::uuid& mainFunctionId)
 {
     projectName = reader.ReadUtf8String();
-    projectDirectoryPath = reader.ReadUtf8String();
+    std::string cmajorRootRelativeDirectoryPath = reader.ReadUtf8String();
+    projectDirectoryPath = ExpandCmajorRootRelativeFilePath(cmajorRootRelativeDirectoryPath);
     numCompileUnits = reader.ReadInt();
     reader.ReadUuid(mainFunctionId);
 }
@@ -104,13 +110,15 @@ void ReadNumberOfFileIndexRecords(BinaryReader& reader, int32_t& numFileIndexRec
 void WriteFileIndexRecord(BinaryWriter& writer, int32_t fileIndex, const std::string& sourceFilePath)
 {
     writer.Write(fileIndex);
-    writer.Write(sourceFilePath);
+    std::string cmajorRootRelativeFilePath = MakeCmajorRootRelativeFilePath(sourceFilePath);
+    writer.Write(cmajorRootRelativeFilePath);
 }
 
 void ReadFileIndexRecord(BinaryReader& reader, int32_t& fileIndex, std::string& sourceFilePath)
 {
     fileIndex = reader.ReadInt();
-    sourceFilePath = reader.ReadUtf8String();
+    std::string cmajorRootRelativeFilePath = reader.ReadUtf8String();
+    sourceFilePath = ExpandCmajorRootRelativeFilePath(cmajorRootRelativeFilePath);
 }
 
 void WriteNumberOfCompileUnitFunctionRecords(BinaryWriter& writer, int32_t numFunctionRecords)

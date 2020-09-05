@@ -17,7 +17,8 @@ namespace cmcode
 
     class MainWindow : Window
     {
-        public MainWindow() : base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
+        public MainWindow(const string& filePath) :
+            base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
             Dock.none, Anchors.none, MainWindowWindowState()), buildService()
         {
             Debug.SetPaint();
@@ -293,6 +294,10 @@ namespace cmcode
             MainConfiguration.Instance().SetMainWindowSize(GetSize());
             SetTimer(1u, defaultConfigSaveTimerPeriod);
             outputTabPage->Select();
+            if (!filePath.IsEmpty())
+            {
+                OpenProject(GetFullPath(filePath));
+            }
         }
         protected override void OnWindowClosing(bool& cancelClose)
         {
@@ -580,6 +585,54 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private void OpenProject(const string& filePath)
+        {
+            try
+            {
+                List<UniquePtr<ustring>> contents;
+                if (!filePath.IsEmpty() && File.Exists(filePath))
+                {
+                    string ext = Path.GetExtension(filePath);
+                    if (ext == ".cms")
+                    {
+                        solution = ReadSolution(filePath, contents);
+                    }
+                    else if (ext == ".cmp")
+                    {
+                        UniquePtr<Cm.Ast.Project> project = ReadProject(filePath, contents);
+                        string solutionFilePath = Path.ChangeExtension(filePath, ".cms");
+                        if (File.Exists(solutionFilePath))
+                        {
+                            solution = ReadSolution(filePath, contents);
+                        }
+                        else
+                        {
+                            solution.Reset(new Cm.Ast.Solution(project->Name(), solutionFilePath));
+                            solution->SetActiveProject(project.Get());
+                            solution->AddProject(Rvalue(project));
+                            solution->Save();
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("file path '" + filePath + " has invalid extension (not .cmp or .cms)");
+                    }
+                }
+                else
+                {
+                    throw Exception("file path '" + filePath + "' is empty or does not exist");
+                }
+                codeTabControl->CloseAllTabPages();
+                UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData, contents);
+                solutionExplorerTreeView->SetRoot(root.Release());
+                SetControlStatus();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void OpenProjectClick()
         {
             try
@@ -596,38 +649,11 @@ namespace cmcode
                     OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
                 if (selected)
                 {
-                    List<UniquePtr<ustring>> contents;
                     if (!fileNames.IsEmpty())
                     {
                         filePath = Path.Combine(currentDirectory, fileNames[0]);
                     }
-                    if (!filePath.IsEmpty() && File.Exists(filePath))
-                    {
-                        string ext = Path.GetExtension(filePath);
-                        if (ext == ".cms")
-                        {
-                            solution = ReadSolution(filePath, contents);
-                        }
-                        else if (ext == ".cmp")
-                        {
-                            UniquePtr<Cm.Ast.Project> project = ReadProject(filePath, contents);
-                            solution.Reset(new Cm.Ast.Solution(project->Name(), Path.ChangeExtension(filePath, ".cms")));
-                            solution->SetActiveProject(project.Get());
-                            solution->AddProject(Rvalue(project));
-                        }
-                        else
-                        {
-                            throw Exception("invalid extension (not .cmp or .cms)");
-                        }
-                    }
-                    else
-                    {
-                        throw Exception("file path is empty or does not exist");
-                    }
-                    codeTabControl->CloseAllTabPages();
-                    UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData, contents);
-                    solutionExplorerTreeView->SetRoot(root.Release());
-                    SetControlStatus();
+                    OpenProject(GetFullPath(filePath));
                 }
             }
             catch (const Exception& ex)
@@ -1124,12 +1150,17 @@ namespace cmcode
     }
 }
 
-int main()
+int main(int argc, const char** argv)
 {
     try
     {
+        string filePath;
+        if (argc >= 1)
+        {
+            filePath = GetFullPath(argv[1]);
+        }
         MainConfiguration.Instance().Load();
-        MainWindow mainWindow;
+        MainWindow mainWindow(filePath);
         mainWindow.SetSmallIcon(Application.GetResourceManager().GetIcon("cmcode.small.icon"));
         int exitCode = Application.Run(mainWindow);
         return exitCode;

@@ -184,6 +184,10 @@ namespace Cm.Views
         }
         protected override void DrawHilites(Graphics& graphics, int lineIndex, const PointF& origin)
         {
+            if (debugStrip == null) 
+            {
+                return;
+            }
             SourceSpan debugLocation = debugStrip->DebugLocation();
             if (!debugLocation.IsEmpty() && debugLocation.line == lineIndex + 1)
             {
