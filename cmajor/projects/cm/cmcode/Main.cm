@@ -18,15 +18,22 @@ namespace cmcode
         none = 0, build = 1
     }
 
+    enum BackendConfig
+    {
+        none = 0, llvm = 1 << 0, cpp = 1 << 1, debug = 1 << 2, release = 1 << 3
+    }
+
     class BuildGuard
     {
         public nothrow BuildGuard(MainWindow* mainWindow_) : mainWindow(mainWindow_)
         {
+            mainWindow->SaveBackendConfig();
             mainWindow->SetControlStatus(UserInterfaceAction.build);
         }
         public ~BuildGuard()
         {
             mainWindow->SetControlStatus(UserInterfaceAction.none);
+            mainWindow->RestoreBackendConfig();
         }
         private MainWindow* mainWindow;
     }
@@ -1066,6 +1073,51 @@ namespace cmcode
             }
         }
 
+        internal void SaveBackendConfig()
+        {
+            backendConfig = BackendConfig.none;
+            if (cppToolButton->GetState() == ToolButton.State.pressed)
+            {
+                backendConfig = cast<BackendConfig>(backendConfig | BackendConfig.cpp);
+            }
+            if (llvmToolButton->GetState() == ToolButton.State.pressed)
+            {
+                backendConfig = cast<BackendConfig>(backendConfig | BackendConfig.llvm);
+            }
+            if (debugToolButton->GetState() == ToolButton.State.pressed)
+            {
+                backendConfig = cast<BackendConfig>(backendConfig | BackendConfig.debug);
+            }
+            if (releaseToolButton->GetState() == ToolButton.State.pressed)
+            {
+                backendConfig = cast<BackendConfig>(backendConfig | BackendConfig.release);
+            }
+        }
+
+        internal void RestoreBackendConfig()
+        {
+            cppToolButton->SetState(ToolButton.State.normal);
+            llvmToolButton->SetState(ToolButton.State.normal);
+            debugToolButton->SetState(ToolButton.State.normal);
+            releaseToolButton->SetState(ToolButton.State.normal);
+            if ((backendConfig & BackendConfig.cpp) != BackendConfig.none)
+            {
+                cppToolButton->SetState(ToolButton.State.pressed);
+            }
+            if ((backendConfig & BackendConfig.llvm) != BackendConfig.none)
+            {
+                llvmToolButton->SetState(ToolButton.State.pressed);
+            }
+            if ((backendConfig & BackendConfig.debug) != BackendConfig.none)
+            {
+                debugToolButton->SetState(ToolButton.State.pressed);
+            }
+            if ((backendConfig & BackendConfig.release) != BackendConfig.none)
+            {
+                releaseToolButton->SetState(ToolButton.State.pressed);
+            }
+        }
+
         internal void SetControlStatus(UserInterfaceAction action)
         {
             saveToolButton->Disable();
@@ -1156,6 +1208,7 @@ namespace cmcode
             toolBar->Invalidate();
         }
 
+        private BackendConfig backendConfig;
         private SplitContainer* verticalSplitContainer;
         private SplitContainer* horizontalSplitContainer;
         private UniquePtr<Cm.Ast.Solution> solution;
