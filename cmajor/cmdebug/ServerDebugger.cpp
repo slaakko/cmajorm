@@ -126,6 +126,7 @@ public:
     std::unique_ptr<JsonValue> ProcessContinueRequest(const ContinueRequest& continueRequest);
     std::unique_ptr<JsonValue> ProcessNextRequest(const NextRequest& stopRequest);
     std::unique_ptr<JsonValue> ProcessStepRequest(const StepRequest& stepRequest);
+    std::unique_ptr<JsonValue> ProcessFinishRequest(const FinishRequest& finishRequst);
     std::unique_ptr<JsonValue> ProcessBreakRequest(const BreakRequest& breakRequest);
     std::unique_ptr<JsonValue> ProcessDeleteRequest(const DeleteRequest& deleteRequest);
     void GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState);
@@ -338,6 +339,11 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessRequest(JsonValue* requestMess
         {
             StepRequest stepRequest(requestMessage);
             return ProcessStepRequest(stepRequest);
+        }
+        case MessageKind::finishRequest:
+        {
+            FinishRequest finishRequest(requestMessage);
+            return ProcessFinishRequest(finishRequest);
         }
         case MessageKind::breakRequest:
         {
@@ -576,6 +582,23 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessStepRequest(const StepRequest&
         stepReply.error = ex.what();
     }
     return stepReply.ToJson();
+}
+
+std::unique_ptr<JsonValue> ServerDebugger::ProcessFinishRequest(const FinishRequest& finishRequest)
+{
+    FinishReply finishReply;
+    finishReply.messageKind = "finishReply";
+    try
+    {
+        Finish();
+        GetLocationResult(finishReply.success, finishReply.error, finishReply.location, finishReply.state);
+    }
+    catch (const std::exception& ex)
+    {
+        finishReply.success = false;
+        finishReply.error = ex.what();
+    }
+    return finishReply.ToJson();
 }
 
 std::unique_ptr<JsonValue> ServerDebugger::ProcessBreakRequest(const BreakRequest& breakRequest)

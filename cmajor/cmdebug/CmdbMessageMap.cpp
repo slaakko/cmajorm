@@ -20,6 +20,8 @@ MessageMap::MessageMap()
     map["nextReply"] = MessageKind::nextReply;
     map["stepRequest"] = MessageKind::stepRequest;
     map["stepReply"] = MessageKind::stepReply;
+    map["finishRequest"] = MessageKind::finishRequest;
+    map["finishReply"] = MessageKind::finishReply;
     map["breakRequest"] = MessageKind::breakRequest;
     map["breakReply"] = MessageKind::breakReply;
     map["deleteRequest"] = MessageKind::deleteRequest;

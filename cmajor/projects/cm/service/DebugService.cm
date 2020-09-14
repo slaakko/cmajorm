@@ -175,6 +175,8 @@ namespace Cm.Service.Debug
             messageKindMap["nextReply"] = MessageKind.nextReply;
             messageKindMap["stepRequest"] = MessageKind.stepRequest;
             messageKindMap["stepReply"] = MessageKind.stepReply;
+            messageKindMap["finishRequest"] = MessageKind.finishRequest;
+            messageKindMap["finishReply"] = MessageKind.finishReply;
             messageKindMap["breakRequest"] = MessageKind.breakRequest;
             messageKindMap["breakReply"] = MessageKind.breakReply;
             messageKindMap["deleteRequest"] = MessageKind.deleteRequest;
@@ -302,7 +304,7 @@ namespace Cm.Service.Debug
         private void ProcessStopReply(JsonValue* reply)
         {
             StopReply stopReply(reply);
-            // todo
+            LogMessage("debugging stopped");
         }
         public void Continue()
         {
@@ -392,6 +394,36 @@ namespace Cm.Service.Debug
             else
             {
                 LogMessage("step request failed: " + stepReply.error);
+            }
+        }
+        public void Finish()
+        {
+            targetState.Reset();
+            RequestGuard requestGuard(this);
+            SendFinishRequest();
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.finishReply);
+            ProcessFinishReply(reply.Get());
+        }
+        private void SendFinishRequest()
+        {
+            FinishRequest finishRequest;
+            UniquePtr<JsonValue> request = finishRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessFinishReply(JsonValue* reply)
+        {
+            FinishReply finishReply(reply);
+            if (finishReply.success)
+            {
+                if (setDebugLocation != SetDebugLocationMethod())
+                {
+                    setDebugLocation(finishReply.location);
+                }
+                ProcessStopReason(finishReply.state);
+            }
+            else
+            {
+                LogMessage("finish request failed: " + finishReply.error);
             }
         }
         public void Break(const string& filePath, Breakpoint* breakpoint)

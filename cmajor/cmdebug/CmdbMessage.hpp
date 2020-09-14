@@ -158,6 +158,26 @@ struct StepReply
     std::string error;
 };
 
+struct FinishRequest
+{
+    FinishRequest();
+    FinishRequest(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+};
+
+struct FinishReply
+{
+    FinishReply();
+    FinishReply(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    bool success;
+    Location location;
+    TargetState state;
+    std::string error;
+};
+
 struct BreakRequest
 {
     BreakRequest();

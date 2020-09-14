@@ -208,6 +208,7 @@ namespace cmcode
             stepOutMenuItem = stepOutMenuItemPtr.Get();
             stepOutMenuItemPtr->SetShortcut(Keys.f12);
             debugMenuItem->AddMenuItem(stepOutMenuItemPtr.Release());
+            stepOutMenuItem->ClickEvent().AddHandler(StepOutClick);
             menuBar->AddMenuItem(debugMenuItem.Release());
 
             UniquePtr<MenuItem> windowMenuItem(new MenuItem("&Window"));
@@ -344,6 +345,7 @@ namespace cmcode
             stepOutToolButton = stepOutToolButtonPtr.Get();
             stepOutToolButton->SetToolTip("Step Out (F12)");
             stepOutToolButton->SetPadding(Padding(8, 8, 8, 8));
+            stepOutToolButton->ClickEvent().AddHandler(StepOutClick);
             toolBar->AddToolButton(stepOutToolButtonPtr.Release());
 
             AddChild(borderedToolBar.Release());
@@ -1342,6 +1344,7 @@ namespace cmcode
                     if (!debugService.IsNull())
                     {
                         debugService->Continue();
+                        debugTabPage = codeTabControl->SelectedTabPage();
                     }
                 }
                 if (!debugService.IsNull())
@@ -1423,8 +1426,32 @@ namespace cmcode
                     {
                         debugService->Step();
                         debugTabPage = codeTabControl->SelectedTabPage();
-                        debugTabPage->Invalidate();
-                        debugTabPage->Update();
+                    }
+                }
+                if (!debugService.IsNull())
+                {
+                    if (debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
+                    {
+                        StopDebuggingClick();
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                debugService.Reset();
+            }
+        }
+        private void StepOutClick()
+        {
+            try
+            {
+                {
+                    DebugGuard debugGuard(this);
+                    if (!debugService.IsNull())
+                    {
+                        debugService->Finish();
+                        debugTabPage = codeTabControl->SelectedTabPage();
                     }
                 }
                 if (!debugService.IsNull())
@@ -1443,13 +1470,23 @@ namespace cmcode
         }
         private void BreakpointAdded(Cm.Views.AddBreakpointEventArgs& args)
         {
-            if (!Debugging()) return;
+            if (!Debugging())
+            {
+                args.breakpoint->info.success = true;
+                return;
+            }
             debugService->Break(args.filePath, args.breakpoint);
         }
         private void BreakpointRemoved(Cm.Views.RemoveBreakpointEventArgs& args)
         {
-            if (!Debugging()) return;
-            debugService->Delete(args.breakpointId);
+            if (!Debugging())
+            {
+                return;
+            }
+            if (!args.breakpointId.IsEmpty())
+            {
+                debugService->Delete(args.breakpointId);
+            }
         }
         private void WriteTargetOutput(int handle, const string& targetOutput)
         {
@@ -1540,8 +1577,7 @@ namespace cmcode
                         Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
                         if (debugStrip != null)
                         {
-                            SourceSpan emptyLocation;
-                            debugStrip->SetDebugLocation(emptyLocation);
+                            debugStrip->ResetDebugLocation();
                             editor->Invalidate();
                             debugStrip->Invalidate();
                         }

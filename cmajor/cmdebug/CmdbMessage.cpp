@@ -357,6 +357,52 @@ StepReply::StepReply(soulng::util::JsonValue* value)
     sngjson::json::FromJson(value, "error", error);
 }
 
+FinishRequest::FinishRequest() : messageKind()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> FinishRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    return object;
+}
+
+FinishRequest::FinishRequest(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+}
+
+FinishReply::FinishReply() : messageKind(), success(), location(), state(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> FinishReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
+    object->AddField(U"success", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(location);
+    object->AddField(U"location", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(state);
+    object->AddField(U"state", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue4));
+    return object;
+}
+
+FinishReply::FinishReply(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(value, "success", success);
+    sngjson::json::FromJson(value, "location", location);
+    sngjson::json::FromJson(value, "state", state);
+    sngjson::json::FromJson(value, "error", error);
+}
+
 BreakRequest::BreakRequest() : messageKind(), breakpointLocation()
 {
 }

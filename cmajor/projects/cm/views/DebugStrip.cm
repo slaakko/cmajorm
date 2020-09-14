@@ -164,6 +164,7 @@ namespace Cm.Views
             args.filePath = filePath;
             args.breakpoint = breakpoint;
             breakpointAddedEvent.Fire(args);
+            breakpoint->disabled = !breakpoint->info.success;
             Invalidate();
         }
         public void RemoveBreakpoint(Breakpoint* breakpoint)

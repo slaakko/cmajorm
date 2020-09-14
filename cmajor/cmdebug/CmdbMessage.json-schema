@@ -111,6 +111,20 @@ struct StepReply
     string error;
 }
 
+struct FinishRequest
+{
+    string messageKind;
+}
+
+struct FinishReply
+{
+    string messageKind;
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
 struct BreakRequest
 {
     string messageKind;
