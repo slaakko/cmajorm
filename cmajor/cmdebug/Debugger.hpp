@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_DEBUG_DEBUGGER_INCLUDED
 #define CMAJOR_DEBUG_DEBUGGER_INCLUDED
-#include <cmajor/cmdebug/DebugApi.hpp>
+#include <cmajor/cmdebug/DebuggerOutputWriter.hpp>
 #include <cmajor/cmdebug/DebugInfo.hpp>
 #include <cmajor/cmdebug/Gdb.hpp>
 #include <cmajor/cmdebug/CmdbSession.hpp>
@@ -14,15 +14,12 @@
 #include <vector>
 #include <list>
 #include <memory>
-#include <mutex>
-#include <condition_variable>
 #include <set>
 
 namespace cmajor { namespace debug {
 
 using namespace soulng::util;
 
-class Console;
 class DebugInfo;
 class BoundDebugNode;
 class Instruction;
@@ -77,12 +74,12 @@ private:
 class DEBUG_API Debugger : public GdbDriver, public CmdbSessionClient
 {
 public:
-    Debugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, CodeFormatter& formatter_, Console& console_, bool breakOnThrow_);
-    ~Debugger();
+    Debugger(bool verbose_, bool breakOnThrow_, DebuggerOutputWriter* outputWriter_, const std::string& executable_, const std::vector<std::string>& args_);
     enum class State
     {
         initializing, programStarted, running, stopped, programExitedNormally, programExited, signalReceived, exitingDebugger
     };
+    void StartDebugging();
     void ResetRunningFlag() { wasRunning = false; }
     void ResetTargetOutputFlag() { targetOutput = false; }
     bool TargetWasRunning() const override { return wasRunning; }
@@ -90,16 +87,9 @@ public:
     void ProcessReplyRecord(GdbReplyRecord* record) override;
     std::string& CurrentSourceFilePath() override { return currentSourceFilePath; }
     bool TargetRunning() const override { return state == State::running; }
-    void Proceed() override;
-    void ResetConsole() override;
     bool Exiting() const override { return state == State::exitingDebugger; }
     void Exit() override;
-    void Prompt() override;
-    void TargetInputPrompt() override;
-    void Error(const std::string& msg) override;
     bool LatestCommandWasRunningCommand() override;
-    void WriteTargetOuput(int handle, const std::string& s) override;
-    std::string GetTargetInputBytes() override;
     bool Run();
     void Help();
     void Next();
@@ -124,9 +114,6 @@ public:
     DIType* GetType(const std::string& expression);
     bool ExecuteGDBCommand(const GdbCommand& command);
     void ProcessReply(GdbCommand::Kind commandKind, GdbReply* reply);
-    void ProcessConsoleOutput(GdbConsoleOutputRecord* record);
-    void ProcessTargetOutput(GdbTargetOutputRecord* record);
-    void ProcessLogOutput(GdbLogOutputRecord* record);
     void ProcessBreakInsertReply(GdbReply* reply);
     void ProcessBreakDeleteReply(GdbReply* reply);
     void ProcessExecRunReply(GdbReply* reply);
@@ -141,7 +128,7 @@ public:
     void ProcessBreakConditionReply(GdbReply* reply);
     void ProcessVarEvaluateReply(GdbReply* reply);
     bool ProcessExecStoppedRecord(GdbExecStoppedRecord* execStoppedRecord);
-    void StartProgram(bool breakOnThrow_);
+    virtual void StartProgram(bool breakOnThrow_);
     GdbBreakpoint* SetBreakpoint(Instruction* instruction);
     bool DeleteBreakpoint(Instruction* instruction);
     GdbBreakpoint* GetBreakpoint(Instruction* instruction) const;
@@ -153,12 +140,13 @@ public:
     int GetNextBreakpointNumber() { return nextBreakpointNumber++; }
     std::string GetNextTemporaryBreakpointId();
     DebuggerVariable GetNextDebuggerVariable();
-    void AddStopResultToResult();
+    virtual void AddStopResultToResult();
     DIType* GetDynamicType(DIType* diType, BoundDebugNode* node);
     void AddDebuggerVariable(const DebuggerVariable& debuggerVariable);
     const DebuggerVariable* GetDebuggerVariable(int index) const;
     void ResetResult(JsonValue* result_) { result.reset(result_); }
     JsonValue* ReleaseResult() { return result.release(); }
+    JsonValue* GetResult() { return result.get(); }
     Instruction* StoppedInstruction() const { return stoppedInstruction; }
     Container* GetContainer(ContainerClassTemplateKind containerKind, const std::string& containerVarExpr);
     void ClearBrowsingData();
@@ -168,7 +156,21 @@ public:
     void ClearThrowBreakpoints(bool printResult);
     bool SetCatchBreakpoints();
     void ClearCatchBreakpoints();
+    bool Verbose() const { return verbose; }
+    DebuggerOutputWriter* OutputWriter() { return outputWriter.get(); }
+    void SetDebugInfo(DebugInfo* debugInfo_);
+    virtual void WriteResult(soulng::util::JsonValue* result, Instruction* stoppedInstruction) = 0;
+    virtual void WriteSourceFile(SourceFile& sourceFile, int line, Instruction* stoppedInstruction) = 0;
+    virtual void SetConsoleActive() = 0;
+    virtual void SetTargetRunning() = 0;
+    virtual void ProcessConsoleOutput(GdbConsoleOutputRecord* record) = 0;
+    virtual void ProcessTargetOutput(GdbTargetOutputRecord* record) = 0;
+    virtual void ProcessLogOutput(GdbLogOutputRecord* record) = 0;
 private:
+    std::string executable;
+    std::vector<std::string> args;
+    bool breakOnThrow;
+    std::unique_ptr<DebuggerOutputWriter> outputWriter;
     State state;
     bool wasRunning;
     bool targetOutput;
@@ -177,7 +179,6 @@ private:
     std::unique_ptr<JsonValue> stopResult;
     bool verbose;
     std::unique_ptr<DebugInfo> debugInfo;
-    CodeFormatter& formatter;
     std::unordered_map<Instruction*, GdbBreakpoint*> gdbBreakpointsByInstruction;
     std::unordered_map<int, GdbBreakpoint*> gdbBreakpointsByNumber;
     std::map<std::string, DebuggerBreakpoint*> debuggerBreakpointMap;
@@ -191,11 +192,6 @@ private:
     SourceLocation listLocation;
     std::string currentSourceFilePath;
     std::string debuggerBreakpointId;
-    Console& console;
-    std::recursive_mutex outputMutex;
-    CodeFormatter outFormatter;
-    CodeFormatter errorFormatter;
-    bool breakOnThrow;
     std::string throwBreakpointsId;
     std::string catchBreakpointsId;
 };
@@ -390,8 +386,6 @@ public:
     void Execute(Debugger& debugger) override;
     DebuggerCommand* Clone() override;
 };
-
-DEBUG_API void RunDebuggerInteractive(const std::string& executable, const std::vector<std::string>& args, bool verbose, bool breakOnThrow);
 
 } } // namespace cmajor::debug
 

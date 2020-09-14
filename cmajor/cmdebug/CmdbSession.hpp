@@ -5,12 +5,9 @@
 
 #ifndef CMAJOR_DEBUG_CMDB_SESSION_INCLUDED
 #define CMAJOR_DEBUG_CMDB_SESSION_INCLUDED
-#include <cmajor/cmdebug/DebugApi.hpp>
-#include <soulng/util/CodeFormatter.hpp>
+#include <cmajor/cmdebug/DebuggerOutputWriter.hpp>
 
 namespace cmajor { namespace debug {
-
-using namespace soulng::util;
 
 class DEBUG_API RemoveCmdbSessionFileGuard
 {
@@ -30,7 +27,7 @@ public:
 };
 
 DEBUG_API void SetCmdbSessionPort(int port_);
-DEBUG_API void StartCmdbSession(const std::string& cmdbSessionFilePath, CodeFormatter& formatter, CmdbSessionClient* client, bool verbose);
+DEBUG_API void StartCmdbSession(const std::string& cmdbSessionFilePath, DebuggerOutputWriter* outputWriter, CmdbSessionClient* client, bool verbose);
 DEBUG_API void StopCmdbSession();
 DEBUG_API void CmdbSessionInit();
 DEBUG_API void CmdbSessionDone();

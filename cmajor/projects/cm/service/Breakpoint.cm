@@ -1,0 +1,112 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace Cm.Service.Debug
+{
+    public class BreakpointCollection
+    {
+        public BreakpointList& GetBreakpointList(const string& filePath)
+        {
+            BreakpointList& breakpointList = breakpointListMap[filePath];
+            if (breakpointList.FilePath().IsEmpty())
+            {
+                breakpointList.SetFilePath(filePath);
+            }
+            return breakpointList;
+        }
+        public nothrow const Map<string, BreakpointList>& BreakpointListMap() const
+        {
+            return breakpointListMap;
+        }
+        private Map<string, BreakpointList> breakpointListMap;
+    }
+
+    public class ByLine : Rel<Breakpoint*>
+    {
+        public nothrow inline bool operator()(Breakpoint* left, Breakpoint* right) const
+        {
+            return left->line < right->line;
+        }
+    }
+
+    public class BreakpointList
+    {
+        public nothrow BreakpointList() 
+        {
+        }
+        public nothrow inline bool IsEmpty() const
+        {
+            return breakpoints.IsEmpty();
+        }
+        public nothrow Breakpoint* GetBreakpoint(int line) const
+        {
+            if (IsEmpty()) return null;
+            Breakpoint bp(line);
+            List<Breakpoint*>.ConstIterator it = LowerBound(breakpoints.CBegin(), breakpoints.CEnd(), &bp, ByLine());
+            if (it != breakpoints.CEnd())
+            {
+                Breakpoint* foundBp = *it;
+                if (foundBp->line == line)
+                {
+                    return foundBp;
+                }
+            }
+            return null;
+        }
+        public void AddBreakpoint(Breakpoint* breakpoint)
+        {
+            if (GetBreakpoint(breakpoint->line) != null)
+            {
+                throw Exception("already has breakpoint on line " + ToString(breakpoint->line));
+            }
+            breakpoints.Add(breakpoint);
+            Sort(breakpoints.Begin(), breakpoints.End(), ByLine());
+        }
+        public void RemoveBreakpoint(Breakpoint* breakpoint)
+        {
+            breakpoints.Remove(breakpoint);
+            delete breakpoint;
+        }
+        public void Clear()
+        {
+            for (Breakpoint* bp : breakpoints)
+            {
+                RemoveBreakpoint(bp);
+            }
+        }
+        public nothrow inline const string& FilePath() const
+        {
+            return filePath;
+        }
+        public nothrow void SetFilePath(const string& filePath_)
+        {
+            filePath = filePath_;
+        }
+        public nothrow inline const List<Breakpoint*>& Breakpoints() const
+        {
+            return breakpoints;
+        }
+        private string filePath;
+        private List<Breakpoint*> breakpoints;
+    }
+
+    public class Breakpoint
+    {
+        public nothrow Breakpoint(int line_, const string& condition_) :
+            line(line_), condition(condition_), disabled(false)
+        {
+        }
+        public nothrow Breakpoint(int line_) : line(line_), condition(), disabled(false)
+        {
+        }
+        public int line;
+        public string condition;
+        public bool disabled;
+        public BreakpointInfo info;
+    }
+}

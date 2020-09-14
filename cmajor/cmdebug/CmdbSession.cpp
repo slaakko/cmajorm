@@ -291,11 +291,11 @@ void SetCmdbSessionPort(int port_)
     port = port_;
 }
 
-void StartCmdbSession(const std::string& cmdbSessionFilePath, CodeFormatter& formatter, CmdbSessionClient* client, bool verbose)
+void StartCmdbSession(const std::string& cmdbSessionFilePath, DebuggerOutputWriter* outputWriter, CmdbSessionClient* client, bool verbose)
 {
     if (verbose)
     {
-        formatter.WriteLine("starting CMDB session...");
+        outputWriter->WriteLogMessage("starting CMDB session...");
     }
     std::ofstream cmdbSessionFile(cmdbSessionFilePath);
     CodeFormatter sessionFileFormatter(cmdbSessionFile);

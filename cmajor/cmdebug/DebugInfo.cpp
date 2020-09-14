@@ -7,6 +7,7 @@
 #include <cmajor/cmdebug/DebugInfoIo.hpp>
 #include <cmajor/cmdebug/DIVariable.hpp>
 #include <cmajor/cmdebug/DIType.hpp>
+#include <cmajor/cmdebug/DebuggerOutputWriter.hpp>
 #include <soulng/util/Ansi.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <soulng/util/Path.hpp>
@@ -1018,7 +1019,7 @@ Instruction* DebugInfo::GetMainFunctionEntryInstruction() const
     return inst;
 }
 
-Instruction* DebugInfo::GetInstruction(const Frame& frame, CodeFormatter& formatter) const
+Instruction* DebugInfo::GetInstruction(const Frame& frame, DebuggerOutputWriter& outputWriter) const
 {
     if (frame.func == "main" || frame.func == "wmain" || frame.func == "WinMain" || frame.func == "wWinMain")
     {
@@ -1041,7 +1042,7 @@ Instruction* DebugInfo::GetInstruction(const Frame& frame, CodeFormatter& format
     }
     catch (const std::exception& ex)
     {
-        formatter.WriteLine("error getting instruction from frame: " + frame.ToString(false) + ": " + ex.what());
+        outputWriter.WriteWarning("error getting instruction from frame: " + frame.ToString(false) + ": " + ex.what());
     }
     return nullptr;
 }

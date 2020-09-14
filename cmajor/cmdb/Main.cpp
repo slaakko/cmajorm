@@ -1,6 +1,8 @@
 #include <cmajor/cmdebug/Gdb.hpp>
 #include <cmajor/cmdebug/InitDone.hpp>
-#include <cmajor/cmdebug/Debugger.hpp>
+#include <cmajor/cmdebug/ConsoleDebugger.hpp>
+#include <cmajor/cmdebug/ServerDebugger.hpp>
+#include <cmajor/cmdebug/DebuggerClient.hpp>
 #include <cmajor/cmdebug/CmdbSession.hpp>
 #include <soulng/util/Ansi.hpp>
 #include <soulng/util/InitDone.hpp>
@@ -44,14 +46,23 @@ void PrintHelp()
     std::cout << "  Debug the debugger." << std::endl;
     std::cout << "--dontBreakOnThrow | -t" << std::endl;
     std::cout << "  Do not break on throw instructions." << std::endl;
+    std::cout << "--server | -e" << std::endl;
+    std::cout << "  Start debugger in server mode. Default is console mode." << std::endl;
+    std::cout << "--client | -c" << std::endl;
+    std::cout << "  Used in combination with --server. Starts test client along with server." << std::endl;
+    std::cout << "--port=PORT_NUMBER | -p=PORT_NUMBER" << std::endl;
+    std::cout << "  Set debug server port number. Default port is 54326." << std::endl;
+    std::cout << "--log | -l" << std::endl;
+    std::cout << "  Write log to %CMAJOR_ROOT%/log/cmdb.log (by default C:\\cmajor\\log\\cmdb.log)." << std::endl;
     std::cout << "--sessionPort=PORT_NUMBER | -s=PORT_NUMBER" << std::endl;
     std::cout << "  Set the port number of the CMDB session that cmdb and the program being debugged will use for exchanging console I/O messages. Default port is 54322." << std::endl;
 }
 
 int main(int argc, const char** argv)
 {
+    bool server = false;
+    bool client = false;
     InitDone initDone;
-    std::cout << "Cmajor debugger version " << version << std::endl;
     try
     {
         bool verbose = false;
@@ -59,6 +70,8 @@ int main(int argc, const char** argv)
         std::vector<std::string> args;
         bool executableSeen = false;
         bool breakOnThrow = true;
+        bool log = false;
+        int port = 54326;
         for (int i = 1; i < argc; ++i)
         {
             std::string arg = argv[i];
@@ -83,15 +96,31 @@ int main(int argc, const char** argv)
                     {
                         breakOnThrow = false;
                     }
+                    else if (arg == "--server")
+                    {
+                        server = true;
+                    }
+                    else if (arg == "--client")
+                    {
+                        client = true;
+                    }
+                    else if (arg == "--log")
+                    {
+                        log = true;
+                    }
                     else if (arg.find('=') != std::string::npos)
                     {
                         std::vector<std::string> components = Split(arg, '=');
                         if (components.size() == 2)
                         {
-                            if (components[0] == "--sessionPort")
+                            if (components[0] == "--port")
                             {
-                                int port = boost::lexical_cast<int>(components[1]);
-                                cmajor::debug::SetCmdbSessionPort(port);
+                                port = boost::lexical_cast<int>(components[1]);
+                            }
+                            else if (components[0] == "--sessionPort")
+                            {
+                                int sessionPort = boost::lexical_cast<int>(components[1]);
+                                cmajor::debug::SetCmdbSessionPort(sessionPort);
                             }
                             else
                             {
@@ -116,10 +145,14 @@ int main(int argc, const char** argv)
                         std::vector<std::string> components = Split(arg, '=');
                         if (components.size() == 2)
                         {
-                            if (components[0] == "s")
+                            if (components[0] == "p")
                             {
-                                int port = boost::lexical_cast<int>(components[1]);
-                                cmajor::debug::SetCmdbSessionPort(port);
+                                port = boost::lexical_cast<int>(components[1]);
+                            }
+                            else if (components[0] == "s")
+                            {
+                                int sessionPort = boost::lexical_cast<int>(components[1]);
+                                cmajor::debug::SetCmdbSessionPort(sessionPort);
                             }
                         }
                         else
@@ -153,6 +186,21 @@ int main(int argc, const char** argv)
                                     breakOnThrow = false;
                                     break;
                                 }
+                                case 'e':
+                                {
+                                    server = true;
+                                    break;
+                                }
+                                case 'c':
+                                {
+                                    client = true;
+                                    break;
+                                }
+                                case 'l':
+                                {
+                                    log = true;
+                                    break;
+                                }
                                 default:
                                 {
                                     throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
@@ -172,11 +220,39 @@ int main(int argc, const char** argv)
                 args.push_back(arg);
             }
         }
-        cmajor::debug::RunDebuggerInteractive(executable, args, verbose, breakOnThrow);
+        if (executable.empty())
+        {
+            throw std::runtime_error("no executable specified");
+        }
+        if (server)
+        {
+            if (client)
+            {
+                cmajor::debug::StartDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log);
+                cmajor::debug::RunClient(port);
+                cmajor::debug::StopDebuggerServer();
+            }
+            else
+            {
+                cmajor::debug::RunDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log);
+            }
+        }
+        else
+        {
+            cmajor::debug::RunDebuggerInteractive(executable, args, verbose, breakOnThrow, version);
+        }
     }
     catch (const std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl;
+        if (server)
+        {
+            std::cout << "debug-server-error" << std::endl;
+            std::cout << ex.what() << std::endl;
+        }
+        else
+        {
+            std::cerr << ex.what() << std::endl;
+        }
         return 1;
     }
     return 0;

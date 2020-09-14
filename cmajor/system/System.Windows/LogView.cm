@@ -10,22 +10,17 @@ namespace System.Windows
 {
     public class LogView : TextView
     {
-        public LogView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base(fontFamily, fontSize, backgroundColor, location, size, dock, anchors)
+        public LogView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Color& textColor, const Point& location, const Size& size,
+            Dock dock, Anchors anchors) :
+            base(fontFamily, fontSize, backgroundColor, textColor, location, size, dock, anchors)
         {
         }
         public LogView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            this(FontFamily("Consolas"), 9.0f, Color.White(), location, size, dock, anchors)
+            this(FontFamily("Consolas"), 9.0f, Color.White(), Color.Black(), location, size, dock, anchors)
         {
         }
         public LogView() : this(Point(0, 0), Size(0, 0), Dock.bottom, Anchors.none)
         {
-        }
-        public void Clear()
-        {
-            ustring newContent;
-            SetTextContent(newContent);
-            Invalidate();
         }
         public virtual void WriteLine(const string& text)
         {

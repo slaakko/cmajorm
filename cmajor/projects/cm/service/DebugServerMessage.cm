@@ -1,0 +1,305 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace Cm.Service.Debug
+{
+    public enum MessageKind
+    {
+        none, startRequest, startReply, stopRequest, stopReply, genericErrorReply, continueRequest, continueReply, nextRequest, nextReply, stepRequest, stepReply,
+        breakRequest, breakReply, deleteRequest, deleteReply,
+        targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply,
+        logMessageRequest, logMessageReply
+    }
+
+    [json]
+    public class Location
+    {
+        public string func;
+        public string file;
+        public string line;
+        public string scol;
+        public string ecol;
+        public string level;
+    }
+
+    public nothrow bool operator==(const Location& left, const Location& right)
+    {
+        return left.func == right.func && left.file == right.file && left.line == right.line && left.scol == right.scol && left.ecol == right.ecol && left.level == right.level;
+    }
+
+    [json]
+    public class TargetState
+    {
+        public nothrow void Reset()
+        {
+            stopReason.Clear();
+            exitCode.Clear();
+            breakpointId.Clear();
+            signalName.Clear();
+            signalMeaning.Clear();
+        }
+        public string stopReason;
+        public string exitCode;
+        public string breakpointId;
+        public string signalName;
+        public string signalMeaning;
+    }
+
+    [json]
+    public class SourceLoc
+    {
+        public string path;
+        public string line;
+    }
+
+    [json]
+    public class BreakpointInfo
+    {
+        public bool success;
+        public string breakpointId;
+        public string numInsts;
+        public Location location;
+        public string error;
+    }
+
+    [json]
+    public class StartRequest
+    {
+        public nothrow StartRequest() : messageKind("startRequest")
+        {
+        }
+        public string messageKind;
+        public List<SourceLoc> breakpointLocations;
+    }
+
+    [json]
+    public class StartReply
+    {
+        public nothrow StartReply() : messageKind("startReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public Location location;
+        public TargetState state;
+        public List<BreakpointInfo> breakpointInfos;
+        public string error;
+    }
+
+    [json]
+    public class StopRequest
+    {
+        public nothrow StopRequest() : messageKind("stopRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class StopReply
+    {
+        public nothrow StopReply() : messageKind("stopReply")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class GenericErrorReply
+    {
+        public nothrow GenericErrorReply() : messageKind("genericErrorReply")
+        {
+        }
+        public string messageKind;
+        public string errorMessage;
+    }
+
+    [json]
+    public class ContinueRequest
+    {
+        public nothrow ContinueRequest() : messageKind("continueRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class ContinueReply
+    {
+        public nothrow ContinueReply() : messageKind("continueReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public Location location;
+        public TargetState state;
+        public string error;
+    }
+
+    [json]
+    public class NextRequest
+    {
+        public nothrow NextRequest() : messageKind("nextRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class NextReply
+    {
+        public nothrow NextReply() : messageKind("nextReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public Location location;
+        public TargetState state;
+        public string error;
+    }
+
+    [json]
+    public class StepRequest
+    {
+        public nothrow StepRequest() : messageKind("stepRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class StepReply
+    {
+        public nothrow StepReply() : messageKind("stepReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public Location location;
+        public TargetState state;
+        public string error;
+    }
+
+    [json]
+    public class BreakRequest
+    {
+        public nothrow BreakRequest() : messageKind("breakRequest")
+        {
+        }
+        public string messageKind;
+        public SourceLoc breakpointLocation;
+    }
+
+    [json]
+    public class BreakReply
+    {
+        public nothrow BreakReply() : messageKind("breakReply")
+        {
+        }
+        public string messageKind;
+        public BreakpointInfo breakpointInfo;
+    }
+
+    [json]
+    public class DeleteRequest
+    {
+        public nothrow DeleteRequest() : messageKind("deleteRequest")
+        {
+        }
+        public string messageKind;
+        public string breakpointId;
+    }
+
+    [json]
+    public class DeleteReply
+    {
+        public nothrow DeleteReply() : messageKind("deleteReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public string error;
+    }
+
+    [json]
+    public class TargetRunningRequest
+    {
+        public nothrow TargetRunningRequest() : messageKind("targetRunningRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class TargetRunningReply
+    {
+        public nothrow TargetRunningReply() : messageKind("targetRunningReply")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class TargetInputRequest
+    {
+        public nothrow TargetInputRequest() : messageKind("targetInputRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class TargetInputReply
+    {
+        public nothrow TargetInputReply() : messageKind("targetInputReply")
+        {
+        }
+        public string messageKind;
+        public string line;
+        public bool eof;
+    }
+
+    [json]
+    public class TargetOutputRequest
+    {
+        public nothrow TargetOutputRequest() : messageKind("targetOutputRequest")
+        {
+        }
+        public string messageKind;
+        public string handle;
+        public string output;
+    }
+
+    [json]
+    public class TargetOutputReply
+    {
+        public nothrow TargetOutputReply() : messageKind("targetOutputReply")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class LogMessageRequest
+    {
+        public nothrow LogMessageRequest() : messageKind("logMessageRequest")
+        {
+        }
+        public string messageKind;
+        public string logMessage;
+    }
+
+    [json]
+    public class LogMessageReply
+    {
+        public nothrow LogMessageReply() : messageKind("logMessageReply")
+        {
+        }
+        public string messageKind;
+    }
+}

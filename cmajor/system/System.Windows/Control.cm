@@ -606,7 +606,7 @@ namespace System.Windows
                 DockWindow();
             }
         }
-        internal void DockWindow()
+        public void DockWindow()
         {
             Control* parentControl = ParentControl();
             if (parentControl != null)
@@ -1110,6 +1110,14 @@ namespace System.Windows
                     }
                     else
                     {
+                        if (accessKey == '\0')
+                        {
+                            Window* window = GetWindow();
+                            if (window->DoKeyDown(Keys.f10))
+                            {
+                                return true;
+                            }
+                        }
                         currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.altModifier);
                         if (DoKeyDown(cast<int>(accessKey)))
                         {

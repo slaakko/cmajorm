@@ -216,4 +216,9 @@ namespace System.Windows
         public int right;
         public int bottom;
     }
+
+    public bool operator==(const Padding& left, const Padding& right)
+    {
+        return left.left == right.left && left.top == right.top && left.right == right.right && left.bottom == right.bottom;
+    }
 }

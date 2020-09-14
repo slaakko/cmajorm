@@ -8,24 +8,15 @@ using System.Collections;
 using System.Threading;
 using System.Net.Sockets;
 using System.Json;
-using System.IO;
 using System.Text;
-using Cm.Ast;
+using System.IO;
+using Cm.Service;
 
-namespace Cm.Build
+namespace Cm.Service.Build
 {
     public int defaultPort = 54325;
 
-    public class delegate void LogMessageNotificationFunction();
     public class delegate void ProgressNotificationFunction();
-
-    public string CmCodeLogDir()
-    {
-        string cmajorRootDir = CmajorRootDir();
-        string logDir = Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cm"), "cmcode"), "log");
-        Directory.CreateDirectories(logDir);
-        return logDir;
-    }
 
     public class BuildServiceArgs
     {
@@ -84,13 +75,14 @@ namespace Cm.Build
         public bool debugServer;
     }
 
-    public class BuildService
+    public class BuildService : ServiceBase
     {
         public nothrow BuildService(BuildServiceArgs& args) :
+            base(),
             port(args.port), log(args.log),
             serverStartWaitSeconds(args.serverStartWaitSeconds), serverStopWaitSeconds(args.serverStopWaitSeconds),
             keepAliveIntervalSeconds(args.keepAliveIntervalSeconds), saveRequestOnly(args.saveRequestOnly),
-            notifyLogMessageAvailable(), notifyProgress(), serverMutex(), terminating(false)
+            notifyProgress(), serverMutex(), terminating(false)
         {
             serverStartCommand = "cmbs";
             if (args.debugServer)
@@ -106,10 +98,6 @@ namespace Cm.Build
             {
                 serverStartCommand.Append(" --timeoutSecs=" + ToString(args.serverTimeoutSeconds));
             }
-        }
-        public nothrow void SetLogMessageNotificationFunction(const LogMessageNotificationFunction& notifyLogMessageAvailable_)
-        {
-            notifyLogMessageAvailable = notifyLogMessageAvailable_;
         }
         public nothrow void SetProgressNotificationFunction(const ProgressNotificationFunction& notifyProgress_)
         {
@@ -366,33 +354,9 @@ namespace Cm.Build
             }
             return string();
         }
-        private void LogMessage(const string& message)
-        {
-            {
-                LockGuard<RecursiveMutex> lock(messageLogMutex);
-                messageLog.Add(message);
-            }
-            notifyLogMessageAvailable();
-        }
         private void Progress()
         {
             notifyProgress();
-        }
-        public nothrow bool MessageLogEmpty() const
-        {
-            LockGuard<RecursiveMutex> lock(messageLogMutex);
-            return messageLog.IsEmpty();
-        }
-        public string FetchLogMessage()
-        {
-            LockGuard<RecursiveMutex> lock(messageLogMutex);
-            if (!messageLog.IsEmpty())
-            {
-                string message = messageLog.Front();
-                messageLog.RemoveFirst();
-                return message;
-            }
-            return string();
         }
         private int port;
         private bool sendKeepAlives;
@@ -403,26 +367,11 @@ namespace Cm.Build
         private int keepAliveIntervalSeconds;
         private int serverStartWaitSeconds;
         private int serverStopWaitSeconds;
-        private LogMessageNotificationFunction notifyLogMessageAvailable;
         private ProgressNotificationFunction notifyProgress;
         private string serverStartCommand;
         private UniquePtr<Process> buildServer;
         private Thread keepAliveThread;
-        private LinkedList<string> messageLog;
-        private RecursiveMutex messageLogMutex;
         private RecursiveMutex serverMutex;
         private RecursiveMutex terminateMutex;
-    }
-
-    public void LogException(const Exception& ex)
-    {
-        try
-        {
-            StreamWriter errorWriter = File.CreateText(Path.Combine(CmCodeLogDir(), "error.txt"));
-            errorWriter << ex.ToString() << endl();
-        }
-        catch (const Exception&)
-        {
-        }
     }
 }

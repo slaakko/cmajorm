@@ -1,0 +1,802 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public class delegate void ColorCharOutputMethod(Color.Constant textColor, Color.Constant backColor, int handle, uchar c);
+
+    public void AnsiProcess(int handle, const string& text, const ColorCharOutputMethod& writeOutputChar)
+    {
+        if (handle == 1)
+        {
+            AnsiEngine.Out().Process(text, writeOutputChar);
+        }
+        else if (handle == 2)
+        {
+            AnsiEngine.Error().Process(text, writeOutputChar);
+        }
+        else
+        {
+            throw Exception("AnsiEngine: invalid handle value " + ToString(handle) + " (not 1 or 2)");
+        }
+    }
+
+    public class AnsiEngine
+    {
+        static AnsiEngine() :
+            out(new AnsiEngine(1)),
+            error(new AnsiEngine(2))
+        {
+        }
+        public static AnsiEngine& Out()
+        {
+            return *out;
+        }
+        public static AnsiEngine& Error()
+        {
+            return *error;
+        }
+        public void Process(const string& text, const ColorCharOutputMethod& writeOutputChar)
+        {
+            for (char c : text)
+            {
+                Put(c, writeOutputChar);
+            }
+        }
+        public nothrow inline Color.Constant DefaultTextColor() const
+        {
+            return defaultTextColor;
+        }
+        public nothrow inline Color.Constant DefautBackColor() const
+        {
+            return defaultBackColor;
+        }
+        public nothrow void SetDefaultTextColor(Color.Constant color)
+        {
+            defaultTextColor = color;
+        }
+        public nothrow void SetDefaultBackColor(Color.Constant color)
+        {
+            defaultBackColor = color;
+        }
+        private nothrow AnsiEngine(int handle_) : handle(handle_), state(0), unicodeEngine(),
+            defaultTextColor(Color.Constant.gray), defaultBackColor(Color.Constant.black),
+            currentTextColor(defaultTextColor), currentBackColor(defaultBackColor),
+            textColor(defaultTextColor), backColor(defaultBackColor)
+        {
+        }
+        private void Put(char c, const ColorCharOutputMethod& writeOutputChar)
+        {
+            switch (state)
+            {
+                case 0:
+                {
+                    if (c == '\033')
+                    {
+                        state = 1;
+                    }
+                    else
+                    {
+                        Emit(c, writeOutputChar);
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (c == '[')
+                    {
+                        state = 2;
+                    }
+                    else if (c == '\033')
+                    {
+                        Emit('\033', writeOutputChar);
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                        state = 0;
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    switch (c)
+                    {
+                        case '3': state = 3; break;
+                        case '9': state = 9; break;
+                        case '4': state = 4; break;
+                        case '1': state = 10; break;
+                        case '0': state = 999; break;
+                        default:
+                        {
+                            Emit('\033', writeOutputChar);
+                            Emit('[', writeOutputChar);
+                            Emit(c, writeOutputChar);
+                            state = 0;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    switch (c)
+                    {
+                        case '0': currentTextColor = Color.Constant.black; state = 1000; break;
+                        case '1': currentTextColor = Color.Constant.darkRed; state = 1001; break;
+                        case '2': currentTextColor = Color.Constant.darkGreen; state = 1002; break;
+                        case '3': currentTextColor = Color.Constant.darkYellow; state = 1003; break;
+                        case '4': currentTextColor = Color.Constant.darkBlue; state = 1004; break;
+                        case '5': currentTextColor = Color.Constant.darkMagenta; state = 1005; break;
+                        case '6': currentTextColor = Color.Constant.darkCyan; state = 1006; break;
+                        case '7': currentTextColor = Color.Constant.gray; state = 1007; break;
+                        default:
+                        {
+                            Emit('\033', writeOutputChar);
+                            Emit('[', writeOutputChar);
+                            Emit('3', writeOutputChar);
+                            Emit(c, writeOutputChar);
+                            state = 0;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 9:
+                {
+                    switch (c)
+                    {
+                        case '1': currentTextColor = Color.Constant.red; state = 9001; break;
+                        case '2': currentTextColor = Color.Constant.green; state = 9002; break;
+                        case '3': currentTextColor = Color.Constant.yellow; state = 9003; break;
+                        case '4': currentTextColor = Color.Constant.blue; state = 9004; break;
+                        case '5': currentTextColor = Color.Constant.magenta; state = 9005; break;
+                        case '6': currentTextColor = Color.Constant.cyan; state = 9006; break;
+                        case '7': currentTextColor = Color.Constant.white; state = 9007; break;
+                        default:
+                        {
+                            Emit('\033', writeOutputChar);
+                            Emit('[', writeOutputChar);
+                            Emit('9', writeOutputChar);
+                            Emit(c, writeOutputChar);
+                            state = 0;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 4:
+                {
+                    switch (c)
+                    {
+                        case '0': currentBackColor = Color.Constant.black; state = 4000; break;
+                        case '1': currentBackColor = Color.Constant.darkRed; state = 4001; break;
+                        case '2': currentBackColor = Color.Constant.darkGreen; state = 4002; break;
+                        case '3': currentBackColor = Color.Constant.darkYellow; state = 4003; break;
+                        case '4': currentBackColor = Color.Constant.darkBlue; state = 4004; break;
+                        case '5': currentBackColor = Color.Constant.darkMagenta; state = 4005; break;
+                        case '6': currentBackColor = Color.Constant.darkCyan; state = 4006; break;
+                        case '7': currentBackColor = Color.Constant.gray; state = 4007; break;
+                        default:
+                        {
+                            Emit('\033', writeOutputChar);
+                            Emit('[', writeOutputChar);
+                            Emit('4', writeOutputChar);
+                            Emit(c, writeOutputChar);
+                            state = 0;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 10:
+                {
+                    if (c == '0')
+                    {
+                        state = 100;
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                        state = 0;
+                        break;
+                    }
+                    break;
+                }
+                case 100:
+                {
+                    switch (c)
+                    {
+                        case '1': currentBackColor = Color.Constant.red; state = 10001; break;
+                        case '2': currentBackColor = Color.Constant.green; state = 10002; break;
+                        case '3': currentBackColor = Color.Constant.yellow; state = 10003; break;
+                        case '4': currentBackColor = Color.Constant.blue; state = 10004; break;
+                        case '5': currentBackColor = Color.Constant.magenta; state = 10005; break;
+                        case '6': currentBackColor = Color.Constant.cyan; state = 10006; break;
+                        case '7': currentBackColor = Color.Constant.white; state = 10007; break;
+                        default:
+                        {
+                            Emit('\033', writeOutputChar);
+                            Emit('[', writeOutputChar);
+                            Emit('1', writeOutputChar);
+                            Emit('0', writeOutputChar);
+                            Emit(c, writeOutputChar);
+                            state = 0;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 999:
+                {
+                    if (c == 'm')
+                    {
+                        ResetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                        break;
+                    }
+                    state = 0;
+                    break;
+                }
+                case 1000:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 1001:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 1002:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit('2', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 1003:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 1004:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 1005:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit('5', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 1006:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit('6', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 1007:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit('7', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 9001:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('9', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 9002:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('9', writeOutputChar);
+                        Emit('2', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 9003:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('9', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 9004:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('9', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 9005:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('9', writeOutputChar);
+                        Emit('5', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 9006:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('9', writeOutputChar);
+                        Emit('6', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 9007:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('9', writeOutputChar);
+                        Emit('7', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 4000:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 4001:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 4002:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit('2', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 4003:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 4004:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 4005:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit('5', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 4006:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit('6', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 4007:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit('7', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 10001:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 10002:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit('2', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 10003:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit('3', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 10004:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit('4', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 10005:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit('5', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 10006:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit('6', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+                case 10007:
+                {
+                    if (c == 'm')
+                    {
+                        SetAttributes();
+                    }
+                    else
+                    {
+                        Emit('\033', writeOutputChar);
+                        Emit('[', writeOutputChar);
+                        Emit('1', writeOutputChar);
+                        Emit('0', writeOutputChar);
+                        Emit('7', writeOutputChar);
+                        Emit(c, writeOutputChar);
+                    }
+                    state = 0;
+                    break;
+                }
+            }
+        }
+        private void Emit(char c, const ColorCharOutputMethod& writeOutputChar)
+        {
+            unicodeEngine.Put(cast<byte>(c));
+            if (unicodeEngine.ResultReady())
+            {
+                writeOutputChar(textColor, backColor, handle, unicodeEngine.Get());
+            }
+        }
+        private nothrow void SetAttributes()
+        {
+            textColor = currentTextColor;
+            backColor = currentBackColor;
+        }
+        private nothrow void ResetAttributes()
+        {
+            textColor = defaultTextColor;
+            backColor = defaultBackColor;
+        }
+        private static UniquePtr<AnsiEngine> out;
+        private static UniquePtr<AnsiEngine> error;
+        private int handle;
+        private int state;
+        private System.Unicode.UnicodeEngine unicodeEngine;
+        private Color.Constant defaultTextColor;
+        private Color.Constant defaultBackColor;
+        private Color.Constant currentTextColor;
+        private Color.Constant currentBackColor;
+        private Color.Constant textColor;
+        private Color.Constant backColor;
+    }
+}

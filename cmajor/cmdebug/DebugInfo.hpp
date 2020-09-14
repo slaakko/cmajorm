@@ -27,6 +27,7 @@ using soulng::util::JsonValue;
 class CompileUnitFunction;
 class Scope;
 class SourceFileReference;
+class DebuggerOutputWriter;
 
 struct DEBUG_API SourceSpan
 {
@@ -403,7 +404,7 @@ public:
     void SetSourceFileWindowSize(int sourceFileWindowSize_) { sourceFileWindowSize = sourceFileWindowSize_; }
     Instruction* GetEntryInstruction(CompileUnitFunction* compileUnitFunction) const;
     Instruction* GetMainFunctionEntryInstruction() const;
-    Instruction* GetInstruction(const Frame& frame, CodeFormatter& formatter) const;
+    Instruction* GetInstruction(const Frame& frame, DebuggerOutputWriter& outputWriter) const;
     Instruction* GetInstruction(const InstructionLocation& location) const;
     DIType* GetPolymorphicType(const std::string& vmtVarName) const;
     void AddPolymorphicType(DIClassType* polymorphicType);

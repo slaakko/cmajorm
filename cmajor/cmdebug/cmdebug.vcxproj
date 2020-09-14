@@ -125,6 +125,7 @@
       <AdditionalIncludeDirectories>..;../..;C:\Boost\include\boost-1_71</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,6 +144,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..;../..;C:\Boost\include\boost-1_71</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251</DisableSpecificWarnings>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,8 +157,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BoundDebugNodeVisitor.hpp" />
+    <ClInclude Include="ClientChannel.hpp" />
+    <ClInclude Include="CmdbMessage.hpp" />
+    <ClInclude Include="CmdbMessageMap.hpp" />
     <ClInclude Include="CmdbSession.hpp" />
     <ClInclude Include="Console.hpp" />
+    <ClInclude Include="ConsoleDebugger.hpp" />
     <ClInclude Include="Container.hpp" />
     <ClInclude Include="ContainerSubscriptTranslator.hpp" />
     <ClInclude Include="DebugExpr.hpp" />
@@ -169,11 +175,13 @@
     <ClInclude Include="DebugExprBinder.hpp" />
     <ClInclude Include="DebugExprVisitor.hpp" />
     <ClInclude Include="Debugger.hpp" />
+    <ClInclude Include="DebuggerClient.hpp" />
     <ClInclude Include="DebuggerCommandClassMap.hpp" />
     <ClInclude Include="DebuggerCommandKeywords.hpp" />
     <ClInclude Include="DebuggerCommandLexer.hpp" />
     <ClInclude Include="DebuggerCommandParser.hpp" />
     <ClInclude Include="DebuggerCommandTokens.hpp" />
+    <ClInclude Include="DebuggerOutputWriter.hpp" />
     <ClInclude Include="DebugInfo.hpp" />
     <ClInclude Include="DebugInfoIo.hpp" />
     <ClInclude Include="DebugApi.hpp" />
@@ -190,12 +198,17 @@
     <ClInclude Include="GdbReplyLineParser.hpp" />
     <ClInclude Include="GdbReplyTokens.hpp" />
     <ClInclude Include="InitDone.hpp" />
+    <ClInclude Include="ServerDebugger.hpp" />
     <ClInclude Include="TokenValueParsers.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BoundDebugNodeVisitor.cpp" />
+    <ClCompile Include="ClientChannel.cpp" />
+    <ClCompile Include="CmdbMessage.cpp" />
+    <ClCompile Include="CmdbMessageMap.cpp" />
     <ClCompile Include="CmdbSession.cpp" />
     <ClCompile Include="Console.cpp" />
+    <ClCompile Include="ConsoleDebugger.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="ContainerSubscriptTranslator.cpp" />
     <ClCompile Include="DebugExpr.cpp" />
@@ -208,11 +221,13 @@
     <ClCompile Include="DebugExprBinder.cpp" />
     <ClCompile Include="DebugExprVisitor.cpp" />
     <ClCompile Include="Debugger.cpp" />
+    <ClCompile Include="DebuggerClient.cpp" />
     <ClCompile Include="DebuggerCommandClassMap.cpp" />
     <ClCompile Include="DebuggerCommandKeywords.cpp" />
     <ClCompile Include="DebuggerCommandLexer.cpp" />
     <ClCompile Include="DebuggerCommandParser.cpp" />
     <ClCompile Include="DebuggerCommandTokens.cpp" />
+    <ClCompile Include="DebuggerOutputWriter.cpp" />
     <ClCompile Include="DebugInfo.cpp" />
     <ClCompile Include="DebugInfoIo.cpp" />
     <ClCompile Include="DebugInfoToXml.cpp" />
@@ -228,9 +243,11 @@
     <ClCompile Include="GdbReplyLineParser.cpp" />
     <ClCompile Include="GdbReplyTokens.cpp" />
     <ClCompile Include="InitDone.cpp" />
+    <ClCompile Include="ServerDebugger.cpp" />
     <ClCompile Include="TokenValueParsers.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CmdbMessage.json-schema" />
     <None Include="DebugExpr.lexer" />
     <None Include="DebugExprParser.parser" />
     <None Include="DebuggerCommand.lexer" />

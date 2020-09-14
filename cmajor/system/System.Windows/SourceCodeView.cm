@@ -85,12 +85,14 @@ namespace System.Windows
 
     public class SourceCodeView : TextView
     {
-        public SourceCodeView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base(fontFamily, fontSize, backgroundColor, location, size, dock, anchors), numLineNumberDigits(0)
+        public SourceCodeView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Color& textColor, const Point& location, const Size& size,
+            Dock dock, Anchors anchors) :
+            base(fontFamily, fontSize, backgroundColor, textColor, location, size, dock, anchors), numLineNumberDigits(0)
         {
             BuildDefaultStyles();
         }
-        public SourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) : this(FontFamily("Consolas"), 10.0f, Color.White(), location, size, dock, anchors)
+        public SourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(FontFamily("Consolas"), 10.0f, Color.White(), Color.Black(), location, size, dock, anchors)
         {
         }
         protected override void OnFontChanged()

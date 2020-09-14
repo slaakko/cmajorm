@@ -16,7 +16,7 @@ parser JsonParser
         ;
         
     Object(var UniquePtr<System.Json.JsonObject> o) : System.Json.JsonObject*
-        ::= LBRACE{ o.Reset(new System.Json.JsonObject()); } (Field(o.Get()):field % COMMA) RBRACE{ return o.Release(); }
+        ::= LBRACE{ o.Reset(new System.Json.JsonObject()); } (Field(o.Get()):field % COMMA)? RBRACE{ return o.Release(); }
         ;
         
     Field(System.Json.JsonObject* o, var ustring n)
@@ -24,6 +24,6 @@ parser JsonParser
         ;
         
     Array(var UniquePtr<System.Json.JsonArray> a) : System.Json.JsonArray*
-        ::= LBRACKET{ a.Reset(new System.Json.JsonArray()); } (Value:v{ a->AddItem(v); } % COMMA) RBRACKET{ return a.Release(); }
+        ::= LBRACKET{ a.Reset(new System.Json.JsonArray()); } (Value:v{ a->AddItem(v); } % COMMA)? RBRACKET{ return a.Release(); }
         ;
 }

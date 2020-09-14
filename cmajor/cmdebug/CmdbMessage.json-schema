@@ -1,0 +1,182 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+struct Location
+{
+    string func;
+    string file;
+    string line;
+    string scol;
+    string ecol;
+    string level;
+}
+
+struct TargetState
+{
+    string stopReason;
+    string exitCode;
+    string breakpointId;
+    string signalName;
+    string signalMeaning;
+}
+
+struct SourceLoc
+{
+    string path;
+    string line;
+}
+
+struct BreakpointInfo
+{
+    bool success;
+    string breakpointId;
+    string numInsts;
+    Location location;
+    string error;
+}
+
+struct StartRequest
+{
+    string messageKind;
+    SourceLoc[] breakpointLocations;
+}
+
+struct StartReply
+{
+    string messageKind;
+    bool success;
+    Location location;
+    TargetState state;
+    BreakpointInfo[] breakpointInfos;
+    string error;
+}
+
+struct StopRequest
+{
+    string messageKind;
+}
+
+struct StopReply
+{
+    string messageKind;
+}
+
+struct GenericErrorReply
+{
+    string messageKind;
+    string errorMessage;
+}
+
+struct ContinueRequest
+{
+    string messageKind;
+}
+
+struct ContinueReply
+{
+    string messageKind;
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+struct NextRequest
+{
+    string messageKind;
+}
+
+struct NextReply
+{
+    string messageKind;
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+struct StepRequest
+{
+    string messageKind;
+}
+
+struct StepReply
+{
+    string messageKind;
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
+struct BreakRequest
+{
+    string messageKind;
+    SourceLoc breakpointLocation;
+}
+
+struct BreakReply
+{
+    string messageKind;
+    BreakpointInfo breakpointInfo;
+}
+
+struct DeleteRequest
+{
+    string messageKind;
+    string breakpointId;
+}
+
+struct DeleteReply
+{
+    string messageKind;
+    bool success;
+    string error;
+}
+
+struct TargetRunningRequest
+{
+    string messageKind;
+}
+
+struct TargetRunningReply
+{
+    string messageKind;
+}
+
+struct TargetInputRequest
+{
+    string messageKind;
+}
+
+struct TargetInputReply
+{
+    string messageKind;
+    string line;
+    bool eof;
+}
+
+struct TargetOutputRequest
+{
+    string messageKind;
+    string handle;
+    string output;
+}
+
+struct TargetOutputReply
+{
+    string messageKind;
+}
+
+struct LogMessageRequest
+{
+    string messageKind;
+    string logMessage;
+}
+
+struct LogMessageReply
+{
+    string messageKind;
+}

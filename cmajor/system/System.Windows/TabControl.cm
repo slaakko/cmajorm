@@ -182,8 +182,9 @@ namespace System.Windows
                     SetSelectedTabPage(null);
                 }
             }
-            tabPages.RemoveChild(tabPage);
-            ControlEventArgs args(tabPage);
+            UniquePtr<Component> component = tabPages.RemoveChild(tabPage);
+            TabPage* tb = cast<TabPage*>(component.Get());
+            ControlEventArgs args(tb);
             OnControlRemoved(args);
             SetChanged();
             Invalidate();
@@ -199,8 +200,9 @@ namespace System.Windows
             while (component != null)
             {
                 Component* next = component->NextSibling();
-                tabPages.RemoveChild(component);
-                TabPage* tabPage = cast<TabPage*>(component);
+                UniquePtr<Component> comp = tabPages.RemoveChild(component);
+                TabPage* tabPage = cast<TabPage*>(comp.Get());
+                RemoveTabPageFromTabPageMap(tabPage);
                 ControlEventArgs args(tabPage);
                 OnControlRemoved(args);
                 component = next;

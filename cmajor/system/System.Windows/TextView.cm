@@ -20,11 +20,12 @@ namespace System.Windows
             none = 0, changed = 1 << 0, painting = 1 << 1
         }
         
-        public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+        public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Color& textColor, const Point& location, const Size& size,
+            Dock dock, Anchors anchors) :
             base("System.Windows.TextView", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP), DefaultExtendedWindowStyle(), backgroundColor,
             "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
             charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(0), caretColumn(0),
-            caretTimerPeriod(defaultCaretTimerPeriod), brush(Color.Black()), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f)
+            caretTimerPeriod(defaultCaretTimerPeriod), brush(textColor), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f)
         {
             uint caretTimeOut = 0u;
             bool succeeded = ReadCaretTimeoutFromRegistry(caretTimeOut);
@@ -36,8 +37,13 @@ namespace System.Windows
             fonts.Add(UniquePtr<Font>(font));
             SetChanged();
         }
-        public TextView(const Point& location, const Size& size, Dock dock, Anchors anchors) : this(FontFamily("Consolas"), 10.0f, Color.White(), location, size, dock, anchors)
+        public TextView(const Point& location, const Size& size, Dock dock, Anchors anchors) : this(FontFamily("Consolas"), 10.0f, Color.White(), Color.Black(),
+            location, size, dock, anchors)
         {
+        }
+        public nothrow inline List<ustring>& Lines()
+        {
+            return lines;
         }
         public nothrow inline const List<ustring>& Lines() const
         {
@@ -128,6 +134,10 @@ namespace System.Windows
         public void SetTopLineCol(int line, int column)
         {
             Point newOrigin(cast<int>((column - 1) * charWidth), cast<int>((line - 1) * charHeight));
+            topLine = cast<int>(newOrigin.y / charHeight + 1.5f);
+            topLineDiff = (topLine - 1) * charHeight - newOrigin.y;
+            leftCol = cast<int>(newOrigin.x / charWidth + 1.5f);
+            leftColDiff = (leftCol - 1) * charWidth - newOrigin.x;
             SetContentLocation(newOrigin);
             Invalidate();
         }
@@ -153,6 +163,22 @@ namespace System.Windows
         {
             line = cast<int>(contentLocation.y / charHeight + 1);
             column = cast<short>(contentLocation.x / charWidth + 1);
+        }
+        public void EnsureLineVisible(int line)
+        {
+            Invalidate();
+            Application.ProcessMessages();
+            if (IsLineVisible(line))
+            {
+                return;
+            }
+            int tl = Max(cast<int>(1), line - GetVisibleLineCount() / 2);
+            SetTopLineCol(tl, 1);
+        }
+        public virtual void Clear()
+        {
+            ustring emptyContent;
+            SetTextContent(emptyContent);
         }
         public void SetTextContent(const ustring& textContent)
         {
@@ -343,45 +369,43 @@ namespace System.Windows
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
-            bool prevPainting = Painting();
-            SetPainting();
             try
             {
-                if (Changed())
-                {
-                    ResetChanged();
-                    Measure(args.graphics);
-                    if (Focused())
-                    {
-                        SetCaretLocation();
-                        ShowCaret();
-                    }
-                }
-                TextRenderingHint prevRenderingHint = args.graphics.GetTextRenderingHint();
-                args.graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
-                args.graphics.ClearChecked(BackgroundColor());
-                int n = cast<int>(lines.Count());
-                SetLineNumberFieldLength(n);
-                PointF origin(0, 0);
-                for (int i = 0; i < n; ++i)
-                {
-                    if (IsLinePartiallyVisible(i + 1))
-                    {
-                        DrawLine(args.graphics, i, origin);
-                    }
-                    origin.y = origin.y + charHeight;
-                }
-                args.graphics.SetTextRenderingHintChecked(prevRenderingHint);
+                PaintContent(args.graphics);
                 base->OnPaint(args);
             }
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message());
             }
-            if (!prevPainting)
+        }
+        protected virtual void PaintContent(Graphics& graphics)
+        {
+            if (Changed())
             {
-                ResetPainting();
+                ResetChanged();
+                Measure(graphics);
+                if (Focused())
+                {
+                    SetCaretLocation();
+                    ShowCaret();
+                }
             }
+            TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
+            graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
+            graphics.ClearChecked(BackgroundColor());
+            int n = cast<int>(lines.Count());
+            SetLineNumberFieldLength(n);
+            PointF origin(0, 0);
+            for (int i = 0; i < n; ++i)
+            {
+                if (IsLinePartiallyVisible(i + 1))
+                {
+                    DrawLine(graphics, i, origin);
+                }
+                origin.y = origin.y + charHeight;
+            }
+            graphics.SetTextRenderingHintChecked(prevRenderingHint);
         }
         protected virtual void DrawLine(Graphics& graphics, int lineIndex, const PointF& origin)
         {
@@ -713,8 +737,18 @@ namespace System.Windows
         {
             linesChangedEvent.Fire();
         }
-        private void SetMaxLineLength()
+        public nothrow inline int MaxLineLength() const
         {
+            return maxLineLength;
+        }
+        public nothrow inline int MaxLineIndex() const
+        {
+            return maxLineIndex;
+        }
+        protected nothrow void SetMaxLineLength()
+        {
+            maxLineLength = 0;
+            maxLineIndex = 0;
             int n = cast<int>(lines.Count());
             for (int i = 0; i < n; ++i)
             {
@@ -726,7 +760,7 @@ namespace System.Windows
                 }
             }
         }
-        private inline nothrow bool Changed() const
+        protected inline nothrow bool Changed() const
         {
             return (flags & Flags.changed) != Flags.none;
         }
@@ -734,7 +768,7 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags | Flags.changed); 
         }
-        private inline nothrow void ResetChanged()
+        protected inline nothrow void ResetChanged()
         {
             flags = cast<Flags>(flags & ~Flags.changed);
         }

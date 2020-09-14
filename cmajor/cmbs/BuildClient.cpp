@@ -63,16 +63,19 @@ void RunRequest(const std::string& requestFilePath, int port)
     Write(socket, request);
     std::unique_ptr<JsonValue> message = ReadMessage(socket);
     std::string messageKind = GetMessageKind(message.get());
-    while (messageKind == "logMessageRequest")
+    while (messageKind == "logMessageRequest" || messageKind == "progressMessage")
     {
-        LogMessageRequest request(message.get());
-        std::cout << request.message << std::endl;
-        LogMessageReply replyMessage;
-        replyMessage.messageKind = "logMessageReply";
-        replyMessage.ok = true;
-        std::unique_ptr<JsonValue> replyMessageValue(replyMessage.ToJson());
-        std::string reply = replyMessageValue->ToString();
-        Write(socket, reply);
+        if (messageKind == "logMessageRequest")
+        {
+            LogMessageRequest request(message.get());
+            std::cout << request.message << std::endl;
+            LogMessageReply replyMessage;
+            replyMessage.messageKind = "logMessageReply";
+            replyMessage.ok = true;
+            std::unique_ptr<JsonValue> replyMessageValue(replyMessage.ToJson());
+            std::string reply = replyMessageValue->ToString();
+            Write(socket, reply);
+        }
         message = ReadMessage(socket);
         messageKind = GetMessageKind(message.get());
     }

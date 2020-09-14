@@ -1,0 +1,626 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Threading;
+using System.Net.Sockets;
+using System.Json;
+using Cm.Service;
+
+namespace Cm.Service.Debug
+{
+    public int defaultPort = 54326;
+    public int defaultSessionPort = 54322;
+    public class delegate void WriteTargetOutputMethod(int handle, const string& targetOutput);
+    public class delegate void SetDebugLocationMethod(const Location& location);
+    public class delegate void TargetRunningMethod();
+
+    public class DebugServiceArgs
+    {
+        public nothrow DebugServiceArgs() :
+            port(defaultPort), sessionPort(defaultSessionPort), log(false), verbose(false), debugServer(false), serverStartWaitSeconds(1),
+            backend("cpp"), toolChain("gcc"), config("debug")
+        {
+        }
+        public nothrow DebugServiceArgs& Port(int port_)
+        {
+            port = port_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& SessionPort(int sessionPort_)
+        {
+            sessionPort = sessionPort_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& Log(bool log_)
+        {
+            log = log_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& Verbose(bool verbose_)
+        {
+            verbose = verbose_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& ServerStartWaitSeconds(int serverStartWaitSeconds_)
+        {
+            serverStartWaitSeconds = serverStartWaitSeconds_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& DebugServer(bool debugServer_)
+        {
+            debugServer = debugServer_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& Backend(const string& backend_)
+        {
+            backend = backend_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& ToolChain(const string& toolChain_)
+        {
+            toolChain = toolChain_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& Config(const string& config_)
+        {
+            config = config_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& ProjectFilePath(const string& projectFilePath_)
+        {
+            projectFilePath = projectFilePath_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& ExecutableName(const string& executableName_)
+        {
+            executableName = executableName_;
+            return *this;
+        }
+        public nothrow string GetExecutablePath() const
+        {
+            string executablePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.GetDirectoryName(projectFilePath), "bin"), backend),
+                toolChain), config), executableName);
+            return executablePath;
+        }
+        public int port;
+        public int sessionPort;
+        public bool log;
+        public bool verbose;
+        public bool debugServer;
+        public int serverStartWaitSeconds;
+        public string backend;
+        public string toolChain;
+        public string config;
+        public string projectFilePath;
+        public string executableName;
+        public List<string> arguments;
+    }
+
+    public class RequestGuard
+    {
+        public nothrow RequestGuard(DebugService* service_) : service(service_), prevState(service->GetState())
+        {
+            service->SetState(DebugService.State.requestInProgress);
+        }
+        public ~RequestGuard()
+        {
+            if (service->GetState() != DebugService.State.debuggingStopped)
+            {
+                service->SetState(prevState);
+            }
+        }
+        private DebugService* service;
+        private DebugService.State prevState;
+    }
+
+    public class DebugService : ServiceBase
+    {
+        public enum State
+        {
+            initialized, debuggingStarted, requestInProgress, debuggingStopped
+        }
+        public DebugService(DebugServiceArgs& args) :
+            base(),
+            port(args.port), sessionPort(args.sessionPort), log(args.log), verbose(args.verbose), serverStartWaitSeconds(args.serverStartWaitSeconds)
+        {
+            InitMessageKindMap();
+            serverStartCommand = "cmdb";
+            if (args.debugServer)
+            {
+                serverStartCommand = "cmdbd";
+            }
+            serverStartCommand.Append(" --server");
+            serverStartCommand.Append(" --port=" + ToString(port));
+            serverStartCommand.Append(" --sessionPort=" + ToString(sessionPort));
+            if (log)
+            {
+                serverStartCommand.Append(" --log");
+            }
+            if (verbose)
+            {
+                serverStartCommand.Append(" --verbose");
+            }
+            serverStartCommand.Append(" \"").Append(args.GetExecutablePath()).Append("\"");
+            for (const string& arg : args.arguments)
+            {
+                serverStartCommand.Append(" \"").Append(arg).Append("\"");
+            }
+        }
+        public nothrow void SetWriteTargetOutputMethod(const WriteTargetOutputMethod& writeTargetOutput_)
+        {
+            writeTargetOutput = writeTargetOutput_;
+        }
+        public nothrow void SetSetDebugLocationMethod(const SetDebugLocationMethod& setDebugLocation_)
+        {
+            setDebugLocation = setDebugLocation_;
+        }
+        public nothrow void SetTargetRunningMethod(const TargetRunningMethod& targetRunning_)
+        {
+            targetRunning = targetRunning_;
+        }
+        private void InitMessageKindMap()
+        {
+            messageKindMap["startRequest"] = MessageKind.startRequest;
+            messageKindMap["startReply"] = MessageKind.startReply;
+            messageKindMap["stopRequest"] = MessageKind.stopRequest;
+            messageKindMap["stopReply"] = MessageKind.stopReply;
+            messageKindMap["genericErrorReply"] = MessageKind.genericErrorReply;
+            messageKindMap["continueRequest"] = MessageKind.continueRequest;
+            messageKindMap["continueReply"] = MessageKind.continueReply;
+            messageKindMap["nextRequest"] = MessageKind.nextRequest;
+            messageKindMap["nextReply"] = MessageKind.nextReply;
+            messageKindMap["stepRequest"] = MessageKind.stepRequest;
+            messageKindMap["stepReply"] = MessageKind.stepReply;
+            messageKindMap["breakRequest"] = MessageKind.breakRequest;
+            messageKindMap["breakReply"] = MessageKind.breakReply;
+            messageKindMap["deleteRequest"] = MessageKind.deleteRequest;
+            messageKindMap["deleteReply"] = MessageKind.deleteReply;
+            messageKindMap["targetRunningRequest"] = MessageKind.targetRunningRequest;
+            messageKindMap["targetRunningReply"] = MessageKind.targetRunningReply;
+            messageKindMap["targetInputRequest"] = MessageKind.targetInputRequest;
+            messageKindMap["targetInputReply"] = MessageKind.targetInputReply;
+            messageKindMap["targetOutputRequest"] = MessageKind.targetOutputRequest;
+            messageKindMap["targetOutputReply"] = MessageKind.targetOutputReply;
+            messageKindMap["logMessageRequest"] = MessageKind.logMessageRequest;
+            messageKindMap["logMessageReply"] = MessageKind.logMessageReply;
+        }
+        public nothrow bool ServerRunning() const
+        {
+            if (debugServer.IsNull()) return false;
+            return debugServer->Running();
+        }
+        public void Start(const BreakpointCollection& breakpointCollection)
+        {
+            targetState.Reset();
+            if (state != State.initialized)
+            {
+                return;
+            }
+            {
+                RequestGuard requestGuard(this);
+                debugServer.Reset(new Process(serverStartCommand,
+                    cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr)));
+                string line = debugServer->ReadLine(Process.StdHandle.stdOut);
+                if (line == "debug-server-error")
+                {
+                    line = debugServer->ReadLine(Process.StdHandle.stdOut);
+                    throw Exception("DebugServer failed: " + line);
+                }
+                LogMessage(line);
+                line = debugServer->ReadLine(Process.StdHandle.stdOut);
+                LogMessage(line);
+                Sleep(Duration.FromSeconds(serverStartWaitSeconds));
+                socket.Connect("localhost", ToString(port));
+                List<Breakpoint*> breakpoints = SendStartRequest(breakpointCollection);
+                UniquePtr<JsonValue> reply = ReadReply(MessageKind.startReply);
+                ProcessStartReply(reply.Get(), breakpoints);
+                LogMessage("DebugService: Debug Server started.");
+            }
+            state = State.debuggingStarted;
+        }
+        private List<Breakpoint*> SendStartRequest(const BreakpointCollection& breakpointCollection)
+        {
+            List<Breakpoint*> breakpoints;
+            StartRequest startRequest;
+            for (const Pair<string, BreakpointList>& p : breakpointCollection.BreakpointListMap())
+            {
+                const BreakpointList& bpList = p.second;
+                for (Breakpoint* breakpoint : bpList.Breakpoints())
+                {
+                    breakpoints.Add(breakpoint);
+                    SourceLoc breakpointLocation;
+                    breakpointLocation.path = bpList.FilePath();
+                    breakpointLocation.line = ToString(breakpoint->line);
+                    startRequest.breakpointLocations.Add(breakpointLocation);
+                }
+            }
+            UniquePtr<JsonValue> request = startRequest.ToJson();
+            WriteRequest(request.Get());
+            return breakpoints;
+        }
+        private void ProcessStartReply(JsonValue* reply, const List<Breakpoint*>& breakpoints)
+        {
+            StartReply startReply(reply);
+            if (startReply.success)
+            {
+                int n = cast<int>(breakpoints.Count());
+                for (int i = 0; i < n; ++i)
+                {
+                    Breakpoint* breakpoint = breakpoints[i];
+                    breakpoint->info = startReply.breakpointInfos[i];
+                    if (breakpoint->info.success)
+                    {
+                        breakpoint->disabled = false;
+                    }
+                    else
+                    {
+                        breakpoint->disabled = true; 
+                    }
+                }
+                if (setDebugLocation != SetDebugLocationMethod())
+                {
+                    setDebugLocation(startReply.location);
+                }
+            }
+            else
+            {
+                LogMessage("start request failed: " + startReply.error);
+            }
+        }
+        public void Stop()
+        {
+            if (!ServerRunning())
+            {
+                return;
+            }
+            targetState.Reset();
+            if (state == State.requestInProgress)
+            {
+                debugServer->Terminate();
+            }
+            else
+            {
+                RequestGuard requestGuard(this);
+                SendStopRequest();
+                UniquePtr<JsonValue> reply = ReadReply(MessageKind.stopReply);
+                ProcessStopReply(reply.Get());
+            }
+            socket.Close();
+            LogMessage("DebugService: Debug Server stopped.");
+            state = State.initialized;
+        }
+        private void SendStopRequest()
+        {
+            StopRequest stopRequest;
+            UniquePtr<JsonValue> request = stopRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessStopReply(JsonValue* reply)
+        {
+            StopReply stopReply(reply);
+            // todo
+        }
+        public void Continue()
+        {
+            targetState.Reset();
+            RequestGuard requestGuard(this);
+            SendContinueRequest();
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.continueReply);
+            ProcessContinueReply(reply.Get());
+        }
+        private void SendContinueRequest()
+        {
+            ContinueRequest continueRequest;
+            UniquePtr<JsonValue> request = continueRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessContinueReply(JsonValue* reply)
+        {
+            ContinueReply continueReply(reply);
+            if (continueReply.success)
+            {
+                if (setDebugLocation != SetDebugLocationMethod())
+                {
+                    setDebugLocation(continueReply.location);
+                }
+                ProcessStopReason(continueReply.state);
+            }
+            else
+            {
+                LogMessage("continue request failed: " + continueReply.error);
+            }
+        }
+        public void Next()
+        {
+            targetState.Reset();
+            RequestGuard requestGuard(this);
+            SendNextRequest();
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.nextReply);
+            ProcessNextReply(reply.Get());
+        }
+        private void SendNextRequest()
+        {
+            NextRequest nextRequest;
+            UniquePtr<JsonValue> request = nextRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessNextReply(JsonValue* reply)
+        {
+            NextReply nextReply(reply);
+            if (nextReply.success)
+            {
+                if (setDebugLocation != SetDebugLocationMethod())
+                {
+                    setDebugLocation(nextReply.location);
+                }
+                ProcessStopReason(nextReply.state);
+            }
+            else
+            {
+                LogMessage("next request failed: " + nextReply.error);
+            }
+        }
+        public void Step()
+        {
+            targetState.Reset();
+            RequestGuard requestGuard(this);
+            SendStepRequest();
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.stepReply);
+            ProcessStepReply(reply.Get());
+        }
+        private void SendStepRequest()
+        {
+            StepRequest stepRequest;
+            UniquePtr<JsonValue> request = stepRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessStepReply(JsonValue* reply)
+        {
+            StepReply stepReply(reply);
+            if (stepReply.success)
+            {
+                if (setDebugLocation != SetDebugLocationMethod())
+                {
+                    setDebugLocation(stepReply.location);
+                }
+                ProcessStopReason(stepReply.state);
+            }
+            else
+            {
+                LogMessage("step request failed: " + stepReply.error);
+            }
+        }
+        public void Break(const string& filePath, Breakpoint* breakpoint)
+        {
+            RequestGuard requestGuard(this);
+            SendBreakRequest(filePath, breakpoint);
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.breakReply);
+            ProcessBreakReply(reply.Get(), breakpoint);
+        }
+        private void SendBreakRequest(const string& filePath, Breakpoint* breakpoint)
+        {
+            BreakRequest breakRequest;
+            breakRequest.breakpointLocation.path = filePath;
+            breakRequest.breakpointLocation.line = ToString(breakpoint->line);
+            UniquePtr<JsonValue> request = breakRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessBreakReply(JsonValue* reply, Breakpoint* breakpoint)
+        {
+            BreakReply breakReply(reply);
+            breakpoint->info = breakReply.breakpointInfo;
+            if (breakpoint->info.success)
+            {
+                LogMessage("breakpoint added");
+            }
+            else
+            {
+                LogMessage("break request failed: " + breakpoint->info.error);
+            }
+        }
+        public void Delete(const string& breakpointId)
+        {
+            RequestGuard requestGuard(this);
+            SendDeleteRequest(breakpointId);
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.deleteReply);
+            ProcessDeleteReply(reply.Get());
+        }
+        private void SendDeleteRequest(const string& breakpointId)
+        {
+            DeleteRequest deleteRequest;
+            deleteRequest.breakpointId = breakpointId;
+            UniquePtr<JsonValue> request = deleteRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessDeleteReply(JsonValue* reply)
+        {
+            DeleteReply deleteReply(reply);
+            if (deleteReply.success)
+            {
+                LogMessage("breakpoint removed");
+            }
+            else
+            {
+                LogMessage("delete request failed: " + deleteReply.error);
+            }
+        }
+        private void ProcessStopReason(const TargetState& state)
+        {
+            if (state.stopReason == "exited-normally")
+            {
+                LogMessage("program exited normally");
+                SetState(State.debuggingStopped);
+            }
+            else if (state.stopReason == "exited")
+            {
+                LogMessage("program exited with code " + state.exitCode);
+                SetState(State.debuggingStopped);
+            }
+            else if (state.stopReason == "signal-received")
+            {
+                LogMessage("program received signal " + state.signalName + "(" + state.signalMeaning + ")");
+                SetState(State.debuggingStopped);
+            }
+            targetState = state;
+        }
+        private void ProcessMessage(JsonValue* message, MessageKind messageKind, const string& messageKindStr)
+        {
+            switch (messageKind)
+            {
+                case MessageKind.targetRunningRequest:
+                {
+                    TargetRunningRequest targetRunningRequest(message);
+                    ProcessTargetRunningRequest(targetRunningRequest);
+                    break;
+                }
+                case MessageKind.targetInputRequest:
+                {
+                    TargetInputRequest targetInputRequest(message);
+                    ProcessTargetInputRequest(targetInputRequest);
+                    break;
+                }
+                case MessageKind.targetOutputRequest:
+                {
+                    TargetOutputRequest targetOutputRequest(message);
+                    ProcessTargetOutputRequest(targetOutputRequest);
+                    break;
+                }
+                case MessageKind.logMessageRequest:
+                {
+                    LogMessageRequest logMessageRequest(message);
+                    ProcessLogMessageRequest(logMessageRequest);
+                    break;
+                }
+                case MessageKind.genericErrorReply:
+                {
+                    GenericErrorReply errorReply(message);
+                    ProcessErrorReply(errorReply);
+                    break;
+                }
+                default:
+                {
+                    LogMessage("unexpected " + messageKindStr + " received");
+                    break;
+                }
+            }
+        }
+        private void ProcessTargetRunningRequest(const TargetRunningRequest& targetRunningRequest)
+        {
+            if (targetRunning != TargetRunningMethod())
+            {
+                targetRunning();
+            }
+            TargetRunningReply targetRunningReply;
+            UniquePtr<JsonValue> reply = targetRunningReply.ToJson();
+            WriteReply(reply.Get());
+        }
+        private void ProcessTargetInputRequest(const TargetInputRequest& targetInputRequest)
+        {
+            TargetInputReply targetInputReply;
+            // todo
+            targetInputReply.line = "...target input line...";
+            targetInputReply.eof = false;
+            UniquePtr<JsonValue> reply = targetInputReply.ToJson();
+            WriteReply(reply.Get());
+        }
+        private void ProcessTargetOutputRequest(const TargetOutputRequest& targetOutputRequest)
+        {
+            int handle = ParseInt(targetOutputRequest.handle);
+            if (writeTargetOutput != WriteTargetOutputMethod())
+            {
+                writeTargetOutput(handle, targetOutputRequest.output);
+            }
+            TargetOutputReply targetOutputReply;
+            UniquePtr<JsonValue> reply = targetOutputReply.ToJson();
+            WriteReply(reply.Get());
+        }
+        private void ProcessLogMessageRequest(const LogMessageRequest& logMessageRequest)
+        {
+            LogMessage(logMessageRequest.logMessage);
+            LogMessageReply logMessageReply;
+            UniquePtr<JsonValue> reply = logMessageReply.ToJson();
+            WriteReply(reply.Get());
+        }
+        private void ProcessErrorReply(const GenericErrorReply& errorReply)
+        {
+            LogMessage("error from debug server: " + errorReply.errorMessage);
+        }
+        private MessageKind GetMessageKind(JsonValue* message, string& messageKindStr)
+        {
+            messageKindStr = "unknown message kind";
+            if (message is JsonObject*)
+            {
+                JsonObject* jsonObject = cast<JsonObject*>(message);
+                JsonValue* messageKindValue = jsonObject->GetField("messageKind");
+                if (messageKindValue is JsonString*)
+                {
+                    JsonString* messageKind = cast<JsonString*>(messageKindValue);
+                    messageKindStr = ToUtf8(messageKind->Value());
+                    Map<string, MessageKind>.ConstIterator it = messageKindMap.CFind(messageKindStr);
+                    if (it != messageKindMap.CEnd())
+                    {
+                        return it->second;
+                    }
+                }
+            }
+            return MessageKind.none;
+        }
+        private void WriteRequest(JsonValue* request)
+        {
+            string requestStr = request->ToString();
+            Write(socket, requestStr);
+        }
+        private void WriteReply(JsonValue* reply)
+        {
+            string replyStr = reply->ToString();
+            Write(socket, replyStr);
+        }
+        private UniquePtr<JsonValue> ReadReply(MessageKind replyMessageKind)
+        {
+            string replyStr = ReadStr(socket);
+            JsonLexer lexer(ToUtf32(replyStr), "", 0);
+            UniquePtr<JsonValue> replyValue = JsonParser.Parse(lexer);
+            string messageKindStr;
+            MessageKind messageKind = GetMessageKind(replyValue.Get(), messageKindStr);
+            while (messageKind != replyMessageKind)
+            {
+                ProcessMessage(replyValue.Get(), messageKind, messageKindStr);
+                replyStr = ReadStr(socket);
+                JsonLexer lexer(ToUtf32(replyStr), "", 0);
+                replyValue = JsonParser.Parse(lexer);
+                messageKind = GetMessageKind(replyValue.Get(), messageKindStr);
+            }
+            return replyValue;
+        }
+        public nothrow State GetState() const
+        {
+            return state;
+        }
+        public nothrow void SetState(State state_)
+        {
+            state = state_;
+        }
+        public nothrow const TargetState& GetTargetState() const
+        {
+            return targetState;
+        }
+        private int port;
+        private int sessionPort;
+        private bool log;
+        private bool verbose;
+        private string serverStartCommand;
+        private State state;
+        private TargetState targetState;
+        private UniquePtr<Process> debugServer;
+        private int serverStartWaitSeconds;
+        private TcpSocket socket;
+        private Map<string, MessageKind> messageKindMap;
+        private WriteTargetOutputMethod writeTargetOutput;
+        private SetDebugLocationMethod setDebugLocation;
+        private TargetRunningMethod targetRunning;
+    }
+}

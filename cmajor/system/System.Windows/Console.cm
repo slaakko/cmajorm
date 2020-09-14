@@ -1,0 +1,227 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Windows
+{
+    public class ColorCount
+    {
+        public nothrow ColorCount() : color(System.Color.Constant.black), count(0)
+        {
+        }
+        public nothrow ColorCount(System.Color.Constant color_, int count_) : color(color_), count(count_)
+        {
+        }
+        public nothrow inline void IncrementCount()
+        {
+            ++count;
+        }
+        public System.Color.Constant color;
+        public int count;
+    }
+
+    public Padding DefaultConsolePadding()
+    {
+        return Padding(4, 4, 4, 4);
+    }
+
+    public class Console : TextView
+    {
+        public Console(const FontFamily& fontFamily, float fontSize, System.Color.Constant backColor, System.Color.Constant textColor,
+            const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            base(fontFamily, fontSize, GetColor(backColor), GetColor(textColor), location, size, dock, anchors),
+            defaultBackColor(backColor), defaultTextColor(textColor), padding(DefaultConsolePadding())
+        {
+            AnsiEngine.Out().SetDefaultBackColor(defaultBackColor);
+            AnsiEngine.Error().SetDefaultBackColor(defaultBackColor);
+            AnsiEngine.Out().SetDefaultTextColor(defaultTextColor);
+            AnsiEngine.Error().SetDefaultTextColor(defaultTextColor);
+        }
+        public Console(System.Color.Constant backColor, System.Color.Constant textColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(FontFamily("Cascadia Code"), 12.0f, backColor, textColor, location, size, dock, anchors)
+        {
+        }
+        public Console(const Point& location, const Size& size, Dock dock, Anchors anchors) :
+            this(System.Color.Constant.black, System.Color.Constant.gray, location, size, dock, anchors)
+        {
+        }
+        public void Write(int handle, const string& text)
+        {
+            if (text.IsEmpty()) return;
+            ColorCharOutputMethod outputCharMethod = OutputChar;
+            AnsiProcess(handle, text, outputCharMethod);
+            SetCaretLineCol(cast<int>(Lines().Count()), 1);
+            ScrollToCaret();
+            Invalidate();
+        }
+        public override void Clear()
+        {
+            base->Clear();
+            textColorLines.Clear();
+            backColorLines.Clear();
+        }
+        public nothrow inline const Padding& GetPadding() const
+        {
+            return padding;
+        }
+        public nothrow  void SetPadding(const Padding& padding_)
+        {
+            if (padding != padding_)
+            {
+                padding = padding_;
+                Invalidate();
+            }
+        }
+        protected override void PaintContent(Graphics& graphics)
+        {
+            TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
+            graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
+            if (Changed())
+            {
+                ResetChanged();
+                SetMaxLineLength();
+                Measure(graphics);
+            }
+            graphics.ClearChecked(BackgroundColor());
+            const List<ustring>& lines = Lines();
+            int n = cast<int>(lines.Count());
+            PointF origin(padding.left, padding.top);
+            for (int i = 0; i < n; ++i)
+            {
+                if (IsLinePartiallyVisible(i + 1))
+                {
+                    List<ColorCount>& backColorLine = backColorLines[i];
+                    PaintLineBackground(graphics, backColorLine, origin);
+                    List<ColorCount>& textColorLine = textColorLines[i];
+                    const ustring& line = lines[i];
+                    DrawLineText(graphics, line, textColorLine, origin);
+                }
+                origin.y = origin.y + CharHeight();
+            }
+            graphics.SetTextRenderingHintChecked(prevRenderingHint);
+        }
+        private void PaintLineBackground(Graphics& graphics, const List<ColorCount>& backColorLine, const PointF& origin)
+        {
+            int n = cast<int>(backColorLine.Count());
+            if (n == 1 && backColorLine[0].color == defaultBackColor) return;
+            PointF loc = origin;
+            for (int i = 0; i < n; ++i)
+            {
+                const ColorCount& colorCount = backColorLine[i];
+                SizeF size(colorCount.count * CharWidth(), CharHeight());
+                if (colorCount.color != defaultBackColor)
+                {
+                    SolidBrush* brush = GetOrInsertBrush(colorCount.color);
+                    RectF rect(loc, size);
+                    graphics.FillRectangleChecked(*brush, rect);
+                }
+                loc.x = loc.x + size.w;
+            }
+        }
+        private void DrawLineText(Graphics& graphics, const ustring& line, const List<ColorCount>& textColorLine, const PointF& origin)
+        {
+            PointF loc = origin;
+            long start = 0;
+            int n = cast<int>(textColorLine.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                const ColorCount& colorCount = textColorLine[i];
+                SolidBrush* brush = GetOrInsertBrush(colorCount.color);
+                long length = colorCount.count;
+                ustring s = line.Substring(start, length);
+                graphics.DrawStringChecked(ToUtf8(s), *Fonts()[0], loc, *brush);
+                loc.x = loc.x + length * CharWidth();
+                start = start + length;
+            }
+        }
+        private void OutputChar(System.Color.Constant textColor, System.Color.Constant backColor, int handle, uchar c)
+        {
+            List<ustring>& lines = Lines();
+            if (lines.IsEmpty() || c == '\n')
+            {
+                ustring line;
+                AddLine(line);
+                List<ColorCount> colorLine;
+                textColorLines.Add(colorLine);
+                backColorLines.Add(colorLine);
+            }
+            if (c != '\n')
+            {
+                ustring& lastLine = lines.Back();
+                lastLine.Append(c);
+                AddColor(textColor, textColorLines.Back());
+                AddColor(backColor, backColorLines.Back());
+                if (lastLine.Length() > MaxLineLength())
+                {
+                    SetMaxLineLength();
+                }
+            }
+        }
+        private nothrow void AddColor(System.Color.Constant color, List<ColorCount>& colorLine)
+        {
+            if (colorLine.IsEmpty() || color != colorLine.Back().color)
+            {
+                ColorCount colorCount(color, 1);
+                colorLine.Add(colorCount);
+            }
+            else
+            {
+                colorLine.Back().IncrementCount();
+            }
+        }
+        private SolidBrush* GetOrInsertBrush(System.Color.Constant color)
+        {
+            HashMap<sbyte, SolidBrush*>.ConstIterator it = brushMap.CFind(cast<sbyte>(color));
+            if (it != brushMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                SolidBrush* solidBrush = new SolidBrush(GetColor(color));
+                brushes.Add(UniquePtr<SolidBrush>(solidBrush));
+                brushMap[cast<sbyte>(color)] = solidBrush;
+                return solidBrush;
+            }
+        }
+        public nothrow inline System.Color.Constant DefaultBackColor() const
+        {
+            return defaultBackColor;
+        }
+        public nothrow void SetDefaultBackColor(System.Color.Constant color)
+        {
+            if (defaultBackColor != color)
+            {
+                defaultBackColor = color;
+                AnsiEngine.Out().SetDefaultBackColor(defaultBackColor);
+                AnsiEngine.Error().SetDefaultBackColor(defaultBackColor);
+                SetBackgroundColor(GetColor(defaultBackColor));
+                Invalidate();
+            }
+        }
+        public nothrow inline System.Color.Constant DefaultTextColor() const
+        {
+            return defaultTextColor;
+        }
+        public nothrow void SetDefaultTextColor(System.Color.Constant color)
+        {
+            if (defaultTextColor != color)
+            {
+                defaultTextColor = color;
+                AnsiEngine.Out().SetDefaultTextColor(defaultTextColor);
+                AnsiEngine.Error().SetDefaultTextColor(defaultTextColor);
+                Invalidate();
+            }
+        }
+        private System.Color.Constant defaultBackColor;
+        private System.Color.Constant defaultTextColor;
+        private List<List<ColorCount>> textColorLines;
+        private List<List<ColorCount>> backColorLines;
+        private HashMap<sbyte, SolidBrush*> brushMap;
+        private List<UniquePtr<SolidBrush>> brushes;
+        private Padding padding;
+    }
+}

@@ -325,65 +325,78 @@ public static class JsonParser
                 Match match(false);
                 Match* parentMatch3 = &match;
                 {
-                    Match match(false);
+                    Match match(true);
+                    long save = lexer.GetPos();
                     Match* parentMatch4 = &match;
                     {
                         Match match(false);
                         Match* parentMatch5 = &match;
                         {
-                            Match match = JsonParser.Field(lexer, o.Get());
-                            *parentMatch5 = match;
-                        }
-                        if (match.hit)
-                        {
                             Match match(false);
                             Match* parentMatch6 = &match;
                             {
-                                Match match(true);
+                                Match match = JsonParser.Field(lexer, o.Get());
+                                *parentMatch6 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
                                 Match* parentMatch7 = &match;
                                 {
-                                    while (true)
+                                    Match match(true);
+                                    Match* parentMatch8 = &match;
                                     {
-                                        long save = lexer.GetPos();
+                                        while (true)
                                         {
-                                            Match match(false);
-                                            Match* parentMatch8 = &match;
-                                            {
-                                                Match match(false);
-                                                if (*lexer == COMMA)
-                                                {
-                                                    ++lexer;
-                                                    match.hit = true;
-                                                }
-                                                *parentMatch8 = match;
-                                            }
-                                            if (match.hit)
+                                            long save = lexer.GetPos();
                                             {
                                                 Match match(false);
                                                 Match* parentMatch9 = &match;
                                                 {
-                                                    Match match = JsonParser.Field(lexer, o.Get());
+                                                    Match match(false);
+                                                    if (*lexer == COMMA)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
                                                     *parentMatch9 = match;
                                                 }
-                                                *parentMatch8 = match;
-                                            }
-                                            if (match.hit)
-                                            {
-                                                *parentMatch7 = match;
-                                            }
-                                            else
-                                            {
-                                                lexer.SetPos(save);
-                                                break;
+                                                if (match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch10 = &match;
+                                                    {
+                                                        Match match = JsonParser.Field(lexer, o.Get());
+                                                        *parentMatch10 = match;
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    *parentMatch8 = match;
+                                                }
+                                                else
+                                                {
+                                                    lexer.SetPos(save);
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
+                                    *parentMatch7 = match;
                                 }
                                 *parentMatch6 = match;
                             }
                             *parentMatch5 = match;
                         }
-                        *parentMatch4 = match;
+                        if (match.hit)
+                        {
+                            *parentMatch4 = match;
+                        }
+                        else
+                        {
+                            lexer.SetPos(save);
+                        }
                     }
                     *parentMatch3 = match;
                 }
@@ -394,10 +407,10 @@ public static class JsonParser
         if (match.hit)
         {
             Match match(false);
-            Match* parentMatch10 = &match;
+            Match* parentMatch11 = &match;
             {
                 Match match(false);
-                Match* parentMatch11 = &match;
+                Match* parentMatch12 = &match;
                 {
                     long pos = lexer.GetPos();
                     Match match(false);
@@ -415,9 +428,9 @@ public static class JsonParser
                             return Match(true, o.Release());
                         }
                     }
-                    *parentMatch11 = match;
+                    *parentMatch12 = match;
                 }
-                *parentMatch10 = match;
+                *parentMatch11 = match;
             }
             *parentMatch0 = match;
         }
@@ -577,7 +590,8 @@ public static class JsonParser
                 Match match(false);
                 Match* parentMatch3 = &match;
                 {
-                    Match match(false);
+                    Match match(true);
+                    long save = lexer.GetPos();
                     Match* parentMatch4 = &match;
                     {
                         Match match(false);
@@ -586,12 +600,77 @@ public static class JsonParser
                             Match match(false);
                             Match* parentMatch6 = &match;
                             {
-                                long pos = lexer.GetPos();
-                                Match match = JsonParser.Value(lexer);
-                                v.Reset(cast<System.Json.JsonValue*>(match.value));
-                                if (match.hit)
+                                Match match(false);
+                                Match* parentMatch7 = &match;
                                 {
-                                    a->AddItem(v.Release());
+                                    long pos = lexer.GetPos();
+                                    Match match = JsonParser.Value(lexer);
+                                    v.Reset(cast<System.Json.JsonValue*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        a->AddItem(v.Release());
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch8 = &match;
+                                {
+                                    Match match(true);
+                                    Match* parentMatch9 = &match;
+                                    {
+                                        while (true)
+                                        {
+                                            long save = lexer.GetPos();
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    Match match(false);
+                                                    if (*lexer == COMMA)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch11 = &match;
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch12 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match = JsonParser.Value(lexer);
+                                                            v.Reset(cast<System.Json.JsonValue*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                a->AddItem(v.Release());
+                                                            }
+                                                            *parentMatch12 = match;
+                                                        }
+                                                        *parentMatch11 = match;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    *parentMatch9 = match;
+                                                }
+                                                else
+                                                {
+                                                    lexer.SetPos(save);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    *parentMatch8 = match;
                                 }
                                 *parentMatch6 = match;
                             }
@@ -599,65 +678,12 @@ public static class JsonParser
                         }
                         if (match.hit)
                         {
-                            Match match(false);
-                            Match* parentMatch7 = &match;
-                            {
-                                Match match(true);
-                                Match* parentMatch8 = &match;
-                                {
-                                    while (true)
-                                    {
-                                        long save = lexer.GetPos();
-                                        {
-                                            Match match(false);
-                                            Match* parentMatch9 = &match;
-                                            {
-                                                Match match(false);
-                                                if (*lexer == COMMA)
-                                                {
-                                                    ++lexer;
-                                                    match.hit = true;
-                                                }
-                                                *parentMatch9 = match;
-                                            }
-                                            if (match.hit)
-                                            {
-                                                Match match(false);
-                                                Match* parentMatch10 = &match;
-                                                {
-                                                    Match match(false);
-                                                    Match* parentMatch11 = &match;
-                                                    {
-                                                        long pos = lexer.GetPos();
-                                                        Match match = JsonParser.Value(lexer);
-                                                        v.Reset(cast<System.Json.JsonValue*>(match.value));
-                                                        if (match.hit)
-                                                        {
-                                                            a->AddItem(v.Release());
-                                                        }
-                                                        *parentMatch11 = match;
-                                                    }
-                                                    *parentMatch10 = match;
-                                                }
-                                                *parentMatch9 = match;
-                                            }
-                                            if (match.hit)
-                                            {
-                                                *parentMatch8 = match;
-                                            }
-                                            else
-                                            {
-                                                lexer.SetPos(save);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                *parentMatch7 = match;
-                            }
-                            *parentMatch5 = match;
+                            *parentMatch4 = match;
                         }
-                        *parentMatch4 = match;
+                        else
+                        {
+                            lexer.SetPos(save);
+                        }
                     }
                     *parentMatch3 = match;
                 }
@@ -668,10 +694,10 @@ public static class JsonParser
         if (match.hit)
         {
             Match match(false);
-            Match* parentMatch12 = &match;
+            Match* parentMatch13 = &match;
             {
                 Match match(false);
-                Match* parentMatch13 = &match;
+                Match* parentMatch14 = &match;
                 {
                     long pos = lexer.GetPos();
                     Match match(false);
@@ -689,9 +715,9 @@ public static class JsonParser
                             return Match(true, a.Release());
                         }
                     }
-                    *parentMatch13 = match;
+                    *parentMatch14 = match;
                 }
-                *parentMatch12 = match;
+                *parentMatch13 = match;
             }
             *parentMatch0 = match;
         }

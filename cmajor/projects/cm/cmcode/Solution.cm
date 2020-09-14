@@ -6,7 +6,7 @@
 using System;
 using System.Collections;
 using System.Windows;
-using Cm.Debug;
+using Cm.Service.Debug;
 
 namespace cmcode
 {
@@ -99,6 +99,18 @@ namespace cmcode
         public nothrow void SetActiveProjectNode(TreeViewNode* activeProjectNode_)
         {
             activeProjectNode = activeProjectNode_;
+        }
+        public TreeViewNodeData* GetTreeViewNodeDataByKey(const string& key)
+        {
+            HashMap<string, TreeViewNodeData*>.ConstIterator it = treeViewDataMap.CFind(key);
+            if (it != treeViewDataMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
         }
         public List<UniquePtr<TreeViewNodeData>> treeViewData;
         public HashMap<string, TreeViewNodeData*> treeViewDataMap;

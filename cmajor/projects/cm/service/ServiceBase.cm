@@ -1,0 +1,76 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Threading;
+using System.IO;
+using Cm.Ast;
+
+namespace Cm.Service
+{
+    public class delegate void LogMessageNotificationFunction();
+
+    public string CmCodeLogDir()
+    {
+        string cmajorRootDir = CmajorRootDir();
+        string logDir = Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cm"), "cmcode"), "log");
+        Directory.CreateDirectories(logDir);
+        return logDir;
+    }
+
+    public void LogException(const Exception& ex)
+    {
+        try
+        {
+            StreamWriter errorWriter = File.CreateText(Path.Combine(CmCodeLogDir(), "error.txt"));
+            errorWriter << ex.ToString() << endl();
+        }
+        catch (const Exception&)
+        {
+        }
+    }
+
+    public class ServiceBase
+    {
+        public ServiceBase() : notifyLogMessageAvailable()
+        {
+        }
+        public nothrow void SetLogMessageNotificationFunction(const LogMessageNotificationFunction& notifyLogMessageAvailable_)
+        {
+            notifyLogMessageAvailable = notifyLogMessageAvailable_;
+        }
+        public void LogMessage(const string& message)
+        {
+            {
+                LockGuard<RecursiveMutex> lock(messageLogMutex);
+                messageLog.Add(message);
+            }
+            if (notifyLogMessageAvailable != LogMessageNotificationFunction())
+            {
+                notifyLogMessageAvailable();
+            }
+        }
+        public nothrow bool MessageLogEmpty() const
+        {
+            LockGuard<RecursiveMutex> lock(messageLogMutex);
+            return messageLog.IsEmpty();
+        }
+        public string FetchLogMessage()
+        {
+            LockGuard<RecursiveMutex> lock(messageLogMutex);
+            if (!messageLog.IsEmpty())
+            {
+                string message = messageLog.Front();
+                messageLog.RemoveFirst();
+                return message;
+            }
+            return string();
+        }
+        private LinkedList<string> messageLog;
+        private RecursiveMutex messageLogMutex;
+        private LogMessageNotificationFunction notifyLogMessageAvailable;
+    }
+}

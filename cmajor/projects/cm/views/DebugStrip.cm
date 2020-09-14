@@ -6,7 +6,7 @@
 using System;
 using System.Collections;
 using System.Windows;
-using Cm.Debug;
+using Cm.Service.Debug;
 
 namespace Cm.Views
 {
@@ -34,6 +34,20 @@ namespace Cm.Views
     {
         return Size(-4, -4);
     }
+
+    public class AddBreakpointEventArgs
+    {
+        public string filePath;
+        public Breakpoint* breakpoint;
+    }
+
+    public class RemoveBreakpointEventArgs
+    {
+        public string breakpointId;
+    }
+
+    public class delegate void AddBreakpointMethod(AddBreakpointEventArgs& args);
+    public class delegate void RemoveBreakpointMethod(RemoveBreakpointEventArgs& args);
 
     public class DebugStrip : Control
     {
@@ -142,10 +156,28 @@ namespace Cm.Views
         public void AddBreakpoint(Breakpoint* breakpoint)
         {
             breakpointList.AddBreakpoint(breakpoint);
+            OnBreakpointAdded(breakpointList.FilePath(), breakpoint);
+        }
+        protected virtual void OnBreakpointAdded(const string& filePath, Breakpoint* breakpoint)
+        {
+            AddBreakpointEventArgs args;
+            args.filePath = filePath;
+            args.breakpoint = breakpoint;
+            breakpointAddedEvent.Fire(args);
+            Invalidate();
         }
         public void RemoveBreakpoint(Breakpoint* breakpoint)
         {
+            string breakpointId = breakpoint->info.breakpointId;
             breakpointList.RemoveBreakpoint(breakpoint);
+            OnBreakpointRemoved(breakpointId);
+        }
+        protected virtual void OnBreakpointRemoved(const string& breakpointId)
+        {
+            RemoveBreakpointEventArgs args;
+            args.breakpointId = breakpointId;
+            breakpointRemovedEvent.Fire(args);
+            Invalidate();
         }
         public nothrow const SourceSpan& DebugLocation() const
         {
@@ -171,6 +203,14 @@ namespace Cm.Views
             RectF s(PointF(), SizeF(arrowBitmapSize.w, arrowBitmapSize.h));
             graphics.DrawImageChecked(*arrowBitmap, r, s, Unit.pixel, attributes);
         }
+        public nothrow Event<AddBreakpointMethod, AddBreakpointEventArgs>& BreakpointAddedEvent()
+        {
+            return breakpointAddedEvent;
+        }
+        public nothrow Event<RemoveBreakpointMethod, RemoveBreakpointEventArgs>& BreakpointRemovedEvent()
+        {
+            return breakpointRemovedEvent;
+        }
         private BreakpointList& breakpointList;
         private SourceSpan debugLocation;
         private TextView* view;
@@ -182,5 +222,7 @@ namespace Cm.Views
         private Point origin;
         private Bitmap* arrowBitmap;
         private Size arrowBitmapSize;
+        private Event<AddBreakpointMethod, AddBreakpointEventArgs> breakpointAddedEvent;
+        private Event<RemoveBreakpointMethod, RemoveBreakpointEventArgs> breakpointRemovedEvent;
     }
 }

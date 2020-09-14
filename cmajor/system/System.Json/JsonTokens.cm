@@ -5,17 +5,29 @@ using System;
 namespace JsonTokens
 {
     public const int END = 0;
+
     public const int STRING = 1;
+
     public const int NUMBER = 2;
+
     public const int LBRACKET = 3;
+
     public const int RBRACKET = 4;
+
     public const int LBRACE = 5;
+
     public const int RBRACE = 6;
+
     public const int COMMA = 7;
+
     public const int COLON = 8;
+
     public const int TRUE = 9;
+
     public const int FALSE = 10;
+
     public const int NULL = 11;
+
     internal class TokenMap
     {
         static TokenMap() :
@@ -93,10 +105,12 @@ namespace JsonTokens
     {
         return TokenMap.Instance().GetTokenId(tokenName);
     }
+
     public ustring GetTokenName(int tokenId)
     {
         return TokenMap.Instance().GetTokenName(tokenId);
     }
+
     public ustring GetTokenInfo(int tokenId)
     {
         return TokenMap.Instance().GetTokenInfo(tokenId);
