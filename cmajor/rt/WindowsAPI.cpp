@@ -328,6 +328,35 @@ int WinApplicationMessageLoop()
     return 1;
 }
 
+const uint32_t CM_ENDMODAL = WM_USER + 1;
+
+void WinRunModal()
+{
+    MSG msg;
+    while (GetMessage(&msg, nullptr, 0, 0))
+    {
+        TranslateMessage(&msg);
+        if (msg.message == CM_ENDMODAL)
+        {
+            return;
+        }
+        bool handled = false;
+        if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+        {
+            if (keyPreview)
+            {
+                uint32_t keyCode = msg.wParam;
+                bool keyDown = msg.message == WM_KEYDOWN;
+                keyPreview(keyCode, keyDown, handled);
+            }
+        }
+        if (!handled)
+        {
+            DispatchMessage(&msg);
+        }
+    }
+}
+
 void* WinGetForegroundWindow()
 {
     return GetForegroundWindow();

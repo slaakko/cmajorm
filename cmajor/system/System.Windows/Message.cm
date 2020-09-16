@@ -92,6 +92,8 @@ namespace System.Windows
     public const ushort SB_PAGELEFT = 2u;
     public const ushort SB_PAGERIGHT = 3u;
 
+    public const uint CM_ENDMODAL = WM_USER + 1u;
+
     public class PaintEventArgs
     {
         public nothrow PaintEventArgs(Graphics& graphics_, const Rect& clipRect_) : graphics(graphics_), clipRect(clipRect_)
@@ -184,6 +186,15 @@ namespace System.Windows
         {
         }
         public Control* control;
+    }
+
+    public class RightClickEventArgs
+    {
+        public nothrow RightClickEventArgs(Control* control_, const Point& location_) : control(control_), location(location_)
+        {
+        }
+        public Control* control;
+        public Point location;
     }
 
     public class ScrollEventArgs

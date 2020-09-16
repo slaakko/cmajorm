@@ -72,67 +72,20 @@ namespace Cm.Views
         {
             return debugStrip;
         }
-        protected override void OnKeyDown(KeyEventArgs& args)
+        public void ToggleBreakpoint()
         {
-            try
+            int line = CaretLine();
+            Breakpoint* bp = debugStrip->GetBreakpoint(line);
+            if (bp != null)
             {
-                base->OnKeyDown(args);
-                if (!args.handled)
-                {
-                    switch (args.keyData)
-                    {
-                        case Keys.f9:
-                        {
-                            int line = CaretLine();
-                            Breakpoint* bp = debugStrip->GetBreakpoint(line);
-                            if (bp != null)
-                            {
-                                debugStrip->RemoveBreakpoint(bp);
-                                debugStrip->Invalidate();
-                            }
-                            else
-                            {
-                                Breakpoint* bp = new Breakpoint(line);
-                                debugStrip->AddBreakpoint(bp);
-                                debugStrip->Invalidate();
-                            }
-                            args.handled = true;
-                            break;
-                        }
-                        case Keys.f11:
-                        {
-                            int line = CaretLine();
-                            SourceSpan debugLocation(line, 0, 0);
-                            if (debugStrip->DebugLocation() == debugLocation)
-                            {
-                                debugStrip->ResetDebugLocation();
-                            }
-                            else
-                            {
-                                debugStrip->SetDebugLocation(debugLocation);
-                            }
-                            debugStrip->Invalidate();
-                            args.handled = true;
-                            break;
-                        }
-                        case Keys.f2:
-                        {
-                            int line = CaretLine();
-                            Breakpoint* bp = debugStrip->GetBreakpoint(line);
-                            if (bp != null)
-                            {
-                                bp->disabled = !bp->disabled;
-                                debugStrip->Invalidate();
-                            }
-                            args.handled = true;
-                            break;
-                        }
-                    }
-                }
+                debugStrip->RemoveBreakpoint(bp);
+                debugStrip->Invalidate();
             }
-            catch (const Exception& ex)
+            else
             {
-                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                Breakpoint* bp = new Breakpoint(line);
+                debugStrip->AddBreakpoint(bp);
+                debugStrip->Invalidate();
             }
         }
         protected override void OnMouseMove(MouseEventArgs& args)
@@ -339,6 +292,14 @@ namespace Cm.Views
         {
             debugStrip = debugStrip_;
         }
+        internal nothrow void SetEditor(CmajorEditor* editor_)
+        {
+            editor = editor_;
+        }
+        public nothrow inline CmajorEditor* GetEditor() const
+        {
+            return editor;
+        }
         private inline nothrow bool GetFlag(Flags flag) const
         {
             return (flags & flag) != Flags.none;
@@ -353,6 +314,7 @@ namespace Cm.Views
         }
         private Flags flags;
         private CmajorLexer lexer;
+        private CmajorEditor* editor;
         private DebugStrip* debugStrip;
         private Token* prevTokenPointed;
         private Event<IdentifierHoverEventHandler, IdentifierHoverEventArgs> identifierHoverEvent;

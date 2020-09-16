@@ -125,6 +125,21 @@ struct FinishReply
     string error;
 }
 
+struct UntilRequest
+{
+    string messageKind;
+    SourceLoc sourceLoc;
+}
+
+struct UntilReply
+{
+    string messageKind;
+    bool success;
+    Location location;
+    TargetState state;
+    string error;
+}
+
 struct BreakRequest
 {
     string messageKind;

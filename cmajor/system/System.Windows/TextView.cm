@@ -12,6 +12,7 @@ namespace System.Windows
 
     public class delegate void CaretPosChangedEventHandler();
     public class delegate void LinesChangedEventHandler();
+    public class delegate void GotoCaretLineEventHandler(ControlEventArgs& args);
 
     public class TextView : Control
     {
@@ -25,7 +26,8 @@ namespace System.Windows
             base("System.Windows.TextView", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP), DefaultExtendedWindowStyle(), backgroundColor,
             "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
             charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(0), caretColumn(0),
-            caretTimerPeriod(defaultCaretTimerPeriod), brush(textColor), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f)
+            caretTimerPeriod(defaultCaretTimerPeriod), brush(textColor), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
+            padding()
         {
             uint caretTimeOut = 0u;
             bool succeeded = ReadCaretTimeoutFromRegistry(caretTimeOut);
@@ -302,6 +304,15 @@ namespace System.Windows
                 }
             }
         }
+        private nothrow void GotoCaretLine()
+        {
+            ControlEventArgs args(this);
+            OnGotoCaretLine(args);
+        }
+        protected virtual void OnGotoCaretLine(ControlEventArgs& args)
+        {
+            gotoCaretLineEvent.Fire(args);
+        }
         public nothrow uchar GetCharAt(int line, int column) const
         {
             if (line < 1)
@@ -444,7 +455,7 @@ namespace System.Windows
             SetFocus(this);
             if (charHeight != 0 && charWidth != 0)
             {
-                if (args.buttons == MouseButtons.lbutton && args.clicks == 1)
+                if ((args.buttons == MouseButtons.lbutton || args.buttons == MouseButtons.rbutton) && args.clicks == 1)
                 {
                     Point loc = args.location;
                     int lineNumber = cast<int>(loc.y / charHeight + 1.5);
@@ -459,6 +470,11 @@ namespace System.Windows
                         Invalidate();
                     }
                     SetCaretLineCol(lineNumber, columnNumber);
+                    if (args.buttons == MouseButtons.rbutton)
+                    {
+                        RightClickEventArgs rightClickArgs(this, loc);
+                        OnRightClick(rightClickArgs);
+                    }
                 }
             }
         }
@@ -610,6 +626,12 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.controlModifier | Keys.k):
+                    {
+                        GotoCaretLine();
+                        args.handled = true;
+                        break;
+                    }
                 }
                 if (args.handled && !scrolled)
                 {
@@ -721,7 +743,7 @@ namespace System.Windows
         }
         protected override void SetCaretLocation()
         {
-            Point caretPos(cast<int>((caretColumn - 1) * charWidth), cast<int>((caretLine - 1) * charHeight));
+            Point caretPos(cast<int>(padding.left + (caretColumn - 1) * charWidth), cast<int>(padding.top + (caretLine - 1) * charHeight));
             TranslateContentLocation(caretPos);
             if (CaretCreated())
             {
@@ -792,6 +814,22 @@ namespace System.Windows
         {
             return linesChangedEvent;
         }
+        public nothrow Event<GotoCaretLineEventHandler, ControlEventArgs>& GotoCaretLineEvent() const
+        {
+            return gotoCaretLineEvent;
+        }
+        public nothrow inline const Padding& GetPadding() const
+        {
+            return padding;
+        }
+        public nothrow void SetPadding(const Padding& padding_)
+        {
+            if (padding != padding_)
+            {
+                padding = padding_;
+                Invalidate();
+            }
+        }
         private Flags flags;
         private List<ustring> lines;
         private List<int> lineStartIndeces;
@@ -815,8 +853,10 @@ namespace System.Windows
         private float leftColDiff;
         private uint caretTimerPeriod;
         private bool update;
+        private Padding padding;
         private Event<CaretPosChangedEventHandler> caretPosChangedEvent;
         private Event<LinesChangedEventHandler> linesChangedEvent;
+        private Event<GotoCaretLineEventHandler, ControlEventArgs> gotoCaretLineEvent;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)

@@ -22,6 +22,8 @@ MessageMap::MessageMap()
     map["stepReply"] = MessageKind::stepReply;
     map["finishRequest"] = MessageKind::finishRequest;
     map["finishReply"] = MessageKind::finishReply;
+    map["untilRequest"] = MessageKind::untilRequest;
+    map["untilReply"] = MessageKind::untilReply;
     map["breakRequest"] = MessageKind::breakRequest;
     map["breakReply"] = MessageKind::breakReply;
     map["deleteRequest"] = MessageKind::deleteRequest;

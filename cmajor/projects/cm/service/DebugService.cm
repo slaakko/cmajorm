@@ -15,6 +15,7 @@ namespace Cm.Service.Debug
     public int defaultPort = 54326;
     public int defaultSessionPort = 54322;
     public class delegate void WriteTargetOutputMethod(int handle, const string& targetOutput);
+    public class delegate void ReadTargetInputMethod(string& targetInput, bool& eof);
     public class delegate void SetDebugLocationMethod(const Location& location);
     public class delegate void TargetRunningMethod();
 
@@ -154,6 +155,10 @@ namespace Cm.Service.Debug
         {
             writeTargetOutput = writeTargetOutput_;
         }
+        public nothrow void SetReadTargetInputMethod(const ReadTargetInputMethod& readTargetInput_)
+        {
+            readTargetInput = readTargetInput_;
+        }
         public nothrow void SetSetDebugLocationMethod(const SetDebugLocationMethod& setDebugLocation_)
         {
             setDebugLocation = setDebugLocation_;
@@ -177,6 +182,8 @@ namespace Cm.Service.Debug
             messageKindMap["stepReply"] = MessageKind.stepReply;
             messageKindMap["finishRequest"] = MessageKind.finishRequest;
             messageKindMap["finishReply"] = MessageKind.finishReply;
+            messageKindMap["untilRequest"] = MessageKind.untilRequest;
+            messageKindMap["untilReply"] = MessageKind.untilReply;
             messageKindMap["breakRequest"] = MessageKind.breakRequest;
             messageKindMap["breakReply"] = MessageKind.breakReply;
             messageKindMap["deleteRequest"] = MessageKind.deleteRequest;
@@ -292,6 +299,7 @@ namespace Cm.Service.Debug
                 ProcessStopReply(reply.Get());
             }
             socket.Close();
+            debugServer.Reset();
             LogMessage("DebugService: Debug Server stopped.");
             state = State.initialized;
         }
@@ -426,6 +434,39 @@ namespace Cm.Service.Debug
                 LogMessage("finish request failed: " + finishReply.error);
             }
         }
+        public void Until(const string& filePath, int line)
+        {
+            targetState.Reset();
+            RequestGuard requestGuard(this);
+            SendUntilRequest(filePath, line);
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.untilReply);
+            ProcessUntilReply(reply.Get());
+        }
+        private void SendUntilRequest(const string& filePath, int line)
+        {
+            SourceLoc sourceLoc;
+            sourceLoc.path = filePath;
+            sourceLoc.line = ToString(line);
+            UntilRequest untilRequest(sourceLoc);
+            UniquePtr<JsonValue> request = untilRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessUntilReply(JsonValue* reply)
+        {
+            UntilReply untilReply(reply);
+            if (untilReply.success)
+            {
+                if (setDebugLocation != SetDebugLocationMethod())
+                {
+                    setDebugLocation(untilReply.location);
+                }
+                ProcessStopReason(untilReply.state);
+            }
+            else
+            {
+                LogMessage("until request failed: " + untilReply.error);
+            }
+        }
         public void Break(const string& filePath, Breakpoint* breakpoint)
         {
             RequestGuard requestGuard(this);
@@ -553,11 +594,15 @@ namespace Cm.Service.Debug
         private void ProcessTargetInputRequest(const TargetInputRequest& targetInputRequest)
         {
             TargetInputReply targetInputReply;
-            // todo
-            targetInputReply.line = "...target input line...";
-            targetInputReply.eof = false;
-            UniquePtr<JsonValue> reply = targetInputReply.ToJson();
-            WriteReply(reply.Get());
+            if (readTargetInput != ReadTargetInputMethod())
+            {
+                readTargetInput(targetInputReply.line, targetInputReply.eof);
+            }
+            if (ServerRunning())
+            {
+                UniquePtr<JsonValue> reply = targetInputReply.ToJson();
+                WriteReply(reply.Get());
+            }
         }
         private void ProcessTargetOutputRequest(const TargetOutputRequest& targetOutputRequest)
         {
@@ -652,6 +697,7 @@ namespace Cm.Service.Debug
         private TcpSocket socket;
         private Map<string, MessageKind> messageKindMap;
         private WriteTargetOutputMethod writeTargetOutput;
+        private ReadTargetInputMethod readTargetInput;
         private SetDebugLocationMethod setDebugLocation;
         private TargetRunningMethod targetRunning;
     }

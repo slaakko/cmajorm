@@ -11,7 +11,7 @@ namespace Cm.Service.Debug
     public enum MessageKind
     {
         none, startRequest, startReply, stopRequest, stopReply, genericErrorReply, continueRequest, continueReply, nextRequest, nextReply, stepRequest, stepReply,
-        finishRequest, finishReply,
+        finishRequest, finishReply, untilRequest, untilReply,
         breakRequest, breakReply, deleteRequest, deleteReply,
         targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply,
         logMessageRequest, logMessageReply
@@ -199,6 +199,29 @@ namespace Cm.Service.Debug
     public class FinishReply
     {
         public nothrow FinishReply() : messageKind("finishReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public Location location;
+        public TargetState state;
+        public string error;
+    }
+
+    [json]
+    public class UntilRequest
+    {
+        public nothrow UntilRequest(const SourceLoc& sourceLoc_) : sourceLoc(sourceLoc_), messageKind("untilRequest")
+        {
+        }
+        public string messageKind;
+        public SourceLoc sourceLoc;
+    }
+
+    [json]
+    public class UntilReply
+    {
+        public nothrow UntilReply() : messageKind("untilReply")
         {
         }
         public string messageKind;

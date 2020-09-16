@@ -25,6 +25,7 @@ extern "C" RT_API int WinInit(void* messageProcessorFunctionAddress, void* keyPr
 extern "C" RT_API int WinRun();
 extern "C" RT_API void WinDone();
 extern "C" RT_API int WinApplicationMessageLoop();
+extern "C" RT_API void WinRunModal();
 extern "C" RT_API void* WinSubClassCommandWndProc(void* windowHandle);
 extern "C" RT_API void WinRestoreOriginalWndProc(void* windowHandle, void* originalWndProc);
 extern "C" RT_API void* WinGetForegroundWindow();

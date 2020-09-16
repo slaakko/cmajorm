@@ -29,6 +29,7 @@ namespace Cm.Views
             sourceCodeView = sourceCodeViewPtr.Get();
             UniquePtr<DebugStrip> debugStrip(new DebugStrip(debugStripWidth, debugStripBackgroundColor, breakpointList, sourceCodeView));
             sourceCodeView->SetDebugStrip(debugStrip.Get());
+            sourceCodeView->SetEditor(this);
             AddChild(debugStrip.Release());
             UniquePtr<ScrollableControl> scrollableSourceCodeView(new ScrollableControl(sourceCodeViewPtr.Release(), Point(), Size(), Dock.fill, Anchors.none));
             AddChild(scrollableSourceCodeView.Release());

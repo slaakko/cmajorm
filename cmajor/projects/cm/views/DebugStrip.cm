@@ -46,8 +46,8 @@ namespace Cm.Views
         public string breakpointId;
     }
 
-    public class delegate void AddBreakpointMethod(AddBreakpointEventArgs& args);
-    public class delegate void RemoveBreakpointMethod(RemoveBreakpointEventArgs& args);
+    public class delegate void AddBreakpointEventHandler(AddBreakpointEventArgs& args);
+    public class delegate void RemoveBreakpointEventHandler(RemoveBreakpointEventArgs& args);
 
     public class DebugStrip : Control
     {
@@ -204,11 +204,11 @@ namespace Cm.Views
             RectF s(PointF(), SizeF(arrowBitmapSize.w, arrowBitmapSize.h));
             graphics.DrawImageChecked(*arrowBitmap, r, s, Unit.pixel, attributes);
         }
-        public nothrow Event<AddBreakpointMethod, AddBreakpointEventArgs>& BreakpointAddedEvent()
+        public nothrow Event<AddBreakpointEventHandler, AddBreakpointEventArgs>& BreakpointAddedEvent()
         {
             return breakpointAddedEvent;
         }
-        public nothrow Event<RemoveBreakpointMethod, RemoveBreakpointEventArgs>& BreakpointRemovedEvent()
+        public nothrow Event<RemoveBreakpointEventHandler, RemoveBreakpointEventArgs>& BreakpointRemovedEvent()
         {
             return breakpointRemovedEvent;
         }
@@ -223,7 +223,7 @@ namespace Cm.Views
         private Point origin;
         private Bitmap* arrowBitmap;
         private Size arrowBitmapSize;
-        private Event<AddBreakpointMethod, AddBreakpointEventArgs> breakpointAddedEvent;
-        private Event<RemoveBreakpointMethod, RemoveBreakpointEventArgs> breakpointRemovedEvent;
+        private Event<AddBreakpointEventHandler, AddBreakpointEventArgs> breakpointAddedEvent;
+        private Event<RemoveBreakpointEventHandler, RemoveBreakpointEventArgs> breakpointRemovedEvent;
     }
 }

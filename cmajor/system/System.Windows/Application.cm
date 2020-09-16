@@ -10,9 +10,21 @@ namespace System.Windows
 {
     public delegate bool MessageProcessorFunction(void* windowHandle, uint msg, uint wparam, long lparam, long& result, void*& originalWndProc);
 
+    public class RunModalGuard
+    {
+        public nothrow RunModalGuard()
+        {
+            Application.SetRunningModal();
+        }
+        public ~RunModalGuard()
+        {
+            Application.ResetRunningModal();
+        }
+    }
+
     public static class Application
     {
-        static Application() : logView(null), activeWindow(null)
+        static Application() : logView(null), activeWindow(null), runningModal(false)
         {            
             MessageProcessorFunction messageProcessorFunction = ProcessMessage;
             ModelessWindowKeyPreviewFunction keyPreviewFunction = ModelessWindowKeyPreview;
@@ -50,6 +62,15 @@ namespace System.Windows
             mainWindow.Update();
             int exitCode = WinRun();
             return exitCode;
+        }
+        public static void RunModal()
+        {
+            RunModalGuard guard;
+            WinRunModal();
+        }
+        public static nothrow void EndModal()
+        {
+            WinPostMessage(MainWindow()->Handle(), CM_ENDMODAL, 0u, 0);
         }
         public static void Exit(int exitCode)
         {
@@ -128,10 +149,23 @@ namespace System.Windows
         {
             mainWindow = w;
         }
+        internal static nothrow void SetRunningModal()
+        {
+            runningModal = true;
+        }
+        internal static nothrow void ResetRunningModal()
+        {
+            runningModal = false;
+        }
+        public static nothrow bool RunningModal()
+        {
+            return runningModal;
+        }
         private static WindowManager windowManager;
         private static ResourceManager resourceManager;
         private static LogView* logView;
         private static Window* activeWindow;
         private static Window* mainWindow;
+        private static bool runningModal;
     }
 }

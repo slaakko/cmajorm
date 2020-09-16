@@ -127,6 +127,7 @@ public:
     std::unique_ptr<JsonValue> ProcessNextRequest(const NextRequest& stopRequest);
     std::unique_ptr<JsonValue> ProcessStepRequest(const StepRequest& stepRequest);
     std::unique_ptr<JsonValue> ProcessFinishRequest(const FinishRequest& finishRequst);
+    std::unique_ptr<JsonValue> ProcessUntilRequest(const UntilRequest& untilRequest);
     std::unique_ptr<JsonValue> ProcessBreakRequest(const BreakRequest& breakRequest);
     std::unique_ptr<JsonValue> ProcessDeleteRequest(const DeleteRequest& deleteRequest);
     void GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState);
@@ -344,6 +345,11 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessRequest(JsonValue* requestMess
         {
             FinishRequest finishRequest(requestMessage);
             return ProcessFinishRequest(finishRequest);
+        }
+        case MessageKind::untilRequest:
+        {
+            UntilRequest untilRequest(requestMessage);
+            return ProcessUntilRequest(untilRequest);
         }
         case MessageKind::breakRequest:
         {
@@ -599,6 +605,24 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessFinishRequest(const FinishRequ
         finishReply.error = ex.what();
     }
     return finishReply.ToJson();
+}
+
+std::unique_ptr<JsonValue> ServerDebugger::ProcessUntilRequest(const UntilRequest& untilRequest)
+{
+    UntilReply untilReply;
+    untilReply.messageKind = "untilReply";
+    try
+    {
+        SourceLocation sourceLocation = ToSourceLocation(untilRequest.sourceLoc);
+        Until(sourceLocation);
+        GetLocationResult(untilReply.success, untilReply.error, untilReply.location, untilReply.state);
+    }
+    catch (const std::exception& ex)
+    {
+        untilReply.success = false;
+        untilReply.error = ex.what();
+    }
+    return untilReply.ToJson();
 }
 
 std::unique_ptr<JsonValue> ServerDebugger::ProcessBreakRequest(const BreakRequest& breakRequest)

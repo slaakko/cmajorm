@@ -13,7 +13,7 @@ namespace cmajor { namespace debug {
 enum class MessageKind
 {
     none, startRequest, startReply, stopRequest, stopReply, genericErrorReply, continueRequest, continueReply, nextRequest, nextReply, stepRequest, stepReply,
-    finishRequest, finishReply,
+    finishRequest, finishReply, untilRequest, untilReply,
     breakRequest, breakReply, deleteRequest, deleteReply,
     targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply, logMessageRequest, logMessageReply
 };

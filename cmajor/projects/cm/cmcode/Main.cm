@@ -108,7 +108,7 @@ namespace cmcode
     {
         public MainWindow(const string& filePath) :
             base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
-            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService()
+            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false)
         {
             UniquePtr<MenuBar> menuBar(new MenuBar());
             menuBar->DisableMenuKey();
@@ -209,6 +209,15 @@ namespace cmcode
             stepOutMenuItemPtr->SetShortcut(Keys.f12);
             debugMenuItem->AddMenuItem(stepOutMenuItemPtr.Release());
             stepOutMenuItem->ClickEvent().AddHandler(StepOutClick);
+
+            debugMenuItem->AddMenuItem(new MenuItemSeparator());
+
+            UniquePtr<MenuItem> toggleBreakpointMenuItemPtr(new MenuItem("&Toggle Breakpoint"));
+            toggleBreakpointMenuItem = toggleBreakpointMenuItemPtr.Get();
+            toggleBreakpointMenuItem->SetShortcut(Keys.f9);
+            toggleBreakpointMenuItem->ClickEvent().AddHandler(ToggleBreakpointClick);
+            debugMenuItem->AddMenuItem(toggleBreakpointMenuItemPtr.Release());
+
             menuBar->AddMenuItem(debugMenuItem.Release());
 
             UniquePtr<MenuItem> windowMenuItem(new MenuItem("&Window"));
@@ -392,6 +401,7 @@ namespace cmcode
             consoleTabPage = consoleTabPagePtr.Get();
             UniquePtr<Console> consolePtr(new Console(Point(), Size(), Dock.none, Anchors.none));
             console = consolePtr.Get();
+            console->ConsoleInputReadyEvent().AddHandler(ConsoleInputReady);
             UniquePtr<Control> scrollableConsole(new ScrollableControl(consolePtr.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             consoleTabPage->AddChild(scrollableConsole.Release());
             outputTabControl->AddTabPage(consoleTabPagePtr.Release());
@@ -833,6 +843,7 @@ namespace cmcode
                 stepOverMenuItem->Disable();
                 stepIntoToolButton->Disable();
                 stepIntoMenuItem->Disable();
+                toggleBreakpointMenuItem->Disable();
             }
             catch (const Exception& ex)
             {
@@ -853,6 +864,7 @@ namespace cmcode
                     stepOverMenuItem->Enable();
                     stepIntoToolButton->Enable();
                     stepIntoMenuItem->Enable();
+                    toggleBreakpointMenuItem->Enable();
                 }
             }
             catch (const Exception& ex)
@@ -874,6 +886,7 @@ namespace cmcode
                     stepOverMenuItem->Enable();
                     stepIntoToolButton->Enable();
                     stepIntoMenuItem->Enable();
+                    toggleBreakpointMenuItem->Enable();
                 }
             }
             catch (const Exception& ex)
@@ -893,6 +906,7 @@ namespace cmcode
                 stepOverMenuItem->Disable();
                 stepIntoToolButton->Disable();
                 stepIntoMenuItem->Disable();
+                toggleBreakpointMenuItem->Disable();
             }
             catch (const Exception& ex)
             {
@@ -1283,6 +1297,8 @@ namespace cmcode
                 solutionExplorerData->breakpointCollection.GetBreakpointList(filePath)));
             Cm.Views.CmajorEditor* editor = editorPtr.Get();
             Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
+            sourceCodeView->RightClickEvent().AddHandler(SourceCodeViewRightClick);
+            sourceCodeView->GotoCaretLineEvent().AddHandler(SourceCodeViewRunToCursor);
             Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
             debugStrip->BreakpointAddedEvent().AddHandler(BreakpointAdded);
             debugStrip->BreakpointRemovedEvent().AddHandler(BreakpointRemoved);
@@ -1316,6 +1332,7 @@ namespace cmcode
                             ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name()))));
                         debugService->SetLogMessageNotificationFunction(DebugServiceLogMessagesAvailable);
                         debugService->SetWriteTargetOutputMethod(WriteTargetOutput);
+                        debugService->SetReadTargetInputMethod(ReadTargetInput);
                         debugService->SetSetDebugLocationMethod(SetDebugLocation);
                         debugService->SetTargetRunningMethod(TargetRunning);
                         debugService->Start(solutionExplorerData->breakpointCollection);
@@ -1349,7 +1366,7 @@ namespace cmcode
                 }
                 if (!debugService.IsNull())
                 {
-                    if (debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
+                    if (stopPending || debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
                     {
                         StopDebuggingClick();
                     }
@@ -1364,12 +1381,21 @@ namespace cmcode
         {
             try
             {
-                if (debugService.IsNull()) return;
-                StopDebugGuard debugGuard(this);
-                if (!debugService.IsNull())
+                if (!Debugging()) return;
+                stopPending = false;
+                if (Application.RunningModal())
                 {
-                    debugService->Stop();
-                    debugService.Reset();
+                    stopPending = true;
+                    GetConsole()->SetEof();
+                }
+                else
+                {
+                    StopDebugGuard debugGuard(this);
+                    if (!debugService.IsNull())
+                    {
+                        debugService->Stop();
+                        debugService.Reset();
+                    }
                 }
             }
             catch (const Exception& ex)
@@ -1398,7 +1424,7 @@ namespace cmcode
                 }
                 if (!debugService.IsNull())
                 {
-                    if (debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
+                    if (stopPending || debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
                     {
                         StopDebuggingClick();
                     }
@@ -1430,7 +1456,7 @@ namespace cmcode
                 }
                 if (!debugService.IsNull())
                 {
-                    if (debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
+                    if (stopPending || debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
                     {
                         StopDebuggingClick();
                     }
@@ -1456,9 +1482,33 @@ namespace cmcode
                 }
                 if (!debugService.IsNull())
                 {
-                    if (debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
+                    if (stopPending || debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
                     {
                         StopDebuggingClick();
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                debugService.Reset();
+            }
+        }
+        private void ToggleBreakpointClick()
+        {
+            try
+            {
+                TabPage* tabPage = codeTabControl->SelectedTabPage();
+                if (tabPage != null)
+                {
+                    Cm.Views.CmajorEditor* editor = GetEditorByTabPage(tabPage);
+                    if (editor != null)
+                    {
+                        Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
+                        if (sourceCodeView != null)
+                        {
+                            sourceCodeView->ToggleBreakpoint();
+                        }
                     }
                 }
             }
@@ -1487,6 +1537,100 @@ namespace cmcode
             {
                 debugService->Delete(args.breakpointId);
             }
+        }
+        private void SourceCodeViewRightClick(RightClickEventArgs& args)
+        {
+            try
+            {
+                Control* control = args.control;
+                if (control is Cm.Views.CmajorSourceCodeView*)
+                {
+                    Cm.Views.CmajorSourceCodeView* sourceCodeView = cast<Cm.Views.CmajorSourceCodeView*>(control);
+                    UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+                    if (Debugging())
+                    {
+                        MenuItem* runToCursorMenuItem = new MenuItem("Run To Cursor");
+                        contextMenu->AddMenuItemAction(runToCursorMenuItem, new RunToCursorAction(this, sourceCodeView));
+                        runToCursorMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.k));
+                    }
+                    if (contextMenu->HasMenuItems())
+                    {
+                        Point loc = args.location;
+                        sourceCodeView->TranslateContentLocation(loc);
+                        Point screenLoc = sourceCodeView->ClientToScreen(loc);
+                        ShowContextMenu(contextMenu.Release(), screenLoc);
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void SourceCodeViewRunToCursor(ControlEventArgs& args)
+        {
+            try
+            {
+                Control* control = args.control;
+                if (control is Cm.Views.CmajorSourceCodeView*)
+                {
+                    Cm.Views.CmajorSourceCodeView* sourceCodeView = cast<Cm.Views.CmajorSourceCodeView*>(control);
+                    RunToCursor(sourceCodeView);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        public void RunToCursor(Cm.Views.CmajorSourceCodeView* sourceCodeView)
+        {
+            try
+            {
+                if (!Debugging())
+                {
+                    return;
+                }
+                {
+                    DebugGuard debugGuard(this);
+                    Cm.Views.CmajorEditor* editor = sourceCodeView->GetEditor();
+                    if (editor != null)
+                    {
+                        debugService->Until(editor->FilePath(), sourceCodeView->CaretLine());
+                        debugTabPage = codeTabControl->SelectedTabPage();
+                    }
+                }
+                if (!debugService.IsNull())
+                {
+                    if (stopPending || debugService->GetState() == Cm.Service.Debug.DebugService.State.debuggingStopped)
+                    {
+                        StopDebuggingClick();
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void ReadTargetInput(string& inputLine, bool& eof)
+        {
+            inputLine.Clear();
+            eof = false;
+            GetConsoleTabPage()->Select();
+            Console* console = GetConsole();
+            console->SetFocus();
+            console->StartReadLine();
+            Application.RunModal();
+            inputLine = ToUtf8(console->InputLine());
+            eof = console->Eof();
+        }
+        private void ConsoleInputReady()
+        {
+            Application.EndModal();
         }
         private void WriteTargetOutput(int handle, const string& targetOutput)
         {
@@ -1678,6 +1822,7 @@ namespace cmcode
             stepOverMenuItem->Disable();
             stepIntoMenuItem->Disable();
             stepOutMenuItem->Disable();
+            toggleBreakpointMenuItem->Disable();
 
             if (action == UserInterfaceAction.build)
             {
@@ -1704,6 +1849,7 @@ namespace cmcode
                 stepOverMenuItem->Enable();
                 stepIntoMenuItem->Enable();
                 stepOutMenuItem->Enable();
+                toggleBreakpointMenuItem->Enable();
                 return;
             }
 
@@ -1731,6 +1877,7 @@ namespace cmcode
                 startDebuggingMenuItem->Enable();
                 stepOverMenuItem->Enable();
                 stepIntoMenuItem->Enable();
+                toggleBreakpointMenuItem->Enable();
 
                 if (!solution->Projects().IsEmpty())
                 {
@@ -1794,6 +1941,7 @@ namespace cmcode
         private MenuItem* stepOverMenuItem;
         private MenuItem* stepIntoMenuItem;
         private MenuItem* stepOutMenuItem;
+        private MenuItem* toggleBreakpointMenuItem;
 
         private ToolButton* saveToolButton;
         private ToolButton* saveAllToolButton;
@@ -1814,6 +1962,7 @@ namespace cmcode
         private UniquePtr<BuildService> buildService;
         private UniquePtr<DebugService> debugService;
         private Cm.Service.Debug.Location latestDebugLocation;
+        private bool stopPending;
     }
 }
 

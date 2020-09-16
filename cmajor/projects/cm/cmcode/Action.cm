@@ -127,4 +127,19 @@ namespace cmcode
         private Cm.Ast.Project* project;
         private TreeViewNode* newActiveProjectNode;
     }
+
+    public class RunToCursorAction : ClickAction
+    {
+        public nothrow RunToCursorAction(MainWindow* mainWindow_, Cm.Views.CmajorSourceCodeView* sourceCodeView_) :
+            mainWindow(mainWindow_), sourceCodeView(sourceCodeView_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->RunToCursor(sourceCodeView);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Views.CmajorSourceCodeView* sourceCodeView;
+    }
 }
