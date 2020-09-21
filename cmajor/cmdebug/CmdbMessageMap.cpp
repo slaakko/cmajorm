@@ -28,6 +28,14 @@ MessageMap::MessageMap()
     map["breakReply"] = MessageKind::breakReply;
     map["deleteRequest"] = MessageKind::deleteRequest;
     map["deleteReply"] = MessageKind::deleteReply;
+    map["depthRequest"] = MessageKind::depthRequest;
+    map["depthReply"] = MessageKind::depthReply;
+    map["framesRequest"] = MessageKind::framesRequest;
+    map["framesReply"] = MessageKind::framesReply;
+    map["localCountRequest"] = MessageKind::localCountRequest;
+    map["localCountReply"] = MessageKind::localCountReply;
+    map["nameRequest"] = MessageKind::nameRequest;
+    map["nameReply"] = MessageKind::nameReply;
     map["targetRunningRequest"] = MessageKind::targetRunningRequest;
     map["targetRunningReply"] = MessageKind::targetRunningReply;
     map["targetInputRequest"] = MessageKind::targetInputRequest;

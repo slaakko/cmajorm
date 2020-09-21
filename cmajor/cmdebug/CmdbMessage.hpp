@@ -236,6 +236,86 @@ struct DeleteReply
     std::string error;
 };
 
+struct DepthRequest
+{
+    DepthRequest();
+    DepthRequest(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+};
+
+struct DepthReply
+{
+    DepthReply();
+    DepthReply(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    bool success;
+    std::string depth;
+    std::string error;
+};
+
+struct FramesRequest
+{
+    FramesRequest();
+    FramesRequest(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    std::string lowFrame;
+    std::string highFrame;
+};
+
+struct FramesReply
+{
+    FramesReply();
+    FramesReply(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    bool success;
+    std::vector<Location> frames;
+    std::string error;
+};
+
+struct LocalCountRequest
+{
+    LocalCountRequest();
+    LocalCountRequest(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+};
+
+struct LocalCountReply
+{
+    LocalCountReply();
+    LocalCountReply(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    bool success;
+    std::string count;
+    std::string error;
+};
+
+struct NameRequest
+{
+    NameRequest();
+    NameRequest(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    std::string start;
+    std::string count;
+};
+
+struct NameReply
+{
+    NameReply();
+    NameReply(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    bool success;
+    std::vector<std::string> names;
+    std::string error;
+};
+
 struct TargetRunningRequest
 {
     TargetRunningRequest();

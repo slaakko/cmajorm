@@ -130,6 +130,10 @@ public:
     std::unique_ptr<JsonValue> ProcessUntilRequest(const UntilRequest& untilRequest);
     std::unique_ptr<JsonValue> ProcessBreakRequest(const BreakRequest& breakRequest);
     std::unique_ptr<JsonValue> ProcessDeleteRequest(const DeleteRequest& deleteRequest);
+    std::unique_ptr<JsonValue> ProcessDepthRequest(const DepthRequest& depthRequest);
+    std::unique_ptr<JsonValue> ProcessFramesRequest(const FramesRequest& framesRequest);
+    std::unique_ptr<JsonValue> ProcessLocalCountRequest(const LocalCountRequest& localCountRequest);
+    std::unique_ptr<JsonValue> ProcessNameRequest(const NameRequest& nameRequest);
     void GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState);
     MessageKind GetMessageKind(JsonValue* message, std::string& messageKindStr);
     void AddStopResultToResult() override; 
@@ -360,6 +364,26 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessRequest(JsonValue* requestMess
         {
             DeleteRequest deleteRequest(requestMessage);
             return ProcessDeleteRequest(deleteRequest);
+        }
+        case MessageKind::depthRequest:
+        {
+            DepthRequest depthRequest(requestMessage);
+            return ProcessDepthRequest(depthRequest);
+        }
+        case MessageKind::framesRequest:
+        {
+            FramesRequest framesRequest(requestMessage);
+            return ProcessFramesRequest(framesRequest);
+        }
+        case MessageKind::localCountRequest:
+        {
+            LocalCountRequest localCountRequest(requestMessage);
+            return ProcessLocalCountRequest(localCountRequest);
+        }
+        case MessageKind::nameRequest:
+        {
+            NameRequest nameRequest(requestMessage);
+            return ProcessNameRequest(nameRequest);
         }
         default:
         {
@@ -674,6 +698,154 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessDeleteRequest(const DeleteRequ
         deleteReply.error = ex.what();
     }
     return deleteReply.ToJson();
+}
+
+std::unique_ptr<JsonValue> ServerDebugger::ProcessDepthRequest(const DepthRequest& depthRequest)
+{
+    DepthReply depthReply;
+    depthReply.messageKind = "depthReply";
+    try
+    {
+        Depth();
+        JsonValue* result = GetResult();
+        if (result && result->Type() == JsonValueType::object)
+        {
+            JsonObject* resultObject = static_cast<JsonObject*>(result);
+            JsonValue* successField = resultObject->GetField(U"success");
+            if (successField && successField->Type() == JsonValueType::boolean)
+            {
+                depthReply.success = static_cast<JsonBool*>(successField)->Value();
+            }
+            JsonValue* depthField = resultObject->GetField(U"depth");
+            if (depthField && depthField->Type() == JsonValueType::string)
+            {
+                depthReply.depth = ToUtf8(static_cast<JsonString*>(depthField)->Value());
+            }
+            JsonValue* errorField = resultObject->GetField(U"error");
+            if (errorField && errorField->Type() == JsonValueType::string)
+            {
+                depthReply.error = ToUtf8(static_cast<JsonString*>(errorField)->Value());
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        depthReply.success = false;
+        depthReply.error = ex.what();
+    }
+    return depthReply.ToJson();
+}
+
+std::unique_ptr<JsonValue> ServerDebugger::ProcessFramesRequest(const FramesRequest& framesRequest)
+{
+    FramesReply framesReply;
+    framesReply.messageKind = "framesReply";
+    try
+    {
+        Frames(boost::lexical_cast<int>(framesRequest.lowFrame), boost::lexical_cast<int>(framesRequest.highFrame));
+        JsonValue* result = GetResult();
+        if (result && result->Type() == JsonValueType::object)
+        {
+            JsonObject* resultObject = static_cast<JsonObject*>(result);
+            JsonValue* successField = resultObject->GetField(U"success");
+            if (successField && successField->Type() == JsonValueType::boolean)
+            {
+                framesReply.success = static_cast<JsonBool*>(successField)->Value();
+            }
+            JsonValue* errorField = resultObject->GetField(U"error");
+            if (errorField && errorField->Type() == JsonValueType::string)
+            {
+                framesReply.error = ToUtf8(static_cast<JsonString*>(errorField)->Value());
+            }
+        }
+        if (framesReply.success)
+        {
+            const std::vector<Frame>& frames = Frames();
+            int n = frames.size();
+            for (int i = 0; i < n; ++i)
+            {
+                const Frame& frame = frames[i];
+                Location loc = ToLocation(frame);
+                framesReply.frames.push_back(std::move(loc));
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        framesReply.success = false;
+        framesReply.error = ex.what();
+    }
+    return framesReply.ToJson();
+}
+
+std::unique_ptr<JsonValue> ServerDebugger::ProcessLocalCountRequest(const LocalCountRequest& localCountRequest)
+{
+    LocalCountReply localCountReply;
+    localCountReply.messageKind = "localCountReply";
+    Instruction* stoppedInstruction = StoppedInstruction();
+    if (stoppedInstruction)
+    {
+        CompileUnitFunction* function = stoppedInstruction->GetCompileUnitFunction();
+        int localVariableCount = function->LocalVariables().size();
+        localCountReply.success = true;
+        localCountReply.count = std::to_string(localVariableCount);
+    }
+    else
+    {
+        localCountReply.success = false;
+        localCountReply.error = "not stopped";
+    }
+    return localCountReply.ToJson();
+}
+
+std::unique_ptr<JsonValue> ServerDebugger::ProcessNameRequest(const NameRequest& nameRequest)
+{
+    NameReply nameReply;
+    nameReply.messageKind = "nameReply";
+    try
+    {
+        int start = boost::lexical_cast<int>(nameRequest.start);
+        int count = boost::lexical_cast<int>(nameRequest.count);
+        Instruction* stoppedInstruction = StoppedInstruction();
+        if (stoppedInstruction)
+        {
+            CompileUnitFunction* function = stoppedInstruction->GetCompileUnitFunction();
+            int localVariableCount = function->LocalVariables().size();
+            if (start >= 0 && start < localVariableCount)
+            {
+                if (start + count >= 0 && start + count <= localVariableCount)
+                {
+                    nameReply.success = true;
+                    for (int i = start; i < start + count; ++i)
+                    {
+                        DIVariable* localVariable = function->LocalVariables()[i];
+                        nameReply.names.push_back(localVariable->Name());
+                    }
+                }
+                else
+                {
+                    nameReply.success = false;
+                    nameReply.error = "count not valid";
+                }
+            }
+            else
+            {
+                nameReply.success = false;
+                nameReply.error = "start not valid";
+            }
+        }
+        else
+        {
+            nameReply.success = false;
+            nameReply.error = "not stopped";
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        nameReply.success = false;
+        nameReply.error = ex.what();
+    }
+    return nameReply.ToJson();
 }
 
 void ServerDebugger::GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState)

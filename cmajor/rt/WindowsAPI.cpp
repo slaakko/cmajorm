@@ -212,7 +212,7 @@ bool WinShellExecute(const char* filePath, int64_t& errorCode)
 }
 
 typedef bool (*messageProcessorFunction)(void* windowHandle, uint32_t message, uint32_t wparam, int64_t lparam, int64_t& result, void*& originalWndProc);
-typedef void (*keyPreviewFunction)(uint32_t keycode, bool keyDown, bool& handled);
+typedef void (*keyPreviewFunction)(uint32_t keycode, bool shift, bool control, bool alt, bool keyDown, bool& handled);
 
 messageProcessorFunction messageProcessor = nullptr;
 keyPreviewFunction keyPreview = nullptr;
@@ -287,7 +287,13 @@ int WinRun()
             {
                 uint32_t keyCode = msg.wParam;
                 bool keyDown = msg.message == WM_KEYDOWN;
-                keyPreview(keyCode, keyDown, handled);
+                int16_t shiftState = GetKeyState(VK_SHIFT);
+                bool shift = (shiftState & (1 << 16)) != 0;
+                int16_t controlState = GetKeyState(VK_CONTROL);
+                bool control = (controlState & (1 << 16)) != 0;
+                int16_t altState = GetKeyState(VK_MENU);
+                bool alt = (altState & (1 << 16)) != 0;
+                keyPreview(keyCode, shift, control, alt, keyDown, handled);
             }
         }
         if (!handled)
@@ -315,7 +321,13 @@ int WinApplicationMessageLoop()
                 {
                     uint32_t keyCode = msg.wParam;
                     bool keyDown = msg.message == WM_KEYDOWN;
-                    keyPreview(keyCode, keyDown, handled);
+                    int16_t shiftState = GetKeyState(VK_SHIFT);
+                    bool shift = (shiftState & (1 << 16)) != 0;
+                    int16_t controlState = GetKeyState(VK_CONTROL);
+                    bool control = (controlState & (1 << 16)) != 0;
+                    int16_t altState = GetKeyState(VK_MENU);
+                    bool alt = (altState & (1 << 16)) != 0;
+                    keyPreview(keyCode, shift, control, alt, keyDown, handled);
                 }
             }
             if (!handled)
@@ -347,7 +359,13 @@ void WinRunModal()
             {
                 uint32_t keyCode = msg.wParam;
                 bool keyDown = msg.message == WM_KEYDOWN;
-                keyPreview(keyCode, keyDown, handled);
+                int16_t shiftState = GetKeyState(VK_SHIFT);
+                bool shift = (shiftState & (1 << 16)) != 0;
+                int16_t controlState = GetKeyState(VK_CONTROL);
+                bool control = (controlState & (1 << 16)) != 0;
+                int16_t altState = GetKeyState(VK_MENU);
+                bool alt = (altState & (1 << 16)) != 0;
+                keyPreview(keyCode, shift, control, alt, keyDown, handled);
             }
         }
         if (!handled)
@@ -368,7 +386,7 @@ bool WinEnableWindow(void* windowHandle, bool enable)
 }
 
 typedef int (*getDialogResultFunction)(void* dialogWindowPtr);
-typedef void (*dialogKeyPreviewFunction)(void* dialogWindowPtr, uint32_t keyCode, bool keyDown, bool& handled);
+typedef void (*dialogKeyPreviewFunction)(void* dialogWindowPtr, uint32_t keyCode, bool shift, bool control, bool alt, bool keyDown, bool& handled);
 
 int WinDialogWindowMessageLoop(void* windowHandle, void* parentWindowHandle, void* getDialogResultFunc, void* keyPreviewFunc, void* dialogWindowPtr)
 {
@@ -392,8 +410,14 @@ int WinDialogWindowMessageLoop(void* windowHandle, void* parentWindowHandle, voi
                 if (keyPreviewFun)
                 {
                     uint32_t keyCode = msg.wParam;
+                    int16_t shiftState = GetKeyState(VK_SHIFT);
+                    bool shift = (shiftState & (1 << 16)) != 0;
+                    int16_t controlState = GetKeyState(VK_CONTROL);
+                    bool control = (controlState & (1 << 16)) != 0;
+                    int16_t altState = GetKeyState(VK_MENU);
+                    bool alt = (altState  & (1 << 16)) != 0;
                     bool keyDown = msg.message == WM_KEYDOWN;
-                    keyPreviewFun(dialogWindowPtr, keyCode, keyDown, handled);
+                    keyPreviewFun(dialogWindowPtr, keyCode, shift, control, alt, keyDown, handled);
                 }
             }
             if (!handled)

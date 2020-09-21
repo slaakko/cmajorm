@@ -12,7 +12,8 @@ namespace Cm.Service.Debug
     {
         none, startRequest, startReply, stopRequest, stopReply, genericErrorReply, continueRequest, continueReply, nextRequest, nextReply, stepRequest, stepReply,
         finishRequest, finishReply, untilRequest, untilReply,
-        breakRequest, breakReply, deleteRequest, deleteReply,
+        breakRequest, breakReply, deleteRequest, deleteReply, depthRequest, depthReply, framesRequest, framesReply, localCountRequest, localCountReply,
+        nameRequest, nameReply,
         targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply,
         logMessageRequest, logMessageReply
     }
@@ -269,6 +270,94 @@ namespace Cm.Service.Debug
         }
         public string messageKind;
         public bool success;
+        public string error;
+    }
+
+    [json]
+    public class DepthRequest
+    {
+        public nothrow DepthRequest() : messageKind("depthRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class DepthReply
+    {
+        public nothrow DepthReply() : messageKind("depthReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public string depth;
+        public string error;
+    }
+
+    [json]
+    public class FramesRequest
+    {
+        public nothrow FramesRequest() : messageKind("framesRequest")
+        {
+        }
+        public string messageKind;
+        public string lowFrame;
+        public string highFrame;
+    }
+
+    [json]
+    public class FramesReply
+    {
+        public nothrow FramesReply() : messageKind("framesReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public List<Location> frames;
+        public string error;
+    }
+
+    [json]
+    public class LocalCountRequest
+    {
+        public nothrow LocalCountRequest() : messageKind("localCountRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class LocalCountReply
+    {
+        public nothrow LocalCountReply() : messageKind("localCountReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public string count;
+        public string error;
+    }
+
+    [json]
+    public class NameRequest
+    {
+        public nothrow NameRequest() : messageKind("nameRequest")
+        {
+        }
+        public string messageKind;
+        public string start;
+        public string count;
+    }
+
+    [json]
+    public class NameReply
+    {
+        public nothrow NameReply() : messageKind("nameReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public List<string> names;
         public string error;
     }
 

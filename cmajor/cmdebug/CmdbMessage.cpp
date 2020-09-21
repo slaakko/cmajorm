@@ -535,6 +535,190 @@ DeleteReply::DeleteReply(soulng::util::JsonValue* value)
     sngjson::json::FromJson(value, "error", error);
 }
 
+DepthRequest::DepthRequest() : messageKind()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> DepthRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    return object;
+}
+
+DepthRequest::DepthRequest(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+}
+
+DepthReply::DepthReply() : messageKind(), success(), depth(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> DepthReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
+    object->AddField(U"success", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(depth);
+    object->AddField(U"depth", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue3));
+    return object;
+}
+
+DepthReply::DepthReply(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(value, "success", success);
+    sngjson::json::FromJson(value, "depth", depth);
+    sngjson::json::FromJson(value, "error", error);
+}
+
+FramesRequest::FramesRequest() : messageKind(), lowFrame(), highFrame()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> FramesRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(lowFrame);
+    object->AddField(U"lowFrame", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(highFrame);
+    object->AddField(U"highFrame", std::move(fieldValue2));
+    return object;
+}
+
+FramesRequest::FramesRequest(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(value, "lowFrame", lowFrame);
+    sngjson::json::FromJson(value, "highFrame", highFrame);
+}
+
+FramesReply::FramesReply() : messageKind(), success(), frames(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> FramesReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
+    object->AddField(U"success", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(frames);
+    object->AddField(U"frames", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue3));
+    return object;
+}
+
+FramesReply::FramesReply(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(value, "success", success);
+    sngjson::json::FromJson(value, "frames", frames);
+    sngjson::json::FromJson(value, "error", error);
+}
+
+LocalCountRequest::LocalCountRequest() : messageKind()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> LocalCountRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    return object;
+}
+
+LocalCountRequest::LocalCountRequest(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+}
+
+LocalCountReply::LocalCountReply() : messageKind(), success(), count(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> LocalCountReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
+    object->AddField(U"success", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(count);
+    object->AddField(U"count", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue3));
+    return object;
+}
+
+LocalCountReply::LocalCountReply(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(value, "success", success);
+    sngjson::json::FromJson(value, "count", count);
+    sngjson::json::FromJson(value, "error", error);
+}
+
+NameRequest::NameRequest() : messageKind(), start(), count()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> NameRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(start);
+    object->AddField(U"start", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(count);
+    object->AddField(U"count", std::move(fieldValue2));
+    return object;
+}
+
+NameRequest::NameRequest(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(value, "start", start);
+    sngjson::json::FromJson(value, "count", count);
+}
+
+NameReply::NameReply() : messageKind(), success(), names(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> NameReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
+    object->AddField(U"success", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(names);
+    object->AddField(U"names", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue3));
+    return object;
+}
+
+NameReply::NameReply(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(value, "success", success);
+    sngjson::json::FromJson(value, "names", names);
+    sngjson::json::FromJson(value, "error", error);
+}
+
 TargetRunningRequest::TargetRunningRequest() : messageKind()
 {
 }

@@ -159,6 +159,7 @@ public:
     bool Verbose() const { return verbose; }
     DebuggerOutputWriter* OutputWriter() { return outputWriter.get(); }
     void SetDebugInfo(DebugInfo* debugInfo_);
+    DebugInfo* GetDebugInfo() const { return debugInfo.get(); }
     virtual void WriteResult(soulng::util::JsonValue* result, Instruction* stoppedInstruction) = 0;
     virtual void WriteSourceFile(SourceFile& sourceFile, int line, Instruction* stoppedInstruction) = 0;
     virtual void SetConsoleActive() = 0;
@@ -166,6 +167,7 @@ public:
     virtual void ProcessConsoleOutput(GdbConsoleOutputRecord* record) = 0;
     virtual void ProcessTargetOutput(GdbTargetOutputRecord* record) = 0;
     virtual void ProcessLogOutput(GdbLogOutputRecord* record) = 0;
+    const std::vector<Frame>& Frames() const { return frames; }
 private:
     std::string executable;
     std::vector<std::string> args;
@@ -177,6 +179,7 @@ private:
     Instruction* stoppedInstruction;
     std::unique_ptr<JsonValue> result;
     std::unique_ptr<JsonValue> stopResult;
+    std::vector<Frame> frames;
     bool verbose;
     std::unique_ptr<DebugInfo> debugInfo;
     std::unordered_map<Instruction*, GdbBreakpoint*> gdbBreakpointsByInstruction;

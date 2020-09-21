@@ -165,6 +165,62 @@ struct DeleteReply
     string error;
 }
 
+struct DepthRequest
+{
+    string messageKind;
+}
+
+struct DepthReply
+{
+    string messageKind;
+    bool success;
+    string depth;
+    string error;
+}
+
+struct FramesRequest
+{
+    string messageKind;
+    string lowFrame;
+    string highFrame;
+}
+
+struct FramesReply
+{
+    string messageKind;
+    bool success;
+    Location[] frames;
+    string error;
+}
+
+struct LocalCountRequest
+{
+    string messageKind;
+}
+
+struct LocalCountReply
+{
+    string messageKind;
+    bool success;
+    string count;
+    string error;
+}
+
+struct NameRequest
+{
+    string messageKind;
+    string start;
+    string count;
+}
+
+struct NameReply
+{
+    string messageKind;
+    bool success;
+    string[] names;
+    string error;
+}
+
 struct TargetRunningRequest
 {
     string messageKind;

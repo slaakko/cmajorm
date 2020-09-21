@@ -6,6 +6,7 @@
 #include <cmajor/cmdebug/Gdb.hpp>
 #include <cmajor/cmdebug/GdbReplyLexer.hpp>
 #include <cmajor/cmdebug/GdbReplyLineParser.hpp>
+#include <soulng/util/Path.hpp>
 #include <soulng/util/Process.hpp>
 #include <soulng/util/Log.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -647,7 +648,7 @@ void Gdb::Start(const std::string& executable, const std::vector<std::string>& a
     if (!args.empty())
     {
         startCommand.append(" --args");
-        startCommand.append(" \"").append(executable).append("\"");
+        startCommand.append(" \"").append(Path::MakeCanonical(executable)).append("\"");
         for (const std::string& arg : args)
         {
             startCommand.append(" \"").append(arg).append("\"");

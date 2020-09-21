@@ -649,26 +649,35 @@ std::u32string FunctionSymbol::FullName() const
     {
         fullName.append(1, U'.');
     }
-    fullName.append(groupName);
+    if (groupName == U"@constructor")
+    {
+        fullName.append(Parent()->Name());
+    }
+    else if (groupName == U"@destructor")
+    {
+        fullName.append(U"~").append(Parent()->Name());
+    }
+    else
+    {
+        fullName.append(groupName);
+    }
     fullName.append(1, U'(');
     int n = parameters.size();
-    for (int i = 0; i < n; ++i)
+    int startParamIndex = StartParamIndex();
+    for (int i = startParamIndex; i < n; ++i)
     {
-        if (i > 0)
+        if (i > startParamIndex)
         {
             fullName.append(U", ");
         }
         ParameterSymbol* parameter = parameters[i];
-        if (i == 0 && (groupName == U"@constructor" || groupName == U"operator=" || IsConstructorDestructorOrNonstaticMemberFunction()))
-        {
-            fullName.append(parameter->GetType()->RemovePointer(GetSpan())->FullName());
-        }
-        else
-        {
-            fullName.append(parameter->GetType()->FullName());
-        }
+        fullName.append(parameter->GetType()->FullName());
     }
     fullName.append(1, U')');
+    if (IsConst())
+    {
+        fullName.append(U" const");
+    }
     return fullName;
 }
 
@@ -1939,6 +1948,18 @@ void MemberFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     if ((specifiers & Specifiers::unit_test_) != Specifiers::none)
     {
         throw Exception(GetRootModuleForCurrentThread(), "member function cannot be unit_test", GetSpan());
+    }
+}
+
+int MemberFunctionSymbol::StartParamIndex() const
+{
+    if (IsStatic())
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
     }
 }
 

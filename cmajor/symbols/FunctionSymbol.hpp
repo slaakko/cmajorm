@@ -169,6 +169,7 @@ public:
     bool IsMoveConstructor() const;
     bool IsCopyAssignment() const;
     bool IsMoveAssignment() const;
+    virtual int StartParamIndex() const { return 0; }
     const boost::uuids::uuid& FunctionId() const { Assert(!functionId.is_nil(), "function id not initialized");  return functionId; }
     void SetFunctionId(const boost::uuids::uuid& functionId_) { functionId = functionId_; }
     const std::u32string& GroupName() const { return groupName; }
@@ -301,6 +302,7 @@ public:
     std::u32string CodeName() const override;
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "StaticConstructorSymbol"; }
+    int StartParamIndex() const override { return 0; }
 };
    
 class SYMBOLS_API ConstructorSymbol : public FunctionSymbol
@@ -318,6 +320,7 @@ public:
     TypeSymbol* ConversionTargetType() const override;
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "ConstructorSymbol"; }
+    int StartParamIndex() const override { return 1; }
 };
 
 class SYMBOLS_API DestructorSymbol : public FunctionSymbol
@@ -338,6 +341,7 @@ public:
     void SetGenerated() { generated = true; }
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "DestructorSymbol"; }
+    int StartParamIndex() const override { return 1; }
 private:
     bool generated;
 };
@@ -352,6 +356,7 @@ public:
     bool IsConstructorDestructorOrNonstaticMemberFunction() const override { return !IsStatic(); }
     void SetSpecifiers(Specifiers specifiers);
     const char* ClassName() const override { return "MemberFunctionSymbol"; }
+    int StartParamIndex() const override;
 };
 
 class SYMBOLS_API ConversionFunctionSymbol : public FunctionSymbol
@@ -370,6 +375,7 @@ public:
     std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "ConversionFunctionSymbol"; }
+    int StartParamIndex() const override { return 0; }
 };
 
 class SYMBOLS_API FunctionGroupTypeSymbol : public TypeSymbol

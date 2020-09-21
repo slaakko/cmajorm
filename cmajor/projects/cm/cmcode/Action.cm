@@ -104,9 +104,9 @@ namespace cmcode
 
     public class SetActiveProjectAction : ClickAction
     {
-        public nothrow SetActiveProjectAction(Window* window_, TreeView* treeView_, SolutionExplorerData* solutionExplorerData_, Cm.Ast.Solution* solution_,
+        public nothrow SetActiveProjectAction(MainWindow* mainWindow_, TreeView* treeView_, SolutionExplorerData* solutionExplorerData_, Cm.Ast.Solution* solution_,
             Cm.Ast.Project* project_, TreeViewNode* newActiveProjectNode_) :
-            base(), window(window_), treeView(treeView_), solutionExplorerData(solutionExplorerData_), solution(solution_), project(project_),
+            base(), mainWindow(mainWindow_), treeView(treeView_), solutionExplorerData(solutionExplorerData_), solution(solution_), project(project_),
             newActiveProjectNode(newActiveProjectNode_)
         {
         }
@@ -117,10 +117,11 @@ namespace cmcode
             newActiveProjectNode->SetActive(true);
             solutionExplorerData->SetActiveProjectNode(newActiveProjectNode);
             solution->SetActiveProject(project);
-            window->HideContextMenu();
+            mainWindow->HideContextMenu();
             treeView->Invalidate();
+            mainWindow->SetControlStatus(UserInterfaceAction.none);
         }
-        private Window* window;
+        private MainWindow* mainWindow;
         private TreeView* treeView;
         private SolutionExplorerData* solutionExplorerData;
         private Cm.Ast.Solution* solution;

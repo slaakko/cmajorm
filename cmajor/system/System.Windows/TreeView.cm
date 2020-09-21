@@ -78,6 +78,30 @@ namespace System.Windows
                 Invalidate();
             }
         }
+        public nothrow bool NodeVisible(TreeViewNode* node) const
+        {
+            Size size = GetSize();
+            Point contentLocation = ContentLocation();
+            Point nodeLocation = node->Location();
+            if (nodeLocation.y >= contentLocation.y && nodeLocation.y < contentLocation.y + size.h)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public List<TreeViewNode*> GetVisibleNodes(int level) const
+        {
+            List<TreeViewNode*> visibleNodes;
+            root->GetVisibleNodes(visibleNodes, this, level);
+            return visibleNodes;
+        }
+        public List<TreeViewNode*> GetVisibleNodes() const
+        {
+            return GetVisibleNodes(-1);
+        }
         protected override void OnPaint(PaintEventArgs& args)
         {
             try
@@ -392,7 +416,7 @@ namespace System.Windows
                 trackedNode = null;
             }
         }
-        private nothrow inline bool Changed() const
+        internal nothrow inline bool Changed() const
         {
             return (flags & Flags.changed) != Flags.none;
         }
@@ -404,7 +428,7 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags & ~Flags.changed);
         }
-        private nothrow inline bool TreeViewNodeChanged() const
+        internal nothrow inline bool TreeViewNodeChanged() const
         {
             return (flags & Flags.treeViewNodeChanged) != Flags.none;
         }
@@ -416,7 +440,7 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags & ~Flags.treeViewNodeChanged);
         }
-        private nothrow inline bool TreeViewNodeStateChanged() const
+        internal nothrow inline bool TreeViewNodeStateChanged() const
         {
             return (flags & Flags.treeViewNodeStateChanged) != Flags.none;
         }
@@ -669,7 +693,7 @@ namespace System.Windows
         {
             none = 0, mouseEntered = 1 << 0, selected = 1 << 1, active = 1 << 2
         }
-        public nothrow TreeViewNode(const string& text_) : treeView(null), text(text_), children(this), state(State.collapsed), flags(Flags.none)
+        public nothrow TreeViewNode(const string& text_) : treeView(null), text(text_), children(this), state(State.collapsed), flags(Flags.none), index(-1)
         {
         }
         public nothrow void SetTreeView(TreeView* treeView_)
@@ -714,6 +738,16 @@ namespace System.Windows
                 view->SetTreeViewNodeChanged();
             }
         }
+        public void RemoveChildren()
+        {
+            Component* component = children.FirstChild();
+            while (component != null)
+            {
+                Component* next = component->NextSibling();
+                UniquePtr<Component> removed = children.RemoveChild(component);
+                component = next;
+            }
+        }
         public nothrow int Level() const
         {
             TreeViewNode* parent = Parent();
@@ -723,6 +757,14 @@ namespace System.Windows
             }
             return 0;
         }
+        public nothrow inline int Index() 
+        {
+            return index;
+        }
+        public nothrow void SetIndex(int index_)
+        {
+            index = index_;
+        }
         public nothrow const Point& Location() const
         {
             return location;
@@ -731,7 +773,7 @@ namespace System.Windows
         {
             return size;
         }
-        internal nothrow void MeasureSize(Graphics& graphics, TreeView* treeView)
+        public nothrow void MeasureSize(Graphics& graphics, TreeView* treeView)
         {
             RectF textRect = graphics.MeasureStringChecked(text, treeView->GetNormalNodeFont(), PointF(0, 0), treeView->Format());
             size = Size(cast<int>(textRect.size.w), cast<int>(textRect.size.h));
@@ -1138,38 +1180,68 @@ namespace System.Windows
                 treeView->EnsureNodeVisible(this);
             }
         }
+        public void GetVisibleNodes(List<TreeViewNode*>& visibleNodes, TreeView* treeView, int selectLevel)
+        {
+            if (selectLevel == -1 || Level() == selectLevel)
+            {
+                if (treeView->NodeVisible(this))
+                {
+                    visibleNodes.Add(this);
+                }
+            }
+            if (state == State.expanded)
+            {
+                Component* child = children.FirstChild();
+                while (child != null)
+                {
+                    if (child is TreeViewNode*)
+                    {
+                        TreeViewNode* childNode = cast<TreeViewNode*>(child);
+                        childNode->GetVisibleNodes(visibleNodes, treeView, selectLevel);
+                    }
+                    child = child->NextSibling();
+                }
+            }
+        }
         public void Draw(Graphics& graphics, TreeView* treeView)
         {
+            bool isVisible = treeView->NodeVisible(this);
             Point loc = location;
             if (!children.IsEmpty())
             {
-                switch (state)
+                if (isVisible)
                 {
-                    case State.expanded:
+                    switch (state)
                     {
-                        graphics.DrawImageChecked(treeView->NodeExpandedBitmap(), PointF(loc.x, loc.y));
-                        break;
-                    }
-                    case State.collapsed:
-                    {
-                        graphics.DrawImageChecked(treeView->NodeCollapsedBitmap(), PointF(loc.x, loc.y));
-                        break;
+                        case State.expanded:
+                        {
+                            graphics.DrawImageChecked(treeView->NodeExpandedBitmap(), PointF(loc.x, loc.y));
+                            break;
+                        }
+                        case State.collapsed:
+                        {
+                            graphics.DrawImageChecked(treeView->NodeCollapsedBitmap(), PointF(loc.x, loc.y));
+                            break;
+                        }
                     }
                 }
                 loc.x = cast<int>(loc.x + treeView->TextHeight());
             }
-            if (Selected())
+            if (isVisible)
             {
-                Rect rect(loc, size);
-                graphics.FillRectangleChecked(treeView->NodeSelectedBrush(), rect);
-            }
-            if (Active())
-            {
-                graphics.DrawStringChecked(text, treeView->GetActiveNodeFont(), PointF(loc.x, loc.y), treeView->TextBrush());
-            }
-            else
-            {
-                graphics.DrawStringChecked(text, treeView->GetNormalNodeFont(), PointF(loc.x, loc.y), treeView->TextBrush());
+                if (Selected())
+                {
+                    Rect rect(loc, size);
+                    graphics.FillRectangleChecked(treeView->NodeSelectedBrush(), rect);
+                }
+                if (Active())
+                {
+                    graphics.DrawStringChecked(text, treeView->GetActiveNodeFont(), PointF(loc.x, loc.y), treeView->TextBrush());
+                }
+                else
+                {
+                    graphics.DrawStringChecked(text, treeView->GetNormalNodeFont(), PointF(loc.x, loc.y), treeView->TextBrush());
+                }
             }
             if (state == State.expanded)
             {
@@ -1241,5 +1313,6 @@ namespace System.Windows
         private Point location;
         private Size size;
         private Rect childRect;
+        private int index;
     }
 }

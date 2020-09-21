@@ -108,6 +108,17 @@ namespace System.Windows
                     args.handled = true;
                     break;
                 }
+                case Keys.back:
+                {
+                    if (caretCol > startInputCol)
+                    {
+                        --caretCol;
+                        SetCaretLineCol(caretLine, caretCol);
+                        DeleteChar();
+                    }
+                    args.handled = true;
+                    break;
+                }
                 case Keys.left:
                 {
                     if (caretCol > startInputCol)
@@ -188,9 +199,6 @@ namespace System.Windows
             ++caretCol;
             SetCaretLineCol(caretLine, caretCol);
             Invalidate();
-            LogView* log = Application.GetLogView();
-            log->WriteLine(ToUtf8(inputLine));
-            log->WriteLine(ToUtf8(line));
         }
         private nothrow void DeleteChar()
         {
@@ -204,9 +212,6 @@ namespace System.Windows
             lines[caretLine - 1] = line;
             DecrementCaretColorCount();
             Invalidate();
-            LogView* log = Application.GetLogView();
-            log->WriteLine(ToUtf8(inputLine));
-            log->WriteLine(ToUtf8(line));
         }
         public override void Clear()
         {

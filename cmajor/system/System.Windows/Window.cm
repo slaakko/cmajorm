@@ -13,11 +13,11 @@ namespace System.Windows
 
     public delegate int GetDialogResultFunction(void* dialogWindowPtr);
 
-    public delegate void DialogWindowKeyPreviewFunction(void* windowPtr, uint keyCode, bool keyDown, bool& handled);
+    public delegate void DialogWindowKeyPreviewFunction(void* windowPtr, uint keyCode, bool shift, bool control, bool alt, bool keyDown, bool& handled);
 
-    public delegate void ModelessWindowKeyPreviewFunction(uint keyCode, bool keyDown, bool& handled);
+    public delegate void ModelessWindowKeyPreviewFunction(uint keyCode, bool shift, bool control, bool alt, bool keyDown, bool& handled);
 
-    public class delegate void KeyPreviewMethod(Keys key, bool keyDown, bool& handled);
+    public class delegate void KeyPreviewMethod(Keys key, bool shift, bool control, bool alt, bool keyDown, bool& handled);
     
     public nothrow Color DefaultWindowBackgroundColor()
     {
@@ -57,7 +57,7 @@ namespace System.Windows
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
             const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_, WindowState state_) : 
             base(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors), flags(Flags.none), state(state_),
-            menuBar(null), contextMenu(null), defaultButton(null), cancelButton(null), focusedControl(null), dialogResult(DialogResult.none), keyPreviewMethod(), currentKeyPreviewModifierKeys(Keys.none),
+            menuBar(null), contextMenu(null), defaultButton(null), cancelButton(null), focusedControl(null), dialogResult(DialogResult.none), keyPreviewMethod(),
             fontFamilyName(fontFamilyName_), fontSize(fontSize_), fontStyle(fontStyle_)
         {
             SetKeyPreviewMethod(DefaultKeyPreview);
@@ -232,38 +232,24 @@ namespace System.Windows
                 cancelButton = null;
             }
         }
-        public void DefaultKeyPreview(Keys key, bool keyDown, bool& handled)
+        public void DefaultKeyPreview(Keys key, bool shift, bool control, bool alt, bool keyDown, bool& handled)
         {
-            switch (key)
-            {
-                case Keys.controlKey:
-                {
-                    if (keyDown)
-                    {
-                        currentKeyPreviewModifierKeys = cast<Keys>(currentKeyPreviewModifierKeys | Keys.controlModifier);
-                    }
-                    else
-                    {
-                        currentKeyPreviewModifierKeys = cast<Keys>(currentKeyPreviewModifierKeys & ~Keys.controlModifier);
-                    }
-                    break;
-                }
-                case Keys.shiftKey:
-                {
-                    if (keyDown)
-                    {
-                        currentKeyPreviewModifierKeys = cast<Keys>(currentKeyPreviewModifierKeys | Keys.shiftModifier);
-                    }
-                    else
-                    {
-                        currentKeyPreviewModifierKeys = cast<Keys>(currentKeyPreviewModifierKeys & ~Keys.shiftModifier);
-                    }
-                    break;
-                }
-            }
             if (keyDown)
             {
-                key = cast<Keys>(key | currentKeyPreviewModifierKeys);
+                Keys modifierKeys = Keys.none;
+                if (shift)
+                {
+                    modifierKeys = cast<Keys>(modifierKeys | Keys.shiftModifier);
+                }
+                if (control)
+                {
+                    modifierKeys = cast<Keys>(modifierKeys | Keys.controlModifier);
+                }
+                if (alt)
+                {
+                    modifierKeys = cast<Keys>(modifierKeys | Keys.altModifier);
+                }
+                key = cast<Keys>(key | modifierKeys);
                 switch (key)
                 {
                     case Keys.enter:
@@ -811,7 +797,6 @@ namespace System.Windows
         private Event<WindowClosedEventHandler> windowClosedEvent;
         private DialogResult dialogResult;
         private KeyPreviewMethod keyPreviewMethod;
-        private Keys currentKeyPreviewModifierKeys;
     }
 
     internal int GetDialogResult(void* dialogWindowPtr)
@@ -820,18 +805,18 @@ namespace System.Windows
         return dialogWindow->GetDialogResult();
     }
 
-    internal void DialogWindowKeyPreview(void* dialogWindowPtr, uint keyCode, bool keyDown, bool& handled)
+    internal void DialogWindowKeyPreview(void* dialogWindowPtr, uint keyCode, bool shift, bool control, bool alt, bool keyDown, bool& handled)
     {
         Window* dialogWindow = cast<Window*>(dialogWindowPtr);
         Keys key = cast<Keys>(cast<int>(keyCode));
         KeyPreviewMethod keyPreview = dialogWindow->GetKeyPreviewMethod();
         if (keyPreview != KeyPreviewMethod())
         {
-            keyPreview(key, keyDown, handled);
+            keyPreview(key, shift, control, alt, keyDown, handled);
         }
     }
 
-    internal void ModelessWindowKeyPreview(uint keyCode, bool keyDown, bool& handled)
+    internal void ModelessWindowKeyPreview(uint keyCode, bool shift, bool control, bool alt, bool keyDown, bool& handled)
     {
         Window* activeWindow = Application.GetActiveWindow();
         if (activeWindow != null)
@@ -840,7 +825,7 @@ namespace System.Windows
             KeyPreviewMethod keyPreview = activeWindow->GetKeyPreviewMethod();
             if (keyPreview != KeyPreviewMethod())
             {
-                keyPreview(key, keyDown, handled);
+                keyPreview(key, shift, control, alt, keyDown, handled);
             }
         }
     }

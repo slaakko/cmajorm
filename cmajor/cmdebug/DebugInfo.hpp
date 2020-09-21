@@ -211,6 +211,9 @@ public:
     const std::vector<std::unique_ptr<Instruction>>& Instructions() const { return instructions; }
     const std::vector<std::unique_ptr<FunctionScope>>& Scopes() const { return scopes; }
     ControlFlowGraph& GetControlFlowGraph() { return controlFlowGraph; }
+    const std::vector<DIVariable*>& LocalVariables() const { return localVariables; }
+    std::vector<DIVariable*>& LocalVariables() { return localVariables; }
+    void AddLocalVariable(DIVariable* localVariable);
 private:
     CompileUnit* compileUnit;
     int32_t fileIndex;
@@ -218,6 +221,7 @@ private:
     std::vector<std::unique_ptr<Instruction>> instructions;
     std::vector<std::unique_ptr<FunctionScope>> scopes;
     ControlFlowGraph controlFlowGraph;
+    std::vector<DIVariable*> localVariables;
 };
 
 class Project;

@@ -59,7 +59,12 @@ bool ContainsWildCard(const std::string& filePath)
     return filePath.find('*') != std::string::npos || filePath.find('?') != std::string::npos;
 }
 
-CommandLineProcessor::CommandLineProcessor() : commandLine(ToUtf32(std::u16string((char16_t*)GetCommandLineW()))), argc(0), argv(nullptr) 
+std::u32string GetCommandLineString()
+{
+    return ToUtf32(std::u16string((char16_t*)GetCommandLineW()));
+}
+
+CommandLineProcessor::CommandLineProcessor() : commandLine(GetCommandLineString()), argc(0), argv(nullptr)
 {
     commandLine = Trim(commandLine);
     commandLine.append(1, '\n');

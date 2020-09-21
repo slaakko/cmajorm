@@ -15,6 +15,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/random_generator.hpp>
+#include <algorithm>
 #include <stdexcept>
 #include <iostream>
 
@@ -22,6 +23,14 @@ namespace cmajor { namespace debug {
 
 using namespace soulng::util;
 using namespace soulng::unicode;
+
+struct VariableNameLess
+{
+    bool operator()(DIVariable* left, DIVariable* right) const
+    {
+        return left->Name() < right->Name();
+    }
+};
 
 std::string SourceSpan::ToString() const
 {
@@ -357,6 +366,11 @@ Instruction* CompileUnitFunction::GetInstruction(int index) const
 void CompileUnitFunction::AddScope(FunctionScope* scope)
 {
     scopes.push_back(std::unique_ptr<FunctionScope>(scope));
+}
+
+void CompileUnitFunction::AddLocalVariable(DIVariable* localVariable)
+{
+    localVariables.push_back(localVariable);
 }
 
 CompileUnit::CompileUnit(Project* project_, const std::string& baseName_) : project(project_), baseName(baseName_)
@@ -1212,7 +1226,12 @@ std::unique_ptr<DebugInfo> ReadDebugInfo(const std::string& cmdbFilePath)
                         localVariable->Read(reader);
                         scope->AddLocalVariable(localVariable);
                         localVariable->SetProject(project.get());
+                        if (!StartsWith(localVariable->Name(), "@"))
+                        {
+                            compileUnitFunction->AddLocalVariable(localVariable);
+                        }
                     }
+                    std::sort(compileUnitFunction->LocalVariables().begin(), compileUnitFunction->LocalVariables().end(), VariableNameLess());
                     compileUnitFunction->AddScope(scope.release());
                 }
                 int32_t controlFlowGraphNodeCount;

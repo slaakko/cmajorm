@@ -1,0 +1,64 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace cmcode
+{
+    public class ProgramArgumentsDialog : Window
+    {
+        public ProgramArgumentsDialog() :
+            base("cmcode.ProgramArgumentsDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(),
+            "Program Arguments", Point.Default(),
+            Size(ScreenMetrics.Get().MMToHorizontalPixels(140), ScreenMetrics.Get().MMToVerticalPixels(50)), Dock.none, Anchors.none, WindowState.normal)
+        {
+            Size s = GetSize();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            UniquePtr<TextBox> textBoxPtr(new TextBox("",
+                Point(2 * defaultControlSpacing.w, 2 * defaultControlSpacing.h),
+                Size(ScreenMetrics.Get().MMToHorizontalPixels(120), ScreenMetrics.Get().MMToHorizontalPixels(5)), Dock.none, Anchors.none));
+            textBox = textBoxPtr.Get();
+            textBox->TextChangedEvent().AddHandler(TextBoxTextChanged);
+            UniquePtr<Control> borderedTextBox(new BorderedControl(
+                textBoxPtr.Release(), Point(2 * defaultControlSpacing.w - 1, 2 * defaultControlSpacing.h - 1),
+                Size(ScreenMetrics.Get().MMToHorizontalPixels(120) + 2, ScreenMetrics.Get().MMToHorizontalPixels(5) + 2),
+                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedTextBox.Release());
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            okButton = okButtonPtr.Get();
+            okButton->SetDialogResult(DialogResult.ok);
+            AddChild(okButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(okButton);
+            SetCancelButton(cancelButton);
+            textBox->SetFocus();
+        }
+        private void TextBoxTextChanged()
+        {
+            arguments = textBox->Text();
+        }
+        public nothrow void SetProgramArguments(const string& programArguments)
+        {
+            textBox->SetText(programArguments);
+        }
+        public nothrow const string& ProgramArguments() const
+        {
+            return arguments;
+        }
+        private Button* cancelButton;
+        private Button* okButton;
+        private TextBox* textBox;
+        private string arguments;
+    }
+}

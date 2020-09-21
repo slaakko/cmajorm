@@ -418,6 +418,24 @@ void Debugger::StartDebugging()
     {
         OutputWriter()->WriteLogMessage("starting GDB...");
     }
+    if (Verbose())
+    {
+        std::string argsStr;
+        bool first = true;
+        for (const std::string& arg : args)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                argsStr.append(" ");
+            }
+            argsStr.append(arg);
+        }
+        OutputWriter()->WriteLogMessage("executable=" + executable + ", args=[" + argsStr + "]");
+    }
     StartGDB(executable, args, *this);
     if (Verbose())
     {
@@ -1215,6 +1233,7 @@ void Debugger::Depth()
 
 void Debugger::Frames(int low, int high)
 {
+    frames.clear();
     result.reset(new JsonObject());
     GdbStackListFramesCommand stackListFrames(low, high);
     bool succeeded = ExecuteGDBCommand(stackListFrames);
@@ -2111,12 +2130,14 @@ void Debugger::ProcessStackListFramesReply(GdbReply* reply)
                         {
                             Frame cmajorFrame = instruction->GetCmajorFrame();
                             cmajorFrame.level = cppFrame.level;
+                            frames.push_back(cmajorFrame);
                             framesArray->AddItem(cmajorFrame.ToJson(true));
                         }
                         else
                         {
                             Frame frame;
                             frame.level = cppFrame.level;
+                            frames.push_back(frame);
                             framesArray->AddItem(frame.ToJson(true));
                         }
                     }
@@ -2124,6 +2145,7 @@ void Debugger::ProcessStackListFramesReply(GdbReply* reply)
                     {
                         Frame frame;
                         frame.level = cppFrame.level;
+                        frames.push_back(frame);
                         framesArray->AddItem(frame.ToJson(true));
                     }
                 }

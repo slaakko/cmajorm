@@ -46,6 +46,7 @@ namespace cmcode
             mainWindow->SaveBackendConfig();
             mainWindow->SetControlStatus(UserInterfaceAction.debug);
             mainWindow->ResetDebugLocation();
+            mainWindow->SetTargetStopped(false);
         }
         public nothrow void SetStartFailed()
         {
@@ -62,6 +63,7 @@ namespace cmcode
                 mainWindow->SetControlStatus(UserInterfaceAction.debugging);
             }
             mainWindow->RestoreBackendConfig();
+            mainWindow->SetTargetStopped(true);
         }
         private MainWindow* mainWindow;
         private bool startFailed;
@@ -108,9 +110,10 @@ namespace cmcode
     {
         public MainWindow(const string& filePath) :
             base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
-            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false)
+            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true)
         {
-            UniquePtr<MenuBar> menuBar(new MenuBar());
+            UniquePtr<MenuBar> menuBarPtr(new MenuBar());
+            menuBar = menuBarPtr.Get();
             menuBar->DisableMenuKey();
             UniquePtr<MenuItem> fileMenuItem(new MenuItem("&File"));
             UniquePtr<MenuItem> newProjectMenuItemPtr(new MenuItem("&New Project..."));
@@ -143,6 +146,15 @@ namespace cmcode
             exitMenuItem->ClickEvent().AddHandler(ExitClick);
             fileMenuItem->AddMenuItem(exitMenuItem.Release());
             menuBar->AddMenuItem(fileMenuItem.Release());
+
+            UniquePtr<MenuItem> viewMenuItem(new MenuItem("&View"));
+            UniquePtr<MenuItem> callStackMenuItemPtr(new MenuItem("&Call Stack"));
+            callStackMenuItemPtr->ClickEvent().AddHandler(ViewCallStackClick);
+            viewMenuItem->AddMenuItem(callStackMenuItemPtr.Release());
+            UniquePtr<MenuItem> localsMenuItemPtr(new MenuItem("&Locals"));
+            localsMenuItemPtr->ClickEvent().AddHandler(ViewLocalsClick);
+            viewMenuItem->AddMenuItem(localsMenuItemPtr.Release());
+            menuBar->AddMenuItem(viewMenuItem.Release());
 
             UniquePtr<MenuItem> buildMenuItem(new MenuItem("&Build"));
             UniquePtr<MenuItem> buildSolutionMenuItemPtr(new MenuItem("&Build Solution"));
@@ -218,6 +230,12 @@ namespace cmcode
             toggleBreakpointMenuItem->ClickEvent().AddHandler(ToggleBreakpointClick);
             debugMenuItem->AddMenuItem(toggleBreakpointMenuItemPtr.Release());
 
+            debugMenuItem->AddMenuItem(new MenuItemSeparator());
+            UniquePtr<MenuItem> programArgumentsMenuItemPtr(new MenuItem("&Program Arguments..."));
+            programArgumentsMenuItem = programArgumentsMenuItemPtr.Get();
+            programArgumentsMenuItem->ClickEvent().AddHandler(ProgramArgumentsClick);
+            debugMenuItem->AddMenuItem(programArgumentsMenuItemPtr.Release());
+
             menuBar->AddMenuItem(debugMenuItem.Release());
 
             UniquePtr<MenuItem> windowMenuItem(new MenuItem("&Window"));
@@ -229,7 +247,8 @@ namespace cmcode
             closeExternalTabsMenuItem->ClickEvent().AddHandler(CloseExternalTabsClick);
             windowMenuItem->AddMenuItem(closeExternalTabsMenuItem.Release());
             menuBar->AddMenuItem(windowMenuItem.Release());
-            AddChild(menuBar.Release());
+            AddChild(menuBarPtr.Release());
+
             UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, ToolButtonToolTipColor(), Color.DefaultBitmapTransparent(), ToolBar.Style.regular,
                 Padding(4, 4, 4, 4), Padding(2, 0, 2, 0)));
             toolBar = toolBarPtr.Get();
@@ -386,7 +405,8 @@ namespace cmcode
             verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.Release());
             UniquePtr<TabControl> outputTabControlPtr(new TabControl(Point(), Size(), Dock.none, Anchors.none));
             outputTabControl = outputTabControlPtr.Get();
-            outputTabControl->ControlRemovedEvent().AddHandler(OutputControlTabPageRemoved);
+            outputTabControl->ControlRemovedEvent().AddHandler(OutputTabControlTabPageRemoved);
+            outputTabControl->TabPageSelectedEvent().AddHandler(OutputTabControlTabPageSelected);
             UniquePtr<Control> paddedOutputTabControl(new PaddedControl(outputTabControlPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> borderedOutputTabControl(new BorderedControl(paddedOutputTabControl.Release(), BorderStyle.single, DefaultTabControlFrameColor(),
                 TabControlSelectedBorderColor(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
@@ -593,7 +613,7 @@ namespace cmcode
                 sourceFilePathStatusBarItem->SetText("");
             }
         }
-        private void OutputControlTabPageRemoved(ControlEventArgs& args)
+        private void OutputTabControlTabPageRemoved(ControlEventArgs& args)
         {
             Control* removedControl = args.control;
             if (removedControl is TabPage*)
@@ -609,10 +629,40 @@ namespace cmcode
                     consoleTabPage = null;
                     console = null;
                 }
+                else if (removedTabPage == callStackTabPage)
+                {
+                    callStackTabPage = null;
+                    callStack = null;
+                }
+                else if (removedTabPage == localsTabPage)
+                {
+                    localsTabPage = null;
+                    locals = null;
+                }
                 else if (removedTabPage == logTabPage)
                 {
                     logTabPage = null;
                     Application.SetLogView(null);
+                }
+            }
+        }
+        private void OutputTabControlTabPageSelected()
+        {
+            TabPage* tabPage = outputTabControl->SelectedTabPage();
+            if (tabPage == callStackTabPage)
+            {
+                if (Debugging() && targetStopped)
+                {
+                    callStack->SetDebugService(debugService.Get());
+                    callStack->Invalidate();
+                }
+            }
+            else if (tabPage == localsTabPage)
+            {
+                if (Debugging() && targetStopped)
+                {
+                    locals->SetDebugService(debugService.Get());
+                    locals->Invalidate();
                 }
             }
         }
@@ -982,7 +1032,7 @@ namespace cmcode
             Console* con = GetConsole();
             return consoleTabPage;
         }
-        internal void StartBuild(const BuildRequest& buildRequest)
+        internal bool StartBuild(const BuildRequest& buildRequest)
         {
             try
             {
@@ -991,12 +1041,14 @@ namespace cmcode
                 BuildGuard buildGuard(this);
                 Application.ProcessMessages();
                 GetBuildService().ProcessBuildRequest(buildRequest);
+                return true;
             }
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
                 LogException(ex);
             }
+            return false;
         }
         private BuildService& GetBuildService()
         {
@@ -1064,6 +1116,7 @@ namespace cmcode
         {
             try
             {
+                buildSucceeded = false;
                 if (solution.IsNull())
                 {
                     throw Exception("no solution is open");
@@ -1073,7 +1126,10 @@ namespace cmcode
                 {
                     BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), activeProject->FilePath(),
                         cast<BuildRequestKind>(BuildRequestKind.build | BuildRequestKind.buildDependencies));
-                    StartBuild(buildRequest);
+                    if (StartBuild(buildRequest))
+                    {
+                        buildSucceeded = true;
+                    }
                 }
                 else
                 {
@@ -1312,6 +1368,41 @@ namespace cmcode
         {
             return !debugService.IsNull();
         }
+        private nothrow void ClearDebuggingWindows()
+        {
+            if (callStack != null)
+            {
+                callStack->Clear();
+            }
+            else if (locals != null)
+            {
+                locals->Clear();
+            }
+        }
+        private void UpdateDebuggingWindows()
+        {
+            if (callStack != null)
+            {
+                callStack->SetDebugService(debugService.Get());
+                callStack->Invalidate();
+            }
+            else if (locals != null)
+            {
+                locals->SetDebugService(debugService.Get());
+                locals->Invalidate();
+            }
+        }
+        private void CloseDebuggingWindows()
+        {
+            if (callStackTabPage != null)
+            {
+                callStackTabPage->Close();
+            }
+            else if (localsTabPage != null)
+            {
+                localsTabPage->Close();
+            }
+        }
         private void StartDebugService(const string& backend, const string& config, DebugGuard& debugGuard)
         {
             try
@@ -1329,7 +1420,7 @@ namespace cmcode
                             throw Exception("project '" + ToUtf8(project->Name()) + "' is a library project");
                         }
                         debugService.Reset(new DebugService(DebugServiceArgs().Log(true).DebugServer(false).Verbose(true).Backend(backend).Config(config).
-                            ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name()))));
+                            ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments)));
                         debugService->SetLogMessageNotificationFunction(DebugServiceLogMessagesAvailable);
                         debugService->SetWriteTargetOutputMethod(WriteTargetOutput);
                         debugService->SetReadTargetInputMethod(ReadTargetInput);
@@ -1337,6 +1428,8 @@ namespace cmcode
                         debugService->SetTargetRunningMethod(TargetRunning);
                         debugService->Start(solutionExplorerData->breakpointCollection);
                         debugTabPage = codeTabControl->SelectedTabPage();
+                        startDebuggingToolButton->SetToolTip("Continue (F5)");
+                        startDebuggingMenuItem->SetText("Continue", menuBar);
                     }
                 }
             }
@@ -1350,6 +1443,11 @@ namespace cmcode
         {
             try
             {
+                if (debugService.IsNull())
+                {
+                    BuildActiveProjectClick();
+                    if (!buildSucceeded) return;
+                }
                 string backend = GetBackend();
                 string config = GetConfig();
                 {
@@ -1360,8 +1458,11 @@ namespace cmcode
                     }
                     if (!debugService.IsNull())
                     {
+                        ClearDebuggingWindows();
+                        ResetDebugLocation();
                         debugService->Continue();
                         debugTabPage = codeTabControl->SelectedTabPage();
+                        UpdateDebuggingWindows();
                     }
                 }
                 if (!debugService.IsNull())
@@ -1395,6 +1496,9 @@ namespace cmcode
                     {
                         debugService->Stop();
                         debugService.Reset();
+                        CloseDebuggingWindows();
+                        startDebuggingToolButton->SetToolTip("Start Debugging (F5)");
+                        startDebuggingMenuItem->SetText("&Start Debugging (F5)", menuBar);
                     }
                 }
             }
@@ -1408,6 +1512,11 @@ namespace cmcode
         {
             try
             {
+                if (debugService.IsNull())
+                {
+                    BuildActiveProjectClick();
+                    if (!buildSucceeded) return;
+                }
                 string backend = GetBackend();
                 string config = GetConfig();
                 {
@@ -1418,8 +1527,10 @@ namespace cmcode
                     }
                     else
                     {
+                        ClearDebuggingWindows();
                         debugService->Next();
                         debugTabPage = codeTabControl->SelectedTabPage();
+                        UpdateDebuggingWindows();
                     }
                 }
                 if (!debugService.IsNull())
@@ -1440,6 +1551,11 @@ namespace cmcode
         {
             try
             {
+                if (debugService.IsNull())
+                {
+                    BuildActiveProjectClick();
+                    if (!buildSucceeded) return;
+                }
                 string backend = GetBackend();
                 string config = GetConfig();
                 {
@@ -1450,8 +1566,10 @@ namespace cmcode
                     }
                     else
                     {
+                        ClearDebuggingWindows();
                         debugService->Step();
                         debugTabPage = codeTabControl->SelectedTabPage();
+                        UpdateDebuggingWindows();
                     }
                 }
                 if (!debugService.IsNull())
@@ -1476,8 +1594,10 @@ namespace cmcode
                     DebugGuard debugGuard(this);
                     if (!debugService.IsNull())
                     {
+                        ClearDebuggingWindows();
                         debugService->Finish();
                         debugTabPage = codeTabControl->SelectedTabPage();
+                        UpdateDebuggingWindows();
                     }
                 }
                 if (!debugService.IsNull())
@@ -1509,6 +1629,126 @@ namespace cmcode
                         {
                             sourceCodeView->ToggleBreakpoint();
                         }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                debugService.Reset();
+            }
+        }
+        private void ProgramArgumentsClick()
+        {
+            try
+            {
+                ProgramArgumentsDialog dialogWindow;
+                dialogWindow.SetProgramArguments(programArguments);
+                if (dialogWindow.ShowDialog(*this)  == DialogResult.ok)
+                {
+                    programArguments = dialogWindow.ProgramArguments();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                debugService.Reset();
+            }
+        }
+        private Cm.Views.CallStack* GetCallStack()
+        {
+            if (callStack == null)
+            {
+                UniquePtr<TabPage> callStackTabPagePtr(new TabPage("Call Stack", "callStack"));
+                callStackTabPage = callStackTabPagePtr.Get();
+                UniquePtr<Cm.Views.CallStack> callStackPtr(new Cm.Views.CallStack());
+                callStack = callStackPtr.Get();
+                callStack->UpdateCallStackEvent().AddHandler(UpdateCallStack);
+                callStack->FrameSelectedEvent().AddHandler(CallStackFrameSelected);
+                callStackTabPage->AddChild(callStackPtr.Release());
+                outputTabControl->AddTabPage(callStackTabPagePtr.Release());
+            }
+            return callStack;
+        }
+        private TabPage* GetCallStackTabPage()
+        {
+            if (callStack == null)
+            {
+                GetCallStack();
+            }
+            return callStackTabPage;
+        }
+        private void UpdateCallStack(Cm.Views.UpdateCallStackEventArgs& args)
+        {
+            args.debugging = Debugging();
+            args.targetStopped = targetStopped;
+        }
+        private void CallStackFrameSelected(Cm.Views.FrameSelectedEventArgs& args)
+        {
+            Cm.Service.Debug.Location* frame = args.frame;
+            selectedFrameLocation = *frame;
+            SetDebugLocation(selectedFrameLocation, false);
+        }
+        private void ViewCallStackClick()
+        {
+            try
+            {
+                TabPage* callStackTabPage = GetCallStackTabPage();
+                callStackTabPage->Select();
+                if (callStack != null)
+                {
+                    if (Debugging() && targetStopped)
+                    {
+                        callStack->SetDebugService(debugService.Get());
+                        callStack->Invalidate();
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                debugService.Reset();
+            }
+        }
+        private Cm.Views.Locals* GetLocals()
+        {
+            if (locals == null)
+            {
+                UniquePtr<TabPage> localsTabPagePtr(new TabPage("Locals", "locals"));
+                localsTabPage = localsTabPagePtr.Get();
+                UniquePtr<Cm.Views.Locals> localsPtr(new Cm.Views.Locals());
+                locals = localsPtr.Get();
+                locals->UpdateLocalsEvent().AddHandler(UpdateLocals);
+                localsTabPage->AddChild(localsPtr.Release());
+                outputTabControl->AddTabPage(localsTabPagePtr.Release());
+            }
+            return locals;
+        }
+        private TabPage* GetLocalsTabPage()
+        {
+            if (locals == null)
+            {
+                GetLocals();
+            }
+            return localsTabPage;
+        }
+        private void UpdateLocals(Cm.Views.UpdateLocalsEventArgs& args)
+        {
+            args.debugging = Debugging();
+            args.targetStopped = targetStopped;
+        }
+        private void ViewLocalsClick()
+        {
+            try
+            {
+                TabPage* localsTabPage = GetLocalsTabPage();
+                localsTabPage->Select();
+                if (locals != null)
+                {
+                    if (Debugging() && targetStopped)
+                    {
+                        locals->SetDebugService(debugService.Get());
+                        locals->Invalidate();
                     }
                 }
             }
@@ -1598,8 +1838,10 @@ namespace cmcode
                     Cm.Views.CmajorEditor* editor = sourceCodeView->GetEditor();
                     if (editor != null)
                     {
+                        ClearDebuggingWindows();
                         debugService->Until(editor->FilePath(), sourceCodeView->CaretLine());
                         debugTabPage = codeTabControl->SelectedTabPage();
+                        UpdateDebuggingWindows();
                     }
                 }
                 if (!debugService.IsNull())
@@ -1649,9 +1891,9 @@ namespace cmcode
         private void ShowNextStatementClick()
         {
             Cm.Service.Debug.Location loc = latestDebugLocation;
-            SetDebugLocation(loc);
+            SetDebugLocation(loc, false);
         }
-        private void SetDebugLocation(const Cm.Service.Debug.Location& location)
+        private void SetDebugLocation(const Cm.Service.Debug.Location& location, bool saveLatest)
         {
             try
             {
@@ -1660,9 +1902,12 @@ namespace cmcode
                 {
                     return;
                 }
-                if (latestDebugLocation != location)
+                if (saveLatest)
                 {
-                    latestDebugLocation = location;
+                    if (latestDebugLocation != location)
+                    {
+                        latestDebugLocation = location;
+                    }
                 }
                 TabPage* tabPage = codeTabControl->GetTabPageByKey(filePath);
                 Cm.Views.CmajorEditor* editor = null;
@@ -1741,6 +1986,10 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        public nothrow void SetTargetStopped(bool targetStopped_)
+        {
+            targetStopped = targetStopped_;
+        }
         internal void SaveBackendConfig()
         {
             backendConfig = BackendConfig.none;
@@ -1807,6 +2056,7 @@ namespace cmcode
             stepOverToolButton->Disable();
             stepIntoToolButton->Disable();
             stepOutToolButton->Disable();
+            programArgumentsMenuItem->Disable();
 
             closeSolutionMenuItem->Disable();
             buildSolutionMenuItem->Disable();
@@ -1886,6 +2136,17 @@ namespace cmcode
                     rebuildActiveProjectMenuItem->Enable();
                     cleanActiveProjectMenuItem->Enable();
                 }
+
+                if (solution->ActiveProject() != null)
+                {
+                    Cm.Ast.Project* activeProject = solution->ActiveProject();
+                    if (activeProject->GetTarget() == Cm.Ast.Target.program ||
+                        activeProject->GetTarget() == Cm.Ast.Target.winapp ||
+                        activeProject->GetTarget() == Cm.Ast.Target.winguiapp)
+                    {
+                        programArgumentsMenuItem->Enable();
+                    }
+                }
             }
 
             TabPage* selectedCodeTabPage = codeTabControl->SelectedTabPage();
@@ -1916,6 +2177,10 @@ namespace cmcode
         private TabPage* outputTabPage;
         private Console* console;
         private TabPage* consoleTabPage;
+        private Cm.Views.CallStack* callStack;
+        private TabPage* callStackTabPage;
+        private Cm.Views.Locals* locals;
+        private TabPage* localsTabPage;
         private TabPage* debugTabPage;
         private ToolBar* toolBar;
         private TreeView* solutionExplorerTreeView;
@@ -1923,6 +2188,7 @@ namespace cmcode
         private StatusBarItem* sourceFilePathStatusBarItem;
         private HashMap<TabPage*, Cm.Views.CmajorEditor*> editorByTabPageMap;
 
+        private MenuBar* menuBar;
         private MenuItem* newProjectMenuItem;
         private MenuItem* openProjectMenuItem;
         private MenuItem* closeSolutionMenuItem;
@@ -1942,6 +2208,7 @@ namespace cmcode
         private MenuItem* stepIntoMenuItem;
         private MenuItem* stepOutMenuItem;
         private MenuItem* toggleBreakpointMenuItem;
+        private MenuItem* programArgumentsMenuItem;
 
         private ToolButton* saveToolButton;
         private ToolButton* saveAllToolButton;
@@ -1962,7 +2229,11 @@ namespace cmcode
         private UniquePtr<BuildService> buildService;
         private UniquePtr<DebugService> debugService;
         private Cm.Service.Debug.Location latestDebugLocation;
+        private Cm.Service.Debug.Location selectedFrameLocation;
         private bool stopPending;
+        private bool targetStopped;
+        private bool buildSucceeded;
+        private string programArguments;
     }
 }
 

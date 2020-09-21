@@ -1753,11 +1753,18 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
     {
         mainFunction = new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr);
     }
+    if (platform != "windows")
+    {
+        mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
+        mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
+    }
+/*
     if (!vsToolChain)
     {
         mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
         mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
     }
+*/
     mainFunction->SetProgramMain();
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
@@ -1792,6 +1799,18 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
         rtInitCall = new ExpressionStatementNode(Span(), invokeRtInit);
     }
     mainFunctionBody->AddStatement(rtInitCall);
+
+    if (platform == "windows")
+    {
+        ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
+        argc->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgc")));
+        mainFunctionBody->AddStatement(argc);
+        ConstructionStatementNode* argv = new ConstructionStatementNode(Span(), new ConstNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span())))), new IdentifierNode(Span(), U"argv"));
+        argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
+        mainFunctionBody->AddStatement(argv);
+    }
+
+    /*
     if (vsToolChain)
     {
         ConstructionStatementNode* argc = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc"));
@@ -1801,6 +1820,7 @@ void CreateMainUnitCpp(std::vector<std::string>& objectFilePaths, Module& module
         argv->AddArgument(new InvokeNode(Span(), new IdentifierNode(Span(), U"RtArgv")));
         mainFunctionBody->AddStatement(argv);
     }
+*/
     CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
     if (!module.GetSymbolTable().JsonClasses().empty())
     {

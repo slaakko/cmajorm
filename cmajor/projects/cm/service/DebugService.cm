@@ -16,7 +16,7 @@ namespace Cm.Service.Debug
     public int defaultSessionPort = 54322;
     public class delegate void WriteTargetOutputMethod(int handle, const string& targetOutput);
     public class delegate void ReadTargetInputMethod(string& targetInput, bool& eof);
-    public class delegate void SetDebugLocationMethod(const Location& location);
+    public class delegate void SetDebugLocationMethod(const Location& location, bool saveLatest);
     public class delegate void TargetRunningMethod();
 
     public class DebugServiceArgs
@@ -81,6 +81,11 @@ namespace Cm.Service.Debug
             executableName = executableName_;
             return *this;
         }
+        public nothrow DebugServiceArgs& Arguments(const string& arguments_)
+        {
+            arguments = arguments_;
+            return *this;
+        }
         public nothrow string GetExecutablePath() const
         {
             string executablePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.GetDirectoryName(projectFilePath), "bin"), backend),
@@ -98,7 +103,7 @@ namespace Cm.Service.Debug
         public string config;
         public string projectFilePath;
         public string executableName;
-        public List<string> arguments;
+        public string arguments;
     }
 
     public class RequestGuard
@@ -146,9 +151,9 @@ namespace Cm.Service.Debug
                 serverStartCommand.Append(" --verbose");
             }
             serverStartCommand.Append(" \"").Append(args.GetExecutablePath()).Append("\"");
-            for (const string& arg : args.arguments)
+            if (!args.arguments.IsEmpty())
             {
-                serverStartCommand.Append(" \"").Append(arg).Append("\"");
+                serverStartCommand.Append(" ").Append(args.arguments);
             }
         }
         public nothrow void SetWriteTargetOutputMethod(const WriteTargetOutputMethod& writeTargetOutput_)
@@ -188,6 +193,14 @@ namespace Cm.Service.Debug
             messageKindMap["breakReply"] = MessageKind.breakReply;
             messageKindMap["deleteRequest"] = MessageKind.deleteRequest;
             messageKindMap["deleteReply"] = MessageKind.deleteReply;
+            messageKindMap["depthRequest"] = MessageKind.depthRequest;
+            messageKindMap["depthReply"] = MessageKind.depthReply;
+            messageKindMap["framesRequest"] = MessageKind.framesRequest;
+            messageKindMap["framesReply"] = MessageKind.framesReply;
+            messageKindMap["localCountRequest"] = MessageKind.localCountRequest;
+            messageKindMap["localCountReply"] = MessageKind.localCountReply;
+            messageKindMap["nameRequest"] = MessageKind.nameRequest;
+            messageKindMap["nameReply"] = MessageKind.nameReply;
             messageKindMap["targetRunningRequest"] = MessageKind.targetRunningRequest;
             messageKindMap["targetRunningReply"] = MessageKind.targetRunningReply;
             messageKindMap["targetInputRequest"] = MessageKind.targetInputRequest;
@@ -272,7 +285,7 @@ namespace Cm.Service.Debug
                 }
                 if (setDebugLocation != SetDebugLocationMethod())
                 {
-                    setDebugLocation(startReply.location);
+                    setDebugLocation(startReply.location, true);
                 }
             }
             else
@@ -335,7 +348,7 @@ namespace Cm.Service.Debug
             {
                 if (setDebugLocation != SetDebugLocationMethod())
                 {
-                    setDebugLocation(continueReply.location);
+                    setDebugLocation(continueReply.location, true);
                 }
                 ProcessStopReason(continueReply.state);
             }
@@ -365,7 +378,7 @@ namespace Cm.Service.Debug
             {
                 if (setDebugLocation != SetDebugLocationMethod())
                 {
-                    setDebugLocation(nextReply.location);
+                    setDebugLocation(nextReply.location, true);
                 }
                 ProcessStopReason(nextReply.state);
             }
@@ -395,7 +408,7 @@ namespace Cm.Service.Debug
             {
                 if (setDebugLocation != SetDebugLocationMethod())
                 {
-                    setDebugLocation(stepReply.location);
+                    setDebugLocation(stepReply.location, true);
                 }
                 ProcessStopReason(stepReply.state);
             }
@@ -425,7 +438,7 @@ namespace Cm.Service.Debug
             {
                 if (setDebugLocation != SetDebugLocationMethod())
                 {
-                    setDebugLocation(finishReply.location);
+                    setDebugLocation(finishReply.location, true);
                 }
                 ProcessStopReason(finishReply.state);
             }
@@ -458,7 +471,7 @@ namespace Cm.Service.Debug
             {
                 if (setDebugLocation != SetDebugLocationMethod())
                 {
-                    setDebugLocation(untilReply.location);
+                    setDebugLocation(untilReply.location, true);
                 }
                 ProcessStopReason(untilReply.state);
             }
@@ -519,6 +532,124 @@ namespace Cm.Service.Debug
             else
             {
                 LogMessage("delete request failed: " + deleteReply.error);
+            }
+        }
+        public int Depth()
+        {
+            RequestGuard requestGuard(this);
+            SendDepthRequest();
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.depthReply);
+            int depth = -1;
+            ProcessDepthReply(reply.Get(), depth);
+            return depth;
+        }
+        private void SendDepthRequest()
+        {
+            DepthRequest depthRequest;
+            UniquePtr<JsonValue> request = depthRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessDepthReply(JsonValue* reply, int& depth)
+        {
+            DepthReply depthReply(reply);
+            if (depthReply.success)
+            {
+                depth = ParseInt(depthReply.depth); 
+            }
+            else
+            {
+                LogMessage("depth request failed: " + depthReply.error);
+            }
+        }
+        public Pair<List<Location>, bool> Frames(int lowFrame, int highFrame)
+        {
+            RequestGuard requestGuard(this);
+            SendFramesRequest(lowFrame, highFrame);
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.framesReply);
+            return ProcessFramesReply(reply.Get());
+        }
+        private void SendFramesRequest(int lowFrame, int highFrame)
+        {
+            FramesRequest framesRequest;
+            framesRequest.lowFrame = ToString(lowFrame);
+            framesRequest.highFrame = ToString(highFrame);
+            UniquePtr<JsonValue> request = framesRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private Pair<List<Location>, bool> ProcessFramesReply(JsonValue* reply)
+        {
+            FramesReply framesReply(reply);
+            if (framesReply.success)
+            {
+                return MakePair(framesReply.frames, true);
+            }
+            else
+            {
+                LogMessage("frames request failed: " + framesReply.error);
+                return MakePair(List<Location>(), false);
+            }
+        }
+        public int LocalCount()
+        {
+            RequestGuard requestGuard(this);
+            SendLocalCountRequest();
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.localCountReply);
+            int count = -1;
+            ProcessLocalCountReply(reply.Get(), count);
+            return count;
+        }
+        private void SendLocalCountRequest()
+        {
+            LocalCountRequest localCountRequest;
+            UniquePtr<JsonValue> request = localCountRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private void ProcessLocalCountReply(JsonValue* reply, int& count)
+        {
+            LocalCountReply localCountReply(reply);
+            if (localCountReply.success)
+            {
+                try
+                {
+                    count = ParseInt(localCountReply.count);
+                }
+                catch (const Exception& ex)
+                {
+                    LogMessage("localCount request failed: count not valid: " + ex.Message());
+                    count = -1;
+                }
+            }
+            else
+            {
+                LogMessage("localCount request failed: " + localCountReply.error);
+                count = -1;
+            }
+        }
+        public Pair<List<string>, bool> Names(int start, int count)
+        {
+            SendNameRequest(start, count);
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.nameReply);
+            return ProcessNameReply(reply.Get());
+        }
+        private void SendNameRequest(int start, int count)
+        {
+            NameRequest nameRequest;
+            nameRequest.start = ToString(start);
+            nameRequest.count = ToString(count);
+            UniquePtr<JsonValue> request = nameRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private Pair<List<string>, bool> ProcessNameReply(JsonValue* reply)
+        {
+            NameReply nameReply(reply);
+            if (nameReply.success)
+            {
+                return MakePair(nameReply.names, true);
+            }
+            else
+            {
+                LogMessage("name request failed: " + nameReply.error);
+                return MakePair(List<string>(), false);
             }
         }
         private void ProcessStopReason(const TargetState& state)
