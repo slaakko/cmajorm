@@ -13,31 +13,56 @@ namespace Cm.Views
     {
         public bool debugging;
         public bool targetStopped;
+        public Cm.Service.Debug.DebugService* debugService;
     }
 
     public class delegate void UpdateLocalsEventHandler(UpdateLocalsEventArgs& args);
 
+    public class NodeDataVisitor
+    {
+        public default ~NodeDataVisitor();
+        public virtual void Visit(VariableNameNodeData& variableNameNodeData) {}
+    }
+
     public abstract class NodeData
     {
         public default virtual ~NodeData();
+        public abstract void Accept(NodeDataVisitor& visitor);
     }
 
-    public class StringNodeData : NodeData
+    public class VariableNameNodeData : NodeData
     {
-        public nothrow StringNodeData(const string& str_) : str(str_)
+        public nothrow VariableNameNodeData(const string& variableName_) : variableName(variableName_)
         {
         }
-        public nothrow const string& Str() const
+        public override void Accept(NodeDataVisitor& visitor)
         {
-            return str;
+            visitor.Visit(*this);
         }
-        private string str;
+        public nothrow const string& VariableName() const
+        {
+            return variableName;
+        }
+        private string variableName;
+    }
+
+    public class LocalsNodeDataVisitor : NodeDataVisitor
+    {
+        public LocalsNodeDataVisitor(TreeViewNode* localVariableNode_, Locals* locals_) : localVariableNode(localVariableNode_), locals(locals_)
+        {
+        }
+        public override void Visit(VariableNameNodeData& variableNameNodeData)
+        {
+            locals->FetchLocalVariable(localVariableNode, variableNameNodeData.VariableName());
+        }
+        private TreeViewNode* localVariableNode;
+        private Locals* locals;
     }
 
     public abstract class Query
     {
         public default virtual ~Query();
-        public abstract void Init(Cm.Service.Debug.DebugService* debugService);
+        public virtual void Init(Cm.Service.Debug.DebugService* debugService) {}
         public abstract void Execute(Cm.Service.Debug.DebugService* debugService);
     }
 
@@ -94,7 +119,7 @@ namespace Cm.Views
             nameData.Resize(start + count);
             for (int i = start; i < start + count; ++i)
             {
-                nameData[i].Reset(new StringNodeData(names[i - start]));
+                nameData[i].Reset(new VariableNameNodeData(names[i - start]));
             }
             int n = cast<int>(visibleNodes.Count());
             for (int i = 0; i < n; ++i)
@@ -105,13 +130,13 @@ namespace Cm.Views
             for (int i = 0; i < n; ++i)
             {
                 TreeViewNode* node = visibleNodes[i];
-                node->SetText(cast<StringNodeData*>(node->Data())->Str());
+                node->SetText(cast<VariableNameNodeData*>(node->Data())->VariableName());
             }
         }
         private int localCount;
         private TreeView* treeView;
         private TreeViewNode* root;
-        private List<UniquePtr<StringNodeData>> nameData;
+        private List<UniquePtr<VariableNameNodeData>> nameData;
     }
 
     public class Locals : Control
@@ -121,6 +146,7 @@ namespace Cm.Views
         {
             UniquePtr<TreeView> treeViewPtr(new TreeView(Point(), Size(), Dock.none, Anchors.none));
             treeView = treeViewPtr.Get();
+            treeView->NodeExpandedEvent().AddHandler(TreeViewNodeExpanded);
             UniquePtr<Control> paddedTreeView(new PaddedControl(treeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> scrollableTreeView(new ScrollableControl(paddedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             child = scrollableTreeView.Get();
@@ -152,6 +178,31 @@ namespace Cm.Views
             child->SetLocation(childRect.location);
             child->SetSize(childRect.size);
         }
+        private void TreeViewNodeExpanded(TreeViewNodeEventArgs& args)
+        {
+            TreeViewNode* treeViewNode = args.node;
+            if (treeViewNode->Data() != null)
+            {
+                NodeData* nodeData = cast<NodeData*>(treeViewNode->Data());
+                LocalsNodeDataVisitor visitor(treeViewNode, this);
+                nodeData->Accept(visitor);
+            }
+        }
+        public void FetchLocalVariable(TreeViewNode* localVariableNode, const string& localVariableName)
+        {
+            UpdateLocalsEventArgs updateArgs;
+            updateArgs.debugging = false;
+            updateArgs.targetStopped = false;
+            OnUpdateLocals(updateArgs);
+            if (updateArgs.debugging && updateArgs.targetStopped)
+            {
+                debugService = updateArgs.debugService;
+                if (debugService != null)
+                {
+                    //debugService->Evaluate(localVariableName);
+                }
+            }
+        }
         protected override void OnPaint(PaintEventArgs& args)
         {
             UpdateLocalsEventArgs updateArgs;
@@ -160,6 +211,7 @@ namespace Cm.Views
             OnUpdateLocals(updateArgs);
             if (updateArgs.debugging && updateArgs.targetStopped)
             {
+                debugService = updateArgs.debugService;
                 TreeViewNode* root = treeView->Root();
                 Size size = root->GetSize();
                 if (size.h == 0)

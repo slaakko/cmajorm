@@ -35,6 +35,22 @@ namespace Cm.Service.Debug
     }
 
     [json]
+    public class Type
+    {
+        public string id;
+        public string name;
+    }
+
+    [json]
+    public class Result
+    {
+        public Type staticType;
+        public Type dynamicType;
+        public bool initialized;
+        public string value;
+    }
+
+    [json]
     public class TargetState
     {
         public nothrow void Reset()
@@ -358,6 +374,28 @@ namespace Cm.Service.Debug
         public string messageKind;
         public bool success;
         public List<string> names;
+        public string error;
+    }
+
+    [json]
+    public class EvaluateRequest
+    {
+        public nothrow EvaluateRequest() : messageKind("evaluateRequest")
+        {
+        }
+        public string messageKind;
+        public string expression;
+    }
+
+    [json]
+    public class EvaluateReply
+    {
+        public nothrow EvaluateReply() : messageKind("evaluateReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public Result result;
         public string error;
     }
 
