@@ -24,10 +24,18 @@ namespace Cm.Views
 
     public class delegate void FrameSelectedEventHandler(FrameSelectedEventArgs& args);   
 
+    public class Frame
+    {
+        public Frame(Cm.Service.Debug.Location&& loc) : location(Rvalue(loc))
+        {
+        }
+        public Cm.Service.Debug.Location location;
+    }
+
     public class CallStack : Control
     {
         public CallStack() : base("Cm.Views.CallStack", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), Color.White(),
-            "callStack", Point(), Size(), Dock.fill, Anchors.none), container(this), treeView(null), child(null), depth(-1), callStackData(), updateCallStackEvent(),
+            "callStack", Point(), Size(), Dock.fill, Anchors.none), container(this), treeView(null), child(null), depth(-1), frames(), updateCallStackEvent(),
             debugService(null)
         {
             UniquePtr<TreeView> treeViewPtr(new TreeView(Point(), Size(), Dock.none, Anchors.none));
@@ -38,10 +46,6 @@ namespace Cm.Views
             child = scrollableTreeView.Get();
             container.AddChild(scrollableTreeView.Release());
             Clear();
-        }
-        public ~CallStack()
-        {
-            ClearCallStackData();
         }
         private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
         {
@@ -62,21 +66,11 @@ namespace Cm.Views
         {
             frameSelectedEvent.Fire(args);
         }
-        public void ClearCallStackData()
-        {
-            List<Cm.Service.Debug.Location*>.Iterator e = callStackData.End();
-            for (List<Cm.Service.Debug.Location*>.Iterator i = callStackData.Begin(); i != e; ++i)
-            {
-                Cm.Service.Debug.Location* frame = *i;
-                delete frame;
-            }
-            callStackData.Clear();
-        }
         public void Clear()
         {
             treeView->SetRoot(new TreeViewNode("Frames"));
             depth = -1;
-            ClearCallStackData();
+            frames.Clear();
             child->Invalidate();
         }
         protected override void OnLocationChanged()
@@ -120,19 +114,21 @@ namespace Cm.Views
                     void* nodeData = node->Data();
                     if (nodeData != null)
                     {
-                        Cm.Service.Debug.Location* frame = cast<Cm.Service.Debug.Location*>(node->Data());
-                        string func = frame->func;
+                        Frame* frame = cast<Frame*>(node->Data());
+                        string func = frame->location.func;
                         if (func.IsEmpty())
                         {
                             func = "<external>";
                         }
-                        node->SetText(ToString(node->Index()) + " - " + func);
+                        string nodeText = ToString(node->Number()) + " - " + func;
+                        node->SetText(nodeText);
                         node->RemoveChildren();
-                        if (!frame->func.IsEmpty())
+                        if (!frame->location.func.IsEmpty())
                         {
-                            TreeViewNode* fileNode = new TreeViewNode(frame->file);
+                            TreeViewNode* fileNode = new TreeViewNode(frame->location.file);
                             node->AddChild(fileNode);
-                            TreeViewNode* lineNode = new TreeViewNode("Line " + frame->line);
+                            string lineText = "Line " + frame->location.line;
+                            TreeViewNode* lineNode = new TreeViewNode(lineText);
                             node->AddChild(lineNode);
                         }
                     }
@@ -147,8 +143,9 @@ namespace Cm.Views
                 depth = GetCallStackDepth();
                 for (int i = 0; i < depth; ++i)
                 {
-                    TreeViewNode* node = new TreeViewNode(ToString(i));
-                    node->SetIndex(i);
+                    string nodeText = ToString(i);
+                    TreeViewNode* node = new TreeViewNode(nodeText);
+                    node->SetNumber(i);
                     root->AddChild(node);
                 }
                 root->Expand();
@@ -172,31 +169,27 @@ namespace Cm.Views
                 last = cast<TreeViewNode*>(last->PrevSibling());
                 --lastIndex;
             }
-            int lowFrame = first->Index();
-            int highFrame = last->Index();
+            int lowFrame = first->Number();
+            int highFrame = last->Number();
             if (lowFrame == highFrame && first->Data() != null)
             {
                 return;
             }
-            Pair<List<Cm.Service.Debug.Location>, bool> framesSuccess = debugService->Frames(lowFrame, highFrame);
-            if (!framesSuccess.second)
+            Pair<List<Cm.Service.Debug.Location>, bool> locationsSuccess = debugService->Frames(lowFrame, highFrame);
+            if (!locationsSuccess.second)
             {
                 return;
             }
-            callStackData.Resize(highFrame + 1);
-            List<Cm.Service.Debug.Location>& frames = framesSuccess.first;
+            frames.Resize(highFrame + 1);
+            List<Cm.Service.Debug.Location>& locations = locationsSuccess.first;
             for (int i = lowFrame; i <= highFrame; ++i)
             {
-                if (callStackData[i] != null)
-                {
-                    delete callStackData[i];
-                }
-                callStackData[i] = new Cm.Service.Debug.Location(Rvalue(frames[i]));
+                frames[i].Reset(new Frame(Rvalue(locations[i - lowFrame])));
             }
             for (int i = firstIndex; i <= lastIndex; ++i)
             {
                 TreeViewNode* node = nodes[i];
-                node->SetData(callStackData[node->Index()]);
+                node->SetData(frames[node->Number()].Get());
             }
         }
         public nothrow void SetDebugService(Cm.Service.Debug.DebugService* debugService_)
@@ -227,7 +220,7 @@ namespace Cm.Views
         private TreeView* treeView;
         private Control* child;
         private int depth;
-        private List<Cm.Service.Debug.Location*> callStackData;
+        private List<UniquePtr<Frame>> frames;
         private Event<UpdateCallStackEventHandler, UpdateCallStackEventArgs> updateCallStackEvent;
         private Cm.Service.Debug.DebugService* debugService;
         private Event<FrameSelectedEventHandler, FrameSelectedEventArgs> frameSelectedEvent;

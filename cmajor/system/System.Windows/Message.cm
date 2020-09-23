@@ -4,6 +4,7 @@
 // =================================
 
 using System;
+using System.Collections;
 
 namespace System.Windows
 {
@@ -14,7 +15,7 @@ namespace System.Windows
     public const uint WM_KILLFOCUS = 0x0008u;
     public const uint WM_PAINT = 0x000Fu;
     public const uint WM_CLOSE = 0x0010u;
-    public const uint WM_SHOWWINDOW =0x0018u;
+    public const uint WM_SHOWWINDOW = 0x0018u;
     public const uint WM_DRAWITEM = 0x002bu;
     public const uint WM_SETFONT = 0x0030u;
     public const uint WM_GETFONT = 0x0031u;
@@ -30,7 +31,7 @@ namespace System.Windows
     public const uint WM_LBUTTONDOWN = 0x0201u;
     public const uint WM_LBUTTONUP = 0x0202u;
     public const uint WM_LBUTTONDBLCLK = 0x0203u;
-    public const uint WM_RBUTTONDOWN  = 0x204u;
+    public const uint WM_RBUTTONDOWN = 0x204u;
     public const uint WM_RBUTTONUP = 0x0205u;
     public const uint WM_MOUSEWHEEL = 0x020au;
     public const uint WM_MOUSELEAVE = 0x02a3u;
@@ -266,5 +267,62 @@ namespace System.Windows
         public long lparam;
         public long result;
         public void* originalWndProc;
+    }
+
+    public class MessageNameMap
+    {
+        static MessageNameMap() : instance(new MessageNameMap())
+        {
+        }
+        public static nothrow MessageNameMap& Instance()
+        {
+            return *instance;
+        }
+        public string GetMessageName(uint message) const
+        {
+            HashMap<uint, string>.ConstIterator it = map.CFind(message);
+            if (it != map.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return "WM_" + ToHexString(message);
+            }
+        }
+        private MessageNameMap()
+        {
+            map[WM_DESTROY] = "WM_DESTROY";
+            map[WM_SIZE] = "WM_SIZE";
+            map[WM_MOVE] = "WM_MOVE";
+            map[WM_SETFOCUS] = "WM_SETFOCUS";
+            map[WM_KILLFOCUS] = "WM_KILLFOCUS";
+            map[WM_PAINT] = "WM_PAINT";
+            map[WM_CLOSE] = "WM_CLOSE";
+            map[WM_SHOWWINDOW] = "WM_SHOWWINDOW";
+            map[WM_DRAWITEM] = "WM_DRAWITEM";
+            map[WM_SETFONT] = "WM_SETFONT";
+            map[WM_GETFONT] = "WM_GETFONT";
+            map[WM_KEYDOWN] = "WM_KEYDOWN";
+            map[WM_KEYUP] = "WM_KEYUP";
+            map[WM_CHAR] = "WM_CHAR";
+            map[WM_COMMAND] = "WM_COMMAND";
+            map[WM_SYSCOMMAND] = "WM_SYSCOMMAND";
+            map[WM_TIMER] = "WM_TIMER";
+            map[WM_HSCROLL] = "WM_HSCROLL";
+            map[WM_VSCROLL] = "WM_VSCROLL";
+            map[WM_MOUSEMOVE] = "WM_MOUSEMOVE";
+            map[WM_LBUTTONDOWN] = "WM_LBUTTONDOWN";
+            map[WM_LBUTTONUP] = "WM_LBUTTONUP";
+            map[WM_LBUTTONDBLCLK] = "WM_LBUTTONDBLCLK";
+            map[WM_RBUTTONDOWN] = "WM_RBUTTONDOWN";
+            map[WM_RBUTTONUP] = "WM_RBUTTONUP";
+            map[WM_MOUSEWHEEL] = "WM_MOUSEWHEEL";
+            map[WM_MOUSELEAVE] = "WM_MOUSELEAVE";
+            map[WM_CLIPBOARDUPDATE] = "WM_CLIPBOARDUPDATE";
+            map[WM_USER] = "WM_USER";
+        }
+        private static UniquePtr<MessageNameMap> instance;
+        private HashMap<uint, string> map;
     }
 }

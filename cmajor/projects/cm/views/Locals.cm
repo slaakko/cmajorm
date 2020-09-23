@@ -79,10 +79,11 @@ namespace Cm.Views
                 root->RemoveChildren();
                 for (int i = 0; i < localCount; ++i)
                 {
-                    TreeViewNode* node = new TreeViewNode(System.ToString(i));
-                    node->SetIndex(i);
+                    string nodeText = System.ToString(i);
+                    TreeViewNode* node = new TreeViewNode(nodeText);
+                    node->SetNumber(i);
                     TreeViewNode* dummyNode = new TreeViewNode();
-                    dummyNode->SetIndex(-1);
+                    dummyNode->SetNumber(-1);
                     node->AddChild(dummyNode);
                     root->AddChild(node);
                 }
@@ -104,8 +105,8 @@ namespace Cm.Views
             {
                 last = cast<TreeViewNode*>(last->PrevSibling());
             }
-            int start = first->Index();
-            int count = last->Index() - start + 1;
+            int start = first->Number();
+            int count = last->Number() - start + 1;
             if (count == 1 && first->Data() != null)
             {
                 return;
@@ -125,7 +126,7 @@ namespace Cm.Views
             for (int i = 0; i < n; ++i)
             {
                 TreeViewNode* node = visibleNodes[i];
-                node->SetData(nameData[node->Index()].Get());
+                node->SetData(nameData[node->Number()].Get());
             }
             for (int i = 0; i < n; ++i)
             {

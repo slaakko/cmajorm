@@ -134,6 +134,7 @@ public:
     std::unique_ptr<JsonValue> ProcessFramesRequest(const FramesRequest& framesRequest);
     std::unique_ptr<JsonValue> ProcessLocalCountRequest(const LocalCountRequest& localCountRequest);
     std::unique_ptr<JsonValue> ProcessNameRequest(const NameRequest& nameRequest);
+    std::unique_ptr<JsonValue> ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest);
     void GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState);
     MessageKind GetMessageKind(JsonValue* message, std::string& messageKindStr);
     void AddStopResultToResult() override; 
@@ -384,6 +385,11 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessRequest(JsonValue* requestMess
         {
             NameRequest nameRequest(requestMessage);
             return ProcessNameRequest(nameRequest);
+        }
+        case MessageKind::evaluateRequest:
+        {
+            EvaluateRequest evaluateRequest(requestMessage);
+            return ProcessEvaluateRequest(evaluateRequest);
         }
         default:
         {
@@ -846,6 +852,85 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessNameRequest(const NameRequest&
         nameReply.error = ex.what();
     }
     return nameReply.ToJson();
+}
+
+std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest)
+{
+    EvaluateReply evaluateReply;
+    evaluateReply.messageKind = "evaluateReply";
+    try
+    {
+        Print(evaluateRequest.expression);
+        JsonValue* result = GetResult();
+        if (result && result->Type() == JsonValueType::object)
+        {
+            JsonObject* resultObject = static_cast<JsonObject*>(result);
+            JsonValue* success = resultObject->GetField(U"success");
+            if (success && success->Type() == JsonValueType::boolean)
+            {
+                evaluateReply.success = static_cast<JsonBool*>(success)->Value();
+            }
+            JsonValue* error = resultObject->GetField(U"error");
+            if (error && error->Type() == JsonValueType::string)
+            {
+                evaluateReply.error = ToUtf8(static_cast<JsonString*>(error)->Value());
+            }
+            JsonValue* staticType = resultObject->GetField(U"static_type");
+            if (staticType && staticType->Type() == JsonValueType::object)
+            {
+                JsonObject* staticTypeObject = static_cast<JsonObject*>(staticType);
+                JsonValue* id = staticTypeObject->GetField(U"id");
+                if (id && id->Type() == JsonValueType::string)
+                {
+                    evaluateReply.result.staticType.id = ToUtf8(static_cast<JsonString*>(id)->Value());
+                }
+                JsonValue* name = staticTypeObject->GetField(U"name");
+                if (name && name->Type() == JsonValueType::string)
+                {
+                    evaluateReply.result.staticType.name = ToUtf8(static_cast<JsonString*>(name)->Value());
+                }
+            }
+            JsonValue* dynamicType = resultObject->GetField(U"dynamic_type");
+            if (dynamicType && dynamicType->Type() == JsonValueType::object)
+            {
+                JsonObject* dynamicTypeObject = static_cast<JsonObject*>(dynamicType);
+                JsonValue* id = dynamicTypeObject->GetField(U"id");
+                if (id && id->Type() == JsonValueType::string)
+                {
+                    evaluateReply.result.dynamicType.id = ToUtf8(static_cast<JsonString*>(id)->Value());
+                }
+                JsonValue* name = dynamicTypeObject->GetField(U"name");
+                if (name && name->Type() == JsonValueType::string)
+                {
+                    evaluateReply.result.dynamicType.name = ToUtf8(static_cast<JsonString*>(name)->Value());
+                }
+            }
+            JsonValue* status = resultObject->GetField(U"status");
+            if (status && status->Type() == JsonValueType::string)
+            {
+                std::string s = ToUtf8(static_cast<JsonString*>(status)->Value());
+                if (s == "initialized")
+                {
+                    evaluateReply.result.initialized = true;
+                }
+                else
+                {
+                    evaluateReply.result.initialized = false;
+                }
+            }
+            JsonValue* value = resultObject->GetField(U"value");
+            if (value && value->Type() == JsonValueType::string)
+            {
+                evaluateReply.result.value = ToUtf8(static_cast<JsonString*>(value)->Value());
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        evaluateReply.success = false;
+        evaluateReply.error = ex.what();
+    }
+    return evaluateReply.ToJson();
 }
 
 void ServerDebugger::GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState)

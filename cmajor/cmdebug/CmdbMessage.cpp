@@ -35,6 +35,52 @@ Location::Location(soulng::util::JsonValue* value)
     sngjson::json::FromJson(value, "level", level);
 }
 
+Type::Type() : id(), name()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> Type::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(id);
+    object->AddField(U"id", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(name);
+    object->AddField(U"name", std::move(fieldValue1));
+    return object;
+}
+
+Type::Type(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "id", id);
+    sngjson::json::FromJson(value, "name", name);
+}
+
+Result::Result() : staticType(), dynamicType(), initialized(), value()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> Result::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(staticType);
+    object->AddField(U"staticType", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(dynamicType);
+    object->AddField(U"dynamicType", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(initialized);
+    object->AddField(U"initialized", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(value);
+    object->AddField(U"value", std::move(fieldValue3));
+    return object;
+}
+
+Result::Result(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "staticType", staticType);
+    sngjson::json::FromJson(value, "dynamicType", dynamicType);
+    sngjson::json::FromJson(value, "initialized", initialized);
+    sngjson::json::FromJson(value, "value", value);
+}
+
 TargetState::TargetState() : stopReason(), exitCode(), breakpointId(), signalName(), signalMeaning()
 {
 }
@@ -716,6 +762,52 @@ NameReply::NameReply(soulng::util::JsonValue* value)
     sngjson::json::FromJson(value, "messageKind", messageKind);
     sngjson::json::FromJson(value, "success", success);
     sngjson::json::FromJson(value, "names", names);
+    sngjson::json::FromJson(value, "error", error);
+}
+
+EvaluateRequest::EvaluateRequest() : messageKind(), expression()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> EvaluateRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(expression);
+    object->AddField(U"expression", std::move(fieldValue1));
+    return object;
+}
+
+EvaluateRequest::EvaluateRequest(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(value, "expression", expression);
+}
+
+EvaluateReply::EvaluateReply() : messageKind(), success(), result(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> EvaluateReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
+    object->AddField(U"success", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(result);
+    object->AddField(U"result", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue3));
+    return object;
+}
+
+EvaluateReply::EvaluateReply(soulng::util::JsonValue* value)
+{
+    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(value, "success", success);
+    sngjson::json::FromJson(value, "result", result);
     sngjson::json::FromJson(value, "error", error);
 }
 

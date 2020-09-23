@@ -8,6 +8,34 @@ using System.Windows.API;
 
 namespace System.Windows
 {
+    public string CmajorRootDir()
+    {
+        string cmajorRootDir;
+        const char* cmajorRootEnv = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        if (cmajorRootEnv != null && *cmajorRootEnv != '\0')
+        {
+            cmajorRootDir = cmajorRootEnv;
+        }
+        if (cmajorRootDir.IsEmpty())
+        {
+            throw Exception("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory.");
+        }
+        return cmajorRootDir;
+    }
+
+    public string LogDir()
+    {
+        string cmajorRootDir = CmajorRootDir();
+        string logDir = Path.Combine(cmajorRootDir, "log");
+        Directory.CreateDirectories(logDir);
+        return logDir;
+    }
+
+    public string ApplicationLogFilePath()
+    {
+        return Path.Combine(LogDir(), "application.log");
+    }
+
     public delegate bool MessageProcessorFunction(void* windowHandle, uint msg, uint wparam, long lparam, long& result, void*& originalWndProc);
 
     public class RunModalGuard
@@ -89,6 +117,12 @@ namespace System.Windows
             Control* window = windowManager.GetWindow(windowHandle);
             if (window != null)
             {
+                if (Debug.Messages())
+                {
+                    System.IO.LogWriter writer(ApplicationLogFilePath());
+                    writer << GetCurrentTimestamp().ToString() << endl();
+                    writer << ">" << MessageNameMap.Instance().GetMessageName(msg) << endl();
+                }
                 Message message(windowHandle, msg, wparam, lparam, result);
                 bool handled = window->ProcessMessageInternal(message);
                 if (message.originalWndProc != null)
@@ -99,13 +133,14 @@ namespace System.Windows
                 {
                     result = message.result;
                 }                
+                if (Debug.Messages())
+                {
+                    System.IO.LogWriter writer(ApplicationLogFilePath());
+                    writer << "<" << MessageNameMap.Instance().GetMessageName(msg) << endl();
+                }
                 return handled;
             }
             return false;
-        }
-        private static void Debug(int level, const char* message)
-        {
-            MessageBox.Show(message);
         }
         public static nothrow WindowManager& GetWindowManager()
         {

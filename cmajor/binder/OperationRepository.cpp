@@ -2293,12 +2293,16 @@ void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
             }
         }
     }
-    if (((flags & CollectFlags::noRvalueRef) != CollectFlags::none ||
-        !TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span)) && !bindToRvalueRef) && (typesEqual || conversionFunctionExists))
+    if (typesEqual ||
+        (((flags & CollectFlags::noRvalueRef) != CollectFlags::none ||
+        !TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span)) && !bindToRvalueRef) && (typesEqual || conversionFunctionExists)))
     {
         if (classType->CopyConstructor())
         {
-            viableFunctions.Insert(classType->CopyConstructor());
+            if (!classType->CopyConstructor()->IsSuppressed())
+            {
+                viableFunctions.Insert(classType->CopyConstructor());
+            }
             return;
         }
         if (GetBoundCompileUnit().HasCopyConstructorFor(classType->TypeId()))
@@ -2510,6 +2514,10 @@ void ClassMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
             {
                 bindToRvalueRef = true;
             }
+        }
+        else
+        {
+            return; // reject conversion
         }
     }
     if (typesEqual || bindToRvalueRef)

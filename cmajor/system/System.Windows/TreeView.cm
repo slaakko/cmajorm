@@ -721,7 +721,7 @@ namespace System.Windows
         {
             none = 0, mouseEntered = 1 << 0, selected = 1 << 1, active = 1 << 2
         }
-        public nothrow TreeViewNode(const string& text_) : treeView(null), text(text_), children(this), state(State.collapsed), flags(Flags.none), index(-1)
+        public explicit nothrow TreeViewNode(const string& text_) : treeView(null), text(text_), children(this), state(State.collapsed), flags(Flags.none), number(-1)
         {
         }
         public nothrow void SetTreeView(TreeView* treeView_)
@@ -784,14 +784,6 @@ namespace System.Windows
                 return parent->Level() + 1;
             }
             return 0;
-        }
-        public nothrow inline int Index() 
-        {
-            return index;
-        }
-        public nothrow void SetIndex(int index_)
-        {
-            index = index_;
         }
         public nothrow const Point& Location() const
         {
@@ -1352,6 +1344,14 @@ namespace System.Windows
                 }
             }
         }
+        public nothrow inline int Number() const
+        {
+            return number;
+        }
+        public nothrow void SetNumber(int number_)
+        {
+            number = number_;
+        }
         private TreeView* treeView;
         private string text;
         private Container children;
@@ -1361,6 +1361,6 @@ namespace System.Windows
         private Point location;
         private Size size;
         private Rect childRect;
-        private int index;
+        private int number;
     }
 }

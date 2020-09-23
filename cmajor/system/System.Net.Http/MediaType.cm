@@ -179,6 +179,14 @@ namespace System.Net.Http
         public MimeType() : mediaType(new AnyMediaType()), subtype(new AnySubtype())
         {
         }
+        suppress MimeType(const MimeType&);
+        suppress void operator=(const MimeType&);
+        public MimeType(MimeType&& that)
+        {
+            mediaType.Reset(that.mediaType.Release());
+            subtype.Reset(that.subtype.Release());
+        }
+        public default void operator=(MimeType&&);
         public MimeType(UniquePtr<MediaType>&& mediaType_) : mediaType(mediaType_), subtype(new AnySubtype())
         {
         }

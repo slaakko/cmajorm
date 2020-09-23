@@ -18,6 +18,26 @@ struct Location
     std::string level;
 };
 
+struct Type
+{
+    Type();
+    Type(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string id;
+    std::string name;
+};
+
+struct Result
+{
+    Result();
+    Result(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    Type staticType;
+    Type dynamicType;
+    bool initialized;
+    std::string value;
+};
+
 struct TargetState
 {
     TargetState();
@@ -313,6 +333,26 @@ struct NameReply
     std::string messageKind;
     bool success;
     std::vector<std::string> names;
+    std::string error;
+};
+
+struct EvaluateRequest
+{
+    EvaluateRequest();
+    EvaluateRequest(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    std::string expression;
+};
+
+struct EvaluateReply
+{
+    EvaluateReply();
+    EvaluateReply(soulng::util::JsonValue* value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    bool success;
+    Result result;
     std::string error;
 };
 

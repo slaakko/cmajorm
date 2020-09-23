@@ -1,0 +1,79 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class LogWriter
+    {
+        public LogWriter(const string& logFilePath_) :
+            logFilePath(logFilePath_), writer(SharedPtr<ByteStream>(new FileByteStream(logFilePath, cast<OpenMode>(OpenMode.append))))
+        {
+        }
+        public void Write(const string& str)
+        {
+            writer << str;
+        }
+        public void WriteLine(const string& str)
+        {
+            writer << str << endl();
+        }
+        public void WriteLine()
+        {
+            writer.WriteLine();
+        }
+        private string logFilePath;
+        private StreamWriter writer;
+    }
+
+    public LogWriter& operator<<(LogWriter& writer, const string& str)
+    {
+        writer.Write(str);
+        return writer;
+    }
+
+    public LogWriter& operator<<(LogWriter& writer, char c)
+    {
+        writer.Write(ToString(c));
+        return writer;
+    }
+
+    public LogWriter& operator<<(LogWriter& writer, bool b)
+    {
+        writer.Write(ToString(b));
+        return writer;
+    }
+
+    public LogWriter& operator<<(LogWriter& writer, int i)
+    {
+        writer.Write(ToString(i));
+        return writer;
+    }
+
+    public LogWriter& operator<<(LogWriter& writer, uint u)
+    {
+        writer.Write(ToString(u));
+        return writer;
+    }
+
+    public LogWriter& operator<<(LogWriter& writer, long l)
+    {
+        writer.Write(ToString(l));
+        return writer;
+    }
+
+    public LogWriter& operator<<(LogWriter& writer, ulong u)
+    {
+        writer.Write(ToString(u));
+        return writer;
+    }
+
+    public LogWriter& operator<<(LogWriter& writer, const System.Endl& endl)
+    {
+        writer.WriteLine();
+        return writer;
+    }
+}

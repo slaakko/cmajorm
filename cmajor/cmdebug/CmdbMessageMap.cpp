@@ -36,6 +36,8 @@ MessageMap::MessageMap()
     map["localCountReply"] = MessageKind::localCountReply;
     map["nameRequest"] = MessageKind::nameRequest;
     map["nameReply"] = MessageKind::nameReply;
+    map["evaluateRequest"] = MessageKind::evaluateRequest;
+    map["evaluateReply"] = MessageKind::evaluateReply;
     map["targetRunningRequest"] = MessageKind::targetRunningRequest;
     map["targetRunningReply"] = MessageKind::targetRunningReply;
     map["targetInputRequest"] = MessageKind::targetInputRequest;

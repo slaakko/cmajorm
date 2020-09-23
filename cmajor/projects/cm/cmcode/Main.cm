@@ -112,6 +112,8 @@ namespace cmcode
             base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
             Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true)
         {
+            //Debug.SetMessages();
+            Debug.SetTreeView();
             UniquePtr<MenuBar> menuBarPtr(new MenuBar());
             menuBar = menuBarPtr.Get();
             menuBar->DisableMenuKey();
@@ -1498,7 +1500,7 @@ namespace cmcode
                         debugService.Reset();
                         CloseDebuggingWindows();
                         startDebuggingToolButton->SetToolTip("Start Debugging (F5)");
-                        startDebuggingMenuItem->SetText("&Start Debugging (F5)", menuBar);
+                        startDebuggingMenuItem->SetText("&Start Debugging", menuBar);
                     }
                 }
             }

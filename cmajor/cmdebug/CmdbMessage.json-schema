@@ -13,6 +13,20 @@ struct Location
     string level;
 }
 
+struct Type
+{
+    string id;
+    string name;
+}
+
+struct Result
+{
+    Type staticType;
+    Type dynamicType;
+    bool initialized;
+    string value;
+}
+
 struct TargetState
 {
     string stopReason;
@@ -221,18 +235,18 @@ struct NameReply
     string error;
 }
 
-struct Type
+struct EvaluateRequest
 {
-    string id;
-    string name;
+    string messageKind;
+    string expression;
 }
 
-struct Result
+struct EvaluateReply
 {
-    Type staticType;
-    Type dynamicType;
-    bool initialized;
-    string value;
+    string messageKind;
+    bool success;
+    Result result;
+    string error;
 }
 
 struct TargetRunningRequest
