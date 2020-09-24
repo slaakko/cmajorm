@@ -2515,7 +2515,7 @@ void ClassMoveConstructorOperation::CollectViableFunctions(ContainerScope* conta
                 bindToRvalueRef = true;
             }
         }
-        else
+        else if (!TypesEqual(rightType, classType))
         {
             return; // reject conversion
         }
