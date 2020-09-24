@@ -1,0 +1,119 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Text;
+
+namespace cmcode.settings
+{
+    [json]
+    public class Breakpoint
+    {
+        public string line;
+        public string condition;
+        public bool disabled;
+    }
+
+    [json]
+    public class BreakpointList
+    {
+        public string filePath;
+        public List<Breakpoint> breakpoints;
+    }
+
+    [json]
+    public class BreakpointCollection
+    {
+        public List<BreakpointList> breakpointLists;
+    }
+
+    [json]
+    public class ProjectSettings
+    {
+        public string programArguments;
+        public BreakpointCollection breakpoints;
+    }
+
+    public ProjectSettings LoadProjectSettings(const string& settingsFilePath)
+    {
+        string settingsFileStr = File.ReadAllText(settingsFilePath);
+        ustring settingsFileContent = ToUtf32(settingsFileStr);
+        JsonLexer lexer(settingsFileContent, settingsFilePath, 0);
+        UniquePtr<System.Json.JsonValue> jsonValue = JsonParser.Parse(lexer);
+        ProjectSettings settings(jsonValue.Get());
+        return settings;
+    }
+
+    public void SaveProjectSettings(const ProjectSettings& settings, const string& settingsFilePath)
+    {
+        UniquePtr<System.Json.JsonValue> jsonValue = settings.ToJson();
+        StreamWriter writer = File.CreateText(settingsFilePath);
+        CodeFormatter formatter(writer);
+        jsonValue->Write(formatter);
+    }
+
+    public void ImportBreakpoints(Cm.Service.Debug.BreakpointCollection& debugBreakpoints, const ProjectSettings& projectSettings)
+    {
+        debugBreakpoints.Clear();
+        for (const cmcode.settings.BreakpointList& breakpointList : projectSettings.breakpoints.breakpointLists)
+        {
+            Cm.Service.Debug.BreakpointList& debugBreakpointList = debugBreakpoints.GetBreakpointList(breakpointList.filePath);
+            for (const cmcode.settings.Breakpoint& settingsBreakpoint : breakpointList.breakpoints)
+            {
+                Cm.Service.Debug.Breakpoint* debugBreakpoint = new Cm.Service.Debug.Breakpoint(
+                    ParseInt(settingsBreakpoint.line), settingsBreakpoint.condition, settingsBreakpoint.disabled);
+                debugBreakpointList.AddBreakpoint(debugBreakpoint);
+             }
+        }
+    }
+
+    public void ExportBreakpoints(ProjectSettings& projectSettings, const Cm.Service.Debug.BreakpointCollection& debugBreakpoints)
+    {
+        projectSettings.breakpoints.breakpointLists.Clear();
+        for (const Pair<string, Cm.Service.Debug.BreakpointList>& filePathBreakpointListPair : debugBreakpoints.BreakpointListMap())
+        {
+            const Cm.Service.Debug.BreakpointList& breakpointList = filePathBreakpointListPair.second;
+            BreakpointList settingsBreakpointList;
+            settingsBreakpointList.filePath = breakpointList.FilePath();
+            const List<Cm.Service.Debug.Breakpoint*>& breakpoints = breakpointList.Breakpoints();
+            List<Cm.Service.Debug.Breakpoint*>.ConstIterator e = breakpoints.CEnd();
+            for (List<Cm.Service.Debug.Breakpoint*>.ConstIterator i = breakpoints.CBegin(); i != e; ++i)
+            {
+                Cm.Service.Debug.Breakpoint* breakpoint = *i;
+                cmcode.settings.Breakpoint settingsBreakpoint;
+                settingsBreakpoint.line = ToString(breakpoint->line);
+                settingsBreakpoint.condition = breakpoint->condition;
+                settingsBreakpoint.disabled = breakpoint->disabled;
+                settingsBreakpointList.breakpoints.Add(Rvalue(settingsBreakpoint));
+            }
+            projectSettings.breakpoints.breakpointLists.Add(Rvalue(settingsBreakpointList));
+        }
+    }
+
+    public void LoadProjectSettings(Cm.Ast.Project* project, SolutionExplorerData* solutionExplorerData)
+    {
+        string projectSettingsFilePath = Path.ChangeExtension(project->FilePath(), "cmcode.settings.json");
+        if (File.Exists(projectSettingsFilePath))
+        {
+            cmcode.settings.ProjectSettings activeProjectSettings = cmcode.settings.LoadProjectSettings(projectSettingsFilePath);
+            solutionExplorerData->SetActiveProjectSettings(activeProjectSettings);
+            cmcode.settings.ImportBreakpoints(solutionExplorerData->breakpointCollection, activeProjectSettings);
+        }
+        else
+        {
+            cmcode.settings.ProjectSettings activeProjectSettings;
+            solutionExplorerData->SetActiveProjectSettings(activeProjectSettings);
+            solutionExplorerData->breakpointCollection.Clear();
+        }
+    }
+
+    public void SaveProjectSettings(Cm.Ast.Project* project, SolutionExplorerData* solutionExplorerData)
+    {
+        string projectSettingsFilePath = Path.ChangeExtension(project->FilePath(), "cmcode.settings.json");
+        ExportBreakpoints(solutionExplorerData->ActiveProjectSettings(), solutionExplorerData->breakpointCollection);
+        SaveProjectSettings(solutionExplorerData->ActiveProjectSettings(), projectSettingsFilePath);
+    }
+}

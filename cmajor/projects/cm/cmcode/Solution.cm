@@ -112,10 +112,19 @@ namespace cmcode
                 return null;
             }
         }
+        public nothrow void SetActiveProjectSettings(const cmcode.settings.ProjectSettings& activeProjectSettings_)
+        {
+            activeProjectSettings = activeProjectSettings_;
+        }
+        public nothrow cmcode.settings.ProjectSettings& ActiveProjectSettings() const
+        {
+            return activeProjectSettings;
+        }
         public List<UniquePtr<TreeViewNodeData>> treeViewData;
         public HashMap<string, TreeViewNodeData*> treeViewDataMap;
         public BreakpointCollection breakpointCollection;
         private TreeViewNode* activeProjectNode;
+        private cmcode.settings.ProjectSettings activeProjectSettings;
     }
 
     void SetActiveProject(Cm.Ast.Solution* solution)

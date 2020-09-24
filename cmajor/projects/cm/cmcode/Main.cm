@@ -264,6 +264,7 @@ namespace cmcode
 
             UniquePtr<ToolButton> saveAllToolButtonPtr(new ToolButton("cmcode.save.all.bitmap"));
             saveAllToolButton = saveAllToolButtonPtr.Get();
+            saveAllToolButton->ClickEvent().AddHandler(SaveAllClick);
             saveAllToolButton->SetToolTip("Save All (Ctrl+Shift+S)");
             saveAllToolButton->SetPadding(Padding(6, 6, 6, 6));
             toolBar->AddToolButton(saveAllToolButtonPtr.Release());
@@ -462,6 +463,7 @@ namespace cmcode
                     debugService->Stop();
                     debugService.Reset();
                 }
+                CloseSolutionClick();
                 Application.SetLogView(null);
                 Cm.Views.Bitmaps.Instance().Clear();
                 base->OnWindowClosing(cancelClose);
@@ -829,6 +831,8 @@ namespace cmcode
                 codeTabControl->CloseAllTabPages();
                 UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData, contents);
                 solutionExplorerTreeView->SetRoot(root.Release());
+                Cm.Ast.Project* activeProject = solution->ActiveProject();
+                cmcode.settings.LoadProjectSettings(activeProject, solutionExplorerData.Get());
                 SetControlStatus(UserInterfaceAction.none);
             }
             catch (const Exception& ex)
@@ -870,6 +874,8 @@ namespace cmcode
         {
             try
             {
+                if (solution.IsNull()) return;
+                SaveAllClick();
                 codeTabControl->CloseAllTabPages();
                 solutionExplorerTreeView->SetRoot(null);
                 solutionExplorerData.Reset();
@@ -1036,6 +1042,7 @@ namespace cmcode
         {
             try
             {
+                SaveAllClick();
                 GetOutputLogView()->Clear();
                 GetOutputTabPage()->Select();
                 BuildGuard buildGuard(this);
@@ -1273,7 +1280,10 @@ namespace cmcode
         {
             try
             {
-                MessageBox.Show("Save all");
+                if (solution.IsNull()) return;
+                solution->Save();
+                Cm.Ast.Project* activeProject = solution->ActiveProject();
+                cmcode.settings.SaveProjectSettings(activeProject, solutionExplorerData.Get());
             }
             catch (const Exception& ex)
             {
@@ -1419,6 +1429,7 @@ namespace cmcode
                         {
                             throw Exception("project '" + ToUtf8(project->Name()) + "' is a library project");
                         }
+                        string programArguments = solutionExplorerData->ActiveProjectSettings().programArguments;
                         debugService.Reset(new DebugService(DebugServiceArgs().Log(true).DebugServer(false).Verbose(true).Backend(backend).Config(config).
                             ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments)));
                         debugService->SetLogMessageNotificationFunction(DebugServiceLogMessagesAvailable);
@@ -1643,10 +1654,10 @@ namespace cmcode
             try
             {
                 ProgramArgumentsDialog dialogWindow;
-                dialogWindow.SetProgramArguments(programArguments);
+                dialogWindow.SetProgramArguments(solutionExplorerData->ActiveProjectSettings().programArguments);
                 if (dialogWindow.ShowDialog(*this)  == DialogResult.ok)
                 {
-                    programArguments = dialogWindow.ProgramArguments();
+                    solutionExplorerData->ActiveProjectSettings().programArguments = dialogWindow.ProgramArguments();
                 }
             }
             catch (const Exception& ex)
@@ -2234,7 +2245,6 @@ namespace cmcode
         private bool stopPending;
         private bool targetStopped;
         private bool buildSucceeded;
-        private string programArguments;
     }
 }
 

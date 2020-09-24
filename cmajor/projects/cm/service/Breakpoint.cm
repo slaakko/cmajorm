@@ -101,6 +101,10 @@ namespace Cm.Service.Debug
 
     public class Breakpoint
     {
+        public nothrow Breakpoint(int line_, const string& condition_, bool disabled_) :
+            line(line_), condition(condition_), disabled(disabled_)
+        {
+        }
         public nothrow Breakpoint(int line_, const string& condition_) :
             line(line_), condition(condition_), disabled(false)
         {
