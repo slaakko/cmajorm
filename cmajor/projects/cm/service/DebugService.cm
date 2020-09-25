@@ -201,6 +201,8 @@ namespace Cm.Service.Debug
             messageKindMap["localCountReply"] = MessageKind.localCountReply;
             messageKindMap["nameRequest"] = MessageKind.nameRequest;
             messageKindMap["nameReply"] = MessageKind.nameReply;
+            messageKindMap["evaluateRequest"] = MessageKind.evaluateRequest;
+            messageKindMap["evaluateReply"] = MessageKind.evaluateReply;
             messageKindMap["targetRunningRequest"] = MessageKind.targetRunningRequest;
             messageKindMap["targetRunningReply"] = MessageKind.targetRunningReply;
             messageKindMap["targetInputRequest"] = MessageKind.targetInputRequest;
@@ -650,6 +652,32 @@ namespace Cm.Service.Debug
             {
                 LogMessage("name request failed: " + nameReply.error);
                 return MakePair(List<string>(), false);
+            }
+        }
+        public Pair<Result, bool> Evaluate(const string& expression)
+        {
+            SendEvaluateRequest(expression);
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateReply);
+            return ProcessEvaluateReply(reply.Get());
+        }
+        private void SendEvaluateRequest(const string& expression)
+        {
+            EvaluateRequest evaluateRequest;
+            evaluateRequest.expression = expression;
+            UniquePtr<JsonValue> request = evaluateRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private Pair<Result, bool> ProcessEvaluateReply(JsonValue* reply)
+        {
+            EvaluateReply evaluateReply(reply);
+            if (evaluateReply.success)
+            {
+                return MakePair(evaluateReply.result, true);
+            }
+            else
+            {
+                LogMessage("evaluate request failed: " + evaluateReply.error);
+                return MakePair(Result(), false);
             }
         }
         private void ProcessStopReason(const TargetState& state)

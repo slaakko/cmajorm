@@ -200,7 +200,31 @@ namespace Cm.Views
                 debugService = updateArgs.debugService;
                 if (debugService != null)
                 {
-                    //debugService->Evaluate(localVariableName);
+                    Pair<Cm.Service.Debug.Result, bool> resultSuccess = debugService->Evaluate(localVariableName);
+                    if (resultSuccess.second)
+                    {
+                        const Cm.Service.Debug.Result& result = resultSuccess.first;
+                        localVariableNode->RemoveChildren();
+                        string typeStr = "Type: ";
+                        if (!result.dynamicType.name.IsEmpty())
+                        {
+                            typeStr.Append("[").Append(result.dynamicType.name).Append("] ");
+                        }
+                        typeStr.Append(result.staticType.name);
+                        TreeViewNode* typeNode = new TreeViewNode(typeStr);
+                        localVariableNode->AddChild(typeNode);
+                        string valueStr = "Value: ";
+                        if (!result.initialized)
+                        {
+                            valueStr.Append("<uninitialized>");
+                        }
+                        else
+                        {
+                            valueStr.Append(result.value);
+                        }
+                        TreeViewNode* valueNode = new TreeViewNode(valueStr);
+                        localVariableNode->AddChild(valueNode);
+                    }
                 }
             }
         }

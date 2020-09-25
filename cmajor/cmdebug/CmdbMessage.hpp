@@ -333,6 +333,7 @@ struct NameReply
     std::string messageKind;
     bool success;
     std::vector<std::string> names;
+    std::vector<std::string> values;
     std::string error;
 };
 

@@ -104,6 +104,7 @@ public:
     const boost::uuids::uuid& UnderlyingTypeId() const { return underlyingTypeId; }
     const std::vector<DIEnumConstant>& EnumConstants() const { return enumConstants; }
     void AddEnumConstant(DIEnumConstant&& enumConstant);
+    DIEnumConstant* GetEnumConstant(uint64_t& value);
     void Write(soulng::util::BinaryWriter& writer) override;
     void Read(soulng::util::BinaryReader& reader) override;
     std::unique_ptr<JsonValue> ToJson() const override;

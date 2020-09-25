@@ -135,6 +135,9 @@ public:
     std::unique_ptr<JsonValue> ProcessLocalCountRequest(const LocalCountRequest& localCountRequest);
     std::unique_ptr<JsonValue> ProcessNameRequest(const NameRequest& nameRequest);
     std::unique_ptr<JsonValue> ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest);
+    std::string GetValue(DIVariable* variable);
+    std::string GetEnumeratedTypeValue(uint64_t value, DIEnumType* enumType);
+    EvaluateReply DoEvaluate(const std::string& expression);
     void GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState);
     MessageKind GetMessageKind(JsonValue* message, std::string& messageKindStr);
     void AddStopResultToResult() override; 
@@ -826,6 +829,7 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessNameRequest(const NameRequest&
                     {
                         DIVariable* localVariable = function->LocalVariables()[i];
                         nameReply.names.push_back(localVariable->Name());
+                        nameReply.values.push_back(GetValue(localVariable));
                     }
                 }
                 else
@@ -854,13 +858,88 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessNameRequest(const NameRequest&
     return nameReply.ToJson();
 }
 
+std::string ServerDebugger::GetValue(DIVariable* variable)
+{
+    EvaluateReply evaluateReply = DoEvaluate(variable->Name());
+    if (evaluateReply.success)
+    {
+        DIType* type = variable->GetType();
+        switch (type->GetKind())
+        {
+            case DIType::Kind::primitiveType:
+            {
+                return evaluateReply.result.value;
+            }
+            case DIType::Kind::enumType:
+            {
+                if (evaluateReply.result.initialized)
+                {
+                    try
+                    {
+                        uint64_t value = boost::lexical_cast<uint64_t>(evaluateReply.result.value);
+                        return GetEnumeratedTypeValue(value, static_cast<DIEnumType*>(type));
+                        
+                    }
+                    catch (...)
+                    {
+                        return evaluateReply.result.value;
+                    }
+                }
+                else
+                {
+                    return evaluateReply.result.value;
+                }
+            }
+        }
+    }
+    return std::string();
+}
+
+std::string ServerDebugger::GetEnumeratedTypeValue(uint64_t value, DIEnumType* enumType)
+{
+    uint64_t wholeValue = value;
+    std::string strValue;
+    bool first = true;
+    while (true)
+    {
+        DIEnumConstant* enumConstant = enumType->GetEnumConstant(value);
+        if (enumConstant)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                strValue.append(" | ");
+            }
+            strValue.append(enumType->Name()).append(".").append(enumConstant->Name());
+            if (value == 0)
+            {
+                break;
+            }
+        }
+        else
+        {
+            return std::to_string(wholeValue);
+        }
+    }
+    return strValue;
+}
+
 std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest)
+{
+    EvaluateReply evaluateReply = DoEvaluate(evaluateRequest.expression);
+    return evaluateReply.ToJson();
+}
+
+EvaluateReply ServerDebugger::DoEvaluate(const std::string& expression)
 {
     EvaluateReply evaluateReply;
     evaluateReply.messageKind = "evaluateReply";
     try
     {
-        Print(evaluateRequest.expression);
+        Print(expression);
         JsonValue* result = GetResult();
         if (result && result->Type() == JsonValueType::object)
         {
@@ -912,16 +991,17 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const Evaluate
                 if (s == "initialized")
                 {
                     evaluateReply.result.initialized = true;
+                    JsonValue* value = resultObject->GetField(U"value");
+                    if (value && value->Type() == JsonValueType::string)
+                    {
+                        evaluateReply.result.value = ToUtf8(static_cast<JsonString*>(value)->Value());
+                    }
                 }
                 else
                 {
                     evaluateReply.result.initialized = false;
+                    evaluateReply.result.value = "<uninitialized>";
                 }
-            }
-            JsonValue* value = resultObject->GetField(U"value");
-            if (value && value->Type() == JsonValueType::string)
-            {
-                evaluateReply.result.value = ToUtf8(static_cast<JsonString*>(value)->Value());
             }
         }
     }
@@ -930,7 +1010,7 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const Evaluate
         evaluateReply.success = false;
         evaluateReply.error = ex.what();
     }
-    return evaluateReply.ToJson();
+    return evaluateReply;
 }
 
 void ServerDebugger::GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState)

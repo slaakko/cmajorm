@@ -8,6 +8,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/random_generator.hpp>
+#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 
 namespace cmajor { namespace debug {
@@ -219,6 +220,33 @@ void DIEnumType::SetUnderlyingTypeId(const boost::uuids::uuid& underlyingTypeId_
 void DIEnumType::AddEnumConstant(DIEnumConstant&& enumConstant)
 {
     enumConstants.push_back(std::move(enumConstant));
+}
+
+DIEnumConstant* DIEnumType::GetEnumConstant(uint64_t& value)
+{
+    for (DIEnumConstant& enumConstant : enumConstants)
+    {
+        try
+        {
+            uint64_t enumConstantValue = boost::lexical_cast<uint64_t>(enumConstant.Value());
+            if (value == 0)
+            {
+                if (enumConstantValue == 0)
+                {
+                    return &enumConstant;
+                }
+            }
+            else if ((value & enumConstantValue) != 0)
+            {
+                value = value & ~enumConstantValue;
+                return &enumConstant;
+            }
+        }
+        catch (...)
+        {
+        }
+    }
+    return nullptr;
 }
 
 void DIEnumType::Write(soulng::util::BinaryWriter& writer)

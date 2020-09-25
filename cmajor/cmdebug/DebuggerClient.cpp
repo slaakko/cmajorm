@@ -57,6 +57,13 @@ public:
     void Execute(DebuggerClient& client) override;
 };
 
+class LocalsCommand : public ClientCommand
+{
+public:
+    void Execute(DebuggerClient& client) override;
+};
+
+
 std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
 {
     if (line == "start")
@@ -79,6 +86,10 @@ std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
     {
         return std::unique_ptr<ClientCommand>(new StepCommand());
     }
+    else if (line == "locals")
+    {
+        return std::unique_ptr<ClientCommand>(new LocalsCommand());
+    }
     else
     {
         throw std::runtime_error("unknown command");
@@ -95,6 +106,7 @@ public:
     void Continue();
     void Next();
     void Step();
+    void Locals();
     void WriteRequest(JsonValue* request);
     void WriteReply(JsonValue* reply);
     std::unique_ptr<JsonValue> ReadReply(MessageKind replyMessageKind);
@@ -109,6 +121,8 @@ public:
     void ProcessContinueReply(JsonValue* reply);
     void ProcessNextReply(JsonValue* reply);
     void ProcessStepReply(JsonValue* reply);
+    int ProcessLocalCountReply(JsonValue* reply);
+    void ProcessNameReply(JsonValue* reply);
     bool Stopped() const { return stopped; }
 private:
     MessageMap messageMap;
@@ -332,6 +346,46 @@ void DebuggerClient::ProcessStepReply(JsonValue* reply)
     StepReply stepReply(reply);
 }
 
+void DebuggerClient::Locals()
+{
+    LocalCountRequest localCountRequest;
+    localCountRequest.messageKind = "localCountRequest";
+    std::unique_ptr<JsonValue> request = localCountRequest.ToJson();
+    WriteRequest(request.get());
+    std::unique_ptr<JsonValue> replyValue = ReadReply(MessageKind::localCountReply);
+    int numLocals = ProcessLocalCountReply(replyValue.get());
+    NameRequest nameRequest;
+    nameRequest.messageKind = "nameRequest";
+    nameRequest.start = std::to_string(0);
+    nameRequest.count = std::to_string(numLocals);
+    std::unique_ptr<JsonValue> req = nameRequest.ToJson();
+    WriteRequest(req.get());
+    std::unique_ptr<JsonValue> replyVal = ReadReply(MessageKind::nameReply);
+    ProcessNameReply(replyVal.get());
+}
+
+int DebuggerClient::ProcessLocalCountReply(JsonValue* reply)
+{
+    LocalCountReply localCountReply(reply);
+    int numLocals = boost::lexical_cast<int>(localCountReply.count);
+    return numLocals;
+}
+
+void DebuggerClient::ProcessNameReply(JsonValue* reply)
+{
+    NameReply nameReply(reply);
+    int n = nameReply.names.size();
+    for (int i = 0; i < n; ++i)
+    {
+        std::string s = nameReply.names[i];
+        if (!nameReply.values[i].empty())
+        {
+            s.append(" = ").append(nameReply.values[i]);
+        }
+        std::cout << s << std::endl;;
+    }
+}
+
 void StartCommand::Execute(DebuggerClient& client)
 {
     client.Start();
@@ -355,6 +409,11 @@ void NextCommand::Execute(DebuggerClient& client)
 void StepCommand::Execute(DebuggerClient& client)
 {
     client.Step();
+}
+
+void LocalsCommand::Execute(DebuggerClient& client)
+{
+    client.Locals();
 }
 
 void RunClient(int port)

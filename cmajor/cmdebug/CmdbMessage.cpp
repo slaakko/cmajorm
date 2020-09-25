@@ -739,7 +739,7 @@ NameRequest::NameRequest(soulng::util::JsonValue* value)
     sngjson::json::FromJson(value, "count", count);
 }
 
-NameReply::NameReply() : messageKind(), success(), names(), error()
+NameReply::NameReply() : messageKind(), success(), names(), values(), error()
 {
 }
 
@@ -752,8 +752,10 @@ std::unique_ptr<soulng::util::JsonValue> NameReply::ToJson() const
     object->AddField(U"success", std::move(fieldValue1));
     std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(names);
     object->AddField(U"names", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(values);
+    object->AddField(U"values", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue4));
     return object;
 }
 
@@ -762,6 +764,7 @@ NameReply::NameReply(soulng::util::JsonValue* value)
     sngjson::json::FromJson(value, "messageKind", messageKind);
     sngjson::json::FromJson(value, "success", success);
     sngjson::json::FromJson(value, "names", names);
+    sngjson::json::FromJson(value, "values", values);
     sngjson::json::FromJson(value, "error", error);
 }
 
