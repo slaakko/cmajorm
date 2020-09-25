@@ -137,6 +137,10 @@ public:
     std::unique_ptr<JsonValue> ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest);
     std::string GetValue(DIVariable* variable);
     std::string GetEnumeratedTypeValue(uint64_t value, DIEnumType* enumType);
+    std::string GetSpecializationValue(const std::string& expression, DIClassTemplateSpecializationType* specializationType);
+    std::string GetStringValue(const std::string& expression);
+    std::string GetWStringValue(const std::string& expression);
+    std::string GetUStringValue(const std::string& expression);
     EvaluateReply DoEvaluate(const std::string& expression);
     void GetLocationResult(bool& success, std::string& error, Location& loc, TargetState& targetState);
     MessageKind GetMessageKind(JsonValue* message, std::string& messageKindStr);
@@ -890,6 +894,10 @@ std::string ServerDebugger::GetValue(DIVariable* variable)
                     return evaluateReply.result.value;
                 }
             }
+            case DIType::Kind::specializationType:
+            {
+                return GetSpecializationValue(variable->Name(), static_cast<DIClassTemplateSpecializationType*>(type));
+            }
         }
     }
     return std::string();
@@ -925,6 +933,81 @@ std::string ServerDebugger::GetEnumeratedTypeValue(uint64_t value, DIEnumType* e
         }
     }
     return strValue;
+}
+
+std::string ServerDebugger::GetSpecializationValue(const std::string& expression, DIClassTemplateSpecializationType* specializationType)
+{
+    if (specializationType->GetContainerClassTemplateKind() != ContainerClassTemplateKind::notContainerClassTemplate) return std::string();
+    if (specializationType->Name() == "String<char>")
+    {
+        return GetStringValue(expression);
+    }
+    else if (specializationType->Name() == "String<wchar>")
+    {
+        return GetWStringValue(expression);
+    }
+    else if (specializationType->Name() == "String<uchar>")
+    {
+        return GetUStringValue(expression);
+    }
+    return std::string();
+}
+
+std::string ServerDebugger::GetStringValue(const std::string& expression)
+{
+    EvaluateReply evaluateReply = DoEvaluate(expression + ".chars");
+    if (evaluateReply.success)
+    {
+        std::string value = evaluateReply.result.value;
+        std::string::size_type firstDoubleQuotePos = value.find('"');
+        if (firstDoubleQuotePos != std::string::npos)
+        {
+            std::string::size_type secondDoubleQuotePos = value.find('"', firstDoubleQuotePos + 1);
+            if (secondDoubleQuotePos != std::string::npos)
+            {
+                return value.substr(firstDoubleQuotePos, secondDoubleQuotePos - firstDoubleQuotePos + 1);
+            }
+        }
+    }
+    return std::string();
+}
+
+std::string ServerDebugger::GetWStringValue(const std::string& expression)
+{
+    EvaluateReply evaluateReply = DoEvaluate(expression + ".chars");
+    if (evaluateReply.success)
+    {
+        std::string value = evaluateReply.result.value;
+        std::string::size_type uPos = value.find('u');
+        if (uPos != std::string::npos)
+        {
+            std::string::size_type doubleQuotePos = value.find('"', uPos + 2);
+            if (doubleQuotePos != std::string::npos)
+            {
+                return value.substr(uPos, doubleQuotePos - uPos + 1);
+            }
+        }
+    }
+    return std::string();
+}
+
+std::string ServerDebugger::GetUStringValue(const std::string& expression)
+{
+    EvaluateReply evaluateReply = DoEvaluate(expression + ".chars");
+    if (evaluateReply.success)
+    {
+        std::string value = evaluateReply.result.value;
+        std::string::size_type uPos = value.find('U');
+        if (uPos != std::string::npos)
+        {
+            std::string::size_type doubleQuotePos = value.find('"', uPos + 2);
+            if (doubleQuotePos != std::string::npos)
+            {
+                return value.substr(uPos, doubleQuotePos - uPos + 1);
+            }
+        }
+    }
+    return std::string();
 }
 
 std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest)
