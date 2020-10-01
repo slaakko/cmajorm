@@ -197,12 +197,10 @@ namespace Cm.Service.Debug
             messageKindMap["depthReply"] = MessageKind.depthReply;
             messageKindMap["framesRequest"] = MessageKind.framesRequest;
             messageKindMap["framesReply"] = MessageKind.framesReply;
-            messageKindMap["localCountRequest"] = MessageKind.localCountRequest;
-            messageKindMap["localCountReply"] = MessageKind.localCountReply;
-            messageKindMap["nameRequest"] = MessageKind.nameRequest;
-            messageKindMap["nameReply"] = MessageKind.nameReply;
-            messageKindMap["evaluateRequest"] = MessageKind.evaluateRequest;
-            messageKindMap["evaluateReply"] = MessageKind.evaluateReply;
+            messageKindMap["countRequest"] = MessageKind.countRequest;
+            messageKindMap["countReply"] = MessageKind.countReply;
+            messageKindMap["evaluateChildRequest"] = MessageKind.evaluateChildRequest;
+            messageKindMap["evaluateChildReply"] = MessageKind.evaluateChildReply;
             messageKindMap["targetRunningRequest"] = MessageKind.targetRunningRequest;
             messageKindMap["targetRunningReply"] = MessageKind.targetRunningReply;
             messageKindMap["targetInputRequest"] = MessageKind.targetInputRequest;
@@ -591,93 +589,69 @@ namespace Cm.Service.Debug
                 return MakePair(List<Location>(), false);
             }
         }
-        public int LocalCount()
+        public int LocalVariableCount()
         {
             RequestGuard requestGuard(this);
-            SendLocalCountRequest();
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.localCountReply);
+            SendLocalVariableCountRequest();
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.countReply);
             int count = -1;
-            ProcessLocalCountReply(reply.Get(), count);
+            ProcessLocalVariableCountReply(reply.Get(), count);
             return count;
         }
-        private void SendLocalCountRequest()
+        private void SendLocalVariableCountRequest()
         {
-            LocalCountRequest localCountRequest;
-            UniquePtr<JsonValue> request = localCountRequest.ToJson();
+            CountRequest countRequest;
+            countRequest.expression = "@locals";
+            UniquePtr<JsonValue> request = countRequest.ToJson();
             WriteRequest(request.Get());
         }
-        private void ProcessLocalCountReply(JsonValue* reply, int& count)
+        private void ProcessLocalVariableCountReply(JsonValue* reply, int& count)
         {
-            LocalCountReply localCountReply(reply);
-            if (localCountReply.success)
+            CountReply countReply(reply);
+            if (countReply.success)
             {
                 try
                 {
-                    count = ParseInt(localCountReply.count);
+                    count = ParseInt(countReply.count);
                 }
                 catch (const Exception& ex)
                 {
-                    LogMessage("localCount request failed: count not valid: " + ex.Message());
+                    LogMessage("count request failed: count not valid: " + ex.Message());
                     count = -1;
                 }
             }
             else
             {
-                LogMessage("localCount request failed: " + localCountReply.error);
+                LogMessage("count request failed: " + countReply.error);
                 count = -1;
             }
         }
-        public Pair<List<string>, bool> Names(int start, int count)
+        public Pair<List<ChildResult>, bool> LocalVariables(int start, int count)
         {
-            SendNameRequest(start, count);
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.nameReply);
-            return ProcessNameReply(reply.Get());
+            SendEvaluateLocalVariablesRequest(start, count);
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateChildReply);
+            return ProcessEvaluateLocalVariablesReply(reply.Get());
         }
-        private void SendNameRequest(int start, int count)
+        private void SendEvaluateLocalVariablesRequest(int start, int count)
         {
-            NameRequest nameRequest;
-            nameRequest.start = ToString(start);
-            nameRequest.count = ToString(count);
-            UniquePtr<JsonValue> request = nameRequest.ToJson();
+            EvaluateChildRequest evaluateChildRequest;
+            evaluateChildRequest.expression = "@locals";
+            evaluateChildRequest.start = ToString(start);
+            evaluateChildRequest.count = ToString(count);
+            UniquePtr<JsonValue> request = evaluateChildRequest.ToJson();
             WriteRequest(request.Get());
         }
-        private Pair<List<string>, bool> ProcessNameReply(JsonValue* reply)
+        private Pair<List<ChildResult>, bool> ProcessEvaluateLocalVariablesReply(JsonValue* reply)
         {
-            NameReply nameReply(reply);
-            if (nameReply.success)
+            EvaluateChildReply evaluateChildReply(reply);
+            if (evaluateChildReply.success)
             {
-                return MakePair(nameReply.names, true);
+                return MakePair(evaluateChildReply.results, true);
             }
             else
             {
-                LogMessage("name request failed: " + nameReply.error);
-                return MakePair(List<string>(), false);
-            }
-        }
-        public Pair<Result, bool> Evaluate(const string& expression)
-        {
-            SendEvaluateRequest(expression);
-            UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateReply);
-            return ProcessEvaluateReply(reply.Get());
-        }
-        private void SendEvaluateRequest(const string& expression)
-        {
-            EvaluateRequest evaluateRequest;
-            evaluateRequest.expression = expression;
-            UniquePtr<JsonValue> request = evaluateRequest.ToJson();
-            WriteRequest(request.Get());
-        }
-        private Pair<Result, bool> ProcessEvaluateReply(JsonValue* reply)
-        {
-            EvaluateReply evaluateReply(reply);
-            if (evaluateReply.success)
-            {
-                return MakePair(evaluateReply.result, true);
-            }
-            else
-            {
-                LogMessage("evaluate request failed: " + evaluateReply.error);
-                return MakePair(Result(), false);
+                LogMessage("evaluate child request failed: " + evaluateChildReply.error);
+                return MakePair(List<ChildResult>(), false);
             }
         }
         private void ProcessStopReason(const TargetState& state)
@@ -742,6 +716,7 @@ namespace Cm.Service.Debug
         }
         private void ProcessTargetRunningRequest(const TargetRunningRequest& targetRunningRequest)
         {
+            
             if (targetRunning != TargetRunningMethod())
             {
                 targetRunning();

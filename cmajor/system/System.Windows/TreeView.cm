@@ -148,9 +148,9 @@ namespace System.Windows
                         Rect r(Point(), GetSize());
                         r.size.w = r.size.w - 1;
                         r.size.h = r.size.h - 1;
-                        int index = 0;
+                        int idx = 0;
                         Rect rect;
-                        root->Measure(args.graphics, r.location, this, 0, index, rect);
+                        root->Measure(args.graphics, r.location, this, 0, idx, rect);
                         SetContentSize(rect.size);
                     }
                 }
@@ -285,7 +285,7 @@ namespace System.Windows
             toolTipWindow->Hide();
             Point loc = node->Location();
             Size size = node->GetSize();
-            Point pt(loc.x + size.w, loc.y);
+            Point pt(loc.x, loc.y + size.h + 4);
             if (!node->Children().IsEmpty())
             {
                 pt.x = pt.x + cast<int>(textHeight + 2.0f);
@@ -721,7 +721,7 @@ namespace System.Windows
         {
             none = 0, mouseEntered = 1 << 0, selected = 1 << 1, active = 1 << 2
         }
-        public explicit nothrow TreeViewNode(const string& text_) : treeView(null), text(text_), children(this), state(State.collapsed), flags(Flags.none), number(-1)
+        public explicit nothrow TreeViewNode(const string& text_) : treeView(null), text(text_), children(this), state(State.collapsed), flags(Flags.none), index(-1)
         {
         }
         public nothrow void SetTreeView(TreeView* treeView_)
@@ -808,9 +808,9 @@ namespace System.Windows
                 child = child->NextSibling();
             }
         }
-        internal nothrow void Measure(Graphics& graphics, const Point& loc, TreeView* treeView, int level, int& index, Rect& parentRect)
+        internal nothrow void Measure(Graphics& graphics, const Point& loc, TreeView* treeView, int level, int& idx, Rect& parentRect)
         {
-            location = Point(cast<int>(loc.x + level * 2 * treeView->TextHeight()), cast<int>(loc.y + index * treeView->TextHeight()));
+            location = Point(cast<int>(loc.x + level * 2 * treeView->TextHeight()), cast<int>(loc.y + idx * treeView->TextHeight()));
             Rect rect(location, size);
             childRect = rect;
             parentRect = Rect.Union(parentRect, childRect);
@@ -822,8 +822,8 @@ namespace System.Windows
                     if (child is TreeViewNode*)
                     {
                         TreeViewNode* childNode = cast<TreeViewNode*>(child);
-                        ++index;
-                        childNode->Measure(graphics, loc, treeView, level + 1, index, childRect);
+                        ++idx;
+                        childNode->Measure(graphics, loc, treeView, level + 1, idx, childRect);
                         parentRect = Rect.Union(parentRect, childRect);
                     }
                     child = child->NextSibling();
@@ -1344,13 +1344,13 @@ namespace System.Windows
                 }
             }
         }
-        public nothrow inline int Number() const
+        public nothrow inline int Index() const
         {
-            return number;
+            return index;
         }
-        public nothrow void SetNumber(int number_)
+        public nothrow void SetIndex(int index_)
         {
-            number = number_;
+            index = index_;
         }
         private TreeView* treeView;
         private string text;
@@ -1361,6 +1361,6 @@ namespace System.Windows
         private Point location;
         private Size size;
         private Rect childRect;
-        private int number;
+        private int index;
     }
 }

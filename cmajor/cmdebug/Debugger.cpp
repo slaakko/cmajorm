@@ -5,6 +5,7 @@
 
 #include <cmajor/cmdebug/Debugger.hpp>
 #include <cmajor/cmdebug/Console.hpp>
+#include <cmajor/cmdebug/Container.hpp>
 #include <cmajor/cmdebug/DebuggerCommandParser.hpp>
 #include <cmajor/cmdebug/DebuggerCommandLexer.hpp>
 #include <cmajor/cmdebug/DebugExprLexer.hpp>
@@ -1393,6 +1394,44 @@ DIType* Debugger::GetDynamicType(DIType* diType, BoundDebugNode* node)
                                     DIType* dynamicType = debugInfo->GetPolymorphicType(vmtVarName);
                                     result.reset(mainResult.release());
                                     return dynamicType;
+                                }
+                                else
+                                {
+                                    DebuggerVariable variable = GetNextDebuggerVariable();
+                                    GdbVarCreateCommand varCreateCommand(variable.GdbVarName(), "*", vmtPtrMember.GdbExprString());
+                                    result.reset(new JsonObject());
+                                    bool succeeded = ExecuteGDBCommand(varCreateCommand);
+                                    AddDebuggerVariable(variable);
+                                    if (result->Type() == JsonValueType::object)
+                                    {
+                                        JsonObject* jsonObject = static_cast<JsonObject*>(result.get());
+                                        JsonValue* value = jsonObject->GetField(U"value");
+                                        std::string vmtVarFieldStr = ToUtf8(static_cast<JsonString*>(value)->Value());
+                                        std::string vmtVarName = ParseVmtVariableName(vmtVarFieldStr);
+                                        if (!vmtVarName.empty())
+                                        {
+                                            DIType* dynamicType = debugInfo->GetPolymorphicType(vmtVarName);
+                                            result.reset(mainResult.release());
+                                            return dynamicType;
+                                        }
+/*  todo!!!!!!!!!!!!!!!!!!!!
+                                        else
+                                        {
+                                            uint64_t addr = ParseHex(vmtVarFieldStr);
+                                            if (addr != 0)
+                                            {
+                                                uint64_t typeIdAddr = addr + 16;
+                                                GdbExamineCommand examineCommand(16, 'x', 'b', typeIdAddr);
+                                                result.reset(new JsonObject());
+                                                bool success = ExecuteGDBCommand(examineCommand);
+                                                if (success)
+                                                {
+
+                                                }
+                                            }
+                                        }
+*/
+                                    }
                                 }
                             }
                         }

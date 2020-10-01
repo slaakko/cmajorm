@@ -84,7 +84,7 @@ bool StructType::WriteDeclaration(CodeFormatter& formatter)
     formatter.WriteLine("{");
     formatter.IncIndent();
     formatter.WriteLine(Name() + "();");
-    formatter.WriteLine(Name() + "(soulng::util::JsonValue* value);");
+    formatter.WriteLine(Name() + "(soulng::util::JsonValue* __json_value);");
     formatter.WriteLine("std::unique_ptr<soulng::util::JsonValue> ToJson() const;");
     for (const std::unique_ptr<Field>& field : fields)
     {
@@ -134,12 +134,12 @@ bool StructType::WriteDefinition(CodeFormatter& formatter)
     formatter.DecIndent();
     formatter.WriteLine("}");
     formatter.WriteLine();
-    formatter.WriteLine(Name() + "::" + Name() + "(soulng::util::JsonValue* value)");
+    formatter.WriteLine(Name() + "::" + Name() + "(soulng::util::JsonValue* __json_value)");
     formatter.WriteLine("{");
     formatter.IncIndent();
     for (const std::unique_ptr<Field>& field : fields)
     {
-        formatter.WriteLine("sngjson::json::FromJson(value, \"" + field->Name() + "\", " + field->Name() + ");");
+        formatter.WriteLine("sngjson::json::FromJson(__json_value, \"" + field->Name() + "\", " + field->Name() + ");");
     }
     formatter.DecIndent();
     formatter.WriteLine("}");

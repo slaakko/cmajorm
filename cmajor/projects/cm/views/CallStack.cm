@@ -120,7 +120,7 @@ namespace Cm.Views
                         {
                             func = "<external>";
                         }
-                        string nodeText = ToString(node->Number()) + " - " + func;
+                        string nodeText = ToString(node->Index()) + " - " + func;
                         node->SetText(nodeText);
                         node->RemoveChildren();
                         if (!frame->location.func.IsEmpty())
@@ -145,7 +145,7 @@ namespace Cm.Views
                 {
                     string nodeText = ToString(i);
                     TreeViewNode* node = new TreeViewNode(nodeText);
-                    node->SetNumber(i);
+                    node->SetIndex(i);
                     root->AddChild(node);
                 }
                 root->Expand();
@@ -169,8 +169,8 @@ namespace Cm.Views
                 last = cast<TreeViewNode*>(last->PrevSibling());
                 --lastIndex;
             }
-            int lowFrame = first->Number();
-            int highFrame = last->Number();
+            int lowFrame = first->Index();
+            int highFrame = last->Index();
             if (lowFrame == highFrame && first->Data() != null)
             {
                 return;
@@ -189,7 +189,7 @@ namespace Cm.Views
             for (int i = firstIndex; i <= lastIndex; ++i)
             {
                 TreeViewNode* node = nodes[i];
-                node->SetData(frames[node->Number()].Get());
+                node->SetData(frames[node->Index()].Get());
             }
         }
         public nothrow void SetDebugService(Cm.Service.Debug.DebugService* debugService_)

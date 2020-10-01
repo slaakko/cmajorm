@@ -60,6 +60,7 @@ public:
     Project* GetProject() const { return project; }
     void SetProject(Project* project_) { project = project_; }
     virtual std::unique_ptr<JsonValue> ToJson() const;
+    virtual DIType* DerefType() { return this; }
 private:
     Kind kind;
     boost::uuids::uuid id;
@@ -173,6 +174,8 @@ private:
     std::string vmtVariableName;
 };
 
+int NumBaseClasses(DIClassType* classType);
+
 class DEBUG_API DIClassTemplateSpecializationType : public DIClassType
 {
 public:
@@ -183,6 +186,7 @@ public:
     ContainerClassTemplateKind GetContainerClassTemplateKind() const { return containerKind; }
     const boost::uuids::uuid& ValueTypeId() const { return valueTypeId; }
     void SetValueTypeId(const boost::uuids::uuid& valueTypeId_);
+    DIType* ValueType();
     void AddTemplateArgumentTypeId(const boost::uuids::uuid& templateArgumentTypeId);
     const std::vector< boost::uuids::uuid>& TemplateArgumentTypeIds() const { return templateArgumentTypeIds; }
     void Write(soulng::util::BinaryWriter& writer) override;
@@ -205,6 +209,14 @@ class DEBUG_API DIClassDelegateType : public DIType
 {
 public:
     DIClassDelegateType();
+    void SetClassTypeId(const boost::uuids::uuid& classTypeId_);
+    DIType* GetClassType() const;
+    void Write(soulng::util::BinaryWriter& writer) override;
+    void Read(soulng::util::BinaryReader& reader) override;
+    std::unique_ptr<JsonValue> ToJson() const override;
+    Scope* GetScope() override;
+private:
+    boost::uuids::uuid classTypeId;
 };
 
 class DEBUG_API DIInterfaceType : public DIType
@@ -223,6 +235,7 @@ public:
     void Write(soulng::util::BinaryWriter& writer) override;
     void Read(soulng::util::BinaryReader& reader) override;
     std::unique_ptr<JsonValue> ToJson() const override;
+    DIType* DerefType() override { return BaseType()->DerefType(); }
 private:
     boost::uuids::uuid baseTypeId;
 };
@@ -237,6 +250,7 @@ public:
     void Write(soulng::util::BinaryWriter& writer) override;
     void Read(soulng::util::BinaryReader& reader) override;
     std::unique_ptr<JsonValue> ToJson() const override;
+    DIType* DerefType() override { return BaseType(); }
 private:
     boost::uuids::uuid baseTypeId;
 };
@@ -251,6 +265,7 @@ public:
     void Write(soulng::util::BinaryWriter& writer) override;
     void Read(soulng::util::BinaryReader& reader) override;
     std::unique_ptr<JsonValue> ToJson() const override;
+    DIType* DerefType() override { return PointedToType(); }
 private:
     boost::uuids::uuid pointedTypeId;
 };

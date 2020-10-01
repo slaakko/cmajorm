@@ -542,7 +542,7 @@ void BoundDerefNode::Accept(BoundDebugNodeVisitor& visitor)
 
 std::string BoundDerefNode::ToString() const
 {
-    return "*" + subject->ToString();
+    return "(*" + subject->ToString() + ")";
 }
 
 BoundDebugNode* BoundDerefNode::Clone() const
@@ -552,7 +552,7 @@ BoundDebugNode* BoundDerefNode::Clone() const
 
 std::string BoundDerefNode::GdbExprString() const
 {
-    return "*" + subject->GdbExprString();
+    return "(*" + subject->GdbExprString() + ")";
 }
 
 BoundAddrOfNode::BoundAddrOfNode(DIType* type, BoundDebugNode* subject_, DebugExprNode* sourceNode) : BoundDebugNode(Kind::addrOfNode, type, sourceNode), subject(subject_)

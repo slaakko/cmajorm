@@ -192,12 +192,15 @@ void TypeIndex::AddType(const boost::uuids::uuid& typeId, TypeSymbol* typeSymbol
                 case SymbolType::classDelegateTypeSymbol:
                 {
                     ClassDelegateTypeSymbol* classDelegateTypeSymbol = static_cast<ClassDelegateTypeSymbol*>(typeSymbol);
+                    ClassTypeSymbol* classType = classDelegateTypeSymbol->ObjectDelegatePairType();
                     cmajor::debug::DIClassDelegateType* type = new cmajor::debug::DIClassDelegateType();
                     type->SetId(typeSymbol->TypeId());
                     type->SetName(ToUtf8(typeSymbol->FullName()));
                     type->SetIrName(emitter.GetIrTypeName(typeSymbol->IrType(emitter)));
                     typeMap[type->Id()] = type;
                     diTypes.push_back(std::unique_ptr<cmajor::debug::DIType>(type));
+                    AddType(classType->TypeId(), classType, emitter);
+                    type->SetClassTypeId(classType->TypeId());
                     break;
                 }
                 case SymbolType::interfaceTypeSymbol:

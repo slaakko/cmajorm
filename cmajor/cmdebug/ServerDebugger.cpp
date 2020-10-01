@@ -18,6 +18,8 @@
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <condition_variable>
 #include <iostream>
 #include <thread>
@@ -114,6 +116,7 @@ public:
     void LogReply(JsonValue* reply);
     std::unique_ptr<JsonValue> ProcessRequest(JsonValue* requestMessage);
     std::unique_ptr<JsonValue> GetIdleClientChannelMessage() override;
+    bool IsIdleChannelMessage(JsonValue* message) const override;
     void ClientChannelError(const std::string& error) override;
     void ProcessReceivedClientChannelMessage(JsonValue* message) override;
     void ProcessTargetRunningReply(JsonValue* message);
@@ -132,12 +135,21 @@ public:
     std::unique_ptr<JsonValue> ProcessDeleteRequest(const DeleteRequest& deleteRequest);
     std::unique_ptr<JsonValue> ProcessDepthRequest(const DepthRequest& depthRequest);
     std::unique_ptr<JsonValue> ProcessFramesRequest(const FramesRequest& framesRequest);
-    std::unique_ptr<JsonValue> ProcessLocalCountRequest(const LocalCountRequest& localCountRequest);
-    std::unique_ptr<JsonValue> ProcessNameRequest(const NameRequest& nameRequest);
-    std::unique_ptr<JsonValue> ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest);
-    std::string GetValue(DIVariable* variable);
+    std::unique_ptr<JsonValue> ProcessCountRequest(const CountRequest& countRequest);
+    std::unique_ptr<JsonValue> ProcessEvaluateChildRequest(const EvaluateChildRequest& evaluateChildRequest);
+    void DoEvaluateChildRequest(Project* project, const std::string& expression, int start, int count, EvaluateChildReply& reply);
+    void EvaluateSpecializationTypeChildRequest(DIClassTemplateSpecializationType* specializationType, const std::string& expression, int start, int count,
+        EvaluateChildReply& reply);
+    void EvaluateContainerTypeChildRequest(DIClassTemplateSpecializationType* containerType, const std::string& expression, int start, int count,
+        EvaluateChildReply& reply);
+    void EvaluateClassTypeChildRequest(DIClassType* classType, const std::string& expression, int start, int count, EvaluateChildReply& reply);
+    std::string GetValue(const std::string& parentExpr, DIVariable* variable, int64_t& count);
+    std::string GetValue(const std::string& expression, DIType* type, int64_t& count);
     std::string GetEnumeratedTypeValue(uint64_t value, DIEnumType* enumType);
-    std::string GetSpecializationValue(const std::string& expression, DIClassTemplateSpecializationType* specializationType);
+    std::string GetSpecializationValue(bool initialized, const std::string& expression, DIClassTemplateSpecializationType* specializationType, int64_t& count);
+    std::string GetClassValue(const std::string& expression, DIClassType* classType, int64_t& count);
+    std::string GetPointedValue(const std::string& expression, DIType* derefType, DIType* dynamicType, int64_t& count);
+    std::string GetClassDelegateValue(const std::string& expression, DIClassDelegateType* classDelegateType);
     std::string GetStringValue(const std::string& expression);
     std::string GetWStringValue(const std::string& expression);
     std::string GetUStringValue(const std::string& expression);
@@ -383,20 +395,15 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessRequest(JsonValue* requestMess
             FramesRequest framesRequest(requestMessage);
             return ProcessFramesRequest(framesRequest);
         }
-        case MessageKind::localCountRequest:
+        case MessageKind::countRequest:
         {
-            LocalCountRequest localCountRequest(requestMessage);
-            return ProcessLocalCountRequest(localCountRequest);
+            CountRequest countRequest(requestMessage);
+            return ProcessCountRequest(countRequest);
         }
-        case MessageKind::nameRequest:
+        case MessageKind::evaluateChildRequest:
         {
-            NameRequest nameRequest(requestMessage);
-            return ProcessNameRequest(nameRequest);
-        }
-        case MessageKind::evaluateRequest:
-        {
-            EvaluateRequest evaluateRequest(requestMessage);
-            return ProcessEvaluateRequest(evaluateRequest);
+            EvaluateChildRequest evaluateChildRequest(requestMessage);
+            return ProcessEvaluateChildRequest(evaluateChildRequest);
         }
         default:
         {
@@ -420,6 +427,24 @@ std::unique_ptr<JsonValue> ServerDebugger::GetIdleClientChannelMessage()
     TargetRunningRequest targetRunningRequest;
     targetRunningRequest.messageKind = "targetRunningRequest";
     return targetRunningRequest.ToJson();
+}
+
+bool ServerDebugger::IsIdleChannelMessage(JsonValue* message) const
+{
+    if (message->Type() == JsonValueType::object)
+    {
+        JsonObject* messageObject = static_cast<JsonObject*>(message);
+        JsonValue* messageKindField = messageObject->GetField(U"messageKind");
+        if (messageKindField && messageKindField->Type() == JsonValueType::string)
+        {
+            JsonString* messageKind = static_cast<JsonString*>(messageKindField);
+            if (messageKind->Value() == U"targetRunningRequest")
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void ServerDebugger::ClientChannelError(const std::string& error)
@@ -578,6 +603,10 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessStopRequest(const StopRequest&
 
 std::unique_ptr<JsonValue> ServerDebugger::ProcessContinueRequest(const ContinueRequest& continueRequest)
 {
+    if (clientChannel)
+    {
+        clientChannel->StartSendingIdleMessages();
+    }
     ContinueReply continueReply;
     continueReply.messageKind = "continueReply";
     try
@@ -590,11 +619,19 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessContinueRequest(const Continue
         continueReply.success = false;
         continueReply.error = ex.what();
     }
+    if (clientChannel)
+    {
+        clientChannel->StopSendingIdleMessages();
+    }
     return continueReply.ToJson();
 }
 
 std::unique_ptr<JsonValue> ServerDebugger::ProcessNextRequest(const NextRequest& stopRequest)
 {
+    if (clientChannel)
+    {
+        clientChannel->StartSendingIdleMessages();
+    }
     NextReply nextReply;
     nextReply.messageKind = "nextReply";
     try
@@ -607,11 +644,19 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessNextRequest(const NextRequest&
         nextReply.success = false;
         nextReply.error = ex.what();
     }
+    if (clientChannel)
+    {
+        clientChannel->StopSendingIdleMessages();
+    }
     return nextReply.ToJson();
 }
 
 std::unique_ptr<JsonValue> ServerDebugger::ProcessStepRequest(const StepRequest& stepRequest)
 {
+    if (clientChannel)
+    {
+        clientChannel->StartSendingIdleMessages();
+    }
     StepReply stepReply;
     stepReply.messageKind = "stepReply";
     try
@@ -624,11 +669,19 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessStepRequest(const StepRequest&
         stepReply.success = false;
         stepReply.error = ex.what();
     }
+    if (clientChannel)
+    {
+        clientChannel->StopSendingIdleMessages();
+    }
     return stepReply.ToJson();
 }
 
 std::unique_ptr<JsonValue> ServerDebugger::ProcessFinishRequest(const FinishRequest& finishRequest)
 {
+    if (clientChannel)
+    {
+        clientChannel->StartSendingIdleMessages();
+    }
     FinishReply finishReply;
     finishReply.messageKind = "finishReply";
     try
@@ -641,11 +694,19 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessFinishRequest(const FinishRequ
         finishReply.success = false;
         finishReply.error = ex.what();
     }
+    if (clientChannel)
+    {
+        clientChannel->StopSendingIdleMessages();
+    }
     return finishReply.ToJson();
 }
 
 std::unique_ptr<JsonValue> ServerDebugger::ProcessUntilRequest(const UntilRequest& untilRequest)
 {
+    if (clientChannel)
+    {
+        clientChannel->StartSendingIdleMessages();
+    }
     UntilReply untilReply;
     untilReply.messageKind = "untilReply";
     try
@@ -658,6 +719,10 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessUntilRequest(const UntilReques
     {
         untilReply.success = false;
         untilReply.error = ex.what();
+    }
+    if (clientChannel)
+    {
+        clientChannel->StopSendingIdleMessages();
     }
     return untilReply.ToJson();
 }
@@ -791,83 +856,270 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessFramesRequest(const FramesRequ
     return framesReply.ToJson();
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessLocalCountRequest(const LocalCountRequest& localCountRequest)
+std::unique_ptr<JsonValue> ServerDebugger::ProcessCountRequest(const CountRequest& countRequest)
 {
-    LocalCountReply localCountReply;
-    localCountReply.messageKind = "localCountReply";
+    CountReply countReply;
+    countReply.messageKind = "countReply";
     Instruction* stoppedInstruction = StoppedInstruction();
     if (stoppedInstruction)
     {
         CompileUnitFunction* function = stoppedInstruction->GetCompileUnitFunction();
-        int localVariableCount = function->LocalVariables().size();
-        localCountReply.success = true;
-        localCountReply.count = std::to_string(localVariableCount);
+        if (countRequest.expression == "@locals")
+        {
+            int localVariableCount = function->LocalVariables().size();
+            countReply.success = true;
+            countReply.count = std::to_string(localVariableCount);
+        }
+        else
+        {
+            countReply.success = false;
+            countReply.error = "unknonwn count expression";
+        }
     }
     else
     {
-        localCountReply.success = false;
-        localCountReply.error = "not stopped";
+        countReply.success = false;
+        countReply.error = "not stopped";
     }
-    return localCountReply.ToJson();
+    return countReply.ToJson();
 }
 
-std::unique_ptr<JsonValue> ServerDebugger::ProcessNameRequest(const NameRequest& nameRequest)
+std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateChildRequest(const EvaluateChildRequest& evaluateChildRequest)
 {
-    NameReply nameReply;
-    nameReply.messageKind = "nameReply";
+    EvaluateChildReply evaluateChildReply;
+    evaluateChildReply.messageKind = "evaluateChildReply";
     try
     {
-        int start = boost::lexical_cast<int>(nameRequest.start);
-        int count = boost::lexical_cast<int>(nameRequest.count);
+        int start = boost::lexical_cast<int>(evaluateChildRequest.start);
+        int count = boost::lexical_cast<int>(evaluateChildRequest.count);
         Instruction* stoppedInstruction = StoppedInstruction();
         if (stoppedInstruction)
         {
             CompileUnitFunction* function = stoppedInstruction->GetCompileUnitFunction();
-            int localVariableCount = function->LocalVariables().size();
-            if (start >= 0 && start < localVariableCount)
+            if (evaluateChildRequest.expression == "@locals")
             {
-                if (start + count >= 0 && start + count <= localVariableCount)
+                int localVariableCount = function->LocalVariables().size();
+                if (start >= 0 && start < localVariableCount)
                 {
-                    nameReply.success = true;
-                    for (int i = start; i < start + count; ++i)
+                    if (start + count >= 0 && start + count <= localVariableCount)
                     {
-                        DIVariable* localVariable = function->LocalVariables()[i];
-                        nameReply.names.push_back(localVariable->Name());
-                        nameReply.values.push_back(GetValue(localVariable));
+                        evaluateChildReply.success = true;
+                        for (int i = start; i < start + count; ++i)
+                        {
+                            DIVariable* localVariable = function->LocalVariables()[i];
+                            ChildResult result;
+                            result.expr = localVariable->Name();
+                            result.name = localVariable->Name();
+                            result.type = localVariable->GetType()->Name();
+                            int64_t count = 0;
+                            result.value = GetValue(std::string(), localVariable, count);
+                            result.count = std::to_string(count);
+                            evaluateChildReply.results.push_back(result);
+                        }
+                    }
+                    else
+                    {
+                        evaluateChildReply.success = false;
+                        evaluateChildReply.error = "start/count not valid";
                     }
                 }
                 else
                 {
-                    nameReply.success = false;
-                    nameReply.error = "count not valid";
+                    evaluateChildReply.success = false;
+                    evaluateChildReply.error = "start not valid";
                 }
             }
             else
             {
-                nameReply.success = false;
-                nameReply.error = "start not valid";
+                CompileUnit* compileUnit = function->GetCompileUnit();
+                Project* project = compileUnit->GetProject();
+                DoEvaluateChildRequest(project, evaluateChildRequest.expression, start, count, evaluateChildReply);
             }
         }
         else
         {
-            nameReply.success = false;
-            nameReply.error = "not stopped";
+            evaluateChildReply.success = false;
+            evaluateChildReply.error = "not stopped";
         }
     }
     catch (const std::exception& ex)
     {
-        nameReply.success = false;
-        nameReply.error = ex.what();
+        evaluateChildReply.success = false;
+        evaluateChildReply.error = ex.what();
     }
-    return nameReply.ToJson();
+    return evaluateChildReply.ToJson();
 }
 
-std::string ServerDebugger::GetValue(DIVariable* variable)
+void ServerDebugger::DoEvaluateChildRequest(Project* project, const std::string& expression, int start, int count, EvaluateChildReply& reply)
 {
-    EvaluateReply evaluateReply = DoEvaluate(variable->Name());
+    EvaluateReply evaluateReply = DoEvaluate(expression);
     if (evaluateReply.success)
     {
-        DIType* type = variable->GetType();
+        const Result& result = evaluateReply.result;
+        const Type& staticType = result.staticType;
+        const Type& dynamicType = result.dynamicType;
+        boost::uuids::uuid staticTypeId = boost::lexical_cast<boost::uuids::uuid>(staticType.id);
+        DIType* type = project->GetType(staticTypeId);
+        while (type)
+        {
+            switch (type->GetKind())
+            {
+                case DIType::Kind::specializationType:
+                {
+                    DIClassTemplateSpecializationType* specializationType = static_cast<DIClassTemplateSpecializationType*>(type);
+                    EvaluateSpecializationTypeChildRequest(specializationType, expression, start, count, reply);
+                    return;
+                }
+                case DIType::Kind::classType:
+                {
+                    DIClassType* classType = static_cast<DIClassType*>(type);
+                    EvaluateClassTypeChildRequest(classType, expression, start, count, reply);
+                    return;
+                }
+                case DIType::Kind::pointerType:
+                {
+                    if (!dynamicType.id.empty())
+                    {
+                        DoEvaluateChildRequest(project, "(*cast<typeid(\"" + dynamicType.id + "\")>(" + expression + "))", start, count, reply);
+                    }
+                    else
+                    {
+                        DoEvaluateChildRequest(project, "(*" + expression + ")", start, count, reply);
+                    }
+                    return;
+                }
+                case DIType::Kind::referenceType:
+                {
+                    if (!dynamicType.id.empty())
+                    {
+                        DoEvaluateChildRequest(project, "(*cast<typeid(\"" + dynamicType.id + "\")>(" + expression + "))", start, count, reply);
+                    }
+                    else
+                    {
+                        DoEvaluateChildRequest(project, "(*" + expression + ")", start, count, reply);
+                    }
+                    return;
+                }
+                case DIType::Kind::constType:
+                {
+                    DIConstType* constType = static_cast<DIConstType*>(type);
+                    type = constType->BaseType();
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        reply.success = false;
+        reply.error = evaluateReply.error;
+    }
+}
+
+void ServerDebugger::EvaluateSpecializationTypeChildRequest(DIClassTemplateSpecializationType* specializationType, const std::string& expression, int start, int count,
+    EvaluateChildReply& reply)
+{
+    if (specializationType->GetContainerClassTemplateKind() != ContainerClassTemplateKind::notContainerClassTemplate)
+    {
+        EvaluateContainerTypeChildRequest(specializationType, expression, start, count, reply);
+    }
+    else
+    {
+        EvaluateClassTypeChildRequest(specializationType, expression, start, count, reply);
+    }
+}
+
+void ServerDebugger::EvaluateContainerTypeChildRequest(DIClassTemplateSpecializationType* containerType, const std::string& expression, int start, int count,
+    EvaluateChildReply& reply)
+{
+    Container* container = GetContainer(containerType->GetContainerClassTemplateKind(), expression);
+    int64_t childCount = container->Count(expression);
+    if (start >= 0 && start < childCount)
+    {
+        if (start + count >= 0 && start + count <= childCount)
+        {
+            DIType* valueType = containerType->ValueType();
+            for (int i = start; i < start + count; ++i)
+            {
+                ChildResult result;
+                result.expr = expression + "[" + std::to_string(i) + "]";
+                result.name = "[" + std::to_string(i) + "]";
+                result.type = valueType->Name();
+                int64_t count = 0;
+                result.value = GetValue(result.expr, valueType, count);
+                result.count = std::to_string(count);
+                reply.results.push_back(std::move(result));
+            }
+            reply.success = true;
+        }
+        else
+        {
+            reply.success = false;
+            reply.error = "start/count not valid";
+        }
+    }
+    else
+    {
+        reply.success = false;
+        reply.error = "start not valid";
+    }
+}
+
+void ServerDebugger::EvaluateClassTypeChildRequest(DIClassType* classType, const std::string& expression, int start, int count, EvaluateChildReply& reply)
+{
+    int index = 0;
+    int nb = NumBaseClasses(classType);
+    for (int i = 0; i < nb; ++i)
+    {
+        if (index >= start && index < start + count)
+        {
+            int nc = i + 1;
+            std::string expr = expression;
+            DIClassType* type = classType;
+            for (int j = 0; j < nc; ++j)
+            {
+                expr.append(".base");
+                type = static_cast<DIClassType*>(type->BaseClassType());
+            }
+            ChildResult childResult;
+            childResult.expr = expr;
+            childResult.name = "[" + type->Name() + "]";
+            childResult.type = type->Name();
+            int64_t count = 0;
+            childResult.value = GetValue(expr, type, count);
+            childResult.count = std::to_string(count);
+            reply.results.push_back(childResult);
+        }
+        ++index;
+    }
+    int nm = classType->MemberVariables().size();
+    for (int i = 0; i < nm; ++i)
+    {
+        if (index >= start && index < start + count)
+        {
+            DIVariable* memberVar = classType->MemberVariables()[i].get();
+            std::string expr = expression;
+            expr.append(".").append(memberVar->Name());
+            ChildResult childResult;
+            childResult.expr = expr;
+            childResult.name = memberVar->Name();
+            DIType* type = memberVar->GetType();
+            childResult.type = type->Name();
+            int64_t count = 0;
+            childResult.value = GetValue(expr, type, count);
+            childResult.count = std::to_string(count);
+            reply.results.push_back(childResult);
+        }
+        ++index;
+    }
+    reply.success = true;
+}
+
+std::string ServerDebugger::GetValue(const std::string& expression, DIType* type, int64_t& count)
+{
+    EvaluateReply evaluateReply = DoEvaluate(expression);
+    if (evaluateReply.success)
+    {
         switch (type->GetKind())
         {
             case DIType::Kind::primitiveType:
@@ -882,7 +1134,6 @@ std::string ServerDebugger::GetValue(DIVariable* variable)
                     {
                         uint64_t value = boost::lexical_cast<uint64_t>(evaluateReply.result.value);
                         return GetEnumeratedTypeValue(value, static_cast<DIEnumType*>(type));
-                        
                     }
                     catch (...)
                     {
@@ -896,11 +1147,83 @@ std::string ServerDebugger::GetValue(DIVariable* variable)
             }
             case DIType::Kind::specializationType:
             {
-                return GetSpecializationValue(variable->Name(), static_cast<DIClassTemplateSpecializationType*>(type));
+                return GetSpecializationValue(evaluateReply.result.initialized, expression, static_cast<DIClassTemplateSpecializationType*>(type), count);
+            }
+            case DIType::Kind::classType:
+            {
+                return GetClassValue(expression, static_cast<DIClassType*>(type), count);
+            }
+            case DIType::Kind::pointerType:
+            {
+                std::string value = evaluateReply.result.value;
+                DIType* dynamicType = nullptr;
+                if (!evaluateReply.result.dynamicType.id.empty())
+                {
+                    try
+                    {
+                        boost::uuids::uuid dynamicTypeId = boost::lexical_cast<boost::uuids::uuid>(evaluateReply.result.dynamicType.id);
+                        dynamicType = type->GetProject()->GetType(dynamicTypeId);
+                    }
+                    catch (...)
+                    {
+                    }
+                }
+                std::string pointedValue = GetPointedValue(expression, static_cast<DIPointerType*>(type)->PointedToType(), dynamicType, count);
+                if (!pointedValue.empty())
+                {
+                    value.append(" *=").append(pointedValue);
+                }
+                return value;
+            }
+            case DIType::Kind::referenceType:
+            {
+                std::string value = evaluateReply.result.value;
+                DIType* dynamicType = nullptr;
+                if (!evaluateReply.result.dynamicType.id.empty())
+                {
+                    try
+                    {
+                        boost::uuids::uuid dynamicTypeId = boost::lexical_cast<boost::uuids::uuid>(evaluateReply.result.dynamicType.id);
+                        dynamicType = type->GetProject()->GetType(dynamicTypeId);
+                    }
+                    catch (...)
+                    {
+                    }
+                }
+                std::string pointedValue = GetPointedValue(expression, static_cast<DIReferenceType*>(type)->BaseType(), dynamicType, count);
+                if (!pointedValue.empty())
+                {
+                    value.append(" *=").append(pointedValue);
+                }
+                return value;
+            }
+            case DIType::Kind::constType:
+            {
+                DIConstType* constType = static_cast<DIConstType*>(type);
+                return GetValue(expression, constType->BaseType(), count);
+            }
+            case DIType::Kind::delegateType:
+            {
+                return evaluateReply.result.value;
+            }
+            case DIType::Kind::classDelegateType:
+            {
+                return GetClassDelegateValue(expression, static_cast<DIClassDelegateType*>(type));
             }
         }
     }
     return std::string();
+}
+
+std::string ServerDebugger::GetValue(const std::string& parentExpr, DIVariable* variable, int64_t& count)
+{
+    std::string expression;
+    if (!parentExpr.empty())
+    {
+        expression.append(parentExpr).append(".");
+    }
+    expression.append(variable->Name());
+    return GetValue(expression, variable->GetType(), count);
 }
 
 std::string ServerDebugger::GetEnumeratedTypeValue(uint64_t value, DIEnumType* enumType)
@@ -935,22 +1258,110 @@ std::string ServerDebugger::GetEnumeratedTypeValue(uint64_t value, DIEnumType* e
     return strValue;
 }
 
-std::string ServerDebugger::GetSpecializationValue(const std::string& expression, DIClassTemplateSpecializationType* specializationType)
+std::string ServerDebugger::GetSpecializationValue(bool initialized, const std::string& expression, DIClassTemplateSpecializationType* specializationType, int64_t& count)
 {
-    if (specializationType->GetContainerClassTemplateKind() != ContainerClassTemplateKind::notContainerClassTemplate) return std::string();
-    if (specializationType->Name() == "String<char>")
+    if (specializationType->GetContainerClassTemplateKind() != ContainerClassTemplateKind::notContainerClassTemplate)
     {
-        return GetStringValue(expression);
+        std::string value;
+        value.append("{ ").append("container=<").append(ContainerName(specializationType->GetContainerClassTemplateKind())).append(">");
+        if (initialized)
+        {
+            Container* container = GetContainer(specializationType->GetContainerClassTemplateKind(), expression);
+            count = container->Count(expression);
+            value.append(", count=").append(std::to_string(count));
+        }
+        else
+        {
+            value.append(", value=<uninitialized>");
+        }
+        value.append(" }");
+        return value;
     }
-    else if (specializationType->Name() == "String<wchar>")
+    else
     {
-        return GetWStringValue(expression);
+        if (specializationType->Name() == "String<char>")
+        {
+            return GetStringValue(expression);
+        }
+        else if (specializationType->Name() == "String<wchar>")
+        {
+            return GetWStringValue(expression);
+        }
+        else if (specializationType->Name() == "String<uchar>")
+        {
+            return GetUStringValue(expression);
+        }
+        else
+        {
+            return GetClassValue(expression, specializationType, count);
+        }
     }
-    else if (specializationType->Name() == "String<uchar>")
+}
+
+std::string ServerDebugger::GetClassValue(const std::string& expression, DIClassType* classType, int64_t& count)
+{
+    bool first = true;
+    std::string value = "{ ";
+    if (!classType->BaseClassId().is_nil())
     {
-        return GetUStringValue(expression);
+        DIType* baseClassType = classType->BaseClassType();
+        if (baseClassType && (baseClassType->GetKind() == DIType::Kind::classType || baseClassType->GetKind() == DIType::Kind::specializationType))
+        {
+            int64_t cnt = 0;
+            std::string baseClassValue = GetClassValue(expression + ".base", static_cast<DIClassType*>(baseClassType), cnt);
+            value.append(baseClassValue);
+        }
+        if (first)
+        {
+            first = false;
+        }
     }
-    return std::string();
+    for (const std::unique_ptr<DIVariable>& memberVar : classType->MemberVariables())
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            value.append(", ");
+        }
+        int64_t count = 0;
+        value.append(memberVar->Name()).append("=").append(GetValue(expression, memberVar.get(), count));
+    }
+    value.append(" }");
+    count = NumBaseClasses(classType) + classType->MemberVariables().size();
+    return value;
+}
+
+std::string ServerDebugger::GetPointedValue(const std::string& expression, DIType* derefType, DIType* dynamicType, int64_t& count)
+{
+    if (dynamicType)
+    {
+        return GetValue("(*cast<typeid(\"" + boost::uuids::to_string(dynamicType->Id()) + "\")>(" + expression + "))", dynamicType->DerefType(), count);
+    }
+    else
+    {
+        if (derefType->GetKind() == DIType::Kind::primitiveType)
+        {
+            DIPrimitiveType* primitiveType = static_cast<DIPrimitiveType*>(derefType);
+            if (primitiveType->GetPrimitiveTypeKind() == DIPrimitiveType::Kind::charType ||
+                primitiveType->GetPrimitiveTypeKind() == DIPrimitiveType::Kind::wcharType ||
+                primitiveType->GetPrimitiveTypeKind() == DIPrimitiveType::Kind::ucharType ||
+                primitiveType->GetPrimitiveTypeKind() == DIPrimitiveType::Kind::voidType)
+            {
+                return std::string();
+            }
+        }
+        return GetValue("(*" + expression + ")", derefType, count);
+    }
+}
+
+std::string ServerDebugger::GetClassDelegateValue(const std::string& expression, DIClassDelegateType* classDelegateType)
+{
+    int64_t count = 0;
+    std::string value = GetClassValue(expression, static_cast<DIClassType*>(classDelegateType->GetClassType()), count);
+    return value;
 }
 
 std::string ServerDebugger::GetStringValue(const std::string& expression)
@@ -962,10 +1373,27 @@ std::string ServerDebugger::GetStringValue(const std::string& expression)
         std::string::size_type firstDoubleQuotePos = value.find('"');
         if (firstDoubleQuotePos != std::string::npos)
         {
-            std::string::size_type secondDoubleQuotePos = value.find('"', firstDoubleQuotePos + 1);
-            if (secondDoubleQuotePos != std::string::npos)
+            std::string::size_type start = firstDoubleQuotePos + 1;
+            while (start != std::string::npos)
             {
-                return value.substr(firstDoubleQuotePos, secondDoubleQuotePos - firstDoubleQuotePos + 1);
+                std::string::size_type secondDoubleQuotePos = value.find('"', start);
+                if (secondDoubleQuotePos > firstDoubleQuotePos + 1 && value[secondDoubleQuotePos - 1] == '\\')
+                {
+                    start = secondDoubleQuotePos + 1;
+                }
+                else if (secondDoubleQuotePos != std::string::npos)
+                {
+                    std::string str = value.substr(firstDoubleQuotePos, secondDoubleQuotePos - firstDoubleQuotePos + 1);
+                    if (str.length() >= 1024)
+                    {
+                        str = str.substr(0, 1024) + "...";
+                    }
+                    return str;
+                }
+                else
+                {
+                    start = std::string::npos;
+                }
             }
         }
     }
@@ -981,10 +1409,27 @@ std::string ServerDebugger::GetWStringValue(const std::string& expression)
         std::string::size_type uPos = value.find('u');
         if (uPos != std::string::npos)
         {
-            std::string::size_type doubleQuotePos = value.find('"', uPos + 2);
-            if (doubleQuotePos != std::string::npos)
+            std::string::size_type start = uPos + 2;
+            while (start != std::string::npos)
             {
-                return value.substr(uPos, doubleQuotePos - uPos + 1);
+                std::string::size_type doubleQuotePos = value.find('"', start);
+                if (doubleQuotePos > uPos + 2 && value[doubleQuotePos - 1] == '\\')
+                {
+                    start = doubleQuotePos + 1;
+                }
+                else if (doubleQuotePos != std::string::npos)
+                {
+                    std::string str = value.substr(uPos, doubleQuotePos - uPos + 1);
+                    if (str.length() > 1024)
+                    {
+                        str = str.substr(0, 1024) + "...";
+                    }
+                    return str;
+                }
+                else
+                {
+                    start = std::string::npos;
+                }
             }
         }
     }
@@ -1000,20 +1445,31 @@ std::string ServerDebugger::GetUStringValue(const std::string& expression)
         std::string::size_type uPos = value.find('U');
         if (uPos != std::string::npos)
         {
-            std::string::size_type doubleQuotePos = value.find('"', uPos + 2);
-            if (doubleQuotePos != std::string::npos)
+            std::string::size_type start = uPos + 2;
+            while (start != std::string::npos)
             {
-                return value.substr(uPos, doubleQuotePos - uPos + 1);
+                std::string::size_type doubleQuotePos = value.find('"', start);
+                if (doubleQuotePos > uPos + 2 && value[doubleQuotePos - 1] == '\\')
+                {
+                    start = doubleQuotePos + 1;
+                }
+                else if (doubleQuotePos != std::string::npos)
+                {
+                    std::string str = value.substr(uPos, doubleQuotePos - uPos + 1);
+                    if (str.length() > 1024)
+                    {
+                        str = str.substr(0, 1024) + "...";
+                    }
+                    return str;
+                }
+                else
+                {
+                    start = std::string::npos;
+                }
             }
         }
     }
     return std::string();
-}
-
-std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest)
-{
-    EvaluateReply evaluateReply = DoEvaluate(evaluateRequest.expression);
-    return evaluateReply.ToJson();
 }
 
 EvaluateReply ServerDebugger::DoEvaluate(const std::string& expression)

@@ -60,21 +60,21 @@ void ContainerSubscriptTranslator::Visit(BoundDerefNode& node)
 {
     node.Subject()->Accept(*this);
     std::string subject = expression;
-    expression = "*" + subject;
+    expression = "(*" + subject + ")";
 }
 
 void ContainerSubscriptTranslator::Visit(BoundAddrOfNode& node)
 {
     node.Subject()->Accept(*this);
     std::string subject = expression;
-    expression = "&" + subject;
+    expression = "(&" + subject + ")";
 }
 
 void ContainerSubscriptTranslator::Visit(BoundDotNode& node)
 {
     node.Subject()->Accept(*this);
     std::string subject = expression;
-    expression = "(" + subject + ")." + node.Member();
+    expression = subject + "." + node.Member();
 }
 
 void ContainerSubscriptTranslator::Visit(BoundSubscriptNode& node)

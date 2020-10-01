@@ -15,8 +15,8 @@ struct Location
 
 struct Type
 {
-    string id;
     string name;
+    string id;
 }
 
 struct Result
@@ -25,6 +25,15 @@ struct Result
     Type dynamicType;
     bool initialized;
     string value;
+}
+
+struct ChildResult
+{
+    string expr;
+    string name;
+    string type;
+    string value;
+    string count;
 }
 
 struct TargetState
@@ -207,35 +216,6 @@ struct FramesReply
     string error;
 }
 
-struct LocalCountRequest
-{
-    string messageKind;
-}
-
-struct LocalCountReply
-{
-    string messageKind;
-    bool success;
-    string count;
-    string error;
-}
-
-struct NameRequest
-{
-    string messageKind;
-    string start;
-    string count;
-}
-
-struct NameReply
-{
-    string messageKind;
-    bool success;
-    string[] names;
-    string[] values;
-    string error;
-}
-
 struct EvaluateRequest
 {
     string messageKind;
@@ -247,6 +227,36 @@ struct EvaluateReply
     string messageKind;
     bool success;
     Result result;
+    string error;
+}
+
+struct CountRequest
+{
+    string messageKind;
+    string expression;
+}
+
+struct CountReply
+{
+    string messageKind;
+    bool success;
+    string count;
+    string error;
+}
+
+struct EvaluateChildRequest
+{
+    string messageKind;
+    string expression;
+    string start;
+    string count;
+}
+
+struct EvaluateChildReply
+{
+    string messageKind;
+    bool success;
+    ChildResult[] results;
     string error;
 }
 

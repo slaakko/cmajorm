@@ -293,18 +293,36 @@ void DebugExprBinder::Visit(DerefDebugExprNode& node)
 {
     node.Operand()->Accept(*this);
     std::unique_ptr<BoundDebugNode> operandNode = std::move(currentNode);
+    DIType* type = operandNode->Type();
     DIType* operandType = nullptr;
-    switch (operandNode->Type()->GetKind())
+    while (type != nullptr)
     {
-        case DIType::Kind::pointerType:
+        switch (type->GetKind())
         {
-            DIPointerType* pointerType = static_cast<DIPointerType*>(operandNode->Type());
-            operandType = pointerType->PointedToType();
-            break;
-        }
-        default:
-        {
-            throw std::runtime_error("cannot dereference an object of a non-pointer type (" + operandNode->Type()->Name() + ")");
+            case DIType::Kind::pointerType:
+            {
+                DIPointerType* pointerType = static_cast<DIPointerType*>(type);
+                operandType = pointerType->PointedToType();
+                type = nullptr;
+                break;
+            }
+            case DIType::Kind::referenceType:
+            {
+                DIReferenceType* referenceType = static_cast<DIReferenceType*>(type);
+                operandType = referenceType->BaseType();
+                type = nullptr;
+                break;
+            }
+            case DIType::Kind::constType:
+            {
+                DIConstType* constType = static_cast<DIConstType*>(type);
+                type = constType->BaseType();
+                break;
+            }
+            default:
+            {
+                throw std::runtime_error("cannot dereference an object of a non-pointer or non-reference type (" + operandNode->Type()->Name() + ")");
+            }
         }
     }
     currentNode.reset(new BoundDerefNode(operandType, operandNode.release(), &node));

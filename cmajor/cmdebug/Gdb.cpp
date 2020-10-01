@@ -13,6 +13,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <thread>
 #include <memory>
+#include <condition_variable>
 
 namespace cmajor { namespace debug {
 
@@ -249,6 +250,11 @@ GdbVarSetVisualizerCommand::GdbVarSetVisualizerCommand(const std::string& name, 
 }
 
 GdbPrintCommand::GdbPrintCommand(const std::string& expression) : GdbCommand(Kind::print, "print " + expression)
+{
+}
+
+GdbExamineCommand::GdbExamineCommand(int numBytes, char format, char unitSize, uint64_t address) :
+    GdbCommand(Kind::examineCommand, "x/" + std::to_string(numBytes) + std::string(1, format) + std::string(1, unitSize) + " 0x" + ToHexString(address))
 {
 }
 
@@ -617,6 +623,8 @@ private:
     std::exception_ptr gdbException;
     int gdbExitCode;
     bool exited;
+    std::condition_variable gdbStarted;
+    std::mutex mtx;
 };
 
 void RunGDB(Gdb* gdb, const std::string& startCommand)
@@ -659,7 +667,8 @@ void Gdb::Start(const std::string& executable, const std::vector<std::string>& a
         startCommand.append(" \"").append(executable).append("\"");
     }
     gdbThread = std::thread{ RunGDB, this, startCommand };
-    std::this_thread::sleep_for(std::chrono::seconds{ 1 });
+    std::unique_lock<std::mutex> lock(mtx);
+    gdbStarted.wait(lock);
     startReply = ReadReply(driver);
 }
 
@@ -671,10 +680,12 @@ void Gdb::Run(const std::string& startCommand)
             soulng::util::Process::Redirections::processStdIn |
             soulng::util::Process::Redirections::processStdOut |
             soulng::util::Process::Redirections::processStdErr));
+        gdbStarted.notify_one();
     }
     catch (...)
     {
         gdbException = std::current_exception();
+        gdbStarted.notify_one();
     }
 }
 

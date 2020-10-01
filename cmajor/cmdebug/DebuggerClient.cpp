@@ -8,6 +8,7 @@
 #include <cmajor/cmdebug/CmdbMessageMap.hpp>
 #include <sngjson/json/JsonLexer.hpp>
 #include <sngjson/json/JsonParser.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/lexical_cast.hpp>
@@ -63,6 +64,16 @@ public:
     void Execute(DebuggerClient& client) override;
 };
 
+class EvaluateCommand : public ClientCommand
+{
+public:
+    EvaluateCommand(const std::string& expr_, const std::string& start_, const std::string& count_);
+    void Execute(DebuggerClient& client) override;
+private:
+    std::string expr;
+    std::string start;
+    std::string count;
+};
 
 std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
 {
@@ -90,6 +101,27 @@ std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
     {
         return std::unique_ptr<ClientCommand>(new LocalsCommand());
     }
+    else if (StartsWith(line, "evaluate"))
+    {
+        std::string::size_type spacePos = line.find(' ');
+        if (spacePos != std::string::npos)
+        {
+            std::string params = line.substr(spacePos + 1);
+            std::vector<std::string> paramVec = Split(params, ',');
+            if (paramVec.size() == 3)
+            {
+                return std::unique_ptr<ClientCommand>(new EvaluateCommand(paramVec[0], paramVec[1], paramVec[2]));
+            }
+            else
+            {
+                throw std::runtime_error("invalid evaluate params");
+            }
+        }
+        else
+        {
+            throw std::runtime_error("invalid evaluate params");
+        }
+    }
     else
     {
         throw std::runtime_error("unknown command");
@@ -107,6 +139,7 @@ public:
     void Next();
     void Step();
     void Locals();
+    void Evaluate(const std::string& expr, const std::string& start, const std::string& count);
     void WriteRequest(JsonValue* request);
     void WriteReply(JsonValue* reply);
     std::unique_ptr<JsonValue> ReadReply(MessageKind replyMessageKind);
@@ -121,8 +154,8 @@ public:
     void ProcessContinueReply(JsonValue* reply);
     void ProcessNextReply(JsonValue* reply);
     void ProcessStepReply(JsonValue* reply);
-    int ProcessLocalCountReply(JsonValue* reply);
-    void ProcessNameReply(JsonValue* reply);
+    int ProcessCountReply(JsonValue* reply);
+    void ProcessEvaluateChildReply(JsonValue* reply);
     bool Stopped() const { return stopped; }
 private:
     MessageMap messageMap;
@@ -348,42 +381,58 @@ void DebuggerClient::ProcessStepReply(JsonValue* reply)
 
 void DebuggerClient::Locals()
 {
-    LocalCountRequest localCountRequest;
-    localCountRequest.messageKind = "localCountRequest";
-    std::unique_ptr<JsonValue> request = localCountRequest.ToJson();
+    CountRequest countRequest;
+    countRequest.messageKind = "countRequest";
+    countRequest.expression = "@locals";
+    std::unique_ptr<JsonValue> request = countRequest.ToJson();
     WriteRequest(request.get());
-    std::unique_ptr<JsonValue> replyValue = ReadReply(MessageKind::localCountReply);
-    int numLocals = ProcessLocalCountReply(replyValue.get());
-    NameRequest nameRequest;
-    nameRequest.messageKind = "nameRequest";
-    nameRequest.start = std::to_string(0);
-    nameRequest.count = std::to_string(numLocals);
-    std::unique_ptr<JsonValue> req = nameRequest.ToJson();
+    std::unique_ptr<JsonValue> replyValue = ReadReply(MessageKind::countReply);
+    int numLocals = ProcessCountReply(replyValue.get());
+    EvaluateChildRequest evaluateChildRequest;
+    evaluateChildRequest.messageKind = "evaluateChildRequest";
+    evaluateChildRequest.expression = "@locals";
+    evaluateChildRequest.start = std::to_string(0);
+    evaluateChildRequest.count = std::to_string(numLocals);
+    std::unique_ptr<JsonValue> req = evaluateChildRequest.ToJson();
     WriteRequest(req.get());
-    std::unique_ptr<JsonValue> replyVal = ReadReply(MessageKind::nameReply);
-    ProcessNameReply(replyVal.get());
+    std::unique_ptr<JsonValue> replyVal = ReadReply(MessageKind::evaluateChildReply);
+    ProcessEvaluateChildReply(replyVal.get());
 }
 
-int DebuggerClient::ProcessLocalCountReply(JsonValue* reply)
+int DebuggerClient::ProcessCountReply(JsonValue* reply)
 {
-    LocalCountReply localCountReply(reply);
-    int numLocals = boost::lexical_cast<int>(localCountReply.count);
+    CountReply countReply(reply);
+    int numLocals = boost::lexical_cast<int>(countReply.count);
     return numLocals;
 }
 
-void DebuggerClient::ProcessNameReply(JsonValue* reply)
+void DebuggerClient::ProcessEvaluateChildReply(JsonValue* reply)
 {
-    NameReply nameReply(reply);
-    int n = nameReply.names.size();
+    EvaluateChildReply evaluateChildReply(reply);
+    int n = evaluateChildReply.results.size();
     for (int i = 0; i < n; ++i)
     {
-        std::string s = nameReply.names[i];
-        if (!nameReply.values[i].empty())
+        const ChildResult& childResult = evaluateChildReply.results[i];
+        std::string s = childResult.name;
+        if (!childResult.value.empty())
         {
-            s.append(" = ").append(nameReply.values[i]);
+            s.append(" = ").append(childResult.value);
         }
-        std::cout << s << std::endl;;
+        std::cout << s << " : [" << childResult.expr << ", " << childResult.type << ", " << childResult.count << "]" << std::endl;;
     }
+}
+
+void DebuggerClient::Evaluate(const std::string& expr, const std::string& start, const std::string& count)
+{
+    EvaluateChildRequest evaluateChildRequest;
+    evaluateChildRequest.messageKind = "evaluateChildRequest";
+    evaluateChildRequest.expression = expr;
+    evaluateChildRequest.start = start;
+    evaluateChildRequest.count = count;
+    std::unique_ptr<JsonValue> req = evaluateChildRequest.ToJson();
+    WriteRequest(req.get());
+    std::unique_ptr<JsonValue> replyVal = ReadReply(MessageKind::evaluateChildReply);
+    ProcessEvaluateChildReply(replyVal.get());
 }
 
 void StartCommand::Execute(DebuggerClient& client)
@@ -414,6 +463,15 @@ void StepCommand::Execute(DebuggerClient& client)
 void LocalsCommand::Execute(DebuggerClient& client)
 {
     client.Locals();
+}
+
+EvaluateCommand::EvaluateCommand(const std::string& expr_, const std::string& start_, const std::string& count_) : expr(expr_), start(start_), count(count_)
+{
+}
+
+void EvaluateCommand::Execute(DebuggerClient& client)
+{
+    client.Evaluate(expr, start, count);
 }
 
 void RunClient(int port)

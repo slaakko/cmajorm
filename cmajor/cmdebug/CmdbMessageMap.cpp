@@ -32,12 +32,10 @@ MessageMap::MessageMap()
     map["depthReply"] = MessageKind::depthReply;
     map["framesRequest"] = MessageKind::framesRequest;
     map["framesReply"] = MessageKind::framesReply;
-    map["localCountRequest"] = MessageKind::localCountRequest;
-    map["localCountReply"] = MessageKind::localCountReply;
-    map["nameRequest"] = MessageKind::nameRequest;
-    map["nameReply"] = MessageKind::nameReply;
-    map["evaluateRequest"] = MessageKind::evaluateRequest;
-    map["evaluateReply"] = MessageKind::evaluateReply;
+    map["countRequest"] = MessageKind::countRequest;
+    map["countReply"] = MessageKind::countReply;
+    map["evaluateChildRequest"] = MessageKind::evaluateChildRequest;
+    map["evaluateChildReply"] = MessageKind::evaluateChildReply;
     map["targetRunningRequest"] = MessageKind::targetRunningRequest;
     map["targetRunningReply"] = MessageKind::targetRunningReply;
     map["targetInputRequest"] = MessageKind::targetInputRequest;

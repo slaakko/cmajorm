@@ -31,6 +31,7 @@ enum class ContainerClassTemplateKind : int8_t
     stack = 9
 };
 
+DEBUG_API uint64_t ParseHex(const std::string& str);
 DEBUG_API std::string ContainerName(ContainerClassTemplateKind containerKind);
 
 class Container;

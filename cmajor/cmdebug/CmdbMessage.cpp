@@ -25,34 +25,34 @@ std::unique_ptr<soulng::util::JsonValue> Location::ToJson() const
     return object;
 }
 
-Location::Location(soulng::util::JsonValue* value)
+Location::Location(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "func", func);
-    sngjson::json::FromJson(value, "file", file);
-    sngjson::json::FromJson(value, "line", line);
-    sngjson::json::FromJson(value, "scol", scol);
-    sngjson::json::FromJson(value, "ecol", ecol);
-    sngjson::json::FromJson(value, "level", level);
+    sngjson::json::FromJson(__json_value, "func", func);
+    sngjson::json::FromJson(__json_value, "file", file);
+    sngjson::json::FromJson(__json_value, "line", line);
+    sngjson::json::FromJson(__json_value, "scol", scol);
+    sngjson::json::FromJson(__json_value, "ecol", ecol);
+    sngjson::json::FromJson(__json_value, "level", level);
 }
 
-Type::Type() : id(), name()
+Type::Type() : name(), id()
 {
 }
 
 std::unique_ptr<soulng::util::JsonValue> Type::ToJson() const
 {
     std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(id);
-    object->AddField(U"id", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(name);
-    object->AddField(U"name", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(name);
+    object->AddField(U"name", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(id);
+    object->AddField(U"id", std::move(fieldValue1));
     return object;
 }
 
-Type::Type(soulng::util::JsonValue* value)
+Type::Type(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "id", id);
-    sngjson::json::FromJson(value, "name", name);
+    sngjson::json::FromJson(__json_value, "name", name);
+    sngjson::json::FromJson(__json_value, "id", id);
 }
 
 Result::Result() : staticType(), dynamicType(), initialized(), value()
@@ -73,12 +73,41 @@ std::unique_ptr<soulng::util::JsonValue> Result::ToJson() const
     return object;
 }
 
-Result::Result(soulng::util::JsonValue* value)
+Result::Result(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "staticType", staticType);
-    sngjson::json::FromJson(value, "dynamicType", dynamicType);
-    sngjson::json::FromJson(value, "initialized", initialized);
-    sngjson::json::FromJson(value, "value", value);
+    sngjson::json::FromJson(__json_value, "staticType", staticType);
+    sngjson::json::FromJson(__json_value, "dynamicType", dynamicType);
+    sngjson::json::FromJson(__json_value, "initialized", initialized);
+    sngjson::json::FromJson(__json_value, "value", value);
+}
+
+ChildResult::ChildResult() : expr(), name(), type(), value(), count()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> ChildResult::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(expr);
+    object->AddField(U"expr", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(name);
+    object->AddField(U"name", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(type);
+    object->AddField(U"type", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(value);
+    object->AddField(U"value", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(count);
+    object->AddField(U"count", std::move(fieldValue4));
+    return object;
+}
+
+ChildResult::ChildResult(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "expr", expr);
+    sngjson::json::FromJson(__json_value, "name", name);
+    sngjson::json::FromJson(__json_value, "type", type);
+    sngjson::json::FromJson(__json_value, "value", value);
+    sngjson::json::FromJson(__json_value, "count", count);
 }
 
 TargetState::TargetState() : stopReason(), exitCode(), breakpointId(), signalName(), signalMeaning()
@@ -101,13 +130,13 @@ std::unique_ptr<soulng::util::JsonValue> TargetState::ToJson() const
     return object;
 }
 
-TargetState::TargetState(soulng::util::JsonValue* value)
+TargetState::TargetState(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "stopReason", stopReason);
-    sngjson::json::FromJson(value, "exitCode", exitCode);
-    sngjson::json::FromJson(value, "breakpointId", breakpointId);
-    sngjson::json::FromJson(value, "signalName", signalName);
-    sngjson::json::FromJson(value, "signalMeaning", signalMeaning);
+    sngjson::json::FromJson(__json_value, "stopReason", stopReason);
+    sngjson::json::FromJson(__json_value, "exitCode", exitCode);
+    sngjson::json::FromJson(__json_value, "breakpointId", breakpointId);
+    sngjson::json::FromJson(__json_value, "signalName", signalName);
+    sngjson::json::FromJson(__json_value, "signalMeaning", signalMeaning);
 }
 
 SourceLoc::SourceLoc() : path(), line()
@@ -124,10 +153,10 @@ std::unique_ptr<soulng::util::JsonValue> SourceLoc::ToJson() const
     return object;
 }
 
-SourceLoc::SourceLoc(soulng::util::JsonValue* value)
+SourceLoc::SourceLoc(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "path", path);
-    sngjson::json::FromJson(value, "line", line);
+    sngjson::json::FromJson(__json_value, "path", path);
+    sngjson::json::FromJson(__json_value, "line", line);
 }
 
 BreakpointInfo::BreakpointInfo() : success(), breakpointId(), numInsts(), location(), error()
@@ -150,13 +179,13 @@ std::unique_ptr<soulng::util::JsonValue> BreakpointInfo::ToJson() const
     return object;
 }
 
-BreakpointInfo::BreakpointInfo(soulng::util::JsonValue* value)
+BreakpointInfo::BreakpointInfo(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "breakpointId", breakpointId);
-    sngjson::json::FromJson(value, "numInsts", numInsts);
-    sngjson::json::FromJson(value, "location", location);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "breakpointId", breakpointId);
+    sngjson::json::FromJson(__json_value, "numInsts", numInsts);
+    sngjson::json::FromJson(__json_value, "location", location);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 StartRequest::StartRequest() : messageKind(), breakpointLocations()
@@ -173,10 +202,10 @@ std::unique_ptr<soulng::util::JsonValue> StartRequest::ToJson() const
     return object;
 }
 
-StartRequest::StartRequest(soulng::util::JsonValue* value)
+StartRequest::StartRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "breakpointLocations", breakpointLocations);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "breakpointLocations", breakpointLocations);
 }
 
 StartReply::StartReply() : messageKind(), success(), location(), state(), breakpointInfos(), error()
@@ -201,14 +230,14 @@ std::unique_ptr<soulng::util::JsonValue> StartReply::ToJson() const
     return object;
 }
 
-StartReply::StartReply(soulng::util::JsonValue* value)
+StartReply::StartReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "location", location);
-    sngjson::json::FromJson(value, "state", state);
-    sngjson::json::FromJson(value, "breakpointInfos", breakpointInfos);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "location", location);
+    sngjson::json::FromJson(__json_value, "state", state);
+    sngjson::json::FromJson(__json_value, "breakpointInfos", breakpointInfos);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 StopRequest::StopRequest() : messageKind()
@@ -223,9 +252,9 @@ std::unique_ptr<soulng::util::JsonValue> StopRequest::ToJson() const
     return object;
 }
 
-StopRequest::StopRequest(soulng::util::JsonValue* value)
+StopRequest::StopRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 StopReply::StopReply() : messageKind()
@@ -240,9 +269,9 @@ std::unique_ptr<soulng::util::JsonValue> StopReply::ToJson() const
     return object;
 }
 
-StopReply::StopReply(soulng::util::JsonValue* value)
+StopReply::StopReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 GenericErrorReply::GenericErrorReply() : messageKind(), errorMessage()
@@ -259,10 +288,10 @@ std::unique_ptr<soulng::util::JsonValue> GenericErrorReply::ToJson() const
     return object;
 }
 
-GenericErrorReply::GenericErrorReply(soulng::util::JsonValue* value)
+GenericErrorReply::GenericErrorReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "errorMessage", errorMessage);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "errorMessage", errorMessage);
 }
 
 ContinueRequest::ContinueRequest() : messageKind()
@@ -277,9 +306,9 @@ std::unique_ptr<soulng::util::JsonValue> ContinueRequest::ToJson() const
     return object;
 }
 
-ContinueRequest::ContinueRequest(soulng::util::JsonValue* value)
+ContinueRequest::ContinueRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 ContinueReply::ContinueReply() : messageKind(), success(), location(), state(), error()
@@ -302,13 +331,13 @@ std::unique_ptr<soulng::util::JsonValue> ContinueReply::ToJson() const
     return object;
 }
 
-ContinueReply::ContinueReply(soulng::util::JsonValue* value)
+ContinueReply::ContinueReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "location", location);
-    sngjson::json::FromJson(value, "state", state);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "location", location);
+    sngjson::json::FromJson(__json_value, "state", state);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 NextRequest::NextRequest() : messageKind()
@@ -323,9 +352,9 @@ std::unique_ptr<soulng::util::JsonValue> NextRequest::ToJson() const
     return object;
 }
 
-NextRequest::NextRequest(soulng::util::JsonValue* value)
+NextRequest::NextRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 NextReply::NextReply() : messageKind(), success(), location(), state(), error()
@@ -348,13 +377,13 @@ std::unique_ptr<soulng::util::JsonValue> NextReply::ToJson() const
     return object;
 }
 
-NextReply::NextReply(soulng::util::JsonValue* value)
+NextReply::NextReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "location", location);
-    sngjson::json::FromJson(value, "state", state);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "location", location);
+    sngjson::json::FromJson(__json_value, "state", state);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 StepRequest::StepRequest() : messageKind()
@@ -369,9 +398,9 @@ std::unique_ptr<soulng::util::JsonValue> StepRequest::ToJson() const
     return object;
 }
 
-StepRequest::StepRequest(soulng::util::JsonValue* value)
+StepRequest::StepRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 StepReply::StepReply() : messageKind(), success(), location(), state(), error()
@@ -394,13 +423,13 @@ std::unique_ptr<soulng::util::JsonValue> StepReply::ToJson() const
     return object;
 }
 
-StepReply::StepReply(soulng::util::JsonValue* value)
+StepReply::StepReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "location", location);
-    sngjson::json::FromJson(value, "state", state);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "location", location);
+    sngjson::json::FromJson(__json_value, "state", state);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 FinishRequest::FinishRequest() : messageKind()
@@ -415,9 +444,9 @@ std::unique_ptr<soulng::util::JsonValue> FinishRequest::ToJson() const
     return object;
 }
 
-FinishRequest::FinishRequest(soulng::util::JsonValue* value)
+FinishRequest::FinishRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 FinishReply::FinishReply() : messageKind(), success(), location(), state(), error()
@@ -440,13 +469,13 @@ std::unique_ptr<soulng::util::JsonValue> FinishReply::ToJson() const
     return object;
 }
 
-FinishReply::FinishReply(soulng::util::JsonValue* value)
+FinishReply::FinishReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "location", location);
-    sngjson::json::FromJson(value, "state", state);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "location", location);
+    sngjson::json::FromJson(__json_value, "state", state);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 UntilRequest::UntilRequest() : messageKind(), sourceLoc()
@@ -463,10 +492,10 @@ std::unique_ptr<soulng::util::JsonValue> UntilRequest::ToJson() const
     return object;
 }
 
-UntilRequest::UntilRequest(soulng::util::JsonValue* value)
+UntilRequest::UntilRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "sourceLoc", sourceLoc);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "sourceLoc", sourceLoc);
 }
 
 UntilReply::UntilReply() : messageKind(), success(), location(), state(), error()
@@ -489,13 +518,13 @@ std::unique_ptr<soulng::util::JsonValue> UntilReply::ToJson() const
     return object;
 }
 
-UntilReply::UntilReply(soulng::util::JsonValue* value)
+UntilReply::UntilReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "location", location);
-    sngjson::json::FromJson(value, "state", state);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "location", location);
+    sngjson::json::FromJson(__json_value, "state", state);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 BreakRequest::BreakRequest() : messageKind(), breakpointLocation()
@@ -512,10 +541,10 @@ std::unique_ptr<soulng::util::JsonValue> BreakRequest::ToJson() const
     return object;
 }
 
-BreakRequest::BreakRequest(soulng::util::JsonValue* value)
+BreakRequest::BreakRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "breakpointLocation", breakpointLocation);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "breakpointLocation", breakpointLocation);
 }
 
 BreakReply::BreakReply() : messageKind(), breakpointInfo()
@@ -532,10 +561,10 @@ std::unique_ptr<soulng::util::JsonValue> BreakReply::ToJson() const
     return object;
 }
 
-BreakReply::BreakReply(soulng::util::JsonValue* value)
+BreakReply::BreakReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "breakpointInfo", breakpointInfo);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "breakpointInfo", breakpointInfo);
 }
 
 DeleteRequest::DeleteRequest() : messageKind(), breakpointId()
@@ -552,10 +581,10 @@ std::unique_ptr<soulng::util::JsonValue> DeleteRequest::ToJson() const
     return object;
 }
 
-DeleteRequest::DeleteRequest(soulng::util::JsonValue* value)
+DeleteRequest::DeleteRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "breakpointId", breakpointId);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "breakpointId", breakpointId);
 }
 
 DeleteReply::DeleteReply() : messageKind(), success(), error()
@@ -574,11 +603,11 @@ std::unique_ptr<soulng::util::JsonValue> DeleteReply::ToJson() const
     return object;
 }
 
-DeleteReply::DeleteReply(soulng::util::JsonValue* value)
+DeleteReply::DeleteReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 DepthRequest::DepthRequest() : messageKind()
@@ -593,9 +622,9 @@ std::unique_ptr<soulng::util::JsonValue> DepthRequest::ToJson() const
     return object;
 }
 
-DepthRequest::DepthRequest(soulng::util::JsonValue* value)
+DepthRequest::DepthRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 DepthReply::DepthReply() : messageKind(), success(), depth(), error()
@@ -616,12 +645,12 @@ std::unique_ptr<soulng::util::JsonValue> DepthReply::ToJson() const
     return object;
 }
 
-DepthReply::DepthReply(soulng::util::JsonValue* value)
+DepthReply::DepthReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "depth", depth);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "depth", depth);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 FramesRequest::FramesRequest() : messageKind(), lowFrame(), highFrame()
@@ -640,11 +669,11 @@ std::unique_ptr<soulng::util::JsonValue> FramesRequest::ToJson() const
     return object;
 }
 
-FramesRequest::FramesRequest(soulng::util::JsonValue* value)
+FramesRequest::FramesRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "lowFrame", lowFrame);
-    sngjson::json::FromJson(value, "highFrame", highFrame);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "lowFrame", lowFrame);
+    sngjson::json::FromJson(__json_value, "highFrame", highFrame);
 }
 
 FramesReply::FramesReply() : messageKind(), success(), frames(), error()
@@ -665,107 +694,12 @@ std::unique_ptr<soulng::util::JsonValue> FramesReply::ToJson() const
     return object;
 }
 
-FramesReply::FramesReply(soulng::util::JsonValue* value)
+FramesReply::FramesReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "frames", frames);
-    sngjson::json::FromJson(value, "error", error);
-}
-
-LocalCountRequest::LocalCountRequest() : messageKind()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> LocalCountRequest::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    return object;
-}
-
-LocalCountRequest::LocalCountRequest(soulng::util::JsonValue* value)
-{
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-}
-
-LocalCountReply::LocalCountReply() : messageKind(), success(), count(), error()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> LocalCountReply::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(count);
-    object->AddField(U"count", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue3));
-    return object;
-}
-
-LocalCountReply::LocalCountReply(soulng::util::JsonValue* value)
-{
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "count", count);
-    sngjson::json::FromJson(value, "error", error);
-}
-
-NameRequest::NameRequest() : messageKind(), start(), count()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> NameRequest::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(start);
-    object->AddField(U"start", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(count);
-    object->AddField(U"count", std::move(fieldValue2));
-    return object;
-}
-
-NameRequest::NameRequest(soulng::util::JsonValue* value)
-{
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "start", start);
-    sngjson::json::FromJson(value, "count", count);
-}
-
-NameReply::NameReply() : messageKind(), success(), names(), values(), error()
-{
-}
-
-std::unique_ptr<soulng::util::JsonValue> NameReply::ToJson() const
-{
-    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
-    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
-    object->AddField(U"messageKind", std::move(fieldValue0));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
-    object->AddField(U"success", std::move(fieldValue1));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(names);
-    object->AddField(U"names", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(values);
-    object->AddField(U"values", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue4));
-    return object;
-}
-
-NameReply::NameReply(soulng::util::JsonValue* value)
-{
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "names", names);
-    sngjson::json::FromJson(value, "values", values);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "frames", frames);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 EvaluateRequest::EvaluateRequest() : messageKind(), expression()
@@ -782,10 +716,10 @@ std::unique_ptr<soulng::util::JsonValue> EvaluateRequest::ToJson() const
     return object;
 }
 
-EvaluateRequest::EvaluateRequest(soulng::util::JsonValue* value)
+EvaluateRequest::EvaluateRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "expression", expression);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "expression", expression);
 }
 
 EvaluateReply::EvaluateReply() : messageKind(), success(), result(), error()
@@ -806,12 +740,110 @@ std::unique_ptr<soulng::util::JsonValue> EvaluateReply::ToJson() const
     return object;
 }
 
-EvaluateReply::EvaluateReply(soulng::util::JsonValue* value)
+EvaluateReply::EvaluateReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "result", result);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "result", result);
+    sngjson::json::FromJson(__json_value, "error", error);
+}
+
+CountRequest::CountRequest() : messageKind(), expression()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> CountRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(expression);
+    object->AddField(U"expression", std::move(fieldValue1));
+    return object;
+}
+
+CountRequest::CountRequest(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "expression", expression);
+}
+
+CountReply::CountReply() : messageKind(), success(), count(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> CountReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
+    object->AddField(U"success", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(count);
+    object->AddField(U"count", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue3));
+    return object;
+}
+
+CountReply::CountReply(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "count", count);
+    sngjson::json::FromJson(__json_value, "error", error);
+}
+
+EvaluateChildRequest::EvaluateChildRequest() : messageKind(), expression(), start(), count()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> EvaluateChildRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(expression);
+    object->AddField(U"expression", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(start);
+    object->AddField(U"start", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(count);
+    object->AddField(U"count", std::move(fieldValue3));
+    return object;
+}
+
+EvaluateChildRequest::EvaluateChildRequest(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "expression", expression);
+    sngjson::json::FromJson(__json_value, "start", start);
+    sngjson::json::FromJson(__json_value, "count", count);
+}
+
+EvaluateChildReply::EvaluateChildReply() : messageKind(), success(), results(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> EvaluateChildReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(success);
+    object->AddField(U"success", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(results);
+    object->AddField(U"results", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue3));
+    return object;
+}
+
+EvaluateChildReply::EvaluateChildReply(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "results", results);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 TargetRunningRequest::TargetRunningRequest() : messageKind()
@@ -826,9 +858,9 @@ std::unique_ptr<soulng::util::JsonValue> TargetRunningRequest::ToJson() const
     return object;
 }
 
-TargetRunningRequest::TargetRunningRequest(soulng::util::JsonValue* value)
+TargetRunningRequest::TargetRunningRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 TargetRunningReply::TargetRunningReply() : messageKind()
@@ -843,9 +875,9 @@ std::unique_ptr<soulng::util::JsonValue> TargetRunningReply::ToJson() const
     return object;
 }
 
-TargetRunningReply::TargetRunningReply(soulng::util::JsonValue* value)
+TargetRunningReply::TargetRunningReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 TargetInputRequest::TargetInputRequest() : messageKind()
@@ -860,9 +892,9 @@ std::unique_ptr<soulng::util::JsonValue> TargetInputRequest::ToJson() const
     return object;
 }
 
-TargetInputRequest::TargetInputRequest(soulng::util::JsonValue* value)
+TargetInputRequest::TargetInputRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 TargetInputReply::TargetInputReply() : messageKind(), line(), eof()
@@ -881,11 +913,11 @@ std::unique_ptr<soulng::util::JsonValue> TargetInputReply::ToJson() const
     return object;
 }
 
-TargetInputReply::TargetInputReply(soulng::util::JsonValue* value)
+TargetInputReply::TargetInputReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "line", line);
-    sngjson::json::FromJson(value, "eof", eof);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "line", line);
+    sngjson::json::FromJson(__json_value, "eof", eof);
 }
 
 TargetOutputRequest::TargetOutputRequest() : messageKind(), handle(), output()
@@ -904,11 +936,11 @@ std::unique_ptr<soulng::util::JsonValue> TargetOutputRequest::ToJson() const
     return object;
 }
 
-TargetOutputRequest::TargetOutputRequest(soulng::util::JsonValue* value)
+TargetOutputRequest::TargetOutputRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "handle", handle);
-    sngjson::json::FromJson(value, "output", output);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "handle", handle);
+    sngjson::json::FromJson(__json_value, "output", output);
 }
 
 TargetOutputReply::TargetOutputReply() : messageKind()
@@ -923,9 +955,9 @@ std::unique_ptr<soulng::util::JsonValue> TargetOutputReply::ToJson() const
     return object;
 }
 
-TargetOutputReply::TargetOutputReply(soulng::util::JsonValue* value)
+TargetOutputReply::TargetOutputReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 LogMessageRequest::LogMessageRequest() : messageKind(), logMessage()
@@ -942,10 +974,10 @@ std::unique_ptr<soulng::util::JsonValue> LogMessageRequest::ToJson() const
     return object;
 }
 
-LogMessageRequest::LogMessageRequest(soulng::util::JsonValue* value)
+LogMessageRequest::LogMessageRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "logMessage", logMessage);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "logMessage", logMessage);
 }
 
 LogMessageReply::LogMessageReply() : messageKind()
@@ -960,8 +992,8 @@ std::unique_ptr<soulng::util::JsonValue> LogMessageReply::ToJson() const
     return object;
 }
 
-LogMessageReply::LogMessageReply(soulng::util::JsonValue* value)
+LogMessageReply::LogMessageReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 

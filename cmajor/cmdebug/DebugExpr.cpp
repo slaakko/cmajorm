@@ -431,7 +431,7 @@ void DerefDebugExprNode::Accept(DebugExprVisitor& visitor)
 
 std::string DerefDebugExprNode::ToString() const
 {
-    return "*" + operand->ToString();
+    return "(*" + operand->ToString() + ")";
 }
 
 AddrOfDebugExprNode::AddrOfDebugExprNode(DebugExprNode* operand_) : DebugExprNode(Kind::addrOf), operand(operand_)
@@ -527,7 +527,7 @@ void TypeIdDebugExprNode::Accept(DebugExprVisitor& visitor)
 
 std::string TypeIdDebugExprNode::ToString() const
 {
-    return "typeid(" + typeId + ")";
+    return "typeid(\"" + typeId + "\")";
 }
 
 CastDebugExprNode::CastDebugExprNode(TypeIdDebugExprNode* typeIdNode_, DebugExprNode* exprNode_) : DebugExprNode(Kind::cast_), typeIdNode(typeIdNode_), exprNode(exprNode_)

@@ -434,6 +434,18 @@ std::unique_ptr<JsonValue> DIClassType::ToJson() const
     return value;
 }
 
+int NumBaseClasses(DIClassType* classType)
+{
+    if (classType->BaseClassId().is_nil())
+    {
+        return 0;
+    }
+    else
+    {
+        return NumBaseClasses(static_cast<DIClassType*>(classType->BaseClassType())) + 1;
+    }
+}
+
 DIClassTemplateSpecializationType::DIClassTemplateSpecializationType() :
     DIClassType(Kind::specializationType), containerKind(ContainerClassTemplateKind::notContainerClassTemplate),
     primaryTypeId(boost::uuids::nil_uuid()), valueTypeId(boost::uuids::nil_uuid())
@@ -448,6 +460,11 @@ void DIClassTemplateSpecializationType::SetPrimaryTypeId(const boost::uuids::uui
 void DIClassTemplateSpecializationType::SetValueTypeId(const boost::uuids::uuid& valueTypeId_)
 {
     valueTypeId = valueTypeId_;
+}
+
+DIType* DIClassTemplateSpecializationType::ValueType()
+{
+    return GetProject()->GetType(valueTypeId);
 }
 
 void DIClassTemplateSpecializationType::AddTemplateArgumentTypeId(const boost::uuids::uuid& templateArgumentTypeId)
@@ -516,8 +533,41 @@ DIDelegateType::DIDelegateType() : DIType(Kind::delegateType)
 {
 }
 
-DIClassDelegateType::DIClassDelegateType() : DIType(Kind::classDelegateType)
+DIClassDelegateType::DIClassDelegateType() : DIType(Kind::classDelegateType), classTypeId()
 {
+}
+
+Scope* DIClassDelegateType::GetScope() 
+{
+    return GetClassType()->GetScope();
+}
+
+void DIClassDelegateType::SetClassTypeId(const boost::uuids::uuid& classTypeId_)
+{
+    classTypeId = classTypeId_;
+}
+
+DIType* DIClassDelegateType::GetClassType() const
+{
+    return GetProject()->GetType(classTypeId);
+}
+
+void DIClassDelegateType::Write(soulng::util::BinaryWriter& writer)
+{
+    DIType::Write(writer);
+    writer.Write(classTypeId);
+}
+
+void DIClassDelegateType::Read(soulng::util::BinaryReader& reader)
+{
+    DIType::Read(reader);
+    reader.ReadUuid(classTypeId);
+}
+
+std::unique_ptr<JsonValue> DIClassDelegateType::ToJson() const
+{
+    DIType* clsType = GetClassType();
+    return clsType->ToJson();
 }
 
 DIInterfaceType::DIInterfaceType() : DIType(Kind::interfaceType)

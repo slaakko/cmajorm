@@ -12,8 +12,8 @@ namespace Cm.Service.Debug
     {
         none, startRequest, startReply, stopRequest, stopReply, genericErrorReply, continueRequest, continueReply, nextRequest, nextReply, stepRequest, stepReply,
         finishRequest, finishReply, untilRequest, untilReply,
-        breakRequest, breakReply, deleteRequest, deleteReply, depthRequest, depthReply, framesRequest, framesReply, localCountRequest, localCountReply,
-        nameRequest, nameReply, evaluateRequest, evaluateReply,
+        breakRequest, breakReply, deleteRequest, deleteReply, depthRequest, depthReply, framesRequest, framesReply,
+        countRequest, countReply, evaluateChildRequest, evaluateChildReply,
         targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply,
         logMessageRequest, logMessageReply
     }
@@ -48,6 +48,16 @@ namespace Cm.Service.Debug
         public Type dynamicType;
         public bool initialized;
         public string value;
+    }
+
+    [json]
+    public class ChildResult
+    {
+        public string expr;
+        public string name;
+        public string type;
+        public string value;
+        public string count;
     }
 
     [json]
@@ -334,53 +344,9 @@ namespace Cm.Service.Debug
     }
 
     [json]
-    public class LocalCountRequest
+    public class CountRequest
     {
-        public nothrow LocalCountRequest() : messageKind("localCountRequest")
-        {
-        }
-        public string messageKind;
-    }
-
-    [json]
-    public class LocalCountReply
-    {
-        public nothrow LocalCountReply() : messageKind("localCountReply")
-        {
-        }
-        public string messageKind;
-        public bool success;
-        public string count;
-        public string error;
-    }
-
-    [json]
-    public class NameRequest
-    {
-        public nothrow NameRequest() : messageKind("nameRequest")
-        {
-        }
-        public string messageKind;
-        public string start;
-        public string count;
-    }
-
-    [json]
-    public class NameReply
-    {
-        public nothrow NameReply() : messageKind("nameReply")
-        {
-        }
-        public string messageKind;
-        public bool success;
-        public List<string> names;
-        public string error;
-    }
-
-    [json]
-    public class EvaluateRequest
-    {
-        public nothrow EvaluateRequest() : messageKind("evaluateRequest")
+        public nothrow CountRequest() : messageKind("countRequest")
         {
         }
         public string messageKind;
@@ -388,14 +354,38 @@ namespace Cm.Service.Debug
     }
 
     [json]
-    public class EvaluateReply
+    public class CountReply
     {
-        public nothrow EvaluateReply() : messageKind("evaluateReply")
+        public nothrow CountReply() : messageKind("countReply")
         {
         }
         public string messageKind;
         public bool success;
-        public Result result;
+        public string count;
+        public string error;
+    }
+
+    [json]
+    public class EvaluateChildRequest
+    {
+        public nothrow EvaluateChildRequest() : messageKind("evaluateChildRequest")
+        {
+        }
+        public string messageKind;
+        public string expression;
+        public string start;
+        public string count;
+    }
+
+    [json]
+    public class EvaluateChildReply
+    {
+        public nothrow EvaluateChildReply() : messageKind("evaluateChildReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public List<ChildResult> results;
         public string error;
     }
 

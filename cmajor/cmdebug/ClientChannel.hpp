@@ -22,6 +22,7 @@ class ClientChannelUser
 public:
     virtual ~ClientChannelUser();
     virtual std::unique_ptr<JsonValue> GetIdleClientChannelMessage() = 0;
+    virtual bool IsIdleChannelMessage(JsonValue* message) const = 0;
     virtual void ClientChannelError(const std::string& error) = 0;
     virtual void ProcessReceivedClientChannelMessage(JsonValue* message) = 0;
 };
@@ -32,6 +33,8 @@ public:
     ClientChannel(ClientChannelUser* user_, TcpSocket& socket_, int timeoutMs_);
     ~ClientChannel();
     void SendMessage(JsonValue* message);
+    void StartSendingIdleMessages();
+    void StopSendingIdleMessages();
     void Run();
 private:
     std::unique_ptr<JsonValue> GetMessage();
@@ -39,9 +42,10 @@ private:
     TcpSocket& socket;
     int timeoutMs;
     std::thread thread;
-    std::mutex mtx;
+    std::mutex messageQueueMtx;
     std::list<std::unique_ptr<JsonValue>> messageQueue;
     std::condition_variable messageEnqueued;
+    bool sendIdleMessages;
 };
 
 } } // namespace cmajor::debug

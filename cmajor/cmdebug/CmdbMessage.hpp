@@ -8,7 +8,7 @@
 struct Location
 {
     Location();
-    Location(soulng::util::JsonValue* value);
+    Location(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string func;
     std::string file;
@@ -21,16 +21,16 @@ struct Location
 struct Type
 {
     Type();
-    Type(soulng::util::JsonValue* value);
+    Type(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string id;
     std::string name;
+    std::string id;
 };
 
 struct Result
 {
     Result();
-    Result(soulng::util::JsonValue* value);
+    Result(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     Type staticType;
     Type dynamicType;
@@ -38,10 +38,22 @@ struct Result
     std::string value;
 };
 
+struct ChildResult
+{
+    ChildResult();
+    ChildResult(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string expr;
+    std::string name;
+    std::string type;
+    std::string value;
+    std::string count;
+};
+
 struct TargetState
 {
     TargetState();
-    TargetState(soulng::util::JsonValue* value);
+    TargetState(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string stopReason;
     std::string exitCode;
@@ -53,7 +65,7 @@ struct TargetState
 struct SourceLoc
 {
     SourceLoc();
-    SourceLoc(soulng::util::JsonValue* value);
+    SourceLoc(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string path;
     std::string line;
@@ -62,7 +74,7 @@ struct SourceLoc
 struct BreakpointInfo
 {
     BreakpointInfo();
-    BreakpointInfo(soulng::util::JsonValue* value);
+    BreakpointInfo(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     bool success;
     std::string breakpointId;
@@ -74,7 +86,7 @@ struct BreakpointInfo
 struct StartRequest
 {
     StartRequest();
-    StartRequest(soulng::util::JsonValue* value);
+    StartRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::vector<SourceLoc> breakpointLocations;
@@ -83,7 +95,7 @@ struct StartRequest
 struct StartReply
 {
     StartReply();
-    StartReply(soulng::util::JsonValue* value);
+    StartReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -96,7 +108,7 @@ struct StartReply
 struct StopRequest
 {
     StopRequest();
-    StopRequest(soulng::util::JsonValue* value);
+    StopRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -104,7 +116,7 @@ struct StopRequest
 struct StopReply
 {
     StopReply();
-    StopReply(soulng::util::JsonValue* value);
+    StopReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -112,7 +124,7 @@ struct StopReply
 struct GenericErrorReply
 {
     GenericErrorReply();
-    GenericErrorReply(soulng::util::JsonValue* value);
+    GenericErrorReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string errorMessage;
@@ -121,7 +133,7 @@ struct GenericErrorReply
 struct ContinueRequest
 {
     ContinueRequest();
-    ContinueRequest(soulng::util::JsonValue* value);
+    ContinueRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -129,7 +141,7 @@ struct ContinueRequest
 struct ContinueReply
 {
     ContinueReply();
-    ContinueReply(soulng::util::JsonValue* value);
+    ContinueReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -141,7 +153,7 @@ struct ContinueReply
 struct NextRequest
 {
     NextRequest();
-    NextRequest(soulng::util::JsonValue* value);
+    NextRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -149,7 +161,7 @@ struct NextRequest
 struct NextReply
 {
     NextReply();
-    NextReply(soulng::util::JsonValue* value);
+    NextReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -161,7 +173,7 @@ struct NextReply
 struct StepRequest
 {
     StepRequest();
-    StepRequest(soulng::util::JsonValue* value);
+    StepRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -169,7 +181,7 @@ struct StepRequest
 struct StepReply
 {
     StepReply();
-    StepReply(soulng::util::JsonValue* value);
+    StepReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -181,7 +193,7 @@ struct StepReply
 struct FinishRequest
 {
     FinishRequest();
-    FinishRequest(soulng::util::JsonValue* value);
+    FinishRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -189,7 +201,7 @@ struct FinishRequest
 struct FinishReply
 {
     FinishReply();
-    FinishReply(soulng::util::JsonValue* value);
+    FinishReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -201,7 +213,7 @@ struct FinishReply
 struct UntilRequest
 {
     UntilRequest();
-    UntilRequest(soulng::util::JsonValue* value);
+    UntilRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     SourceLoc sourceLoc;
@@ -210,7 +222,7 @@ struct UntilRequest
 struct UntilReply
 {
     UntilReply();
-    UntilReply(soulng::util::JsonValue* value);
+    UntilReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -222,7 +234,7 @@ struct UntilReply
 struct BreakRequest
 {
     BreakRequest();
-    BreakRequest(soulng::util::JsonValue* value);
+    BreakRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     SourceLoc breakpointLocation;
@@ -231,7 +243,7 @@ struct BreakRequest
 struct BreakReply
 {
     BreakReply();
-    BreakReply(soulng::util::JsonValue* value);
+    BreakReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     BreakpointInfo breakpointInfo;
@@ -240,7 +252,7 @@ struct BreakReply
 struct DeleteRequest
 {
     DeleteRequest();
-    DeleteRequest(soulng::util::JsonValue* value);
+    DeleteRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string breakpointId;
@@ -249,7 +261,7 @@ struct DeleteRequest
 struct DeleteReply
 {
     DeleteReply();
-    DeleteReply(soulng::util::JsonValue* value);
+    DeleteReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -259,7 +271,7 @@ struct DeleteReply
 struct DepthRequest
 {
     DepthRequest();
-    DepthRequest(soulng::util::JsonValue* value);
+    DepthRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -267,7 +279,7 @@ struct DepthRequest
 struct DepthReply
 {
     DepthReply();
-    DepthReply(soulng::util::JsonValue* value);
+    DepthReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -278,7 +290,7 @@ struct DepthReply
 struct FramesRequest
 {
     FramesRequest();
-    FramesRequest(soulng::util::JsonValue* value);
+    FramesRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string lowFrame;
@@ -288,7 +300,7 @@ struct FramesRequest
 struct FramesReply
 {
     FramesReply();
-    FramesReply(soulng::util::JsonValue* value);
+    FramesReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -296,51 +308,10 @@ struct FramesReply
     std::string error;
 };
 
-struct LocalCountRequest
-{
-    LocalCountRequest();
-    LocalCountRequest(soulng::util::JsonValue* value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
-};
-
-struct LocalCountReply
-{
-    LocalCountReply();
-    LocalCountReply(soulng::util::JsonValue* value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
-    bool success;
-    std::string count;
-    std::string error;
-};
-
-struct NameRequest
-{
-    NameRequest();
-    NameRequest(soulng::util::JsonValue* value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
-    std::string start;
-    std::string count;
-};
-
-struct NameReply
-{
-    NameReply();
-    NameReply(soulng::util::JsonValue* value);
-    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
-    std::string messageKind;
-    bool success;
-    std::vector<std::string> names;
-    std::vector<std::string> values;
-    std::string error;
-};
-
 struct EvaluateRequest
 {
     EvaluateRequest();
-    EvaluateRequest(soulng::util::JsonValue* value);
+    EvaluateRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string expression;
@@ -349,7 +320,7 @@ struct EvaluateRequest
 struct EvaluateReply
 {
     EvaluateReply();
-    EvaluateReply(soulng::util::JsonValue* value);
+    EvaluateReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool success;
@@ -357,10 +328,52 @@ struct EvaluateReply
     std::string error;
 };
 
+struct CountRequest
+{
+    CountRequest();
+    CountRequest(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    std::string expression;
+};
+
+struct CountReply
+{
+    CountReply();
+    CountReply(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    bool success;
+    std::string count;
+    std::string error;
+};
+
+struct EvaluateChildRequest
+{
+    EvaluateChildRequest();
+    EvaluateChildRequest(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    std::string expression;
+    std::string start;
+    std::string count;
+};
+
+struct EvaluateChildReply
+{
+    EvaluateChildReply();
+    EvaluateChildReply(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    bool success;
+    std::vector<ChildResult> results;
+    std::string error;
+};
+
 struct TargetRunningRequest
 {
     TargetRunningRequest();
-    TargetRunningRequest(soulng::util::JsonValue* value);
+    TargetRunningRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -368,7 +381,7 @@ struct TargetRunningRequest
 struct TargetRunningReply
 {
     TargetRunningReply();
-    TargetRunningReply(soulng::util::JsonValue* value);
+    TargetRunningReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -376,7 +389,7 @@ struct TargetRunningReply
 struct TargetInputRequest
 {
     TargetInputRequest();
-    TargetInputRequest(soulng::util::JsonValue* value);
+    TargetInputRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -384,7 +397,7 @@ struct TargetInputRequest
 struct TargetInputReply
 {
     TargetInputReply();
-    TargetInputReply(soulng::util::JsonValue* value);
+    TargetInputReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string line;
@@ -394,7 +407,7 @@ struct TargetInputReply
 struct TargetOutputRequest
 {
     TargetOutputRequest();
-    TargetOutputRequest(soulng::util::JsonValue* value);
+    TargetOutputRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string handle;
@@ -404,7 +417,7 @@ struct TargetOutputRequest
 struct TargetOutputReply
 {
     TargetOutputReply();
-    TargetOutputReply(soulng::util::JsonValue* value);
+    TargetOutputReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -412,7 +425,7 @@ struct TargetOutputReply
 struct LogMessageRequest
 {
     LogMessageRequest();
-    LogMessageRequest(soulng::util::JsonValue* value);
+    LogMessageRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string logMessage;
@@ -421,7 +434,7 @@ struct LogMessageRequest
 struct LogMessageReply
 {
     LogMessageReply();
-    LogMessageReply(soulng::util::JsonValue* value);
+    LogMessageReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };

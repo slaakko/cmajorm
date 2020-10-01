@@ -122,6 +122,7 @@ xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmsngjsond.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmsngjsond.lib ..\lib
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmsngjson.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmsngjson.lib ..\lib
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\jsongen.exe ..\bin
 
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmcppid.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmcppid.lib ..\lib
