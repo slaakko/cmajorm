@@ -30,12 +30,12 @@ CFLAGS += -I$(SOURCE_PREFIX)/../.. -DNDEBUG -O2 -DSHARED -DRT_EXPORTS
 	
 $(BINARY_PREFIX)/$(LIBRARY_NAME): $(OBJECTS)
 	$(CXX) -shared -o $@ $(OBJECTS) -mwindows -municode \
-		-L$(LIBRARY_PREFIX) -LC:/mingw-boost/lib \
+		-L$(LIBRARY_PREFIX) -LD:/mingw-boost/lib \
 		-lcmsngcmparser -lcmsngcmlexer \
 		-lcmsngparser -lcmsngcmast -lcmsngxmldom -lcmsngxmlxml \
 		-lcmsngxmlxpath -lcmsnglexer -lcmeh -lcmcommon -lcmsngutil -lpdcurses \
-		-lbz2 -lz -lwsock32 -lws2_32 -lboost_filesystem-mgw8-mt-s-x64-1_73 \
-		-lboost_iostreams-mgw8-mt-s-x64-1_73 -lboost_system-mgw8-mt-s-x64-1_73 \
+		-lbz2 -lz -lwsock32 -lws2_32 -lboost_filesystem-mgw8-mt-x64-1_74 \
+		-lboost_iostreams-mgw8-mt-x64-1_74 -lboost_system-mgw8-mt-x64-1_74 \
 		-lgdiplus 
 
 clean:
