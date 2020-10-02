@@ -23,7 +23,7 @@
         Note: the compiler needs write access to installation directory and its subdirectories,
         so C:\Program Files\ is not a good place to install.
         The setup creates an environment variable CMAJOR_ROOT that points to the installation directory
-        and adds the CMAJOR_ROOT\bin directory to PATH. The setup adds a shortcut to <em>CmajorDevEnv</em>
+        and adds the CMAJOR_ROOT\bin directory to PATH. The setup adds a shortcut to the <em>Cmajor Code</em>
         (IDE) to the desktop.
     </p>
 
@@ -75,9 +75,47 @@
             </li>
         </ul>
     </p>
+    
+    <h3>
+        1.4 Compiling the Cmajor system libraries with cppcmc
+    </h3>
+    
+    <ul>
+    <li>
+        Debug configuration:
+        Open a command prompt or Windows Terminal, 
+        change to the <strong>C:\cmajor\system\platform\windows</strong> directory and enter the following command:
+        <pre>
+        C:\cmajor\system\platform\windows>cppcmc -u -v System.cms
+        </pre>
+        The <strong>-u</strong> flag tells the compiler to rebuild everything, strictly not necessary.
+        The <strong>-v</strong> flag tells the compiler to be verbose, so you will see what's going on.
+        If everything went fine, the last lines will say:
+        <pre>
+        System libraries installed.
+        Solution 'System' built successfully.
+        </pre>
+        The debug-mode libraries are installed to the <strong>C:\cmajor\system\lib\cpp\gcc\debug</strong> directory.
+    </li>
+    
+    <li>
+        Release configuration:
+        Enter the following command:
+        <pre>
+        C:\cmajor\system\platform\windows>cppcmc -u -v -c=release System.cms
+        </pre>
+        The <strong>-c=release</strong> option tells the compiler to build for release configuration (optimizations enabled).
+        Again the last lines should say:
+        <pre>
+        System libraries installed.
+        Solution 'System' built successfully.
+        </pre>
+        The release-mode libraries are installed to the <strong>C:\cmajor\system\lib\cpp\gcc\release</strong> directory.
+    </li>
+    </ul>
 
     <h3>
-        1.4 Optional: Installing Cmajor Visual Studio extension
+        1.5 Optional: Installing Cmajor Visual Studio extension
     </h3>
 
     <p>
@@ -85,7 +123,7 @@
     </p>
 
     <h4>
-        1.4.1 Step 1: Installing Visual Studio extension
+        1.5.1 Step 1: Installing Visual Studio extension
     </h4>
 
     <ul>
@@ -128,7 +166,7 @@
     </ul>
 
     <h4>
-        1.4.2 Step 2: Installing Cmajor project system files
+        1.5.2 Step 2: Installing Cmajor project system files
     </h4>
 
     <ul>
@@ -156,7 +194,7 @@
     </ul>
 
     <h3>
-        1.5 Tour of Cmajor Visual Studio extension
+        1.6 Tour of Cmajor Visual Studio extension
     </h3>
 
     <p>
@@ -164,7 +202,7 @@
     </p>
 
     <h3>
-        1.6 Uninstalling Cmajor Visual Studio extension
+        1.7 Uninstalling Cmajor Visual Studio extension
     </h3>
 
     <ul>
