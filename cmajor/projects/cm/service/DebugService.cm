@@ -654,6 +654,34 @@ namespace Cm.Service.Debug
                 return MakePair(List<ChildResult>(), false);
             }
         }
+        public Pair<List<ChildResult>, bool> Children(const string& expr, int start, int count)
+        {
+            SendEvaluateChildRequest(expr, start, count);
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateChildReply);
+            return ProcessEvaluateChildReply(reply.Get());
+        }
+        private void SendEvaluateChildRequest(const string& expr, int start, int count)
+        {
+            EvaluateChildRequest evaluateChildRequest;
+            evaluateChildRequest.expression = expr;
+            evaluateChildRequest.start = ToString(start);
+            evaluateChildRequest.count = ToString(count);
+            UniquePtr<JsonValue> request = evaluateChildRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private Pair<List<ChildResult>, bool> ProcessEvaluateChildReply(JsonValue* reply)
+        {
+            EvaluateChildReply evaluateChildReply(reply);
+            if (evaluateChildReply.success)
+            {
+                return MakePair(evaluateChildReply.results, true);
+            }
+            else
+            {
+                LogMessage("evaluate child request failed: " + evaluateChildReply.error);
+                return MakePair(List<ChildResult>(), false);
+            }
+        }
         private void ProcessStopReason(const TargetState& state)
         {
             if (state.stopReason == "exited-normally")

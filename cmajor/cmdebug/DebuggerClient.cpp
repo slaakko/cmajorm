@@ -6,6 +6,7 @@
 #include <cmajor/cmdebug/DebuggerClient.hpp>
 #include <cmajor/cmdebug/CmdbMessage.hpp>
 #include <cmajor/cmdebug/CmdbMessageMap.hpp>
+#include <cmajor/cmdebug/DebugInfo.hpp>
 #include <sngjson/json/JsonLexer.hpp>
 #include <sngjson/json/JsonParser.hpp>
 #include <soulng/util/TextUtils.hpp>
@@ -75,6 +76,15 @@ private:
     std::string count;
 };
 
+class BreakCommand : public ClientCommand
+{
+public:
+    BreakCommand(const SourceLoc& location_);
+    void Execute(DebuggerClient& client) override;
+private:
+    SourceLoc location;
+};
+
 std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
 {
     if (line == "start")
@@ -122,6 +132,37 @@ std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
             throw std::runtime_error("invalid evaluate params");
         }
     }
+    else if (StartsWith(line, "break"))
+    {
+        std::string::size_type spacePos = line.find(' ');
+        if (spacePos != std::string::npos)
+        {
+            std::string params = line.substr(spacePos + 1);
+            std::vector<std::string> paramVec = Split(params, ':');
+            if (paramVec.size() == 1)
+            {
+                SourceLoc sourceLoc;
+                sourceLoc.path = "";
+                sourceLoc.line = params[0];
+                return std::unique_ptr<ClientCommand>(new BreakCommand(sourceLoc));
+            }
+            else if (paramVec.size() == 2)
+            {
+                SourceLoc sourceLoc;
+                sourceLoc.path = paramVec[0];
+                sourceLoc.line = paramVec[1];
+                return std::unique_ptr<ClientCommand>(new BreakCommand(sourceLoc));
+            }
+            else
+            {
+                throw std::runtime_error("invalid break params");
+            }
+        }
+        else
+        {
+            throw std::runtime_error("invalid break params");
+        }
+    }
     else
     {
         throw std::runtime_error("unknown command");
@@ -140,6 +181,7 @@ public:
     void Step();
     void Locals();
     void Evaluate(const std::string& expr, const std::string& start, const std::string& count);
+    void Break(const SourceLoc& location);
     void WriteRequest(JsonValue* request);
     void WriteReply(JsonValue* reply);
     std::unique_ptr<JsonValue> ReadReply(MessageKind replyMessageKind);
@@ -156,6 +198,7 @@ public:
     void ProcessStepReply(JsonValue* reply);
     int ProcessCountReply(JsonValue* reply);
     void ProcessEvaluateChildReply(JsonValue* reply);
+    void ProcessBreakReply(JsonValue* reply);
     bool Stopped() const { return stopped; }
 private:
     MessageMap messageMap;
@@ -422,6 +465,11 @@ void DebuggerClient::ProcessEvaluateChildReply(JsonValue* reply)
     }
 }
 
+void DebuggerClient::ProcessBreakReply(JsonValue* reply)
+{
+    BreakReply breakReply(reply);
+}
+
 void DebuggerClient::Evaluate(const std::string& expr, const std::string& start, const std::string& count)
 {
     EvaluateChildRequest evaluateChildRequest;
@@ -433,6 +481,17 @@ void DebuggerClient::Evaluate(const std::string& expr, const std::string& start,
     WriteRequest(req.get());
     std::unique_ptr<JsonValue> replyVal = ReadReply(MessageKind::evaluateChildReply);
     ProcessEvaluateChildReply(replyVal.get());
+}
+
+void DebuggerClient::Break(const SourceLoc& location)
+{
+    BreakRequest breakRequest;
+    breakRequest.messageKind = "breakRequest";
+    breakRequest.breakpointLocation = location;
+    std::unique_ptr<JsonValue> request = breakRequest.ToJson();
+    WriteRequest(request.get());
+    std::unique_ptr<JsonValue> reply = ReadReply(MessageKind::breakReply);
+    ProcessBreakReply(reply.get());
 }
 
 void StartCommand::Execute(DebuggerClient& client)
@@ -472,6 +531,15 @@ EvaluateCommand::EvaluateCommand(const std::string& expr_, const std::string& st
 void EvaluateCommand::Execute(DebuggerClient& client)
 {
     client.Evaluate(expr, start, count);
+}
+
+BreakCommand::BreakCommand(const SourceLoc& location_) : location(location_)
+{
+}
+
+void BreakCommand::Execute(DebuggerClient& client)
+{
+    client.Break(location);
 }
 
 void RunClient(int port)

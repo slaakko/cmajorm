@@ -46,6 +46,7 @@ struct ChildResult
     std::string expr;
     std::string name;
     std::string type;
+    std::string dynType;
     std::string value;
     std::string count;
 };

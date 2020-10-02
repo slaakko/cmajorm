@@ -513,7 +513,7 @@ std::unique_ptr<JsonValue> ListIterator::Current()
 std::string ListIterator::CurrentStr()
 {
     Pointer* itemPtr = new Pointer(GetContainer(), itemsPtr->Expression() + "+" + std::to_string(Index()));
-    return "*(" + itemPtr->Expression() + ")";
+    return "(*(" + itemPtr->Expression() + "))";
 }
 
 Iterator* ListIterator::Next()

@@ -81,7 +81,7 @@ Result::Result(soulng::util::JsonValue* __json_value)
     sngjson::json::FromJson(__json_value, "value", value);
 }
 
-ChildResult::ChildResult() : expr(), name(), type(), value(), count()
+ChildResult::ChildResult() : expr(), name(), type(), dynType(), value(), count()
 {
 }
 
@@ -94,10 +94,12 @@ std::unique_ptr<soulng::util::JsonValue> ChildResult::ToJson() const
     object->AddField(U"name", std::move(fieldValue1));
     std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(type);
     object->AddField(U"type", std::move(fieldValue2));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(value);
-    object->AddField(U"value", std::move(fieldValue3));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(count);
-    object->AddField(U"count", std::move(fieldValue4));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(dynType);
+    object->AddField(U"dynType", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(value);
+    object->AddField(U"value", std::move(fieldValue4));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(count);
+    object->AddField(U"count", std::move(fieldValue5));
     return object;
 }
 
@@ -106,6 +108,7 @@ ChildResult::ChildResult(soulng::util::JsonValue* __json_value)
     sngjson::json::FromJson(__json_value, "expr", expr);
     sngjson::json::FromJson(__json_value, "name", name);
     sngjson::json::FromJson(__json_value, "type", type);
+    sngjson::json::FromJson(__json_value, "dynType", dynType);
     sngjson::json::FromJson(__json_value, "value", value);
     sngjson::json::FromJson(__json_value, "count", count);
 }
