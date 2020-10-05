@@ -611,6 +611,10 @@ namespace System.Windows
                     {
                         MenuItem* parentItem = selectedMenuItem->GetParentMenuItem();
                         bool handled = selectedMenuItem->HandleKey(keyCode, wantsKeys, parentItem, this);
+                        if (MenuInvalidated())
+                        {
+                            InvalidateMenu();
+                        }
                         return handled;
                     }
                 }
