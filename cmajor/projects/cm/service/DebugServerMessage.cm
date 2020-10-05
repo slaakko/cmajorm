@@ -13,7 +13,7 @@ namespace Cm.Service.Debug
         none, startRequest, startReply, stopRequest, stopReply, genericErrorReply, continueRequest, continueReply, nextRequest, nextReply, stepRequest, stepReply,
         finishRequest, finishReply, untilRequest, untilReply,
         breakRequest, breakReply, deleteRequest, deleteReply, depthRequest, depthReply, framesRequest, framesReply,
-        countRequest, countReply, evaluateChildRequest, evaluateChildReply,
+        countRequest, countReply, evaluateChildRequest, evaluateChildReply, evaluateRequest, evaluateReply,
         targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply,
         logMessageRequest, logMessageReply
     }
@@ -387,6 +387,28 @@ namespace Cm.Service.Debug
         public string messageKind;
         public bool success;
         public List<ChildResult> results;
+        public string error;
+    }
+
+    [json]
+    public class EvaluateRequest
+    {
+        public nothrow EvaluateRequest() : messageKind("evaluateRequest")
+        {
+        }
+        public string messageKind;
+        public string expression;
+    }
+
+    [json]
+    public class EvaluateReply
+    {
+        public nothrow EvaluateReply() : messageKind("evaluateReply")
+        {
+        }
+        public string messageKind;
+        public bool success;
+        public Result result;
         public string error;
     }
 

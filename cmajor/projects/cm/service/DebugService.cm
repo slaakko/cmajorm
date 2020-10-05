@@ -201,6 +201,8 @@ namespace Cm.Service.Debug
             messageKindMap["countReply"] = MessageKind.countReply;
             messageKindMap["evaluateChildRequest"] = MessageKind.evaluateChildRequest;
             messageKindMap["evaluateChildReply"] = MessageKind.evaluateChildReply;
+            messageKindMap["evaluateRequest"] = MessageKind.evaluateRequest;
+            messageKindMap["evaluateReply"] = MessageKind.evaluateReply;
             messageKindMap["targetRunningRequest"] = MessageKind.targetRunningRequest;
             messageKindMap["targetRunningReply"] = MessageKind.targetRunningReply;
             messageKindMap["targetInputRequest"] = MessageKind.targetInputRequest;
@@ -628,6 +630,7 @@ namespace Cm.Service.Debug
         }
         public Pair<List<ChildResult>, bool> LocalVariables(int start, int count)
         {
+            RequestGuard requestGuard(this);
             SendEvaluateLocalVariablesRequest(start, count);
             UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateChildReply);
             return ProcessEvaluateLocalVariablesReply(reply.Get());
@@ -656,6 +659,7 @@ namespace Cm.Service.Debug
         }
         public Pair<List<ChildResult>, bool> Children(const string& expr, int start, int count)
         {
+            RequestGuard requestGuard(this);
             SendEvaluateChildRequest(expr, start, count);
             UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateChildReply);
             return ProcessEvaluateChildReply(reply.Get());
@@ -680,6 +684,31 @@ namespace Cm.Service.Debug
             {
                 LogMessage("evaluate child request failed: " + evaluateChildReply.error);
                 return MakePair(List<ChildResult>(), false);
+            }
+        }
+        public Pair<string, bool> Evaluate(const string& expr)
+        {
+            SendEvaluateRequest(expr);
+            UniquePtr<JsonValue> reply = ReadReply(MessageKind.evaluateReply);
+            return ProcessEvaluateReply(reply.Get());
+        }
+        private void SendEvaluateRequest(const string& expr)
+        {
+            EvaluateRequest evaluateRequest;
+            evaluateRequest.expression = expr;
+            UniquePtr<JsonValue> request = evaluateRequest.ToJson();
+            WriteRequest(request.Get());
+        }
+        private Pair<string, bool> ProcessEvaluateReply(JsonValue* reply)
+        {
+            EvaluateReply evaluateReply(reply);
+            if (evaluateReply.success)
+            {
+                return MakePair(evaluateReply.result.value, true);
+            }
+            else
+            {
+                return MakePair(string(), false);
             }
         }
         private void ProcessStopReason(const TargetState& state)

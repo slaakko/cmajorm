@@ -1219,4 +1219,12 @@ namespace System.Windows.API
         }
         return size;
     }
+
+    public void GetCursorPos(int& x, int& y)
+    {
+        if (!WinGetCursorPos(x, y))
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
 }

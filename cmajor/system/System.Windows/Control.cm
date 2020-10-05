@@ -77,18 +77,31 @@ namespace System.Windows
         return GetSystemColor(SystemColor.COLOR_MENU);
     }
 
+    public const uint mouseHoverTimerId = 2u;
+
+    public nothrow uint DefaultMouseHoverMs()
+    {
+        return 300u;
+    }
+
+    public nothrow Size DefaultMouseHoverRectSize()
+    {
+        return Size(8, 8);
+    }
+
     public abstract class Control : Component
     {
         private enum Flags : short
         {
             none = 0, mouseInClient = 1 << 0, lbuttonPressed = 1 << 1, menuWantsKeys = 1 << 2, keyDownHandled = 1 << 3, focused = 1 << 4, caretCreated = 1 << 5, caretShown = 1 << 6,
-            disabled = 1 << 7, hidden = 1 << 8, tabStop = 1 << 9, baseOnCreatedCalled = 1 << 10
+            disabled = 1 << 7, hidden = 1 << 8, tabStop = 1 << 9, baseOnCreatedCalled = 1 << 10, mouseHoverTimerStarted = 1 << 11
         }
         public Control(const char* windowClassName_, WindowClassStyle windowClassStyle_, WindowStyle style_, ExtendedWindowStyle exStyle_, 
             const Color& backgroundColor_, const string& text_, const Point& location_, const Size& size_, Dock dock_, Anchors anchors_) : 
             windowClassName(windowClassName_), windowClassStyle(windowClassStyle_), style(style_), exStyle(exStyle_),
             backgroundColor(backgroundColor_), handle(null), text(text_), location(location_), size(size_), contentLocation(0, 0), contentSize(), dock(dock_), anchors(anchors_), flags(Flags.none),
-            arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), caretShowCount(0), font(null), fontHandle(null), originalWndProc(null)
+            arrowCursor(LoadStandardCursor(StandardCursorId.IDC_ARROW)), caretShowCount(0), font(null), fontHandle(null), originalWndProc(null),
+            mouseHoverMs(0u), mouseHoverRectSize(DefaultMouseHoverRectSize()) 
         {
             if ((style & WindowStyle.WS_DISABLED) != 0)
             {
@@ -1111,15 +1124,17 @@ namespace System.Windows
                     }
                     else
                     {
-                        if (accessKey == '\0')
+                        if (lparam == VK_F10)
                         {
-                            Window* window = GetWindow();
-                            if (window->DoKeyDown(Keys.f10))
+                            if (DoKeyDown(cast<int>(lparam)))
                             {
                                 return true;
                             }
                         }
-                        currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.altModifier);
+                        else
+                        {
+                            currentModifierKeys = cast<Keys>(currentModifierKeys | Keys.altModifier);
+                        }
                         if (DoKeyDown(cast<int>(accessKey)))
                         {
                             currentModifierKeys = cast<Keys>(currentModifierKeys & ~Keys.altModifier);
@@ -1562,6 +1577,54 @@ namespace System.Windows
                 }
                 OnMouseMove(args);
             }
+            if (mouseHoverMs != 0u && !MouseHoverTimerStarted())
+            {
+                Point pt = args.location;
+                int dx = Abs(mouseHoverLocation.x - pt.x);
+                int dy = Abs(mouseHoverLocation.y - pt.y);
+                if (dx > mouseHoverRectSize.w || dy > mouseHoverRectSize.h)
+                {
+                    SetMouseHoverTimerStarted();
+                    mouseHoverLocation = pt;
+                    SetTimer(mouseHoverTimerId, mouseHoverMs);
+                }
+            }
+        }
+        public nothrow void SetMouseHoverMs(uint mouseHoverMs_)
+        {
+            mouseHoverMs = mouseHoverMs_;
+        }
+        public nothrow uint MouseHoverMs() const
+        {
+            return mouseHoverMs;
+        }
+        public nothrow void SetMouseHoverRectSize(const Size& mouseHoverRectSize_)
+        {
+            mouseHoverRectSize = mouseHoverRectSize_;
+        }
+        public nothrow const Size& MouseHoverRectSize() const
+        {
+            return mouseHoverRectSize;
+        }
+        private void DoMouseHover()
+        {
+            ResetMouseHoverTimerStarted();
+            KillTimer(mouseHoverTimerId);
+            Point pt;
+            GetCursorPos(pt.x, pt.y);
+            pt = ScreenToClient(pt);
+            if (!IsDecoratorControl())
+            {
+                TranslateMousePos(pt);
+            }
+            int dx = Abs(mouseHoverLocation.x - pt.x);
+            int dy = Abs(mouseHoverLocation.y - pt.y);
+            if (dx <= mouseHoverRectSize.w && dy <= mouseHoverRectSize.h)
+            {
+                MouseEventArgs args;
+                args.location = pt;
+                OnMouseHover(args);
+            }
         }
         private void DoMouseLeave()
         {
@@ -1625,7 +1688,14 @@ namespace System.Windows
         }
         protected virtual void OnTimer(TimerEventArgs& args)
         {
-            timerEvent.Fire(args);
+            if (args.timerId == mouseHoverTimerId)
+            {
+                DoMouseHover();
+            }
+            else
+            {
+                timerEvent.Fire(args);
+            }
         }
         protected virtual void SetCursor()
         {
@@ -1638,6 +1708,10 @@ namespace System.Windows
         protected virtual void OnMouseMove(MouseEventArgs& args)
         {
             mouseMoveEvent.Fire(args);
+        }
+        protected virtual void OnMouseHover(MouseEventArgs& args)
+        {
+            mouseHoverEvent.Fire(args);
         }
         protected virtual void OnMouseLeave()
         {
@@ -1804,6 +1878,10 @@ namespace System.Windows
         public nothrow Event<MouseEventHandler, MouseEventArgs>& MouseMoveEvent() const
         {
             return mouseMoveEvent;
+        }
+        public nothrow Event<MouseEventHandler, MouseEventArgs>& MouseHoverEvent() const
+        {
+            return mouseHoverEvent;
         }
         public nothrow Event<MouseLeaveEventHandler>& MouseLeaveEvent() const
         {
@@ -2065,6 +2143,18 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags & ~Flags.baseOnCreatedCalled);
         }
+        private nothrow inline bool MouseHoverTimerStarted() const
+        {
+            return (flags & Flags.mouseHoverTimerStarted) != Flags.none;
+        }
+        private nothrow inline void SetMouseHoverTimerStarted()
+        {
+            flags = cast<Flags>(flags | Flags.mouseHoverTimerStarted);
+        }
+        private nothrow inline void ResetMouseHoverTimerStarted()
+        {
+            flags = cast<Flags>(flags & ~Flags.mouseHoverTimerStarted);
+        }
         private const char* windowClassName;
         private WindowClassStyle windowClassStyle;
         private Color backgroundColor;
@@ -2088,9 +2178,13 @@ namespace System.Windows
         private Font font;
         private FontHandle fontHandle;
         private void* originalWndProc;
+        private Size mouseHoverRectSize;
+        private uint mouseHoverMs;
+        private Point mouseHoverLocation;
         private Event<PaintEventHandler, PaintEventArgs> paintEvent;
         private Event<MouseEnterEventHandler> mouseEnterEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseMoveEvent;
+        private Event<MouseEventHandler, MouseEventArgs> mouseHoverEvent;
         private Event<MouseLeaveEventHandler> mouseLeaveEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseDownEvent;
         private Event<MouseEventHandler, MouseEventArgs> mouseUpEvent;

@@ -65,15 +65,24 @@ public:
     void Execute(DebuggerClient& client) override;
 };
 
-class EvaluateCommand : public ClientCommand
+class ChildrenCommand : public ClientCommand
 {
 public:
-    EvaluateCommand(const std::string& expr_, const std::string& start_, const std::string& count_);
+    ChildrenCommand(const std::string& expr_, const std::string& start_, const std::string& count_);
     void Execute(DebuggerClient& client) override;
 private:
     std::string expr;
     std::string start;
     std::string count;
+};
+
+class EvaluateCommand : public ClientCommand
+{
+public:
+    EvaluateCommand(const std::string& expr_);
+    void Execute(DebuggerClient& client) override;
+private:
+    std::string expr;
 };
 
 class BreakCommand : public ClientCommand
@@ -111,7 +120,7 @@ std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
     {
         return std::unique_ptr<ClientCommand>(new LocalsCommand());
     }
-    else if (StartsWith(line, "evaluate"))
+    else if (StartsWith(line, "children"))
     {
         std::string::size_type spacePos = line.find(' ');
         if (spacePos != std::string::npos)
@@ -120,12 +129,25 @@ std::unique_ptr<ClientCommand> ParseCommand(const std::string& line)
             std::vector<std::string> paramVec = Split(params, ',');
             if (paramVec.size() == 3)
             {
-                return std::unique_ptr<ClientCommand>(new EvaluateCommand(paramVec[0], paramVec[1], paramVec[2]));
+                return std::unique_ptr<ClientCommand>(new ChildrenCommand(paramVec[0], paramVec[1], paramVec[2]));
             }
             else
             {
-                throw std::runtime_error("invalid evaluate params");
+                throw std::runtime_error("invalid children params");
             }
+        }
+        else
+        {
+            throw std::runtime_error("invalid children params");
+        }
+    }
+    else if (StartsWith(line, "evaluate"))
+    {
+        std::string::size_type spacePos = line.find(' ');
+        if (spacePos != std::string::npos)
+        {
+            std::string expr = line.substr(spacePos + 1);
+            return std::unique_ptr<ClientCommand>(new EvaluateCommand(expr));
         }
         else
         {
@@ -180,7 +202,8 @@ public:
     void Next();
     void Step();
     void Locals();
-    void Evaluate(const std::string& expr, const std::string& start, const std::string& count);
+    void Children(const std::string& expr, const std::string& start, const std::string& count);
+    void Evaluate(const std::string& expr);
     void Break(const SourceLoc& location);
     void WriteRequest(JsonValue* request);
     void WriteReply(JsonValue* reply);
@@ -198,6 +221,7 @@ public:
     void ProcessStepReply(JsonValue* reply);
     int ProcessCountReply(JsonValue* reply);
     void ProcessEvaluateChildReply(JsonValue* reply);
+    void ProcessEvaluateReply(JsonValue* reply);
     void ProcessBreakReply(JsonValue* reply);
     bool Stopped() const { return stopped; }
 private:
@@ -465,12 +489,25 @@ void DebuggerClient::ProcessEvaluateChildReply(JsonValue* reply)
     }
 }
 
+void DebuggerClient::ProcessEvaluateReply(JsonValue* reply)
+{
+    EvaluateReply evaluateReply(reply);
+    if (evaluateReply.success)
+    {
+        std::cout << evaluateReply.result.value << std::endl;
+    }
+    else
+    {
+        std::cerr << evaluateReply.error << std::endl;
+    }
+}
+
 void DebuggerClient::ProcessBreakReply(JsonValue* reply)
 {
     BreakReply breakReply(reply);
 }
 
-void DebuggerClient::Evaluate(const std::string& expr, const std::string& start, const std::string& count)
+void DebuggerClient::Children(const std::string& expr, const std::string& start, const std::string& count)
 {
     EvaluateChildRequest evaluateChildRequest;
     evaluateChildRequest.messageKind = "evaluateChildRequest";
@@ -481,6 +518,17 @@ void DebuggerClient::Evaluate(const std::string& expr, const std::string& start,
     WriteRequest(req.get());
     std::unique_ptr<JsonValue> replyVal = ReadReply(MessageKind::evaluateChildReply);
     ProcessEvaluateChildReply(replyVal.get());
+}
+
+void DebuggerClient::Evaluate(const std::string& expr)
+{
+    EvaluateRequest evaluateRequest;
+    evaluateRequest.messageKind = "evaluateRequest";
+    evaluateRequest.expression = expr;
+    std::unique_ptr<JsonValue> request = evaluateRequest.ToJson();
+    WriteRequest(request.get());
+    std::unique_ptr<JsonValue> reply = ReadReply(MessageKind::evaluateReply);
+    ProcessEvaluateReply(reply.get());
 }
 
 void DebuggerClient::Break(const SourceLoc& location)
@@ -524,13 +572,22 @@ void LocalsCommand::Execute(DebuggerClient& client)
     client.Locals();
 }
 
-EvaluateCommand::EvaluateCommand(const std::string& expr_, const std::string& start_, const std::string& count_) : expr(expr_), start(start_), count(count_)
+ChildrenCommand::ChildrenCommand(const std::string& expr_, const std::string& start_, const std::string& count_) : expr(expr_), start(start_), count(count_)
+{
+}
+
+void ChildrenCommand::Execute(DebuggerClient& client)
+{
+    client.Children(expr, start, count);
+}
+
+EvaluateCommand::EvaluateCommand(const std::string& expr_) : expr(expr_)
 {
 }
 
 void EvaluateCommand::Execute(DebuggerClient& client)
 {
-    client.Evaluate(expr, start, count);
+    client.Evaluate(expr);
 }
 
 BreakCommand::BreakCommand(const SourceLoc& location_) : location(location_)

@@ -13,18 +13,21 @@ using Cm.Service.Debug;
 
 namespace Cm.Views
 {
-    public class IdentifierHoverEventArgs
+    public const uint expressionHoverTimerId = 3u;
+
+    public class ExpressionHoverEventArgs
     {
-        public nothrow IdentifierHoverEventArgs(const ustring& identifier_, int lineNumber_, short columnNumber_) :
-            identifier(identifier_), lineNumber(lineNumber_), columnNumber(columnNumber_)
+        public nothrow ExpressionHoverEventArgs(const ustring& expression_, CmajorSourceCodeView* view_, const Point& location_) :
+            expression(expression_), view(view_), location(location_)
         {
         }
-        public ustring identifier;
-        public int lineNumber;
-        public short columnNumber;
+        public ustring expression;
+        public CmajorSourceCodeView* view;
+        public Point location;
     }
 
-    public class delegate void IdentifierHoverEventHandler(IdentifierHoverEventArgs& args);
+    public class delegate void ExpressionHoverEventHandler(ExpressionHoverEventArgs& args);
+    public class delegate void ExpressionExitHoverEventHandler();
 
     public nothrow inline System.Windows.Color DefaultDebugLocationBackgroundColor()
     {
@@ -45,11 +48,11 @@ namespace Cm.Views
     {
         private enum Flags : sbyte
         {
-            none = 0, generateIdentifierHoverEvents = 1 << 0
+            none = 0, generateExpressionHoverEvents = 1 << 0, expressionHovered = 1 << 1
         }
 
         public CmajorSourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
-            base(location, size, dock, anchors), lexer(null, null, string(), 0), flags(Flags.none), prevTokenPointed(null),
+            base(location, size, dock, anchors), lexer(null, null, string(), 0), flags(Flags.none), prevTokenText(),
             debugLocationBackgroundColor(DefaultDebugLocationBackgroundColor()), debugLocationTextColor(DefaultDebugLocationTextColor())
         {
             lexer.SetCommentTokenId(COMMENT);
@@ -59,6 +62,7 @@ namespace Cm.Views
             blockCommentStates.Insert(126);
             blockCommentStates.Insert(127);
             lexer.SetBlockCommentStates(blockCommentStates);
+            SetMouseHoverMs(DefaultMouseHoverMs());
         }
         public nothrow void SetDebugLocationBackgroundColor(const System.Windows.Color& debugLocationBackgroundColor_)
         {
@@ -88,40 +92,39 @@ namespace Cm.Views
                 debugStrip->Invalidate();
             }
         }
-        protected override void OnMouseMove(MouseEventArgs& args)
+        protected override void OnMouseHover(MouseEventArgs& args)
         {
             try
             {
-                base->OnMouseMove(args);
-                if (GenerateIdentifierHoverEvents())
+                base->OnMouseHover(args);
+                if (GenerateExpressionHoverEvents())
                 {
                     int lineNumber = 0;
                     short columnNumber = 0;
                     GetLineColumn(args.location, lineNumber, columnNumber);
                     if (lineNumber >= 1 && lineNumber <= Lines().Count() && columnNumber >= 1 && columnNumber <= GetLineLength(lineNumber))
                     {
-                        Pair<Token*, short> tokenColumn = GetToken(lineNumber, columnNumber);
-                        Token* token = tokenColumn.first;
-                        if (token != null)
+                        ustring tokenText = GetTokenText(lineNumber, columnNumber);
+                        if (!tokenText.IsEmpty())
                         {
-                            if (token != prevTokenPointed)
+                            if (tokenText != prevTokenText)
                             {
-                                prevTokenPointed = token;
-                                SourceCodeTokenKind tokenKind = GetTokenKind(*token);
-                                if (tokenKind == SourceCodeTokenKind.identifier)
-                                {
-                                    OnIdentifierHovered(token->match.ToString(), lineNumber, tokenColumn.second);
-                                }
+                                SetExpressionHovered();
+                                prevTokenText = tokenText;
+                                expressionHoverTime = Now();
+                                OnExpressionHovered(tokenText, args.location);
+                                SetTimer(expressionHoverTimerId, 3000u);
+                                return;
                             }
                         }
                         else
                         {
-                            prevTokenPointed = null;
+                            prevTokenText.Clear();
                         }
                     }
                     else
                     {
-                        prevTokenPointed = null;
+                        prevTokenText.Clear();
                     }
                 }
             }
@@ -130,10 +133,25 @@ namespace Cm.Views
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
             }
         }
-        protected virtual void OnIdentifierHovered(const ustring& identifier, int lineNumber, short columnNumber)
+        protected override void OnTimer(TimerEventArgs& args)
         {
-            IdentifierHoverEventArgs args(identifier, lineNumber, columnNumber);
-            identifierHoverEvent.Fire(args);
+            base->OnTimer(args);
+            if (args.timerId == expressionHoverTimerId && ExpressionHovered())
+            {
+                KillTimer(expressionHoverTimerId);
+                ResetExpressionHovered();
+                OnExpressionExitHover();
+                prevTokenText.Clear();
+            }
+        }
+        protected virtual void OnExpressionHovered(const ustring& expression, const Point& location)
+        {
+            ExpressionHoverEventArgs args(expression, this, location);
+            expressionHoverEvent.Fire(args);
+        }
+        protected virtual void OnExpressionExitHover()
+        {
+            expressionExitHoverEvent.Fire();
         }
         protected override void DrawHilites(Graphics& graphics, int lineIndex, const PointF& origin)
         {
@@ -249,9 +267,13 @@ namespace Cm.Views
                 case MINUSMINUS: case CPL: case DOT: case ARROW: case LBRACKET:
                 case RBRACKET: case LPAREN: case RPAREN: case LANGLE: case RANGLE:
                 case LBRACE: case RBRACE: case COMMA: case ASSIGN: case COLON:
-                case SEMICOLON: case HASH: case WS:
+                case SEMICOLON: case HASH:
                 {
                     return SourceCodeTokenKind.plain;
+                }
+                case WS:
+                {
+                    return SourceCodeTokenKind.space;
                 }
                 case FLOATINGLIT: case INTLIT: 
                 {
@@ -272,21 +294,37 @@ namespace Cm.Views
             }
             return SourceCodeTokenKind.plain;
         }
-        public nothrow inline void DoGenerateIdentifierHoverEvents()
+        public nothrow inline void DoGenerateExpressionHoverEvents()
         {
-            SetFlag(Flags.generateIdentifierHoverEvents);
+            SetFlag(Flags.generateExpressionHoverEvents);
         }
-        public nothrow inline void DontGenerateIdentifierHoverEvents()
+        public nothrow inline void DontGenerateExpressionHoverEvents()
         {
-            ResetFlag(Flags.generateIdentifierHoverEvents);
+            ResetFlag(Flags.generateExpressionHoverEvents);
         }
-        public nothrow inline Event<IdentifierHoverEventHandler, IdentifierHoverEventArgs>& IdentifierHoverEvent()
+        public nothrow inline Event<ExpressionHoverEventHandler, ExpressionHoverEventArgs>& ExpressionHoverEvent()
         {
-            return identifierHoverEvent;
+            return expressionHoverEvent;
         }
-        private nothrow inline bool GenerateIdentifierHoverEvents() const
+        public nothrow inline Event<ExpressionExitHoverEventHandler>& ExpressionExitHoverEvent()
         {
-            return GetFlag(Flags.generateIdentifierHoverEvents);
+            return expressionExitHoverEvent;
+        }
+        private nothrow inline bool GenerateExpressionHoverEvents() const
+        {
+            return GetFlag(Flags.generateExpressionHoverEvents);
+        }
+        private nothrow void SetExpressionHovered()
+        {
+            SetFlag(Flags.expressionHovered);
+        }
+        private nothrow void ResetExpressionHovered()
+        {
+            ResetFlag(Flags.expressionHovered);
+        }
+        private nothrow inline bool ExpressionHovered() const
+        {
+            return GetFlag(Flags.expressionHovered);
         }
         internal nothrow void SetDebugStrip(DebugStrip* debugStrip_)
         {
@@ -316,9 +354,12 @@ namespace Cm.Views
         private CmajorLexer lexer;
         private CmajorEditor* editor;
         private DebugStrip* debugStrip;
-        private Token* prevTokenPointed;
-        private Event<IdentifierHoverEventHandler, IdentifierHoverEventArgs> identifierHoverEvent;
+        private ustring prevTokenText;
+        private Event<ExpressionHoverEventHandler, ExpressionHoverEventArgs> expressionHoverEvent;
+        private Event<ExpressionExitHoverEventHandler> expressionExitHoverEvent;
         private System.Windows.Color debugLocationBackgroundColor;
         private System.Windows.Color debugLocationTextColor;
+        private TimePoint expressionHoverTime;
+
     }
 }

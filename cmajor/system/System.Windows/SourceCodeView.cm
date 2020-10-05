@@ -33,7 +33,7 @@ namespace System.Windows
 
     public enum SourceCodeTokenKind : int
     {
-        plain, keyword, identifier, string, character, number, comment, lineNumber
+        plain, space, keyword, identifier, string, character, number, comment, lineNumber
     }
 
     public nothrow ulong GetHashCode(SourceCodeTokenKind tokenKind)
@@ -157,14 +157,22 @@ namespace System.Windows
             base->GetLineColumn(contentLocation, line, column);
             column = column - cast<short>(LineNumberFieldLength());
         }
-        public nothrow Pair<Token*, short> GetToken(int lineNumber, short columnNumber) const
+        public nothrow ustring GetTokenText(int lineNumber, short columnNumber) const
         {
             if (lineNumber >= 1 && lineNumber <= tokenLines.Count())
             {
                 const TokenLine& tokenLine = tokenLines[lineNumber - 1];
-                return tokenLine.GetTokenByColumn(columnNumber);
+                int tokenIndex = tokenLine.TokenIndex(columnNumber);
+                if (tokenIndex != -1)
+                {
+                    const Token& token = tokenLine.tokens[tokenIndex];
+                    if (GetTokenKind(token) == SourceCodeTokenKind.identifier)
+                    {
+                        return token.match.ToString();
+                    }
+                }
             }
-            return MakePair(cast<Token*>(null), cast<short>(0));
+            return ustring();
         }
         protected virtual TokenLine TokenizeLine(const ustring& line, int lineNumber, int startState)
         {
@@ -230,6 +238,8 @@ namespace System.Windows
         {
             SourceCodeTokenStyle* plainStyle = GetOrInsertTokenStyle(Color.Black(), FontStyle.regular);
             tokenKindMap[SourceCodeTokenKind.plain] = plainStyle;
+            SourceCodeTokenStyle* spaceStyle = GetOrInsertTokenStyle(Color.Black(), FontStyle.regular);
+            tokenKindMap[SourceCodeTokenKind.space] = spaceStyle;
             SourceCodeTokenStyle* keywordStyle = GetOrInsertTokenStyle(Color.Blue(), FontStyle.regular);
             tokenKindMap[SourceCodeTokenKind.keyword] = keywordStyle;
             SourceCodeTokenStyle* identifierStyle = GetOrInsertTokenStyle(Color.Black(), FontStyle.regular);

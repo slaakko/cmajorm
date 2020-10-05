@@ -278,5 +278,6 @@ extern "C" RT_API void* WinGlobalLock(void* memHandle);
 extern "C" RT_API bool WinGlobalUnlock(void* memHandle);
 extern "C" RT_API void* WinGlobalFree(void* memHandle);
 extern "C" RT_API uint64_t WinGlobalSize(void* memHandle);
+extern "C" RT_API bool WinGetCursorPos(int& x, int& y);
 
 #endif // CMAJOR_RTS_WINDOWS_API_INCLUDED

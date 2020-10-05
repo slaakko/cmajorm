@@ -148,9 +148,9 @@ namespace Cm.Views
         {
             UniquePtr<TreeView> treeViewPtr(new TreeView(Point(), Size(), Dock.none, Anchors.none));
             treeView = treeViewPtr.Get();
-            treeView->NodeEnterEvent().AddHandler(TreeViewNodeEnter);
             treeView->NodeLeaveEvent().AddHandler(TreeViewNodeLeave);
             treeView->NodeExpandedEvent().AddHandler(TreeViewNodeExpanded);
+            treeView->NodeHoveredEvent().AddHandler(TreeViewNodeHovered);
             treeView->ContentLocationChangedEvent().AddHandler(TreeViewContentLocationChanged);
             UniquePtr<Control> paddedTreeView(new PaddedControl(treeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> scrollableTreeView(new ScrollableControl(paddedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
@@ -187,7 +187,7 @@ namespace Cm.Views
             child->SetLocation(childRect.location);
             child->SetSize(childRect.size);
         }
-        private void TreeViewNodeEnter(TreeViewNodeEventArgs& args)
+        private void TreeViewNodeHovered(TreeViewNodeEventArgs& args)
         {
             TreeViewNode* treeViewNode = args.node;
             if (treeViewNode->Data() != null)

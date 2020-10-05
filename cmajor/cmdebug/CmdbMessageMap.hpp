@@ -15,7 +15,7 @@ enum class MessageKind
     none, startRequest, startReply, stopRequest, stopReply, genericErrorReply, continueRequest, continueReply, nextRequest, nextReply, stepRequest, stepReply,
     finishRequest, finishReply, untilRequest, untilReply,
     breakRequest, breakReply, deleteRequest, deleteReply, depthRequest, depthReply, framesRequest, framesReply, 
-    countRequest, countReply, evaluateChildRequest, evaluateChildReply,
+    countRequest, countReply, evaluateChildRequest, evaluateChildReply, evaluateRequest, evaluateReply,
     targetRunningRequest, targetRunningReply, targetInputRequest, targetInputReply, targetOutputRequest, targetOutputReply, logMessageRequest, logMessageReply
 };
 

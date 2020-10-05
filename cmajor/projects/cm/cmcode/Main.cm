@@ -110,7 +110,7 @@ namespace cmcode
     {
         public MainWindow(const string& filePath) :
             base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
-            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true)
+            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true), toolTipWindow(new ToolTip())
         {
             UniquePtr<MenuBar> menuBarPtr(new MenuBar());
             menuBar = menuBarPtr.Get();
@@ -448,6 +448,8 @@ namespace cmcode
             {
                 OpenProject(GetFullPath(filePath));
             }
+
+            AddChild(toolTipWindow);
         }
         protected override void OnWindowClosing(bool& cancelClose)
         {
@@ -668,19 +670,6 @@ namespace cmcode
                 }
             }
         }
-        private void IdentifierHovered(Cm.Views.IdentifierHoverEventArgs& args)
-        {
-            TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
-            Cm.Views.CmajorEditor* editor = GetEditorByTabPage(selectedTabPage);
-            if (editor != null)
-            {
-                Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
-                SourceSpan span(args.lineNumber, args.columnNumber, args.columnNumber + cast<short>(args.identifier.Length()));
-                sourceCodeView->GetDebugStrip()->SetDebugLocation(span);
-                sourceCodeView->GetDebugStrip()->Invalidate();
-                sourceCodeView->Invalidate();
-            }
-        }
         private void TreeViewNodeClick(TreeViewNodeMouseClickEventArgs& args)
         {
             try
@@ -763,8 +752,6 @@ namespace cmcode
                         else
                         {
                             AddEditor(data->fileName, data->key, data->filePath);
-                            //editor->GetSourceCodeView()->DoGenerateIdentifierHoverEvents();
-                            //editor->GetSourceCodeView()->IdentifierHoverEvent().AddHandler(IdentifierHovered);
                         }
                     }
                     else
@@ -1365,6 +1352,8 @@ namespace cmcode
             Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
             sourceCodeView->RightClickEvent().AddHandler(SourceCodeViewRightClick);
             sourceCodeView->GotoCaretLineEvent().AddHandler(SourceCodeViewRunToCursor);
+            sourceCodeView->ExpressionHoverEvent().AddHandler(ExpressionHovered);
+            sourceCodeView->ExpressionExitHoverEvent().AddHandler(ExpressionExitHover);
             Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
             debugStrip->BreakpointAddedEvent().AddHandler(BreakpointAdded);
             debugStrip->BreakpointRemovedEvent().AddHandler(BreakpointRemoved);
@@ -1441,6 +1430,12 @@ namespace cmcode
                         debugTabPage = codeTabControl->SelectedTabPage();
                         startDebuggingToolButton->SetToolTip("Continue (F5)");
                         startDebuggingMenuItem->SetText("Continue", menuBar);
+                        Cm.Views.CmajorEditor* editor = GetEditorByTabPage(debugTabPage);
+                        if (editor != null)
+                        {
+                            Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
+                            sourceCodeView->DoGenerateExpressionHoverEvents();
+                        }
                     }
                 }
             }
@@ -1510,6 +1505,22 @@ namespace cmcode
                         CloseDebuggingWindows();
                         startDebuggingToolButton->SetToolTip("Start Debugging (F5)");
                         startDebuggingMenuItem->SetText("&Start Debugging", menuBar);
+                        const Container& container = codeTabControl->TabPages();
+                        Component* child = container.FirstChild();
+                        while (child != null)
+                        {
+                            if (child is TabPage*)
+                            {
+                                TabPage* tabPage = cast<TabPage*>(child);
+                                Cm.Views.CmajorEditor* editor = GetEditorByTabPage(tabPage);
+                                if (editor != null)
+                                {
+                                    Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
+                                    sourceCodeView->DontGenerateExpressionHoverEvents();
+                                }
+                            }
+                            child = child->NextSibling();
+                        }
                     }
                 }
             }
@@ -1870,6 +1881,39 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private void ExpressionHovered(Cm.Views.ExpressionHoverEventArgs& args)
+        {
+            if (Debugging() && targetStopped)
+            {
+                if (debugService->GetState() == Cm.Service.Debug.DebugService.State.requestInProgress)
+                {
+                    return;
+                }
+                toolTipWindow->Hide();
+                Point loc = args.location;
+                string expression = ToUtf8(args.expression);
+                Pair<string, bool> valueSuccess = debugService->Evaluate(expression);
+                if (valueSuccess.second)
+                {
+                    toolTipWindow->SetText(expression + " = " + valueSuccess.first);
+                    toolTipWindow->MeasureExtent();
+                    Size size = toolTipWindow->GetSize();
+                    Point pt(loc.x, loc.y + size.h);
+                    args.view->TranslateContentLocation(pt);
+                    pt = args.view->ClientToScreen(pt);
+                    pt = ScreenToClient(pt);
+                    toolTipWindow->SetLocation(pt);
+                    toolTipWindow->BringToFront();
+                    toolTipWindow->Show();
+                    toolTipWindow->Invalidate();
+                    toolTipWindow->Update();
+                }
+            }
+        }
+        private void ExpressionExitHover()
+        {
+            toolTipWindow->Hide();
+        }
         private void ReadTargetInput(string& inputLine, bool& eof)
         {
             inputLine.Clear();
@@ -1955,6 +1999,7 @@ namespace cmcode
                         }
                         sourceCodeView->EnsureLineVisible(debugLocation.line);
                         sourceCodeView->SetCaretLineCol(debugLocation.line, 1);
+                        sourceCodeView->DoGenerateExpressionHoverEvents();
                     }
                 }
                 Application.ProcessMessages();
@@ -2237,6 +2282,8 @@ namespace cmcode
         private ToolButton* stepOverToolButton;
         private ToolButton* stepIntoToolButton;
         private ToolButton* stepOutToolButton;
+
+        private ToolTip* toolTipWindow;
 
         private UniquePtr<BuildService> buildService;
         private UniquePtr<DebugService> debugService;

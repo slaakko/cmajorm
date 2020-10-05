@@ -221,7 +221,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int64_t result = 0;
     void* originalWndProc = nullptr;
-    bool handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
+    bool handled = false;
+    if (message == WM_SYSCOMMAND)
+    {
+        if (wParam == SC_KEYMENU)
+        {
+            if (lParam == 0)
+            {
+                int16_t altState = GetAsyncKeyState(VK_MENU);
+                bool alt = altState != 0;
+                if (!alt)
+                {
+                    lParam = VK_F10;
+                }
+            }
+        }
+    }
+    if (!handled)
+    {
+        handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
+    }
     if (!handled)
     {
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -234,7 +253,25 @@ LRESULT CALLBACK CommandSubClassWndProc(HWND hWnd, UINT message, WPARAM wParam, 
     int64_t result = 0;
     bool handled = false;
     void* originalWndProc = nullptr;
-    handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
+    if (message == WM_SYSCOMMAND)
+    {
+        if (wParam == SC_KEYMENU)
+        {
+            if (lParam == 0)
+            {
+                int16_t altState = GetAsyncKeyState(VK_MENU);
+                bool alt = altState != 0;
+                if (!alt)
+                {
+                    lParam = VK_F10;
+                }
+            }
+        }
+    }
+    if (!handled)
+    {
+        handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
+    }
     return CallWindowProcW((WNDPROC)originalWndProc, hWnd, message, wParam, lParam);
 }
 
@@ -1948,3 +1985,14 @@ uint64_t WinGlobalSize(void* memHandle)
     return GlobalSize((HGLOBAL)memHandle);
 }
 
+bool WinGetCursorPos(int& x, int& y)
+{
+    POINT pt;
+    if (GetCursorPos(&pt))
+    {
+        x = pt.x;
+        y = pt.y;
+        return true;
+    }
+    return false;
+}

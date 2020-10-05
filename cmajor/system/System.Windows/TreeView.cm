@@ -27,6 +27,7 @@ namespace System.Windows
                 format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5), selectedNode(null), trackedNode(null), toolTipWindow(new ToolTip())
         {
             SetChanged();
+            SetMouseHoverMs(DefaultMouseHoverMs());
         }
         public TreeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this(Font(FontFamily("Segoe UI"), 9.0f), Font(FontFamily("Segoe UI"), 9.0f, FontStyle.bold, Unit.point),
@@ -348,6 +349,10 @@ namespace System.Windows
         {
             return nodeCollapsedEvent;
         }
+        public nothrow Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs>& NodeHoveredEvent()
+        {
+            return nodeHoveredEvent;
+        }
         protected override void OnMouseDown(MouseEventArgs& args)
         {
             base->OnMouseDown(args);
@@ -422,6 +427,15 @@ namespace System.Windows
                     trackedNode->MouseLeaveInternal();
                 }
                 trackedNode = null;
+            }
+        }
+        protected override void OnMouseHover(MouseEventArgs& args)
+        {
+            base->OnMouseHover(args);
+            if (!root.IsNull())
+            {
+                bool handled = false;
+                root->DispatchMouseHover(args, handled);
             }
         }
         internal nothrow inline bool Changed() const
@@ -678,10 +692,19 @@ namespace System.Windows
         {
             nodeCollapsedEvent.Fire(args);
         }
+        protected virtual void OnNodeHovered(TreeViewNodeEventArgs& args)
+        {
+            nodeHoveredEvent.Fire(args);
+        }
         internal void NodeCollapsed(TreeViewNode* node)
         {
             TreeViewNodeEventArgs args(node);
             OnNodeCollapsed(args);
+        }
+        internal void NodeHovered(TreeViewNode* node)
+        {
+            TreeViewNodeEventArgs args(node);
+            OnNodeHovered(args);
         }
         private Flags flags;
         private UniquePtr<TreeViewNode> root;
@@ -709,6 +732,7 @@ namespace System.Windows
         private Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs> nodeSelectedEvent;
         private Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs> nodeExpandedEvent;
         private Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs> nodeCollapsedEvent;
+        private Event<TreeViewNodeEventHandler, TreeViewNodeEventArgs> nodeHoveredEvent;
     }
 
     public class TreeViewNode : Component
@@ -968,6 +992,35 @@ namespace System.Windows
         {
             OnMouseLeave();
         }
+        internal void DispatchMouseHover(MouseEventArgs& args, bool& handled)
+        {
+            Rect r(location, size);
+            if (r.Contains(args.location))
+            {
+                handled = true;
+                OnMouseHover();
+            }
+            else
+            {
+                if (childRect.Contains(args.location))
+                {
+                    Component* child = children.FirstChild();
+                    while (child != null)
+                    {
+                        if (child is TreeViewNode*)
+                        {
+                            TreeViewNode* childNode = cast<TreeViewNode*>(child);
+                            childNode->DispatchMouseHover(args, handled);
+                            if (handled)
+                            {
+                                return;
+                            }
+                        }
+                        child = child->NextSibling();
+                    }
+                }
+            }
+        }
         private void OnMouseDown(MouseEventArgs& args)
         {
             if (args.buttons == MouseButtons.lbutton)
@@ -1046,6 +1099,14 @@ namespace System.Windows
             if (view != null)
             {
                 view->NodeLeave(this);
+            }
+        }
+        private void OnMouseHover()
+        {
+            TreeView* view = GetTreeView();
+            if (view != null)
+            {
+                view->NodeHovered(this);
             }
         }
         public void Toggle()

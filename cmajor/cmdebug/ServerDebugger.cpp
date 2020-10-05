@@ -138,6 +138,7 @@ public:
     std::unique_ptr<JsonValue> ProcessFramesRequest(const FramesRequest& framesRequest);
     std::unique_ptr<JsonValue> ProcessCountRequest(const CountRequest& countRequest);
     std::unique_ptr<JsonValue> ProcessEvaluateChildRequest(const EvaluateChildRequest& evaluateChildRequest);
+    std::unique_ptr<JsonValue> ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest);
     void DoEvaluateChildRequest(Project* project, const std::string& expression, int start, int count, EvaluateChildReply& reply, std::set<uint64_t>& printedPointers);
     void EvaluateSpecializationTypeChildRequest(DIClassTemplateSpecializationType* specializationType, const std::string& expression, int start, int count,
         EvaluateChildReply& reply, std::set<uint64_t>& printedPointers);
@@ -407,6 +408,11 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessRequest(JsonValue* requestMess
         {
             EvaluateChildRequest evaluateChildRequest(requestMessage);
             return ProcessEvaluateChildRequest(evaluateChildRequest);
+        }
+        case MessageKind::evaluateRequest:
+        {
+            EvaluateRequest evaluateRequest(requestMessage);
+            return ProcessEvaluateRequest(evaluateRequest);
         }
         default:
         {
@@ -958,6 +964,41 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateChildRequest(const Eva
         evaluateChildReply.error = ex.what();
     }
     return evaluateChildReply.ToJson();
+}
+
+std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest)
+{
+    EvaluateReply evaluateReply = DoEvaluate(evaluateRequest.expression);
+    if (evaluateReply.success)
+    {
+        try
+        {
+            boost::uuids::uuid staticTypeId = boost::lexical_cast<boost::uuids::uuid>(evaluateReply.result.staticType.id);
+            Instruction* stoppedInstruction = StoppedInstruction();
+            if (stoppedInstruction)
+            {
+                CompileUnitFunction* function = stoppedInstruction->GetCompileUnitFunction();
+                CompileUnit* compileUnit = function->GetCompileUnit();
+                Project* project = compileUnit->GetProject();
+                DIType* type = project->GetType(staticTypeId);
+                int64_t count = 0;
+                DIType* dynType = nullptr;
+                std::set<uint64_t> printedPointers;
+                evaluateReply.result.value = GetValue(evaluateRequest.expression, type, count, dynType, printedPointers);
+            }
+            else
+            {
+                evaluateReply.success = false;
+                evaluateReply.error = "not stopped";
+            }
+        }
+        catch (const std::exception& ex)
+        {
+            evaluateReply.success = false;
+            evaluateReply.error = ex.what();
+        }
+    }
+    return evaluateReply.ToJson();
 }
 
 void ServerDebugger::DoEvaluateChildRequest(Project* project, const std::string& expression, int start, int count, EvaluateChildReply& reply,
