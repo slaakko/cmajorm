@@ -186,6 +186,68 @@ namespace System
             AppendFrom(that.chars, that.len);
             return *this;
         }
+        public nothrow void Insert(long index, CharT c)
+        {
+            #assert(index >= 0);
+            if (index >= len)
+            {
+                Append(c);
+            }
+            else
+            {
+                Reserve(len + 1);
+                for (long i = len - 1; i >= index; --i)
+                {
+                    chars[i + 1] = chars[i];
+                }
+                chars[index] = c;
+                ++len;
+                chars[len] = '\0';
+            }
+        }
+        public nothrow void Insert(long index, const String<CharT>& that)
+        {
+            #assert(index >= 0);
+            if (that.IsEmpty()) return;
+            if (index >= len)
+            {
+                Append(that);
+            }
+            else
+            {
+                Reserve(len + that.len);
+                for (long i = len - 1; i >= index; --i)
+                {
+                    chars[i + that.len] = chars[i];
+                }
+                for (long i = 0; i < that.len; ++i)
+                {
+                    chars[index + i] = that.chars[i];
+                }
+                len = len + that.len;
+                chars[len] = '\0';
+            }
+        }
+        public nothrow void Remove(long index, long count)
+        {
+            #assert(index >= 0);
+            #assert(count >= 0);
+            if (IsEmpty()) return;
+            if (index > len)
+            {
+                index = len;
+            }
+            if (index + count > len)
+            {
+                count = len - index;
+            }
+            for (long i = index; i < len - count; ++i)
+            {
+                chars[i] = chars[i + count];
+            }
+            len = len - count;
+            chars[len] = '\0';
+        }
         public nothrow void Replace(CharT oldChar, CharT newChar)
         {
             long n = len;

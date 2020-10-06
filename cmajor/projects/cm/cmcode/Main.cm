@@ -1044,12 +1044,20 @@ namespace cmcode
             }
             return false;
         }
+        private BuildServiceArgs MakeBuildServiceArgs()
+        {
+        #if (DEBUG)
+            BuildServiceArgs args = BuildServiceArgs().Log(true).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false);
+        #else
+            BuildServiceArgs args = BuildServiceArgs().Log(false).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false);
+        #endif
+            return args;
+        }
         private BuildService& GetBuildService()
         {
             if (buildService.IsNull())
             {
-                buildService.Reset(new BuildService(BuildServiceArgs().
-                    Log(true).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false)));
+                buildService.Reset(new BuildService(MakeBuildServiceArgs()));
                 buildService->SetLogMessageNotificationFunction(BuildServiceLogMessagesAvailable);
                 buildService->SetProgressNotificationFunction(BuildServiceProgress);
             }
@@ -1402,6 +1410,17 @@ namespace cmcode
                 localsTabPage->Close();
             }
         }
+        private DebugServiceArgs MakeDebugServiceArgs(const string& backend, const string& config, Cm.Ast.Project* project, const string& programArguments)
+        {
+        #if (DEBUG)
+            DebugServiceArgs args = DebugServiceArgs().Log(true).DebugServer(false).Verbose(true).Backend(backend).Config(config).
+                ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments);
+        #else
+            DebugServiceArgs args = DebugServiceArgs().Log(false).DebugServer(false).Verbose(true).Backend(backend).Config(config).
+                ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments);
+        #endif
+            return args;
+        }
         private void StartDebugService(const string& backend, const string& config, DebugGuard& debugGuard)
         {
             try
@@ -1419,8 +1438,7 @@ namespace cmcode
                             throw Exception("project '" + ToUtf8(project->Name()) + "' is a library project");
                         }
                         string programArguments = solutionExplorerData->ActiveProjectSettings().programArguments;
-                        debugService.Reset(new DebugService(DebugServiceArgs().Log(true).DebugServer(false).Verbose(true).Backend(backend).Config(config).
-                            ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments)));
+                        debugService.Reset(new DebugService(MakeDebugServiceArgs(backend, config, project, programArguments)));
                         debugService->SetLogMessageNotificationFunction(DebugServiceLogMessagesAvailable);
                         debugService->SetWriteTargetOutputMethod(WriteTargetOutput);
                         debugService->SetReadTargetInputMethod(ReadTargetInput);
