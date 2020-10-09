@@ -15,9 +15,6 @@ xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmdb2xml.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmupdd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmupd.exe ..\bin
 
-xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gnutls\bin\*.dll ..\bin
-xcopy /Y /D D:\work\cmajorm\cmajor\system\ext\gnutls\libgnutls-30.lib ..\lib
-
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmdebugd.dll ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmdebugd.lib ..\lib
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmdebug.dll ..\bin
@@ -187,10 +184,10 @@ xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cmrtsd.lib ..\lib\vs
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cmrts.lib ..\lib\vs
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\ehd.lib ..\lib\vs
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\eh.lib ..\lib\vs
+xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\libbz2.lib ..\lib
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\zlibstat.lib ..\lib
 xcopy /Y /D ..\lib\libbz2.lib ..\lib\vs
 xcopy /Y /D ..\lib\pdcurses.lib ..\lib\vs
-xcopy /Y /D ..\lib\libgnutls-30.lib ..\lib\vs
 xcopy /Y /D ..\lib\zlibstat.lib ..\lib\vs
 
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cm2htmld.exe ..\bin
@@ -234,9 +231,9 @@ xcopy /Y /D D:\work\cmajorm\cmajor\x64\Debug\cppcmparserd.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\x64\Release\cppcmparser.exe ..\bin
 xcopy /Y /D D:\work\cmajorm\cmajor\projects\cm\cmcmparser\bin\release\cmcmparser.exe ..\bin
 
-xcopy /Y /D D:\work\llvm-project-10.0.0\llvm\build\Release\bin\llc.exe ..\bin
-xcopy /Y /D D:\work\llvm-project-10.0.0\llvm\build\Release\bin\opt.exe ..\bin
-xcopy /Y /D D:\work\llvm-project-10.0.0\llvm\build\Release\bin\llvm-dis.exe ..\bin
+xcopy /Y /D D:\llvm-10.0.1.src\build\Release\bin\llc.exe ..\bin
+xcopy /Y /D D:\llvm-10.0.1.src\build\Release\bin\opt.exe ..\bin
+xcopy /Y /D D:\llvm-10.0.1.src\build\Release\bin\llvm-dis.exe ..\bin
 
 xcopy /Y /D D:\work\cmajorm\cmajor\task\bin\Release\CmajorTasks.dll ..\bin
 
