@@ -147,6 +147,8 @@ class Pattern
     public nothrow Pattern(const string& name_) : name(name_)
     {
     }
+    suppress Pattern(const Pattern&);
+    suppress void operator=(const Pattern&);
     public nothrow void AddFileMask(FileMask* fileMask)
     {
         fileMasks.Add(UniquePtr<FileMask>(fileMask));
@@ -203,6 +205,8 @@ class PatternSet
     public nothrow PatternSet()
     {
     }
+    suppress PatternSet(const PatternSet&);
+    suppress void operator=(const PatternSet&);
     public void AddPattern(Pattern* pattern)
     {
         Pattern* prev = GetPattern(pattern->Name());
@@ -256,6 +260,8 @@ class DirSet
     public nothrow DirSet()
     {
     }
+    suppress DirSet(const DirSet&);
+    suppress void operator=(const DirSet&);
     public nothrow Dir* GetDir(const string& dirName) const
     {
         Map<string, Dir*>.ConstIterator it = dirMap.CFind(dirName);

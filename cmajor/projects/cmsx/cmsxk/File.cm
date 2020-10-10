@@ -35,7 +35,7 @@ namespace cmsx.kernel
         text = 1u << 5u
     }
 
-    public int Create(Machine& machine, Process* process, ulong pathAddress, int mode)
+    public int Create(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress, int mode)
     {
         if (pathAddress == 0u)
         {
@@ -51,7 +51,7 @@ namespace cmsx.kernel
         return fs->Create(process, path, mode, true);
     }
 
-    public int Open(Machine& machine, Process* process, ulong pathAddress, OpenFlags flags, int mode)
+    public int Open(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress, OpenFlags flags, int mode)
     {
         if (pathAddress == 0u)
         {
@@ -67,7 +67,7 @@ namespace cmsx.kernel
         return fs->Open(process, path, flags, mode);
     }
 
-    public void Close(Machine& machine, Process* process, int fd)
+    public void Close(Machine& machine, cmsx.kernel.Process* process, int fd)
     {
         File* file = process->fileTable.GetFile(fd);
         if (file != null)
@@ -81,7 +81,7 @@ namespace cmsx.kernel
         }
     }
 
-    public long Read(Machine& machine, Process* process, int fd, ulong bufferAddress, long count)
+    public long Read(Machine& machine, cmsx.kernel.Process* process, int fd, ulong bufferAddress, long count)
     {
         File* file = process->fileTable.GetFile(fd);
         if (count > 0)
@@ -91,7 +91,7 @@ namespace cmsx.kernel
         return 0;
     }
 
-    public long Write(Machine& machine, Process* process, int fd, ulong bufferAddress, long count)
+    public long Write(Machine& machine, cmsx.kernel.Process* process, int fd, ulong bufferAddress, long count)
     {
         File* file = process->fileTable.GetFile(fd);
         if (count > 0)
@@ -101,19 +101,19 @@ namespace cmsx.kernel
         return 0;
     }
 
-    public long Seek(Machine& machine, Process* process, int fd, long pos, Origin origin)
+    public long Seek(Machine& machine, cmsx.kernel.Process* process, int fd, long pos, Origin origin)
     {
         File* file = process->fileTable.GetFile(fd);
         return file->Seek(pos, origin);
     }
 
-    public long Tell(Machine& machine, Process* process, int fd)
+    public long Tell(Machine& machine, cmsx.kernel.Process* process, int fd)
     {
         File* file = process->fileTable.GetFile(fd);
         return file->Tell();
     }
 
-    public int Dup(Process* process, int fd)
+    public int Dup(cmsx.kernel.Process* process, int fd)
     {
         File* file = process->fileTable.GetFile(fd);
         File* shared = file->Share();
@@ -122,7 +122,7 @@ namespace cmsx.kernel
         return duplicate;
     }
 
-    public void Pipe(Machine& machine, Process* process, ulong readFDAddress, ulong writeFDAddress)
+    public void Pipe(Machine& machine, cmsx.kernel.Process* process, ulong readFDAddress, ulong writeFDAddress)
     {
         if (readFDAddress == 0u)
         {
@@ -151,7 +151,7 @@ namespace cmsx.kernel
         inodePutter.ResetINode();
     }
 
-    public void Link(Machine& machine, Process* process, ulong sourcePathAddress, ulong targetPathAddress)
+    public void Link(Machine& machine, cmsx.kernel.Process* process, ulong sourcePathAddress, ulong targetPathAddress)
     {
         if (sourcePathAddress == 0u)
         {
@@ -177,7 +177,7 @@ namespace cmsx.kernel
         fs->Link(process, sourcePath, targetPath);
     }
 
-    public void Unlink(Machine& machine, Process* process, ulong pathAddress)
+    public void Unlink(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress)
     {
         if (pathAddress == 0u)
         {
@@ -193,7 +193,7 @@ namespace cmsx.kernel
         fs->Unlink(process, path);
     }
 
-    public void Rename(Machine& machine, Process* process, ulong sourcePathAddress, ulong targetPathAddress)
+    public void Rename(Machine& machine, cmsx.kernel.Process* process, ulong sourcePathAddress, ulong targetPathAddress)
     {
         if (sourcePathAddress == 0u)
         {
@@ -219,7 +219,7 @@ namespace cmsx.kernel
         fs->Rename(process, sourcePath, targetPath);
     }
 
-    public void Mkdir(Machine& machine, Process* process, ulong pathAddress, int mode)
+    public void Mkdir(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress, int mode)
     {
         if (pathAddress == 0u)
         {
@@ -235,7 +235,7 @@ namespace cmsx.kernel
         fs->MakeDirectory(process, path, mode);
     }
 
-    public int OpenDir(Machine& machine, Process* process, ulong pathAddress)
+    public int OpenDir(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress)
     {
         if (pathAddress == 0u)
         {
@@ -251,7 +251,7 @@ namespace cmsx.kernel
         return fs->OpenDirectory(process, path);
     }
 
-    public int ReadDir(Machine& machine, Process* process, int fd, ulong inodeNumberAddress, ulong entryNameAddress)
+    public int ReadDir(Machine& machine, cmsx.kernel.Process* process, int fd, ulong inodeNumberAddress, ulong entryNameAddress)
     {
         if (inodeNumberAddress == 0u)
         {
@@ -280,7 +280,7 @@ namespace cmsx.kernel
         }
     }
 
-    public void CloseDir(Machine& machine, Process* process, int fd)
+    public void CloseDir(Machine& machine, cmsx.kernel.Process* process, int fd)
     {
         File* file = process->fileTable.GetFile(fd);
         if (file != null)
@@ -301,7 +301,7 @@ namespace cmsx.kernel
         }
     }
 
-    public void GetCWD(Machine& machine, Process* process, ulong pathBufferAddress, long count)
+    public void GetCWD(Machine& machine, cmsx.kernel.Process* process, ulong pathBufferAddress, long count)
     {
         if (pathBufferAddress == 0u)
         {
@@ -320,7 +320,7 @@ namespace cmsx.kernel
         WriteProcessMemory(machine, process, pathBufferAddress, cast<byte*>(cast<void*>(currentWorkindDirectory.Chars())), cast<ulong>(currentWorkindDirectory.Length() + 1), Protection.write);
     }
 
-    public void ChDir(Machine& machine, Process* process, ulong pathAddress)
+    public void ChDir(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress)
     {
         if (pathAddress == 0u)
         {
@@ -336,7 +336,7 @@ namespace cmsx.kernel
         fs->ChDir(process, path);
     }
 
-    public void Stat(Machine& machine, Process* process, ulong pathAddress, ulong statBufAddress)
+    public void Stat(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress, ulong statBufAddress)
     {
         if (pathAddress == 0u)
         {
@@ -352,14 +352,14 @@ namespace cmsx.kernel
         fs->Stat(process, path, statBufAddress);
     }
 
-    public int UMask(Machine& machine, Process* process, int mask)
+    public int UMask(Machine& machine, cmsx.kernel.Process* process, int mask)
     {
         int prevUMask = process->umask;
         process->umask = mask & cast<int>(ParseOctal("777"));
         return prevUMask;
     }
 
-    public void IOCtl(Machine& machine, Process* process, int fd, int item, ulong bufferAddress, long count)
+    public void IOCtl(Machine& machine, cmsx.kernel.Process* process, int fd, int item, ulong bufferAddress, long count)
     {
         if (bufferAddress == 0u)
         {
@@ -373,19 +373,19 @@ namespace cmsx.kernel
         file->IOCtl(machine, process, item, bufferAddress, count);
     }
 
-    public int GetFGPID(Process* process, int fd)
+    public int GetFGPID(cmsx.kernel.Process* process, int fd)
     {
         File* file = process->fileTable.GetFile(fd);
         return file->GetFGPID();
     }
 
-    public void SetFGPID(Process* process, int fd, int pid)
+    public void SetFGPID(cmsx.kernel.Process* process, int fd, int pid)
     {
         File* file = process->fileTable.GetFile(fd);
         file->SetFGPID(pid);
     }
 
-    public void Chmod(Machine& machine, Process* process, ulong pathAddress, int mode)
+    public void Chmod(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress, int mode)
     {
         if (pathAddress == 0u)
         {
@@ -401,7 +401,7 @@ namespace cmsx.kernel
         fs->ChangeMode(process, path, mode);
     }
 
-    public void Chown(Machine& machine, Process* process, ulong pathAddress,  int uid, int gid)
+    public void Chown(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress,  int uid, int gid)
     {
         if (pathAddress == 0u)
         {
@@ -417,7 +417,7 @@ namespace cmsx.kernel
         fs->ChangeOwner(process, path, uid, gid);
     }
 
-    public void UTime(Machine& machine, Process* process, ulong pathAddress, ulong timeBufAddress)
+    public void UTime(Machine& machine, cmsx.kernel.Process* process, ulong pathAddress, ulong timeBufAddress)
     {
         if (pathAddress == 0u)
         {
@@ -447,11 +447,11 @@ namespace cmsx.kernel
         public nothrow File(const string& name_) : name(name_)
         {
         }
-        public virtual long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        public virtual long Write(Machine& machine, cmsx.kernel.Process* writer, ulong bufferAddress, long count)
         {
             throw SystemError(EBADF, name + " not open for writing");
         }
-        public virtual long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        public virtual long Read(Machine& machine, cmsx.kernel.Process* reader, ulong bufferAddress, long count)
         {
             throw SystemError(EBADF, name + " not open for reading");
         }
@@ -483,7 +483,7 @@ namespace cmsx.kernel
         {
             throw SystemError(ENOTSUPPORTED, name + " does not support ioctl(setecho)");
         }
-        public virtual void IOCtl(Machine& machine, Process* process, int item, ulong bufferAddress, long count)
+        public virtual void IOCtl(Machine& machine, cmsx.kernel.Process* process, int item, ulong bufferAddress, long count)
         {
             bool itemFound = true;
             switch (item)
@@ -568,7 +568,7 @@ namespace cmsx.kernel
                 LogMessage("fs.file", "release.fd=" + ToString(fd));
             }
         }
-        private void GetConsoleStatus(Machine& machine, Process* process, ulong bufferAddress, long count)
+        private void GetConsoleStatus(Machine& machine, cmsx.kernel.Process* process, ulong bufferAddress, long count)
         {
             if (count < 1)
             {
@@ -579,7 +579,7 @@ namespace cmsx.kernel
             writer.Write(cast<byte>(IsConsole()));
             WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
         }
-        private void GetHostTextFileStatus(Machine& machine, Process* process, ulong bufferAddress, long count)
+        private void GetHostTextFileStatus(Machine& machine, cmsx.kernel.Process* process, ulong bufferAddress, long count)
         {
             if (count < 1)
             {
@@ -590,7 +590,7 @@ namespace cmsx.kernel
             writer.Write(cast<byte>(IsHostTextFile()));
             WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
         }
-        private void GetColorStatus(Machine& machine, Process* process, ulong bufferAddress, long count)
+        private void GetColorStatus(Machine& machine, cmsx.kernel.Process* process, ulong bufferAddress, long count)
         {
             if (count < 1)
             {
@@ -601,7 +601,7 @@ namespace cmsx.kernel
             writer.Write(cast<byte>(HasColors()));
             WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
         }
-        private void GetEcho(Machine& machine, Process* process, ulong bufferAddress, long count)
+        private void GetEcho(Machine& machine, cmsx.kernel.Process* process, ulong bufferAddress, long count)
         {
             if (count < 1)
             {
@@ -613,7 +613,7 @@ namespace cmsx.kernel
             writer.Write(cast<byte>(echo));
             WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
         }
-        private void SetEcho(Machine& machine, Process* process, ulong bufferAddress, long count)
+        private void SetEcho(Machine& machine, cmsx.kernel.Process* process, ulong bufferAddress, long count)
         {
             if (count < 1)
             {
@@ -625,7 +625,7 @@ namespace cmsx.kernel
             bool echo = cast<bool>(reader.ReadByte());
             SetEcho(echo);
         }
-        private void GetWindowDimensions(Machine& machine, Process* process, ulong bufferAddress, long count)
+        private void GetWindowDimensions(Machine& machine, cmsx.kernel.Process* process, ulong bufferAddress, long count)
         {
             if (count < 8)
             {
@@ -643,7 +643,7 @@ namespace cmsx.kernel
             writer.Write(cols);
             WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
         }
-        private void GetConsoleColors(Machine& machine, Process* process, ulong bufferAddress, long count)
+        private void GetConsoleColors(Machine& machine, cmsx.kernel.Process* process, ulong bufferAddress, long count)
         {
             if (count < 2)
             {
@@ -666,7 +666,7 @@ namespace cmsx.kernel
             }
             WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
         }
-        private void SetConsoleColors(Machine& machine, Process* process, ulong bufferAddress, long count)
+        private void SetConsoleColors(Machine& machine, cmsx.kernel.Process* process, ulong bufferAddress, long count)
         {
             if (count < 2)
             {
@@ -704,7 +704,7 @@ namespace cmsx.kernel
         public nothrow DebuggerInputFile() : base("CONSOLE INPUT (DEBUGGER)")
         {
         }
-        public override long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        public override long Read(Machine& machine, cmsx.kernel.Process* reader, ulong bufferAddress, long count)
         {
             try
             {
@@ -764,7 +764,7 @@ namespace cmsx.kernel
         public nothrow DebuggerOutputFile() : base("CONSOLE OUTPUT (DEBUGGER)")
         {
         }
-        public override long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        public override long Write(Machine& machine, cmsx.kernel.Process* writer, ulong bufferAddress, long count)
         {
             try
             {
@@ -792,7 +792,7 @@ namespace cmsx.kernel
         public nothrow ConsoleInputFile() : base("CONSOLE INPUT")
         {
         }
-        public override long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        public override long Read(Machine& machine, cmsx.kernel.Process* reader, ulong bufferAddress, long count)
         {
             try
             {
@@ -849,7 +849,7 @@ namespace cmsx.kernel
         {
             bufferedInput = line;
         }
-        private void EnqueueReadRequest(Process* reader, ulong bufferAddress, long count)
+        private void EnqueueReadRequest(cmsx.kernel.Process* reader, ulong bufferAddress, long count)
         {
             SleepProcess(reader, consoleInputEvent, bufferAddress, cast<ulong>(count));
         }
@@ -885,7 +885,7 @@ namespace cmsx.kernel
         public nothrow ConsoleOutputFile() : base("CONSOLE OUTPUT")
         {
         }
-        public override long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        public override long Write(Machine& machine, cmsx.kernel.Process* writer, ulong bufferAddress, long count)
         {
             try
             {
@@ -917,7 +917,7 @@ namespace cmsx.kernel
         public nothrow RegularFile(const string& name_, FilePtr* filePtr_) : base(name_), filePtr(filePtr_)
         {
         }
-        public override long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        public override long Write(Machine& machine, cmsx.kernel.Process* writer, ulong bufferAddress, long count)
         {
             if ((filePtr->Flags() & OpenFlags.write) == OpenFlags.none)
             {
@@ -925,7 +925,7 @@ namespace cmsx.kernel
             }
             return filePtr->Write(machine, writer, bufferAddress, count);
         }
-        public override long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        public override long Read(Machine& machine, cmsx.kernel.Process* reader, ulong bufferAddress, long count)
         {
             if ((filePtr->Flags() & OpenFlags.read) == OpenFlags.none)
             {
@@ -970,7 +970,7 @@ namespace cmsx.kernel
         public nothrow DirectoryFile(INode* dirINode_) : base("dir"), dirINode(dirINode_), offset(0)
         {
         }
-        public virtual int Read(Process* process, ulong inodeNumberAddress, ulong entryNameAddress)
+        public virtual int Read(cmsx.kernel.Process* process, ulong inodeNumberAddress, ulong entryNameAddress)
         {
             if (dirINode == null)
             {
@@ -1016,7 +1016,7 @@ namespace cmsx.kernel
         public nothrow HostDirectoryFile(INode* dirINode_) : base(dirINode_), findHandle(null)
         {
         }
-        public override int Read(Process* process, ulong inodeNumberAddress, ulong entryNameAddress)
+        public override int Read(cmsx.kernel.Process* process, ulong inodeNumberAddress, ulong entryNameAddress)
         {
             FileSystem* fs = GetMountTable().GetFileSystem(DirINode()->Key().fsNumber);
             return fs->ReadDirectory(process, this, inodeNumberAddress, entryNameAddress);
@@ -1055,7 +1055,7 @@ namespace cmsx.kernel
         {
             fifo->Share();
         }
-        public override long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        public override long Read(Machine& machine, cmsx.kernel.Process* reader, ulong bufferAddress, long count)
         {
             return fifo->Read(machine, reader, bufferAddress, count);
         }
@@ -1086,7 +1086,7 @@ namespace cmsx.kernel
             fifo->Share();
             fifo->AddWriter();
         }
-        public override long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        public override long Write(Machine& machine, cmsx.kernel.Process* writer, ulong bufferAddress, long count)
         {
             return fifo->Write(machine, writer, bufferAddress, count);
         }
@@ -1120,7 +1120,7 @@ namespace cmsx.kernel
                 pos = inode->GetFileSize();
             }
         }
-        public long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        public long Write(Machine& machine, cmsx.kernel.Process* writer, ulong bufferAddress, long count)
         {
             if (Log())
             {
@@ -1183,7 +1183,7 @@ namespace cmsx.kernel
             }
             return bytesWritten;
         }
-        public long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        public long Read(Machine& machine, cmsx.kernel.Process* reader, ulong bufferAddress, long count)
         {
             while (inode->GetFlag(INode.Flags.locked))
             {
@@ -1325,7 +1325,7 @@ namespace cmsx.kernel
                 LogMessage("fs.file", "fifo.removewriter.writers=" + ToString(writerCount));
             }
         }
-        public long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        public long Write(Machine& machine, cmsx.kernel.Process* writer, ulong bufferAddress, long count)
         {
             if (Log())
             {
@@ -1432,7 +1432,7 @@ namespace cmsx.kernel
             }
             return bytesWritten;
         }
-        public long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        public long Read(Machine& machine, cmsx.kernel.Process* reader, ulong bufferAddress, long count)
         {
             if (Log())
             {
@@ -1573,8 +1573,8 @@ namespace cmsx.kernel
         {
             Kernel& kernel = GetKernel();
             ProcessTable& processTable = kernel.GetProcessTable();
-            List<Process*> waitingPipeWriters = inode->GetWaitingPipeWriters();
-            for (Process* writer : waitingPipeWriters)
+            List<cmsx.kernel.Process*> waitingPipeWriters = inode->GetWaitingPipeWriters();
+            for (cmsx.kernel.Process* writer : waitingPipeWriters)
             {
                 WakeUpProcess(processTable, writer);
             }
@@ -1583,8 +1583,8 @@ namespace cmsx.kernel
         {
             Kernel& kernel = GetKernel();
             ProcessTable& processTable = kernel.GetProcessTable();
-            List<Process*> waitingPipeReaders = inode->GetWaitingPipeReaders();
-            for (Process* reader : waitingPipeReaders)
+            List<cmsx.kernel.Process*> waitingPipeReaders = inode->GetWaitingPipeReaders();
+            for (cmsx.kernel.Process* reader : waitingPipeReaders)
             {
                 WakeUpProcess(processTable, reader);
             }

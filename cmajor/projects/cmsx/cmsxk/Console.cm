@@ -299,10 +299,10 @@ namespace cmsx.kernel
                 {
                     LogMessage("con.deliver", "fgpid=" + ToString(session->fgpid));
                 }
-                Process* reader = processTable.GetProcess(session->fgpid);
+                cmsx.kernel.Process* reader = processTable.GetProcess(session->fgpid);
                 if (reader != null)
                 {
-                    if (reader->state == Process.State.asleep && reader->event == consoleInputEvent)
+                    if (reader->state == cmsx.kernel.Process.State.asleep && reader->event == consoleInputEvent)
                     {
                         GlobalFileTable& fileTable = kernel.FileTable();
                         ConsoleInputFile* consoleInputFile = fileTable.GetConsoleInputFile();

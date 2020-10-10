@@ -4987,7 +4987,7 @@ namespace spring
             }
             RectF r(cornerBitmapLocF, cornerBitmapSizeF);
             ImageAttributes imageAttributes;
-            Color transparentColor(0u, 128u, 128u);
+            System.Windows.Color transparentColor(0u, 128u, 128u);
             imageAttributes.SetColorKey(transparentColor, transparentColor, ColorAdjustType.default_);
             RectF s(PointF(0, 0), cornerBitmapSizeF);
             SmoothingMode prevSmoothingMode = graphics.GetSmoothingModeChecked();
@@ -5151,7 +5151,7 @@ namespace spring
         bitmapGraphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
         bitmapGraphics.SetSmoothingModeChecked(SmoothingMode.highQuality);
         bitmapGraphics.SetPageUnitChecked(Unit.millimeter);
-        bitmapGraphics.ClearChecked(Color.White());
+        bitmapGraphics.ClearChecked(System.Windows.Color.White());
         diagram.Draw(bitmapGraphics);
         bitmap.SaveChecked(fileName.Chars(), GetEncoderClsIdChecked(GetImageFormat(imageFormat)));
     }

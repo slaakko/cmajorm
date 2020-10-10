@@ -5,7 +5,7 @@ using cmsx.machine;
 
 namespace cmsx.kernel
 {
-    public void ReadExceptionTableFromProcessMemory(Machine& machine, Process* process, ulong exceptionTableAddress, uint& frameSize, List<cmsx.object.DispatchTableEntry>& dispatchTable)
+    public void ReadExceptionTableFromProcessMemory(Machine& machine, cmsx.kernel.Process* process, ulong exceptionTableAddress, uint& frameSize, List<cmsx.object.DispatchTableEntry>& dispatchTable)
     {
         Memory& mem = machine.GetMemory();
         Registers& regs = machine.GetRegisters();
@@ -27,7 +27,7 @@ namespace cmsx.kernel
         regs.SetSpecial(Registers.rV, prevRV);
     }
 
-    public void ReadExceptionBlockTableFromProcessMemory(Machine& machine, Process* process, ulong exceptionBlockTableAddress, List<UniquePtr<cmsx.object.ExceptionBlock>>& exceptionBlockTable)
+    public void ReadExceptionBlockTableFromProcessMemory(Machine& machine, cmsx.kernel.Process* process, ulong exceptionBlockTableAddress, List<UniquePtr<cmsx.object.ExceptionBlock>>& exceptionBlockTable)
     {
         Memory& mem = machine.GetMemory();
         Registers& regs = machine.GetRegisters();
@@ -60,7 +60,7 @@ namespace cmsx.kernel
         regs.SetSpecial(Registers.rV, prevRV);
     }
 
-    public ulong GetHandlerAddress(Machine& machine, Process* process, ulong exceptionBlockTableAddress, ulong exceptionClassId)
+    public ulong GetHandlerAddress(Machine& machine, cmsx.kernel.Process* process, ulong exceptionBlockTableAddress, ulong exceptionClassId)
     {
         List<UniquePtr<cmsx.object.ExceptionBlock>> exceptionBlockTable;
         ReadExceptionBlockTableFromProcessMemory(machine, process, exceptionBlockTableAddress, exceptionBlockTable);
@@ -80,7 +80,7 @@ namespace cmsx.kernel
         return 0u;
     }
 
-    public void DispatchException(Machine& machine, Process* process, ulong fp)
+    public void DispatchException(Machine& machine, cmsx.kernel.Process* process, ulong fp)
     {
         process->handlerAddress = 0u;
         process->currentExceptionFrameSize = 0u;
@@ -187,7 +187,7 @@ namespace cmsx.kernel
         throw SystemError(EFAIL, "dispatch exception failed: exception handler not found");
     }
 
-    public void ContinueExceptionDispatch(Machine& machine, Process* process, ulong fp)
+    public void ContinueExceptionDispatch(Machine& machine, cmsx.kernel.Process* process, ulong fp)
     {
         ulong prevFP = 0u;
         ReadProcessMemory(machine, process, fp, prevFP, 8u, false);

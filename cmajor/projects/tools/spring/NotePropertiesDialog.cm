@@ -14,7 +14,7 @@ namespace spring
         public NotePropertiesDialog(NoteElement* noteElement_) :
             base("spring.notePropertiesDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(),
             DefaultControlBackgroundColor(), "Note Properties", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(100), ScreenMetrics.Get().MMToVerticalPixels(70)),
-            Dock.none, Anchors.none), noteElement(noteElement_)
+            Dock.none, Anchors.none, WindowState.normal), noteElement(noteElement_)
         {
             Size s = GetSize();
             Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
@@ -38,7 +38,7 @@ namespace spring
                 noteText.Append(line);
             }
             UniquePtr<TextBox> textBoxPtr(new TextBox(cast<TextBoxStyle>(TextBoxStyle.ES_LEFT | TextBoxStyle.ES_AUTOHSCROLL | TextBoxStyle.ES_AUTOVSCROLL | TextBoxStyle.ES_MULTILINE),
-                Color.White(), noteText, textBoxLoc, textBoxSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+                System.Windows.Color.White(), noteText, textBoxLoc, textBoxSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
             textBox = textBoxPtr.Get();
             textBox->TextChangedEvent().AddHandler(NoteTextChanged);
             textBox->SelectAll();

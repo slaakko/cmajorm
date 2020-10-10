@@ -30,7 +30,7 @@ CFLAGS += -I$(SOURCE_PREFIX)/../.. -DNDEBUG -O2 -DSHARED -DRT_EXPORTS
 	
 $(BINARY_PREFIX)/$(LIBRARY_NAME): $(OBJECTS)
 	$(CXX) -shared -o $@ $(OBJECTS) -mwindows -municode \
-		-L$(LIBRARY_PREFIX) -LD:/mingw-boost/lib \
+		-L$(LIBRARY_PREFIX) -LC:/mingw-boost/lib \
 		-lcmsngcmparser -lcmsngcmlexer \
 		-lcmsngparser -lcmsngcmast -lcmsngxmldom -lcmsngxmlxml \
 		-lcmsngxmlxpath -lcmsnglexer -lcmeh -lcmcommon -lcmsngutil -lpdcurses \

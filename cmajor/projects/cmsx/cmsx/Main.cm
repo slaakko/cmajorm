@@ -55,7 +55,7 @@ void Terminate(Machine& machine)
     int pid = kernel.GetProgramPID();
     if (pid != -1)
     {
-        Process* process = kernel.GetProcessTable().GetProcess(pid);
+        cmsx.kernel.Process* process = kernel.GetProcessTable().GetProcess(pid);
         if (process != null && Machine.GetFlag(Machine.Flags.verbose))
         {
             Console.Out() << "process exited with code " << process->exitCode << "." << endl();

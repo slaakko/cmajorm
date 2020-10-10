@@ -77,11 +77,11 @@ namespace cmsx.kernel
         public nothrow Block(const BlockKey& key_, BlockManager* manager_, BlockCache* cache_) : key(key_), manager(manager_), cache(cache_), flags(Flags.none), iterator(), owner(null)
         {
         }
-        public nothrow inline Process* Owner() const
+        public nothrow inline cmsx.kernel.Process* Owner() const
         {
             return owner;
         }
-        public nothrow inline void SetOwner(Process* owner_)
+        public nothrow inline void SetOwner(cmsx.kernel.Process* owner_)
         {
             owner = owner_;
         }
@@ -148,13 +148,13 @@ namespace cmsx.kernel
         {
             key = key_;
         }
-        public void AddWaitingProcess(Process* process)
+        public void AddWaitingProcess(cmsx.kernel.Process* process)
         {
             waitingProcesses.Add(process);
         }
-        public nothrow List<Process*> GetWaitingProcesses()
+        public nothrow List<cmsx.kernel.Process*> GetWaitingProcesses()
         {
-            List<Process*> processes;
+            List<cmsx.kernel.Process*> processes;
             Swap(processes, waitingProcesses);
             return processes;
         }
@@ -175,9 +175,9 @@ namespace cmsx.kernel
         private BlockManager* manager;
         private BlockCache* cache;
         private Flags flags;
-        private List<Process*> waitingProcesses;
+        private List<cmsx.kernel.Process*> waitingProcesses;
         private LinkedList<Block*>.Iterator iterator;
-        private Process* owner;
+        private cmsx.kernel.Process* owner;
     }
 
     public class SuperBlock : Block

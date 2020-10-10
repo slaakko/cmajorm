@@ -14,8 +14,8 @@ namespace spring
     {
         public SaveImageDialog(const string& diagramFileName_, const Layout& layout_) : 
             base("spring.saveImageDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(),
-            DefaultControlBackgroundColor(), "Save image", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(100), ScreenMetrics.Get().MMToVerticalPixels(100)), Dock.none, Anchors.none),
-            diagramFileName(diagramFileName_), layout(layout_)
+            DefaultControlBackgroundColor(), "Save image", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(100), ScreenMetrics.Get().MMToVerticalPixels(100)), Dock.none, Anchors.none,
+            WindowState.normal), diagramFileName(diagramFileName_), layout(layout_)
         {
             if (!diagramFileName.IsEmpty())
             {

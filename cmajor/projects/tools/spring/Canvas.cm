@@ -12,14 +12,14 @@ namespace spring
 
     public class Canvas : Control
     {
-        public Canvas(const Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
+        public Canvas(const System.Windows.Color& backgroundColor, const Point& location, const Size& size, Dock dock, Anchors anchors) :
             base("spring.canvas", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
             backgroundColor, "canvas", location, size, dock, anchors), diagram(new Diagram()), operationCreated(false),
             buttonPressed(false)
         {
             diagram->SetCanvas(this);
         }
-        public Canvas() : this(Color.White(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none) // todo
+        public Canvas() : this(System.Windows.Color.White(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none) // todo
         {
         }
         public nothrow void SetNoteCornerBitmap(Bitmap* noteCornerBitmap_)

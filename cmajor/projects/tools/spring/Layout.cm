@@ -164,9 +164,9 @@ namespace spring
         return Path.Combine(SpringDirectory(), "diagrams");
     }
 
-    public nothrow Color DefaultSelectionColor()
+    public nothrow System.Windows.Color DefaultSelectionColor()
     {
-        return Color(64u, 96u, 156u, 210u);
+        return System.Windows.Color(64u, 96u, 156u, 210u);
     }
 
     public nothrow float DefaultResizeHandleWidth()
@@ -417,7 +417,7 @@ namespace spring
             fonts.Add(Rvalue(fontPtr));
             return font;
         }
-        internal Pen* GetOrInsertPen(const Color& color, float width, DashStyle dashStyle)
+        internal Pen* GetOrInsertPen(const System.Windows.Color& color, float width, DashStyle dashStyle)
         {
             PenKey key(color, width, dashStyle);
             HashMap<PenKey, Pen*>.ConstIterator it = penMap.CFind(key);
@@ -432,9 +432,9 @@ namespace spring
             pens.Add(Rvalue(penPtr));
             return pen;
         }
-        internal Brush* GetOrInsertBrush(const Color& color)
+        internal Brush* GetOrInsertBrush(const System.Windows.Color& color)
         {
-            HashMap<Color, Brush*>.ConstIterator it = brushMap.CFind(color);
+            HashMap<System.Windows.Color, Brush*>.ConstIterator it = brushMap.CFind(color);
             if (it != brushMap.CEnd())
             {
                 return it->second;
@@ -451,7 +451,7 @@ namespace spring
         private List<UniquePtr<Pen>> pens;
         private HashMap<PenKey, Pen*> penMap;
         private List<UniquePtr<Brush>> brushes;
-        private HashMap<Color, Brush*> brushMap;
+        private HashMap<System.Windows.Color, Brush*> brushMap;
         private UniquePtr<ColorElement> selectedColorElement;
         private UniquePtr<AbstractClassLayoutElement> abstractClassLayoutElement;
         private UniquePtr<ConcreteClassLayoutElement> concreteClassLayoutElement;
@@ -622,18 +622,18 @@ namespace spring
 
     public class ColorElement : LayoutElement
     {
-        public nothrow ColorElement(const Color& color_, const string& elementName_) : color(color_), elementName(elementName_)
+        public nothrow ColorElement(const System.Windows.Color& color_, const string& elementName_) : color(color_), elementName(elementName_)
         {
         }
         suppress ColorElement(const ColorElement&);
         suppress void operator=(const ColorElement&);
         suppress ColorElement(ColorElement&&);
         suppress void operator=(ColorElement&&);
-        public nothrow inline const Color& GetColor() const
+        public nothrow inline const System.Windows.Color& GetColor() const
         {
             return color;
         }
-        public nothrow void SetColor(const Color& color_)
+        public nothrow void SetColor(const System.Windows.Color& color_)
         {
             color = color_;
         }
@@ -669,7 +669,7 @@ namespace spring
         {
             return layout.GetOrInsertBrush(color);
         }
-        private Color color;
+        private System.Windows.Color color;
         private string elementName;
     }
 
@@ -677,9 +677,9 @@ namespace spring
     {
         public RelationshipLayoutElement(Layout& layout, Graphics& graphics) :
             lineWidth(DefaultLineWidth(graphics)),
-            lineColorElement(new ColorElement(Color.Black(), "lineColor")),
-            arrowColorElement(new ColorElement(Color.Black(), "arrowColor")),
-            textColorElement(new ColorElement(Color.Black(), "textColor")),
+            lineColorElement(new ColorElement(System.Windows.Color.Black(), "lineColor")),
+            arrowColorElement(new ColorElement(System.Windows.Color.Black(), "arrowColor")),
+            textColorElement(new ColorElement(System.Windows.Color.Black(), "textColor")),
             inheritanceArrowWidth(DefaultInheritanceArrowWidth()),
             aggregateSymbolWidth(DefaultAggregateSymbolWidth()),
             aggregateSymbolHeight(DefaultAggregateSymbolHeight()),
@@ -912,8 +912,8 @@ namespace spring
         public ResizeHandleLayoutElement(Layout& layout, Graphics& graphics) :
             lineWidth(DefaultLineWidth(graphics)),
             resizeHandleWidth(DefaultResizeHandleWidth()),
-            lineColorElement(new ColorElement(Color.Black(), "lineColor")),
-            insideColorElement(new ColorElement(Color.White(), "insideColor"))
+            lineColorElement(new ColorElement(System.Windows.Color.Black(), "lineColor")),
+            insideColorElement(new ColorElement(System.Windows.Color.White(), "insideColor"))
         {
             linePen = layout.GetOrInsertPen(lineColorElement->GetColor(), lineWidth, DashStyle.solid);
             insideBrush = layout.GetOrInsertBrush(insideColorElement->GetColor());
@@ -1029,7 +1029,7 @@ namespace spring
     public abstract class FieldLayoutElement : LayoutElement
     {
         public FieldLayoutElement(Layout& layout) :
-            textColorElement(new ColorElement(Color.Black(), "textColor")),
+            textColorElement(new ColorElement(System.Windows.Color.Black(), "textColor")),
             fontElement(new FontElement(DefaultFieldFontFamily(), DefaultFontSize(), FontStyle.regular, "font", layout))
         {
         }
@@ -1112,7 +1112,7 @@ namespace spring
     public class AbstractOperationLayoutElement : OperationLayoutElement
     {
         public AbstractOperationLayoutElement(Layout& layout) :
-            base(new ColorElement(Color.Black(), "textColor"),
+            base(new ColorElement(System.Windows.Color.Black(), "textColor"),
                 new FontElement(DefaultOperationFontFamily(), DefaultFontSize(), FontStyle.italic, "font", layout))
         {
         }
@@ -1148,7 +1148,7 @@ namespace spring
     public class ConcreteOperationLayoutElement : OperationLayoutElement
     {
         public ConcreteOperationLayoutElement(Layout& layout) :
-            base(new ColorElement(Color.Black(), "textColor"),
+            base(new ColorElement(System.Windows.Color.Black(), "textColor"),
                 new FontElement(DefaultOperationFontFamily(), DefaultFontSize(), FontStyle.regular, "font", layout))
         {
         }
@@ -1245,7 +1245,7 @@ namespace spring
     {
         public AbstractClassLayoutElement(Layout& layout, Graphics& graphics) :
             base(new CaptionLayoutElement(new FontElement(DefaultCaptionFontFamily(), DefaultFontSize(), cast<FontStyle>(FontStyle.bold | FontStyle.italic), "font", layout)),
-                new ColorElement(Color.Black(), "textColor"), new ColorElement(Color.Black(), "frameColor"), DefaultFrameWidth(graphics), layout)
+                new ColorElement(System.Windows.Color.Black(), "textColor"), new ColorElement(System.Windows.Color.Black(), "frameColor"), DefaultFrameWidth(graphics), layout)
         {
         }
         suppress AbstractClassLayoutElement(const AbstractClassLayoutElement&);
@@ -1285,7 +1285,7 @@ namespace spring
     {
         public nothrow ConcreteClassLayoutElement(Layout& layout, Graphics& graphics) :
             base(new CaptionLayoutElement(new FontElement(DefaultCaptionFontFamily(), DefaultFontSize(), cast<FontStyle>(FontStyle.bold), "font", layout)),
-                new ColorElement(Color.Black(), "textColor"), new ColorElement(Color.Black(), "frameColor"), DefaultFrameWidth(graphics), layout)
+                new ColorElement(System.Windows.Color.Black(), "textColor"), new ColorElement(System.Windows.Color.Black(), "frameColor"), DefaultFrameWidth(graphics), layout)
         {
         }
         suppress ConcreteClassLayoutElement(const ConcreteClassLayoutElement&);
@@ -1325,8 +1325,8 @@ namespace spring
     {
         public ObjectLayoutElement(Layout& layout, Graphics& graphics) :
             captionElement(new CaptionLayoutElement(new FontElement(DefaultCaptionFontFamily(), DefaultFontSize(), cast<FontStyle>(FontStyle.bold), "font", layout))),
-            textColorElement(new ColorElement(Color.Black(), "textColor")),
-            frameColorElement(new ColorElement(Color.Black(), "frameColor")),
+            textColorElement(new ColorElement(System.Windows.Color.Black(), "textColor")),
+            frameColorElement(new ColorElement(System.Windows.Color.Black(), "frameColor")),
             frameWidth(DefaultFrameWidth(graphics)),
             frameRoundingRadius(DefaultFrameRoundingRadius())
         {
@@ -1414,8 +1414,8 @@ namespace spring
     public class NoteLayoutElement : LayoutElement
     {
         public NoteLayoutElement(Layout& layout, Graphics& graphics) : 
-            textColorElement(new ColorElement(Color.Black(), "textColor")),
-            frameColorElement(new ColorElement(Color.Black(), "frameColor")),
+            textColorElement(new ColorElement(System.Windows.Color.Black(), "textColor")),
+            frameColorElement(new ColorElement(System.Windows.Color.Black(), "frameColor")),
             frameWidth(DefaultFrameWidth(graphics)),
             fontElement(new FontElement(DefaultNoteFontFamily(), DefaultNoteFontSize(), DefaultNoteFontStyle(), "font", layout))
         {

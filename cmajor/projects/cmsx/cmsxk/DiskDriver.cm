@@ -65,7 +65,7 @@ namespace cmsx.kernel
 
     public class IORequest
     {
-        public nothrow IORequest(int number_, Block* block_, ulong offset_, Process* process_, IOOperation op_, bool deliver_) :
+        public nothrow IORequest(int number_, Block* block_, ulong offset_, cmsx.kernel.Process* process_, IOOperation op_, bool deliver_) :
             number(number_), block(block_), overlapped(offset_), process(process_), op(op_), deliver(deliver_)
         {
         }
@@ -85,7 +85,7 @@ namespace cmsx.kernel
         public Block* block;
         public Overlapped overlapped;
         public Buffer buffer;
-        public Process* process;
+        public cmsx.kernel.Process* process;
         public IOOperation op;
         public ulong numberOfBytesTransferred;
         public bool deliver;
@@ -292,7 +292,7 @@ namespace cmsx.kernel
             HostFile* hostFile = fs->GetHostFile(block->Key().fsNumber);
             ulong offset = cast<ulong>(block->Key().blockNumber * blockSize);
             void* fiberData = OsGetFiberData();
-            Process* process = cast<Process*>(fiberData);
+            cmsx.kernel.Process* process = cast<cmsx.kernel.Process*>(fiberData);
             UniquePtr<IORequest> request;
             {
                 LockGuard<Mutex> lock(mtx);
@@ -380,7 +380,7 @@ namespace cmsx.kernel
             HostFile* hostFile = fs->GetHostFile(block->Key().fsNumber);
             ulong offset = cast<ulong>(block->Key().blockNumber * blockSize);
             void* fiberData = OsGetFiberData();
-            Process* process = cast<Process*>(fiberData);
+            cmsx.kernel.Process* process = cast<cmsx.kernel.Process*>(fiberData);
             bool deliver = false;
             if (Machine.GetFlag(Machine.Flags.sleepingWrite) || process == null)
             {

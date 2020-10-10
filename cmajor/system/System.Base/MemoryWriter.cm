@@ -79,6 +79,14 @@ namespace System
             Write(d.Day());
             Write(dt.Seconds());
         }
+        public void Write(const string& s)
+        {
+            for (char c : s)
+            {
+                Write(cast<byte>(c));
+            }
+            Write(cast<byte>(0u));
+        }
         private byte* ptr;
         private byte* pos;
         private long count;

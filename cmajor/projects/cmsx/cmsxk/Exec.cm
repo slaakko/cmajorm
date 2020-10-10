@@ -143,7 +143,7 @@ namespace cmsx.kernel
         return memoryStream;
     }
 
-    public void Exec(Machine& machine, ProcessTable& processTable, Process* process, int argc, int envc, ulong bufferAddress, long count)
+    public void Exec(Machine& machine, ProcessTable& processTable, cmsx.kernel.Process* process, int argc, int envc, ulong bufferAddress, long count)
     {
         if (Log())
         {
@@ -224,7 +224,7 @@ namespace cmsx.kernel
         long poolSize = Align(poolDataLength, cast<long>(pageSize));
         ulong poolSegmentSize = cast<ulong>(poolSize);
         INodeKey executableINodeKey = inode->Key();
-        Process* prevProcess = processTable.GetProcessFromExecutableINodeProcessMap(executableINodeKey);
+        cmsx.kernel.Process* prevProcess = processTable.GetProcessFromExecutableINodeProcessMap(executableINodeKey);
         ExecutableFile* executable = null;
         if (prevProcess != null && !followExec)
         {
