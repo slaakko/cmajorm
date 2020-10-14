@@ -1227,4 +1227,20 @@ namespace System.Windows.API
             throw WindowsAPIException(WinGetLastError());
         }
     }
+    public string GetFolder(void* windowHandle, const string& defaultDirectory)
+    {
+        wstring defaultDir = ToUtf16(defaultDirectory);
+        long folderNameBufferSize = 1024;
+        UniquePtr<wchar> folderNameBuffer = cast<wchar*>(MemAlloc(sizeof(wchar) * folderNameBufferSize));
+        bool success = WinGetFolder(windowHandle, defaultDir.Chars(), folderNameBuffer.Get(), cast<uint>(folderNameBufferSize));
+        if (success)
+        {
+            wstring folderName(folderNameBuffer.Get());
+            return ToUtf8(folderName);
+        }
+        else
+        {
+            return string();
+        }
+    }
 }

@@ -1,0 +1,103 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace cmcode
+{
+    public class SelectProjectTypeDialog : Window
+    {
+        public SelectProjectTypeDialog() :
+            base("cmcode.SelectProjectTypeDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(),
+                "Select Project Type", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(180), ScreenMetrics.Get().MMToVerticalPixels(100)), Dock.none, Anchors.none, WindowState.normal)
+        {
+            Size s = GetSize();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Point iconListViewLocation(defaultControlSpacing.w, defaultControlSpacing.h);
+            UniquePtr<IconListView> iconListViewPtr(new IconListView(Point(0, 0), Size(80, 80), Dock.none, Anchors.none));
+            iconListView = iconListViewPtr.Get();
+            iconListView->AddItem("console.app.bitmap", "Console Application");
+            iconListView->AddItem("win.gui.app.bitmap", "Windows GUI Application");
+            iconListView->AddItem("lib.bitmap", "Library");
+            iconListView->AddItem("win.lib.bitmap", "Windows Library");
+            iconListView->SelectedIndexChangedEvent().AddHandler(IconListViewSelectedIndexChanged);
+            iconListView->IconDoubleClickedEvent().AddHandler(IconListViewIconDoubleClicked);
+            targetMap[0] = Cm.Ast.Target.program;
+            targetMap[1] = Cm.Ast.Target.winguiapp;
+            targetMap[2] = Cm.Ast.Target.library;
+            targetMap[3] = Cm.Ast.Target.winlib;
+            UniquePtr<BorderedControl> borderedIconListViewPtr(new BorderedControl(iconListViewPtr.Release(), BorderStyle.single, System.Windows.Color(204u, 206u, 219u),
+                System.Windows.Color(204u, 206u, 219u), iconListViewLocation, Size(80, 80), Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            borderedIconListView = borderedIconListViewPtr.Get();
+            AddChild(borderedIconListViewPtr.Release());
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> selectButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "Select", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            selectButton = selectButtonPtr.Get();
+            selectButton->SetDialogResult(DialogResult.ok);
+            selectButton->Disable();
+            AddChild(selectButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(selectButton);
+            SetCancelButton(cancelButton);
+        }
+        private void IconListViewSelectedIndexChanged()
+        {
+            int selectedIndex = iconListView->GetSelectedIndex();
+            if (selectedIndex != -1)
+            {
+                selectButton->Enable();
+            }
+            else
+            {
+                selectButton->Disable();
+            }
+        }
+        private void IconListViewIconDoubleClicked()
+        {
+            selectButton->DoClick();
+        }
+        public nothrow Cm.Ast.Target GetSelectedProjectType() const
+        {
+            int selectedIndex = iconListView->GetSelectedIndex();
+            if (selectedIndex != -1)
+            {
+                HashMap<int, Cm.Ast.Target>.ConstIterator it = targetMap.CFind(selectedIndex);
+                if (it != targetMap.CEnd())
+                {
+                    return it->second;
+                }
+            }
+            return Cm.Ast.Target.program;
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            base->OnPaint(args);
+            Size origSize = iconListView->GetSize();
+            iconListView->Invalidate();
+            iconListView->Update();
+            Size size = iconListView->GetSize();
+            if (size != origSize)
+            {
+                size.w = size.w + 1;
+                size.h = size.h + 1;
+                borderedIconListView->SetSize(size);
+            }
+        }
+        private Button* cancelButton;
+        private Button* selectButton;
+        private IconListView* iconListView;
+        private BorderedControl* borderedIconListView;
+        private HashMap<int, Cm.Ast.Target> targetMap;
+    }
+}

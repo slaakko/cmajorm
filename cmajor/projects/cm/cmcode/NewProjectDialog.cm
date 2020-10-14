@@ -1,0 +1,263 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+public nothrow inline ulong GetHashCode(Cm.Ast.Target target)
+{
+    return cast<ulong>(cast<int>(target));
+}
+    
+namespace cmcode
+{
+    public nothrow bool IsValidProjectOrSolutionName(const string& name)
+    {
+        if (name.IsEmpty()) return false;
+        ustring s(ToUtf32(name));
+        if (!IsIdStart(s[0]))
+        {
+            return false;
+        }
+        for (int i = 1; i < s.Length(); ++i)
+        {
+            uchar c = s[i];
+            if (!IsIdCont(c))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public class NewProjectDialog : Window
+    {
+        public NewProjectDialog() : base("cmcode.NewProjectDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(),
+            "New Project", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(160), ScreenMetrics.Get().MMToVerticalPixels(100)), Dock.none, Anchors.none, WindowState.normal)
+        {
+            Size s = GetSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            Size defaultCheckBoxSize = ScreenMetrics.Get().DefaultCheckBoxSize();
+            int borderWidth = DefaultSingleBorderWidth();
+
+            Point projectNameLabelLocation(16, 16);
+            UniquePtr<Label> projectNameLabelPtr(new Label("Project name:", projectNameLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            AddChild(projectNameLabelPtr.Release());
+            UniquePtr<TextBox> projectNameTextBoxPtr(new TextBox(""));
+            projectNameTextBox = projectNameTextBoxPtr.Get();
+            projectNameTextBox->TextChangedEvent().AddHandler(ProjectNameTextBoxTextChanged);
+            Point projectNameTextBoxLocation(20, 16 + 24);
+            Size projectNameTextBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(120), defaultTextBoxSize.h);
+            Rect projectNameTextBoxRec(projectNameTextBoxLocation, projectNameTextBoxSize);
+            UniquePtr<Control> paddedProjectNameTextBox = new PaddedControl(projectNameTextBoxPtr.Release());
+            Rect paddedProjectNameTextBoxRect = projectNameTextBoxRec;
+            paddedProjectNameTextBoxRect.Inflate(4, 4);
+            Rect borderedPaddedProjectNameTextBoxRect = paddedProjectNameTextBoxRect;
+            borderedPaddedProjectNameTextBoxRect.Inflate(borderWidth, borderWidth);
+            UniquePtr<Control> borderedPaddedProjectNameTextBox(new BorderedControl(paddedProjectNameTextBox.Release(), borderedPaddedProjectNameTextBoxRect.location,
+                borderedPaddedProjectNameTextBoxRect.size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedProjectNameTextBox.Release());
+
+            Point projectTypeLabelLocation(16, 64);
+            UniquePtr<Label> projectTypeLabelPtr(new Label("Project type:", projectTypeLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            AddChild(projectTypeLabelPtr.Release());
+
+            projectType = Cm.Ast.Target.program;
+            projectTypeNameMap[Cm.Ast.Target.program] = "Console Application";
+            projectTypeNameMap[Cm.Ast.Target.winguiapp] = "Windows GUI Application";
+            projectTypeNameMap[Cm.Ast.Target.library] = "Library";
+            projectTypeNameMap[Cm.Ast.Target.winlib] = "Windows Library";
+
+            Point projectTypeTextLocation(16, cast<int>(64) + 24);
+            UniquePtr<Label> projectTypeTextPtr(new Label(GetProjectTypeName(projectType), projectTypeTextLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            projectTypeText = projectTypeTextPtr.Get(); 
+            AddChild(projectTypeTextPtr.Release());
+
+            Point selectProjectTypeButtonLocation(20 + ScreenMetrics.Get().MMToHorizontalPixels(120) + 24, cast<int>(64) + 20);
+            Size selectProjectTypeButtonSize(48, 24);
+            UniquePtr<Button> selectProjectTypeButton(new Button("...", selectProjectTypeButtonLocation, selectProjectTypeButtonSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            selectProjectTypeButton->ClickEvent().AddHandler(SelectProjectTypeButtonClick);
+            AddChild(selectProjectTypeButton.Release());
+
+            Point locationLabelLocation(16, cast<int>(64) + 24 + 24);
+            UniquePtr<Label> locationLabelPtr(new Label("Location:", locationLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            AddChild(locationLabelPtr.Release());
+            UniquePtr<TextBox> locationTextBoxPtr(new TextBox(""));
+            locationTextBox = locationTextBoxPtr.Get();
+            locationTextBox->TextChangedEvent().AddHandler(LocationTextBoxTextChanged);
+            Point locationTextBoxLocation(20, cast<int>(64) + 24 + 24 + 24);
+            Size locationTextBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(120), defaultTextBoxSize.h);
+            Rect locationTextBoxRec(locationTextBoxLocation, locationTextBoxSize);
+            UniquePtr<Control> paddedLocationTextBox = new PaddedControl(locationTextBoxPtr.Release());
+            Rect paddedLocationTextBoxRect = locationTextBoxRec;
+            paddedLocationTextBoxRect.Inflate(4, 4);
+            Rect borderedPaddedLocationTextBoxRect = paddedLocationTextBoxRect;
+            borderedPaddedLocationTextBoxRect.Inflate(borderWidth, borderWidth);
+            UniquePtr<Control> borderedPaddedLocationTextBox(new BorderedControl(paddedLocationTextBox.Release(), borderedPaddedLocationTextBoxRect.location,
+                borderedPaddedLocationTextBoxRect.size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedLocationTextBox.Release());
+
+            Point selectLocationButtonLocation(20 + ScreenMetrics.Get().MMToHorizontalPixels(120) + 24, cast<int>(64) + 24 + 24 + 20);
+            Size selectLocationButtonSize(48, 24);
+            UniquePtr<Button> selectLocationButton(new Button("...", selectLocationButtonLocation, selectLocationButtonSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            selectLocationButton->ClickEvent().AddHandler(SelectLocationButtonClick);
+            AddChild(selectLocationButton.Release());
+
+            Point solutionNameLabelLocation(16, cast<int>(64) + 24 + 24 + 24 + 24);
+            UniquePtr<Label> solutionNameLabelPtr(new Label("Solution name:", solutionNameLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            AddChild(solutionNameLabelPtr.Release());
+            UniquePtr<TextBox> solutionNameTextBoxPtr(new TextBox(""));
+            solutionNameTextBox = solutionNameTextBoxPtr.Get();
+            solutionNameTextBox->TextChangedEvent().AddHandler(SolutionNameTextBoxTextChanged);
+            Point solutionNameTextBoxLocation(20, cast<int>(64) + 24 + 24 + 24 + 24 + 24);
+            Size solutionNameTextBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(120), defaultTextBoxSize.h);
+            Rect solutionNameTextBoxRec(solutionNameTextBoxLocation, solutionNameTextBoxSize);
+            UniquePtr<Control> paddedSolutionNameTextBox = new PaddedControl(solutionNameTextBoxPtr.Release());
+            Rect paddedSolutionNameTextBoxRect = solutionNameTextBoxRec;
+            paddedSolutionNameTextBoxRect.Inflate(4, 4);
+            Rect borderedPaddedSolutionNameTextBoxRect = paddedSolutionNameTextBoxRect;
+            borderedPaddedSolutionNameTextBoxRect.Inflate(borderWidth, borderWidth);
+            UniquePtr<Control> borderedPaddedSolutionNameTextBox(new BorderedControl(paddedSolutionNameTextBox.Release(), borderedPaddedSolutionNameTextBoxRect.location,
+                borderedPaddedSolutionNameTextBoxRect.size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedSolutionNameTextBox.Release());
+
+            Point checkBoxLocation(16, cast<int>(64) + 24 + 24 + 24 + 24 + 24 + 24);
+            UniquePtr<CheckBox> placeInTheSameDirectoryCheckBoxPtr(new CheckBox("Place solution and project in the same directory", checkBoxLocation, defaultCheckBoxSize, Dock.none,
+                cast<Anchors>(Anchors.top | Anchors.left), true));
+            placeInTheSameDirectoryCheckBox = placeInTheSameDirectoryCheckBoxPtr.Get();
+            placeInTheSameDirectoryCheckBox->CheckedChangedEvent().AddHandler(CheckBoxCheckedChanged);
+            AddChild(placeInTheSameDirectoryCheckBoxPtr.Release());
+
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> createButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "Create", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            createButton = createButtonPtr.Get();
+            createButton->SetDialogResult(DialogResult.ok);
+            AddChild(createButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(createButton);
+            SetCancelButton(cancelButton);
+        }
+        public nothrow void SetLocation(const string& location)
+        {
+            locationTextBox->SetText(location);
+        }
+        public nothrow string GetLocation() const
+        {
+            return locationTextBox->Text();
+        }
+        public nothrow string GetProjectName() const
+        {
+            return projectNameTextBox->Text();
+        }
+        public nothrow Cm.Ast.Target GetProjectType() const
+        {
+            return projectType;
+        }
+        public nothrow string GetSolutionName() const
+        {
+            return solutionNameTextBox->Text();
+        }
+        public nothrow bool PlaceInTheSameDirectory() const
+        {
+            return placeInTheSameDirectoryCheckBox->Checked();
+        }
+        private void ProjectNameTextBoxTextChanged()
+        {
+            solutionNameTextBox->SetText(projectNameTextBox->Text());
+            if (IsValidProjectOrSolutionName(projectNameTextBox->Text()) && IsValidProjectOrSolutionName(solutionNameTextBox->Text()) && !locationTextBox->Text().IsEmpty())
+            {
+                createButton->Enable();
+            }
+            else
+            {
+                createButton->Disable();
+            }
+        }
+        private void LocationTextBoxTextChanged()
+        {
+            if (IsValidProjectOrSolutionName(projectNameTextBox->Text()) && IsValidProjectOrSolutionName(solutionNameTextBox->Text()) && !locationTextBox->Text().IsEmpty())
+            {
+                createButton->Enable();
+            }
+            else
+            {
+                createButton->Disable();
+            }
+        }
+        private void SolutionNameTextBoxTextChanged()
+        {
+            if (IsValidProjectOrSolutionName(projectNameTextBox->Text()) && IsValidProjectOrSolutionName(solutionNameTextBox->Text()) && !locationTextBox->Text().IsEmpty())
+            {
+                createButton->Enable();
+            }
+            else
+            {
+                createButton->Disable();
+            }
+        }
+        private void SelectProjectTypeButtonClick()
+        {
+            SelectProjectTypeDialog dialog;
+            if (dialog.ShowDialog(*this) == DialogResult.ok)
+            {
+                projectType = dialog.GetSelectedProjectType();
+                projectTypeText->SetText(GetProjectTypeName(projectType));
+                projectTypeText->Invalidate();
+                Invalidate();
+            }
+        }
+        private void SelectLocationButtonClick()
+        {
+            string folder = System.Windows.API.GetFolder(Handle(), locationTextBox->Text());
+            if (!folder.IsEmpty())
+            {
+                SetLocation(folder);
+            }
+        }
+        private void CheckBoxCheckedChanged()
+        {
+            if (placeInTheSameDirectoryCheckBox->Checked())
+            {
+                solutionNameTextBox->SetText(projectNameTextBox->Text());
+                solutionNameTextBox->Disable();
+            }
+            else
+            {
+                solutionNameTextBox->Enable();
+            }
+        }
+        private string GetProjectTypeName(Cm.Ast.Target projectType) const
+        {
+            HashMap<Cm.Ast.Target, string>.ConstIterator it = projectTypeNameMap.CFind(projectType);
+            if (it != projectTypeNameMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return "Unknown project type";
+            }
+        }
+        private Button* createButton;
+        private Button* cancelButton;
+        private TextBox* projectNameTextBox;
+        private TextBox* locationTextBox;
+        private TextBox* solutionNameTextBox;
+        private CheckBox* placeInTheSameDirectoryCheckBox;
+        private Label* projectTypeText;
+        private Cm.Ast.Target projectType;
+        private HashMap<Cm.Ast.Target, string> projectTypeNameMap;
+    }
+}

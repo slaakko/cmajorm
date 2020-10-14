@@ -16,6 +16,7 @@
 #include <string>
 #include <gdiplus.h>
 #pragma comment (lib,"Gdiplus.lib")
+#include <shobjidl_core.h>
 
 using namespace soulng::unicode;
 using namespace soulng::util;
@@ -1995,4 +1996,77 @@ bool WinGetCursorPos(int& x, int& y)
         return true;
     }
     return false;
+}
+
+bool WinGetFolder(void* windowHandle, const char16_t* defaultDirectory, char16_t* folderNameBuffer, uint32_t folderNameBufferSize)
+{
+    IFileDialog* fileDialog = nullptr;
+    if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDialog))))
+    {
+        IShellItem* defaultFolder = nullptr;
+        if (defaultDirectory && *defaultDirectory != '\0')
+        {
+            if (SUCCEEDED(SHCreateItemFromParsingName((PCWSTR)defaultDirectory, nullptr, IID_IShellItem, (void**)&defaultFolder)))
+            {
+                if (!SUCCEEDED(fileDialog->SetDefaultFolder(defaultFolder)))
+                {
+                    fileDialog->Release();
+                    return false;
+                }
+            }
+        }
+        DWORD options = 0;
+        if (SUCCEEDED(fileDialog->GetOptions(&options)))
+        {
+            if (SUCCEEDED(fileDialog->SetOptions(options | FOS_PICKFOLDERS)))
+            {
+                if (SUCCEEDED(fileDialog->Show(HWND(windowHandle))))
+                {
+                    IShellItem* result = nullptr;
+                    if (SUCCEEDED(fileDialog->GetResult(&result)))
+                    {
+                        LPWSTR name = nullptr;
+                        if (SUCCEEDED(result->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &name)))
+                        {
+                            wcsncpy((wchar_t*)folderNameBuffer, name, folderNameBufferSize);
+                            fileDialog->Release();
+                            result->Release();
+                            CoTaskMemFree(name);
+                            return true;
+                        }
+                        else
+                        {
+                            result->Release();
+                            fileDialog->Release();
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        fileDialog->Release();
+                        return false;
+                    }
+                }
+                else
+                {
+                    fileDialog->Release();
+                    return false;
+                }
+            }
+            else
+            {
+                fileDialog->Release();
+                return false;
+            }
+        }
+        else
+        {
+            fileDialog->Release();
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
 }

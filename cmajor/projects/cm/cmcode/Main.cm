@@ -106,6 +106,20 @@ namespace cmcode
         return span;
     }
 
+    public string GetCmajorProjectsDirectory()
+    {
+        const char* cmajorRootEnv = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        if (cmajorRootEnv != null)
+        {
+            string cmajorRoot = GetFullPath(cmajorRootEnv);
+            return Path.Combine(cmajorRoot, "projects");
+        }
+        else
+        {
+            return string();
+        }
+    }
+
     class MainWindow : Window
     {
         public MainWindow(const string& filePath) :
@@ -766,18 +780,6 @@ namespace cmcode
                 LogException(ex);
             }
         }
-        private void NewProjectClick()
-        {
-            try
-            {
-                MessageBox.Show("New project");
-            }
-            catch (const Exception& ex)
-            {
-                MessageBox.Show(ex.Message());
-                LogException(ex);
-            }
-        }
         private void OpenProject(const string& filePath)
         {
             try
@@ -821,6 +823,49 @@ namespace cmcode
                 Cm.Ast.Project* activeProject = solution->ActiveProject();
                 cmcode.settings.LoadProjectSettings(activeProject, solutionExplorerData.Get());
                 SetControlStatus(UserInterfaceAction.none);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void NewProjectClick()
+        {
+            try
+            {
+                NewProjectDialog dialog;
+                dialog.SetLocation(GetCmajorProjectsDirectory());
+                if (dialog.ShowDialog(*this) == DialogResult.ok)
+                {
+                    bool sameDir = dialog.PlaceInTheSameDirectory();
+                    string solutionFilePath;
+                    string projectFilePath;
+                    if (!sameDir)
+                    {
+                        solutionFilePath = Path.Combine(dialog.GetLocation(), Path.Combine(dialog.GetSolutionName(), dialog.GetSolutionName() + ".cms"));
+                        projectFilePath = Path.Combine(dialog.GetLocation(), Path.Combine(dialog.GetSolutionName(), Path.Combine(dialog.GetProjectName(), dialog.GetProjectName() + ".cmp")));
+                        string solutionDir = Path.GetDirectoryName(solutionFilePath);
+                        Directory.CreateDirectories(solutionDir);
+                        string projectDir = Path.GetDirectoryName(projectFilePath);
+                        Directory.CreateDirectories(projectDir);
+                    }
+                    else
+                    {
+                        projectFilePath = Path.Combine(dialog.GetLocation(), Path.Combine(dialog.GetProjectName(), dialog.GetProjectName() + ".cmp"));
+                        solutionFilePath = Path.ChangeExtension(projectFilePath, ".cms");
+                        string projectDir = Path.GetDirectoryName(projectFilePath);
+                        Directory.CreateDirectories(projectDir);
+                    }
+                    UniquePtr<Cm.Ast.Solution> solution(new Cm.Ast.Solution(ToUtf32(dialog.GetSolutionName()), solutionFilePath));
+                    UniquePtr<Cm.Ast.Project> project(new Cm.Ast.Project(ToUtf32(dialog.GetProjectName()), projectFilePath, "debug", Cm.Ast.BackEnd.llvm));
+                    project->SetTarget(dialog.GetProjectType());
+                    solution->SetActiveProject(project.Get());
+                    solution->AddProject(Rvalue(project));
+                    solution->Save();
+                    CloseSolutionClick();
+                    OpenProject(solutionFilePath);
+                }
             }
             catch (const Exception& ex)
             {
