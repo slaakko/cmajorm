@@ -259,6 +259,18 @@ namespace System
                 }
             }
         }
+        public nothrow void Replace(const String<CharT>& oldString, const String<CharT>& newString)
+        {
+             long oldLen = oldString.Length();
+             long newLen = newString.Length();
+             long pos = Find(oldString);
+             while (pos != -1)
+             {
+                 Remove(pos, oldLen);
+                 Insert(pos, newString);
+                 pos = Find(oldString, pos + newLen);
+             }
+        }
         public nothrow String<CharT> Substring(long start) const
         {
             if (start >= 0 && start < len)
