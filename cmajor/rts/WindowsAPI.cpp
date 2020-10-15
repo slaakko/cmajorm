@@ -16,7 +16,10 @@
 #include <string>
 #include <gdiplus.h>
 #pragma comment (lib,"Gdiplus.lib")
+
+#ifndef __MINGW32__
 #include <shobjidl_core.h>
+#endif
 
 using namespace soulng::unicode;
 using namespace soulng::util;
@@ -1998,6 +2001,8 @@ bool WinGetCursorPos(int& x, int& y)
     return false;
 }
 
+#ifndef __MINGW32__
+
 bool WinGetFolder(void* windowHandle, const char16_t* defaultDirectory, char16_t* folderNameBuffer, uint32_t folderNameBufferSize)
 {
     IFileDialog* fileDialog = nullptr;
@@ -2070,3 +2075,5 @@ bool WinGetFolder(void* windowHandle, const char16_t* defaultDirectory, char16_t
         return false;
     }
 }
+
+#endif
