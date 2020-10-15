@@ -1,0 +1,171 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Base/LogWriter.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">IO</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#constructor_LogWriter_0E78AE236111AB18E600DA9232C76969520DCF59">LogWriter</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">logFilePath_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">logFilePath</span><span class="other">(</span><span class="identifier">logFilePath_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">writer</span><span class="other">(</span><span class="identifier">SharedPtr</span><span class="other">&lt;</span><a href="../doc/class_SharedPtr_T_E2198BEF58335A9A782FD48D7E8DFFD1A2D8865F.html#constructor_SharedPtr_T_15B7F423B5B948A0AC139012588F154B7349523B">ByteStream</a><span class="other">></span><span class="other">(</span><span class="kw">new</span>&nbsp;<span class="identifier">FileByteStream</span><span class="other">(</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_variable_logFilePath_97E2BDE8C6C0B340B8184E2C093377B37D0C688C">logFilePath</a><span class="other">,&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><a href="../doc/enumerated_type_OpenMode_063ACAC8B31C29229F5F485205B9D6C7EB9D6810.html">OpenMode</a><span class="other">></span><span class="other">(</span><a href="../doc/enumerated_type_OpenMode_063ACAC8B31C29229F5F485205B9D6C7EB9D6810.html">OpenMode</a><span class="other">.</span><a href="../doc/enumerated_type_OpenMode_063ACAC8B31C29229F5F485205B9D6C7EB9D6810.html#enumeration_constant_append_160ECD47A246A9DC376A5DE7DECCBAF2CA5EE591">append</a><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_Write_LogWriter_31FEA85EA7FF8385914233D0B0EE75C1FE8159A4">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">str</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_variable_writer_D89A2B0A1FF9BEDD08C4F81C5B2E6F06045CB648">writer</a><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">str</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_WriteLine_LogWriter_7B19DA7E9DE299FB0D8DBDC251F92061254BD93F">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">str</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_variable_writer_D89A2B0A1FF9BEDD08C4F81C5B2E6F06045CB648">writer</a><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">str</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><a href="../doc/ns_System.html#function_endl_6CF73794B39EC3D6208AD75F99327E1DACEBC134">endl</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_WriteLine_LogWriter_42CD7F8C84236A748B57E61461C804B80DBF9F57">WriteLine</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_variable_writer_D89A2B0A1FF9BEDD08C4F81C5B2E6F06045CB648">writer</a><span class="other">.</span><a href="../doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html#member_function_WriteLine_StreamWriter_B7BD517B33385B4550CAB84DD00FA56CE12B8550">WriteLine</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<span class="identifier">logFilePath</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html">StreamWriter</a>&nbsp;<span class="identifier">writer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_B454684F477FF365ECB38F2DF50954FB2743C5C4">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">str</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_Write_LogWriter_31FEA85EA7FF8385914233D0B0EE75C1FE8159A4">Write</a><span class="other">(</span><span class="identifier">str</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">writer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_5500DD0BEE85A96846D0A3F3C49872AC38820F19">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">char</span>&nbsp;<span class="identifier">c</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_Write_LogWriter_31FEA85EA7FF8385914233D0B0EE75C1FE8159A4">Write</a><span class="other">(</span><a href="../doc/ns_System.html#function_ToString_1D0635DC777F6FBEE59C24E97D00D5715056AB7F">ToString</a><span class="other">(</span><span class="identifier">c</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">writer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_79DFFA03ED4CC3592387133AFBBD78A1C682D1DD">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">b</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_Write_LogWriter_31FEA85EA7FF8385914233D0B0EE75C1FE8159A4">Write</a><span class="other">(</span><a href="../doc/ns_System.html#function_ToString_8228739ACBC7EE96AD4369E2CFFBC3828FFA7BEE">ToString</a><span class="other">(</span><span class="identifier">b</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">writer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_ECBFF094E1459A459E82D3228212C9A494CFAB18">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_Write_LogWriter_31FEA85EA7FF8385914233D0B0EE75C1FE8159A4">Write</a><span class="other">(</span><a href="../doc/ns_System.html#function_ToString_45DAFF73E9D4870570132FAB4BF547270338BCA8">ToString</a><span class="other">(</span><span class="identifier">i</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">writer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_2677697EAE665CE39C2AA7031CE5F6B47723B449">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">uint</span>&nbsp;<span class="identifier">u</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_Write_LogWriter_31FEA85EA7FF8385914233D0B0EE75C1FE8159A4">Write</a><span class="other">(</span><a href="../doc/ns_System.html#function_ToString_C4BC137F246FFC5892F806C6557F3CFBEE99E208">ToString</a><span class="other">(</span><span class="identifier">u</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">writer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_C1007401B5C634C9D4C603D14DA8123BFFBCCB6F">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">long</span>&nbsp;<span class="identifier">l</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_Write_LogWriter_31FEA85EA7FF8385914233D0B0EE75C1FE8159A4">Write</a><span class="other">(</span><a href="../doc/ns_System.html#function_ToString_126CDC878E235D8E3F81E46AFDE3B64B60083BEC">ToString</a><span class="other">(</span><span class="identifier">l</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">writer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_2CAB75A82D1798EAD2B22C3E6AC8E4F927425A92">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">ulong</span>&nbsp;<span class="identifier">u</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_Write_LogWriter_31FEA85EA7FF8385914233D0B0EE75C1FE8159A4">Write</a><span class="other">(</span><a href="../doc/ns_System.html#function_ToString_CBA8B607A96D159C0C24E46462CA7967967BFFEE">ToString</a><span class="other">(</span><span class="identifier">u</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">writer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_F64067186AA43C09A866CF2AA2995F51BF6FDAE6">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html">LogWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><a href="../doc/class_Endl_8E2537FC3949E4C290D6CAA3B15C71D5697AC895.html">Endl</a><span class="other">&amp;</span>&nbsp;<span class="identifier">endl</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../doc/class_LogWriter_B4272A03687DE3F3A77648E66827E88F61C72BFC.html#member_function_WriteLine_LogWriter_42CD7F8C84236A748B57E61461C804B80DBF9F57">WriteLine</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">writer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

@@ -271,7 +271,8 @@ function drawInheritanceDiagram() {
         { name: "System.Windows.Component", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../System.Windows/doc/class_Component_33CC3BCB117A61015FF98DB1F33C83E5961F8D40.html" },
         { name: "System.Windows.Control", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html" },
         { name: "System.Windows.ContainerControl", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: true, link: "../../System.Windows/doc/class_ContainerControl_C51C940ECF1618F86A97329C20B6483B7DF45EF5.html" },
-        { name: "System.Windows.Panel", id: "diagram_node_3", level: 3, subject: true, hasDerivedNodes: false, link: "../../System.Windows/doc/class_Panel_F90698F48F6679BB092404A7CEC6DA6BDE1BBAC8.html" }];
+        { name: "System.Windows.Panel", id: "diagram_node_3", level: 3, subject: true, hasDerivedNodes: true, link: "../../System.Windows/doc/class_Panel_F90698F48F6679BB092404A7CEC6DA6BDE1BBAC8.html" },
+        { name: "System.Windows.TabPage", id: "diagram_node_4", level: 4, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TabPage_E456ED9A3CAF817718F507E38A087CD8F6A38FFD.html" }];
     drawDiagram(diagramNodes);
 }
 

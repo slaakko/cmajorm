@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Setting up Cmajor compiler development environment</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>Setting up Cmajor compiler development environment</h1>
+
+	<h2>
+		Requirements
+	</h2>
+	
+	<ul>
+		<li>Microsoft Visual Studio Community Edition 2019</li>
+	</ul>
+
+    <h2>
+        1. Boost (C++ msvc)
+    </h2>
+    
+    <h3>
+        Version
+    </h3>
+    
+    <p>
+        <strong>1.74</strong>
+    </p>
+    
+    <h3>
+        Location:
+    </h3>
+    
+    <p>
+        <strong>C:\boost</strong>
+    </p>
+    
+    <h3>
+        Sources
+    </h3>
+    
+    <p>
+        <a href="https://boost.org">boost.org</a>
+    </p>
+    
+    <p>
+        Extract sources to <strong>C:\work\boost_1_74_0</strong> directory.
+		(For example place boost_1_74_0.7z package in C:\work directory and choose 7-Zip | Extract here)
+    </p>
+    
+    <h3>
+        Build
+    </h3>
+    
+    <ol>
+    
+    <li>Open x64 Native Tools Command Prompt for VS 2019 (can be found from the start menu in Visual Studio 2019 folder)</li>
+    
+    <li>Change to C:\work\boost_1_74_0 directory.</li>
+    
+    <li>
+        Bootstrap:
+    <pre>
+        C:\work\boost_1_74_0> bootstrap
+    </pre>
+    </li>
+    
+    <li>
+        Compilation:
+    <pre>
+        C:\work\boost_1_74_0> b2 toolset=msvc address-model=64 --build-dir=C:\boost-build-dir --prefix=C:\boost install
+    </pre>
+    </li>
+    
+    <li>
+        After compiling <strong>C:\boost-build-dir</strong> ja <strong>C:\work\boost_1_74_0</strong> can be removed.
+    </li>
+    
+    </ol>
+    
+    <h2>
+        2. Mingw-w64
+    </h2>
+
+    <h3>
+        Download
+    </h3>
+
+    <p>
+        From the <a href="http://mingw-w64.org/doku.php/download">Download</a> page select MingW-W64-builds.
+    </p>
+
+    <h3>
+        Version
+    <h3>
+    
+    <p>
+        <strong>8.1.0</strong>
+    </p>
+    
+    <h3>
+        Installation
+    </h3>
+    
+    <ol>
+    
+    <li>
+    <p>
+        Installation using these settings:<br/>
+        <img src="mingw.png"/>
+    </p>
+    </li>
+
+    <li>
+        Add <strong>C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin</strong> directory to PATH.
+    </li>
+
+    </ol>
+    
+    <h2>
+        3. Boost (C++ mingw-w64)
+    </h2>
+    
+    <h3>
+        Version
+    </h3>
+    
+    <p>
+        <strong>1.74</strong>
+    </p>
+    
+    <h3>
+        Location:
+    </h3>
+    
+    <p>
+        <strong>C:\mingw-boost</strong>
+    </p>
+    
+    <h3>
+        Sources
+    </h3>
+    
+    <p>
+        <a href="https://boost.org">boost.org</a>
+    </p>
+    
+    <p>
+         Extract sources to <strong>C:\work\boost_1_74_0</strong> directory.
+    </p>
+    
+    <h3>
+        Build
+    </h3>
+
+    <ol>
+    
+    <li>Open Windows Terminal (wt.exe) to <strong>C:\work\boost_1_74_0</strong> directory:
+    
+    <li>
+        It's assumed that mingw-w64's gcc can be found from PATH: gcc --version
+    </li>
+    
+    <li>
+        Bootstrap:
+        
+    <pre>
+        C:\work\boost_1_74_0> bootstrap gcc
+    </pre>
+        
+    </li>
+    
+    <li>
+        Compilation:
+    <pre>
+        C:\work\boost_1_74_0> b2 toolset=gcc address-model=64 --build-dir=C:\mingw-boost-build-dir --prefix=C:\mingw-boost install
+    </pre>
+    </li>
+    
+    <li>
+        After compiling <strong>C:\mingw-boost-build-dir</strong> ja <strong>C:\work\boost_1_74_0</strong> can be removed.
+    </li>
+    
+    </ol>
+    
+    <h2>
+        4. LLVM binaries
+    </h2>
+    
+    <h3>
+        Version
+    </h3>
+    
+    <p>
+        <strong>10.0.0</strong>
+    </p>
+    
+    <h3>
+        Location:
+    </h3>
+    
+    <p>
+        <strong>C:\Program Files\LLVM</strong>
+    </p>
+    
+    <h3>
+        Download
+    </h3>
+    
+    <p>
+        From the <a href="https://releases.llvm.org/download.html#10.0.0">Download</a> page select Windows (64-bit) link.
+    </p>
+    
+    <p>
+        This is a direct link: <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/LLVM-10.0.0-win64.exe">LLVM-10.0.0-win64.exe</a>
+    </p>
+    
+    <h3>
+        Installation
+    </h3>
+    
+    <ol>
+        <li>After installation add <strong>C:\Program Files\LLVM\bin</strong> directory to PATH.
+    </ol>
+    
+    <h2>
+        5. CMake
+    </h2>
+    
+    <h3>
+        Version
+    </h3>
+    
+    <p>
+        <strong>3.18.4</strong>
+    </p>
+    
+    <h3>
+        Location:
+    </h3>
+    
+    <p>
+        <strong>C:\Program Files\CMake</strong>
+    </p>
+    
+    <h3>
+        Download
+    </h3>
+    
+    <p>
+        From the <a href="https://cmake.org/download/">Download</a> page select cmake-3.18.4-win64-x64.msi link.
+    </p>
+    
+    <p>
+        This is a direct link: <a href="https://github.com/Kitware/CMake/releases/download/v3.18.4/cmake-3.18.4-win64-x64.msi">cmake-3.18.4-win64-x64.msi</a>
+    </p>
+    
+    <h3>
+        Installation
+    </h3>
+    
+    <ol>
+    
+    <li>
+    <p>
+        Installation using these settings:<br/>
+        <img src="cmake.png"/>
+    </p>
+    </li>
+
+    </ol>
+    
+	<h2>
+		6. Python
+	</h2>
+	
+	<h3>
+		Version
+	</h3>
+	
+	<p>
+		3.9.0
+	</p>
+	
+	<h3>
+		Location
+	</h3>
+	
+	<p>
+		C:\Program Files\Python39
+	</p>
+	
+	<h3>
+		Download
+	</h3>
+	
+	<p>
+		From the <a href="https://www.python.org/downloads/">Download</a> page select Download Python 3.9.0.
+	</p>
+	
+	<h3>
+		Installation
+	</h3>
+	
+	<p>
+		Installation using these settings:<br/>
+		<br/>
+		<img src="python.png"/>
+	</p>
+	
+	<h2>
+		7. LLVM sources
+    </h2>
+    
+    <h3>
+        Version
+    </h3>
+    
+    <p>
+        <strong>10.0.1</strong>
+    </p>
+    
+    <h3>
+        Location:
+    </h3>
+    
+    <p>
+        <strong>C:\llvm-10.0.1.src</strong>
+    </p>
+    
+    <h3>
+        Download
+    </h3>
+    
+    <p>
+        From the <a href="https://releases.llvm.org/download.html#10.0.1">Download</a> page select LLVM source code.
+    </p>
+    
+    <p>
+        This is a direct link: <a href="https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.1/llvm-10.0.1.src.tar.xz">llvm-10.0.1.src.tar.xz</a>
+    </p>
+    
+    <p>
+        Extract package to <strong>C:\llvm-10.0.1.src</strong> folder.
+    </p>
+    
+    <h3>
+        Compilation
+    </h3>
+    
+    <ol>
+        <li>
+            Open x64 Native Tools Command Prompt for VS 2019.
+        </li>
+        
+        <li>
+            Change to C:\llvm-10.0.1.src directory.
+        </li>
+        
+        <li>
+            Make directory <strong>build</strong>:
+            
+        <pre>
+            C:\llvm-10.0.1.src>mkdir build
+        </pre>
+        </li>
+        
+        <li>
+            Change to <strong>build</strong> directory:
+            
+        <pre>
+            C:\llvm-10.0.1.src>cd build
+        </pre>
+        </li>
+        
+        <li>
+            Run CMake:
+            
+        <pre>
+            C:\llvm-10.0.1.src\build> cmake -G "Visual Studio 16 2019" -Thost=x64 -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_ENABLE_EH=On -DLLVM_ENABLE_RTTI=On ..
+        </pre>
+        </li>
+        
+        <li>
+            Open <strong>C:\llvm-10.0.1.src\build\LLVM.sln</strong> solution in Visual Studio 2019.
+        </li>
+        
+        <li>
+            Build solution using Debug/x64 configuration.
+        </li>
+
+        <li>
+            Build solution using Release/x64 configuration
+        </li>
+    </ol>
+	
+	<h2>
+		8. Git for Windows
+	</h2>
+	
+	<h3>
+		Versio
+	</h3>
+	
+	<p><strong>2.28.0</strong></p>
+    
+	<h3>
+		Download
+	</h3>
+	
+	<p><a href="https://git-scm.com/download/win">Git for Windows</a></p>.
+	
+	<h2>
+        9. Cmajor compiler and C++ runtime
+    </h2>
+    
+    <h3>
+        Location
+    </h3>
+    
+    <p>
+        <strong>C:\work\cmajorm</strong>
+    </p>
+    
+    <h3>
+        Download
+    </h3>
+    
+    From <a href="https://github.com/slaakko/cmajorm">https://github.com/slaakko/cmajorm</a> page select Code | https://github.com/slaakko/cmajorm.git
+    
+    <ol>
+    <li>
+		Start Git Bash.
+    </li>
+    <li>
+		Change to C:\work directory.
+	</li>
+	<li>
+		Clone cmajorm repository:
+	<pre>
+		git clone https://github.com/slaakko/cmajorm.git
+	</pre>
+	</li>
+	<li>
+		Clones repository to cmajorm directory.
+	</li>
+    </ol>
+
+    <h3>
+        Installation
+    </h3>
+    
+    <ol>
+        <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\lib</strong></li>
+        <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\lib\gcc</strong></li>
+        <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\lib\vs</strong></li>
+        <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\bin</strong></li>
+        <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\rts\build\gcc\lib</strong></li>
+        <li>Make subdirectory <strong>C:\work\cmajorm\cmajor\rts\build\gcc\bin</strong></li>
+        <li>Add environment variable CMAJOR_ROOT with value <strong>C:\work\cmajorm\cmajor</strong>.</li>
+		<li>Add <strong>C:\work\cmajorm\cmajor\bin</strong> directory to PATH.
+        <li>Open x64 Native Tools Command Prompt for VS 2019</li>
+        <li>Change to <strong>C:\work\cmajorm\cmajor\system\ext\pdcurs36\build</strong> directory.</li>
+        <li>Run <strong>build.bat</strong>.</li>
+        <li>Change to <strong>C:\work\cmajorm\cmajor\system\ext\zlib-1.2.11\contrib\masmx64</strong> directory</li>
+        <li>Run <strong>bld_ml64.bat</strong></li>
+        <li>Open <strong>C:\work\cmajorm\cmajor\cmajor.sln</strong> in Visual Studio 2019.</li>
+        <li>Select <strong>Debug/x64</strong> configuration.</li>
+        <li>Build solution.</li>
+        <li>Select <strong>Release/x64</strong> configuration.</li>
+        <li>Build solution.</li>
+        <li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\bat</strong> directory.</li>
+        <li>Run <strong>install.bat</strong>. Does not find all the files, but does not matter for now.</li>
+        <li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\rts\build\gcc</strong> directory.</li>
+        <li>Run mingw32-make (assumed that can be found from PATH):
+        <pre>
+            C:\work\cmajorm\cmajor\rts\build\gcc> mingw32-make
+        </pre>
+        </li>
+        <li>Run mingw32-make install:
+        <pre>
+            C:\work\cmajorm\cmajor\rts\build\gcc> mingw32-make install
+        </pre>
+        </li>
+    </ol>
+
+    <h2>
+        10. Unicode
+    </h2>
+
+    <h3>
+        Download
+    </h3>
+    
+    <p>
+        Download <a href="https://www.unicode.org/Public/12.1.0/ucdxml/ucd.all.flat.zip">Unicode 12.1 Character Database: ucd.all.flat.zip</a> 
+		and extract it to <strong>C:\work\cmajorm\cmajor\unicode</strong> directory.
+    </p>
+    
+    <h3>
+        Installation
+    </h3>
+    
+    <ol>
+        <li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\unicode</strong> directory.</li>
+        <li>Run makecmajorucd. Makes cmajor_ucd.bin Unicode database for Cmajor:
+        <pre>
+            C:\work\cmajorm\cmajor\unicode> makecmajorucd
+        </pre>
+        </li>
+    </ol>
+
+    <h2>
+        11. Cmajor system libraries
+    </h2>
+
+    <h3>
+        Installation
+    </h3>
+    
+    <ol>
+        <li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\system\platform\windows</strong> directory.</li>
+        <li>Build System library using debug-configuration (LLVM):
+        <pre>
+            C:\work\cmajorm\cmajor\system\platform\windows> cmc -u -v System.cms
+        </pre>
+        <li>Build System library using release-configuration (LLVM):
+        <pre>
+            C:\work\cmajorm\cmajor\system\platform\windows> cmc -u -v -c=release System.cms
+        </pre>
+        <li>Build System library using debug-configuration (C++):
+        <pre>
+            C:\work\cmajorm\cmajor\system\platform\windows> cppcmc -u -v System.cms
+        </pre>
+        <li>Build System library using release-configuration (C++):
+        <pre>
+            C:\work\cmajorm\cmajor\system\platform\windows> cppcmc -u -v -c=release System.cms
+        </pre>
+    </ol>
+	
+	<h2>
+		12. Cmajor Visual Studio extension
+	</h2>
+	
+	<ol>
+		<li>Open <strong>C:\work\cmajorm\cmajor\task\task.sln</strong> in Visual Studio 2019</li>
+		<li>Select Debug|Any CPU -konfiguraaatio</li>
+		<li>Build solution</li>
+		<li>Select Release|Any CPU -konfiguraaatio</li>
+		<li>Build solution</li>
+		<li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\bat</strong> directory.
+		<li>Run <strong>install.bat</strong>: copies C:\work\cmajorm\cmajor\task\bin\Release\CmajorTasks.dll to bin directory.
+		<li>Change to <strong>C:\work\cmajorm\cmajor\vs\2019</strong> directory.
+		<li>Run CreateCmajorCPS.exe:
+		<pre>
+			C:\work\cmajorm\cmajor\vs\2019>CreateCmajorCPS
+		</pre>
+		<li>Close Windows Terminal</li>
+		<li>Right click <strong>C:\work\cmajorm\cmajor\vs\2019\cmajor.vsix</strong> and select install.
+	</ol>
+	
+	<h2>
+		13. Cmajor tools
+	</h2>
+	
+	<ol>
+		<li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\projects\cm</strong> directory.</li>
+		<li>Compile Cm.cms solution using debug config:
+		<pre>
+			C:\work\cmajorm\cmajor\projects\cm>cmc -u -v Cm.cms
+		</pre>
+		</li>
+		<li>Compile Cm.cms solution using release config:
+		<pre>
+			C:\work\cmajorm\cmajor\projects\cm>cmc -u -v -c=release Cm.cms
+		</pre>
+		</li>
+		<li>Change to <strong>C:\work\cmajorm\cmajor\projects\tools\soulcm\scmlg</strong> directory.</li>
+		<li>Compile scmlg.cmp project using debug config:
+		<pre>cmc -u -v scmlg.cmp</pre>
+		</li>
+		<li>Compile scmlg.cmp project using release config:
+		<pre>cmc -u -v -c=release scmlg.cmp</pre>
+		</li>
+		<li>Change to <strong>C:\work\cmajorm\cmajor\projects\tools\soulcm\scmpg</strong> directory.</li>
+		<li>Compile scmpg.cmp project using debug config:
+		<pre>cmc -u -v scmpg.cmp</pre>
+		</li>
+		<li>Compile scmpg.cmp project using release config:
+		<pre>cmc -u -v -c=release scmpg.cmp</pre>
+		</li>
+		<li>Change to <strong>C:\work\cmajorm\cmajor\projects\tools\soulcm\scm2html</strong> directory.</li>
+		<li>Compile scm2html.cmp project using debug config:
+		<pre>cmc -u -v scm2html.cmp</pre>
+		</li>
+		<li>Compile scm2html.cmp project using release config:
+		<pre>cmc -u -v -c=release scm2html.cmp</pre>
+		</li>
+		<li>Change to <strong>C:\work\cmajorm\cmajor\projects\tools\spring</strong> directory.</li>
+		<li>Compile spring.cmp project using debug config:
+		<pre>cmc -u -v spring.cmp</pre>
+		</li>
+		<li>Compile spring.cmp project using release config:
+		<pre>cmc -u -v -c=release spring.cmp</pre>
+		</li>
+		<li>Change to <strong>C:\work\cmajorm\cmajor\projects\tools\supd</strong> directory.</li>
+		<li>Compile supd.cmp project using debug config:
+		<pre>cmc -u -v supd.cmp</pre>
+		</li>
+		<li>Compile supd.cmp project using release config:
+		<pre>cmc -u -v -c=release supd.cmp</pre>
+		</li>
+	</ol>
+	
+	<h2>
+		14. Cmajor examples
+	</h2>
+	
+	<ol>
+		<li>Open  Windows Terminal to <strong>C:\work\cmajorm\cmajor\projects\examples</strong> directory.</li>
+		<li>Compile examples.cms solution using debug config:
+		<pre>
+			C:\work\cmajorm\cmajor\projects\examples>cmc -u -v examples.cms
+		</pre>
+		</li>
+		<li>Compile examples.cms solution using release config:
+		<pre>
+			C:\work\cmajorm\cmajor\projects\examples>cmc -u -v -c=release examples.cms
+		</pre>
+		</li>
+	</ol>
+	
+	<h2>
+		15. System X
+	</h2>
+
+	<ol>
+		<li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\projects\cmsx</strong> directory.</li>
+		<li>Compile cmsx.cms solution using debug config:
+		<pre>
+			C:\work\cmajorm\cmajor\projects\cmsx> cmc -u -v cmsx.cms
+		</pre>
+		</li>
+		<li>Compile cmsx.cms solution using release config:
+		<pre>
+			C:\work\cmajorm\cmajor\projects\cmsx> cmc -u -v -c=release cmsx.cms
+		</pre>
+		</li>
+	</ol>
+	
+	<h2>
+		16. Installation
+	</h2>
+	
+	<ol>
+		<li>Open Windows Terminal to <strong>C:\work\cmajorm\cmajor\bat</strong> directory.</li>
+		<li>Run <strong>install.bat</strong>. Changed files are copied to <strong>C:\work\cmajorm\cmajor\bin</strong> and <strong>C:\work\cmajorm\cmajor\lib</strong> directories. 
+		All except cmajor.vsix and cmsxpg.exe should now be found.</li>
+	</ol>
+</body>

@@ -271,8 +271,9 @@ function drawInheritanceDiagram() {
         { name: "System.Windows.Component", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../System.Windows/doc/class_Component_33CC3BCB117A61015FF98DB1F33C83E5961F8D40.html" },
         { name: "System.Windows.Control", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../System.Windows/doc/class_Control_0EB43E34C2C7F73B847C59F69B43675667D9AF58.html" },
         { name: "System.Windows.TextView", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: true, link: "../../System.Windows/doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html" },
+        { name: "System.Windows.Console", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_Console_32B08C59ADDD210D892C6AE0FFE2A490FFACE282.html" },
         { name: "System.Windows.LogView", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_LogView_F339633FD50FEA5DDB9B8AD4F55ECF1F9CC4208A.html" },
-        { name: "System.Windows.SourceCodeView", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_SourceCodeView_595916E7841E9110B7FBDA4F8AD2ABB43C96E5E6.html" }];
+        { name: "System.Windows.SourceCodeView", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_SourceCodeView_595916E7841E9110B7FBDA4F8AD2ABB43C96E5E6.html" }];
     drawDiagram(diagramNodes);
 }
 

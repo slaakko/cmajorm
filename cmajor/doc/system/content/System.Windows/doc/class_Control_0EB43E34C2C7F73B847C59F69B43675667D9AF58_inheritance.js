@@ -273,18 +273,20 @@ function drawInheritanceDiagram() {
         { name: "System.Windows.BorderedControl", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_BorderedControl_108CA92BFB2B9C9DBC7F950BBCA27BFF8823E4DB.html" },
         { name: "System.Windows.ButtonBase", id: "diagram_node_5", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ButtonBase_5490FC832D4E0038352B09CB8F04FDD3AF4C978D.html" },
         { name: "System.Windows.ContainerControl", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ContainerControl_C51C940ECF1618F86A97329C20B6483B7DF45EF5.html" },
-        { name: "System.Windows.Label", id: "diagram_node_6", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_Label_852A85113142D8688AD5C6F02BA415DE928D76A8.html" },
-        { name: "System.Windows.ListBox", id: "diagram_node_8", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ListBox_8AA811285E27EDC5CEC16D7157B42FD70FF3998F.html" },
+        { name: "System.Windows.IconListView", id: "diagram_node_7", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_IconListView_C9AB58B9E184B1FEF2A2333F4102806CCE535A4F.html" },
+        { name: "System.Windows.Label", id: "diagram_node_8", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_Label_852A85113142D8688AD5C6F02BA415DE928D76A8.html" },
+        { name: "System.Windows.ListBox", id: "diagram_node_10", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ListBox_8AA811285E27EDC5CEC16D7157B42FD70FF3998F.html" },
         { name: "System.Windows.MenuControl", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_MenuControl_57AA6856669CDE893B4DAF44D1E48443297BE292.html" },
-        { name: "System.Windows.PaddedControl", id: "diagram_node_7", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_PaddedControl_3409BA3BC293EF83E798BF25F807872DF68EFF5A.html" },
-        { name: "System.Windows.ScrollableControl", id: "diagram_node_9", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ScrollableControl_48DEFDE877DCFC20AF5583A7BF0107DECD45A1F6.html" },
-        { name: "System.Windows.Splitter", id: "diagram_node_10", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_Splitter_924212F86B2539F70B580E6D98723F57D7256E1A.html" },
-        { name: "System.Windows.StatusBar", id: "diagram_node_11", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_StatusBar_477EB39DACBD72581A42FAB989264AE575C5F4AB.html" },
-        { name: "System.Windows.TextBox", id: "diagram_node_12", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TextBox_997A2B29DDD36F3862B0D84C13798A3C6A0B52F3.html" },
-        { name: "System.Windows.TextView", id: "diagram_node_13", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html" },
-        { name: "System.Windows.ToolBar", id: "diagram_node_14", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ToolBar_721F53F44FE155E9925331A98AFE6D1210D2485A.html" },
-        { name: "System.Windows.ToolTip", id: "diagram_node_15", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ToolTip_7771D1FB7C5D30B982C40376BC738C4B6185A14A.html" },
-        { name: "System.Windows.TreeView", id: "diagram_node_16", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TreeView_6BAB46365E7945E2282A06B8FE3E1FDE3463EF2F.html" }];
+        { name: "System.Windows.PaddedControl", id: "diagram_node_9", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_PaddedControl_3409BA3BC293EF83E798BF25F807872DF68EFF5A.html" },
+        { name: "System.Windows.ScrollableControl", id: "diagram_node_6", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ScrollableControl_48DEFDE877DCFC20AF5583A7BF0107DECD45A1F6.html" },
+        { name: "System.Windows.Splitter", id: "diagram_node_11", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_Splitter_924212F86B2539F70B580E6D98723F57D7256E1A.html" },
+        { name: "System.Windows.StatusBar", id: "diagram_node_12", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_StatusBar_477EB39DACBD72581A42FAB989264AE575C5F4AB.html" },
+        { name: "System.Windows.TabControl", id: "diagram_node_13", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TabControl_994045BDB5A17FBBDD740D4DDE16648BE49EF31F.html" },
+        { name: "System.Windows.TextBox", id: "diagram_node_14", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TextBox_997A2B29DDD36F3862B0D84C13798A3C6A0B52F3.html" },
+        { name: "System.Windows.TextView", id: "diagram_node_15", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TextView_D415A8B0D975070B98048D29E492D98898E6381A.html" },
+        { name: "System.Windows.ToolBar", id: "diagram_node_16", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ToolBar_721F53F44FE155E9925331A98AFE6D1210D2485A.html" },
+        { name: "System.Windows.ToolTip", id: "diagram_node_17", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_ToolTip_7771D1FB7C5D30B982C40376BC738C4B6185A14A.html" },
+        { name: "System.Windows.TreeView", id: "diagram_node_18", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Windows/doc/class_TreeView_6BAB46365E7945E2282A06B8FE3E1FDE3463EF2F.html" }];
     drawDiagram(diagramNodes);
 }
 
