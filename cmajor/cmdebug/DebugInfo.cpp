@@ -550,7 +550,7 @@ DIType* Project::GetType(const boost::uuids::uuid& typeId) const
     }
     else
     {
-        throw std::runtime_error("type with id '" + boost::uuids::to_string(typeId) + "' not found from project '" + name + "'");
+        return debugInfo->GetType(boost::uuids::to_string(typeId));
     }
 }
 
