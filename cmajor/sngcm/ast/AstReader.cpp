@@ -197,12 +197,20 @@ Span AstReader::ReadSpan()
             }
             else
             {
-                throw std::runtime_error("module id for module name '" + it->second + "' not found");
+                //throw std::runtime_error("module id for module name '" + it->second + "' not found");
+                uint32_t line = binaryReader.ReadULEB128UInt();
+                uint32_t start = binaryReader.ReadULEB128UInt();
+                uint32_t end = binaryReader.ReadULEB128UInt();
+                return Span();
             }
         }
         else
         {
-            throw std::runtime_error("module name for module id " + std::to_string(moduleId) + " not found");
+            //throw std::runtime_error("module name for module id " + std::to_string(moduleId) + " not found");
+            uint32_t line = binaryReader.ReadULEB128UInt();
+            uint32_t start = binaryReader.ReadULEB128UInt();
+            uint32_t end = binaryReader.ReadULEB128UInt();
+            return Span();
         }
         int16_t fileId = GetFileId(static_cast<int32_t>(fileIndex));
         fileIndex = static_cast<uint32_t>(MakeFileIndex(moduleId, fileId));

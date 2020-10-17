@@ -86,10 +86,11 @@
         Open a command prompt or Windows Terminal, 
         change to the <strong>C:\cmajor\system\platform\windows</strong> directory and enter the following command:
         <pre>
-        C:\cmajor\system\platform\windows>cppcmc -u -v System.cms
+        C:\cmajor\system\platform\windows>cppcmc -st -u -v System.cms
         </pre>
         The <strong>-u</strong> flag tells the compiler to rebuild everything, strictly not necessary.
         The <strong>-v</strong> flag tells the compiler to be verbose, so you will see what's going on.
+		The <strong>-st</strong> flag tells to compile sequentally. This is a workaround for a compiler bug.
         If everything went fine, the last lines will say:
         <pre>
         System libraries installed.
@@ -102,7 +103,7 @@
         Release configuration:
         Enter the following command:
         <pre>
-        C:\cmajor\system\platform\windows>cppcmc -u -v -c=release System.cms
+        C:\cmajor\system\platform\windows>cppcmc -st -u -v -c=release System.cms
         </pre>
         The <strong>-c=release</strong> option tells the compiler to build for release configuration (optimizations enabled).
         Again the last lines should say:

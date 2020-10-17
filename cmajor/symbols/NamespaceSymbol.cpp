@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/symbols/NamespaceSymbol.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 
 namespace cmajor { namespace symbols {
@@ -14,7 +15,11 @@ NamespaceSymbol::NamespaceSymbol(const Span& span_, const std::u32string& name_)
 
 void NamespaceSymbol::Import(NamespaceSymbol* that, SymbolTable& symbolTable)
 {
-    NamespaceSymbol* ns = symbolTable.BeginNamespace(that->Name(), that->GetSpan());
+    cmajor::symbols::SpanMapper spanMapper;
+    Span thatSpan = that->GetSpan();
+    Span span = spanMapper.MapSpan(thatSpan, GetRootModuleForCurrentThread()->Id());
+    //NamespaceSymbol* ns = symbolTable.BeginNamespace(that->Name(), that->GetSpan());
+    NamespaceSymbol* ns = symbolTable.BeginNamespace(that->Name(), span);
     symbolTable.MapNs(that, ns);
     for (const std::unique_ptr<Symbol>& symbol : that->Members())
     {

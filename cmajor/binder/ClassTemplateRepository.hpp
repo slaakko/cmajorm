@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_BINDER_CLASS_TEMPLATE_REPOSITORY_INCLUDED
 #define CMAJOR_BINDER_CLASS_TEMPLATE_REPOSITORY_INCLUDED
+#include <cmajor/binder/BinderApi.hpp>
 #include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
 
 namespace cmajor { namespace binder {
@@ -14,12 +15,12 @@ using namespace cmajor::symbols;
 class BoundCompileUnit;
 class BoundFunction;
 
-struct ClassIdMemberFunctionIndexHash
+struct BINDER_API ClassIdMemberFunctionIndexHash
 {
     size_t operator()(const std::pair<boost::uuids::uuid, int>& p) const;
 };
 
-class ClassTemplateRepository
+class BINDER_API ClassTemplateRepository
 {
 public:
     ClassTemplateRepository(BoundCompileUnit& boundCompileUnit_);

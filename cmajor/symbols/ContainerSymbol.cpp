@@ -26,6 +26,10 @@ ContainerSymbol::ContainerSymbol(SymbolType symbolType_, const Span& span_, cons
 
 void ContainerSymbol::Write(SymbolWriter& writer)
 {
+    if (MangledName() == U"namespace_cmsx_D667B117D01111627F3E9E567EDEC61A5E581423")
+    {
+        int x = 0;
+    }
     Symbol::Write(writer);
     std::vector<Symbol*> exportSymbols;
     for (const std::unique_ptr<Symbol>& member : members)
@@ -46,6 +50,10 @@ void ContainerSymbol::Write(SymbolWriter& writer)
 void ContainerSymbol::Read(SymbolReader& reader)
 {
     Symbol::Read(reader);
+    if (MangledName() == U"namespace_cmsx_D667B117D01111627F3E9E567EDEC61A5E581423")
+    {
+        int x = 0;
+    }
     uint32_t n = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < n; ++i)
     {
