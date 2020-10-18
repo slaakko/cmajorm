@@ -833,7 +833,7 @@ void* Emitter::CreateGlobalStringPtr(const std::string& name)
     llvm::Constant* strConstant = llvm::ConstantDataArray::getString(context, name);
     llvm::GlobalVariable* gv = new llvm::GlobalVariable(*module, strConstant->getType(), true, llvm::GlobalValue::PrivateLinkage, strConstant, "", nullptr, llvm::GlobalVariable::NotThreadLocal, 0);
     gv->setUnnamedAddr(llvm::GlobalValue::UnnamedAddr::Global);
-    gv->setAlignment(1);
+    gv->setAlignment(llvm::MaybeAlign(1));
     llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 0);
     llvm::Constant* indices[] = { zero, zero };
     return llvm::ConstantExpr::getInBoundsGetElementPtr(gv->getValueType(), gv, indices);
@@ -856,7 +856,11 @@ void* Emitter::CreateCall(void* callee, const std::vector<void*>& args)
     {
         arguments.push_back(static_cast<llvm::Value*>(arg));
     }
+#if (LLVM_VERSION_MAJOR >= 11)
+    return builder.CreateCall(llvm::cast<llvm::FunctionType>(static_cast<llvm::Value*>(callee)->getType()->getPointerElementType()), static_cast<llvm::Value*>(callee), arguments);
+#else
     return builder.CreateCall(static_cast<llvm::Value*>(callee), arguments);
+#endif
 }
 
 void* Emitter::CreateCallInst(void* callee, const std::vector<void*>& args, const std::vector<void*>& bundles, const Span& span)
@@ -873,7 +877,13 @@ void* Emitter::CreateCallInst(void* callee, const std::vector<void*>& args, cons
         inputs.push_back(static_cast<llvm::Value*>(bundle));
         bundleDefs.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
+#if (LLVM_VERSION_MAJOR >= 11)
+    llvm::CallInst* callInst = llvm::CallInst::Create(llvm::cast<llvm::FunctionType>(
+        llvm::cast<llvm::PointerType>(static_cast<llvm::Value*>(callee)->getType())->getElementType()), 
+        static_cast<llvm::Value*>(callee), arguments, bundleDefs, "", static_cast<llvm::BasicBlock*>(CurrentBasicBlock()));
+#else
     llvm::CallInst* callInst = llvm::CallInst::Create(static_cast<llvm::Value*>(callee), arguments, bundleDefs, "", static_cast<llvm::BasicBlock*>(CurrentBasicBlock()));
+#endif
     if (DIBuilder())
     {
         callInst->setDebugLoc(GetDebugLocation(span));
@@ -895,7 +905,13 @@ void* Emitter::CreateCallInstToBasicBlock(void* callee, const std::vector<void*>
         inputs.push_back(static_cast<llvm::Value*>(bundle));
         bundleDefs.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
+#if (LLVM_VERSION_MAJOR >= 11)
+    llvm::CallInst* callInst = llvm::CallInst::Create(llvm::cast<llvm::FunctionType>(
+        llvm::cast<llvm::PointerType>(static_cast<llvm::Value*>(callee)->getType())->getElementType()),
+        static_cast<llvm::Value*>(callee), arguments, bundleDefs, "", static_cast<llvm::BasicBlock*>(basicBlock));
+#else
     llvm::CallInst* callInst = llvm::CallInst::Create(static_cast<llvm::Value*>(callee), arguments, bundleDefs, "", static_cast<llvm::BasicBlock*>(basicBlock));
+#endif
     if (DIBuilder())
     {
         callInst->setDebugLoc(GetDebugLocation(span));
@@ -910,7 +926,13 @@ void* Emitter::CreateInvoke(void* callee, void* normalBlock, void* unwindBlock, 
     {
         arguments.push_back(static_cast<llvm::Value*>(arg));
     }
+#if (LLVM_VERSION_MAJOR >= 11)
+    return builder.CreateInvoke(llvm::cast<llvm::FunctionType>(
+        llvm::cast<llvm::PointerType>(static_cast<llvm::Value*>(callee)->getType())->getElementType()),
+        static_cast<llvm::Value*>(callee), static_cast<llvm::BasicBlock*>(normalBlock), static_cast<llvm::BasicBlock*>(unwindBlock), arguments);
+#else
     return builder.CreateInvoke(static_cast<llvm::Value*>(callee), static_cast<llvm::BasicBlock*>(normalBlock), static_cast<llvm::BasicBlock*>(unwindBlock), arguments);
+#endif
 }
 
 void* Emitter::CreateInvokeInst(void* callee, void* normalBlock, void* unwindBlock, const std::vector<void*>& args, const std::vector<void*>& bundles, const Span& span)
@@ -927,8 +949,15 @@ void* Emitter::CreateInvokeInst(void* callee, void* normalBlock, void* unwindBlo
         inputs.push_back(static_cast<llvm::Value*>(bundle));
         bundleDefs.push_back(llvm::OperandBundleDef("funclet", inputs));
     }
+#if (LLVM_VERSION_MAJOR >= 11)
+    llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(llvm::cast<llvm::FunctionType>(
+        llvm::cast<llvm::PointerType>(static_cast<llvm::Value*>(callee)->getType())->getElementType()),
+        static_cast<llvm::Value*>(callee), static_cast<llvm::BasicBlock*>(normalBlock), static_cast<llvm::BasicBlock*>(unwindBlock),
+        arguments, bundleDefs, "", static_cast<llvm::BasicBlock*>(CurrentBasicBlock()));
+#else
     llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(static_cast<llvm::Value*>(callee), static_cast<llvm::BasicBlock*>(normalBlock), static_cast<llvm::BasicBlock*>(unwindBlock),
         arguments, bundleDefs, "", static_cast<llvm::BasicBlock*>(CurrentBasicBlock()));
+#endif
     if (DIBuilder())
     {
         invokeInst->setDebugLoc(GetDebugLocation(span));
@@ -1979,7 +2008,13 @@ void* Emitter::CreateAlloca(void* irType)
 
 void* Emitter::NewAllocaInst(void* irType)
 {
+#if (LLVM_VERSION_MAJOR >= 11)
+    llvm::Twine name = "";
+    llvm::Instruction* insertBefore = nullptr;
+    return new llvm::AllocaInst(static_cast<llvm::Type*>(irType), 0, name, insertBefore);
+#else
     return new llvm::AllocaInst(static_cast<llvm::Type*>(irType), 0);
+#endif
 }
 
 void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)

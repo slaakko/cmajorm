@@ -231,9 +231,9 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cppcmparserd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cppcmparser.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\cm\cmcmparser\bin\release\cmcmparser.exe ..\bin
 
-xcopy /Y /D C:\llvm-10.0.1.src\build\Release\bin\llc.exe ..\bin
-xcopy /Y /D C:\llvm-10.0.1.src\build\Release\bin\opt.exe ..\bin
-xcopy /Y /D C:\llvm-10.0.1.src\build\Release\bin\llvm-dis.exe ..\bin
+xcopy /Y /D C:\llvm-11.0.0.src\build\Release\bin\llc.exe ..\bin
+xcopy /Y /D C:\llvm-11.0.0.src\build\Release\bin\opt.exe ..\bin
+xcopy /Y /D C:\llvm-11.0.0.src\build\Release\bin\llvm-dis.exe ..\bin
 
 xcopy /Y /D C:\work\cmajorm\cmajor\task\bin\Release\CmajorTasks.dll ..\bin
 
