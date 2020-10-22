@@ -1,0 +1,31 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace Cm.Views
+{
+    public class Editor : ContainerControl
+    {
+        public Editor(const string& filePath_) : base("Cm.Views.Editor", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
+            DefaultControlBackgroundColor(), "editor", Point(), Size(), Dock.fill, Anchors.none), filePath(filePath_)
+        {
+        }
+        public nothrow inline const string& FilePath() const
+        {
+            return filePath;
+        }
+        public nothrow bool Dirty() const
+        {
+            return false;
+        }
+        public void Save()
+        {
+            // todo
+        }
+        private string filePath;
+    }
+}

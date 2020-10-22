@@ -1,0 +1,96 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace cmcode
+{
+    public nothrow bool IsValidSourceFileName(const string& name)
+    {
+        if (name.IsEmpty()) return false;
+        ustring s(ToUtf32(name));
+        if (!IsIdStart(s[0]))
+        {
+            return false;
+        }
+        for (int i = 1; i < s.Length(); ++i)
+        {
+            uchar c = s[i];
+            if (!IsIdCont(c) && c != '.')
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public class NewSourceFileDialog : Window
+    {
+        public NewSourceFileDialog() : base("cmcode.NewSourceFileDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(),
+            "New Source File", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(160), ScreenMetrics.Get().MMToVerticalPixels(60)), Dock.none, Anchors.none, WindowState.normal)
+        {
+            Size s = GetSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            int borderWidth = DefaultSingleBorderWidth();
+
+            Point sourceFileNameLabelLocation(16, 16);
+            UniquePtr<Label> sourceFileNameLabelPtr(new Label("Source file name:", sourceFileNameLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            AddChild(sourceFileNameLabelPtr.Release());
+            UniquePtr<TextBox> sourceFileNameTextBoxPtr(new TextBox(""));
+            sourceFileNameTextBox = sourceFileNameTextBoxPtr.Get();
+            sourceFileNameTextBox->TextChangedEvent().AddHandler(SourceFileNameTextBoxTextChanged);
+            Point sourceFileNameTextBoxLocation(20, 16 + 24);
+            Size sourceFileNameTextBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(120), defaultTextBoxSize.h);
+            Rect sourceFileNameTextBoxRec(sourceFileNameTextBoxLocation, sourceFileNameTextBoxSize);
+            UniquePtr<Control> paddedSourceFileNameTextBox = new PaddedControl(sourceFileNameTextBoxPtr.Release());
+            Rect paddedSourceFileNameTextBoxRect = sourceFileNameTextBoxRec;
+            paddedSourceFileNameTextBoxRect.Inflate(4, 4);
+            Rect borderedPaddedSourceFileNameTextBoxRect = paddedSourceFileNameTextBoxRect;
+            borderedPaddedSourceFileNameTextBoxRect.Inflate(borderWidth, borderWidth);
+            UniquePtr<Control> borderedPaddedSourceFileNameTextBox(new BorderedControl(paddedSourceFileNameTextBox.Release(), borderedPaddedSourceFileNameTextBoxRect.location,
+                borderedPaddedSourceFileNameTextBoxRect.size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedSourceFileNameTextBox.Release());
+
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> createButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "Create", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            createButton = createButtonPtr.Get();
+            createButton->SetDialogResult(DialogResult.ok);
+            createButton->Disable();
+            AddChild(createButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(createButton);
+            SetCancelButton(cancelButton);
+        }
+        public nothrow const string& SourceFileName() const
+        {
+            return sourceFileNameTextBox->Text();
+        }
+        private void SourceFileNameTextBoxTextChanged()
+        {
+            if (IsValidSourceFileName(sourceFileNameTextBox->Text()))
+            {
+                createButton->Enable();
+            }
+            else
+            {
+                createButton->Disable();
+            }
+        }
+        private Button* createButton;
+        private Button* cancelButton;
+        private TextBox* sourceFileNameTextBox;
+    }
+}

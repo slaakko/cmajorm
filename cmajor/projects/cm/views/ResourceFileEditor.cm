@@ -1,0 +1,28 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace Cm.Views
+{
+    public class ResourceFileEditor : Editor
+    {
+        public ResourceFileEditor(const string& filePath) : base(filePath)
+        {
+            UniquePtr<TextView> textViewPtr(new TextView(Point(), Size(), Dock.none, Anchors.none));
+            textView = textViewPtr.Get();
+            UniquePtr<ScrollableControl> scrollableTextView(new ScrollableControl(textViewPtr.Release(), Point(), Size(), Dock.fill, Anchors.none));
+            AddChild(scrollableTextView.Release());
+            ustring content = ToUtf32(File.ReadAllText(filePath));
+            textView->SetTextContent(content);
+        }
+        public nothrow inline TextView* GetTextView() const
+        {
+            return textView;
+        }
+        private TextView* textView;
+    }
+}

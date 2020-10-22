@@ -790,6 +790,15 @@ namespace System.Windows
                 view->SetTreeViewNodeChanged();
             }
         }
+        public void RemoveChild(TreeViewNode* child)
+        {
+            UniquePtr<Component> removed = children.RemoveChild(child);
+            TreeView* view = GetTreeView();
+            if (view != null)
+            {
+                view->SetTreeViewNodeChanged();
+            }
+        }
         public void RemoveChildren()
         {
             Component* component = children.FirstChild();

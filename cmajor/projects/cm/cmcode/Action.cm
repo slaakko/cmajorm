@@ -9,6 +9,49 @@ using Cm.Service.Build;
 
 namespace cmcode
 {
+    public class AddNewProjectAction : ClickAction
+    {
+        public nothrow AddNewProjectAction(MainWindow* mainWindow_, Cm.Ast.Solution* solution_) : base(), mainWindow(mainWindow_), solution(solution_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->AddNewProject(solution);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Solution* solution;
+    }
+
+    public class AddExistingProjectAction : ClickAction
+    {
+        public nothrow AddExistingProjectAction(MainWindow* mainWindow_, Cm.Ast.Solution* solution_) : base(), mainWindow(mainWindow_), solution(solution_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->AddExistingProject(solution);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Solution* solution;
+    }
+
+    public class RemoveProjectAction : ClickAction
+    {
+        public nothrow RemoveProjectAction(MainWindow* mainWindow_, Cm.Ast.Solution* solution_, Cm.Ast.Project* project_) : base(), mainWindow(mainWindow_), solution(solution_), project(project_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->RemoveProject(solution, project);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Solution* solution;
+        private Cm.Ast.Project* project;
+    }
+
     public class BuildSolutionAction : ClickAction
     {
         public nothrow BuildSolutionAction(MainWindow* mainWindow_, Cm.Ast.Solution* solution_) : base(), mainWindow(mainWindow_), solution(solution_)
@@ -128,6 +171,134 @@ namespace cmcode
         private Cm.Ast.Solution* solution;
         private Cm.Ast.Project* project;
         private TreeViewNode* newActiveProjectNode;
+    }
+
+    public class AddNewSourceFileAction : ClickAction
+    {
+        public nothrow AddNewSourceFileAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, TreeViewNode* projectNode_) :
+            base(), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->AddNewSourceFile(project, projectNode);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+        private TreeViewNode* projectNode;
+    }
+
+    public class AddExistingSourceFileAction : ClickAction
+    {
+        public nothrow AddExistingSourceFileAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, TreeViewNode* projectNode_) :
+            base(), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->AddExistingSourceFile(project, projectNode);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+        private TreeViewNode* projectNode;
+    }
+
+    public class AddNewResourceFileAction : ClickAction
+    {
+        public nothrow AddNewResourceFileAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, TreeViewNode* projectNode_) :
+            base(), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->AddNewResourceFile(project, projectNode);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+        private TreeViewNode* projectNode;
+    }
+
+    public class AddExistingResourceFileAction : ClickAction
+    {
+        public nothrow AddExistingResourceFileAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, TreeViewNode* projectNode_) :
+            base(), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->AddExistingResourceFile(project, projectNode);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+        private TreeViewNode* projectNode;
+    }
+
+    public class AddNewTextFileAction : ClickAction
+    {
+        public nothrow AddNewTextFileAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, TreeViewNode* projectNode_) :
+            base(), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->AddNewTextFile(project, projectNode);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+        private TreeViewNode* projectNode;
+    }
+
+    public class AddExistingTextFileAction : ClickAction
+    {
+        public nothrow AddExistingTextFileAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, TreeViewNode* projectNode_) :
+            base(), mainWindow(mainWindow_), project(project_), projectNode(projectNode_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->AddExistingTextFile(project, projectNode);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+        private TreeViewNode* projectNode;
+    }
+
+    public class RemoveFileAction : ClickAction
+    {
+        public nothrow RemoveFileAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, const string& filePath_, const string& fileName_, TreeViewNode* fileNode_) :
+            base(), mainWindow(mainWindow_), project(project_), filePath(filePath_), fileName(fileName_), fileNode(fileNode_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->RemoveFile(project, filePath, fileName, fileNode);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+        private string filePath;
+        private string fileName;
+        private TreeViewNode* fileNode;
+    }
+
+    public class OpenFileLocationAction : ClickAction
+    {
+        public nothrow OpenFileLocationAction(MainWindow* mainWindow_, const string& filePath_) : base(), mainWindow(mainWindow_), filePath(filePath_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->OpenFileLocation(filePath);
+        }
+        private MainWindow* mainWindow;
+        private string filePath;
     }
 
     public class RunToCursorAction : ClickAction

@@ -5,6 +5,14 @@ using System.Text;
 
 namespace Cm.Ast
 {
+    public class ByProjectName : Rel<UniquePtr<Project>>
+    {
+        public nothrow inline bool operator()(const UniquePtr<Project>& left, const UniquePtr<Project>& right)
+        {
+            return left->Name() < right->Name();
+        }
+    }
+
     internal void Visit(List<ustring>& order, const ustring& projectName, HashSet<ustring>& visited, HashSet<ustring>& tempVisit, HashMap<ustring, ProjectDependencyDeclaration*>& dependencyMap,
         Solution* solution)
     {
@@ -273,6 +281,18 @@ namespace Cm.Ast
                 }
             }
         }
+        public void SortByProjectName()
+        {
+            Sort(projects.Begin(), projects.End(), ByProjectName());
+        }
+        public nothrow bool HasProject(const ustring& projectName) const
+        {
+            for (const UniquePtr<Project>& project : projects)
+            {
+                if (project->Name() == projectName) return true;
+            }
+            return false;
+        }
         public void Save()
         {
             StreamWriter writer = File.CreateText(filePath);
@@ -299,6 +319,21 @@ namespace Cm.Ast
             for (const UniquePtr<Project>& project : projects)
             {
                 project->Save();
+            }
+        }
+        public void RemoveProject(Project* project)
+        {
+            for (List<UniquePtr<Project>>.Iterator it = projects.Begin(); it != projects.End(); ++it)
+            {
+                if (it->Get() == project)
+                {
+                    if (project == activeProject)
+                    {
+                        activeProject = null;
+                    }
+                    projects.Remove(it);
+                    break;
+                }
             }
         }
         private ustring name;

@@ -608,7 +608,7 @@ namespace cmcode
         private void CodeTabPageSelected()
         {
             TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
-            Cm.Views.CmajorEditor* editor = GetEditorByTabPage(selectedTabPage);
+            Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
             if (editor != null)
             {
                 sourceFilePathStatusBarItem->SetText(editor->FilePath());
@@ -688,19 +688,25 @@ namespace cmcode
         {
             try
             {
+                TreeViewNode* node = args.node;
                 if (args.buttons == MouseButtons.rbutton)
                 {
-                    TreeViewNode* node = args.node;
                     TreeViewNodeData* data = cast<TreeViewNodeData*>(node->Data());
                     if (data->kind == TreeViewNodeData.Kind.solution)
                     {
                         UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+                        MenuItem* addNewProjectMenuItem = new MenuItem("Add New Project...");
+                        contextMenu->AddMenuItemAction(addNewProjectMenuItem, new AddNewProjectAction(this, solution.Get()));
+                        MenuItem* addExistingProjectMenuItem = new MenuItem("Add Existing Project...");
+                        contextMenu->AddMenuItemAction(addExistingProjectMenuItem, new AddExistingProjectAction(this, solution.Get()));
                         MenuItem* buildMenuItem = new MenuItem("Build");
                         contextMenu->AddMenuItemAction(buildMenuItem, new BuildSolutionAction(this, solution.Get()));
                         MenuItem* rebuildMenuItem = new MenuItem("Rebuild");
                         contextMenu->AddMenuItemAction(rebuildMenuItem, new RebuildSolutionAction(this, solution.Get()));
                         MenuItem* cleanMenuItem = new MenuItem("Clean");
                         contextMenu->AddMenuItemAction(cleanMenuItem, new CleanSolutionAction(this, solution.Get()));
+                        MenuItem* openFileLocationMenuItem = new MenuItem("Open File Location");
+                        contextMenu->AddMenuItemAction(openFileLocationMenuItem, new OpenFileLocationAction(this, solution->FilePath()));
                         if (contextMenu->HasMenuItems())
                         {
                             Point loc = args.location;
@@ -712,24 +718,51 @@ namespace cmcode
                     {
                         Cm.Ast.Project* project = data->project;
                         UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+                        MenuItem* addNewSourceFileMenuItem = new MenuItem("Add New Source File...");
+                        contextMenu->AddMenuItemAction(addNewSourceFileMenuItem, new AddNewSourceFileAction(this, project, node));
+                        MenuItem* addExistingSourceFileMenuItem = new MenuItem("Add Existing Source File...");
+                        contextMenu->AddMenuItemAction(addExistingSourceFileMenuItem, new AddExistingSourceFileAction(this, project, node));
+                        MenuItem* addNewResourceFileMenuItem = new MenuItem("Add New Resource File...");
+                        contextMenu->AddMenuItemAction(addNewResourceFileMenuItem, new AddNewResourceFileAction(this, project, node));
+                        MenuItem* addExistingResourceFileMenuItem = new MenuItem("Add Existing Resource File...");
+                        contextMenu->AddMenuItemAction(addExistingResourceFileMenuItem, new AddExistingResourceFileAction(this, project, node));
+                        MenuItem* addNewTextFileMenuItem = new MenuItem("Add New Text File...");
+                        contextMenu->AddMenuItemAction(addNewTextFileMenuItem, new AddNewTextFileAction(this, project, node));
+                        MenuItem* addExistingTextFileMenuItem = new MenuItem("Add Existing Text File...");
+                        contextMenu->AddMenuItemAction(addExistingTextFileMenuItem, new AddExistingTextFileAction(this, project, node));
                         MenuItem* buildMenuItem = new MenuItem("Build");
                         contextMenu->AddMenuItemAction(buildMenuItem, new BuildProjectAction(this, project));
                         MenuItem* rebuildMenuItem = new MenuItem("Rebuild");
                         contextMenu->AddMenuItemAction(rebuildMenuItem, new RebuildProjectAction(this, project));
                         MenuItem* cleanMenuItem = new MenuItem("Clean");
                         contextMenu->AddMenuItemAction(cleanMenuItem, new CleanProjectAction(this, project));
+                        MenuItem* openFileLocationMenuItem = new MenuItem("Open File Location");
+                        contextMenu->AddMenuItemAction(openFileLocationMenuItem, new OpenFileLocationAction(this, project->FilePath()));
                         if (solution->ActiveProject() != project)
                         {
                             MenuItem* setActiveMenuItem = new MenuItem("Set Active");
                             contextMenu->AddMenuItemAction(setActiveMenuItem, new SetActiveProjectAction(this, solutionExplorerTreeView, solutionExplorerData.Get(),
                                 solution.Get(), project, node)); 
                         }
+                        MenuItem* removeMenuItem = new MenuItem("Remove");
+                        contextMenu->AddMenuItemAction(removeMenuItem, new RemoveProjectAction(this, solution.Get(), project));
                         if (contextMenu->HasMenuItems())
                         {
                             Point loc = args.location;
                             Point screenLoc = solutionExplorerTreeView->ClientToScreen(loc);
                             ShowContextMenu(contextMenu.Release(), screenLoc);
                         }
+                    }
+                    else if (data->kind == TreeViewNodeData.Kind.file)
+                    {
+                        UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+                        MenuItem* removeFileMenuItem = new MenuItem("Remove");
+                        contextMenu->AddMenuItemAction(removeFileMenuItem, new RemoveFileAction(this, data->project, data->filePath, data->fileName, node));
+                        MenuItem* openFileLocationMenuItem = new MenuItem("Open File Location");
+                        contextMenu->AddMenuItemAction(openFileLocationMenuItem, new OpenFileLocationAction(this, data->filePath));
+                        Point loc = args.location;
+                        Point screenLoc = solutionExplorerTreeView->ClientToScreen(loc);
+                        ShowContextMenu(contextMenu.Release(), screenLoc);
                     }
                 }
             }
@@ -765,12 +798,32 @@ namespace cmcode
                         }
                         else
                         {
-                            AddEditor(data->fileName, data->key, data->filePath);
+                            AddCmajorEditor(data->fileName, data->key, data->filePath);
+                        }
+                    }
+                    else if (ext == ".xml")
+                    {
+                        TabPage* prevTabPage = codeTabControl->GetTabPageByKey(data->key);
+                        if (prevTabPage != null)
+                        {
+                            codeTabControl->SetSelectedTabPage(prevTabPage);
+                        }
+                        else
+                        {
+                            AddResourceFileEditor(data->fileName, data->key, data->filePath);
                         }
                     }
                     else
                     {
-                        throw Exception("no editor for '" + ext + "' file implemented");
+                        TabPage* prevTabPage = codeTabControl->GetTabPageByKey(data->key);
+                        if (prevTabPage != null)
+                        {
+                            codeTabControl->SetSelectedTabPage(prevTabPage);
+                        }
+                        else
+                        {
+                            AddTextFileEditor(data->fileName, data->key, data->filePath);
+                        }
                     }
                 }
             }
@@ -821,7 +874,10 @@ namespace cmcode
                 UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData, contents);
                 solutionExplorerTreeView->SetRoot(root.Release());
                 Cm.Ast.Project* activeProject = solution->ActiveProject();
-                cmcode.settings.LoadProjectSettings(activeProject, solutionExplorerData.Get());
+                if (activeProject != null)
+                {
+                    cmcode.settings.LoadProjectSettings(activeProject, solutionExplorerData.Get());
+                }
                 SetControlStatus(UserInterfaceAction.none);
             }
             catch (const Exception& ex)
@@ -873,6 +929,89 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        internal void AddNewProject(Cm.Ast.Solution* solution)
+        {
+            try
+            {
+                AddNewProjectDialog dialog;
+                string solutionDir = Path.GetDirectoryName(solution->FilePath());
+                dialog.SetLocation(solutionDir);
+                if (dialog.ShowDialog(*this) == DialogResult.ok)
+                {
+                    string projectFilePath = Path.Combine(dialog.GetLocation(), Path.Combine(dialog.GetProjectName(), dialog.GetProjectName() + ".cmp"));
+                    string projectDir = Path.GetDirectoryName(projectFilePath);
+                    Directory.CreateDirectories(projectDir);
+                    UniquePtr<Cm.Ast.Project> project(new Cm.Ast.Project(ToUtf32(dialog.GetProjectName()), projectFilePath, "debug", Cm.Ast.BackEnd.llvm));
+                    project->SetTarget(dialog.GetProjectType());
+                    solution->AddProject(Rvalue(project));
+                    solution->SortByProjectName();
+                    solution->Save();
+                    string solutionFilePath = solution->FilePath();
+                    CloseSolutionClick();
+                    OpenProject(solutionFilePath);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        internal void AddExistingProject(Cm.Ast.Solution* solution)
+        {
+            try
+            {
+                List<Pair<string, string>> descriptionFilterPairs;
+                descriptionFilterPairs.Add(Pair<string, string>("Cmajor Project Files (*.cmp)", "*.cmp"));
+                string initialDirectory = CmajorProjectDirectory();
+                string filePath;
+                string currentDirectory;
+                List<string> fileNames;
+                string defaultFilePath;
+                bool selected = System.Windows.API.GetOpenFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".cmp",
+                    OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
+                if (selected)
+                {
+                    if (!fileNames.IsEmpty())
+                    {
+                        filePath = Path.Combine(currentDirectory, fileNames[0]);
+                    }
+                    List<UniquePtr<ustring>> contents;
+                    UniquePtr<Cm.Ast.Project> project = ReadProject(GetFullPath(filePath), contents);
+                    if (solution->HasProject(project->Name()))
+                    {
+                        throw Exception("solution already has a project with name '" + ToUtf8(project->Name()) + "'");
+                    }
+                    solution->AddProject(Rvalue(project));
+                    solution->SortByProjectName();
+                    solution->Save();
+                    string solutionFilePath = solution->FilePath();
+                    CloseSolutionClick();
+                    OpenProject(solutionFilePath);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        internal void RemoveProject(Cm.Ast.Solution* solution, Cm.Ast.Project* project)
+        {
+            try
+            {
+                solution->RemoveProject(project);
+                solution->Save();
+                string solutionFilePath = solution->FilePath();
+                CloseSolutionClick();
+                OpenProject(solutionFilePath);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void OpenProjectClick()
         {
             try
@@ -913,6 +1052,353 @@ namespace cmcode
                 solutionExplorerData.Reset();
                 SetControlStatus(UserInterfaceAction.none);
                 Invalidate();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void AddFilePathsToProject(const string& newSourceFilePath, const string& newResourceFilePath, const string& newTextFilePath, Cm.Ast.Project* project, TreeViewNode* projectNode)
+        {
+            projectNode->RemoveChildren();
+            for (const string& sourceFilePath : project->SourceFilePaths())
+            {
+                TreeViewNodeData* data = solutionExplorerData->GetTreeViewNodeDataByKey(sourceFilePath);
+                if (data != null)
+                {
+                    UniquePtr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
+                    fileNode->SetData(data);
+                    projectNode->AddChild(fileNode.Release());
+                }
+                else
+                {
+                    UniquePtr<TreeViewNodeData> newData(new TreeViewNodeData(TreeViewNodeData.Kind.file, solution.Get(), project, sourceFilePath, Path.GetFileName(sourceFilePath)));
+                    data = newData.Get();
+                    UniquePtr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
+                    fileNode->SetData(newData.Get());
+                    projectNode->AddChild(fileNode.Release());
+                    solutionExplorerData->treeViewDataMap[newData->key] = newData.Get();
+                    solutionExplorerData->treeViewData.Add(Rvalue(newData));
+                }
+                if (sourceFilePath == newSourceFilePath)
+                {
+                    StreamWriter writer = File.CreateText(sourceFilePath);
+                    AddCmajorEditor(data->fileName, data->key, data->filePath);
+                }
+            }
+            for (const string& resourceFilePath : project->ResourceFilePaths())
+            {
+                TreeViewNodeData* data = solutionExplorerData->GetTreeViewNodeDataByKey(resourceFilePath);
+                if (data != null)
+                {
+                    UniquePtr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
+                    fileNode->SetData(data);
+                    projectNode->AddChild(fileNode.Release());
+                }
+                else
+                {
+                    UniquePtr<TreeViewNodeData> newData(new TreeViewNodeData(TreeViewNodeData.Kind.file, solution.Get(), project, resourceFilePath, Path.GetFileName(resourceFilePath)));
+                    data = newData.Get();
+                    UniquePtr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
+                    fileNode->SetData(newData.Get());
+                    projectNode->AddChild(fileNode.Release());
+                    solutionExplorerData->treeViewDataMap[newData->key] = newData.Get();
+                    solutionExplorerData->treeViewData.Add(Rvalue(newData));
+                }
+                if (resourceFilePath == newResourceFilePath)
+                {
+                    StreamWriter writer = File.CreateText(resourceFilePath);
+                    AddResourceFileEditor(data->fileName, data->key, data->filePath);
+                }
+            }
+            for (const string& textFilePath : project->TextFilePaths())
+            {
+                TreeViewNodeData* data = solutionExplorerData->GetTreeViewNodeDataByKey(textFilePath);
+                if (data != null)
+                {
+                    UniquePtr<TreeViewNode> fileNode(new TreeViewNode(data->fileName));
+                    fileNode->SetData(data);
+                    projectNode->AddChild(fileNode.Release());
+                }
+                else
+                {
+                    UniquePtr<TreeViewNodeData> newData(new TreeViewNodeData(TreeViewNodeData.Kind.file, solution.Get(), project, textFilePath, Path.GetFileName(textFilePath)));
+                    data = newData.Get();
+                    UniquePtr<TreeViewNode> fileNode(new TreeViewNode(newData->fileName));
+                    fileNode->SetData(newData.Get());
+                    projectNode->AddChild(fileNode.Release());
+                    solutionExplorerData->treeViewDataMap[newData->key] = newData.Get();
+                    solutionExplorerData->treeViewData.Add(Rvalue(newData));
+                }
+                if (textFilePath == newTextFilePath)
+                {
+                    StreamWriter writer = File.CreateText(textFilePath);
+                    AddTextFileEditor(data->fileName, data->key, data->filePath);
+                }
+            }
+            projectNode->Expand();
+            solutionExplorerTreeView->Invalidate();
+        }
+        internal void AddNewSourceFile(Cm.Ast.Project* project, TreeViewNode* projectNode)
+        {
+            try
+            {
+                NewSourceFileDialog dialog;
+                if (dialog.ShowDialog(*this) == DialogResult.ok)
+                {
+                    string sourceFileName = dialog.SourceFileName();
+                    if (!sourceFileName.EndsWith(".cm"))
+                    {
+                        sourceFileName.Append(".cm");
+                    }
+                    string newSourceFilePath = Path.Combine(project->SourceBasePath(), sourceFileName);
+                    for (const string& sourceFilePath : project->SourceFilePaths())
+                    {
+                        if (sourceFilePath == newSourceFilePath)
+                        {
+                            throw Exception("source file '" + newSourceFilePath + "' already exists in project '" + ToUtf8(project->Name()) + "'");
+                        }
+                    }
+                    project->AddSourceFileName(sourceFileName, newSourceFilePath);
+                    project->Save();
+                    AddFilePathsToProject(newSourceFilePath, "", "", project, projectNode);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        internal void AddExistingSourceFile(Cm.Ast.Project* project, TreeViewNode* projectNode)
+        {
+            try
+            {
+                List<Pair<string, string>> descriptionFilterPairs;
+                descriptionFilterPairs.Add(Pair<string, string>("Cmajor Source Files (*.cm)", "*.cm"));
+                string initialDirectory = Path.GetDirectoryName(project->FilePath());
+                string currentDirectory;
+                List<string> fileNames;
+                string defaultFilePath;
+                bool selected = System.Windows.API.GetOpenFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".cm",
+                    OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
+                if (selected)
+                {
+                    if (!fileNames.IsEmpty())
+                    {
+                        for (const string& fileName : fileNames)
+                        {
+                            bool skip = false;
+                            string filePath = Path.Combine(currentDirectory, fileName);
+                            for (const string& sourceFilePath : project->SourceFilePaths())
+                            {
+                                if (sourceFilePath == filePath)
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+                            if (!skip)
+                            {
+                                project->AddSourceFileName(fileName, filePath);
+                                project->Save();
+                                AddFilePathsToProject("", "", "", project, projectNode);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        internal void AddNewResourceFile(Cm.Ast.Project* project, TreeViewNode* projectNode)
+        {
+            try
+            {
+                NewResourceFileDialog dialog;
+                if (dialog.ShowDialog(*this) == DialogResult.ok)
+                {
+                    string resourceFileName = dialog.ResourceFileName();
+                    if (!resourceFileName.EndsWith(".xml"))
+                    {
+                        resourceFileName.Append(".xml");
+                    }
+                    string newResourceFilePath = Path.Combine(project->SourceBasePath(), resourceFileName);
+                    for (const string& resourceFilePath : project->ResourceFilePaths())
+                    {
+                        if (resourceFilePath == newResourceFilePath)
+                        {
+                            throw Exception("resource file '" + newResourceFilePath + "' already exists in project '" + ToUtf8(project->Name()) + "'");
+                        }
+                    }
+                    project->AddResourceFileName(resourceFileName, newResourceFilePath);
+                    project->Save();
+                    AddFilePathsToProject("", newResourceFilePath, "", project, projectNode);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        internal void AddExistingResourceFile(Cm.Ast.Project* project, TreeViewNode* projectNode)
+        {
+            try
+            {
+                List<Pair<string, string>> descriptionFilterPairs;
+                descriptionFilterPairs.Add(Pair<string, string>("Cmajor Resource Files (*.xml)", "*.xml"));
+                string initialDirectory = Path.GetDirectoryName(project->FilePath());
+                string currentDirectory;
+                List<string> fileNames;
+                string defaultFilePath;
+                bool selected = System.Windows.API.GetOpenFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, ".xml",
+                    OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
+                if (selected)
+                {
+                    if (!fileNames.IsEmpty())
+                    {
+                        for (const string& fileName : fileNames)
+                        {
+                            bool skip = false;
+                            string filePath = Path.Combine(currentDirectory, fileName);
+                            for (const string& resourceFilePath : project->ResourceFilePaths())
+                            {
+                                if (resourceFilePath == filePath)
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+                            if (!skip)
+                            {
+                                project->AddResourceFileName(fileName, filePath);
+                                project->Save();
+                                AddFilePathsToProject("", "", "", project, projectNode);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        internal void AddNewTextFile(Cm.Ast.Project* project, TreeViewNode* projectNode)
+        {
+            try
+            {
+                NewTextFileDialog dialog;
+                if (dialog.ShowDialog(*this) == DialogResult.ok)
+                {
+                    string textFileName = dialog.TextFileName();
+                    string newTextFilePath = Path.Combine(project->SourceBasePath(), textFileName);
+                    for (const string& textFilePath : project->TextFilePaths())
+                    {
+                        if (textFilePath == newTextFilePath)
+                        {
+                            throw Exception("text file '" + newTextFilePath + "' already exists in project '" + ToUtf8(project->Name()) + "'");
+                        }
+                    }
+                    project->AddTextFileName(textFileName, newTextFilePath);
+                    project->Save();
+                    AddFilePathsToProject("", "", newTextFilePath, project, projectNode);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        internal void AddExistingTextFile(Cm.Ast.Project* project, TreeViewNode* projectNode)
+        {
+            try
+            {
+                List<Pair<string, string>> descriptionFilterPairs;
+                descriptionFilterPairs.Add(Pair<string, string>("Cmajor Resource Files (*.*)", "*.*"));
+                string initialDirectory = Path.GetDirectoryName(project->FilePath());
+                string currentDirectory;
+                List<string> fileNames;
+                string defaultFilePath;
+                bool selected = System.Windows.API.GetOpenFileName(Handle(), descriptionFilterPairs, initialDirectory, defaultFilePath, "",
+                    OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST, currentDirectory, fileNames);
+                if (selected)
+                {
+                    if (!fileNames.IsEmpty())
+                    {
+                        for (const string& fileName : fileNames)
+                        {
+                            bool skip = false;
+                            string filePath = Path.Combine(currentDirectory, fileName);
+                            for (const string& textFilePath : project->TextFilePaths())
+                            {
+                                if (textFilePath == filePath)
+                                {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+                            if (!skip)
+                            {
+                                project->AddTextFileName(fileName, filePath);
+                                project->Save();
+                                AddFilePathsToProject("", "", "", project, projectNode);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        internal void RemoveFile(Cm.Ast.Project* project, const string& filePath, const string& fileName, TreeViewNode* fileNode)
+        {
+            try
+            {
+                TabPage* tabPage = codeTabControl->GetTabPageByKey(filePath);
+                if (tabPage != null)
+                {
+                    Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                    if (editor != null)
+                    {
+                        if (editor->Dirty())
+                        {
+                            editor->Save();
+                        }
+                    }
+                    tabPage->Close();
+                }
+                TreeViewNode* projectNode = fileNode->Parent();
+                project->RemoveFile(filePath, fileName);
+                project->Save();
+                projectNode->RemoveChild(fileNode);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        internal void OpenFileLocation(const string& filePath)
+        {
+            try
+            {
+                string directoryLocation = Path.GetDirectoryName(filePath);
+                long errorCode = 0;
+                if (!WinShellExecute(directoryLocation.Chars(), errorCode))
+                {
+                    throw Exception("could not open file location '" + directoryLocation + "'");
+                }
             }
             catch (const Exception& ex)
             {
@@ -1323,7 +1809,10 @@ namespace cmcode
                 if (solution.IsNull()) return;
                 solution->Save();
                 Cm.Ast.Project* activeProject = solution->ActiveProject();
-                cmcode.settings.SaveProjectSettings(activeProject, solutionExplorerData.Get());
+                if (!solutionExplorerData.IsNull() && activeProject != null)
+                {
+                    cmcode.settings.SaveProjectSettings(activeProject, solutionExplorerData.Get());
+                }
             }
             catch (const Exception& ex)
             {
@@ -1359,7 +1848,7 @@ namespace cmcode
                     if (child is TabPage*)
                     {
                         TabPage* tabPage = cast<TabPage*>(child);
-                        Cm.Views.CmajorEditor* editor = GetEditorByTabPage(tabPage);
+                        Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
                         if (editor != null)
                         {
                             const string& filePath = editor->FilePath();
@@ -1384,9 +1873,9 @@ namespace cmcode
                 LogException(ex);
             }
         }
-        private nothrow Cm.Views.CmajorEditor* GetEditorByTabPage(TabPage* tabPage) const
+        private nothrow Cm.Views.Editor* GetEditorByTabPage(TabPage* tabPage) const
         {
-            HashMap<TabPage*, Cm.Views.CmajorEditor*>.ConstIterator it = editorByTabPageMap.CFind(tabPage);
+            HashMap<TabPage*, Cm.Views.Editor*>.ConstIterator it = editorByTabPageMap.CFind(tabPage);
             if (it != editorByTabPageMap.CEnd())
             {
                 return it->second;
@@ -1396,7 +1885,7 @@ namespace cmcode
                 return null;
             }
         }
-        private Cm.Views.CmajorEditor* AddEditor(const string& fileName, const string& key, const string& filePath)
+        private Cm.Views.CmajorEditor* AddCmajorEditor(const string& fileName, const string& key, const string& filePath)
         {
             UniquePtr<TabPage> tabPage(new TabPage(fileName, key));
             UniquePtr<Cm.Views.CmajorEditor> editorPtr(new Cm.Views.CmajorEditor(filePath,
@@ -1415,6 +1904,28 @@ namespace cmcode
             codeTabControl->AddTabPage(tabPage.Release());
             sourceCodeView->SetFocus();
             return editor;
+        }
+        private void AddResourceFileEditor(const string& fileName, const string& key, const string& filePath)
+        {
+            UniquePtr<TabPage> tabPage(new TabPage(fileName, key));
+            UniquePtr<Cm.Views.ResourceFileEditor> editorPtr(new Cm.Views.ResourceFileEditor(filePath));
+            Cm.Views.ResourceFileEditor* editor = editorPtr.Get();
+            TextView* textView = editor->GetTextView();
+            editorByTabPageMap[tabPage.Get()] = editor;
+            tabPage->AddChild(editorPtr.Release());
+            codeTabControl->AddTabPage(tabPage.Release());
+            textView->SetFocus();
+        }
+        private void AddTextFileEditor(const string& fileName, const string& key, const string& filePath)
+        {
+            UniquePtr<TabPage> tabPage(new TabPage(fileName, key));
+            UniquePtr<Cm.Views.TextFileEditor> editorPtr(new Cm.Views.TextFileEditor(filePath));
+            Cm.Views.TextFileEditor* editor = editorPtr.Get();
+            TextView* textView = editor->GetTextView();
+            editorByTabPageMap[tabPage.Get()] = editor;
+            tabPage->AddChild(editorPtr.Release());
+            codeTabControl->AddTabPage(tabPage.Release());
+            textView->SetFocus();
         }
         private nothrow bool Debugging() const
         {
@@ -1493,11 +2004,15 @@ namespace cmcode
                         debugTabPage = codeTabControl->SelectedTabPage();
                         startDebuggingToolButton->SetToolTip("Continue (F5)");
                         startDebuggingMenuItem->SetText("Continue", menuBar);
-                        Cm.Views.CmajorEditor* editor = GetEditorByTabPage(debugTabPage);
+                        Cm.Views.Editor* editor = GetEditorByTabPage(debugTabPage);
                         if (editor != null)
                         {
-                            Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
-                            sourceCodeView->DoGenerateExpressionHoverEvents();
+                            if (editor is Cm.Views.CmajorEditor*)
+                            {
+                                Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                                Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                                sourceCodeView->DoGenerateExpressionHoverEvents();
+                            }
                         }
                     }
                 }
@@ -1575,11 +2090,15 @@ namespace cmcode
                             if (child is TabPage*)
                             {
                                 TabPage* tabPage = cast<TabPage*>(child);
-                                Cm.Views.CmajorEditor* editor = GetEditorByTabPage(tabPage);
+                                Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
                                 if (editor != null)
                                 {
-                                    Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
-                                    sourceCodeView->DontGenerateExpressionHoverEvents();
+                                    if (editor is Cm.Views.CmajorEditor*)
+                                    {
+                                        Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                                        Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                                        sourceCodeView->DontGenerateExpressionHoverEvents();
+                                    }
                                 }
                             }
                             child = child->NextSibling();
@@ -1706,13 +2225,17 @@ namespace cmcode
                 TabPage* tabPage = codeTabControl->SelectedTabPage();
                 if (tabPage != null)
                 {
-                    Cm.Views.CmajorEditor* editor = GetEditorByTabPage(tabPage);
+                    Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
                     if (editor != null)
                     {
-                        Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
-                        if (sourceCodeView != null)
+                        if (editor is Cm.Views.CmajorEditor*)
                         {
-                            sourceCodeView->ToggleBreakpoint();
+                            Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                            Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                            if (sourceCodeView != null)
+                            {
+                                sourceCodeView->ToggleBreakpoint();
+                            }
                         }
                     }
                 }
@@ -2029,29 +2552,33 @@ namespace cmcode
                     }
                 }
                 TabPage* tabPage = codeTabControl->GetTabPageByKey(filePath);
-                Cm.Views.CmajorEditor* editor = null;
+                Cm.Views.CmajorEditor* cmajorEditor = null;
                 if (tabPage != null)
                 {
-                    editor = GetEditorByTabPage(tabPage);
+                    Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                    if (editor is Cm.Views.CmajorEditor*)
+                    {
+                        cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                    }
                     tabPage->Select();
                 }
-                else
+                if (cmajorEditor == null)
                 {
                     HashMap<string, TreeViewNodeData*>.ConstIterator it = solutionExplorerData->treeViewDataMap.CFind(filePath);
                     if (it != solutionExplorerData->treeViewDataMap.CEnd())
                     {
                         TreeViewNodeData* data = it->second;
-                        editor = AddEditor(data->fileName, data->key, data->filePath);
+                        cmajorEditor = AddCmajorEditor(data->fileName, data->key, data->filePath);
                     }
                     else
                     {
-                        editor = AddEditor(Path.GetFileName(filePath), filePath, filePath);
+                        cmajorEditor = AddCmajorEditor(Path.GetFileName(filePath), filePath, filePath);
                     }
                 }
                 SourceSpan debugLocation = GetSourceSpan(location);
-                if (editor != null && !debugLocation.IsEmpty())
+                if (cmajorEditor != null && !debugLocation.IsEmpty())
                 {
-                    Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
+                    Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
                     if (sourceCodeView != null)
                     {
                         Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
@@ -2077,18 +2604,22 @@ namespace cmcode
         {
             if (debugTabPage != null)
             {
-                Cm.Views.CmajorEditor* editor = GetEditorByTabPage(debugTabPage);
+                Cm.Views.Editor* editor = GetEditorByTabPage(debugTabPage);
                 if (editor != null)
                 {
-                    Cm.Views.CmajorSourceCodeView* sourceCodeView = editor->GetSourceCodeView();
-                    if (sourceCodeView != null)
+                    if (editor is Cm.Views.CmajorEditor*)
                     {
-                        Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
-                        if (debugStrip != null)
+                        Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                        Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                        if (sourceCodeView != null)
                         {
-                            debugStrip->ResetDebugLocation();
-                            editor->Invalidate();
-                            debugStrip->Invalidate();
+                            Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
+                            if (debugStrip != null)
+                            {
+                                debugStrip->ResetDebugLocation();
+                                editor->Invalidate();
+                                debugStrip->Invalidate();
+                            }
                         }
                     }
                 }
@@ -2272,7 +2803,7 @@ namespace cmcode
             TabPage* selectedCodeTabPage = codeTabControl->SelectedTabPage();
             if (selectedCodeTabPage != null)
             {
-                Cm.Views.CmajorEditor* editor = GetEditorByTabPage(selectedCodeTabPage);
+                Cm.Views.Editor* editor = GetEditorByTabPage(selectedCodeTabPage);
                 if (editor != null)
                 {
                     if (editor->Dirty())
@@ -2306,7 +2837,7 @@ namespace cmcode
         private TreeView* solutionExplorerTreeView;
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
         private StatusBarItem* sourceFilePathStatusBarItem;
-        private HashMap<TabPage*, Cm.Views.CmajorEditor*> editorByTabPageMap;
+        private HashMap<TabPage*, Cm.Views.Editor*> editorByTabPageMap;
 
         private MenuBar* menuBar;
         private MenuItem* newProjectMenuItem;

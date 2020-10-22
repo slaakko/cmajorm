@@ -277,6 +277,36 @@ namespace Cm.Ast
         {
             return sourceFilePaths;
         }
+        public void AddSourceFileName(const string& sourceFileName, const string& sourceFilePath)
+        {
+            relativeSourceFilePaths.Add(sourceFileName);
+            Sort(relativeSourceFilePaths.Begin(), relativeSourceFilePaths.End());
+            sourceFilePaths.Add(sourceFilePath);
+            Sort(sourceFilePaths.Begin(), sourceFilePaths.End());
+        }
+        public void AddResourceFileName(const string& resourceFileName, const string& resourceFilePath)
+        {
+            relativeResourceFilePaths.Add(resourceFileName);
+            Sort(relativeResourceFilePaths.Begin(), relativeResourceFilePaths.End());
+            resourceFilePaths.Add(resourceFilePath);
+            Sort(resourceFilePaths.Begin(), resourceFilePaths.End());
+        }
+        public void AddTextFileName(const string& textFileName, const string& textFilePath)
+        {
+            relativeTextFilePaths.Add(textFileName);
+            Sort(relativeTextFilePaths.Begin(), relativeTextFilePaths.End());
+            textFilePaths.Add(textFilePath);
+            Sort(textFilePaths.Begin(), textFilePaths.End());
+        }
+        public void RemoveFile(const string& filePath, const string& fileName)
+        {
+            relativeSourceFilePaths.Remove(fileName);
+            sourceFilePaths.Remove(filePath);
+            relativeResourceFilePaths.Remove(fileName);
+            resourceFilePaths.Remove(filePath);
+            relativeTextFilePaths.Remove(fileName);
+            textFilePaths.Remove(filePath);
+        }
         public nothrow const List<string>& RelativeSourceFilePaths() const
         {
             return relativeSourceFilePaths;

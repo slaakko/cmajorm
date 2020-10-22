@@ -19,11 +19,9 @@ namespace Cm.Views
         return System.Windows.Color(230u, 231u, 232u);
     }
 
-    public class CmajorEditor : ContainerControl
+    public class CmajorEditor : Editor
     {
-        public CmajorEditor(const string& filePath_, BreakpointList& breakpointList, int debugStripWidth, const System.Windows.Color& debugStripBackgroundColor) :
-            base("Cm.Views.CmajorEditor", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(),
-            DefaultControlBackgroundColor(), "editor", Point(), Size(), Dock.fill, Anchors.none), filePath(filePath_)
+        public CmajorEditor(const string& filePath, BreakpointList& breakpointList, int debugStripWidth, const System.Windows.Color& debugStripBackgroundColor) : base(filePath)
         {
             UniquePtr<CmajorSourceCodeView> sourceCodeViewPtr(new CmajorSourceCodeView(Point(), Size(), Dock.none, Anchors.none));
             sourceCodeView = sourceCodeViewPtr.Get();
@@ -40,17 +38,9 @@ namespace Cm.Views
             this(filePath, breakpointList, DefaultDebugStripWidth(), DefaultDebugStripBackgroundColor())
         {
         }
-        public nothrow inline const string& FilePath() const
-        {
-            return filePath;
-        }
         public nothrow inline CmajorSourceCodeView* GetSourceCodeView() const
         {
             return sourceCodeView;
-        }
-        public nothrow bool Dirty() const
-        {
-            return false;
         }
         private string filePath;
         private CmajorSourceCodeView* sourceCodeView;
