@@ -1,0 +1,43 @@
+char charReturn(char x)
+{
+    return x;
+}
+
+unit_test void charTest()
+{
+    char x;
+    #assert(x == '\0');
+    #assert(!(x < x));
+    char y = x;
+    #assert(x == y);
+    #assert(!(x < y));
+    char z;
+    z = x;
+    #assert(z == x);
+    char a = System.Rvalue(x);
+    #assert(a == x);
+    char b;
+    b = System.Rvalue(x);
+    #assert(b == x);
+    #assert(charReturn(x) == x);
+    
+    char c = 'a';
+    #assert(c == 'a');
+    #assert(!(c < c));
+    char d = c;
+    #assert(c == d);
+    #assert(!(c < d));
+    char e;
+    e = c;
+    #assert(e == c);
+    char f = System.Rvalue(c);
+    #assert(f == c);
+    char g;
+    g = System.Rvalue(c);
+    #assert(g == c);
+    #assert(charReturn(c) == c);
+    #assert(x < c);
+    #assert(x <= c);
+    #assert(c > x);
+    #assert(c >= x);
+}

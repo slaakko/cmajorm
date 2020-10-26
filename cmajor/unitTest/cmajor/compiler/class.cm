@@ -1,0 +1,186 @@
+using System;
+
+class EmptyDefault
+{
+}
+
+class OneDefault
+{
+    public void SetId(int id_)
+    {
+        id = id_;
+    }
+    public int GetId() const
+    {
+        return id;
+    }
+    private int id;
+}
+
+bool operator==(const OneDefault& left, const OneDefault& right)
+{
+    return left.GetId() == right.GetId();
+}
+
+bool operator<(const OneDefault& left, const OneDefault& right)
+{
+    return left.GetId() < right.GetId();
+}
+
+class OneCopy
+{
+    public OneCopy() : id(0)
+    {
+    }
+    public OneCopy(int id_) : id(id_)
+    {
+    }
+    public OneCopy(const OneCopy& that) : id(that.id)
+    {
+    }
+    public void operator=(const OneCopy& that)
+    {
+        id = that.id;
+    }
+    suppress OneCopy(OneCopy&&);
+    suppress void operator=(OneCopy&&);
+    public int GetId() const
+    {
+        return id;
+    }
+    private int id;
+}
+
+bool operator==(const OneCopy& left, const OneCopy& right)
+{
+    return left.GetId() == right.GetId();
+}
+
+bool operator<(const OneCopy& left, const OneCopy& right)
+{
+    return left.GetId() < right.GetId();
+}
+
+class OneMove
+{
+    public OneMove() : id(0)
+    {
+    }
+    public OneMove(int id_) : id(id_)
+    {
+    }
+    suppress OneMove(const OneMove&);
+    suppress void operator=(const OneMove&);
+    public OneMove(OneMove&& that) : id(that.id)
+    {
+        that.id = 0;
+    }
+    public void operator=(OneMove&& that)
+    {
+        Swap(id, that.id);
+    }
+    public int GetId() const
+    {
+        return id;
+    }
+    private int id;
+}
+
+bool operator==(const OneMove& left, const OneMove& right)
+{
+    return left.GetId() == right.GetId();
+}
+
+bool operator<(const OneMove& left, const OneMove& right)
+{
+    return left.GetId() < right.GetId();
+}
+
+class OneCopyContainer
+{
+    public OneCopyContainer() : contained(1)
+    {
+    }
+    public const OneCopy& Contained() const 
+    {
+        return contained;
+    }
+    private OneCopy contained;
+}
+
+class OneMoveContainer
+{
+    public OneMoveContainer() : contained(1)
+    {
+    }
+    public const OneMove& Contained() const 
+    {
+        return contained;
+    }
+    private OneMove contained;
+}
+
+unit_test void classTest()
+{
+    EmptyDefault empty;
+    EmptyDefault emptyCopy = empty;
+    EmptyDefault emptyMoved = Rvalue(empty);
+    EmptyDefault emptyCopyAssigned;
+    emptyCopyAssigned = emptyCopy;
+    EmptyDefault emptyMoveAssigned;
+    emptyMoveAssigned = Rvalue(emptyCopy);
+    
+    OneDefault one;
+    #assert(one.GetId() == 0);
+    one.SetId(1);
+    #assert(one.GetId() == 1);
+    #assert(one == one);
+    #assert(!(one < one));
+    OneDefault oneDefaultCopy = one;
+    #assert(one == oneDefaultCopy);
+    OneDefault oneDefaultCopyAssigned;
+    oneDefaultCopyAssigned = one;
+    #assert(one == oneDefaultCopyAssigned);
+    OneDefault oneDefaultMoved = Rvalue(one);
+    #assert(oneDefaultMoved == oneDefaultCopy);
+    OneDefault oneDefaultMoveAssigned;
+    one = oneDefaultCopy;
+    oneDefaultMoveAssigned = Rvalue(one);
+    #assert(oneDefaultMoveAssigned == oneDefaultCopy);
+    
+    OneCopy oneCopy(1);
+    #assert(oneCopy.GetId() == 1);
+    OneCopy oneCopyCopied = oneCopy;
+    #assert(oneCopy.GetId() == 1);
+    #assert(oneCopyCopied.GetId() == 1);
+    #assert(oneCopy == oneCopyCopied);
+    OneCopy oneCopyCopyAssigned;
+    oneCopyCopyAssigned = oneCopy;
+    #assert(oneCopy.GetId() == 1);
+    #assert(oneCopyCopyAssigned.GetId() == 1);
+    #assert(oneCopy == oneCopyCopyAssigned);
+    
+    OneMove oneMove(1);
+    #assert(oneMove.GetId() == 1);
+    OneMove oneMoveMoved = Rvalue(oneMove);
+    #assert(oneMove.GetId() == 0);
+    #assert(oneMoveMoved.GetId() == 1);
+    #assert(oneMove != oneMoveMoved);
+    OneMove oneMoveOne(1);
+    OneMove oneMoveMoveAssigned;
+    oneMoveMoveAssigned = Rvalue(oneMoveOne);
+    #assert(oneMoveOne.GetId() == 0);
+    #assert(oneMoveMoveAssigned.GetId() == 1);
+    #assert(oneMoveOne != oneMoveMoveAssigned);
+    
+    OneCopyContainer copyContainer;
+    #assert(copyContainer.Contained().GetId() == 1);
+    OneCopyContainer containerCopy(copyContainer);
+    #assert(containerCopy.Contained().GetId() == 1);
+    #assert(copyContainer.Contained().GetId() == 1);
+    OneMoveContainer moveContainer;
+    #assert(moveContainer.Contained().GetId() == 1);
+    OneMoveContainer containerMoved(Rvalue(moveContainer));
+    #assert(containerMoved.Contained().GetId() == 1);
+    #assert(moveContainer.Contained().GetId() == 0);
+}

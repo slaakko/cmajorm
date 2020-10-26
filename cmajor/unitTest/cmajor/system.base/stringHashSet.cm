@@ -1,0 +1,175 @@
+using System;
+using System.Collections;
+
+unit_test void stringHashSetTest()
+{
+    HashSet<string> empty;
+    #assert(empty.IsEmpty());
+    #assert(empty.Count() == 0);
+    #assert(empty.Begin() == empty.End());
+    #assert(empty.CBegin() == empty.CEnd());
+    #assert(empty.Find("10") == empty.End());
+    #assert(empty.CFind("10") == empty.CEnd());
+    HashSet<string> emptyCopy = empty;
+    #assert(emptyCopy.IsEmpty());
+    #assert(emptyCopy.Count() == 0);
+    #assert(emptyCopy.Begin() == emptyCopy.End());
+    #assert(emptyCopy.CBegin() == emptyCopy.CEnd());
+    #assert(emptyCopy.Find("10") == emptyCopy.End());
+    #assert(emptyCopy.CFind("10") == emptyCopy.CEnd());
+    #assert(emptyCopy == empty);
+    HashSet<string> emptyMoved = Rvalue(empty);
+    #assert(empty.IsEmpty());
+    #assert(empty.Count() == 0);
+    #assert(emptyMoved.IsEmpty());
+    #assert(emptyMoved.Count() == 0);
+    #assert(emptyMoved.Begin() == emptyMoved.End());
+    #assert(emptyMoved.CBegin() == emptyMoved.CEnd());
+    #assert(emptyMoved.Find("10") == emptyMoved.End());
+    #assert(emptyMoved.CFind("10") == emptyMoved.CEnd());
+    #assert(emptyMoved == emptyCopy);
+    HashSet<string> emptyCopyAssigned;
+    emptyCopyAssigned = emptyCopy;
+    #assert(emptyCopyAssigned.IsEmpty());
+    #assert(emptyCopyAssigned.Count() == 0);
+    #assert(emptyCopyAssigned.Begin() == emptyCopyAssigned.End());
+    #assert(emptyCopyAssigned.CBegin() == emptyCopyAssigned.CEnd());
+    #assert(emptyCopyAssigned.Find("10") == emptyCopyAssigned.End());
+    #assert(emptyCopyAssigned.CFind("10") == emptyCopyAssigned.CEnd());
+    #assert(emptyCopyAssigned == emptyCopy);
+    HashSet<string> emptyMoveAssigned;
+    empty = emptyCopy;
+    emptyMoveAssigned = Rvalue(empty);
+    #assert(emptyMoveAssigned.IsEmpty());
+    #assert(emptyMoveAssigned.Count() == 0);
+    #assert(emptyMoveAssigned.Begin() == emptyMoveAssigned.End());
+    #assert(emptyMoveAssigned.CBegin() == emptyMoveAssigned.CEnd());
+    #assert(emptyMoveAssigned.Find("10") == emptyMoveAssigned.End());
+    #assert(emptyMoveAssigned.CFind("10") == emptyMoveAssigned.CEnd());
+    #assert(emptyMoveAssigned == emptyCopy);
+    HashSet<string> one;
+    one.Insert("10");
+    #assert(!one.IsEmpty());
+    #assert(one.Count() == 1);
+    #assert(one.Begin() != one.End());
+    HashSet<string>.Iterator it = one.Begin();
+    ++it;
+    #assert(it == one.End());
+    #assert(one.CBegin() != one.CEnd());
+    HashSet<string>.ConstIterator cit = one.CBegin();
+    ++cit;
+    #assert(cit == one.CEnd());
+    HashSet<string>.Iterator fit = one.Find("10");
+    #assert(fit != one.End());
+    #assert(fit == one.Begin());
+    #assert(*fit == "10");
+    HashSet<string>.ConstIterator fcit = one.CFind("10");
+    #assert(fcit != one.CEnd());
+    #assert(fcit == one.CBegin());
+    #assert(*fcit == "10");
+    HashSet<string> oneCopy = one;
+    #assert(!oneCopy.IsEmpty());
+    #assert(oneCopy.Count() == 1);
+    #assert(oneCopy == one);
+    HashSet<string> oneMoved = Rvalue(one);
+    #assert(one.IsEmpty());
+    #assert(one.Count() == 0);
+    #assert(oneMoved == oneCopy);
+    HashSet<string> oneCopyAssigned;
+    oneCopyAssigned = oneCopy;
+    #assert(!oneCopy.IsEmpty());
+    #assert(oneCopy.Count() == 1);
+    #assert(oneCopyAssigned == oneCopy);
+    HashSet<string> oneMoveAssigned;
+    one = oneCopy;
+    oneMoveAssigned = Rvalue(one);
+    #assert(!oneMoveAssigned.IsEmpty());
+    #assert(oneMoveAssigned.Count() == 1);
+    #assert(oneMoveAssigned == oneCopy);
+    oneCopy.Remove("10");
+    #assert(oneCopy.IsEmpty());
+    #assert(oneCopy.Count() == 0);
+    
+    HashSet<string> two;
+    two.Insert("20");
+    two.Insert("10");
+    #assert(!two.IsEmpty());
+    #assert(two.Count() == 2);
+    #assert(two.Begin() != two.End());
+    HashSet<string>.Iterator tit = two.Begin();
+    ++tit;
+    ++tit;
+    #assert(tit == two.End());
+    #assert(two.CBegin() != two.CEnd());
+    HashSet<string>.ConstIterator tcit = two.CBegin();
+    ++tcit;
+    ++tcit;
+    #assert(tcit == two.CEnd());
+    HashSet<string>.Iterator tfit = two.Find("10");
+    #assert(tfit != two.End());
+    #assert(*tfit == "10");
+    HashSet<string>.ConstIterator tfcit = two.CFind("10");
+    #assert(tfcit != two.CEnd());
+    #assert(*tfcit == "10");
+    tfit = two.Find("20");
+    #assert(tfit != two.End());
+    #assert(*tfit == "20");
+    tfcit = two.CFind("20");
+    #assert(tfcit != two.CEnd());
+    #assert(*tfcit == "20");
+    HashSet<string> twoCopy = two;
+    #assert(!twoCopy.IsEmpty());
+    #assert(twoCopy.Count() == 2);
+    #assert(twoCopy == two);
+    HashSet<string> twoMoved = Rvalue(two);
+    #assert(two.IsEmpty());
+    #assert(two.Count() == 0);
+    #assert(twoMoved == twoCopy);
+    HashSet<string> twoCopyAssigned;
+    twoCopyAssigned = twoCopy;
+    #assert(!twoCopy.IsEmpty());
+    #assert(twoCopy.Count() == 2);
+    #assert(twoCopyAssigned == twoCopy);
+    HashSet<string> twoMoveAssigned;
+    two = twoCopy;
+    twoMoveAssigned = Rvalue(two);
+    #assert(!twoMoveAssigned.IsEmpty());
+    #assert(twoMoveAssigned.Count() == 2);
+    #assert(twoMoveAssigned == twoCopy);
+    twoCopy.Remove("10");
+    #assert(!twoCopy.IsEmpty());
+    #assert(twoCopy.Count() == 1);
+    twoCopy.Remove("20");
+    #assert(twoCopy.IsEmpty());
+    #assert(twoCopy.Count() == 0);
+    
+    List<int> tenBase;
+    while (tenBase.Count() < 10)
+    {
+        int x = cast<int>(Random());
+        if (Find(tenBase.CBegin(), tenBase.CEnd(), x) == tenBase.CEnd())
+        {
+            tenBase.Add(x);
+        }
+    }
+    HashSet<string> ten;
+    for (int i = 0; i < 10; ++i)
+    {
+        ten.Insert(ToString(tenBase[i]));
+    }
+    for (int i = 0; i < 10; ++i)
+    {
+        #assert(ten.CFind(ToString(tenBase[i])) != ten.CEnd());
+    }
+    HashSet<string> tenCopy = ten;
+    #assert(tenCopy == ten);
+    HashSet<string> tenMoved = Rvalue(ten);
+    #assert(tenMoved == tenCopy);
+    HashSet<string> tenCopyAssigned;
+    tenCopyAssigned = tenCopy;
+    #assert(tenCopyAssigned == tenCopy);
+    ten = tenCopy;
+    HashSet<string> tenMoveAssigned;
+    tenMoveAssigned = Rvalue(ten);
+    #assert(tenMoveAssigned == tenCopy);
+}

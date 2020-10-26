@@ -1,0 +1,995 @@
+using System;
+using System.Collections;
+
+class Comparable
+{
+    public Comparable(int value_, int id_) : value(value_), id(id_)
+    {
+    }
+    public default Comparable(const Comparable&);
+    public default void operator=(const Comparable&);
+    public Comparable(Comparable&& that) : value(that.value), id(that.id)
+    {
+        that.value = 0;
+        that.id = 0;
+    }
+    public void operator=(Comparable&& that)
+    {
+        Swap(value, that.value);
+        Swap(id, that.id);
+    }
+    public int Value() const
+    {
+        return value;
+    }
+    public int Id() const
+    {
+        return id;
+    }
+    private int value;
+    private int id;
+}
+
+bool operator==(const Comparable& left, const Comparable& right)
+{
+    return left.Value() == right.Value();
+}
+
+bool operator<(const Comparable& left, const Comparable& right)
+{
+    return left.Value() < right.Value();
+}
+
+unit_test void minMaxTest()
+{
+    #assert(Min(0, 0) == 0);
+    #assert(Max(0, 0) == 0);
+    #assert(Min(0, 1) == 0);
+    #assert(Max(0, 1) == 1);
+    #assert(Min(1, 0) == 0);
+    #assert(Max(1, 0) == 1);
+    #assert(Min(Comparable(0, 1), Comparable(0, 2)).Id() == 1);
+    #assert(Max(Comparable(0, 1), Comparable(0, 2)).Id() == 2);
+    #assert(Min(Comparable(0, 1), Comparable(1, 2)).Id() == 1);
+    #assert(Max(Comparable(0, 1), Comparable(1, 2)).Id() == 2);
+    #assert(Min(Comparable(1, 1), Comparable(0, 2)).Id() == 2);
+    #assert(Max(Comparable(1, 1), Comparable(0, 2)).Id() == 1);
+}
+
+unit_test void swapTest()
+{
+    int x = 0;
+    int y = 1;
+    Swap(x, y);
+    #assert(x == 1);
+    #assert(y == 0);
+    Comparable a(0, 1);
+    Comparable b(1, 2);
+    Swap(a, b);
+    #assert(a.Value() == 1);
+    #assert(a.Id() == 2);
+    #assert(b.Value() == 0);
+    #assert(b.Id() == 1);
+}
+
+unit_test void reverseTest()
+{
+    List<int> empty;
+    Reverse(empty.Begin(), empty.End());
+    #assert(empty.IsEmpty());
+    List<int> one;
+    one.Add(10);
+    Reverse(one.Begin(), one.End());
+    #assert(*one.Begin() == 10);
+    List<int> two;
+    two.Add(10);
+    two.Add(20);
+    Reverse(two.Begin(), two.End());
+    #assert(*two.Begin() == 20);
+    #assert(two[1] == 10);
+    List<int> ten;
+    for (int i = 0; i < 10; ++i)
+    {
+        ten.Add(i);       
+    }
+    Reverse(ten.Begin(), ten.End());
+    for (int i = 0; i < 10; ++i)
+    {
+        #assert(ten[9 - i] == i);
+    }
+    List<int> baseR;
+    List<int> random;
+    for (int i = 0; i < 10; ++i)
+    {
+        int x = cast<int>(Random());
+        baseR.Add(x);
+        random.Add(x);
+    }
+    Reverse(random.Begin(), random.End());
+    for (int i = 0; i < 10; ++i)
+    {
+        #assert(random[i] == baseR[9 - i]);
+    }
+    LinkedList<int> x;
+    for (int i = 0; i < 10; ++i)
+    {
+        x.Add(baseR[i]);
+    }
+    Reverse(x.Begin(), x.End());
+    LinkedList<int>.Iterator it = x.Begin();
+    for (int i = 0; i < 10; ++i)
+    {
+        #assert(*it == baseR[9 - i]);
+        ++it;
+    }
+}
+
+unit_test void rotateTest()
+{
+    List<int> x1;
+    x1.Add(1);
+    Rotate(x1.Begin(), x1.Begin(), x1.End());
+    #assert(x1[0] == 1);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    Rotate(x2.Begin(), x2.Begin() + 1, x2.End());
+    #assert(x2[0] == 2);
+    #assert(x2[1] == 1);
+    List<int> x3;
+    x3.Add(1);
+    x3.Add(2);
+    x3.Add(3);
+    Rotate(x3.Begin(), x3.Begin() + 1, x3.End());
+    #assert(x3[0] == 2);
+    #assert(x3[1] == 3);
+    #assert(x3[2] == 1);
+}
+
+unit_test void copyTest()
+{
+    LinkedList<int> x0;
+    LinkedList<int> y0;
+    Copy(x0.Begin(), x0.End(), BackInserter(y0));
+    #assert(x0 == y0);
+    LinkedList<int> x1;
+    x1.Add(10);
+    LinkedList<int> y1;
+    Copy(x1.Begin(), x1.End(), BackInserter(y1));
+    #assert(x1 == y1);
+    LinkedList<int> x2;
+    x2.Add(10);
+    x2.Add(20);
+    LinkedList<int> y2;
+    Copy(x2.Begin(), x2.End(), BackInserter(y2));
+    #assert(x2 == y2);
+    List<int> x10;
+    for (int i = 0; i < 10; ++i)
+    {
+        x10.Add(i);
+    }
+    List<int> y10;
+    Copy(x10.Begin(), x10.End(), BackInserter(y10));
+    #assert(x10 == y10);
+}
+
+unit_test void copyBackwardTest()
+{
+    List<int> x;
+    x.Add(10);
+    x.Add(20);
+    x.Add(30);
+    CopyBackward(x.Begin(), x.End() - 1,  x.End());
+    #assert(x[0] == 10);
+    #assert(x[1] == 10);
+    #assert(x[2] == 20);
+}
+
+unit_test void moveTest()
+{
+    List<UniquePtr<int>> x;
+    x.Add(UniquePtr<int>(new int(0)));
+    x.Add(UniquePtr<int>(new int(1)));
+    x.Add(UniquePtr<int>(new int(2)));
+    List<UniquePtr<int>> y;
+    y.Add(UniquePtr<int>(null));
+    y.Add(UniquePtr<int>(null));
+    y.Add(UniquePtr<int>(null));
+    Move(x.Begin(), x.End(), y.Begin());
+    for (int i = 0; i < x.Count(); ++i)
+    {
+        #assert(x[i].IsNull());
+        #assert(*y[i] == i);
+    }
+}
+
+unit_test void moveBackwardTest()
+{
+    List<UniquePtr<int>> x;
+    x.Add(UniquePtr<int>(new int(0)));
+    x.Add(UniquePtr<int>(new int(1)));
+    x.Add(UniquePtr<int>(new int(2)));
+    MoveBackward(x.Begin(), x.End() - 1,  x.End());
+    #assert(x[0].IsNull());
+    #assert(*x[1] == 0);
+    #assert(*x[2] == 1);
+}
+
+unit_test void distanceTest()
+{
+    ForwardList<int> x0;
+    #assert(Distance(x0.Begin(), x0.End()) == 0);
+    ForwardList<int> x1;
+    x1.InsertFront(1);
+    #assert(Distance(x1.Begin(), x1.End()) == 1);
+    List<int> x2;
+    x2.Add(10);
+    x2.Add(20);
+    #assert(Distance(x2.Begin(), x2.End()) == 2);
+    List<int> x10;
+    for (int i = 0; i < 10; ++i)
+    {
+        x10.Add(i);
+    }
+    #assert(Distance(x10.Begin(), x10.End()) == 10);
+}
+
+unit_test void nextTest()
+{
+    ForwardList<int> x0;
+    #assert(Next(x0.Begin(), 0) == x0.Begin());
+    ForwardList<int> x1;
+    x1.InsertFront(1);
+    ForwardList<int>.Iterator it1 = x1.Begin();
+    ++it1;
+    #assert(Next(x1.Begin(), 1) == it1);
+    ForwardList<int> x2;
+    x2.InsertFront(2);
+    x2.InsertFront(1);
+    ForwardList<int>.Iterator it2 = x2.Begin();
+    ++it2;
+    ++it2;
+    #assert(Next(x2.Begin(), 2) == it2);
+    List<int> x10;
+    for (int i = 0; i < 10; ++i)
+    {
+        x10.Add(i);
+    }
+    List<int>.Iterator n = Next(x10.Begin(), 5);
+    #assert(*n == 5);
+}
+
+class Compare : Rel<int>
+{
+    public bool operator()(int x, int y) const
+    {
+        return x < y;
+    }
+}
+
+unit_test void lowerBoundTest()
+{
+    ForwardList<int> x0;
+    #assert(LowerBound(x0.Begin(), x0.End(), 1) == x0.End());
+    ForwardList<int> x1;
+    x1.InsertFront(1);
+    #assert(LowerBound(x1.Begin(), x1.End(), 0) == x1.Begin());
+    #assert(LowerBound(x1.Begin(), x1.End(), 1) == x1.Begin());
+    #assert(LowerBound(x1.Begin(), x1.End(), 2) == x1.End());
+    ForwardList<int> x2;
+    x2.InsertFront(1);
+    x2.InsertFront(1);
+    #assert(LowerBound(x2.Begin(), x2.End(), 0) == x2.Begin());
+    #assert(LowerBound(x2.Begin(), x2.End(), 1) == x2.Begin());
+    #assert(LowerBound(x2.Begin(), x2.End(), 2) == x2.End());
+    List<int> x6;
+    x6.Add(1);
+    x6.Add(1);
+    x6.Add(2);
+    x6.Add(2);
+    x6.Add(3);
+    x6.Add(4);
+    #assert(LowerBound(x6.Begin(), x6.End(), 0) == x6.Begin());
+    #assert(LowerBound(x6.Begin(), x6.End(), 1) == x6.Begin());
+    #assert(LowerBound(x6.Begin(), x6.End(), 2) == x6.Begin() + 2);
+    #assert(LowerBound(x6.Begin(), x6.End(), 3) == x6.Begin() + 4);
+    #assert(LowerBound(x6.Begin(), x6.End(), 4) == x6.Begin() + 5);
+    #assert(LowerBound(x6.Begin(), x6.End(), 5) == x6.End());
+    #assert(LowerBound(x6.Begin(), x6.End(), cast<int>(0), Compare()) == x6.Begin());
+    #assert(LowerBound(x6.Begin(), x6.End(), cast<int>(1), Compare()) == x6.Begin());
+    #assert(LowerBound(x6.Begin(), x6.End(), cast<int>(2), Compare()) == x6.Begin() + 2);
+    #assert(LowerBound(x6.Begin(), x6.End(), cast<int>(3), Compare()) == x6.Begin() + 4);
+    #assert(LowerBound(x6.Begin(), x6.End(), cast<int>(4), Compare()) == x6.Begin() + 5);
+    #assert(LowerBound(x6.Begin(), x6.End(), cast<int>(5), Compare()) == x6.End());
+}
+
+unit_test void upperBoundTest()
+{
+    ForwardList<int> x0;
+    #assert(UpperBound(x0.Begin(), x0.End(), 1) == x0.End());
+    ForwardList<int> x1;
+    x1.InsertFront(1);
+    #assert(UpperBound(x1.Begin(), x1.End(), 0) == x1.Begin());
+    #assert(UpperBound(x1.Begin(), x1.End(), 1) == x1.End());
+    #assert(UpperBound(x1.Begin(), x1.End(), 2) == x1.End());
+    ForwardList<int> x2;
+    x2.InsertFront(1);
+    x2.InsertFront(1);
+    #assert(UpperBound(x2.Begin(), x2.End(), 0) == x2.Begin());
+    #assert(UpperBound(x2.Begin(), x2.End(), 1) == x2.End());
+    #assert(UpperBound(x2.Begin(), x2.End(), 2) == x2.End());
+    List<int> x6;
+    x6.Add(1);
+    x6.Add(1);
+    x6.Add(2);
+    x6.Add(2);
+    x6.Add(3);
+    x6.Add(4);
+    #assert(UpperBound(x6.Begin(), x6.End(), 0) == x6.Begin());
+    #assert(UpperBound(x6.Begin(), x6.End(), 1) == x6.Begin() + 2);
+    #assert(UpperBound(x6.Begin(), x6.End(), 2) == x6.Begin() + 4);
+    #assert(UpperBound(x6.Begin(), x6.End(), 3) == x6.Begin() + 5);
+    #assert(UpperBound(x6.Begin(), x6.End(), 4) == x6.End());
+    #assert(UpperBound(x6.Begin(), x6.End(), 5) == x6.End());
+    #assert(UpperBound(x6.Begin(), x6.End(), cast<int>(0), Compare()) == x6.Begin());
+    #assert(UpperBound(x6.Begin(), x6.End(), cast<int>(1), Compare()) == x6.Begin() + 2);
+    #assert(UpperBound(x6.Begin(), x6.End(), cast<int>(2), Compare()) == x6.Begin() + 4);
+    #assert(UpperBound(x6.Begin(), x6.End(), cast<int>(3), Compare()) == x6.Begin() + 5);
+    #assert(UpperBound(x6.Begin(), x6.End(), cast<int>(4), Compare()) == x6.End());
+    #assert(UpperBound(x6.Begin(), x6.End(), cast<int>(5), Compare()) == x6.End());
+}
+
+unit_test void equalRangeTest()
+{
+    ForwardList<int> x0;
+    #assert(EqualRange(x0.Begin(), x0.End(), 1) == MakePair(x0.End(), x0.End()));
+    ForwardList<int> x1;
+    x1.InsertFront(1);
+    #assert(EqualRange(x1.Begin(), x1.End(), 0) == MakePair(x1.Begin(), x1.Begin()));
+    #assert(EqualRange(x1.Begin(), x1.End(), 1) == MakePair(x1.Begin(), x1.End()));
+    #assert(EqualRange(x1.Begin(), x1.End(), 2) == MakePair(x1.End(), x1.End()));
+    ForwardList<int> x2;
+    x2.InsertFront(1);
+    x2.InsertFront(1);
+    #assert(EqualRange(x2.Begin(), x2.End(), 0) == MakePair(x2.Begin(), x2.Begin()));
+    #assert(EqualRange(x2.Begin(), x2.End(), 1) == MakePair(x2.Begin(), x2.End()));
+    #assert(EqualRange(x2.Begin(), x2.End(), 2) == MakePair(x2.End(), x2.End()));
+    List<int> x6;
+    x6.Add(1);
+    x6.Add(1);
+    x6.Add(2);
+    x6.Add(2);
+    x6.Add(3);
+    x6.Add(4);
+    #assert(EqualRange(x6.Begin(), x6.End(), 0) == MakePair(x6.Begin(), x6.Begin()));
+    #assert(EqualRange(x6.Begin(), x6.End(), 1) == MakePair(x6.Begin(), x6.Begin() + 2));
+    #assert(EqualRange(x6.Begin(), x6.End(), 2) == MakePair(x6.Begin() + 2, x6.Begin() + 4));
+    #assert(EqualRange(x6.Begin(), x6.End(), 3) == MakePair(x6.Begin() + 4, x6.Begin() + 5));
+    #assert(EqualRange(x6.Begin(), x6.End(), 4) == MakePair(x6.Begin() + 5, x6.End()));
+    #assert(EqualRange(x6.Begin(), x6.End(), 5) == MakePair(x6.End(), x6.End()));
+    #assert(EqualRange(x6.Begin(), x6.End(), cast<int>(0), Compare()) == MakePair(x6.Begin(), x6.Begin()));
+    #assert(EqualRange(x6.Begin(), x6.End(), cast<int>(1), Compare()) == MakePair(x6.Begin(), x6.Begin() + 2));
+    #assert(EqualRange(x6.Begin(), x6.End(), cast<int>(2), Compare()) == MakePair(x6.Begin() + 2, x6.Begin() + 4));
+    #assert(EqualRange(x6.Begin(), x6.End(), cast<int>(3), Compare()) == MakePair(x6.Begin() + 4, x6.Begin() + 5));
+    #assert(EqualRange(x6.Begin(), x6.End(), cast<int>(4), Compare()) == MakePair(x6.Begin() + 5, x6.End()));
+    #assert(EqualRange(x6.Begin(), x6.End(), cast<int>(5), Compare()) == MakePair(x6.End(), x6.End()));
+}
+
+class Eq : UnaryPred<int>
+{
+    public nothrow Eq(int a_) : a(a_)
+    {
+    }
+    public inline nothrow bool operator()(int x) const
+    {
+        return a == x;
+    }
+    private int a;
+}
+
+unit_test void findTest()
+{
+    ForwardList<int> x0;
+    #assert(Find(x0.CBegin(), x0.CEnd(), 1) == x0.CEnd());
+    ForwardList<int> x1;
+    x1.InsertFront(1);
+    #assert(Find(x1.CBegin(), x1.CEnd(), 0) == x1.CEnd());
+    #assert(Find(x1.CBegin(), x1.CEnd(), 1) == x1.CBegin());
+    #assert(Find(x1.CBegin(), x1.CEnd(), 2) == x1.CEnd());
+    ForwardList<int> x2;
+    x2.InsertFront(1);
+    x2.InsertFront(1);
+    #assert(Find(x2.CBegin(), x2.CEnd(), 0) == x2.CEnd());
+    #assert(Find(x2.CBegin(), x2.CEnd(), 1) == x2.CBegin());
+    #assert(Find(x2.CBegin(), x2.CEnd(), 2) == x2.CEnd());
+    List<int> x6;
+    x6.Add(1);
+    x6.Add(1);
+    x6.Add(2);
+    x6.Add(2);
+    x6.Add(3);
+    x6.Add(4);
+    #assert(Find(x6.CBegin(), x6.CEnd(), 0) == x6.CEnd());
+    #assert(Find(x6.CBegin(), x6.CEnd(), 1) == x6.CBegin());
+    #assert(Find(x6.CBegin(), x6.CEnd(), 2) == x6.CBegin() + 2);
+    #assert(Find(x6.CBegin(), x6.CEnd(), 3) == x6.CBegin() + 4);
+    #assert(Find(x6.CBegin(), x6.CEnd(), 4) == x6.CBegin() + 5);
+    #assert(Find(x6.CBegin(), x6.CEnd(), 5) == x6.CEnd());
+
+    ForwardList<int> x0a;
+    #assert(Find(x0a.CBegin(), x0a.CEnd(), Eq(1)) == x0a.CEnd());
+    ForwardList<int> x1a;
+    x1a.InsertFront(1);
+    #assert(Find(x1a.CBegin(), x1a.CEnd(), Eq(0)) == x1a.CEnd());
+    #assert(Find(x1a.CBegin(), x1a.CEnd(), Eq(1)) == x1a.CBegin());
+    #assert(Find(x1a.CBegin(), x1a.CEnd(), Eq(2)) == x1a.CEnd());
+    ForwardList<int> x2a;
+    x2a.InsertFront(1);
+    x2a.InsertFront(1);
+    #assert(Find(x2a.CBegin(), x2a.CEnd(), Eq(0)) == x2a.CEnd());
+    #assert(Find(x2a.CBegin(), x2a.CEnd(), Eq(1)) == x2a.CBegin());
+    #assert(Find(x2a.CBegin(), x2a.CEnd(), Eq(2)) == x2a.CEnd());
+    List<int> x6a;
+    x6a.Add(1);
+    x6a.Add(1);
+    x6a.Add(2);
+    x6a.Add(2);
+    x6a.Add(3);
+    x6a.Add(4);
+    #assert(Find(x6a.CBegin(), x6a.CEnd(), Eq(0)) == x6a.CEnd());
+    #assert(Find(x6a.CBegin(), x6a.CEnd(), Eq(1)) == x6a.CBegin());
+    #assert(Find(x6a.CBegin(), x6a.CEnd(), Eq(2)) == x6a.CBegin() + 2);
+    #assert(Find(x6a.CBegin(), x6a.CEnd(), Eq(3)) == x6a.CBegin() + 4);
+    #assert(Find(x6a.CBegin(), x6a.CEnd(), Eq(4)) == x6a.CBegin() + 5);
+    #assert(Find(x6a.CBegin(), x6a.CEnd(), Eq(5)) == x6a.CEnd());
+}
+
+unit_test void countTest()
+{
+    ForwardList<int> x0;
+    #assert(Count(x0.CBegin(), x0.CEnd(), 1) == 0);
+    ForwardList<int> x1;
+    x1.InsertFront(1);
+    #assert(Count(x1.CBegin(), x1.CEnd(), 0) == 0);
+    #assert(Count(x1.CBegin(), x1.CEnd(), 1) == 1);
+    #assert(Count(x1.CBegin(), x1.CEnd(), 2) == 0);
+    ForwardList<int> x2;
+    x2.InsertFront(1);
+    x2.InsertFront(1);
+    #assert(Count(x2.CBegin(), x2.CEnd(), 0) == 0);
+    #assert(Count(x2.CBegin(), x2.CEnd(), 1) == 2);
+    #assert(Count(x2.CBegin(), x2.CEnd(), 2) == 0);
+    List<int> x6;
+    x6.Add(1);
+    x6.Add(1);
+    x6.Add(2);
+    x6.Add(2);
+    x6.Add(3);
+    x6.Add(4);
+    #assert(Count(x6.CBegin(), x6.CEnd(), 0) == 0);
+    #assert(Count(x6.CBegin(), x6.CEnd(), 1) == 2);
+    #assert(Count(x6.CBegin(), x6.CEnd(), 2) == 2);
+    #assert(Count(x6.CBegin(), x6.CEnd(), 3) == 1);
+    #assert(Count(x6.CBegin(), x6.CEnd(), 4) == 1);
+    #assert(Count(x6.CBegin(), x6.CEnd(), 5) == 0);
+
+    ForwardList<int> x0a;
+    #assert(Count(x0a.CBegin(), x0a.CEnd(), Eq(1)) == 0);
+    ForwardList<int> x1a;
+    x1a.InsertFront(1);
+    #assert(Count(x1a.CBegin(), x1a.CEnd(), Eq(0)) == 0);
+    #assert(Count(x1a.CBegin(), x1a.CEnd(), Eq(1)) == 1);
+    #assert(Count(x1a.CBegin(), x1a.CEnd(), Eq(2)) == 0);
+    ForwardList<int> x2a;
+    x2a.InsertFront(1);
+    x2a.InsertFront(1);
+    #assert(Count(x2a.CBegin(), x2a.CEnd(), Eq(0)) == 0);
+    #assert(Count(x2a.CBegin(), x2a.CEnd(), Eq(1)) == 2);
+    #assert(Count(x2a.CBegin(), x2a.CEnd(), Eq(2)) == 0);
+    List<int> x6a;
+    x6a.Add(1);
+    x6a.Add(1);
+    x6a.Add(2);
+    x6a.Add(2);
+    x6a.Add(3);
+    x6a.Add(4);
+    #assert(Count(x6a.CBegin(), x6a.CEnd(), Eq(0)) == 0);
+    #assert(Count(x6a.CBegin(), x6a.CEnd(), Eq(1)) == 2);
+    #assert(Count(x6a.CBegin(), x6a.CEnd(), Eq(2)) == 2);
+    #assert(Count(x6a.CBegin(), x6a.CEnd(), Eq(3)) == 1);
+    #assert(Count(x6a.CBegin(), x6a.CEnd(), Eq(4)) == 1);
+    #assert(Count(x6a.CBegin(), x6a.CEnd(), Eq(5)) == 0);
+}
+
+unit_test void removeCopyPredicateTest()
+{
+    List<int> x0;
+    List<int> y0;
+    RemoveCopy(x0.Begin(), x0.End(), BackInserter(y0), Eq(0));
+    #assert(y0.IsEmpty());
+    List<int> x1;
+    x1.Add(1);
+    List<int> y10;
+    RemoveCopy(x1.Begin(), x1.End(), BackInserter(y10), Eq(0));
+    #assert(!y10.IsEmpty());
+    #assert(y10.Count() == 1);
+    #assert(y10[0] == 1);
+    List<int> y11;
+    RemoveCopy(x1.Begin(), x1.End(), BackInserter(y11), Eq(1));
+    #assert(y11.IsEmpty());
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    List<int> y20;
+    RemoveCopy(x2.Begin(), x2.End(), BackInserter(y20), Eq(0));
+    #assert(!y20.IsEmpty());
+    #assert(y20.Count() == 2);
+    #assert(y20[0] == 1);
+    #assert(y20[1] == 2);
+    List<int> y21;
+    RemoveCopy(x2.Begin(), x2.End(), BackInserter(y21), Eq(1));
+    #assert(!y21.IsEmpty());
+    #assert(y21.Count() == 1);
+    #assert(y21[0] == 2);
+}
+
+unit_test void removePredicateTest()
+{
+    List<int> x0;
+    #assert(Remove(x0.Begin(), x0.End(), Eq(0)) == x0.End());
+    List<int> x1;
+    x1.Add(1);
+    #assert(Remove(x1.Begin(), x1.End(), Eq(0)) == x1.End());
+    #assert(Remove(x1.Begin(), x1.End(), Eq(1)) == x1.Begin());
+    #assert(x1[0] == 1);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    #assert(Remove(x2.Begin(), x2.End(), Eq(0)) == x2.End());
+    #assert(Remove(x2.Begin(), x2.End(), Eq(1)) == x2.Begin() + 1);
+    #assert(x2[0] == 2);
+}
+
+unit_test void removeCopyValueTest()
+{
+    List<int> x0;
+    List<int> y0;
+    RemoveCopy(x0.Begin(), x0.End(), BackInserter(y0), 0);
+    #assert(y0.IsEmpty());
+    List<int> x1;
+    x1.Add(1);
+    List<int> y10;
+    RemoveCopy(x1.Begin(), x1.End(), BackInserter(y10), 0);
+    #assert(!y10.IsEmpty());
+    #assert(y10.Count() == 1);
+    #assert(y10[0] == 1);
+    List<int> y11;
+    RemoveCopy(x1.Begin(), x1.End(), BackInserter(y11), 1);
+    #assert(y11.IsEmpty());
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    List<int> y20;
+    RemoveCopy(x2.Begin(), x2.End(), BackInserter(y20), 0);
+    #assert(!y20.IsEmpty());
+    #assert(y20.Count() == 2);
+    #assert(y20[0] == 1);
+    #assert(y20[1] == 2);
+    List<int> y21;
+    RemoveCopy(x2.Begin(), x2.End(), BackInserter(y21), 1);
+    #assert(!y21.IsEmpty());
+    #assert(y21.Count() == 1);
+    #assert(y21[0] == 2);
+}
+
+unit_test void removeValueTest()
+{
+    List<int> x0;
+    #assert(Remove(x0.Begin(), x0.End(), 0) == x0.End());
+    List<int> x1;
+    x1.Add(1);
+    #assert(Remove(x1.Begin(), x1.End(), 0) == x1.End());
+    #assert(Remove(x1.Begin(), x1.End(), 1) == x1.Begin());
+    #assert(x1[0] == 1);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    #assert(Remove(x2.Begin(), x2.End(), 0) == x2.End());
+    #assert(Remove(x2.Begin(), x2.End(), 1) == x2.Begin() + 1);
+    #assert(x2[0] == 2);
+}
+
+unit_test void fillTest()
+{
+    List<int> x0;
+    Fill(x0.Begin(), x0.End(), cast<int>(1));
+    #assert(x0.IsEmpty());
+    #assert(x0.Count() == 0);
+    List<int> x1;
+    x1.Add(1);
+    Fill(x1.Begin(), x1.End(), cast<int>(2));
+    #assert(!x1.IsEmpty());
+    #assert(x1.Count() == 1);
+    #assert(x1[0] == 2);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    Fill(x2.Begin(), x2.End(), cast<int>(0));
+    #assert(!x2.IsEmpty());
+    #assert(x2.Count() == 2);
+    #assert(x2[0] == 0);
+    #assert(x2[1] == 0);
+}
+
+unit_test void accumulateTest()
+{
+    List<int> x0;
+    #assert(Accumulate(x0.Begin(), x0.End(), cast<int>(0), Plus<int>()) == 0);
+    #assert(Accumulate(x0.Begin(), x0.End(), cast<int>(1), Plus<int>()) == 1);
+    List<int> x1;
+    x1.Add(1);
+    #assert(Accumulate(x1.Begin(), x1.End(), cast<int>(0), Plus<int>()) == 1);
+    #assert(Accumulate(x1.Begin(), x1.End(), cast<int>(1), Plus<int>()) == 2);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    #assert(Accumulate(x2.Begin(), x2.End(), cast<int>(0), Plus<int>()) == 3);
+    #assert(Accumulate(x2.Begin(), x2.End(), cast<int>(1), Multiplies<int>()) == 2);
+}
+
+class Sum : UnaryFun<int, void>
+{
+    public void operator()(int x) const
+    {
+        sum = sum + x;
+    }
+    public int sum;
+}
+
+void constructSum()
+{
+    Sum s;
+}
+
+unit_test void forEachTest()
+{
+    List<int> x0;
+    #assert(ForEach(x0.Begin(), x0.End(), Sum()).sum == 0);
+    List<int> x1;
+    x1.Add(1);
+    #assert(ForEach(x1.Begin(), x1.End(), Sum()).sum == 1);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    #assert(ForEach(x2.Begin(), x2.End(), Sum()).sum == 3);
+}
+
+class Twice : UnaryFun<int, int>
+{
+    public int operator()(int x) const
+    {
+        return 2 * x;
+    }
+}
+
+void constructTwice()
+{
+    Twice twice;
+}
+
+unit_test void unaryTransformTest()
+{
+    List<int> x0;
+    List<int> y0;
+    Transform(x0.Begin(), x0.End(), BackInserter(y0), Twice());
+    #assert(y0.IsEmpty());
+    List<int> x1;
+    x1.Add(1);
+    List<int> y1;
+    Transform(x1.Begin(), x1.End(), BackInserter(y1), Twice());
+    #assert(!y1.IsEmpty());
+    #assert(y1.Count() == 1);
+    #assert(y1[0] == 2);
+}
+
+unit_test void binaryTransformTest()
+{
+    List<int> x0;
+    List<int> y0;
+    List<int> z0;
+    Transform(x0.Begin(), x0.End(), y0.Begin(), BackInserter(z0), Plus<int>());
+    #assert(z0.IsEmpty());
+    List<int> x1;
+    x1.Add(1);
+    List<int> y1;
+    y1.Add(2);
+    List<int> z1;
+    Transform(x1.Begin(), x1.End(), y1.Begin(), BackInserter(z1), Plus<int>());
+    #assert(!z1.IsEmpty());
+    #assert(z1.Count() == 1);
+    #assert(z1[0] == 3);
+}
+
+unit_test void sortTest()
+{
+    List<int> x0;
+    Sort(x0);
+    #assert(x0.IsEmpty());
+    List<int> x1;
+    x1.Add(1);
+    Sort(x1);
+    #assert(!x1.IsEmpty());
+    #assert(x1.Count() == 1);
+    #assert(x1[0] == 1);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    Sort(x2);
+    #assert(!x2.IsEmpty());
+    #assert(x2.Count() == 2);
+    #assert(x2[0] == 1);
+    #assert(x2[1] == 2);
+    x2[0] = 2;
+    x2[1] = 1;
+    Sort(x2);
+    #assert(!x2.IsEmpty());
+    #assert(x2.Count() == 2);
+    #assert(x2[0] == 1);
+    #assert(x2[1] == 2);
+    List<int> x100;
+    for (int i = 0; i < 100; ++i)
+    {
+        x100.Add(cast<int>(Random()));
+    }
+    Sort(x100);
+    for (int i = 0; i < 100; ++i)
+    {
+        if (i > 0)
+        {
+            #assert(x100[i - 1] <= x100[i]);
+        }
+    }
+}
+
+unit_test void equalTest()
+{
+    List<int> x0;
+    ForwardList<int> y0;
+    #assert(Equal(x0.Begin(), x0.End(), y0.Begin(), y0.End()));
+    List<int> x1;
+    ForwardList<int> y1;
+    x1.Add(1);
+    y1.InsertFront(1);
+    #assert(Equal(x1.Begin(), x1.End(), y1.Begin(), y1.End()));
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    ForwardList<int> y2;
+    y2.InsertFront(2);
+    y2.InsertFront(1);
+    #assert(Equal(x2.Begin(), x2.End(), y2.Begin(), y2.End()));
+}
+
+unit_test void lexicographicalCompareTest()
+{
+    List<int> x0;
+    ForwardList<int> y0;
+    #assert(!LexicographicalCompare(x0.Begin(), x0.End(), y0.Begin(), y0.End()));
+    List<int> x1;
+    ForwardList<int> y10;
+    x1.Add(1);
+    y10.InsertFront(1);
+    #assert(!LexicographicalCompare(x1.Begin(), x1.End(), y10.Begin(), y10.End()));
+    ForwardList<int> y11;
+    y11.InsertFront(2);
+    #assert(LexicographicalCompare(x1.Begin(), x1.End(), y11.Begin(), y11.End()));
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    ForwardList<int> y20;
+    y20.InsertFront(2);
+    y20.InsertFront(1);
+    #assert(!LexicographicalCompare(x2.Begin(), x2.End(), y20.Begin(), y20.End()));
+    ForwardList<int> y21;
+    y21.InsertFront(2);
+    y21.InsertFront(2);
+    #assert(LexicographicalCompare(x2.Begin(), x2.End(), y21.Begin(), y21.End()));
+}
+
+unit_test void minElementTest()
+{
+    ForwardList<int> x0;
+    #assert(MinElement(x0.Begin(), x0.End()) == x0.End());
+    ForwardList<int> x1;
+    x1.InsertFront(1);
+    #assert(MinElement(x1.Begin(), x1.End()) == x1.Begin());
+    ForwardList<int> x2;
+    x2.InsertFront(1);
+    x2.InsertFront(2);
+    #assert(MinElement(x2.Begin(), x2.End()) == Next(x2.Begin(), 1));
+    List<int> x10;
+    for (int i = 0; i < 10; ++i)
+    {
+        x10.Add(10 - i);
+    }
+    #assert(MinElement(x10.Begin(), x10.End()) == x10.Begin() + 9);
+}
+
+unit_test void maxElementTest()
+{
+    ForwardList<int> x0;
+    #assert(MaxElement(x0.Begin(), x0.End()) == x0.End());
+    ForwardList<int> x1;
+    x1.InsertFront(1);
+    #assert(MaxElement(x1.Begin(), x1.End()) == x1.Begin());
+    ForwardList<int> x2;
+    x2.InsertFront(1);
+    x2.InsertFront(2);
+    #assert(MaxElement(x2.Begin(), x2.End()) == x2.Begin());
+    List<int> x10;
+    for (int i = 0; i < 10; ++i)
+    {
+        x10.Add(10 - i);
+    }
+    #assert(MaxElement(x10.Begin(), x10.End()) == x10.Begin());
+}
+
+unit_test void absTest()
+{
+    #assert(Abs(0) == 0);
+    #assert(Abs(1) == 1);
+    #assert(Abs(-1) == 1);
+    #assert(Abs(12345678) == 12345678);
+    #assert(Abs(-12345678) == 12345678);
+}
+
+unit_test void factorialTest()
+{
+    #assert(Factorial(0u) == 1u);
+    #assert(Factorial(1u) == 1u);
+    #assert(Factorial(2u) == 2u);
+    #assert(Factorial(3u) == 6u);
+    #assert(Factorial(4u) == 24u);
+    #assert(Factorial(5u) == 120u);
+}
+
+unit_test void gcdTest()
+{
+    #assert(Gcd(1, 1) == 1);
+    #assert(Gcd(1, 2) == 1);
+    #assert(Gcd(2, 1) == 1);
+    #assert(Gcd(2, 2) == 2);
+    #assert(Gcd(2, 3) == 1);
+    #assert(Gcd(3, 2) == 1);
+    #assert(Gcd(2, 4) == 2);
+    #assert(Gcd(4, 2) == 2);
+    #assert(Gcd(3, 4) == 1);
+    #assert(Gcd(4, 3) == 1);
+    #assert(Gcd(4, 4) == 4);
+}
+
+unit_test void nextPermutationTest()
+{
+    List<int> x0;
+    #assert(NextPermutation(x0.Begin(), x0.End()) == false);
+    List<int> x1;
+    x1.Add(1);
+    #assert(NextPermutation(x1.Begin(), x1.End()) == false);
+    #assert(x1[0] == 1);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    #assert(NextPermutation(x2.Begin(), x2.End()) == true);
+    #assert(x2[0] == 2);
+    #assert(x2[1] == 1);
+    #assert(NextPermutation(x2.Begin(), x2.End()) == false);
+    #assert(x2[0] == 1);
+    #assert(x2[1] == 2);
+    List<int> x3;
+    x3.Add(1);
+    x3.Add(2);
+    x3.Add(3);
+    #assert(NextPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 1);
+    #assert(x3[1] == 3);
+    #assert(x3[2] == 2);
+    #assert(NextPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 2);
+    #assert(x3[1] == 1);
+    #assert(x3[2] == 3);
+    #assert(NextPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 2);
+    #assert(x3[1] == 3);
+    #assert(x3[2] == 1);
+    #assert(NextPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 3);
+    #assert(x3[1] == 1);
+    #assert(x3[2] == 2);
+    #assert(NextPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 3);
+    #assert(x3[1] == 2);
+    #assert(x3[2] == 1);
+    #assert(NextPermutation(x3.Begin(), x3.End()) == false);
+    #assert(x3[0] == 1);
+    #assert(x3[1] == 2);
+    #assert(x3[2] == 3);
+}
+
+unit_test void prevPermutationTest()
+{
+    List<int> x0;
+    #assert(PrevPermutation(x0.Begin(), x0.End()) == false);
+    List<int> x1;
+    x1.Add(1);
+    #assert(PrevPermutation(x1.Begin(), x1.End()) == false);
+    #assert(x1[0] == 1);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    #assert(PrevPermutation(x2.Begin(), x2.End()) == false);
+    #assert(x2[0] == 2);
+    #assert(x2[1] == 1);
+    #assert(PrevPermutation(x2.Begin(), x2.End()) == true);
+    #assert(x2[0] == 1);
+    #assert(x2[1] == 2);
+    List<int> x3;
+    x3.Add(1);
+    x3.Add(2);
+    x3.Add(3);
+    #assert(PrevPermutation(x3.Begin(), x3.End()) == false);
+    #assert(x3[0] == 3);
+    #assert(x3[1] == 2);
+    #assert(x3[2] == 1);
+    #assert(PrevPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 3);
+    #assert(x3[1] == 1);
+    #assert(x3[2] == 2);
+    #assert(PrevPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 2);
+    #assert(x3[1] == 3);
+    #assert(x3[2] == 1);
+    #assert(PrevPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 2);
+    #assert(x3[1] == 1);
+    #assert(x3[2] == 3);
+    #assert(PrevPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 1);
+    #assert(x3[1] == 3);
+    #assert(x3[2] == 2);
+    #assert(PrevPermutation(x3.Begin(), x3.End()) == true);
+    #assert(x3[0] == 1);
+    #assert(x3[1] == 2);
+    #assert(x3[2] == 3);
+}
+
+unit_test void randomShuffleTest()
+{
+    List<int> x0;
+    RandomShuffle(x0.Begin(), x0.End());
+    #assert(x0.IsEmpty());
+    List<int> x1;
+    x1.Add(1);
+    RandomShuffle(x1.Begin(), x1.End());
+    #assert(!x1.IsEmpty());
+    #assert(x1.Count() == 1);
+    #assert(x1[0] == 1);
+    List<int> x2;
+    x2.Add(1);
+    x2.Add(2);
+    RandomShuffle(x2.Begin(), x2.End());
+    #assert(!x2.IsEmpty());
+    #assert(x2.Count() == 2);
+    Sort(x2);
+    #assert(x2[0] == 1);
+    #assert(x2[1] == 2);
+    List<int> x10;
+    for (int i = 0; i < 10; ++i)
+    {
+        x10.Add(i);
+    }
+    RandomShuffle(x10.Begin(), x10.End());
+    for (int i = 0; i < 10; ++i)
+    {
+        #assert(Find(x10.Begin(), x10.End(), i) != x10.End());
+    }
+}

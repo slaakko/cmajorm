@@ -1,0 +1,93 @@
+using System;
+using System.Collections;
+
+unit_test void stringLinkedListTest()
+{
+    LinkedList<string> empty;
+    #assert(empty.IsEmpty());
+    #assert(empty.Count() == 0);
+    #assert(empty.Begin() == empty.End());
+    #assert(empty.CBegin() == empty.CEnd());
+    #assert(empty == empty);
+    #assert(!(empty < empty));
+    LinkedList<string> emptyCopy = empty;
+    #assert(emptyCopy == empty);
+    LinkedList<string> emptyMoved = Rvalue(empty);
+    #assert(emptyMoved == emptyCopy);
+    LinkedList<string> emptyCopyAssigned;
+    emptyCopyAssigned = emptyCopy;
+    #assert(emptyCopyAssigned == emptyCopy);
+    empty = emptyCopy;
+    LinkedList<string> emptyMoveAssigned;
+    emptyMoveAssigned = Rvalue(empty);
+    #assert(emptyMoveAssigned == emptyCopy);
+    
+    LinkedList<string> one;
+    one.Add("10");
+    #assert(!one.IsEmpty());
+    #assert(one.Count() == 1);
+    #assert(*one.Begin() == "10");
+    #assert(one == one);
+    #assert(!(one < one));
+    LinkedList<string> oneCopy = one;
+    #assert(oneCopy == one);
+    LinkedList<string> oneMoved = Rvalue(one);
+    #assert(one.IsEmpty());
+    #assert(oneMoved == oneCopy);
+    LinkedList<string> oneCopyAssigned;
+    oneCopyAssigned = oneCopy;
+    #assert(oneCopyAssigned == oneCopy);
+    one = oneCopy;
+    LinkedList<string> oneMoveAssigned;
+    oneMoveAssigned = Rvalue(one);
+    #assert(oneMoveAssigned == oneCopy);
+    oneCopy.Remove("10");
+    #assert(oneCopy.IsEmpty());
+    #assert(oneCopy.Count() == 0);
+    
+    LinkedList<string> two;
+    two.Add("20");
+    two.Add("10");
+    #assert(two == two);
+    #assert(!(two < two));
+    LinkedList<string> twoCopy = two;
+    #assert(twoCopy == two);
+    LinkedList<string> twoMoved = Rvalue(two);
+    #assert(two.IsEmpty());
+    #assert(twoMoved == twoCopy);
+    LinkedList<string> twoCopyAssigned;
+    twoCopyAssigned = twoCopy;
+    #assert(twoCopyAssigned == twoCopy);
+    two = twoCopy;
+    LinkedList<string> twoMovedAssigned;
+    twoMovedAssigned = Rvalue(two);
+    #assert(twoMovedAssigned == twoCopy);
+    twoCopy.Remove("10");
+    #assert(!twoCopy.IsEmpty());
+    #assert(twoCopy.Count() == 1);
+    twoCopy.Remove("20");
+    #assert(twoCopy.IsEmpty());
+    #assert(twoCopy.Count() == 0);
+    
+    LinkedList<string> ten;
+    int n = 10;
+    for (int i = 0; i < n; ++i)
+    {
+        ten.Add(ToString(i));
+    }
+    for (int i = 0; i < n; ++i)
+    {
+        #assert(Find(ten.CBegin(), ten.CEnd(), ToString(i)) != ten.CEnd());
+    }
+    LinkedList<string> tenCopy = ten;
+    #assert(tenCopy == ten);
+    LinkedList<string> tenMoved = Rvalue(ten);
+    #assert(tenMoved == tenCopy);
+    LinkedList<string> tenCopyAssigned;
+    tenCopyAssigned = tenCopy;
+    #assert(tenCopyAssigned == tenCopy);
+    ten = tenCopy;
+    LinkedList<string> tenMoveAssigned;
+    tenMoveAssigned = Rvalue(ten);
+    #assert(tenMoveAssigned == tenCopy);
+}

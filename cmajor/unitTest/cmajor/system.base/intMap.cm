@@ -1,0 +1,120 @@
+using System;
+using System.Collections;
+
+unit_test void intMapTest()
+{
+    Map<int, int> empty;
+    #assert(empty.IsEmpty());
+    #assert(empty.Count() == 0);
+    #assert(empty.Begin() == empty.End());
+    #assert(empty.CBegin() == empty.CEnd());
+    #assert(empty.Find(10) == empty.End());
+    #assert(empty.CFind(10) == empty.CEnd());
+    #assert(empty.Remove(10) == false);
+    #assert(empty == empty);
+    #assert(!(empty < empty));
+    Map<int, int> emptyCopy = empty;
+    #assert(emptyCopy == empty);
+    Map<int, int> emptyMoved = Rvalue(empty);
+    #assert(emptyMoved == emptyCopy);
+    Map<int, int> emptyCopyAssigned;
+    emptyCopyAssigned = emptyCopy;
+    #assert(emptyCopyAssigned == emptyCopy);
+    empty = emptyCopy;
+    Map<int, int> emptyMoveAssigned;
+    emptyMoveAssigned = Rvalue(empty);
+    #assert(emptyMoveAssigned == emptyCopy);
+    
+    Map<int, int> one;
+    Pair<int, int> oneP = MakePair(cast<int>(10), cast<int>(10));
+    one.Insert(oneP);
+    #assert(!one.IsEmpty());
+    #assert(one.Count() == 1);
+    #assert(one.Find(10) == one.Begin());
+    #assert(*one.Begin() == oneP);
+    #assert(one.CFind(10) == one.CBegin());
+    #assert(*one.CBegin() == oneP);
+    int& oneX = one[10];
+    #assert(oneX == 10);
+    Map<int, int> oneCopy = one;
+    #assert(oneCopy == one);
+    Map<int, int> oneMoved = Rvalue(one);
+    #assert(oneMoved == oneCopy);
+    Map<int, int> oneCopyAssigned;
+    oneCopyAssigned = oneCopy;
+    #assert(oneCopyAssigned == oneCopy);
+    one = oneCopy;
+    Map<int, int> oneMoveAssigned;
+    oneMoveAssigned = Rvalue(one);
+    #assert(oneMoveAssigned == oneCopy);
+    
+    Map<int, int> two;
+    Pair<int, int> twoP1 = MakePair(cast<int>(10), cast<int>(10));
+    Pair<int, int> twoP2 = MakePair(cast<int>(20), cast<int>(20));
+    two.Insert(twoP2);
+    two.Insert(twoP1);
+    #assert(!two.IsEmpty());
+    #assert(two.Count() == 2);
+    Map<int, int>.Iterator twoIt = two.Begin();
+    #assert(two.Find(10) == twoIt);
+    #assert(*twoIt == twoP1);
+    ++twoIt;
+    #assert(two.Find(20) == twoIt);
+    #assert(*twoIt == twoP2);
+    Map<int, int>.ConstIterator twoCit = two.CBegin();
+    #assert(two.CFind(10) == twoCit);
+    #assert(*twoCit == twoP1);
+    ++twoCit;
+    #assert(two.CFind(20) == twoCit);
+    #assert(*twoCit == twoP2);
+    int& twoX1 = two[10];
+    #assert(twoX1 == 10);
+    int& twoX2 = two[20];
+    #assert(twoX2 == 20);
+    Map<int, int> twoCopy = two;
+    #assert(twoCopy == two);
+    Map<int, int> twoMoved = Rvalue(two);
+    #assert(twoMoved == twoCopy);
+    Map<int, int> twoCopyAssigned; 
+    twoCopyAssigned = twoCopy;
+    #assert(twoCopyAssigned == twoCopy);
+    Map<int, int> twoMoveAssigned; 
+    two = twoCopy;
+    twoMoveAssigned = Rvalue(two);
+    #assert(twoMoveAssigned == twoCopy);
+
+    List<int> tenBase;
+    while (tenBase.Count() < 10)
+    {
+        int x = cast<int>(Random());
+        if (Find(tenBase.CBegin(), tenBase.CEnd(), x) == tenBase.CEnd())
+        {
+            tenBase.Add(x);
+        }
+    }
+    Map<int, int> ten;
+    for (int i = 0; i < 10; ++i)
+    {
+        Pair<int, int> tenP = MakePair(tenBase[i], tenBase[i]);
+        ten.Insert(tenP);
+    }
+    List<int> tenSorted = tenBase;
+    Sort(tenSorted);
+    List<Pair<int, int>> tenSortedP;
+    for (int i = 0; i < 10; ++i)
+    {
+        tenSortedP.Add(MakePair(tenSorted[i], tenSorted[i]));
+    }
+    #assert(Equal(tenSortedP.CBegin(), tenSortedP.CEnd(), ten.CBegin(), ten.CEnd()));
+    Map<int, int> tenCopy = ten;
+    #assert(tenCopy == ten);
+    Map<int, int> tenMoved = Rvalue(ten);
+    #assert(tenMoved == tenCopy);
+    Map<int, int> tenCopyAssigned;
+    tenCopyAssigned = tenCopy;
+    #assert(tenCopyAssigned == tenCopy);
+    ten = tenCopy;
+    Map<int, int> tenMoveAssigned;
+    tenMoveAssigned = Rvalue(ten);
+    #assert(tenMoveAssigned == tenCopy);
+}

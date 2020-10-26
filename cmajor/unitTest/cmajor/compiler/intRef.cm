@@ -1,0 +1,45 @@
+int& returnLvalueRef(int& x)
+{
+    return x;
+}
+
+int&& returnRvalueRef(int&& x)
+{
+    return x;
+}
+
+unit_test void intLvalueRefTest()
+{
+    int a = 10;
+    int& x = a;
+    #assert(x == 10);
+    x = 20;
+    #assert(x == 20);
+    #assert(a == 20);
+    int& y = x;
+    #assert(y == 20);
+    y = 30;
+    #assert(x == 30);
+    #assert(y == 30);
+    #assert(a == 30);
+    #assert(returnLvalueRef(x) == x);
+}
+
+unit_test void intRvalueRefTest()
+{
+    int a = 10;
+    int b = 20;
+    int c = 30;
+    int&& x = a;
+    #assert(x == 10);
+    x = System.Rvalue(b);
+    #assert(x == 20);
+    #assert(a == 20);
+    int&& y = x;
+    #assert(y == 20);
+    y = System.Rvalue(c);
+    #assert(x == 30);
+    #assert(y == 30);
+    #assert(a == 30);
+    #assert(returnRvalueRef(x) == x);
+}

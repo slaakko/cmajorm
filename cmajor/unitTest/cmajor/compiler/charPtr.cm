@@ -1,0 +1,67 @@
+using System;
+
+const char* nullPtrReturn()
+{
+    return null;
+}
+
+const char* charPtrReturn(char* p)
+{
+    return p;
+}
+
+unit_test void charPtrTest()
+{
+    const char* nullPtr;
+    #assert(nullPtr == null);
+    const char* nullPtrCopy = nullPtr;
+    #assert(nullPtrCopy == null);
+    #assert(nullPtr == nullPtrCopy);
+    #assert(!(nullPtr < nullPtrCopy));
+    const char* nullPtrRvalue = Rvalue(nullPtr);
+    #assert(nullPtr == null);
+    #assert(nullPtrRvalue == null);
+    const char* charPtrCopyAssign;
+    charPtrCopyAssign = nullPtr;
+    #assert(charPtrCopyAssign == null);
+    const char* charPtrRvalueAssign;
+    charPtrRvalueAssign = Rvalue(nullPtr);
+    #assert(charPtrRvalueAssign == null);
+    #assert(nullPtrReturn() == null);
+    
+    string a = "abradacabra";
+    char* pa = a.Chars();
+    #assert(pa != null);
+    #assert(*pa == 'a');
+    char* paCopy = pa;
+    #assert(paCopy != null);
+    #assert(paCopy == pa);
+    #assert(*paCopy == 'a');
+    char* paRvalue = Rvalue(pa);
+    #assert(pa != null);
+    #assert(paRvalue != null);
+    #assert(paRvalue == pa);
+    char* paCopyAssign;
+    paCopyAssign = pa;
+    #assert(paCopyAssign != null);
+    #assert(paCopyAssign == pa);
+    char* paRvalueAssign;
+    paRvalueAssign = Rvalue(pa);
+    #assert(paRvalueAssign != null);
+    #assert(paRvalueAssign == pa);
+    #assert(charPtrReturn(pa) == pa);
+    *pa = 'i';
+    #assert(*pa == 'i');
+    ++pa;
+    #assert(*pa == 'b');
+    #assert(*(pa + 1) == 'r');
+    #assert(*(1 + pa) == 'r');
+    #assert(*(pa - 1) == 'i');
+    #assert(pa - paCopy == 1);
+    #assert(paCopy < pa);
+    --pa;
+    #assert(*pa == 'i');
+    #assert(pa == paCopy);
+    char* c = pa + 6;
+    #assert(*c == 'c');
+}

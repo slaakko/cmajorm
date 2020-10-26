@@ -136,6 +136,43 @@ namespace System.Windows
                 tokenLines.Add(Rvalue(tokenLine));
             }
         }
+        protected override void OnLineChanged(LineEventArgs& args)
+        {
+            base->OnLineChanged(args);
+            int lineIndex = args.lineIndex;
+            const ustring& line = Lines()[lineIndex];
+            int state = 0;
+            if (lineIndex > 0 && !tokenLines.IsEmpty())
+            {
+                state = tokenLines[lineIndex - 1].endState;
+            }
+            while (lineIndex >= tokenLines.Count())
+            {
+                tokenLines.Add(TokenLine());
+            }
+            tokenLines[lineIndex] = TokenizeLine(line, lineIndex + 1, state);
+            Invalidate();
+        }
+        protected override void OnLineDeleted(LineEventArgs& args)
+        {
+            base->OnLineDeleted(args);
+            int lineIndex = args.lineIndex;
+            tokenLines.Remove(tokenLines.Begin() + lineIndex);
+            Invalidate();
+        }
+        protected override void OnLineInserted(LineEventArgs& args)
+        {
+            base->OnLineInserted(args);
+            int lineIndex = args.lineIndex;
+            const ustring& line = Lines()[lineIndex];
+            int state = 0;
+            if (!tokenLines.IsEmpty())
+            {
+                state = tokenLines[lineIndex - 1].endState;
+            }
+            tokenLines.Insert(tokenLines.Begin() + lineIndex, TokenizeLine(line, lineIndex + 1, state));
+            Invalidate();
+        }
         public nothrow ustring GetText(const SourceSpan& span) const
         {
             if (span.line >= 1 && span.line <= Lines().Count())

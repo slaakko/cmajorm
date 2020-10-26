@@ -1,0 +1,37 @@
+bool boolReturn(bool x)
+{
+    return x;
+}
+
+unit_test void boolTest()
+{
+    bool x;
+    #assert(x == false);
+    bool y = x;
+    #assert(y == x);
+    bool z;
+    z = x;
+    #assert(z == x);
+    bool a = System.Rvalue(x);
+    #assert(a == x);
+    bool b;
+    b = System.Rvalue(x);
+    #assert(b == x);
+    #assert(!x == true);
+    #assert(boolReturn(x) == x);
+    
+    bool t = true;
+    #assert(t == true);
+    bool u = t;
+    #assert(u == t);
+    bool v = System.Rvalue(t);
+    #assert(v == t);
+    bool w;
+    w = t;
+    #assert(w == t);
+    bool s;
+    s = System.Rvalue(t);
+    #assert(s == t);
+    #assert(!t == false);
+    #assert(boolReturn(t) == t);
+}

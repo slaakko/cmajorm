@@ -1,0 +1,73 @@
+using System;
+using System.Collections;
+
+int* nullPtrReturn()
+{
+    return null;
+}
+
+int* intPtrReturn(int* p)
+{
+    return p;
+}
+
+unit_test void intPtrTest()
+{
+    int* nullPtr;
+    #assert(nullPtr == null);
+    int* nullPtrCopy = nullPtr;
+    #assert(nullPtrCopy == null);
+    #assert(nullPtr == nullPtrCopy);
+    #assert(!(nullPtr < nullPtrCopy));
+    int* nullPtrRvalue = Rvalue(nullPtr);
+    #assert(nullPtr == null);
+    #assert(nullPtrRvalue == null);
+    int* intPtrCopyAssign;
+    intPtrCopyAssign = nullPtr;
+    #assert(intPtrCopyAssign == null);
+    int* intPtrRvalueAssign;
+    intPtrRvalueAssign = Rvalue(nullPtr);
+    #assert(intPtrRvalueAssign == null);
+    #assert(nullPtrReturn() == null);
+    
+    List<int> a;
+    for (int i = 0; i < 10; ++i)
+    {
+        a.Add(i);
+    }
+    int* pa = a.Begin().Ptr();
+    #assert(pa != null);
+    #assert(*pa == 0);
+    int* paCopy = pa;
+    #assert(paCopy != null);
+    #assert(paCopy == pa);
+    #assert(*paCopy == 0);
+    int* paRvalue = Rvalue(pa);
+    #assert(pa != null);
+    #assert(paRvalue != null);
+    #assert(paRvalue == pa);
+    int* paCopyAssign;
+    paCopyAssign = pa;
+    #assert(paCopyAssign != null);
+    #assert(paCopyAssign == pa);
+    int* paRvalueAssign;
+    paRvalueAssign = Rvalue(pa);
+    #assert(paRvalueAssign != null);
+    #assert(paRvalueAssign == pa);
+    #assert(intPtrReturn(pa) == pa);
+    *pa = 10;
+    #assert(*pa == 10);
+    ++pa;
+    #assert(*pa == 1);
+    #assert(*(pa + 1) == 2);
+    #assert(*(1 + pa) == 2);
+    #assert(*(pa - 1) == 10);
+    #assert(pa - paCopy == 1);
+    #assert(paCopy < pa);
+    --pa;
+    #assert(*pa == 10);
+    #assert(pa == paCopy);
+    int* e = pa + 6;
+    #assert(*e == 6);
+}
+

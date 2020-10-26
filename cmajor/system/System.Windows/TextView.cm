@@ -10,22 +10,33 @@ namespace System.Windows
 {
     public const uint defaultCaretTimerPeriod = 5000u; // 5 seconds
 
+    public class LineEventArgs
+    {
+        public nothrow LineEventArgs(int lineIndex_) : lineIndex(lineIndex_)
+        {
+        }
+        public int lineIndex;
+    }
+
     public class delegate void CaretPosChangedEventHandler();
     public class delegate void LinesChangedEventHandler();
+    public class delegate void LineChangedEventHandler(LineEventArgs& args);
+    public class delegate void LineDeletedEventHandler(LineEventArgs& args);
+    public class delegate void LineInsertedEventHandler(LineEventArgs& args);
     public class delegate void GotoCaretLineEventHandler(ControlEventArgs& args);
 
     public class TextView : Control
     {
         private enum Flags : sbyte
         {
-            none = 0, changed = 1 << 0, painting = 1 << 1
+            none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4
         }
         
         public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Color& textColor, const Point& location, const Size& size,
             Dock dock, Anchors anchors) :
             base("System.Windows.TextView", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP), DefaultExtendedWindowStyle(), backgroundColor,
             "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
-            charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(0), caretColumn(0),
+            charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(1), caretColumn(1),
             caretTimerPeriod(defaultCaretTimerPeriod), brush(textColor), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
             padding()
         {
@@ -38,6 +49,7 @@ namespace System.Windows
             Font* font = new Font(fontFamily, fontSize, FontStyle.regular, Unit.point);
             fonts.Add(UniquePtr<Font>(font));
             SetChanged();
+            measureString = "// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/AstReader.hpp' using cpp2cm version 1.0.0";
         }
         public TextView(const Point& location, const Size& size, Dock dock, Anchors anchors) : this(FontFamily("Consolas"), 10.0f, Color.White(), Color.Black(),
             location, size, dock, anchors)
@@ -62,6 +74,7 @@ namespace System.Windows
             fontSize = fontSize_;
             fonts.Clear();
             OnFontChanged();
+            SetChanged();
         }
         protected virtual void OnFontChanged()
         {
@@ -76,11 +89,11 @@ namespace System.Windows
         {
             return charHeight;
         }
-        public nothrow inline float TextWidth() const
+        public nothrow inline int TextWidth() const
         {
             return textWidth;
         }
-        public nothrow inline float TextHeight() const
+        public nothrow inline int TextHeight() const
         {
             return textHeight;
         }
@@ -432,19 +445,39 @@ namespace System.Windows
         {
             charWidth = 0;
             charHeight = 0;
-            if (!lines.IsEmpty() && maxLineLength > 0)
+            string ms;
+            bool measure = false;
+            if (IsFixed())
+            {
+                ms = measureString;
+                maxLineLength = cast<int>(ToUtf32(measureString).Length());
+                measure = true;
+            }
+            else
+            {
+                if (!lines.IsEmpty() && maxLineLength > 0)
+                {
+                    ms = ToUtf8(lines[maxLineIndex]);
+                    measure = true;
+                }
+            }
+            if (measure)
             {
                 for (const UniquePtr<Font>& font : fonts)
                 {
                     TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
                     graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
-                    RectF charRect = graphics.MeasureStringChecked(ToUtf8(lines[maxLineIndex]), *font, PointF(0, 0), drawFormat);
+                    RectF charRect = graphics.MeasureStringChecked(ms, *font, PointF(0, 0), drawFormat);
                     graphics.SetTextRenderingHintChecked(prevRenderingHint);
                     charWidth = Max(charWidth, charRect.size.w / maxLineLength);
                     charHeight = Max(charHeight, charRect.size.h);
                 }
             }
             SetScrollUnits(cast<int>(charHeight), cast<int>(2 * charWidth));
+            SetTextExtent();
+        }
+        private void SetTextExtent()
+        {
             textWidth = cast<int>(maxLineLength * charWidth);
             textHeight = cast<int>(lines.Count() * charHeight);
             SetContentSize(Size(textWidth, textHeight));
@@ -459,7 +492,7 @@ namespace System.Windows
                 {
                     Point loc = args.location;
                     int lineNumber = cast<int>(loc.y / charHeight + 1.5);
-                    lineNumber = Min(lineNumber, cast<int>(lines.Count()));
+                    lineNumber = Max(1, Min(lineNumber, cast<int>(lines.Count())));
                     int columnNumber = cast<int>(loc.x / charWidth + 1.5);
                     columnNumber = Max(columnNumber, 1 + LineNumberFieldLength());
                     int lineLength = GetLineLength(lineNumber);
@@ -632,6 +665,45 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case Keys.delete_:
+                    {
+                        if (!IsReadOnly())
+                        {
+                            int lineIndex = caretLine - 1;
+                            int columnIndex = CaretColumn() - 1;
+                            DeleteChar(lineIndex, columnIndex);
+                            args.handled = true;
+                        }
+                        break;
+                    }
+                    case Keys.back:
+                    {
+                        if (!IsReadOnly())
+                        {
+                            int lineIndex = caretLine - 1;
+                            int columnIndex = CaretColumn() - 1;
+                            Backspace(lineIndex, columnIndex);
+                            args.handled = true;
+                        }
+                        break;
+                    }
+                    case Keys.enter:
+                    {
+                        if (!IsReadOnly())
+                        {
+                            int lineIndex = caretLine - 1;
+                            int columnIndex = CaretColumn() - 1;
+                            NewLine(lineIndex, columnIndex);
+                            args.handled = true;
+                        }
+                        break;
+                    }
+                    case cast<Keys>(Keys.controlModifier | Keys.r):
+                    {
+                        StreamWriter writer = File.AppendText(@"C:\temp\text.txt");
+                        writer << lines[maxLineIndex] << "\n" << lines[maxLineIndex].Length() << "\n" << charWidth << "\n" << charHeight << "\n" << endl();
+                        break;
+                    }
                 }
                 if (args.handled && !scrolled)
                 {
@@ -639,6 +711,90 @@ namespace System.Windows
                     ScrollToCaret();
                 }
             }
+        }
+        protected override void OnKeyPress(KeyPressEventArgs& args)
+        {
+            base->OnKeyPress(args);
+            if (IsReadOnly()) return;
+            if (!args.handled)
+            {
+                uchar c(args.keyChar);
+                int lineIndex = caretLine - 1;
+                int columnIndex = CaretColumn() - 1;
+                InsertChar(lineIndex, columnIndex, c);
+                KeyEventArgs rightArgs(Keys.right, Keys.none);
+                OnKeyDown(rightArgs);
+                args.handled = true;
+            }
+        }
+        private void InsertChar(int lineIndex, int columnIndex, uchar c)
+        {
+            while (lineIndex >= lines.Count())
+            {
+                lines.Add(ustring());
+            }
+            ustring& line = lines[lineIndex];
+            line.Insert(columnIndex, c);
+            if (line.Length() > maxLineLength)
+            {
+                maxLineLength = cast<int>(line.Length());
+                maxLineIndex = lineIndex;
+                SetTextExtent();
+            }
+            LineEventArgs args(lineIndex);
+            OnLineChanged(args);
+            SetDirty();
+        }
+        private void DeleteChar(int lineIndex, int columnIndex)
+        {
+            ustring& line = lines[lineIndex];
+            if (columnIndex < line.Length())
+            {
+                line.Remove(columnIndex, 1);
+                LineEventArgs args(lineIndex);
+                OnLineChanged(args);
+            }
+            else
+            {
+                if (lines.Count() > lineIndex + 1)
+                {
+                    line.Append(lines[lineIndex + 1]);
+                    LineEventArgs changedArgs(lineIndex);
+                    OnLineChanged(changedArgs);
+                    lines.Remove(lines.Begin() + lineIndex + 1);
+                    LineEventArgs deletedArgs(lineIndex + 1);
+                    OnLineDeleted(deletedArgs);
+                }
+            }
+            SetDirty();
+        }
+        private void Backspace(int lineIndex, int columnIndex)
+        {
+            if (lineIndex != 0 || columnIndex != 0)
+            {
+                KeyEventArgs leftArgs(Keys.left, Keys.none);
+                OnKeyDown(leftArgs);
+                KeyEventArgs deleteArgs(Keys.delete_, Keys.none);
+                OnKeyDown(deleteArgs);
+            }
+        }
+        private void NewLine(int lineIndex, int columnIndex)
+        {
+            ustring& line = lines[lineIndex];
+            ustring toInsert = line.Substring(columnIndex);
+            if (!toInsert.IsEmpty())
+            {
+                line.Remove(columnIndex, line.Length() - columnIndex);
+                LineEventArgs changedArgs(lineIndex);
+                OnLineChanged(changedArgs);
+            }
+            lines.Insert(lines.Begin() + lineIndex + 1, toInsert);
+            SetLineNumberFieldLength(cast<int>(lines.Count()));
+            LineEventArgs insertedArgs(lineIndex + 1);
+            OnLineInserted(insertedArgs);
+            SetCaretLineCol(lineIndex + 2 + 1, 1 + LineNumberFieldLength());
+            ScrollToCaret();
+            Invalidate();
         }
         protected override nothrow void SetContentLocationInternal(const Point& contentLocation)
         {
@@ -760,6 +916,18 @@ namespace System.Windows
         {
             linesChangedEvent.Fire();
         }
+        protected virtual void OnLineChanged(LineEventArgs& args)
+        {
+            lineChangedEvent.Fire(args);
+        }
+        protected virtual void OnLineDeleted(LineEventArgs& args)
+        {
+            lineDeletedEvent.Fire(args);
+        }
+        protected virtual void OnLineInserted(LineEventArgs& args)
+        {
+            lineInsertedEvent.Fire(args);
+        }
         public nothrow inline int MaxLineLength() const
         {
             return maxLineLength;
@@ -807,6 +975,42 @@ namespace System.Windows
         {
             flags = cast<Flags>(flags & ~Flags.painting);
         }
+        public nothrow inline bool IsReadOnly() const
+        {
+            return (flags & Flags.readOnly) != Flags.none;
+        }
+        public nothrow void SetReadOnly()
+        {
+            flags = cast<Flags>(flags | Flags.readOnly);
+        }
+        public nothrow void ResetReadOnly()
+        {
+            flags = cast<Flags>(flags & ~Flags.readOnly);
+        }
+        public nothrow inline bool IsFixed() const
+        {
+            return (flags & Flags.fixed) != Flags.none;
+        }
+        public nothrow void SetFixed()
+        {
+            flags = cast<Flags>(flags | Flags.fixed);
+        }
+        public nothrow void ResetFixed()
+        {
+            flags = cast<Flags>(flags & ~Flags.fixed);
+        }
+        public nothrow inline bool IsDirty() const
+        {
+            return (flags & Flags.dirty) != Flags.none;
+        }
+        public nothrow void SetDirty()
+        {
+            flags = cast<Flags>(flags | Flags.dirty);
+        }
+        public nothrow void ResetDirty()
+        {
+            flags = cast<Flags>(flags & ~Flags.dirty);
+        }
         public nothrow Event<CaretPosChangedEventHandler>& CaretPosChangedEvent() const
         {
             return caretPosChangedEvent;
@@ -814,6 +1018,18 @@ namespace System.Windows
         public nothrow Event<LinesChangedEventHandler>& LinesChangedEvent() const
         {
             return linesChangedEvent;
+        }
+        public nothrow Event<LineChangedEventHandler, LineEventArgs>& LineChangedEvent() const
+        {
+            return lineChangedEvent;
+        }
+        public nothrow Event<LineDeletedEventHandler, LineEventArgs>& LineDeletedEvent() const
+        {
+            return lineDeletedEvent;
+        }
+        public nothrow Event<LineInsertedEventHandler, LineEventArgs>& LineInsertedEvent() const
+        {
+            return lineInsertedEvent;
         }
         public nothrow Event<GotoCaretLineEventHandler, ControlEventArgs>& GotoCaretLineEvent() const
         {
@@ -857,7 +1073,11 @@ namespace System.Windows
         private Padding padding;
         private Event<CaretPosChangedEventHandler> caretPosChangedEvent;
         private Event<LinesChangedEventHandler> linesChangedEvent;
+        private Event<LineChangedEventHandler, LineEventArgs> lineChangedEvent;
+        private Event<LineDeletedEventHandler, LineEventArgs> lineDeletedEvent;
+        private Event<LineInsertedEventHandler, LineEventArgs> lineInsertedEvent;
         private Event<GotoCaretLineEventHandler, ControlEventArgs> gotoCaretLineEvent;
+        private string measureString;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)

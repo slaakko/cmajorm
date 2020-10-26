@@ -1,0 +1,70 @@
+int intReturn(int x)
+{
+    return x;
+}
+
+unit_test void intTest()
+{
+    int x;
+    #assert(x == 0);
+    #assert(!(x < x));
+    int y = x;
+    #assert(x == y);
+    #assert(!(x < y));
+    int z;
+    z = x;
+    #assert(z == x);
+    int a = System.Rvalue(x);
+    #assert(a == x);
+    int b;
+    b = System.Rvalue(x);
+    #assert(b == x);
+    #assert(intReturn(x) == x);
+    #assert(+x == x);
+    #assert(-x == x);
+    #assert(~x == -1);
+    #assert(x + 1 == 1);
+    #assert(x - 1 == -1);
+    #assert(x * 2 == 0);
+    #assert(x / 2 == 0);
+    #assert(x % 2 == 0);
+    #assert((x & 2) == 0);
+    #assert((x | 2) == 2);
+    #assert((x ^ 2) == 2);
+    #assert(x << 1 == 0);
+    #assert(x >> 1 == 0);
+
+    int c = 10;
+    #assert(c == 10);
+    #assert(!(c < c));
+    int d = c;
+    #assert(c == d);
+    #assert(!(c < d));
+    int e;
+    e = c;
+    #assert(e == c);
+    int f = System.Rvalue(c);
+    #assert(f == c);
+    int g;
+    g = System.Rvalue(c);
+    #assert(g == c);
+    #assert(intReturn(c) == c);
+    #assert(+c == 10);
+    #assert(-c == -10);
+    #assert(~c == -11);
+    #assert(c + 10 == 20);
+    #assert(c - 10 == 0);
+    #assert(c * 10 == 100);
+    #assert(c / 10 == 1);
+    #assert(c % 10 == 0);
+    #assert((c & 10) == 10);
+    #assert((c | 0x10) == 0x1a);
+    #assert((c ^ 2) == 8);
+    #assert(c << 1 == 20);
+    #assert(c >> 1 == 5);
+    
+    #assert(x < c);
+    #assert(x <= c);
+    #assert(c > x);
+    #assert(c >= x);
+}
