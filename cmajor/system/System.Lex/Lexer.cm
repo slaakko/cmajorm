@@ -436,12 +436,18 @@ namespace System.Lex
                     token.line = lineNumber;
                 }
                 lexeme.end = pos + 1;
+                int prevState = state;
                 state = NextState(state, c);
                 if (state == -1)
                 {
+                    if (prevState == 0)
+                    {
+                        break;
+                    }
                     state = 0;
                     pos = token.match.end;
                     tokenLine.tokens.Add(token);
+                    lexeme.begin = lexeme.end;
                 }
                 else
                 {
@@ -467,8 +473,9 @@ namespace System.Lex
                     return tokenLine;
                 }
             }
-            if (token.match.begin != token.match.end)
+            if (lexeme.begin != lexeme.end)
             {
+                token.match = lexeme;
                 tokenLine.tokens.Add(token);
             }
             if (state == -1)

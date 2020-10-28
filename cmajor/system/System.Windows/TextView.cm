@@ -673,6 +673,7 @@ namespace System.Windows
                             int columnIndex = CaretColumn() - 1;
                             DeleteChar(lineIndex, columnIndex);
                             args.handled = true;
+                            return;
                         }
                         break;
                     }
@@ -684,6 +685,7 @@ namespace System.Windows
                             int columnIndex = CaretColumn() - 1;
                             Backspace(lineIndex, columnIndex);
                             args.handled = true;
+                            return;
                         }
                         break;
                     }
@@ -695,6 +697,7 @@ namespace System.Windows
                             int columnIndex = CaretColumn() - 1;
                             NewLine(lineIndex, columnIndex);
                             args.handled = true;
+                            return;
                         }
                         break;
                     }
@@ -792,7 +795,7 @@ namespace System.Windows
             SetLineNumberFieldLength(cast<int>(lines.Count()));
             LineEventArgs insertedArgs(lineIndex + 1);
             OnLineInserted(insertedArgs);
-            SetCaretLineCol(lineIndex + 2 + 1, 1 + LineNumberFieldLength());
+            SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength());
             ScrollToCaret();
             Invalidate();
         }
@@ -900,7 +903,9 @@ namespace System.Windows
         }
         protected override void SetCaretLocation()
         {
-            Point caretPos(cast<int>(padding.left + (caretColumn - 1) * charWidth), cast<int>(padding.top + (caretLine - 1) * charHeight));
+            int x = cast<int>(padding.left + (caretColumn - 1) * charWidth);
+            int y = cast<int>(padding.top + (caretLine - 1) * charHeight);
+            Point caretPos(x, y);
             TranslateContentLocation(caretPos);
             if (CaretCreated())
             {
