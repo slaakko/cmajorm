@@ -64,6 +64,7 @@ namespace Cm.Views
             lexer.SetBlockCommentStates(blockCommentStates);
             SetMouseHoverMs(DefaultMouseHoverMs());
             SetFixed();
+            SetIndentSize(4);
         }
         public nothrow void SetDebugLocationBackgroundColor(const System.Windows.Color& debugLocationBackgroundColor_)
         {
@@ -267,10 +268,18 @@ namespace Cm.Views
                 case PLUS: case MINUS: case STAR: case DIV: case REM: case PLUSPLUS:
                 case MINUSMINUS: case CPL: case DOT: case ARROW: case LBRACKET:
                 case RBRACKET: case LPAREN: case RPAREN: case LANGLE: case RANGLE:
-                case LBRACE: case RBRACE: case COMMA: case ASSIGN: case COLON:
+                case COMMA: case ASSIGN: case COLON:
                 case SEMICOLON: case HASH:
                 {
                     return SourceCodeTokenKind.plain;
+                }
+                case LBRACE:
+                {
+                    return SourceCodeTokenKind.beginBlock;
+                }
+                case RBRACE:
+                {
+                    return SourceCodeTokenKind.endBlock;
                 }
                 case WS:
                 {

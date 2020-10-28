@@ -33,7 +33,7 @@ namespace System.Windows
 
     public enum SourceCodeTokenKind : int
     {
-        plain, space, keyword, identifier, string, character, number, comment, lineNumber
+        plain, space, keyword, identifier, string, character, number, comment, lineNumber, beginBlock, endBlock
     }
 
     public nothrow ulong GetHashCode(SourceCodeTokenKind tokenKind)
@@ -87,13 +87,17 @@ namespace System.Windows
     {
         public SourceCodeView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Color& textColor, const Point& location, const Size& size,
             Dock dock, Anchors anchors) :
-            base(fontFamily, fontSize, backgroundColor, textColor, location, size, dock, anchors), numLineNumberDigits(0)
+            base(fontFamily, fontSize, backgroundColor, textColor, location, size, dock, anchors), numLineNumberDigits(0), indentSize(0)
         {
             BuildDefaultStyles();
         }
         public SourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this(FontFamily("Consolas"), 10.0f, Color.White(), Color.Black(), location, size, dock, anchors)
         {
+        }
+        public nothrow void SetIndentSize(int indentSize_)
+        {
+            indentSize = indentSize_;
         }
         protected override void OnFontChanged()
         {
@@ -160,11 +164,83 @@ namespace System.Windows
             tokenLines.Remove(tokenLines.Begin() + lineIndex);
             Invalidate();
         }
+        private nothrow bool IsBeginBlockLine(int lineIndex) const
+        {
+            if (lineIndex >= 0 && lineIndex < tokenLines.Count())
+            {
+                const TokenLine& tokenLine = tokenLines[lineIndex];
+                for (const Token& token : tokenLine.tokens)
+                {
+                    if (GetTokenKind(token) == SourceCodeTokenKind.beginBlock)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        private nothrow bool IsEndBlockLine(int lineIndex) const
+        {
+            if (lineIndex >= 0 && lineIndex < tokenLines.Count())
+            {
+                const TokenLine& tokenLine = tokenLines[lineIndex];
+                for (const Token& token : tokenLine.tokens)
+                {
+                    if (GetTokenKind(token) == SourceCodeTokenKind.endBlock)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        protected override nothrow int RemoveIndent(int lineIndex) const
+        {
+            if (IsEndBlockLine(lineIndex))
+            {
+                return indentSize;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        protected override nothrow int IndentSize() const
+        {
+            return indentSize;
+        }
+        protected override nothrow int GetIndent(const ustring& line, int lineIndex)
+        {
+            for (int i = 0; i < line.Length(); ++i)
+            {
+                if (line[i] != ' ')
+                {
+                    if (IsBeginBlockLine(lineIndex))
+                    {
+                        return i + indentSize;
+                    }
+                    else
+                    {
+                        return i;
+                    }
+                }
+            }
+            return 0;
+        }
         protected override void OnLineInserted(LineEventArgs& args)
         {
             base->OnLineInserted(args);
             int lineIndex = args.lineIndex;
-            const ustring& line = Lines()[lineIndex];
+            ustring& line = Lines()[lineIndex];
+            int indent = 0;
+            if (lineIndex > 0)
+            {
+                indent = GetIndent(Lines()[lineIndex - 1], lineIndex - 1);
+            }
+            if (indent != 0)
+            {
+                line.Insert(0, ustring(' ', indent));
+            }
             int state = 0;
             if (!tokenLines.IsEmpty())
             {
@@ -172,6 +248,28 @@ namespace System.Windows
             }
             tokenLines.Insert(tokenLines.Begin() + lineIndex, TokenizeLine(line, lineIndex + 1, state));
             Invalidate();
+        }
+        protected nothrow override bool PrepareLine(ustring& line)
+        {
+            int removeIndex = -1;
+            int n = cast<int>(line.Length());
+            for (int i = n - 1; i >= 0; --i)
+            {
+                if (line[i] != ' ')
+                {
+                    removeIndex = i + 1;
+                    break;
+                }
+            }
+            if (removeIndex == n)
+            {
+                removeIndex = -1;
+            }
+            if (removeIndex != -1)
+            {
+                line.Remove(removeIndex, n - removeIndex + 1);
+            }
+            return removeIndex != -1;
         }
         public nothrow ustring GetText(const SourceSpan& span) const
         {
@@ -275,6 +373,8 @@ namespace System.Windows
         {
             SourceCodeTokenStyle* plainStyle = GetOrInsertTokenStyle(Color.Black(), FontStyle.regular);
             tokenKindMap[SourceCodeTokenKind.plain] = plainStyle;
+            tokenKindMap[SourceCodeTokenKind.beginBlock] = plainStyle;
+            tokenKindMap[SourceCodeTokenKind.endBlock] = plainStyle;
             SourceCodeTokenStyle* spaceStyle = GetOrInsertTokenStyle(Color.Black(), FontStyle.regular);
             tokenKindMap[SourceCodeTokenKind.space] = spaceStyle;
             SourceCodeTokenStyle* keywordStyle = GetOrInsertTokenStyle(Color.Blue(), FontStyle.regular);
@@ -348,6 +448,7 @@ namespace System.Windows
         }
         private List<TokenLine> tokenLines;
         private int numLineNumberDigits;
+        private int indentSize;
         private List<UniquePtr<Brush>> brushes;
         private List<UniquePtr<SourceCodeTextStyle>> textStyles;
         private List<UniquePtr<SourceCodeTokenStyle>> sourceCodeTokenStyles;

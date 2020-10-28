@@ -701,10 +701,28 @@ namespace System.Windows
                         }
                         break;
                     }
-                    case cast<Keys>(Keys.controlModifier | Keys.r):
+                    case Keys.tab:
                     {
-                        StreamWriter writer = File.AppendText(@"C:\temp\text.txt");
-                        writer << lines[maxLineIndex] << "\n" << lines[maxLineIndex].Length() << "\n" << charWidth << "\n" << charHeight << "\n" << endl();
+                        if (!IsReadOnly())
+                        {
+                            int lineIndex = caretLine - 1;
+                            int columnIndex = CaretColumn() - 1;
+                            Tab(lineIndex, columnIndex);
+                            args.handled = true;
+                            return;
+                        }
+                        break;
+                    }
+                    case cast<Keys>(Keys.shiftModifier | Keys.tab):
+                    {
+                        if (!IsReadOnly())
+                        {
+                            int lineIndex = caretLine - 1;
+                            int columnIndex = CaretColumn() - 1;
+                            Backtab(lineIndex, columnIndex);
+                            args.handled = true;
+                            return;
+                        }
                         break;
                     }
                 }
@@ -781,13 +799,40 @@ namespace System.Windows
                 OnKeyDown(deleteArgs);
             }
         }
+        protected virtual nothrow int GetIndent(const ustring& line, int lineIndex) const
+        {
+            return 0;
+        }
+        protected virtual nothrow int RemoveIndent(int lineIndex) const
+        {
+            return 0;
+        }
+        protected virtual nothrow bool PrepareLine(ustring& line)
+        {
+            return false;
+        }
         private void NewLine(int lineIndex, int columnIndex)
         {
             ustring& line = lines[lineIndex];
             ustring toInsert = line.Substring(columnIndex);
+            bool lineChanged = false;
             if (!toInsert.IsEmpty())
             {
                 line.Remove(columnIndex, line.Length() - columnIndex);
+                lineChanged = true;
+            }
+            int removeIndent = RemoveIndent(lineIndex);
+            if (removeIndent > 0)
+            {
+                line.Remove(0, removeIndent);
+                lineChanged = true;
+            }
+            if (PrepareLine(line))
+            {
+                lineChanged = true;
+            }
+            if (lineChanged)
+            {
                 LineEventArgs changedArgs(lineIndex);
                 OnLineChanged(changedArgs);
             }
@@ -795,9 +840,65 @@ namespace System.Windows
             SetLineNumberFieldLength(cast<int>(lines.Count()));
             LineEventArgs insertedArgs(lineIndex + 1);
             OnLineInserted(insertedArgs);
-            SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength());
+            SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength() + GetIndent(line, lineIndex));
             ScrollToCaret();
             Invalidate();
+            SetDirty();
+        }
+        protected virtual nothrow int IndentSize() const
+        {
+            return 0;
+        }
+        private void Tab(int lineIndex, int columnIndex)
+        {
+            while (lineIndex >= lines.Count())
+            {
+                lines.Add(ustring());
+            }
+            ustring& line = lines[lineIndex];
+            line.Insert(columnIndex, ustring(' ', IndentSize()));
+            if (line.Length() > maxLineLength)
+            {
+                maxLineLength = cast<int>(line.Length());
+                maxLineIndex = lineIndex;
+                SetTextExtent();
+            }
+            LineEventArgs args(lineIndex);
+            OnLineChanged(args);
+            SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength() + IndentSize());
+            ScrollToCaret();
+            Invalidate();
+            SetDirty();
+        }
+        private void Backtab(int lineIndex, int columnIndex)
+        {
+            if (lineIndex >= lines.Count()) return;
+            ustring& line = lines[lineIndex];
+            int targetCol = Max(cast<int>(1), columnIndex - IndentSize() + 1);
+            int numSpaces = 0;
+            int col = 0;
+            for (int i = columnIndex; i >= targetCol; --i)
+            {
+                if (line[i - 1] == ' ')
+                {
+                    col = i - 1;
+                    ++numSpaces;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if (numSpaces > 0)
+            {
+                line.Remove(col, numSpaces);
+                LineEventArgs args(lineIndex);
+                OnLineChanged(args);
+                SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength() - numSpaces);
+                ScrollToCaret();
+                Invalidate();
+                SetDirty();
+            }
         }
         protected override nothrow void SetContentLocationInternal(const Point& contentLocation)
         {
