@@ -8,6 +8,57 @@ using System.Collections;
 
 namespace System.Windows
 {
+    public nothrow System.Windows.Color DefaultSelectionBackgroundColor()
+    {
+        return System.Windows.Color(153u, 201u, 239u);
+    }
+
+    public class SourcePos
+    {
+        public nothrow SourcePos() : line(0), column(0)
+        {
+        }
+        public nothrow SourcePos(int line_, int column_) : line(line_), column(column_)
+        {
+        }
+        public nothrow bool IsValid() const
+        {
+            return line != 0 && column != 0;
+        }
+        public int line;
+        public int column;
+    }
+
+    public nothrow bool operator==(const SourcePos& left, const SourcePos& right)
+    {
+        return left.line == right.line && left.column == right.column;
+    }
+
+    public nothrow bool operator<(const SourcePos& left, const SourcePos& right)
+    {
+        if (left.line < right.line) return true;
+        if (left.line > right.line) return false;
+        return left.column < right.column;
+    }
+
+    public class Selection
+    {
+        public enum Fix : sbyte
+        {
+            none, start, end
+        }
+        public nothrow Selection() : fixed(Fix.none), start(), end()
+        {
+        }
+        public nothrow bool IsEmpty() const
+        {
+            return !start.IsValid() && !end.IsValid();
+        }
+        public Fix fixed;
+        public SourcePos start;
+        public SourcePos end;
+    }
+
     public const uint defaultCaretTimerPeriod = 5000u; // 5 seconds
 
     public class LineEventArgs
@@ -32,13 +83,13 @@ namespace System.Windows
             none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4
         }
         
-        public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Color& textColor, const Point& location, const Size& size,
+        public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Color& textColor_, const Point& location, const Size& size,
             Dock dock, Anchors anchors) :
             base("System.Windows.TextView", DefaultWindowClassStyle(), cast<WindowStyle>(DefaultChildWindowStyle() | WindowStyle.WS_TABSTOP), DefaultExtendedWindowStyle(), backgroundColor,
             "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
             charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(1), caretColumn(1),
-            caretTimerPeriod(defaultCaretTimerPeriod), brush(textColor), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
-            padding()
+            caretTimerPeriod(defaultCaretTimerPeriod), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
+            padding(), selectionBackgroundColor(DefaultSelectionBackgroundColor()), textColor(textColor_)
         {
             uint caretTimeOut = 0u;
             bool succeeded = ReadCaretTimeoutFromRegistry(caretTimeOut);
@@ -420,16 +471,52 @@ namespace System.Windows
             graphics.ClearChecked(BackgroundColor());
             int n = cast<int>(lines.Count());
             SetLineNumberFieldLength(n);
+            int lineNumberFieldLength = LineNumberFieldLength();
             PointF origin(0, 0);
             for (int i = 0; i < n; ++i)
             {
                 if (IsLinePartiallyVisible(i + 1))
                 {
+                    DrawSelectionBackground(graphics, i + 1, origin, lineNumberFieldLength);
                     DrawLine(graphics, i, origin);
                 }
                 origin.y = origin.y + charHeight;
             }
             graphics.SetTextRenderingHintChecked(prevRenderingHint);
+        }
+        private void DrawSelectionBackground(Graphics& graphics, int line, const PointF& origin, int lineNumberFieldLength)
+        {
+            if (selection.IsEmpty()) return;
+            if (line < selection.start.line) return;
+            if (line > selection.end.line) return;
+            PointF pt(origin);
+            pt.x = pt.x + charWidth * lineNumberFieldLength;
+            RectF rect;
+            if (line > selection.start.line && line < selection.end.line)
+            {
+                int lineLength = Max(1, GetLineLength(line));
+                rect = RectF(pt, SizeF(charWidth * lineLength, charHeight));
+            }
+            else if (selection.start.line == selection.end.line)
+            {
+                pt.x = pt.x + charWidth * (selection.start.column - 1);
+                int selectionLength = selection.end.column - selection.start.column;
+                rect = RectF(pt, SizeF(charWidth * selectionLength, charHeight));
+            }
+            else if (line == selection.start.line)
+            {
+                pt.x = pt.x + charWidth * (selection.start.column - 1);
+                int lineLength = GetLineLength(line);
+                int selectionLength = lineLength - selection.start.column + 1;
+                rect = RectF(pt, SizeF(charWidth * selectionLength, charHeight));
+            }
+            else if (line == selection.end.line)
+            {
+                int selectionLength = selection.end.column - 1;
+                rect = RectF(pt, SizeF(charWidth * selectionLength, charHeight));
+            }
+            Brush* brush = GetOrInsertBrush(selectionBackgroundColor);
+            graphics.FillRectangleChecked(*brush, rect);
         }
         protected virtual void DrawLine(Graphics& graphics, int lineIndex, const PointF& origin)
         {
@@ -438,7 +525,8 @@ namespace System.Windows
                 PointF pt(origin);
                 const ustring& line = lines[lineIndex];
                 string s(ToUtf8(line));
-                graphics.DrawStringChecked(s, *fonts[0], pt, brush);
+                Brush* brush = GetOrInsertBrush(textColor);
+                graphics.DrawStringChecked(s, *fonts[0], pt, *brush);
             }
         }
         protected virtual void Measure(Graphics& graphics)
@@ -523,18 +611,41 @@ namespace System.Windows
                 {
                     case Keys.home:
                     {
+                        ResetSelection();
                         columnNumber = 1 + LineNumberFieldLength();
+                        args.handled = true;
+                        break;
+                    }
+                    case cast<Keys>(Keys.shiftModifier | Keys.home):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        SourcePos end(CaretLine(), 1);
+                        ExtendSelection(start, end);
+                        columnNumber = 1 + LineNumberFieldLength();
+                        Invalidate();
                         args.handled = true;
                         break;
                     }
                     case Keys.end:
                     {
+                        ResetSelection();
                         columnNumber = GetLineLength(lineNumber) + 1 + LineNumberFieldLength();
+                        args.handled = true;
+                        break;
+                    }
+                    case cast<Keys>(Keys.shiftModifier | Keys.end):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        SourcePos end(CaretLine(), GetLineLength(lineNumber) + 1);
+                        ExtendSelection(start, end);
+                        columnNumber = GetLineLength(lineNumber) + 1 + LineNumberFieldLength();
+                        Invalidate();
                         args.handled = true;
                         break;
                     }
                     case Keys.left:
                     {
+                        ResetSelection();
                         if (columnNumber > 1 + LineNumberFieldLength())
                         {
                             --columnNumber;
@@ -548,8 +659,34 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.left):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        if (columnNumber > 1 + LineNumberFieldLength())
+                        {
+                            SourcePos end(start);
+                            --columnNumber;
+                            --end.column;
+                            ExtendSelection(start, end);
+                            Invalidate();
+                        }
+                        else if (lineNumber > 1)
+                        {
+                            SourcePos end(start);
+                            --lineNumber;
+                            --end.line;
+                            int lineLength = GetLineLength(lineNumber);
+                            columnNumber = lineLength + 1 + LineNumberFieldLength();
+                            end.column = lineLength + 1;
+                            ExtendSelection(start, end);
+                            Invalidate();
+                        }
+                        args.handled = true;
+                        break;
+                    }
                     case Keys.right:
                     {
+                        ResetSelection();
                         if (lineNumber <= lines.Count())
                         {
                             int lineLength = GetLineLength(lineNumber);
@@ -566,8 +703,35 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.right):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        if (lineNumber <= lines.Count())
+                        {
+                            SourcePos end(start);
+                            int lineLength = GetLineLength(lineNumber);
+                            if (columnNumber < lineLength + 1 + LineNumberFieldLength())
+                            {
+                                ++columnNumber;
+                                ++end.column;
+                                ExtendSelection(start, end);
+                            }
+                            else
+                            {
+                                ++lineNumber;
+                                ++end.line;
+                                columnNumber = 1 + LineNumberFieldLength();
+                                end.column = 1;
+                                ExtendSelection(start, end);
+                            }
+                            Invalidate();
+                        }
+                        args.handled = true;
+                        break;
+                    }
                     case Keys.down:
                     {
+                        ResetSelection();
                         if (lineNumber < lines.Count())
                         {
                             ++lineNumber;
@@ -582,8 +746,33 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.down):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        SourcePos end(start);
+                        if (lineNumber < lines.Count())
+                        {
+                            ++lineNumber;
+                            ++end.line;
+                            int lineLength = GetLineLength(lineNumber);
+                            columnNumber = Min(columnNumber, lineLength + 1 + LineNumberFieldLength());
+                            end.column = Min(end.column, lineLength + 1);
+                        }
+                        else
+                        {
+                            lineNumber = cast<int>(lines.Count()) + 1;
+                            end.line = cast<int>(lines.Count()) + 1;
+                            columnNumber = 1 + LineNumberFieldLength();
+                            end.column = 1;
+                        }
+                        ExtendSelection(start, end);
+                        Invalidate();
+                        args.handled = true;
+                        break;
+                    }
                     case Keys.up:
                     {
+                        ResetSelection();
                         if (lineNumber > 1)
                         {
                             --lineNumber;
@@ -593,8 +782,26 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.up):
+                    {
+                        if (lineNumber > 1)
+                        {
+                            SourcePos start(CaretLine(), CaretColumn());
+                            SourcePos end(start);
+                            --lineNumber;
+                            --end.line;
+                            int lineLength = GetLineLength(lineNumber);
+                            columnNumber = Min(columnNumber, lineLength + 1 + LineNumberFieldLength());
+                            end.column = Min(end.column, lineLength + 1);
+                            Invalidate();
+                            ExtendSelection(start, end);
+                        }
+                        args.handled = true;
+                        break;
+                    }
                     case Keys.pageDown:
                     {
+                        ResetSelection();
                         Size size = GetSize();
                         int windowLines = cast<int>(size.h / charHeight);
                         lineNumber = lineNumber + windowLines;
@@ -602,8 +809,24 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.pageDown):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        SourcePos end(start);
+                        Size size = GetSize();
+                        int windowLines = cast<int>(size.h / charHeight);
+                        lineNumber = lineNumber + windowLines;
+                        end.line = end.line + windowLines;
+                        lineNumber = Min(lineNumber, cast<int>(lines.Count()) + 1);
+                        end.line = Min(end.line, cast<int>(lines.Count()) + 1);
+                        ExtendSelection(start, end);
+                        Invalidate();
+                        args.handled = true;
+                        break;
+                    }
                     case Keys.pageUp:
                     {
+                        ResetSelection();
                         Size size = GetSize();
                         int windowLines = cast<int>(size.h / charHeight);
                         lineNumber = lineNumber - windowLines;
@@ -611,22 +834,66 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.pageUp):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        SourcePos end(start);
+                        Size size = GetSize();
+                        int windowLines = cast<int>(size.h / charHeight);
+                        lineNumber = lineNumber - windowLines;
+                        end.line = end.line - windowLines;
+                        lineNumber = Max(lineNumber, 1);
+                        end.line = Max(end.line, 1);
+                        ExtendSelection(start, end);
+                        Invalidate();
+                        args.handled = true;
+                        break;
+                    }
                     case cast<Keys>(Keys.controlModifier | Keys.home):
                     {
+                        ResetSelection();
                         lineNumber = 1;
                         columnNumber = 1 + LineNumberFieldLength();
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.controlModifier | Keys.home):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        SourcePos end(start);
+                        lineNumber = 1;
+                        end.line = 1;
+                        columnNumber = 1 + LineNumberFieldLength();
+                        end.column = 1;
+                        ExtendSelection(start, end);
+                        Invalidate();
+                        args.handled = true;
+                        break;
+                    }
                     case cast<Keys>(Keys.controlModifier | Keys.end):
                     {
+                        ResetSelection();
                         lineNumber = cast<int>(lines.Count() + 1);
                         columnNumber = 1 + LineNumberFieldLength();
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.controlModifier | Keys.end):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        SourcePos end(start);
+                        lineNumber = cast<int>(lines.Count() + 1);
+                        end.line = cast<int>(lines.Count() + 1);
+                        columnNumber = 1 + LineNumberFieldLength();
+                        end.column = 1;
+                        ExtendSelection(start, end);
+                        Invalidate();
+                        args.handled = true;
+                        break;
+                    }
                     case cast<Keys>(Keys.controlModifier | Keys.left):
                     {
+                        ResetSelection();
                         int line = lineNumber;
                         int col = columnNumber - LineNumberFieldLength();
                         PrevWord(line, col);
@@ -635,8 +902,25 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.controlModifier | Keys.left):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        SourcePos end(start);
+                        int line = lineNumber;
+                        int col = columnNumber - LineNumberFieldLength();
+                        PrevWord(line, col);
+                        lineNumber = line;
+                        end.line = line;
+                        columnNumber = col + LineNumberFieldLength();
+                        end.column = col;
+                        ExtendSelection(start, end);
+                        Invalidate();
+                        args.handled = true;
+                        break;
+                    }
                     case cast<Keys>(Keys.controlModifier | Keys.right):
                     {
+                        ResetSelection();
                         int line = lineNumber;
                         int col = columnNumber - LineNumberFieldLength();
                         NextWord(line, col);
@@ -645,8 +929,25 @@ namespace System.Windows
                         args.handled = true;
                         break;
                     }
+                    case cast<Keys>(Keys.shiftModifier | Keys.controlModifier | Keys.right):
+                    {
+                        SourcePos start(CaretLine(), CaretColumn());
+                        SourcePos end(start);
+                        int line = lineNumber;
+                        int col = columnNumber - LineNumberFieldLength();
+                        NextWord(line, col);
+                        lineNumber = line;
+                        end.line = line;
+                        columnNumber = col + LineNumberFieldLength();
+                        end.column = col;
+                        ExtendSelection(start, end);
+                        Invalidate();
+                        args.handled = true;
+                        break;
+                    }
                     case cast<Keys>(Keys.controlModifier | Keys.down):
                     {
+                        ResetSelection();
                         ScrollLineDown();
                         scrolled = true;
                         args.handled = true;
@@ -654,6 +955,7 @@ namespace System.Windows
                     }
                     case cast<Keys>(Keys.controlModifier | Keys.up):
                     {
+                        ResetSelection();
                         ScrollLineUp();
                         scrolled = true;
                         args.handled = true;
@@ -661,6 +963,7 @@ namespace System.Windows
                     }
                     case cast<Keys>(Keys.controlModifier | Keys.k):
                     {
+                        ResetSelection();
                         GotoCaretLine();
                         args.handled = true;
                         break;
@@ -693,6 +996,7 @@ namespace System.Windows
                     {
                         if (!IsReadOnly())
                         {
+                            ResetSelection();
                             int lineIndex = caretLine - 1;
                             int columnIndex = CaretColumn() - 1;
                             NewLine(lineIndex, columnIndex);
@@ -739,6 +1043,7 @@ namespace System.Windows
             if (IsReadOnly()) return;
             if (!args.handled)
             {
+                ResetSelection();
                 uchar c(args.keyChar);
                 int lineIndex = caretLine - 1;
                 int columnIndex = CaretColumn() - 1;
@@ -1153,13 +1458,93 @@ namespace System.Windows
                 Invalidate();
             }
         }
+        public nothrow void ResetSelection()
+        {
+            if (!selection.IsEmpty())
+            {
+                selection = Selection();
+                Invalidate();
+            }
+        }
+        public nothrow void ExtendSelection(const SourcePos& start, const SourcePos& end)
+        {
+            switch (selection.fixed)
+            {
+                case Selection.Fix.none:
+                {
+                    if (start < end)
+                    {
+                        selection.fixed = Selection.Fix.start;
+                        selection.start = start;
+                        selection.end = end;
+                    }
+                    else
+                    {
+                        selection.fixed = Selection.Fix.end;
+                        selection.end = start;
+                        selection.start = end;
+                    }
+                    break;
+                }
+                case Selection.Fix.start:
+                {
+                    if (end == selection.start)
+                    {
+                        ResetSelection();
+                    }
+                    else if (end > selection.start)
+                    {
+                        selection.end = end;
+                    }
+                    else
+                    {
+                        selection.fixed = Selection.Fix.end;
+                        selection.end = start;
+                        selection.start = end;
+                    }
+                    break;
+                }
+                case Selection.Fix.end:
+                {
+                    if (end == selection.end)
+                    {
+                        ResetSelection();
+                    }
+                    else if (end < selection.end)
+                    {
+                        selection.start = end;
+                    }
+                    else
+                    {
+                        selection.fixed = Selection.Fix.start;
+                        selection.start = start;
+                        selection.end = end;
+                    }
+                    break;
+                }
+            }
+        }
+        public Brush* GetOrInsertBrush(const Color& color)
+        {
+            HashMap<Color, Brush*>.ConstIterator it = colorBrushMap.CFind(color);
+            if (it != colorBrushMap.CEnd())
+            {
+                return it->second;
+            }
+            Brush* brush = new SolidBrush(color);
+            brushes.Add(UniquePtr<Brush>(brush));
+            colorBrushMap[color] = brush;
+            return brush;
+        }
         private Flags flags;
         private List<ustring> lines;
         private List<int> lineStartIndeces;
         private StringFormat drawFormat;
         private FontFamily fontFamily;
+        private Color textColor;
         private List<UniquePtr<Font>> fonts;
-        private SolidBrush brush;
+        private List<UniquePtr<Brush>> brushes;
+        private HashMap<Color, Brush*> colorBrushMap;
         private float fontSize;
         private float charWidth;
         private float charHeight;
@@ -1184,6 +1569,8 @@ namespace System.Windows
         private Event<LineInsertedEventHandler, LineEventArgs> lineInsertedEvent;
         private Event<GotoCaretLineEventHandler, ControlEventArgs> gotoCaretLineEvent;
         private string measureString;
+        private Selection selection;
+        private System.Windows.Color selectionBackgroundColor;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)

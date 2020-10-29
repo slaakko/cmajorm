@@ -409,18 +409,6 @@ namespace System.Windows
             tokenStyleTextStyleMap[sourceCodeTokenStyle] = textStyle;
             return sourceCodeTokenStyle;
         }
-        public Brush* GetOrInsertBrush(const Color& color)
-        {
-            HashMap<Color, Brush*>.ConstIterator it = colorBrushMap.CFind(color);
-            if (it != colorBrushMap.CEnd())
-            {
-                return it->second;
-            }
-            Brush* brush = new SolidBrush(color);
-            brushes.Add(UniquePtr<Brush>(brush));
-            colorBrushMap[color] = brush;
-            return brush;
-        }
         public Font* GetOrInsertFont(FontStyle fontStyle)
         {
             Map<FontStyle, Font*>.ConstIterator it = fontStyleFontMap.CFind(fontStyle);
@@ -449,11 +437,9 @@ namespace System.Windows
         private List<TokenLine> tokenLines;
         private int numLineNumberDigits;
         private int indentSize;
-        private List<UniquePtr<Brush>> brushes;
         private List<UniquePtr<SourceCodeTextStyle>> textStyles;
         private List<UniquePtr<SourceCodeTokenStyle>> sourceCodeTokenStyles;
         private Map<FontStyle, Font*> fontStyleFontMap;
-        private HashMap<Color, Brush*> colorBrushMap;
         private HashMap<SourceCodeTokenStyle, SourceCodeTokenStyle*> tokenStyleMap;
         private HashMap<SourceCodeTokenStyle*, SourceCodeTextStyle*> tokenStyleTextStyleMap;
         private HashMap<SourceCodeTextStyle, SourceCodeTextStyle*> textStyleMap;
