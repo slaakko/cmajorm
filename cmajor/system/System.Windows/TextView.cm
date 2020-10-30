@@ -1038,9 +1038,16 @@ namespace System.Windows
                     {
                         if (!IsReadOnly())
                         {
-                            int lineIndex = caretLine - 1;
-                            int columnIndex = CaretColumn() - 1;
-                            Tab(lineIndex, columnIndex);
+                            if (selection.IsEmpty())
+                            {
+                                int lineIndex = caretLine - 1;
+                                int columnIndex = CaretColumn() - 1;
+                                Tab(lineIndex, columnIndex);
+                            }
+                            else
+                            {
+                                IndentSelection();
+                            }
                             args.handled = true;
                             return;
                         }
@@ -1050,9 +1057,16 @@ namespace System.Windows
                     {
                         if (!IsReadOnly())
                         {
-                            int lineIndex = caretLine - 1;
-                            int columnIndex = CaretColumn() - 1;
-                            Backtab(lineIndex, columnIndex);
+                            if (selection.IsEmpty())
+                            {
+                                int lineIndex = caretLine - 1;
+                                int columnIndex = CaretColumn() - 1;
+                                Backtab(lineIndex, columnIndex);
+                            }
+                            else
+                            {
+                                UnindentSelection();
+                            }
                             args.handled = true;
                             return;
                         }
@@ -1559,6 +1573,41 @@ namespace System.Windows
                 SetCaretLineCol(selection.start.line, selection.start.column + LineNumberFieldLength());
             }
             ResetSelection();
+            Invalidate();
+            SetDirty();
+        }
+        public nothrow void IndentSelection()
+        {
+            if (selection.IsEmpty()) return;
+            int startLineIndex = selection.start.line - 1;
+            int endLineIndex = selection.end.line - 1;
+            ustring indentString(' ', IndentSize());
+            for (int i = startLineIndex; i <= endLineIndex; ++i)
+            {
+                if (lines[i].IsEmpty()) continue;
+                if (i == selection.end.line - 1 && lines[i].Substring(0, selection.end.column - 1).IsEmpty()) continue;
+                lines[i].Insert(0, indentString);
+                LineEventArgs changeArgs(i, -1);
+                OnLineChanged(changeArgs);
+            }
+            Invalidate();
+            SetDirty();
+        }
+        public nothrow void UnindentSelection()
+        {
+            if (selection.IsEmpty()) return;
+            int startLineIndex = selection.start.line - 1;
+            int endLineIndex = selection.end.line - 1;
+            ustring indentString(' ', IndentSize());
+            for (int i = startLineIndex; i <= endLineIndex; ++i)
+            {
+                if (lines[i].StartsWith(indentString))
+                {
+                    lines[i].Remove(0, IndentSize());
+                    LineEventArgs changeArgs(i, -1);
+                    OnLineChanged(changeArgs);
+                }
+            }
             Invalidate();
             SetDirty();
         }

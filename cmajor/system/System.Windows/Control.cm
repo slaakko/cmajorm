@@ -895,8 +895,11 @@ namespace System.Windows
                 }
                 case WM_CHAR:
                 {
-                    ResetModifierKeys();
                     wchar ch = cast<wchar>(message.wparam);
+                    if (ch != '\t')
+                    {
+                        ResetModifierKeys();
+                    }
                     KeyPressEventArgs args(ch);
                     DoKeyPress(args);
                     if (args.handled)
