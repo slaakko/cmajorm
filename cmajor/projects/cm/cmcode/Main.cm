@@ -244,7 +244,7 @@ namespace cmcode
             debugMenuItem->AddMenuItem(showNextStatementMenuItemPtr.Release());
             UniquePtr<MenuItem> stepOverMenuItemPtr(new MenuItem("Step &Over"));
             stepOverMenuItem = stepOverMenuItemPtr.Get();
-            stepOverMenuItem->SetShortcut(Keys.f10);
+            stepOverMenuItem->SetShortcut(Keys.f12);
             stepOverMenuItem->ClickEvent().AddHandler(StepOverClick);
             debugMenuItem->AddMenuItem(stepOverMenuItemPtr.Release());
             UniquePtr<MenuItem> stepIntoMenuItemPtr(new MenuItem("Step &Into"));
@@ -254,7 +254,7 @@ namespace cmcode
             debugMenuItem->AddMenuItem(stepIntoMenuItemPtr.Release());
             UniquePtr<MenuItem> stepOutMenuItemPtr(new MenuItem("Step Ou&t"));
             stepOutMenuItem = stepOutMenuItemPtr.Get();
-            stepOutMenuItemPtr->SetShortcut(Keys.f12);
+            stepOutMenuItemPtr->SetShortcut(cast<Keys>(Keys.shiftModifier | Keys.f11));
             debugMenuItem->AddMenuItem(stepOutMenuItemPtr.Release());
             stepOutMenuItem->ClickEvent().AddHandler(StepOutClick);
 
@@ -579,7 +579,6 @@ namespace cmcode
                             break;
                         }
                     }
-
                 }
             }
             catch (const Exception& ex)
@@ -2270,6 +2269,10 @@ namespace cmcode
         {
             try
             {
+                if (WinAltPressed())
+                {
+                    return;
+                }
                 if (debugService.IsNull())
                 {
                     BuildActiveProjectClick();

@@ -220,6 +220,12 @@ typedef void (*keyPreviewFunction)(uint32_t keycode, bool shift, bool control, b
 
 messageProcessorFunction messageProcessor = nullptr;
 keyPreviewFunction keyPreview = nullptr;
+bool altPressed = false;
+
+bool WinAltPressed()
+{
+    return altPressed;
+}
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -232,10 +238,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             if (lParam == 0)
             {
-                int16_t altState = GetAsyncKeyState(VK_MENU);
-                bool alt = altState != 0;
-                if (!alt)
+                short x = GetKeyState(VK_LMENU);
+                if (x != 0)
                 {
+                    altPressed = true;
+                }
+                else
+                {
+                    altPressed = false;
                     lParam = VK_F10;
                 }
             }
@@ -263,10 +273,14 @@ LRESULT CALLBACK CommandSubClassWndProc(HWND hWnd, UINT message, WPARAM wParam, 
         {
             if (lParam == 0)
             {
-                int16_t altState = GetAsyncKeyState(VK_MENU);
-                bool alt = altState != 0;
-                if (!alt)
+                short x = GetKeyState(VK_LMENU);
+                if (x != 0)
                 {
+                    altPressed = true;
+                }
+                else
+                {
+                    altPressed = false;
                     lParam = VK_F10;
                 }
             }
