@@ -233,9 +233,9 @@ namespace System.Windows
             int lineIndex = args.lineIndex;
             ustring& line = Lines()[lineIndex];
             int indent = 0;
-            if (lineIndex > 0)
+            if (args.indentLineIndex >= 0 && args.indentLineIndex < Lines().Count())
             {
-                indent = GetIndent(Lines()[lineIndex - 1], lineIndex - 1);
+                indent = GetIndent(Lines()[args.indentLineIndex], args.indentLineIndex);
             }
             if (indent != 0)
             {
@@ -248,28 +248,6 @@ namespace System.Windows
             }
             tokenLines.Insert(tokenLines.Begin() + lineIndex, TokenizeLine(line, lineIndex + 1, state));
             Invalidate();
-        }
-        protected nothrow override bool PrepareLine(ustring& line)
-        {
-            int removeIndex = -1;
-            int n = cast<int>(line.Length());
-            for (int i = n - 1; i >= 0; --i)
-            {
-                if (line[i] != ' ')
-                {
-                    removeIndex = i + 1;
-                    break;
-                }
-            }
-            if (removeIndex == n)
-            {
-                removeIndex = -1;
-            }
-            if (removeIndex != -1)
-            {
-                line.Remove(removeIndex, n - removeIndex + 1);
-            }
-            return removeIndex != -1;
         }
         public nothrow ustring GetText(const SourceSpan& span) const
         {

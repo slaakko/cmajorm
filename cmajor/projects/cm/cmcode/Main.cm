@@ -124,7 +124,8 @@ namespace cmcode
     {
         public MainWindow(const string& filePath) :
             base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
-            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true), toolTipWindow(new ToolTip())
+            Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true), toolTipWindow(new ToolTip()),
+            clipboardListener(Handle()), cmajorCodeFormat("cmajor.code")
         {
             UniquePtr<MenuBar> menuBarPtr(new MenuBar());
             menuBar = menuBarPtr.Get();
@@ -160,6 +161,27 @@ namespace cmcode
             exitMenuItem->ClickEvent().AddHandler(ExitClick);
             fileMenuItem->AddMenuItem(exitMenuItem.Release());
             menuBar->AddMenuItem(fileMenuItem.Release());
+
+            UniquePtr<MenuItem> editMenuItem(new MenuItem("&Edit"));
+            UniquePtr<MenuItem> copyMenuItemPtr(new MenuItem("&Copy"));
+            copyMenuItem = copyMenuItemPtr.Get();
+            copyMenuItem->Disable();
+            copyMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.c));
+            copyMenuItem->ClickEvent().AddHandler(CopyClick);
+            editMenuItem->AddMenuItem(copyMenuItemPtr.Release());
+            UniquePtr<MenuItem> cutMenuItemPtr(new MenuItem("C&ut"));
+            cutMenuItem = cutMenuItemPtr.Get();
+            cutMenuItem->Disable();
+            cutMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.x));
+            cutMenuItem->ClickEvent().AddHandler(CutClick);
+            editMenuItem->AddMenuItem(cutMenuItemPtr.Release());
+            UniquePtr<MenuItem> pasteMenuItemPtr(new MenuItem("&Paste"));
+            pasteMenuItem = pasteMenuItemPtr.Get();
+            pasteMenuItem->Disable();
+            pasteMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.v));
+            pasteMenuItem->ClickEvent().AddHandler(PasteClick);
+            editMenuItem->AddMenuItem(pasteMenuItemPtr.Release());
+            menuBar->AddMenuItem(editMenuItem.Release());
 
             UniquePtr<MenuItem> viewMenuItem(new MenuItem("&View"));
             UniquePtr<MenuItem> callStackMenuItemPtr(new MenuItem("&Call Stack"));
@@ -1821,6 +1843,133 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        protected override void OnClipboardUpdate()
+        {
+            base->OnClipboardUpdate();
+            Clipboard clipboard(Handle());
+            if (clipboard.IsClipboardFormatAvailable(cmajorCodeFormat))
+            {
+                clipboardData = clipboard.GetStringData(cmajorCodeFormat);
+                pasteMenuItem->Enable();
+            }
+            else
+            {
+                ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
+                if (clipboard.IsClipboardFormatAvailable(unicodeText))
+                {
+                    clipboardData = clipboard.GetStringData(unicodeText);
+                    pasteMenuItem->Enable();
+                }
+                else
+                {
+                    ClipboardFormat ansiText(ClipboardFormat.Format.text);
+                    if (clipboard.IsClipboardFormatAvailable(ansiText))
+                    {
+                        clipboardData = clipboard.GetStringData(ansiText);
+                        pasteMenuItem->Enable();
+                    }
+                }
+            }
+        }
+        private void CopyClick()
+        {
+            try
+            {
+                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                if (editor != null)
+                {
+                    if (editor is Cm.Views.CmajorEditor*)
+                    {
+                        Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                        Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                        if (sourceCodeView != null)
+                        {
+                            ustring selection = sourceCodeView->GetSelection();
+                            if (!selection.IsEmpty())
+                            {
+                                Clipboard clipboard(Handle());
+                                clipboard.SetStringData(cmajorCodeFormat, selection);
+                                ustring crlfText = selection;
+                                crlfText.Replace(u"\n", u"\r\n");
+                                ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
+                                clipboard.SetStringData(unicodeText, crlfText);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void CutClick()
+        {
+            try
+            {
+                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                if (editor != null)
+                {
+                    if (editor is Cm.Views.CmajorEditor*)
+                    {
+                        Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                        Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                        if (sourceCodeView != null)
+                        {
+                            ustring selection = sourceCodeView->GetSelection();
+                            if (!selection.IsEmpty())
+                            {
+                                Clipboard clipboard(Handle());
+                                clipboard.SetStringData(cmajorCodeFormat, selection);
+                                ustring crlfText = selection;
+                                crlfText.Replace(u"\n", u"\r\n");
+                                ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
+                                clipboard.SetStringData(unicodeText, crlfText);
+                                sourceCodeView->RemoveSelection();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void PasteClick()
+        {
+            try
+            {
+                if (!clipboardData.IsEmpty())
+                {
+                    TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                    Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                    if (editor != null)
+                    {
+                        if (editor is Cm.Views.CmajorEditor*)
+                        {
+                            Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                            Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                            if (sourceCodeView != null)
+                            {
+                                int lineIndex = sourceCodeView->CaretLine() - 1;
+                                int columnIndex = sourceCodeView->CaretColumn() - 1;
+                                sourceCodeView->InsertText(lineIndex, columnIndex, clipboardData);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void ExitClick()
         {
             Close();
@@ -1897,6 +2046,10 @@ namespace cmcode
             sourceCodeView->GotoCaretLineEvent().AddHandler(SourceCodeViewRunToCursor);
             sourceCodeView->ExpressionHoverEvent().AddHandler(ExpressionHovered);
             sourceCodeView->ExpressionExitHoverEvent().AddHandler(ExpressionExitHover);
+            sourceCodeView->SelectionChangedEvent().AddHandler(SourceCodeViewSelectionChanged);
+            sourceCodeView->CopyEvent().AddHandler(CopyClick);
+            sourceCodeView->CutEvent().AddHandler(CutClick);
+            sourceCodeView->PasteEvent().AddHandler(PasteClick);
             Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
             debugStrip->BreakpointAddedEvent().AddHandler(BreakpointAdded);
             debugStrip->BreakpointRemovedEvent().AddHandler(BreakpointRemoved);
@@ -2501,6 +2654,32 @@ namespace cmcode
         {
             toolTipWindow->Hide();
         }
+        private void SourceCodeViewSelectionChanged()
+        {
+            TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+            Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+            if (editor != null)
+            {
+                if (editor is Cm.Views.CmajorEditor*)
+                {
+                    Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                    Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                    if (sourceCodeView != null)
+                    {
+                        if (sourceCodeView->IsSelectionEmpty())
+                        {
+                            copyMenuItem->Disable();
+                            cutMenuItem->Disable();
+                        }
+                        else
+                        {
+                            copyMenuItem->Enable();
+                            cutMenuItem->Enable();
+                        }
+                    }
+                }
+            }
+        }
         private void ReadTargetInput(string& inputLine, bool& eof)
         {
             inputLine.Clear();
@@ -2861,6 +3040,9 @@ namespace cmcode
         private MenuItem* stepOutMenuItem;
         private MenuItem* toggleBreakpointMenuItem;
         private MenuItem* programArgumentsMenuItem;
+        private MenuItem* copyMenuItem;
+        private MenuItem* cutMenuItem;
+        private MenuItem* pasteMenuItem;
 
         private ToolButton* saveToolButton;
         private ToolButton* saveAllToolButton;
@@ -2887,6 +3069,9 @@ namespace cmcode
         private bool stopPending;
         private bool targetStopped;
         private bool buildSucceeded;
+        private ClipboardListener clipboardListener;
+        private ClipboardFormat cmajorCodeFormat;
+        private ustring clipboardData;
     }
 }
 
