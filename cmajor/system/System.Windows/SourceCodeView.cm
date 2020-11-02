@@ -242,7 +242,11 @@ namespace System.Windows
                 line.Insert(0, ustring(' ', indent));
             }
             int state = 0;
-            if (!tokenLines.IsEmpty())
+            while (lineIndex >= tokenLines.Count())
+            {
+                tokenLines.Add(TokenLine());
+            }
+            if (lineIndex > 0)
             {
                 state = tokenLines[lineIndex - 1].endState;
             }

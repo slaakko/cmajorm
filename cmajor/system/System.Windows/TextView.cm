@@ -59,6 +59,19 @@ namespace System.Windows
         public SourcePos end;
     }
 
+    public class SelectionData
+    {
+        public nothrow SelectionData() : selectedText(), indent(0), numTrailingSpaces(0)
+        {
+        }
+        public nothrow SelectionData(const ustring& selectedText_, int indent_, int numTrailingSpaces_) : selectedText(selectedText_), indent(indent_), numTrailingSpaces(numTrailingSpaces_)
+        {
+        }
+        public ustring selectedText;
+        public int indent;
+        public int numTrailingSpaces;
+    }
+
     public const uint defaultCaretTimerPeriod = 5000u; // 5 seconds
 
     public class LineEventArgs
@@ -94,7 +107,7 @@ namespace System.Windows
             "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
             charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(1), caretColumn(1),
             caretTimerPeriod(defaultCaretTimerPeriod), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
-            padding(), selectionBackgroundColor(DefaultSelectionBackgroundColor()), textColor(textColor_)
+            padding(), selectionBackgroundColor(DefaultSelectionBackgroundColor()), textColor(textColor_), editCommandList(this)
         {
             uint caretTimeOut = 0u;
             bool succeeded = ReadCaretTimeoutFromRegistry(caretTimeOut);
@@ -152,6 +165,22 @@ namespace System.Windows
         {
             Font* font = new Font(fontFamily, fontSize, FontStyle.regular, Unit.point);
             fonts.Add(UniquePtr<Font>(font));
+        }
+        public nothrow void SetUndoRedoMenuItems(MenuItem* undoMenuItem, MenuItem* redoMenuItem)
+        {
+            editCommandList.SetMenuItems(undoMenuItem, redoMenuItem);
+        }
+        public nothrow void Select()
+        {
+            editCommandList.UpdateMenuItems();
+        }
+        public nothrow void Undo()
+        {
+            editCommandList.Undo();
+        }
+        public nothrow void Redo()
+        {
+            editCommandList.Redo();
         }
         public nothrow inline float CharWidth() const
         {
@@ -998,10 +1027,12 @@ namespace System.Windows
                             {
                                 int lineIndex = caretLine - 1;
                                 int columnIndex = CaretColumn() - 1;
-                                DeleteChar(lineIndex, columnIndex);
+                                AddDeleteCharCommand(lineIndex, columnIndex);
+                                DeleteChar(lineIndex, columnIndex, 0, 0, 0);
                             }
                             else
                             {
+                                AddRemoveSelectionCommand();
                                 RemoveSelection();
                             }
                             args.handled = true;
@@ -1028,7 +1059,8 @@ namespace System.Windows
                             ResetSelection();
                             int lineIndex = caretLine - 1;
                             int columnIndex = CaretColumn() - 1;
-                            NewLine(lineIndex, columnIndex);
+                            AddNewLineCommand(lineIndex, columnIndex);
+                            NewLine(lineIndex, columnIndex, true);
                             args.handled = true;
                             return;
                         }
@@ -1042,10 +1074,12 @@ namespace System.Windows
                             {
                                 int lineIndex = caretLine - 1;
                                 int columnIndex = CaretColumn() - 1;
+                                AddTabCommand(lineIndex, columnIndex);
                                 Tab(lineIndex, columnIndex);
                             }
                             else
                             {
+                                AddIndentSelectionCommand();
                                 IndentSelection();
                             }
                             args.handled = true;
@@ -1061,10 +1095,12 @@ namespace System.Windows
                             {
                                 int lineIndex = caretLine - 1;
                                 int columnIndex = CaretColumn() - 1;
+                                AddBacktabCommand(lineIndex, columnIndex);
                                 Backtab(lineIndex, columnIndex);
                             }
                             else
                             {
+                                AddUnindentSelectionCommand();
                                 UnindentSelection();
                             }
                             args.handled = true;
@@ -1089,6 +1125,16 @@ namespace System.Windows
                         OnCut();
                         break;
                     }
+                    case cast<Keys>(Keys.altModifier | Keys.back):
+                    {
+                        Undo();
+                        break;
+                    }
+                    case Keys.f4:
+                    {
+                        Redo();
+                        break;
+                    }
                 }
                 if (args.handled && !scrolled)
                 {
@@ -1107,13 +1153,16 @@ namespace System.Windows
                 uchar c(args.keyChar);
                 int lineIndex = caretLine - 1;
                 int columnIndex = CaretColumn() - 1;
+                AddInsertCharCommand(lineIndex, columnIndex, c);
                 InsertChar(lineIndex, columnIndex, c);
-                KeyEventArgs rightArgs(Keys.right, Keys.none);
-                OnKeyDown(rightArgs);
                 args.handled = true;
             }
         }
-        private void InsertChar(int lineIndex, int columnIndex, uchar c)
+        private nothrow void AddInsertCharCommand(int lineIndex, int columnIndex, uchar c)
+        {
+            editCommandList.AddCommand(new InsertCharCommand(lineIndex, columnIndex, c));
+        }
+        public void InsertChar(int lineIndex, int columnIndex, uchar c)
         {
             while (lineIndex >= lines.Count())
             {
@@ -1129,17 +1178,29 @@ namespace System.Windows
             }
             LineEventArgs args(lineIndex, -1);
             OnLineChanged(args);
+            SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength());
+            KeyEventArgs rightArgs(Keys.right, Keys.none);
+            OnKeyDown(rightArgs);
             SetDirty();
         }
         public void InsertText(int lineIndex, int columnIndex, const ustring& text)
         {
             if (text.IsEmpty()) return;
+            List<ustring> linesToInsert = SplitTextIntoLines(text);
+            AddInsertLinesCommand(lineIndex, columnIndex, linesToInsert);
+            InsertLines(lineIndex, columnIndex, linesToInsert);
+        }
+        public nothrow void AddInsertLinesCommand(int lineIndex, int columnIndex, const List<ustring>& linesToInsert)
+        {
+            editCommandList.AddCommand(new InsertLinesCommand(lineIndex, columnIndex, linesToInsert));
+        }
+        public nothrow void InsertLines(int lineIndex, int columnIndext, const List<ustring>& linesToInsert)
+        {
             int indent = 0;
             if (lineIndex > 0 && lineIndex < lines.Count())
             {
                 indent = GetIndent(lines[lineIndex - 1], lineIndex - 1);
             }
-            List<ustring> linesToInsert = SplitTextIntoLines(text);
             int indentLineIndex = lineIndex - 1;
             for (const ustring& lineToInsert : linesToInsert)
             {
@@ -1154,8 +1215,40 @@ namespace System.Windows
             Invalidate();
             SetDirty();
         }
-        private void DeleteChar(int lineIndex, int columnIndex)
+        public nothrow void DeleteLines(int lineIndex, int numLines)
         {
+            for (int i = 0; i < numLines; ++i)
+            {
+                lines.Remove(lines.Begin() + lineIndex);
+                LineEventArgs deleteArgs(lineIndex, -1);
+                OnLineDeleted(deleteArgs);
+            }
+            SetLineNumberFieldLength(cast<int>(lines.Count()));
+            SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength());
+            ScrollToCaret();
+            Invalidate();
+            SetDirty();
+        }
+        private nothrow void AddDeleteCharCommand(int lineIndex, int columnIndex)
+        {
+            if (lineIndex >= lines.Count()) return;
+            ustring& line = lines[lineIndex];
+            if (columnIndex < line.Length())
+            {
+                uchar c = line[columnIndex];
+                editCommandList.AddCommand(new DeleteCharCommand(lineIndex, columnIndex, c));
+            }
+            else
+            {
+                if (lines.Count() > lineIndex + 1)
+                {
+                    editCommandList.AddCommand(new DeleteCharCommand(lineIndex, columnIndex, '\0'));
+                }
+            }
+        }
+        public void DeleteChar(int lineIndex, int columnIndex, int indent, int removedIndent, int numSpaces)
+        {
+            if (lineIndex >= lines.Count()) return;
             ustring& line = lines[lineIndex];
             if (columnIndex < line.Length())
             {
@@ -1167,7 +1260,16 @@ namespace System.Windows
             {
                 if (lines.Count() > lineIndex + 1)
                 {
-                    line.Append(lines[lineIndex + 1]);
+                    if (numSpaces > 0)
+                    {
+                        line.Append(ustring(' ', numSpaces));
+                    }
+                    ustring nextLine = lines[lineIndex + 1];
+                    line.Append(nextLine.Substring(indent));
+                    if (removedIndent > 0 && indent >= removedIndent)
+                    {
+                        line.Insert(0, ustring(' ', removedIndent));
+                    }
                     LineEventArgs changedArgs(lineIndex, -1);
                     OnLineChanged(changedArgs);
                     lines.Remove(lines.Begin() + lineIndex + 1);
@@ -1175,6 +1277,7 @@ namespace System.Windows
                     OnLineDeleted(deletedArgs);
                 }
             }
+            SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength());
             SetDirty();
         }
         private void Backspace(int lineIndex, int columnIndex)
@@ -1195,8 +1298,48 @@ namespace System.Windows
         {
             return 0;
         }
-        private void NewLine(int lineIndex, int columnIndex)
+        public nothrow void AddNewLineCommand(int lineIndex, int columnIndex)
         {
+            while (lineIndex >= lines.Count())
+            {
+                lines.Add(ustring());
+            }
+            ustring& line = lines[lineIndex];
+            int indent = 0;
+            bool countIndent = false;
+            int i = columnIndex - 1;
+            while (i >= 0)
+            {
+                if (line[i] != ' ')
+                {
+                    countIndent = true;
+                    break;
+                }
+                --i;
+            }
+            if (countIndent)
+            {
+                for (int i = 0; i < columnIndex - 1; ++i)
+                {
+                    if (line[i] == ' ') ++indent; else break;
+                }
+            }
+            int numSpaces = 0;
+            i = columnIndex - 1;
+            while (i >= 0 && line[i] == ' ')
+            {
+                ++numSpaces;
+                --i;
+            }
+            int removedIndent = RemoveIndent(lineIndex);
+            editCommandList.AddCommand(new NewLineCommand(lineIndex, columnIndex, indent, removedIndent, numSpaces));
+        }
+        public void NewLine(int lineIndex, int columnIndex, bool doIndent)
+        {
+            while (lineIndex >= lines.Count())
+            {
+                lines.Add(ustring());
+            }
             ustring& line = lines[lineIndex];
             ustring toInsert = TrimEnd(line.Substring(columnIndex));
             bool lineChanged = false;
@@ -1205,7 +1348,11 @@ namespace System.Windows
                 line.Remove(columnIndex, line.Length() - columnIndex);
                 lineChanged = true;
             }
-            int removeIndent = RemoveIndent(lineIndex);
+            int removeIndent = -1;
+            if (doIndent)
+            {
+                removeIndent = RemoveIndent(lineIndex);
+            }
             if (removeIndent > 0 && line.Length() >= removeIndent)
             {
                 line.Remove(0, removeIndent);
@@ -1224,18 +1371,27 @@ namespace System.Windows
             }
             lines.Insert(lines.Begin() + lineIndex + 1, toInsert);
             SetLineNumberFieldLength(cast<int>(lines.Count()));
-            LineEventArgs insertedArgs(lineIndex + 1, lineIndex);
+            int indentLineIndex = -1;
+            if (doIndent)
+            {
+                indentLineIndex = lineIndex;
+            }
+            LineEventArgs insertedArgs(lineIndex + 1, indentLineIndex);
             OnLineInserted(insertedArgs);
             SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength() + GetIndent(line, lineIndex));
             ScrollToCaret();
             Invalidate();
             SetDirty();
         }
-        protected virtual nothrow int IndentSize() const
+        public virtual nothrow int IndentSize() const
         {
             return 0;
         }
-        private void Tab(int lineIndex, int columnIndex)
+        private void AddTabCommand(int lineIndex, int columnIndex)
+        {
+            editCommandList.AddCommand(new TabCommand(lineIndex, columnIndex));
+        }
+        public void Tab(int lineIndex, int columnIndex)
         {
             while (lineIndex >= lines.Count())
             {
@@ -1256,7 +1412,25 @@ namespace System.Windows
             Invalidate();
             SetDirty();
         }
-        private void Backtab(int lineIndex, int columnIndex)
+        private void AddBacktabCommand(int lineIndex, int columnIndex)
+        {
+            ustring& line = lines[lineIndex];
+            int targetCol = Max(cast<int>(1), columnIndex - IndentSize() + 1);
+            int numSpaces = 0;
+            for (int i = columnIndex; i >= targetCol; --i)
+            {
+                if (line[i - 1] == ' ')
+                {
+                    ++numSpaces;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            editCommandList.AddCommand(new BacktabCommand(lineIndex, columnIndex, numSpaces));
+        }
+        public void Backtab(int lineIndex, int columnIndex)
         {
             if (lineIndex >= lines.Count()) return;
             ustring& line = lines[lineIndex];
@@ -1285,6 +1459,28 @@ namespace System.Windows
                 Invalidate();
                 SetDirty();
             }
+        }
+        public nothrow void AddSpaces(int lineIndex, int columnIndex, int numSpaces)
+        {
+            ustring& line = lines[lineIndex];
+            line.Insert(columnIndex - numSpaces, ustring(' ', numSpaces));
+            LineEventArgs args(lineIndex, -1);
+            OnLineChanged(args);
+            SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength() - numSpaces);
+            ScrollToCaret();
+            Invalidate();
+            SetDirty();
+        }
+        public nothrow void RemoveSpaces(int lineIndex, int columnIndex, int numSpaces)
+        {
+            ustring& line = lines[lineIndex];
+            line.Remove(columnIndex - numSpaces, numSpaces);
+            LineEventArgs args(lineIndex, -1);
+            OnLineChanged(args);
+            SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength() - numSpaces);
+            ScrollToCaret();
+            Invalidate();
+            SetDirty();
         }
         protected virtual void OnCopy()
         {
@@ -1472,6 +1668,10 @@ namespace System.Windows
         {
             selectionChangedEvent.Fire();
         }
+        public nothrow void SetSelection(const Selection& selection_)
+        {
+            selection = selection_;
+        }
         public nothrow void ResetSelection()
         {
             if (!selection.IsEmpty())
@@ -1485,27 +1685,170 @@ namespace System.Windows
         {
             return selection.IsEmpty();
         }
-        public nothrow ustring GetSelection() const
+        public nothrow SelectionData GetSelection() const
         {
-            if (selection.IsEmpty()) return ustring();
+            if (selection.IsEmpty()) return SelectionData();
             if (selection.start.line == selection.end.line)
             {
                 ustring s = lines[selection.start.line - 1].Substring(selection.start.column - 1, selection.end.column - selection.start.column);
-                return Unindent(s, MinIndent(s));
+                int indent = MinIndent(s);
+                SelectionData selectionData(Unindent(s, indent), indent, 0);
+                return selectionData;
             }
             else
             {
+                int numTrailingSpaces = 0;
                 ustring s = lines[selection.start.line - 1].Substring(selection.start.column - 1).Append(u"\n");
                 for (int i = selection.start.line; i < selection.end.line - 1; ++i)
                 {
                     s.Append(lines[i]).Append(u"\n");
                 }
-                if (!lines[selection.end.line - 1].Substring(0, selection.end.column - 1).IsEmpty())
+                if (selection.end.line - 1 < lines.Count())
                 {
-                    s.Append(lines[selection.end.line - 1].Substring(0, selection.end.column - 1)).Append(u"\n");
+                    if (!lines[selection.end.line - 1].Substring(0, selection.end.column - 1).IsEmpty())
+                    {
+                        ustring lastLine = lines[selection.end.line - 1].Substring(0, selection.end.column - 1);
+                        numTrailingSpaces = GetNumTrailingSpaces(lastLine);
+                        s.Append(lastLine).Append(u"\n");
+                    }
                 }
-                return Unindent(s, MinIndent(s));
+                else
+                {
+                    int i = selection.end.line - 1;
+                    while (i >= lines.Count())
+                    {
+                        s.Append(u"\n");
+                        --i;
+                    }
+                }
+                int indent = MinIndent(s);
+                SelectionData selectionData(Unindent(s, indent), indent, numTrailingSpaces);
+                return selectionData;
             }
+        }
+        public nothrow void InsertSelection(const Selection& selectionToInsert, const SelectionData& selectionData, bool wholeLine)
+        {
+            if (selectionToInsert.IsEmpty()) return;
+            if (selectionToInsert.start.line == selectionToInsert.end.line)
+            {
+                if (wholeLine)
+                {
+                    int lineIndex = selectionToInsert.start.line - 1;
+                    ustring selectedText = selectionData.selectedText;
+                    if (selectionData.indent > 0)
+                    {
+                        selectedText.Insert(0, ustring(' ', selectionData.indent));
+                    }
+                    lines.Insert(lines.Begin() + lineIndex, selectedText);
+                    LineEventArgs insertArgs(lineIndex, -1);
+                    OnLineInserted(insertArgs);
+                    SetCaretLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
+                }
+                else
+                {
+                    int lineIndex = selectionToInsert.start.line - 1;
+                    ustring selectedText = selectionData.selectedText;
+                    if (selectionData.indent > 0)
+                    {
+                        selectedText.Insert(0, ustring(' ', selectionData.indent));
+                    }
+                    lines[lineIndex].Insert(selectionToInsert.start.column - 1, selectedText);
+                    LineEventArgs changeArgs(lineIndex, -1);
+                    OnLineChanged(changeArgs);
+                    SetCaretLineCol(lineIndex + 1, selectionToInsert.start.column + LineNumberFieldLength());
+                }
+            }
+            else
+            {
+                List<ustring> selectionLines = SplitTextIntoLines(selectionData.selectedText);
+                int startLineIndex = selectionToInsert.start.line - 1;
+                int endLineIndex = selectionToInsert.end.line - 1;
+                int lineCount  = endLineIndex - startLineIndex + 1;
+                if (selectionToInsert.start.column > 1)
+                {
+                    ustring firstSelectionLine = selectionLines[0];
+                    if (selectionData.indent > 0)
+                    {
+                        firstSelectionLine.Insert(0, ustring(' ', selectionData.indent));
+                    }
+                    lines[startLineIndex].Insert(selectionToInsert.start.column - 1, firstSelectionLine);
+                    LineEventArgs changeArgs(startLineIndex, -1);
+                    OnLineChanged(changeArgs);
+                    ++startLineIndex;
+                }
+                else
+                {
+                    ustring firstSelectionLine = selectionLines[0];
+                    if (selectionData.indent > 0)
+                    {
+                        firstSelectionLine.Insert(0, ustring(' ', selectionData.indent));
+                    }
+                    lines.Insert(lines.Begin() + startLineIndex, firstSelectionLine);
+                    LineEventArgs insertArgs(startLineIndex, -1);
+                    OnLineInserted(insertArgs);
+                    ++startLineIndex;
+                }
+                int n = endLineIndex;
+                for (int i = startLineIndex; i < n; ++i)
+                {
+                    ustring selectionLine = selectionLines[i - startLineIndex + 1];
+                    if (selectionData.indent > 0)
+                    {
+                        selectionLine.Insert(0, ustring(' ', selectionData.indent));
+                    }
+                    lines.Insert(lines.Begin() + i, selectionLine);
+                    LineEventArgs insertArgs(i, -1);
+                    OnLineInserted(insertArgs);
+                }
+                ustring lastLine;
+                if (selectionLines.Count() >= lineCount)
+                {
+                    lastLine = selectionLines.Back();
+                    if (selectionData.indent > 0)
+                    {
+                        lastLine.Insert(0, ustring(' ', selectionData.indent));
+                    }
+                    lastLine.Append(' ', selectionData.numTrailingSpaces);
+                }
+                if (wholeLine)
+                {
+                    lines.Insert(lines.Begin() + endLineIndex, lastLine);
+                    LineEventArgs insertArgs(endLineIndex, -1);
+                    OnLineInserted(insertArgs);
+                }
+                else
+                {
+                    lines[endLineIndex].Insert(0, lastLine);
+                    LineEventArgs changeArgs(endLineIndex, -1);
+                    OnLineChanged(changeArgs);
+                }
+            }
+            selection = selectionToInsert;
+            SetCaretLineCol(selection.end.line, selection.end.column + LineNumberFieldLength());
+            Invalidate();
+            SetDirty();
+        }
+        public nothrow void AddRemoveSelectionCommand()
+        {
+            if (selection.IsEmpty()) return;
+            bool wholeLine = false;
+            SelectionData selectionData = GetSelection();
+            if (selection.start.line == selection.end.line)
+            {
+                if (selection.end.column - selection.start.column >= GetLineLength(selection.start.line))
+                {
+                    wholeLine = true;
+                }
+            }
+            else
+            {
+                int endLineIndex = selection.end.line - 1;
+                if (selection.end.column > GetLineLength(endLineIndex + 1))
+                {
+                    wholeLine = true;
+                }
+            }
+            editCommandList.AddCommand(new RemoveSelectionCommand(selection, selectionData, wholeLine));
         }
         public nothrow void RemoveSelection()
         {
@@ -1518,7 +1861,7 @@ namespace System.Windows
                     lines.Remove(lines.Begin() + lineIndex);
                     LineEventArgs deleteArgs(lineIndex, -1);
                     OnLineDeleted(deleteArgs);
-                    SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength());
+                    SetCaretLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
                 }
                 else
                 {
@@ -1576,6 +1919,10 @@ namespace System.Windows
             Invalidate();
             SetDirty();
         }
+        private nothrow void AddIndentSelectionCommand()
+        {
+            editCommandList.AddCommand(new IndentSelectionCommand(selection));
+        }
         public nothrow void IndentSelection()
         {
             if (selection.IsEmpty()) return;
@@ -1593,6 +1940,10 @@ namespace System.Windows
             Invalidate();
             SetDirty();
         }
+        public nothrow void AddUnindentSelectionCommand()
+        {
+            editCommandList.AddCommand(new UnindentSelectionCommand(selection));
+        }
         public nothrow void UnindentSelection()
         {
             if (selection.IsEmpty()) return;
@@ -1601,7 +1952,12 @@ namespace System.Windows
             ustring indentString(' ', IndentSize());
             for (int i = startLineIndex; i <= endLineIndex; ++i)
             {
-                if (lines[i].StartsWith(indentString))
+                ustring line = lines[i];
+                if (i == endLineIndex)
+                {
+                    line = line.Substring(0, selection.end.column - 1);
+                }
+                if (line.StartsWith(indentString))
                 {
                     lines[i].Remove(0, IndentSize());
                     LineEventArgs changeArgs(i, -1);
@@ -1821,6 +2177,7 @@ namespace System.Windows
         private string measureString;
         private Selection selection;
         private System.Windows.Color selectionBackgroundColor;
+        private EditCommandList editCommandList;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)
@@ -1831,6 +2188,18 @@ namespace System.Windows
             --i;
         }
         return line.Substring(0, i);
+    }
+
+    public nothrow int GetNumTrailingSpaces(const ustring& line)
+    {
+        int numTrailingSpaces = 0;
+        long i = line.Length();
+        while (i > 0 && IsWhiteSpace(line[i - 1]))
+        {
+            --i;
+            ++numTrailingSpaces;
+        }
+        return numTrailingSpaces;
     }
 
     public List<ustring> SplitTextIntoLines(const ustring& text)
@@ -1933,6 +2302,10 @@ namespace System.Windows
         if (indent > 0 && indent < minIndent)
         {
             minIndent = indent;
+        }
+        if (minIndent == MaxValue<int>())
+        {
+            minIndent = 0;
         }
         return minIndent;
     }

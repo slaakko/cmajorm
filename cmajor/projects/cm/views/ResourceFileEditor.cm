@@ -19,9 +19,21 @@ namespace Cm.Views
             ustring content = ToUtf32(File.ReadAllText(filePath));
             textView->SetTextContent(content);
         }
-        public nothrow inline TextView* GetTextView() const
+        public nothrow override TextView* GetTextView() const
         {
             return textView;
+        }
+        public nothrow override void Select()
+        {
+            textView->Select();
+        }
+        public nothrow override void Undo()
+        {
+            textView->Undo();
+        }
+        public nothrow override void Redo()
+        {
+            textView->Redo();
         }
         private TextView* textView;
     }

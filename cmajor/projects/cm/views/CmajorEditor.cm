@@ -42,6 +42,22 @@ namespace Cm.Views
         {
             return sourceCodeView;
         }
+        public nothrow override TextView* GetTextView() const
+        {
+            return sourceCodeView;
+        }
+        public nothrow override void Select()
+        {
+            sourceCodeView->Select();
+        }
+        public nothrow override void Undo()
+        {
+            sourceCodeView->Undo();
+        }
+        public nothrow override void Redo()
+        {
+            sourceCodeView->Redo();
+        }
         private string filePath;
         private CmajorSourceCodeView* sourceCodeView;
     }

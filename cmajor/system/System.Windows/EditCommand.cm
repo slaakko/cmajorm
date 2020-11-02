@@ -1,0 +1,271 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows
+{
+    public abstract class EditCommand
+    {
+        public default virtual ~EditCommand();
+        public abstract nothrow void Undo(TextView* textView);
+        public abstract nothrow void Redo(TextView* textView);
+    }
+
+    public class EditCommandList
+    {
+        public nothrow EditCommandList(TextView* textView_) : textView(textView_), currentIndex(0)
+        {
+        }
+        public nothrow void SetMenuItems(MenuItem* undoMenuItem_, MenuItem* redoMenuItem_)
+        {
+            undoMenuItem = undoMenuItem_;
+            redoMenuItem = redoMenuItem_;
+            UpdateMenuItems();
+        }
+        public nothrow bool CanUndo() const
+        {
+            return currentIndex > 0;
+        }
+        public nothrow bool CanRedo() const
+        {
+            return currentIndex < commands.Count();
+        }
+        public nothrow void UpdateMenuItems()
+        {
+            if (CanUndo())
+            {
+                undoMenuItem->Enable();
+            }
+            else
+            {
+                undoMenuItem->Disable();
+            }
+            if (CanRedo())
+            {
+                redoMenuItem->Enable();
+            }
+            else
+            {
+                redoMenuItem->Disable();
+            }
+        }
+        public nothrow void AddCommand(EditCommand* command)
+        {
+            if (currentIndex >= commands.Count())
+            {
+                commands.Add(UniquePtr<EditCommand>(command));
+                currentIndex = cast<int>(commands.Count());
+            }
+            else
+            {
+                commands[currentIndex].Reset(command);
+                ++currentIndex;
+            }
+            commands.Resize(currentIndex);
+            UpdateMenuItems();
+        }
+        public nothrow void Undo()
+        {
+            if (CanUndo())
+            {
+                --currentIndex;
+                EditCommand* command = commands[currentIndex].Get();
+                command->Undo(textView);
+            }
+            UpdateMenuItems();
+        }
+        public nothrow void Redo()
+        {
+            if (CanRedo())
+            {
+                EditCommand* command = commands[currentIndex].Get();
+                command->Redo(textView);
+                ++currentIndex;
+            }
+            UpdateMenuItems();
+        }
+        private TextView* textView;
+        private int currentIndex;
+        private List<UniquePtr<EditCommand>> commands;
+        private MenuItem* undoMenuItem;
+        private MenuItem* redoMenuItem;
+    }
+
+    public class InsertCharCommand : EditCommand
+    {
+        public nothrow InsertCharCommand(int lineIndex_, int columnIndex_, uchar c_) : lineIndex(lineIndex_), columnIndex(columnIndex_), c(c_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            textView->DeleteChar(lineIndex, columnIndex, 0, 0, 0);
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->InsertChar(lineIndex, columnIndex, c);
+        }
+        private int lineIndex;
+        private int columnIndex;
+        private uchar c;
+    }
+
+    public class DeleteCharCommand : EditCommand
+    {
+        public nothrow DeleteCharCommand(int lineIndex_, int columnIndex_, uchar c_) : lineIndex(lineIndex_), columnIndex(columnIndex_), c(c_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            if (c != '\0')
+            {
+                textView->InsertChar(lineIndex, columnIndex, c);
+            }
+            else
+            {
+                textView->NewLine(lineIndex, columnIndex, false);
+            }
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->DeleteChar(lineIndex, columnIndex, 0, 0, 0);
+        }
+        private int lineIndex;
+        private int columnIndex;
+        private uchar c;
+    }
+
+    public class NewLineCommand : EditCommand
+    {
+        public nothrow NewLineCommand(int lineIndex_, int columnIndex_, int indent_, int removedIndent_, int numSpaces_) :
+            lineIndex(lineIndex_), columnIndex(columnIndex_), indent(indent_), removedIndent(removedIndent_), numSpaces(numSpaces_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            textView->DeleteChar(lineIndex, columnIndex, indent, removedIndent, numSpaces);
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->NewLine(lineIndex, columnIndex, true);
+        }
+        private int lineIndex;
+        private int columnIndex;
+        private int indent;
+        private int removedIndent;
+        private int numSpaces;
+    }
+
+    public class InsertLinesCommand : EditCommand
+    {
+        public nothrow InsertLinesCommand(int lineIndex_, int columnIndex_, const List<ustring>& lines_) :
+            lineIndex(lineIndex_), columnIndex(columnIndex_), lines(lines_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            textView->DeleteLines(lineIndex, cast<int>(lines.Count()));
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->InsertLines(lineIndex, columnIndex, lines);
+        }
+        private int lineIndex;
+        private int columnIndex;
+        private List<ustring> lines;
+    }
+
+    public class RemoveSelectionCommand : EditCommand
+    {
+        public nothrow RemoveSelectionCommand(const Selection& selection_, const SelectionData& selectionData_, bool wholeLine_) : 
+            selection(selection_), selectionData(selectionData_), wholeLine(wholeLine_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            textView->InsertSelection(selection, selectionData, wholeLine);
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->SetSelection(selection);
+            textView->RemoveSelection();
+        }
+        private Selection selection;
+        private SelectionData selectionData;
+        private bool wholeLine;
+    }
+
+    public class TabCommand : EditCommand
+    {
+        public nothrow TabCommand(int lineIndex_, int columnIndex_) : lineIndex(lineIndex_), columnIndex(columnIndex_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            textView->Backtab(lineIndex, columnIndex + textView->IndentSize());
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->Tab(lineIndex, columnIndex);
+        }
+        private int lineIndex;
+        private int columnIndex;
+    }
+
+    public class BacktabCommand : EditCommand
+    {
+        public nothrow BacktabCommand(int lineIndex_, int columnIndex_, int numSpaces_) : lineIndex(lineIndex_), columnIndex(columnIndex_), numSpaces(numSpaces_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            textView->AddSpaces(lineIndex, columnIndex, numSpaces);
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->RemoveSpaces(lineIndex, columnIndex, numSpaces);
+        }
+        private int lineIndex;
+        private int columnIndex;
+        private int numSpaces;
+    }
+
+    public class IndentSelectionCommand : EditCommand
+    {
+        public nothrow IndentSelectionCommand(const Selection& selection_) : selection(selection_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            textView->SetSelection(selection);
+            textView->UnindentSelection();
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->SetSelection(selection);
+            textView->IndentSelection();
+        }
+        private Selection selection;
+    }
+
+    public class UnindentSelectionCommand : EditCommand
+    {
+        public UnindentSelectionCommand(const Selection& selection_) : selection(selection_)
+        {
+        }
+        public override nothrow void Undo(TextView* textView)
+        {
+            textView->SetSelection(selection);
+            textView->IndentSelection();
+        }
+        public override nothrow void Redo(TextView* textView)
+        {
+            textView->SetSelection(selection);
+            textView->UnindentSelection();
+        }
+        private Selection selection;
+    }
+}

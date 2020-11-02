@@ -181,6 +181,18 @@ namespace cmcode
             pasteMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.v));
             pasteMenuItem->ClickEvent().AddHandler(PasteClick);
             editMenuItem->AddMenuItem(pasteMenuItemPtr.Release());
+            UniquePtr<MenuItem> undoMenuItemPtr(new MenuItem("U&ndo"));
+            undoMenuItem = undoMenuItemPtr.Get();
+            undoMenuItem->Disable();
+            undoMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.z));
+            undoMenuItem->ClickEvent().AddHandler(UndoClick);
+            editMenuItem->AddMenuItem(undoMenuItemPtr.Release());
+            UniquePtr<MenuItem> redoMenuItemPtr(new MenuItem("&Redo"));
+            redoMenuItem = redoMenuItemPtr.Get();
+            redoMenuItem->Disable();
+            redoMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.y));
+            redoMenuItem->ClickEvent().AddHandler(RedoClick);
+            editMenuItem->AddMenuItem(redoMenuItemPtr.Release());
             menuBar->AddMenuItem(editMenuItem.Release());
 
             UniquePtr<MenuItem> viewMenuItem(new MenuItem("&View"));
@@ -633,6 +645,21 @@ namespace cmcode
             if (editor != null)
             {
                 sourceFilePathStatusBarItem->SetText(editor->FilePath());
+                editor->Select();
+                TextView* textView = editor->GetTextView();
+                if (textView != null)
+                {
+                    if (!textView->IsSelectionEmpty())
+                    {
+                        copyMenuItem->Enable();
+                        cutMenuItem->Enable();
+                    }
+                    else
+                    {
+                        copyMenuItem->Disable();
+                        cutMenuItem->Disable();
+                    }
+                }
             }
         }
         private void CodeTabPageRemoved(ControlEventArgs& args)
@@ -1878,22 +1905,18 @@ namespace cmcode
                 Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
                 if (editor != null)
                 {
-                    if (editor is Cm.Views.CmajorEditor*)
+                    TextView* textView = editor->GetTextView();
+                    if (textView!= null)
                     {
-                        Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
-                        Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
-                        if (sourceCodeView != null)
+                        SelectionData selection = textView->GetSelection();
+                        if (!selection.selectedText.IsEmpty())
                         {
-                            ustring selection = sourceCodeView->GetSelection();
-                            if (!selection.IsEmpty())
-                            {
-                                Clipboard clipboard(Handle());
-                                clipboard.SetStringData(cmajorCodeFormat, selection);
-                                ustring crlfText = selection;
-                                crlfText.Replace(u"\n", u"\r\n");
-                                ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
-                                clipboard.SetStringData(unicodeText, crlfText);
-                            }
+                            Clipboard clipboard(Handle());
+                            clipboard.SetStringData(cmajorCodeFormat, selection.selectedText);
+                            ustring crlfText = selection.selectedText;
+                            crlfText.Replace(u"\n", u"\r\n");
+                            ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
+                            clipboard.SetStringData(unicodeText, crlfText);
                         }
                     }
                 }
@@ -1912,23 +1935,19 @@ namespace cmcode
                 Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
                 if (editor != null)
                 {
-                    if (editor is Cm.Views.CmajorEditor*)
+                    TextView* textView = editor->GetTextView();
+                    if (textView!= null)
                     {
-                        Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
-                        Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
-                        if (sourceCodeView != null)
+                        SelectionData selection = textView->GetSelection();
+                        if (!selection.selectedText.IsEmpty())
                         {
-                            ustring selection = sourceCodeView->GetSelection();
-                            if (!selection.IsEmpty())
-                            {
-                                Clipboard clipboard(Handle());
-                                clipboard.SetStringData(cmajorCodeFormat, selection);
-                                ustring crlfText = selection;
-                                crlfText.Replace(u"\n", u"\r\n");
-                                ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
-                                clipboard.SetStringData(unicodeText, crlfText);
-                                sourceCodeView->RemoveSelection();
-                            }
+                            Clipboard clipboard(Handle());
+                            clipboard.SetStringData(cmajorCodeFormat, selection.selectedText);
+                            ustring crlfText = selection.selectedText;
+                            crlfText.Replace(u"\n", u"\r\n");
+                            ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
+                            clipboard.SetStringData(unicodeText, crlfText);
+                            textView->RemoveSelection();
                         }
                     }
                 }
@@ -1949,16 +1968,12 @@ namespace cmcode
                     Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
                     if (editor != null)
                     {
-                        if (editor is Cm.Views.CmajorEditor*)
+                        TextView* textView = editor->GetTextView();
+                        if (textView != null)
                         {
-                            Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
-                            Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
-                            if (sourceCodeView != null)
-                            {
-                                int lineIndex = sourceCodeView->CaretLine() - 1;
-                                int columnIndex = sourceCodeView->CaretColumn() - 1;
-                                sourceCodeView->InsertText(lineIndex, columnIndex, clipboardData);
-                            }
+                            int lineIndex = textView->CaretLine() - 1;
+                            int columnIndex = textView->CaretColumn() - 1;
+                            textView->InsertText(lineIndex, columnIndex, clipboardData);
                         }
                     }
                 }
@@ -2045,10 +2060,11 @@ namespace cmcode
             sourceCodeView->GotoCaretLineEvent().AddHandler(SourceCodeViewRunToCursor);
             sourceCodeView->ExpressionHoverEvent().AddHandler(ExpressionHovered);
             sourceCodeView->ExpressionExitHoverEvent().AddHandler(ExpressionExitHover);
-            sourceCodeView->SelectionChangedEvent().AddHandler(SourceCodeViewSelectionChanged);
+            sourceCodeView->SelectionChangedEvent().AddHandler(EditorSelectionChanged);
             sourceCodeView->CopyEvent().AddHandler(CopyClick);
             sourceCodeView->CutEvent().AddHandler(CutClick);
             sourceCodeView->PasteEvent().AddHandler(PasteClick);
+            sourceCodeView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
             Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
             debugStrip->BreakpointAddedEvent().AddHandler(BreakpointAdded);
             debugStrip->BreakpointRemovedEvent().AddHandler(BreakpointRemoved);
@@ -2064,6 +2080,11 @@ namespace cmcode
             UniquePtr<Cm.Views.ResourceFileEditor> editorPtr(new Cm.Views.ResourceFileEditor(filePath));
             Cm.Views.ResourceFileEditor* editor = editorPtr.Get();
             TextView* textView = editor->GetTextView();
+            textView->SelectionChangedEvent().AddHandler(EditorSelectionChanged);
+            textView->CopyEvent().AddHandler(CopyClick);
+            textView->CutEvent().AddHandler(CutClick);
+            textView->PasteEvent().AddHandler(PasteClick);
+            textView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
             editorByTabPageMap[tabPage.Get()] = editor;
             tabPage->AddChild(editorPtr.Release());
             codeTabControl->AddTabPage(tabPage.Release());
@@ -2075,6 +2096,11 @@ namespace cmcode
             UniquePtr<Cm.Views.TextFileEditor> editorPtr(new Cm.Views.TextFileEditor(filePath));
             Cm.Views.TextFileEditor* editor = editorPtr.Get();
             TextView* textView = editor->GetTextView();
+            textView->SelectionChangedEvent().AddHandler(EditorSelectionChanged);
+            textView->CopyEvent().AddHandler(CopyClick);
+            textView->CutEvent().AddHandler(CutClick);
+            textView->PasteEvent().AddHandler(PasteClick);
+            textView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
             editorByTabPageMap[tabPage.Get()] = editor;
             tabPage->AddChild(editorPtr.Release());
             codeTabControl->AddTabPage(tabPage.Release());
@@ -2375,6 +2401,40 @@ namespace cmcode
                 debugService.Reset();
             }
         }
+        private void UndoClick()
+        {
+            try
+            {
+                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                if (editor != null)
+                {
+                    editor->Undo();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void RedoClick()
+        {
+            try
+            {
+                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                if (editor != null)
+                {
+                    editor->Redo();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void ToggleBreakpointClick()
         {
             try
@@ -2657,28 +2717,24 @@ namespace cmcode
         {
             toolTipWindow->Hide();
         }
-        private void SourceCodeViewSelectionChanged()
+        private void EditorSelectionChanged()
         {
             TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
             Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
             if (editor != null)
             {
-                if (editor is Cm.Views.CmajorEditor*)
+                TextView* textView = editor->GetTextView();
+                if (textView!= null)
                 {
-                    Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
-                    Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
-                    if (sourceCodeView != null)
+                    if (textView->IsSelectionEmpty())
                     {
-                        if (sourceCodeView->IsSelectionEmpty())
-                        {
-                            copyMenuItem->Disable();
-                            cutMenuItem->Disable();
-                        }
-                        else
-                        {
-                            copyMenuItem->Enable();
-                            cutMenuItem->Enable();
-                        }
+                        copyMenuItem->Disable();
+                        cutMenuItem->Disable();
+                    }
+                    else
+                    {
+                        copyMenuItem->Enable();
+                        cutMenuItem->Enable();
                     }
                 }
             }
@@ -3046,6 +3102,8 @@ namespace cmcode
         private MenuItem* copyMenuItem;
         private MenuItem* cutMenuItem;
         private MenuItem* pasteMenuItem;
+        private MenuItem* undoMenuItem;
+        private MenuItem* redoMenuItem;
 
         private ToolButton* saveToolButton;
         private ToolButton* saveAllToolButton;

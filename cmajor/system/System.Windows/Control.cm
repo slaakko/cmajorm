@@ -896,10 +896,6 @@ namespace System.Windows
                 case WM_CHAR:
                 {
                     wchar ch = cast<wchar>(message.wparam);
-                    if (ch != '\t')
-                    {
-                        ResetModifierKeys();
-                    }
                     KeyPressEventArgs args(ch);
                     DoKeyPress(args);
                     if (args.handled)
@@ -1291,6 +1287,7 @@ namespace System.Windows
                 args.handled = KeyDownHandled();
                 return;
             }
+            ResetModifierKeys();
             DispatchKeyPress(args);
         }
         private void DispatchKeyPress(KeyPressEventArgs& args)
