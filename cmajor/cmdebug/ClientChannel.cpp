@@ -97,7 +97,7 @@ std::unique_ptr<JsonValue> ClientChannel::GetMessage()
 
 void ClientChannel::SendMessage(JsonValue* message)
 {
-    std::lock_guard lock(messageQueueMtx);
+    std::lock_guard<std::mutex> lock(messageQueueMtx);
     messageQueue.push_back(std::unique_ptr<JsonValue>(message));
     messageEnqueued.notify_one();
 }
