@@ -2008,7 +2008,7 @@ void* Emitter::CreateAlloca(void* irType)
 
 void* Emitter::NewAllocaInst(void* irType)
 {
-#if (LLVM_VERSION_MAJOR >= 11)
+#if (LLVM_VERSION_MAJOR >= 11 && defined(_WIN32))
     llvm::Twine name = "";
     llvm::Instruction* insertBefore = nullptr;
     return new llvm::AllocaInst(static_cast<llvm::Type*>(irType), 0, name, insertBefore);
