@@ -349,7 +349,6 @@ public:
     virtual void* CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags) = 0;
     virtual void SetDISubprogram(void* function, void* subprogram) = 0;
     virtual void* CreateAlloca(void* irType) = 0;
-    virtual void* NewAllocaInst(void* irType, void* basicBlock) = 0;
     virtual void* CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst) = 0;
     virtual void* CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst) = 0;
     virtual void* GetFunctionArgument(void* function, int argumentIndex) = 0;
@@ -383,7 +382,7 @@ public:
     virtual int Install(const std::u32string& str) = 0;
     virtual void* CreateLandingPad(void* lpType) = 0;
     virtual void SetLandindPadAsCleanup(void* landingPad) = 0;
-    virtual void InsertAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock) = 0;
+    virtual void MoveAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock) = 0;
     virtual void AddClauseToLangdingPad(void* landingPad, void* exceptionTypeId) = 0;
     virtual void* CreateExtractValue(void* aggregate, const std::vector<unsigned int>& indeces) = 0;
     virtual void* CreateInsertValue(void* aggregate, void* value, const std::vector<unsigned int>& indeces) = 0;

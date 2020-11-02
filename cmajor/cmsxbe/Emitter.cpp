@@ -1720,11 +1720,6 @@ void* Emitter::CreateAlloca(void* irType)
     return context->CreateLocal(static_cast<cmsxi::Type*>(irType));
 }
 
-void* Emitter::NewAllocaInst(void* irType, void* basicBlock)
-{
-    return nullptr;
-}
-
 void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)
 {
     // todo
@@ -1898,7 +1893,7 @@ void Emitter::SetLandindPadAsCleanup(void* landingPad)
 {
 }
 
-void Emitter::InsertAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock)
+void Emitter::MoveAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock)
 {
 }
 

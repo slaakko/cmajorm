@@ -1718,9 +1718,9 @@ int LlvmCodeGenerator::Install(const std::u32string& str)
     return compileUnit->Install(str);
 }
 
-void LlvmCodeGenerator::InsertAllocaIntoEntryBlock(void* allocaInst)
+void LlvmCodeGenerator::MoveAllocaIntoEntryBlock(void* allocaInst)
 {
-    emitter->InsertAllocaIntoBasicBlock(allocaInst, lastAlloca, entryBasicBlock);
+    emitter->MoveAllocaIntoBasicBlock(allocaInst, lastAlloca, entryBasicBlock);
     lastAlloca = allocaInst;
 }
 

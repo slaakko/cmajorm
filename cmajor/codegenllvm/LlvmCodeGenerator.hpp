@@ -106,7 +106,7 @@ public:
     int Install(const std::string& str) override;
     int Install(const std::u16string& str) override;
     int Install(const std::u32string& str) override;
-    void InsertAllocaIntoEntryBlock(void* allocaInst);
+    void MoveAllocaIntoEntryBlock(void* allocaInst);
     void Optimize(int optimizationLevel, const std::string& bcFilePath, const std::string& optBCFilePath);
     void* EntryBasicBlock() const { return entryBasicBlock; }
 protected:

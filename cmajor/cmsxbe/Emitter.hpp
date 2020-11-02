@@ -318,7 +318,6 @@ public:
     void* CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags) override;
     void SetDISubprogram(void* function, void* subprogram) override;
     void* CreateAlloca(void* irType) override;
-    void* NewAllocaInst(void* irType, void* basicBlock) override;
     void* CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst) override;
     void* CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst) override;
     void* GetFunctionArgument(void* function, int argumentIndex) override;
@@ -352,7 +351,7 @@ public:
     int Install(const std::u32string& str) override;
     void* CreateLandingPad(void* lpType) override;
     void SetLandindPadAsCleanup(void* landingPad) override;
-    void InsertAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock) override;
+    void MoveAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock) override;
     void AddClauseToLangdingPad(void* landingPad, void* exceptionTypeId) override;
     void* CreateExtractValue(void* aggregate, const std::vector<unsigned int>& indeces) override;
     void* CreateInsertValue(void* aggregate, void* value, const std::vector<unsigned int>& indeces) override;

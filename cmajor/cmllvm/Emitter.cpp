@@ -2006,12 +2006,6 @@ void* Emitter::CreateAlloca(void* irType)
     return builder.CreateAlloca(static_cast<llvm::Type*>(irType));
 }
 
-void* Emitter::NewAllocaInst(void* irType, void* basicBlock)
-{
-    llvm::Twine name = "";
-    return new llvm::AllocaInst(static_cast<llvm::Type*>(irType), 0, name, static_cast<llvm::BasicBlock*>(basicBlock));
-}
-
 void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)
 {
     llvm::DILocalVariable* paramVar = diBuilder->createParameterVariable(static_cast<llvm::DIScope*>(CurrentScope()), name, index, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
@@ -2242,22 +2236,23 @@ void Emitter::SetLandindPadAsCleanup(void* landingPad)
     lp->setCleanup(true);
 }
 
-void Emitter::InsertAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock)
+void Emitter::MoveAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock)
 {
     if (lastAlloca)
     {
-        static_cast<llvm::AllocaInst*>(allocaInst)->insertAfter(static_cast<llvm::AllocaInst*>(lastAlloca));
+        static_cast<llvm::AllocaInst*>(allocaInst)->moveAfter(static_cast<llvm::AllocaInst*>(lastAlloca));
     }
     else
     {
         llvm::BasicBlock* block = static_cast<llvm::BasicBlock*>(basicBlock);
         if (block->empty())
         {
+            static_cast<llvm::AllocaInst*>(allocaInst)->removeFromParent();
             block->getInstList().push_back(static_cast<llvm::AllocaInst*>(allocaInst));
         }
         else
         {
-            block->getInstList().insert(block->getInstList().begin(), static_cast<llvm::AllocaInst*>(allocaInst));
+            static_cast<llvm::AllocaInst*>(allocaInst)->moveBefore(block->getTerminator());
         }
     }
 }
