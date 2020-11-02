@@ -9,6 +9,7 @@
 #include <soulng/util/TextUtils.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
+#include <thread>
 #include <iostream>
 
 namespace cmajor { namespace debug {
