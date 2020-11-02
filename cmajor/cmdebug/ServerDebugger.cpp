@@ -229,7 +229,7 @@ struct ClientChannelGuard
 
 ServerDebugger::ServerDebugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, bool breakOnThrow_, const std::string& version_,
     int port_, bool log_) :
-    Debugger(verbose_, breakOnThrow_, new ServerDebuggerOutputWriter(this, log), executable, args), version(version_), port(port_), log(log_), exiting(false),
+    Debugger(verbose_, breakOnThrow_, new ServerDebuggerOutputWriter(this, log_), executable, args), version(version_), port(port_), log(log_), exiting(false),
     listening(false), logFilePath(CmdbLogFilePath()), clientChannel(nullptr), targetInputReplyReceived(false), targetOutputReplyReceived(false), targetRunningIntervalMs(250)
 {
 }
