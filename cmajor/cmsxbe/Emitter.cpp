@@ -1720,7 +1720,7 @@ void* Emitter::CreateAlloca(void* irType)
     return context->CreateLocal(static_cast<cmsxi::Type*>(irType));
 }
 
-void* Emitter::NewAllocaInst(void* irType)
+void* Emitter::NewAllocaInst(void* irType, void* basicBlock)
 {
     return nullptr;
 }

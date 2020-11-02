@@ -320,7 +320,7 @@ public:
     void* CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags) override;
     void SetDISubprogram(void* function, void* subprogram) override;
     void* CreateAlloca(void* irType) override;
-    void* NewAllocaInst(void* irType) override;
+    void* NewAllocaInst(void* irType, void* basicBlock) override;
     void* CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst) override;
     void* CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst) override;
     void* GetFunctionArgument(void* function, int argumentIndex) override;

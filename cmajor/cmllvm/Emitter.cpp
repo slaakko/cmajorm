@@ -2006,15 +2006,10 @@ void* Emitter::CreateAlloca(void* irType)
     return builder.CreateAlloca(static_cast<llvm::Type*>(irType));
 }
 
-void* Emitter::NewAllocaInst(void* irType)
+void* Emitter::NewAllocaInst(void* irType, void* basicBlock)
 {
-#if (LLVM_VERSION_MAJOR >= 11 && defined(_WIN32))
     llvm::Twine name = "";
-    llvm::Instruction* insertBefore = nullptr;
-    return new llvm::AllocaInst(static_cast<llvm::Type*>(irType), 0, name, insertBefore);
-#else
-    return new llvm::AllocaInst(static_cast<llvm::Type*>(irType), 0);
-#endif
+    return new llvm::AllocaInst(static_cast<llvm::Type*>(irType), 0, name, static_cast<llvm::BasicBlock*>(basicBlock));
 }
 
 void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)
