@@ -4,6 +4,7 @@
 // =================================
 
 #include <soulng/util/Multiprecision.hpp>
+#include <boost/serialization/nvp.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/lexical_cast.hpp>
