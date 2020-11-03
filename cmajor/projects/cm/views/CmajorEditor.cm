@@ -46,6 +46,18 @@ namespace Cm.Views
         {
             return sourceCodeView;
         }
+        public override void SaveTo(const string& filePath)
+        {
+            sourceCodeView->SaveText(filePath);
+        }
+        public nothrow override bool IsDirty() const
+        {
+            return sourceCodeView->IsDirty();
+        }
+        public nothrow override void ResetDirty()
+        {
+            sourceCodeView->ResetDirty();
+        }
         public nothrow override void Select()
         {
             sourceCodeView->Select();
@@ -58,7 +70,6 @@ namespace Cm.Views
         {
             sourceCodeView->Redo();
         }
-        private string filePath;
         private CmajorSourceCodeView* sourceCodeView;
     }
 }

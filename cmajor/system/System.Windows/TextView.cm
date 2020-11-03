@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using System.IO;
 
 namespace System.Windows
 {
@@ -90,6 +91,7 @@ namespace System.Windows
     public class delegate void LineInsertedEventHandler(LineEventArgs& args);
     public class delegate void GotoCaretLineEventHandler(ControlEventArgs& args);
     public class delegate void SelectionChangedEventHandler();
+    public class delegate void DirtyChangedEventHandler();
     public class delegate void CopyEventHandler();
     public class delegate void CutEventHandler();
     public class delegate void PasteEventHandler();
@@ -1147,6 +1149,14 @@ namespace System.Windows
         {
             base->OnKeyPress(args);
             if (IsReadOnly()) return;
+            if (WinKeyPressed(VK_CONTROL))
+            {
+                return;
+            }
+            if (WinKeyPressed(VK_MENU))
+            {
+                return;
+            }
             if (!args.handled)
             {
                 ResetSelection();
@@ -1668,6 +1678,18 @@ namespace System.Windows
         {
             selectionChangedEvent.Fire();
         }
+        protected virtual void OnDirtyChanged()
+        {
+            dirtyChangedEvent.Fire();
+        }
+        public void SaveText(const string& filePath)
+        {
+            StreamWriter writer = File.CreateText(filePath);
+            for (const ustring& line : lines)
+            {
+                writer.WriteLine(line);
+            }
+        }
         public nothrow void SetSelection(const Selection& selection_)
         {
             selection = selection_;
@@ -2092,11 +2114,19 @@ namespace System.Windows
         }
         public nothrow void SetDirty()
         {
-            flags = cast<Flags>(flags | Flags.dirty);
+            if (!IsDirty())
+            {
+                flags = cast<Flags>(flags | Flags.dirty);
+                OnDirtyChanged();
+            }
         }
         public nothrow void ResetDirty()
         {
-            flags = cast<Flags>(flags & ~Flags.dirty);
+            if (IsDirty())
+            {
+                flags = cast<Flags>(flags & ~Flags.dirty);
+                OnDirtyChanged();
+            }
         }
         public nothrow Event<CaretPosChangedEventHandler>& CaretPosChangedEvent() const
         {
@@ -2125,6 +2155,10 @@ namespace System.Windows
         public nothrow Event<SelectionChangedEventHandler>& SelectionChangedEvent() const
         {
             return selectionChangedEvent;
+        }
+        public nothrow Event<DirtyChangedEventHandler>& DirtyChangedEvent() const
+        {
+            return dirtyChangedEvent;
         }
         public nothrow Event<CopyEventHandler>& CopyEvent() const
         {
@@ -2171,6 +2205,7 @@ namespace System.Windows
         private Event<LineInsertedEventHandler, LineEventArgs> lineInsertedEvent;
         private Event<GotoCaretLineEventHandler, ControlEventArgs> gotoCaretLineEvent;
         private Event<SelectionChangedEventHandler> selectionChangedEvent;
+        private Event<DirtyChangedEventHandler> dirtyChangedEvent;
         private Event<CopyEventHandler> copyEvent;
         private Event<CutEventHandler> cutEvent;
         private Event<PasteEventHandler> pasteEvent;

@@ -220,41 +220,17 @@ typedef void (*keyPreviewFunction)(uint32_t keycode, bool shift, bool control, b
 
 messageProcessorFunction messageProcessor = nullptr;
 keyPreviewFunction keyPreview = nullptr;
-bool altPressed = false;
 
-bool WinAltPressed()
+bool WinKeyPressed(int keyCode)
 {
-    return altPressed;
+    return (GetKeyState(keyCode) & 0x8000) != 0;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int64_t result = 0;
     void* originalWndProc = nullptr;
-    bool handled = false;
-    if (message == WM_SYSCOMMAND)
-    {
-        if (wParam == SC_KEYMENU)
-        {
-            if (lParam == 0)
-            {
-                short x = GetKeyState(VK_LMENU);
-                if (x != 0)
-                {
-                    altPressed = true;
-                }
-                else
-                {
-                    altPressed = false;
-                    lParam = VK_F10;
-                }
-            }
-        }
-    }
-    if (!handled)
-    {
-        handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
-    }
+    bool handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
     if (!handled)
     {
         return DefWindowProc(hWnd, message, wParam, lParam);
@@ -265,31 +241,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 LRESULT CALLBACK CommandSubClassWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int64_t result = 0;
-    bool handled = false;
     void* originalWndProc = nullptr;
-    if (message == WM_SYSCOMMAND)
-    {
-        if (wParam == SC_KEYMENU)
-        {
-            if (lParam == 0)
-            {
-                short x = GetKeyState(VK_LMENU);
-                if (x != 0)
-                {
-                    altPressed = true;
-                }
-                else
-                {
-                    altPressed = false;
-                    lParam = VK_F10;
-                }
-            }
-        }
-    }
-    if (!handled)
-    {
-        handled = messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
-    }
+    messageProcessor(hWnd, message, wParam, lParam, result, originalWndProc);
     return CallWindowProcW((WNDPROC)originalWndProc, hWnd, message, wParam, lParam);
 }
 

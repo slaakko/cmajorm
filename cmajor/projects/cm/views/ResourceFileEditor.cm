@@ -23,6 +23,18 @@ namespace Cm.Views
         {
             return textView;
         }
+        public override void SaveTo(const string& filePath)
+        {
+            textView->SaveText(filePath);
+        }
+        public nothrow override bool IsDirty() const
+        {
+            return textView->IsDirty();
+        }
+        public nothrow override void ResetDirty()
+        {
+            textView->ResetDirty();
+        }
         public nothrow override void Select()
         {
             textView->Select();

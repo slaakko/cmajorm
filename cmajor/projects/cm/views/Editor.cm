@@ -18,13 +18,23 @@ namespace Cm.Views
         {
             return filePath;
         }
-        public nothrow bool Dirty() const
+        public virtual nothrow bool IsDirty() const
         {
             return false;
         }
+        public nothrow virtual void ResetDirty()
+        {
+        }
         public void Save()
         {
-            // todo
+            if (IsDirty())
+            {
+                ResetDirty();
+                SaveTo(filePath);
+            }
+        }
+        public virtual void SaveTo(const string& filePath)
+        {
         }
         public nothrow virtual TextView* GetTextView() const
         {

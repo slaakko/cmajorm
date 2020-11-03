@@ -150,6 +150,7 @@ namespace cmcode
             saveMenuItem = saveMenuItemPtr.Get();
             saveMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.s));
             saveMenuItem->ClickEvent().AddHandler(SaveClick);
+            fileMenuItem->AddMenuItem(saveMenuItemPtr.Release());
             UniquePtr<MenuItem> saveAllMenuItemPtr(new MenuItem("Save A&ll"));
             saveAllMenuItem = saveAllMenuItemPtr.Get();
             saveAllMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.shiftModifier | Keys.s));
@@ -306,6 +307,7 @@ namespace cmcode
 
             UniquePtr<ToolButton> saveToolButtonPtr(new ToolButton("cmcode.save.bitmap"));
             saveToolButton = saveToolButtonPtr.Get();
+            saveToolButton->ClickEvent().AddHandler(SaveClick);
             saveToolButton->SetToolTip("Save (Ctrl+S)");
             saveToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(saveToolButtonPtr.Release());
@@ -486,6 +488,8 @@ namespace cmcode
             StatusBar* statusBar = new StatusBar();
             sourceFilePathStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
             statusBar->AddItem(sourceFilePathStatusBarItem);
+            dirtyStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
+            statusBar->AddItem(dirtyStatusBarItem);
             AddChild(statusBar);
             SetControlStatus(UserInterfaceAction.none);
             MainConfiguration.Instance().SetMainWindowLocation(Location());
@@ -1420,7 +1424,7 @@ namespace cmcode
                     Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
                     if (editor != null)
                     {
-                        if (editor->Dirty())
+                        if (editor->IsDirty())
                         {
                             editor->Save();
                         }
@@ -1843,7 +1847,15 @@ namespace cmcode
         {
             try
             {
-                MessageBox.Show("Save");
+                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                if (selectedTabPage != null)
+                {
+                    Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                    if (editor != null)
+                    {
+                        editor->Save();
+                    }
+                }
             }
             catch (const Exception& ex)
             {
@@ -1861,6 +1873,20 @@ namespace cmcode
                 if (!solutionExplorerData.IsNull() && activeProject != null)
                 {
                     cmcode.settings.SaveProjectSettings(activeProject, solutionExplorerData.Get());
+                }
+                Component* child = codeTabControl->TabPages().FirstChild();
+                while (child != null)
+                {
+                    if (child is TabPage*)
+                    {
+                        TabPage* tabPage = cast<TabPage*>(child);
+                        Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                        if (editor != null)
+                        {
+                            editor->Save();
+                        }
+                    }
+                    child = child->NextSibling();
                 }
             }
             catch (const Exception& ex)
@@ -2061,6 +2087,7 @@ namespace cmcode
             sourceCodeView->ExpressionHoverEvent().AddHandler(ExpressionHovered);
             sourceCodeView->ExpressionExitHoverEvent().AddHandler(ExpressionExitHover);
             sourceCodeView->SelectionChangedEvent().AddHandler(EditorSelectionChanged);
+            sourceCodeView->DirtyChangedEvent().AddHandler(EditorDirtyChanged);
             sourceCodeView->CopyEvent().AddHandler(CopyClick);
             sourceCodeView->CutEvent().AddHandler(CutClick);
             sourceCodeView->PasteEvent().AddHandler(PasteClick);
@@ -2081,6 +2108,7 @@ namespace cmcode
             Cm.Views.ResourceFileEditor* editor = editorPtr.Get();
             TextView* textView = editor->GetTextView();
             textView->SelectionChangedEvent().AddHandler(EditorSelectionChanged);
+            textView->DirtyChangedEvent().AddHandler(EditorDirtyChanged);
             textView->CopyEvent().AddHandler(CopyClick);
             textView->CutEvent().AddHandler(CutClick);
             textView->PasteEvent().AddHandler(PasteClick);
@@ -2097,6 +2125,7 @@ namespace cmcode
             Cm.Views.TextFileEditor* editor = editorPtr.Get();
             TextView* textView = editor->GetTextView();
             textView->SelectionChangedEvent().AddHandler(EditorSelectionChanged);
+            textView->DirtyChangedEvent().AddHandler(EditorDirtyChanged);
             textView->CopyEvent().AddHandler(CopyClick);
             textView->CutEvent().AddHandler(CutClick);
             textView->PasteEvent().AddHandler(PasteClick);
@@ -2295,10 +2324,6 @@ namespace cmcode
         {
             try
             {
-                if (WinAltPressed())
-                {
-                    return;
-                }
                 if (debugService.IsNull())
                 {
                     BuildActiveProjectClick();
@@ -2739,6 +2764,26 @@ namespace cmcode
                 }
             }
         }
+        private void EditorDirtyChanged()
+        {
+            TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+            Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+            if (editor != null)
+            {
+                if (editor->IsDirty())
+                {
+                    saveToolButton->Enable();
+                    saveMenuItem->Enable();
+                    dirtyStatusBarItem->SetText("*");
+                }
+                else
+                {
+                    saveToolButton->Disable();
+                    saveMenuItem->Disable();
+                    dirtyStatusBarItem->SetText("");
+                }
+            }
+        }
         private void ReadTargetInput(string& inputLine, bool& eof)
         {
             inputLine.Clear();
@@ -3038,21 +3083,6 @@ namespace cmcode
                     }
                 }
             }
-
-            TabPage* selectedCodeTabPage = codeTabControl->SelectedTabPage();
-            if (selectedCodeTabPage != null)
-            {
-                Cm.Views.Editor* editor = GetEditorByTabPage(selectedCodeTabPage);
-                if (editor != null)
-                {
-                    if (editor->Dirty())
-                    {
-                        saveToolButton->Enable();
-                        saveMenuItem->Enable();
-                    }
-                }
-            }
-
             toolBar->Invalidate();
         }
 
@@ -3076,6 +3106,7 @@ namespace cmcode
         private TreeView* solutionExplorerTreeView;
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
         private StatusBarItem* sourceFilePathStatusBarItem;
+        private StatusBarItem* dirtyStatusBarItem;
         private HashMap<TabPage*, Cm.Views.Editor*> editorByTabPageMap;
 
         private MenuBar* menuBar;
