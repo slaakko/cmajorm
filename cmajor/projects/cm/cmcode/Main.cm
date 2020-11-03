@@ -14,6 +14,11 @@ using cmcode;
 
 namespace cmcode
 {
+    public nothrow string Version()
+    {
+        return "3.7.0";
+    }
+    
     enum UserInterfaceAction
     {
         none = 0, build = 1, debug = 2, debugging = 3
@@ -297,6 +302,18 @@ namespace cmcode
             windowMenuItem->AddMenuItem(closeExternalTabsMenuItem.Release());
             menuBar->AddMenuItem(windowMenuItem.Release());
             AddChild(menuBarPtr.Release());
+
+            UniquePtr<MenuItem> helpMenuItem(new MenuItem("&Help"));
+            UniquePtr<MenuItem> homePageMenuItem(new MenuItem("&Homepage"));
+            homePageMenuItem->ClickEvent().AddHandler(HelpHomepageClick);
+            helpMenuItem->AddMenuItem(homePageMenuItem.Release());
+            UniquePtr<MenuItem> localDocumentationMenuItem(new MenuItem("&Local Documentation"));
+            localDocumentationMenuItem->ClickEvent().AddHandler(HelpLocalDocumentationClick);
+            helpMenuItem->AddMenuItem(localDocumentationMenuItem.Release());
+            UniquePtr<MenuItem> aboutMenuItem(new MenuItem("&About..."));
+            aboutMenuItem->ClickEvent().AddHandler(HelpAboutClick);
+            helpMenuItem->AddMenuItem(aboutMenuItem.Release());
+            menuBar->AddMenuItem(helpMenuItem.Release());
 
             UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, ToolButtonToolTipColor(), Color.DefaultBitmapTransparent(), ToolBar.Style.regular,
                 Padding(4, 4, 4, 4), Padding(2, 0, 2, 0)));
@@ -2628,6 +2645,38 @@ namespace cmcode
             {
                 debugService->Delete(args.breakpointId);
             }
+        }
+        private void HelpHomepageClick()
+        {
+            try
+            {
+                long errorCode = 0;
+                WinShellExecute("http://slaakko.github.io/cmajor/", errorCode);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void HelpLocalDocumentationClick()
+        {
+            try
+            {
+                string cmajorRootDir = CmajorRootDir();
+                string indexFilePath = Path.Combine(cmajorRootDir, "doc/index.html");
+                long errorCode = 0;
+                WinShellExecute(indexFilePath.Chars(), errorCode);
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void HelpAboutClick()
+        {
+            MessageBox.Show("Cmajor Code version " + Version(), "Info", null, MessageBoxType.MB_OK);
         }
         private void SourceCodeViewRightClick(RightClickEventArgs& args)
         {
