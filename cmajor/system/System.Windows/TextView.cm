@@ -1149,11 +1149,7 @@ namespace System.Windows
         {
             base->OnKeyPress(args);
             if (IsReadOnly()) return;
-            if (WinKeyPressed(VK_CONTROL))
-            {
-                return;
-            }
-            if (WinKeyPressed(VK_MENU))
+            if (!WinKeyPressed(VK_MENU) && WinKeyPressed(VK_CONTROL))
             {
                 return;
             }
