@@ -59,12 +59,58 @@ namespace Cm.Views
                 arrowBitmapSize(Size(cast<int>(arrowBitmap->GetWidth()), cast<int>(arrowBitmap->GetHeight())))
         {
             view->ContentLocationChangedEvent().AddHandler(ViewContentLocationChanged);
+            view->LineInsertedEvent().AddHandler(ViewLineInserted);
+            view->LineDeletedEvent().AddHandler(ViewLineDeleted);
         }
         private void ViewContentLocationChanged()
         {
             topLineNumber = view->TopLine();
             origin = view->ContentLocation();
             Invalidate();
+        }
+        private void ViewLineInserted(LineEventArgs& args)
+        {
+            bool changed = false;
+            int line = args.lineIndex + 1 - 1;
+            for (Breakpoint* breakpoint : breakpointList.Breakpoints())
+            {
+                if (breakpoint->line >= line)
+                {
+                    ++breakpoint->line;
+                    changed = true;
+                }
+            }
+            if (changed)
+            {
+                Invalidate();
+            }
+        }
+        private void ViewLineDeleted(LineEventArgs& args)
+        {
+            bool changed = false;
+            List<Breakpoint*> breakpointsToDelete;
+            int line = args.lineIndex + 1;
+            for (Breakpoint* breakpoint : breakpointList.Breakpoints())
+            {
+                if (breakpoint->line == line)
+                {
+                    breakpointsToDelete.Add(breakpoint);
+                }
+                else if (breakpoint->line > line)
+                {
+                    --breakpoint->line;
+                    changed = true;
+                }
+            }
+            for (Breakpoint* breakpointToDelete : breakpointsToDelete)
+            {
+                breakpointList.RemoveBreakpoint(breakpointToDelete);
+                changed = true;
+            }
+            if (changed)
+            {
+                Invalidate();
+            }
         }
         protected override void OnMouseDown(MouseEventArgs& args)
         {

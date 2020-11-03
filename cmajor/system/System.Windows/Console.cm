@@ -41,6 +41,7 @@ namespace System.Windows
             base(fontFamily, fontSize, GetColor(backColor), GetColor(textColor), location, size, dock, anchors),
             defaultBackColor(backColor), defaultTextColor(textColor), inputLine(), eof(false)
         {
+            SetReadOnly();
             SetPadding(DefaultConsolePadding());
             AnsiEngine.Out().SetDefaultBackColor(defaultBackColor);
             AnsiEngine.Error().SetDefaultBackColor(defaultBackColor);
