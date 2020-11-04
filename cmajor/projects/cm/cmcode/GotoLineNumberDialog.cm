@@ -1,0 +1,87 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+namespace cmcode
+{
+    public nothrow bool IsValidLineNumber(const string& lineNumberText)
+    {
+        int lineNumber = -1;
+        if (ParseInt(lineNumberText, lineNumber))
+        {
+            if (lineNumber >= 1) return true;
+        }
+        return false;
+    }
+    
+    public class GotoLineNumberDialog : Window
+    {
+        public nothrow GotoLineNumberDialog() : base("cmcode.GotoLineNumberDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(),
+            "Goto Line Number", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(80), ScreenMetrics.Get().MMToVerticalPixels(60)), Dock.none, Anchors.none, WindowState.normal)
+        {
+            Size s = GetSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            int borderWidth = DefaultSingleBorderWidth();
+
+            Point lineNumberLabelLocation(16, 16);
+            UniquePtr<Label> lineNumberLabelPtr(new Label("Line number:", lineNumberLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            AddChild(lineNumberLabelPtr.Release());
+            UniquePtr<TextBox> lineNumberTextBoxPtr(new TextBox(""));
+            lineNumberTextBox = lineNumberTextBoxPtr.Get();
+            lineNumberTextBox->TextChangedEvent().AddHandler(LineNumberTextBoxTextChanged);
+            Point lineNumberTextBoxLocation(20, 16 + 24);
+            Size lineNumberTextBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(20), defaultTextBoxSize.h);
+            Rect lineNumberTextBoxRec(lineNumberTextBoxLocation, lineNumberTextBoxSize);
+            UniquePtr<Control> paddedLineNumberTextBox = new PaddedControl(lineNumberTextBoxPtr.Release());
+            Rect paddedLineNumberTextBoxRect = lineNumberTextBoxRec;
+            paddedLineNumberTextBoxRect.Inflate(4, 4);
+            Rect borderedPaddedLineNumberTextBoxRect = paddedLineNumberTextBoxRect;
+            borderedPaddedLineNumberTextBoxRect.Inflate(borderWidth, borderWidth);
+            UniquePtr<Control> borderedPaddedLineNumberTextBox(new BorderedControl(paddedLineNumberTextBox.Release(), borderedPaddedLineNumberTextBoxRect.location,
+                borderedPaddedLineNumberTextBoxRect.size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedLineNumberTextBox.Release());
+
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            okButton = okButtonPtr.Get();
+            okButton->SetDialogResult(DialogResult.ok);
+            okButton->Disable();
+            AddChild(okButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(okButton);
+            SetCancelButton(cancelButton);
+        }
+        private void LineNumberTextBoxTextChanged()
+        {
+            if (IsValidLineNumber(lineNumberTextBox->Text()))
+            {
+                okButton->Enable();
+            }
+            else
+            {
+                okButton->Disable();
+            }
+        }
+        public int LineNumber()
+        {
+            return ParseInt(lineNumberTextBox->Text());
+        }
+        private Button* okButton;
+        private Button* cancelButton;
+        private TextBox* lineNumberTextBox;
+    }
+
+}

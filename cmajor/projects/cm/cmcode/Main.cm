@@ -616,6 +616,29 @@ namespace cmcode
                             args.handled = true;
                             break;
                         }
+                        case cast<Keys>(Keys.controlModifier | Keys.g):
+                        {
+                            TabPage* tabPage = codeTabControl->SelectedTabPage();
+                            if (tabPage != null)
+                            {
+                                Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                                if (editor != null)
+                                {
+                                    GotoLineNumberDialog dialog;
+                                    if (dialog.ShowDialog(*this) == DialogResult.ok)
+                                    {
+                                        int lineNumber = dialog.LineNumber();
+                                        TextView* textView = editor->GetTextView();
+                                        textView->SetCaretLineCol(Min(lineNumber, cast<int>(textView->Lines().Count())), 1 + textView->LineNumberFieldLength());
+                                        textView->ScrollToCaret();
+                                        textView->SetFocus();
+                                        textView->Invalidate();
+                                    }
+                                }
+                            }
+                            args.handled = true;
+                            break;
+                        }
                     }
                 }
             }
