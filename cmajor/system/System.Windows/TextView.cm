@@ -1222,7 +1222,7 @@ namespace System.Windows
             SetDirty();
         }
         public nothrow void DeleteLines(int lineIndex, int numLines)
-        {    
+        {
             for (int i = 0; i < numLines; ++i)
             {
                 lines.Remove(lines.Begin() + lineIndex);
@@ -1626,14 +1626,17 @@ namespace System.Windows
         protected virtual void OnLineChanged(LineEventArgs& args)
         {
             lineChangedEvent.Fire(args);
+            Invalidate();
         }
         protected virtual void OnLineDeleted(LineEventArgs& args)
         {
             lineDeletedEvent.Fire(args);
+            Invalidate();
         }
         protected virtual void OnLineInserted(LineEventArgs& args)
         {
             lineInsertedEvent.Fire(args);
+            Invalidate();
         }
         public nothrow inline int MaxLineLength() const
         {

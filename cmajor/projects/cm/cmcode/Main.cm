@@ -694,6 +694,18 @@ namespace cmcode
             if (removedControl is TabPage*)
             {
                 TabPage* removedTabPage = cast<TabPage*>(removedControl);
+                Cm.Views.Editor* editor = GetEditorByTabPage(removedTabPage);
+                if (editor != null)
+                {
+                    if (editor->IsDirty())
+                    {
+                        MessageBoxResult result = MessageBox.Show(editor->FilePath() + " is modified. Save changes?", "Question", this, MessageBoxType.MB_YESNO);
+                        if (result == MessageBoxResult.yes)
+                        {
+                            editor->Save();
+                        }
+                    }
+                }
                 editorByTabPageMap.Remove(removedTabPage);
                 if (removedTabPage == debugTabPage)
                 {

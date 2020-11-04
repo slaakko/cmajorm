@@ -23,7 +23,7 @@ namespace System.Windows
             base("System.Windows.TreeView", DoubleClickWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), backgroundColor, "treeView",
                 location, size, dock, anchors), flags(Flags.none), root(), normalNodeFont(normalNodeFont_), activeNodeFont(activeNodeFont_),
                 textHeight(0), stateIndicatorPercentage(50.0f),
-                stateIndicatorColor(stateIndicatorColor_), nodeSelectedColor(nodeSelectedColor_), nodeSelectedBrush(nodeSelectedColor), textColor(textColor_), textBrush(textColor), 
+                stateIndicatorColor(stateIndicatorColor_), nodeSelectedColor(nodeSelectedColor_), nodeSelectedBrush(nodeSelectedColor), textColor(textColor_), textBrush(textColor),
                 format(StringAlignment.near, StringAlignment.near), bitmapIndex(-1), animationMs(5), selectedNode(null), trackedNode(null), toolTipWindow(new ToolTip())
         {
             SetChanged();
@@ -829,7 +829,7 @@ namespace System.Windows
         public nothrow void MeasureSize(Graphics& graphics, TreeView* treeView)
         {
             RectF textRect = graphics.MeasureStringChecked(text, treeView->GetNormalNodeFont(), PointF(0, 0), treeView->Format());
-            size = Size(cast<int>(textRect.size.w), cast<int>(textRect.size.h));
+            size = Size(cast<int>(treeView->TextHeight() + textRect.size.w), cast<int>(textRect.size.h));
             Component* child = children.FirstChild();
             while (child != null)
             {

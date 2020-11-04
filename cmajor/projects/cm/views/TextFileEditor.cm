@@ -18,6 +18,7 @@ namespace Cm.Views
             AddChild(scrollableTextView.Release());
             ustring content = ToUtf32(File.ReadAllText(filePath));
             textView->SetTextContent(content);
+            textView->SetFixed();
         }
         public nothrow override TextView* GetTextView() const
         {
