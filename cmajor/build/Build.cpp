@@ -122,6 +122,7 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(Module* m
             compileUnit->SetHash(GetSha1MessageDigest(""));
             int32_t fileIndex = module->GetFileTable().RegisterFilePath(sourceFilePath);
             compileUnits.push_back(std::move(compileUnit));
+            lexers.push_back(std::unique_ptr<CmajorLexer>());
         }
         else
         {
@@ -204,6 +205,7 @@ void ParseSourceFile(ParserData* parserData)
                 std::unique_ptr<CompileUnitNode> compileUnit(new CompileUnitNode(Span(), sourceFilePath));
                 compileUnit->SetHash(GetSha1MessageDigest(""));
                 parserData->compileUnits[index].reset(compileUnit.release());
+                parserData->lexers[index].reset();
             }
             else
             {

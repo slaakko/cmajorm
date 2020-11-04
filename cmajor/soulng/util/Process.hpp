@@ -50,6 +50,8 @@ constexpr Process::Redirections operator&(Process::Redirections left, Process::R
     return Process::Redirections(int(left) & int(right));
 }
 
+UTIL_API int GetPid();
+
 } } // namespace soulng::util
 
 #endif // SOULNG_UTIL_PROCESS_INCLUDED

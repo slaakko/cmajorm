@@ -5,6 +5,7 @@
 
 #include <cmajor/rt/WindowsAPI.hpp>
 #include <soulng/util/Unicode.hpp>
+#include <soulng/util/Process.hpp>
 #define OEMRESOURCE
 #ifdef __MINGW32__
 #define WINVER 0x0600
@@ -1966,6 +1967,11 @@ bool WinGetCursorPos(int& x, int& y)
         return true;
     }
     return false;
+}
+
+int WinGetCurrentProcessId()
+{
+    return soulng::util::GetPid();
 }
 
 #ifndef __MINGW32__

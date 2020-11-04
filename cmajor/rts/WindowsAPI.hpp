@@ -281,5 +281,6 @@ extern "C" RT_API uint64_t WinGlobalSize(void* memHandle);
 extern "C" RT_API bool WinGetCursorPos(int& x, int& y);
 extern "C" RT_API bool WinGetFolder(void* windowHandle, const char16_t* defaultDirectory, char16_t* folderNameBuffer, uint32_t folderNameBufferSize);
 extern "C" RT_API bool WinKeyPressed(int keyCode);
+extern "C" RT_API int WinGetCurrentProcessId();
 
 #endif // CMAJOR_RTS_WINDOWS_API_INCLUDED

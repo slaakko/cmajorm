@@ -125,12 +125,17 @@ namespace cmcode
         }
     }
 
+    public string Title()
+    {
+        return "Cmajor Code - " + System.ToString(WinGetCurrentProcessId());
+    }
+
     class MainWindow : Window
     {
         public MainWindow(const string& filePath) :
-            base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Code", MainWindowLocation(), MainWindowSize(),
+            base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), Title(), MainWindowLocation(), MainWindowSize(),
             Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true), toolTipWindow(new ToolTip()),
-            clipboardListener(Handle()), cmajorCodeFormat("cmajor.code")
+            clipboardListener(Handle()), cmajorCodeFormat("cmajor.code"), pid(WinGetCurrentProcessId())
         {
             UniquePtr<MenuBar> menuBarPtr(new MenuBar());
             menuBar = menuBarPtr.Get();
@@ -988,7 +993,10 @@ namespace cmcode
                     solution->SetActiveProject(project.Get());
                     solution->AddProject(Rvalue(project));
                     solution->Save();
-                    CloseSolutionClick();
+                    if (!CloseSolution())
+                    {
+                        return;
+                    }
                     OpenProject(solutionFilePath);
                 }
             }
@@ -1016,7 +1024,10 @@ namespace cmcode
                     solution->SortByProjectName();
                     solution->Save();
                     string solutionFilePath = solution->FilePath();
-                    CloseSolutionClick();
+                    if (!CloseSolution())
+                    {
+                        return;
+                    }
                     OpenProject(solutionFilePath);
                 }
             }
@@ -1055,7 +1066,10 @@ namespace cmcode
                     solution->SortByProjectName();
                     solution->Save();
                     string solutionFilePath = solution->FilePath();
-                    CloseSolutionClick();
+                    if (!CloseSolution())
+                    {
+                        return;
+                    }
                     OpenProject(solutionFilePath);
                 }
             }
@@ -1072,7 +1086,10 @@ namespace cmcode
                 solution->RemoveProject(project);
                 solution->Save();
                 string solutionFilePath = solution->FilePath();
-                CloseSolutionClick();
+                if (!CloseSolution())
+                {
+                    return;
+                }
                 OpenProject(solutionFilePath);
             }
             catch (const Exception& ex)
@@ -1110,23 +1127,53 @@ namespace cmcode
                 LogException(ex);
             }
         }
-        private void CloseSolutionClick()
+        private bool CloseSolution()
         {
             try
             {
-                if (solution.IsNull()) return;
-                SaveAllClick();
+                if (solution.IsNull()) return true;
+                Component* component = codeTabControl->TabPages().FirstChild();
+                while (component != null)
+                {
+                    if (component is TabPage*)
+                    {
+                        TabPage* tabPage = cast<TabPage*>(component);
+                        Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                        if (editor != null)
+                        {
+                            if (editor->IsDirty())
+                            {
+                                MessageBoxResult result = MessageBox.Show(editor->FilePath() + " is modified. Save changes?", "Question", this, MessageBoxType.MB_YESNOCANCEL);
+                                if (result == MessageBoxResult.cancel)
+                                {
+                                    return false;
+                                }
+                                else if (result == MessageBoxResult.yes)
+                                {
+                                    editor->Save();
+                                }
+                            }
+                        }
+                    }
+                    component = component->NextSibling();
+                }
                 codeTabControl->CloseAllTabPages();
                 solutionExplorerTreeView->SetRoot(null);
                 solutionExplorerData.Reset();
                 SetControlStatus(UserInterfaceAction.none);
                 Invalidate();
+                return true;
             }
             catch (const Exception& ex)
             {
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
                 LogException(ex);
             }
+            return false;
+        }
+        private void CloseSolutionClick()
+        {
+            CloseSolution();
         }
         private void AddFilePathsToProject(const string& newSourceFilePath, const string& newResourceFilePath, const string& newTextFilePath, Cm.Ast.Project* project, TreeViewNode* projectNode)
         {
@@ -3213,6 +3260,7 @@ namespace cmcode
         private ClipboardListener clipboardListener;
         private ClipboardFormat cmajorCodeFormat;
         private ustring clipboardData;
+        private int pid;
     }
 }
 
