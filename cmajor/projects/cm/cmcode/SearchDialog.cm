@@ -1,0 +1,153 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace cmcode
+{
+    public enum SearchExtent
+    {
+        currentFile = 0, activeProject = 1, entireSolution = 2
+    }
+
+    public class SearchDialog : Window
+    {
+        public SearchDialog(bool hasCurrentFile_) : base("cmcode.SearchDialog", DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(),
+            "Search", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(160), ScreenMetrics.Get().MMToVerticalPixels(90)), Dock.none, Anchors.none, WindowState.normal),
+            hasCurrentFile(hasCurrentFile_)
+        {
+            Size s = GetSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+            Size defaultTextBoxSize = ScreenMetrics.Get().DefaultTextBoxSize();
+            Size defaultLabelSize = ScreenMetrics.Get().DefaultLabelSize();
+            int borderWidth = DefaultSingleBorderWidth();
+
+            Point searchLabelLocation(16, 16);
+            UniquePtr<Label> searchLabelPtr(new Label("Search:", searchLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            AddChild(searchLabelPtr.Release());
+            UniquePtr<TextBox> searchTextBoxPtr(new TextBox(""));
+            searchTextBox = searchTextBoxPtr.Get();
+            searchTextBox->TextChangedEvent().AddHandler(SearchTextBoxTextChanged);
+            Point searchTextBoxLocation(20, 16 + 24);
+            Size searchTextBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(120), defaultTextBoxSize.h);
+            Rect searchTextBoxRec(searchTextBoxLocation, searchTextBoxSize);
+            UniquePtr<Control> paddedSearchTextBox = new PaddedControl(searchTextBoxPtr.Release());
+            Rect paddedSearchTextBoxRect = searchTextBoxRec;
+            paddedSearchTextBoxRect.Inflate(4, 4);
+            Rect borderedPaddedSearchTextBoxRect = paddedSearchTextBoxRect;
+            borderedPaddedSearchTextBoxRect.Inflate(borderWidth, borderWidth);
+            UniquePtr<Control> borderedPaddedSearchTextBox(new BorderedControl(paddedSearchTextBox.Release(), borderedPaddedSearchTextBoxRect.location,
+                borderedPaddedSearchTextBoxRect.size, Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            AddChild(borderedPaddedSearchTextBox.Release());
+
+            Point wholeWordsCheckBoxLocation(16, 16 + 24 + 24);
+            UniquePtr<CheckBox> wholeWordsCheckBoxPtr(new CheckBox("Whole words only", wholeWordsCheckBoxLocation, Size(), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            wholeWordsCheckBox = wholeWordsCheckBoxPtr.Get();
+            AddChild(wholeWordsCheckBoxPtr.Release());
+
+            Point caseInsensitiveCheckBoxLocation(16, 16 + 16 + 24 + 24);
+            UniquePtr<CheckBox> caseInsensitiveCheckBoxPtr(new CheckBox("Case-insensitive", caseInsensitiveCheckBoxLocation, Size(), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            caseInsensitiveCheckBox = caseInsensitiveCheckBoxPtr.Get();
+            AddChild(caseInsensitiveCheckBoxPtr.Release());
+
+            Point regularExpressionCheckBoxLocation(16, 16 + 16 + 16 + 24 + 24);
+            UniquePtr<CheckBox> regularExpressionCheckBoxPtr(new CheckBox("Regular expression", regularExpressionCheckBoxLocation, Size(), Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            regularExpressionCheckBox = regularExpressionCheckBoxPtr.Get();
+            AddChild(regularExpressionCheckBoxPtr.Release());
+
+            Point whereLabelLocation(16, cast<int>(16) + 16 + 16 + 16 + 24 + 24);
+            UniquePtr<Label> whereLabelPtr(new Label("Where:", whereLabelLocation, defaultLabelSize, Dock.none, cast<Anchors>(Anchors.top | Anchors.left), true));
+            AddChild(whereLabelPtr.Release());
+            Point listBoxLocation(16, cast<int>(16) + 16 + 16 + 16 + 16 + 24 + 24);
+            Size listBoxSize(ScreenMetrics.Get().MMToHorizontalPixels(70), ScreenMetrics.Get().MMToVerticalPixels(16));
+            Rect listBoxRect(listBoxLocation, listBoxSize);
+            listBoxRect.Inflate(-1, -1);
+            UniquePtr<ListBox> listBoxPtr(new ListBox(listBoxRect.location, listBoxRect.size, Dock.none, Anchors.none));
+            whereListBox = listBoxPtr.Get();
+            UniquePtr<Control> borderedListBoxPtr(new BorderedControl(listBoxPtr.Release(), listBoxLocation, listBoxSize, Dock.none, cast <Anchors>(Anchors.top  | Anchors.left)));
+            Control* borderedListBox = borderedListBoxPtr.Get();
+            AddChild(borderedListBoxPtr.Release());
+            Point realListBoxLocation = whereListBox->Location();
+            Size realListBoxSize = whereListBox->GetSize();
+            Rect realListBoxRect(realListBoxLocation, realListBoxSize);
+            realListBoxRect.Inflate(1, 1);
+            borderedListBox->SetSize(realListBoxRect.size);
+            if (hasCurrentFile)
+            {
+                whereListBox->AddItem("Current file");
+            }
+            whereListBox->AddItem("Active project");
+            whereListBox->AddItem("Entire solution");
+            whereListBox->SetSelectedIndex(0);
+
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> searchButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "Search", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            searchButton = searchButtonPtr.Get();
+            searchButton->SetDialogResult(DialogResult.ok);
+            searchButton->Disable();
+            AddChild(searchButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(searchButton);
+            SetCancelButton(cancelButton);
+            searchTextBox->SetFocus();
+        }
+        public nothrow const string& SeachText() const
+        {
+            return searchTextBox->Text();
+        }
+        public nothrow bool WholeWords() const
+        {
+            return wholeWordsCheckBox->Checked();
+        }
+        public nothrow bool CaseInsensitive() const
+        {
+            return caseInsensitiveCheckBox->Checked();
+        }
+        public nothrow bool RegularExpression() const
+        {
+            return regularExpressionCheckBox->Checked();
+        }
+        public nothrow SearchExtent GetSearchExtent() const
+        {
+            int selectedIndex = whereListBox->GetSelectedIndex();
+            if (!hasCurrentFile)
+            {
+                return cast<SearchExtent>(selectedIndex + 1);
+            }
+            else
+            {
+                return cast<SearchExtent>(selectedIndex);
+            }
+        }
+        private void SearchTextBoxTextChanged()
+        {
+            if (!searchTextBox->Text().IsEmpty())
+            {
+                searchButton->Enable();
+            }
+            else
+            {
+                searchButton->Disable();
+            }
+        }
+        private Button* searchButton;
+        private Button* cancelButton;
+        private TextBox* searchTextBox;
+        private CheckBox* wholeWordsCheckBox;
+        private CheckBox* caseInsensitiveCheckBox;
+        private CheckBox* regularExpressionCheckBox;
+        private ListBox* whereListBox;
+        private bool hasCurrentFile;
+    }
+}

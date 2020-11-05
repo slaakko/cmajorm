@@ -1,0 +1,104 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace Cm.Views
+{
+    public class SearchResult
+    {
+        public nothrow SearchResult(const string& fileName_, long lineNumber_, const string& line_) : fileName(fileName_), lineNumber(lineNumber_), line(line_)
+        {
+        }
+        public string fileName;
+        public long lineNumber;
+        public string line;
+    }
+
+    public class ViewSearchResultEventArgs
+    {
+        public nothrow ViewSearchResultEventArgs(SearchResult* searchResult_) : searchResult(searchResult_)
+        {
+        }
+        public SearchResult* searchResult;
+    }
+
+    public class delegate void ViewSearchResultEventHandler(ViewSearchResultEventArgs& args);
+    
+    public class SearchResults : Control
+    {
+        public SearchResults() : base("Cm.Views.SearchResults", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), Color.White(),
+            "searchResults", Point(), Size(), Dock.fill, Anchors.none), container(this), treeView(null), child(null)
+        {
+            UniquePtr<TreeView> treeViewPtr(new TreeView(Point(), Size(), Dock.none, Anchors.none));
+            treeView = treeViewPtr.Get();
+            treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
+            UniquePtr<Control> paddedTreeView(new PaddedControl(treeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> scrollableTreeView(new ScrollableControl(paddedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            child = scrollableTreeView.Get();
+            container.AddChild(scrollableTreeView.Release());
+            Clear();
+        }
+        public void Clear()
+        {
+            treeView->SetRoot(new TreeViewNode("Search Results"));
+            child->Invalidate();
+        }
+        public void Add(SearchResult* searchResult)
+        {
+            searchResults.Add(UniquePtr<SearchResult>(searchResult));
+            string text = searchResult->fileName;
+            text.Append(':').Append(ToString(searchResult->lineNumber));
+            TreeViewNode* resultNode = new TreeViewNode(text);
+            resultNode->SetData(searchResult);
+            resultNode->AddChild(new TreeViewNode(searchResult->line));
+            treeView->Root()->AddChild(resultNode);
+        }
+        private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
+        {
+            SearchResult* searchResult = cast<SearchResult*>(args.node->Data());
+            OnViewSearchResult(searchResult);
+        }
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+            SetChildPos();
+        }
+        protected override void OnSizeChanged(uint windowState)
+        {
+            base->OnSizeChanged(windowState);
+            SetChildPos();
+        }
+        private void SetChildPos()
+        {
+            Point loc;
+            Size size = GetSize();
+            Rect childRect(loc, size);
+            child->SetLocation(childRect.location);
+            child->SetSize(childRect.size);
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            treeView->Root()->ExpandAll();
+            treeView->Invalidate();
+        }
+        protected virtual void OnViewSearchResult(SearchResult* searchResult)
+        {
+            ViewSearchResultEventArgs args(searchResult);
+            viewSearchResultEvent.Fire(args);
+        }
+        public nothrow Event<ViewSearchResultEventHandler, ViewSearchResultEventArgs>& ViewSearchResultEvent()
+        {
+            return viewSearchResultEvent;
+        }
+        private Container container;
+        private TreeView* treeView;
+        private Control* child;
+        private List<UniquePtr<SearchResult>> searchResults;
+        private Event<ViewSearchResultEventHandler, ViewSearchResultEventArgs> viewSearchResultEvent;
+    }
+}

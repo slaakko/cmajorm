@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Windows;
+using System.RegularExpressions;
 using Cm.Service;
 using Cm.Service.Build;
 using Cm.Service.Debug;
@@ -204,6 +205,18 @@ namespace cmcode
             redoMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.y));
             redoMenuItem->ClickEvent().AddHandler(RedoClick);
             editMenuItem->AddMenuItem(redoMenuItemPtr.Release());
+            UniquePtr<MenuItem> gotoLineMenuItemPtr(new MenuItem("&Goto Line..."));
+            gotoLineMenuItem = gotoLineMenuItemPtr.Get();
+            gotoLineMenuItem->Disable();
+            gotoLineMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.g));
+            gotoLineMenuItem->ClickEvent().AddHandler(GotoLineClick);
+            editMenuItem->AddMenuItem(gotoLineMenuItemPtr.Release());
+            UniquePtr<MenuItem> searchMenuItemPtr(new MenuItem("&Search..."));
+            searchMenuItem = searchMenuItemPtr.Get();
+            searchMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.f));
+            searchMenuItem->ClickEvent().AddHandler(SearchClick);
+            searchMenuItem->Disable();
+            editMenuItem->AddMenuItem(searchMenuItemPtr.Release());
             menuBar->AddMenuItem(editMenuItem.Release());
 
             UniquePtr<MenuItem> viewMenuItem(new MenuItem("&View"));
@@ -213,6 +226,9 @@ namespace cmcode
             UniquePtr<MenuItem> localsMenuItemPtr(new MenuItem("&Locals"));
             localsMenuItemPtr->ClickEvent().AddHandler(ViewLocalsClick);
             viewMenuItem->AddMenuItem(localsMenuItemPtr.Release());
+            UniquePtr<MenuItem> searchResultsMenuItemPtr(new MenuItem("&Search Results"));
+            searchResultsMenuItemPtr->ClickEvent().AddHandler(ViewSearchResultsClick);
+            viewMenuItem->AddMenuItem(searchResultsMenuItemPtr.Release());
             menuBar->AddMenuItem(viewMenuItem.Release());
 
             UniquePtr<MenuItem> buildMenuItem(new MenuItem("&Build"));
@@ -616,29 +632,6 @@ namespace cmcode
                             args.handled = true;
                             break;
                         }
-                        case cast<Keys>(Keys.controlModifier | Keys.g):
-                        {
-                            TabPage* tabPage = codeTabControl->SelectedTabPage();
-                            if (tabPage != null)
-                            {
-                                Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
-                                if (editor != null)
-                                {
-                                    GotoLineNumberDialog dialog;
-                                    if (dialog.ShowDialog(*this) == DialogResult.ok)
-                                    {
-                                        int lineNumber = dialog.LineNumber();
-                                        TextView* textView = editor->GetTextView();
-                                        textView->SetCaretLineCol(Min(lineNumber, cast<int>(textView->Lines().Count())), 1 + textView->LineNumberFieldLength());
-                                        textView->ScrollToCaret();
-                                        textView->SetFocus();
-                                        textView->Invalidate();
-                                    }
-                                }
-                            }
-                            args.handled = true;
-                            break;
-                        }
                     }
                 }
             }
@@ -693,6 +686,7 @@ namespace cmcode
             Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
             if (editor != null)
             {
+                gotoLineMenuItem->Enable();
                 sourceFilePathStatusBarItem->SetText(editor->FilePath());
                 editor->Select();
                 TextView* textView = editor->GetTextView();
@@ -770,6 +764,11 @@ namespace cmcode
                 {
                     logTabPage = null;
                     Application.SetLogView(null);
+                }
+                else if (removedTabPage == searchResultsTabPage)
+                {
+                    searchResultsTabPage = null;
+                    searchResults = null;
                 }
             }
         }
@@ -1196,6 +1195,7 @@ namespace cmcode
                 solutionExplorerTreeView->SetRoot(null);
                 solutionExplorerData.Reset();
                 SetControlStatus(UserInterfaceAction.none);
+                gotoLineMenuItem->Disable();
                 Invalidate();
                 return true;
             }
@@ -2191,6 +2191,7 @@ namespace cmcode
             sourceCodeView->CutEvent().AddHandler(CutClick);
             sourceCodeView->PasteEvent().AddHandler(PasteClick);
             sourceCodeView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
+            gotoLineMenuItem->Enable();
             Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
             debugStrip->BreakpointAddedEvent().AddHandler(BreakpointAdded);
             debugStrip->BreakpointRemovedEvent().AddHandler(BreakpointRemoved);
@@ -2212,6 +2213,7 @@ namespace cmcode
             textView->CutEvent().AddHandler(CutClick);
             textView->PasteEvent().AddHandler(PasteClick);
             textView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
+            gotoLineMenuItem->Enable();
             editorByTabPageMap[tabPage.Get()] = editor;
             tabPage->AddChild(editorPtr.Release());
             codeTabControl->AddTabPage(tabPage.Release());
@@ -2229,6 +2231,7 @@ namespace cmcode
             textView->CutEvent().AddHandler(CutClick);
             textView->PasteEvent().AddHandler(PasteClick);
             textView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
+            gotoLineMenuItem->Enable();
             editorByTabPageMap[tabPage.Get()] = editor;
             tabPage->AddChild(editorPtr.Release());
             codeTabControl->AddTabPage(tabPage.Release());
@@ -2559,6 +2562,185 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private void GotoLineClick()
+        {
+            try
+            {
+                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                if (selectedTabPage != null)
+                {
+                    Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                    if (editor != null)
+                    {
+                        TextView* textView = editor->GetTextView();
+                        if (textView != null)
+                        {
+                            GotoLineNumberDialog dialog;
+                            if (dialog.ShowDialog(*this) == DialogResult.ok)
+                            {
+                                int lineNumber = dialog.LineNumber();
+                                textView->SetCaretLineCol(Min(lineNumber, cast<int>(textView->Lines().Count())), 1 + textView->LineNumberFieldLength());
+                                textView->ScrollToCaret();
+                                textView->SetFocus();
+                                textView->Invalidate();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void SearchClick()
+        {
+            try
+            {
+                if (solution.IsNull()) return;
+                bool hasCurrentFile = false;
+                TabPage* tabPage = codeTabControl->SelectedTabPage();
+                Cm.Views.Editor* editor = null;
+                if (tabPage != null)
+                {
+                    editor = GetEditorByTabPage(tabPage);
+                    if (editor != null)
+                    {
+                        hasCurrentFile = true;
+                    }
+                }
+                SearchDialog dialog(hasCurrentFile);
+                if (dialog.ShowDialog(*this) == DialogResult.ok)
+                {
+                    List<string> files;
+                    switch (dialog.GetSearchExtent())
+                    {
+                        case SearchExtent.currentFile:
+                        {
+                            files.Add(editor->FilePath());
+                            Search(SearchExtent.currentFile, files, editor->GetTextView()->Lines(), dialog.SeachText(), dialog.WholeWords(), dialog.CaseInsensitive(), dialog.RegularExpression());
+                            break;
+                        }
+                        case SearchExtent.activeProject:
+                        {
+                            Cm.Ast.Project* activeProject = solution->ActiveProject();
+                            files = activeProject->SourceFilePaths();
+                            Search(SearchExtent.activeProject, files, List<ustring>(), dialog.SeachText(), dialog.WholeWords(), dialog.CaseInsensitive(), dialog.RegularExpression());
+                            break;
+                        }
+                        case SearchExtent.entireSolution:
+                        {
+                            for (const UniquePtr<Cm.Ast.Project>& project : solution->Projects())
+                            {
+                                for (const string& filePath : project->SourceFilePaths())
+                                {
+                                    files.Add(filePath);
+                                }
+                            }
+                            Search(SearchExtent.entireSolution, files, List<ustring>(), dialog.SeachText(), dialog.WholeWords(), dialog.CaseInsensitive(), dialog.RegularExpression());
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void Search(SearchExtent extent, const List<string>& files, const List<ustring>& lines, const string& searchText, bool wholeWords, bool caseInsensitive, bool regularExpression)
+        {
+            Cm.Views.SearchResults* searchResults = GetSearchResults();
+            searchResults->Clear();
+            ustring text = ToUtf32(searchText);
+            if (caseInsensitive)
+            {
+                text = ToLower(text);
+            }
+            Nfa* re = null;
+            Context context;
+            Nfa nfa;
+            if (regularExpression)
+            {
+                nfa = CompileRegularExpressionPattern(context, u".*(" + text + u").*");
+                re = &nfa;
+            }
+            for (const string& fileName : files)
+            {
+                List<ustring> readLines;
+                List<ustring>* lns = &readLines;
+                if (extent == SearchExtent.currentFile)
+                {
+                    lns = &lines;
+                }
+                else
+                {
+                    List<string> utf8Lines = File.ReadAllLines(fileName);
+                    for (const string& utf8Line : utf8Lines)
+                    {
+                        readLines.Add(ToUtf32(utf8Line));
+                    }
+                }
+                long n = lns->Count();
+                for (long i = 0; i < n; ++i)
+                {
+                    ustring* line = &(*lns)[i];
+                    ustring lowerLine;
+                    if (caseInsensitive)
+                    {
+                        lowerLine = ToLower(*line);
+                        line = &lowerLine;
+                    }
+                    if (Search(*line, text, wholeWords, re))
+                    {
+                        searchResults->Add(new Cm.Views.SearchResult(fileName, i + 1, ToUtf8((*lns)[i])));
+                    }
+                }
+            }
+            searchResults->Invalidate();
+        }
+        private bool Search(const ustring& line, const ustring& text, bool wholeWords, Nfa* re)
+        {
+            if (re != null)
+            {
+                return Match(*re, line);
+            }
+            else
+            {
+                long pos = line.Find(text);
+                while (pos != -1)
+                {
+                    bool match = true;
+                    if (wholeWords)
+                    {
+                        if (pos > 0)
+                        {
+                            uchar prev = line[pos - 1];
+                            if (IsAlphabetic(prev) || IsNumber(prev))
+                            {
+                                match = false;
+                            }
+                        }
+                        if (pos + text.Length() < line.Length())
+                        {
+                            uchar next = line[pos + text.Length()];
+                            if (IsAlphabetic(next) || IsNumber(next))
+                            {
+                                match = false;
+                            }
+                        }
+                    }
+                    if (match)
+                    {
+                        return true;
+                    }
+                    pos = line.Find(text, pos + 1);
+                }
+            }
+            return false;
+        }
         private void ToggleBreakpointClick()
         {
             try
@@ -2681,6 +2863,28 @@ namespace cmcode
             }
             return localsTabPage;
         }
+        private Cm.Views.SearchResults* GetSearchResults()
+        {
+            if (searchResults == null)
+            {
+                UniquePtr<TabPage> searchResultsTabPagePtr(new TabPage("Search Results", "searchResults"));
+                searchResultsTabPage = searchResultsTabPagePtr.Get();
+                UniquePtr<Cm.Views.SearchResults> searchResultsPtr(new Cm.Views.SearchResults());
+                searchResults = searchResultsPtr.Get();
+                searchResults->ViewSearchResultEvent().AddHandler(ViewSearchResult);
+                searchResultsTabPage->AddChild(searchResultsPtr.Release());
+                outputTabControl->AddTabPage(searchResultsTabPagePtr.Release());
+            }
+            return searchResults;
+        }
+        private TabPage* GetSearchResultsTabPage()
+        {
+            if (searchResults == null)
+            {
+                GetSearchResults();
+            }
+            return searchResultsTabPage;
+        }
         private void UpdateLocals(Cm.Views.UpdateLocalsEventArgs& args)
         {
             args.debugging = Debugging();
@@ -2706,6 +2910,66 @@ namespace cmcode
             {
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
                 debugService.Reset();
+            }
+        }
+        private void ViewSearchResultsClick()
+        {
+            try
+            {
+                TabPage* searchResultsTabPage = GetSearchResultsTabPage();
+                searchResultsTabPage->Select();
+                if (searchResults != null)
+                {
+                    searchResults->Invalidate();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void ViewSearchResult(Cm.Views.ViewSearchResultEventArgs& args)
+        {
+            try
+            {
+                Cm.Views.SearchResult* searchResult = args.searchResult;
+                if (searchResult != null)
+                {
+                    TabPage* tabPage = codeTabControl->GetTabPageByKey(searchResult->fileName);
+                    Cm.Views.Editor* editor = null;
+                    if (tabPage != null)
+                    {
+                        editor = GetEditorByTabPage(tabPage);
+                        tabPage->Select();
+                    }
+                    if (editor == null)
+                    {
+                        HashMap<string, TreeViewNodeData*>.ConstIterator it = solutionExplorerData->treeViewDataMap.CFind(searchResult->fileName);
+                        if (it != solutionExplorerData->treeViewDataMap.CEnd())
+                        {
+                            TreeViewNodeData* data = it->second;
+                            editor = AddCmajorEditor(data->fileName, data->key, data->filePath);
+                        }
+                        else
+                        {
+                            editor = AddCmajorEditor(Path.GetFileName(searchResult->fileName), searchResult->fileName, searchResult->fileName);
+                        }
+                    }
+                    TextView* textView = editor->GetTextView();
+                    if (textView != null)
+                    {
+                        textView->SetCaretLineCol(Min(cast<int>(searchResult->lineNumber), cast<int>(textView->Lines().Count())), 1 + textView->LineNumberFieldLength());
+                        textView->ScrollToCaret();
+                        textView->SetFocus();
+                        textView->Invalidate();
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
             }
         }
         private void BreakpointAdded(Cm.Views.AddBreakpointEventArgs& args)
@@ -3105,6 +3369,7 @@ namespace cmcode
         {
             saveToolButton->Disable();
             saveAllToolButton->Disable();
+            searchMenuItem->Disable();
             cppToolButton->Disable();
             cppToolButton->SetState(ToolButton.State.disabled);
             llvmToolButton->Disable();
@@ -3185,6 +3450,7 @@ namespace cmcode
                 stepIntoToolButton->Enable();
                 closeSolutionMenuItem->Enable();
                 saveAllMenuItem->Enable();
+                searchMenuItem->Enable();
 
                 buildSolutionMenuItem->Enable();
                 rebuildSolutionMenuItem->Enable();
@@ -3234,6 +3500,8 @@ namespace cmcode
         private TabPage* localsTabPage;
         private TabPage* debugTabPage;
         private ToolBar* toolBar;
+        private Cm.Views.SearchResults* searchResults;
+        private TabPage* searchResultsTabPage;
         private TreeView* solutionExplorerTreeView;
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
         private StatusBarItem* sourceFilePathStatusBarItem;
@@ -3266,6 +3534,8 @@ namespace cmcode
         private MenuItem* pasteMenuItem;
         private MenuItem* undoMenuItem;
         private MenuItem* redoMenuItem;
+        private MenuItem* gotoLineMenuItem;
+        private MenuItem* searchMenuItem;
 
         private ToolButton* saveToolButton;
         private ToolButton* saveAllToolButton;
