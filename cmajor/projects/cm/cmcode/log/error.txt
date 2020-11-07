@@ -1,14 +1,22 @@
-System.Net.Sockets.SocketException: Yhteyttä ei voi muodostaa, koska kohdekone ei salli sitä.
+System.Exception: Cm.Service.PortMap.PortMapService: GetFreePortNumber: Yhteyttä ei voi muodostaa, koska kohdekone ei salli sitä.
 
 CALL STACK:
 System.Net.Sockets.TcpSocket.TcpSocket(const String<char>&, const String<char>&, System.Net.Sockets.ConnectOptions) C:/work/cmajorm/cmajor/system/System.Net.Sockets/TcpSocket.cm:48
 System.Net.Sockets.TcpSocket.TcpSocket(const String<char>&, const String<char>&) C:/work/cmajorm/cmajor/system/System.Net.Sockets/TcpSocket.cm:56
-Cm.Service.Build.BuildService.ProcessBuildRequest(const BuildRequest&) C:/work/cmajorm/cmajor/projects/cm/service/BuildService.cm:283
+Cm.Service.PortMap.ConnectPortMapServer(int&) C:/work/cmajorm/cmajor/projects/cm/service/PortMapService.cm:144
+Cm.Service.PortMap.GetFreePortNumber(const String<char>&, int, int&) C:/work/cmajorm/cmajor/projects/cm/service/PortMapService.cm:198
+Cm.Service.Build.BuildService.MakeServerStartCommand() C:/work/cmajorm/cmajor/projects/cm/service/BuildService.cm:103
+Cm.Service.Build.BuildService.StartServer() C:/work/cmajorm/cmajor/projects/cm/service/BuildService.cm:140
+Cm.Service.Build.BuildService.ProcessBuildRequest(const BuildRequest&) C:/work/cmajorm/cmajor/projects/cm/service/BuildService.cm:294
 cmcode.MainWindow.StartBuild(const BuildRequest&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:1720
-cmcode.MainWindow.BuildSolutionClick() C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:1758
-System.Windows.ToolButton.OnClick() C:/work/cmajorm/cmajor/system/System.Windows/ToolBar.cm:752
-System.Windows.ToolButton.DoClick() C:/work/cmajorm/cmajor/system/System.Windows/ToolBar.cm:747
-System.Windows.ToolBar.OnMouseUp(MouseEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/ToolBar.cm:344
+cmcode.BuildProjectAction.Execute() C:/work/cmajorm/cmajor/projects/cm/cmcode/Action.cm:110
+System.Windows.ClickAction.Click() C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:1052
+System.Windows.MenuItem.OnClick() C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:2126
+System.Windows.MenuItem.DoClick() C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:2122
+System.Windows.MenuItem.DoMouseUp(MouseEventArgs&, MenuControl*) C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:1935
+System.Windows.MenuItem.DoMouseUp(MouseEventArgs&, bool&, MenuControl*) C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:1885
+System.Windows.MenuItem.DoMouseUp(MouseEventArgs&, bool&, MenuControl*) C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:1866
+System.Windows.MenuBox.OnMouseUp(MouseEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/Menu.cm:1022
 System.Windows.Control.DoMouseUp(MouseEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:1659
 System.Windows.Control.ProcessMessage(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:871
 System.Windows.Control.ProcessMessageInternal(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:789

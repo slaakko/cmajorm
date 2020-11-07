@@ -5,7 +5,9 @@
 
 #include <cmajor/cmbs/BuildServer.hpp>
 #include <cmajor/cmbs/BuildClient.hpp>
+#include <cmajor/cmpm/PortMapClient.hpp>
 #include <soulng/util/Path.hpp>
+#include <soulng/util/Process.hpp>
 #include <sngcm/ast/InitDone.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <cmajor/cmmid/InitDone.hpp>
@@ -35,9 +37,11 @@ struct InitDone
 #ifdef _WIN32
         cmajor::resources::Init();
 #endif
+        cmajor::cmpm::InitPortMapClient();
     }
     ~InitDone()
     {
+        cmajor::cmpm::DonePortMapClient();
 #ifdef _WIN32
         cmajor::resources::Done();
 #endif
@@ -73,6 +77,9 @@ void PrintHelp()
     std::cout << "--port=PORT | -p=PORT" << std::endl;
     std::cout << "  Set server port number to PORT." << std::endl;
     std::cout << "  Default port number is 54325." << std::endl;
+    std::cout << "--portMapServicePort=PORT | -m=PORT" << std::endl;
+    std::cout << "  Set port map service port number to PORT." << std::endl;
+    std::cout << "  Optional. When set revises main port number using port map service every minute." << std::endl;
     std::cout << std::endl;
     std::cout << "--request=FILE | -r=FILE" << std::endl;
     std::cout << "  Read build request from file FILE and run it." << std::endl;
@@ -90,6 +97,25 @@ struct BuildServerRun
     }
 };
 
+struct PortMapClientRun
+{
+    PortMapClientRun(int portMapServicePort_, const std::vector<int>& portNumbers, const std::string& programName, int pid) : portMapServicePort(portMapServicePort_)
+    {
+        if (portMapServicePort != -1)
+        {
+            cmajor::cmpm::StartPortMapClient(portMapServicePort, portNumbers, programName, pid);
+        }
+    }
+    ~PortMapClientRun()
+    {
+        if (portMapServicePort != -1)
+        {
+            cmajor::cmpm::StopPortMapClient();
+        }
+    }
+    int portMapServicePort;
+};
+
 int main(int argc, const char** argv)
 {
     InitDone initDone;
@@ -97,6 +123,7 @@ int main(int argc, const char** argv)
     try
     {
         int port = 54325;
+        int portMapServicePort = -1;
         std::string requestFilePath;
         int timeoutSecs = 15;
         for (int i = 1; i < argc; ++i)
@@ -123,6 +150,10 @@ int main(int argc, const char** argv)
                         if (option == "--port")
                         {
                             port = boost::lexical_cast<int>(value);
+                        }
+                        else if (option == "--portMapServicePort")
+                        {
+                            portMapServicePort = boost::lexical_cast<int>(value);
                         }
                         else if (option == "--request")
                         {
@@ -157,6 +188,10 @@ int main(int argc, const char** argv)
                     if (option == "-p")
                     {
                         port = boost::lexical_cast<int>(value);
+                    }
+                    else if (option == "-m")
+                    {
+                        portMapServicePort = boost::lexical_cast<int>(value);
                     }
                     else if (option == "-r")
                     {
@@ -202,6 +237,12 @@ int main(int argc, const char** argv)
             }
         }
         BuildServerRun runBuildServer(port, version, timeoutSecs, log);
+        std::vector<int> ports;
+        if (portMapServicePort != -1)
+        {
+            ports.push_back(port);
+        }
+        PortMapClientRun runPortMapClient(portMapServicePort, ports, "cmbs", soulng::util::GetPid());
         if (requestFilePath.empty())
         {
             while (!cmbs::BuildServerStopRequested() && !cmbs::BuildServerTimeOut())

@@ -1,0 +1,217 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using Cm.Service;
+using System;
+using System.Dom;
+using System.XPath;
+using System.IO;
+using System.Net.Sockets;
+using System.Threading;
+using System.Json;
+
+namespace Cm.Service.PortMap
+{
+    string PortMapLogFilePath()
+    {
+        return Path.Combine(CmCodeLogDir(), "portmap.service.log");
+    }
+
+    [json]
+    class GetFreePortNumberRequest
+    {
+        public nothrow GetFreePortNumberRequest(const string& programName_, int pid_, const string& time_) :
+            message("GetFreePortNumberRequest"), programName(programName_), pid(ToString(pid_)), time(time_)
+        {
+        }
+        public string message;
+        public string programName;
+        public string pid;
+        public string time;
+    }
+
+    [json]
+    class GetFreePortNumberReply
+    {
+        public nothrow GetFreePortNumberReply() : message("GetFreePortNumberReply")
+        {
+        }
+        public string message;
+        public string portNumber;
+    }
+
+    string PortMapConfigFileName()
+    {
+        string cmajorRootDir = Cm.Ast.CmajorRootDir();
+        string cmajorConfigDir = Path.Combine(cmajorRootDir, "config");
+        Directory.CreateDirectories(cmajorConfigDir);
+        return Path.Combine(cmajorConfigDir, "cmpm.config.xml");
+    }
+
+    int GetPortMapServicePortNumber()
+    {
+        try
+        {
+            string portMapConfigFileName = PortMapConfigFileName();
+            try
+            {
+                UniquePtr<Document> portMapConfigDoc = ReadDocument(portMapConfigFileName);
+                UniquePtr<XPathObject> result = Evaluate(u"/cmpm", portMapConfigDoc.Get());
+                if (result.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                    if (nodeSet->Length() == 1)
+                    {
+                        Node* node = (*nodeSet)[0];
+                        if (node is Element*)
+                        {
+                            Element* element = cast<Element*>(node);
+                            ustring portMapServicePortAttribute = element->GetAttribute(u"portMapServicePort");
+                            if (!portMapServicePortAttribute.IsEmpty())
+                            {
+                                return ParseInt(ToUtf8(portMapServicePortAttribute));
+                            }
+                            else
+                            {
+                                throw Exception("'portMapServicePort' attribute not found from 'cmpm' element");
+                            }
+                        }
+                        else
+                        {
+                            throw Exception("cmpm: element node expected");
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("single 'cmpm' node expected");
+                    }
+                }
+                else
+                {
+                    throw Exception("cmpm: node set expected");
+                }
+            }
+            catch (const Exception& ex)
+            {
+                throw Exception("Cm.Service.PortMap.PortMapService: GetPortMapServicePortNumber: file=" + portMapConfigFileName + ": " + ex.Message());
+            }
+        }
+        catch (const Exception& ex)
+        {
+            LogWriter logWriter(PortMapLogFilePath());
+            logWriter << ex.ToString() << endl();
+        }
+        return -1;
+    }
+
+    void StartPortMapServer()
+    {
+        try
+        {
+            Process* portMapServer = new Process("cmpms", cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr));
+            string line = portMapServer->ReadLine(Process.StdHandle.stdOut);
+            if (line == "port-map-server-ready")
+            {
+                Sleep(Duration.FromSeconds(1));
+            }
+            else if (line == "port-map-server-error")
+            {
+                line = portMapServer->ReadLine(Process.StdHandle.stdOut);
+                throw Exception(line);
+            }
+        }
+        catch (const Exception& ex)
+        {
+            throw Exception("Cm.Service.PortMap.PortMapService: StartPortMapServer: " + ex.Message());
+        }
+    }
+
+    string GetMessage(JsonValue* jsonValue)
+    {
+        if (jsonValue is JsonObject*)
+        {
+            JsonObject* jsonObject = cast<JsonObject*>(jsonValue);
+            JsonValue* message = jsonObject->GetField("message");
+            if (message != null && message is JsonString*)
+            {
+                JsonString* messageStr = cast<JsonString*>(message);
+                return ToUtf8(messageStr->Value());
+            }
+        }
+        return string();
+    }
+
+    public int GetFreePortNumber(const string& programName, int pid, int& portMapServicePortNumber)
+    {
+        portMapServicePortNumber = -1;
+        try
+        {
+            bool portMapServerStarted = false;
+            int port = GetPortMapServicePortNumber();
+            if (port == -1)
+            {
+                StartPortMapServer();
+                portMapServerStarted = true;
+            }
+            port = GetPortMapServicePortNumber();
+            if (port == -1)
+            {
+                throw Exception("could not resolve port map service port number");
+            }
+            for (int connectionAttempt = 1; connectionAttempt <= 2; ++connectionAttempt)
+            {
+                try
+                {
+                    TcpSocket portMapServerConnection("localhost", ToString(port));
+                    GetFreePortNumberRequest request(programName, pid, GetCurrentTimestamp().ToString());
+                    UniquePtr<JsonValue> requestValue = request.ToJson();
+                    string requestStr = requestValue->ToString();
+                    Write(portMapServerConnection, requestStr);
+                    string replyStr = ReadStr(portMapServerConnection);
+                    UniquePtr<JsonValue> replyValue = ParseJson(replyStr);
+                    string message = GetMessage(replyValue.Get());
+                    if (message == "GetFreePortNumberReply")
+                    {
+                        GetFreePortNumberReply reply(replyValue.Get());
+                        string portNumberStr = reply.portNumber;
+                        if (portNumberStr.IsEmpty())
+                        {
+                            throw Exception("portNumber field in 'GetFreePortNumberReply' is empty");
+                        }
+                        int freePortNumber = ParseInt(portNumberStr);
+                        portMapServicePortNumber = port;
+                        return freePortNumber;
+                    }
+                    else
+                    {
+                        throw Exception("'GetFreePortNumberReply' expected, message=" + message);
+                    }
+                }
+                catch (const Exception& ex)
+                {
+                    if (connectionAttempt > 1)
+                    {
+                        throw ex;
+                    }
+                }
+                if (connectionAttempt == 1 && !portMapServerStarted)
+                {
+                    StartPortMapServer();
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        catch (const Exception& ex)
+        {
+            LogWriter logWriter(PortMapLogFilePath());
+            logWriter << ex.ToString() << endl();
+        }
+        return -1;
+    }
+}
+

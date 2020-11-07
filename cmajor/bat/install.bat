@@ -12,6 +12,13 @@ xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmdb.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmdb2xmld.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmdb2xml.exe ..\bin
 
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmd.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmd.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmpm.dll ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmpm.lib ..\lib
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmpmsd.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmpms.exe ..\bin
+
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Debug\cmupdd.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\x64\Release\cmupd.exe ..\bin
 

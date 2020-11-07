@@ -4,8 +4,10 @@
 #include <cmajor/cmdebug/ServerDebugger.hpp>
 #include <cmajor/cmdebug/DebuggerClient.hpp>
 #include <cmajor/cmdebug/CmdbSession.hpp>
+#include <cmajor/cmpm/PortMapClient.hpp>
 #include <soulng/util/Ansi.hpp>
 #include <soulng/util/InitDone.hpp>
+#include <soulng/util/Process.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <sngxml/xpath/InitDone.hpp>
 #include <boost/lexical_cast.hpp>
@@ -21,9 +23,11 @@ struct InitDone
         soulng::util::Init();
         sngxml::xpath::Init();
         cmajor::debug::Init();
+        cmajor::cmpm::InitPortMapClient();
     }
     ~InitDone()
     {
+        cmajor::cmpm::DonePortMapClient();
         cmajor::debug::Done();
         sngxml::xpath::Done();
         soulng::util::Done();
@@ -56,6 +60,9 @@ void PrintHelp()
     std::cout << "  Write log to %CMAJOR_ROOT%/log/cmdb.log (by default C:\\cmajor\\log\\cmdb.log)." << std::endl;
     std::cout << "--sessionPort=PORT_NUMBER | -s=PORT_NUMBER" << std::endl;
     std::cout << "  Set the port number of the CMDB session that cmdb and the program being debugged will use for exchanging console I/O messages. Default port is 54322." << std::endl;
+    std::cout << "--portMapServicePort=PORT_NUMBER | -m=PORT_NUMBER" << std::endl;
+    std::cout << "  Set port map service port number to PORT_NUMBER." << std::endl;
+    std::cout << "  Optional. When set revises main port number and session port number using port map service every minute." << std::endl;
 }
 
 int main(int argc, const char** argv)
@@ -63,6 +70,7 @@ int main(int argc, const char** argv)
     bool server = false;
     bool client = false;
     InitDone initDone;
+    int portMapServicePort = -1;
     try
     {
         bool verbose = false;
@@ -72,6 +80,8 @@ int main(int argc, const char** argv)
         bool breakOnThrow = true;
         bool log = false;
         int port = 54326;
+        int sessionPort = 54322;
+        std::vector<int> portNumbers;
         for (int i = 1; i < argc; ++i)
         {
             std::string arg = argv[i];
@@ -119,8 +129,12 @@ int main(int argc, const char** argv)
                             }
                             else if (components[0] == "--sessionPort")
                             {
-                                int sessionPort = boost::lexical_cast<int>(components[1]);
+                                sessionPort = boost::lexical_cast<int>(components[1]);
                                 cmajor::debug::SetCmdbSessionPort(sessionPort);
+                            }
+                            else if (components[0] == "--portMapServicePort")
+                            {
+                                portMapServicePort = boost::lexical_cast<int>(components[1]);
                             }
                             else
                             {
@@ -151,8 +165,12 @@ int main(int argc, const char** argv)
                             }
                             else if (components[0] == "s")
                             {
-                                int sessionPort = boost::lexical_cast<int>(components[1]);
+                                sessionPort = boost::lexical_cast<int>(components[1]);
                                 cmajor::debug::SetCmdbSessionPort(sessionPort);
+                            }
+                            else if (components[0] == "m")
+                            {
+                                portMapServicePort = boost::lexical_cast<int>(components[1]);
                             }
                         }
                         else
@@ -226,6 +244,13 @@ int main(int argc, const char** argv)
         }
         if (server)
         {
+            if (portMapServicePort != -1)
+            {
+                std::vector<int> portNumbers;
+                portNumbers.push_back(port);
+                portNumbers.push_back(sessionPort);
+                cmajor::cmpm::StartPortMapClient(portMapServicePort, portNumbers, "cmdb", GetPid());
+            }
             if (client)
             {
                 cmajor::debug::StartDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log);
@@ -236,6 +261,11 @@ int main(int argc, const char** argv)
             {
                 cmajor::debug::RunDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log);
             }
+            if (portMapServicePort != -1)
+            {
+                cmajor::cmpm::StopPortMapClient();
+                portMapServicePort = -1;
+            }
         }
         else
         {
@@ -244,6 +274,10 @@ int main(int argc, const char** argv)
     }
     catch (const std::exception& ex)
     {
+        if (portMapServicePort != -1)
+        {
+            cmajor::cmpm::StopPortMapClient();
+        }
         if (server)
         {
             std::cout << "debug-server-error" << std::endl;

@@ -167,7 +167,7 @@ namespace System.Windows
         }
         public override nothrow void Undo(TextView* textView)
         {
-            textView->DeleteLines(lineIndex, cast<int>(lines.Count()));
+            textView->DeleteLines(lineIndex, columnIndex, lines);
         }
         public override nothrow void Redo(TextView* textView)
         {

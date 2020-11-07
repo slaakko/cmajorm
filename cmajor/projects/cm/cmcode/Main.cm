@@ -528,6 +528,10 @@ namespace cmcode
             statusBar->AddItem(sourceFilePathStatusBarItem);
             dirtyStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
             statusBar->AddItem(dirtyStatusBarItem);
+            caretLineStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
+            statusBar->AddItem(caretLineStatusBarItem);
+            caretColumnStatusBarItem = new StatusBarItem("", StatusBarItem.BorderStyle.sunken);
+            statusBar->AddItem(caretColumnStatusBarItem);
             AddChild(statusBar);
             SetControlStatus(UserInterfaceAction.none);
             MainConfiguration.Instance().SetMainWindowLocation(Location());
@@ -1730,9 +1734,9 @@ namespace cmcode
         private BuildServiceArgs MakeBuildServiceArgs()
         {
         #if (DEBUG)
-            BuildServiceArgs args = BuildServiceArgs().Log(true).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false);
+            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false);
         #else
-            BuildServiceArgs args = BuildServiceArgs().Log(false).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false);
+            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(false).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false);
         #endif
             return args;
         }
@@ -2191,6 +2195,7 @@ namespace cmcode
             sourceCodeView->CutEvent().AddHandler(CutClick);
             sourceCodeView->PasteEvent().AddHandler(PasteClick);
             sourceCodeView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
+            sourceCodeView->CaretPosChangedEvent().AddHandler(EditorCaretPosChanged);
             gotoLineMenuItem->Enable();
             Cm.Views.DebugStrip* debugStrip = sourceCodeView->GetDebugStrip();
             debugStrip->BreakpointAddedEvent().AddHandler(BreakpointAdded);
@@ -2213,6 +2218,7 @@ namespace cmcode
             textView->CutEvent().AddHandler(CutClick);
             textView->PasteEvent().AddHandler(PasteClick);
             textView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
+            textView->CaretPosChangedEvent().AddHandler(EditorCaretPosChanged);
             gotoLineMenuItem->Enable();
             editorByTabPageMap[tabPage.Get()] = editor;
             tabPage->AddChild(editorPtr.Release());
@@ -2231,6 +2237,7 @@ namespace cmcode
             textView->CutEvent().AddHandler(CutClick);
             textView->PasteEvent().AddHandler(PasteClick);
             textView->SetUndoRedoMenuItems(undoMenuItem, redoMenuItem);
+            textView->CaretPosChangedEvent().AddHandler(EditorCaretPosChanged);
             gotoLineMenuItem->Enable();
             editorByTabPageMap[tabPage.Get()] = editor;
             tabPage->AddChild(editorPtr.Release());
@@ -2279,10 +2286,10 @@ namespace cmcode
         private DebugServiceArgs MakeDebugServiceArgs(const string& backend, const string& config, Cm.Ast.Project* project, const string& programArguments)
         {
         #if (DEBUG)
-            DebugServiceArgs args = DebugServiceArgs().Log(true).DebugServer(false).Verbose(true).Backend(backend).Config(config).
+            DebugServiceArgs args = DebugServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).DebugServer(false).Verbose(true).Backend(backend).Config(config).
                 ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments);
         #else
-            DebugServiceArgs args = DebugServiceArgs().Log(false).DebugServer(false).Verbose(true).Backend(backend).Config(config).
+            DebugServiceArgs args = DebugServiceArgs().ProgramName("cmcode").Pid(pid).Log(false).DebugServer(false).Verbose(true).Backend(backend).Config(config).
                 ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments);
         #endif
             return args;
@@ -3304,6 +3311,25 @@ namespace cmcode
                 }
             }
         }
+        private void EditorCaretPosChanged()
+        {
+            TabPage* tabPage = codeTabControl->SelectedTabPage();
+            if (tabPage != null)
+            {
+                Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                if (editor != null)
+                {
+                    TextView* textView = editor->GetTextView();
+                    if (textView != null)
+                    {
+                        int caretLine = textView->CaretLine();
+                        int caretCol = textView->CaretColumn();
+                        caretLineStatusBarItem->SetText(ToString(caretLine));
+                        caretColumnStatusBarItem->SetText(ToString(caretCol));
+                    }
+                }
+            }
+        }
         private void TargetRunning()
         {
             try
@@ -3506,6 +3532,8 @@ namespace cmcode
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
         private StatusBarItem* sourceFilePathStatusBarItem;
         private StatusBarItem* dirtyStatusBarItem;
+        private StatusBarItem* caretLineStatusBarItem;
+        private StatusBarItem* caretColumnStatusBarItem;
         private HashMap<TabPage*, Cm.Views.Editor*> editorByTabPageMap;
 
         private MenuBar* menuBar;

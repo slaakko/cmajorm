@@ -26,6 +26,16 @@ namespace Cm.Service.Debug
             backend("cpp"), toolChain("gcc"), config("debug")
         {
         }
+        public nothrow DebugServiceArgs& ProgramName(const string& programName_)
+        {
+            programName = programName_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& Pid(int pid_)
+        {
+            pid = pid_;
+            return *this;
+        }
         public nothrow DebugServiceArgs& Port(int port_)
         {
             port = port_;
@@ -92,6 +102,8 @@ namespace Cm.Service.Debug
                 toolChain), config), executableName);
             return executablePath;
         }
+        public string programName;
+        public int pid;
         public int port;
         public int sessionPort;
         public bool log;
@@ -129,32 +141,9 @@ namespace Cm.Service.Debug
         {
             initialized, debuggingStarted, requestInProgress, debuggingStopped
         }
-        public DebugService(DebugServiceArgs& args) :
-            base(),
-            port(args.port), sessionPort(args.sessionPort), log(args.log), verbose(args.verbose), serverStartWaitSeconds(args.serverStartWaitSeconds)
+        public DebugService(DebugServiceArgs& args_) : base(), args(args_)
         {
             InitMessageKindMap();
-            serverStartCommand = "cmdb";
-            if (args.debugServer)
-            {
-                serverStartCommand = "cmdbd";
-            }
-            serverStartCommand.Append(" --server");
-            serverStartCommand.Append(" --port=" + ToString(port));
-            serverStartCommand.Append(" --sessionPort=" + ToString(sessionPort));
-            if (log)
-            {
-                serverStartCommand.Append(" --log");
-            }
-            if (verbose)
-            {
-                serverStartCommand.Append(" --verbose");
-            }
-            serverStartCommand.Append(" \"").Append(args.GetExecutablePath()).Append("\"");
-            if (!args.arguments.IsEmpty())
-            {
-                serverStartCommand.Append(" ").Append(args.arguments);
-            }
         }
         public nothrow void SetWriteTargetOutputMethod(const WriteTargetOutputMethod& writeTargetOutput_)
         {
@@ -212,6 +201,52 @@ namespace Cm.Service.Debug
             messageKindMap["logMessageRequest"] = MessageKind.logMessageRequest;
             messageKindMap["logMessageReply"] = MessageKind.logMessageReply;
         }
+        private string MakeDebugServerStartCommand()
+        {
+            string serverStartCommand = "cmdb";
+            if (args.debugServer)
+            {
+                serverStartCommand = "cmdbd";
+            }
+            serverStartCommand.Append(" --server");
+            port = Cm.Service.PortMap.GetFreePortNumber(args.programName, args.pid, portMapServicePortNumber);
+            bool gotNoPort = false;
+            if (port == -1)
+            {
+                port = args.port;
+                LogMessage("DebugService: got no port from port map server, resorting to default port " + ToString(port));
+                gotNoPort = true;
+            }
+            serverStartCommand.Append(" --port=" + ToString(port));
+            if (!gotNoPort)
+            {
+                sessionPort = Cm.Service.PortMap.GetFreePortNumber(args.programName, args.pid, portMapServicePortNumber);
+            }
+            if (sessionPort == -1)
+            {
+                sessionPort = args.sessionPort;
+                LogMessage("DebugService: got no port from port map server, resorting to default session port " + ToString(sessionPort));
+            }
+            if (portMapServicePortNumber != -1)
+            {
+                serverStartCommand.Append(" --portMapServicePort=" + ToString(portMapServicePortNumber));
+            }
+            serverStartCommand.Append(" --sessionPort=" + ToString(sessionPort));
+            if (args.log)
+            {
+                serverStartCommand.Append(" --log");
+            }
+            if (args.verbose)
+            {
+                serverStartCommand.Append(" --verbose");
+            }
+            serverStartCommand.Append(" \"").Append(args.GetExecutablePath()).Append("\"");
+            if (!args.arguments.IsEmpty())
+            {
+                serverStartCommand.Append(" ").Append(args.arguments);
+            }
+            return serverStartCommand;
+        }
         public nothrow bool ServerRunning() const
         {
             if (debugServer.IsNull()) return false;
@@ -226,6 +261,7 @@ namespace Cm.Service.Debug
             }
             {
                 RequestGuard requestGuard(this);
+                string serverStartCommand = MakeDebugServerStartCommand();
                 debugServer.Reset(new Process(serverStartCommand,
                     cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr)));
                 string line = debugServer->ReadLine(Process.StdHandle.stdOut);
@@ -876,11 +912,10 @@ namespace Cm.Service.Debug
         {
             return targetState;
         }
+        private DebugServiceArgs args;
         private int port;
         private int sessionPort;
-        private bool log;
-        private bool verbose;
-        private string serverStartCommand;
+        private int portMapServicePortNumber;
         private State state;
         private TargetState targetState;
         private UniquePtr<Process> debugServer;
