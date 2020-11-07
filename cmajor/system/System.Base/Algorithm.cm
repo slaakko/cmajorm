@@ -10,9 +10,8 @@ namespace System
     public constexpr nothrow inline const T& Min<T>(const T& left, const T& right) where T is LessThanComparable
     {
         if (left <= right) return left;
-        return right;
+        return right;    
     }
-
     public constexpr nothrow inline const T& Max<T>(const T& left, const T& right) where T is LessThanComparable
     {
         if (right >= left) return right;
@@ -377,7 +376,7 @@ namespace System
         }
     }
 
-    public O RemoveCopy<I, O, T>(I begin, I end, O result, const T& value) 
+    public O RemoveCopy<I, O, T>(I begin, I end, O result, const T& value)
         where T is Semiregular and I is InputIterator and O is OutputIterator and O.ValueType is I.ValueType and EqualityComparable<T, I.ValueType>
     {
         while (begin != end)
@@ -413,7 +412,7 @@ namespace System
         {
             *begin = value;
             ++begin;
-        }        
+        }
     }
 
     public nothrow T Accumulate<I, T, Op>(I begin, I end, T init, Op op) where I is InputIterator and T is Semiregular and Op is BinaryOperation and Op.FirstArgumentType is T and Op.SecondArgumentType is I.ValueType
@@ -956,17 +955,17 @@ namespace System
             }
         }
     }
-    
+
     public nothrow inline void InitRand(uint seed)
     {
         RtInitRand(seed);
     }
-    
+
     public nothrow inline uint Random()
     {
         return RtRandom();
     }
-    
+
     public nothrow inline ulong Random64()
     {
         return RtRandom64();
@@ -976,7 +975,7 @@ namespace System
     {
         return Random() % n;
     }
-    
+
     public nothrow void RandomShuffle<I>(I begin, I end) where I is RandomAccessIterator
     {
         if (begin == end) return;

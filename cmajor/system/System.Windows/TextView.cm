@@ -1047,7 +1047,7 @@ namespace System.Windows
                                 int lineIndex = caretLine - 1;
                                 int columnIndex = CaretColumn() - 1;
                                 AddDeleteCharCommand(lineIndex, columnIndex);
-                                DeleteChar(lineIndex, columnIndex, 0, 0, 0);
+                                DeleteChar(lineIndex, columnIndex, 0, 0, false);
                             }
                             else
                             {
@@ -1079,7 +1079,7 @@ namespace System.Windows
                             int lineIndex = caretLine - 1;
                             int columnIndex = CaretColumn() - 1;
                             AddNewLineCommand(lineIndex, columnIndex);
-                            NewLine(lineIndex, columnIndex, true);
+                            NewLine(lineIndex, columnIndex);
                             args.handled = true;
                             return;
                         }
@@ -1183,7 +1183,17 @@ namespace System.Windows
         }
         private nothrow void AddInsertCharCommand(int lineIndex, int columnIndex, uchar c)
         {
-            editCommandList.AddCommand(new InsertCharCommand(lineIndex, columnIndex, c));
+            bool removeIndent = false;
+            while (lineIndex >= lines.Count())
+            {
+                lines.Add(ustring());
+            }
+            ustring& line = lines[lineIndex];
+            if (c == '}' && line.StartsWith(ustring(' ', IndentSize())))
+            {
+                removeIndent = true;
+            }
+            editCommandList.AddCommand(new InsertCharCommand(lineIndex, columnIndex, c, removeIndent));
         }
         public void InsertChar(int lineIndex, int columnIndex, uchar c)
         {
@@ -1193,6 +1203,11 @@ namespace System.Windows
             }
             ustring& line = lines[lineIndex];
             line.Insert(columnIndex, c);
+            if (c == '}' && line.StartsWith(ustring(' ', IndentSize())))
+            {
+                line.Remove(0, IndentSize());
+                columnIndex = columnIndex - IndentSize();
+            }
             if (line.Length() > maxLineLength)
             {
                 maxLineLength = cast<int>(line.Length());
@@ -1297,10 +1312,14 @@ namespace System.Windows
                 }
             }
         }
-        public void DeleteChar(int lineIndex, int columnIndex, int indent, int removedIndent, int numSpaces)
+        public void DeleteChar(int lineIndex, int columnIndex, int indent, int numSpaces, bool removeIndent)
         {
             if (lineIndex >= lines.Count()) return;
             ustring& line = lines[lineIndex];
+            if (removeIndent)
+            {
+                line.Insert(0, ustring(' ', IndentSize()));
+            }
             if (columnIndex < line.Length())
             {
                 line.Remove(columnIndex, 1);
@@ -1317,10 +1336,6 @@ namespace System.Windows
                     }
                     ustring nextLine = lines[lineIndex + 1];
                     line.Append(nextLine.Substring(indent));
-                    if (removedIndent > 0 && indent >= removedIndent)
-                    {
-                        line.Insert(0, ustring(' ', removedIndent));
-                    }
                     LineEventArgs changedArgs(lineIndex, -1);
                     OnLineChanged(changedArgs);
                     lines.Remove(lines.Begin() + lineIndex + 1);
@@ -1382,10 +1397,9 @@ namespace System.Windows
                 ++numSpaces;
                 --i;
             }
-            int removedIndent = RemoveIndent(lineIndex);
-            editCommandList.AddCommand(new NewLineCommand(lineIndex, columnIndex, indent, removedIndent, numSpaces));
+            editCommandList.AddCommand(new NewLineCommand(lineIndex, columnIndex, indent, numSpaces));
         }
-        public void NewLine(int lineIndex, int columnIndex, bool doIndent)
+        public void NewLine(int lineIndex, int columnIndex)
         {
             while (lineIndex >= lines.Count())
             {
@@ -1397,16 +1411,6 @@ namespace System.Windows
             if (!toInsert.IsEmpty())
             {
                 line.Remove(columnIndex, line.Length() - columnIndex);
-                lineChanged = true;
-            }
-            int removeIndent = -1;
-            if (doIndent)
-            {
-                removeIndent = RemoveIndent(lineIndex);
-            }
-            if (removeIndent > 0 && line.Length() >= removeIndent)
-            {
-                line.Remove(0, removeIndent);
                 lineChanged = true;
             }
             ustring trimmedLine = TrimEnd(line);
@@ -1422,11 +1426,7 @@ namespace System.Windows
             }
             lines.Insert(lines.Begin() + lineIndex + 1, toInsert);
             SetLineNumberFieldLength(cast<int>(lines.Count()));
-            int indentLineIndex = -1;
-            if (doIndent)
-            {
-                indentLineIndex = lineIndex;
-            }
+            int indentLineIndex = lineIndex;
             LineEventArgs insertedArgs(lineIndex + 1, indentLineIndex);
             OnLineInserted(insertedArgs);
             SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength() + GetIndent(line, lineIndex));

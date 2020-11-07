@@ -97,12 +97,12 @@ namespace System.Windows
 
     public class InsertCharCommand : EditCommand
     {
-        public nothrow InsertCharCommand(int lineIndex_, int columnIndex_, uchar c_) : lineIndex(lineIndex_), columnIndex(columnIndex_), c(c_)
+        public nothrow InsertCharCommand(int lineIndex_, int columnIndex_, uchar c_, bool removeIndent_) : lineIndex(lineIndex_), columnIndex(columnIndex_), c(c_), removeIndent(removeIndent_)
         {
         }
         public override nothrow void Undo(TextView* textView)
         {
-            textView->DeleteChar(lineIndex, columnIndex, 0, 0, 0);
+            textView->DeleteChar(lineIndex, columnIndex, 0, 0, removeIndent);
         }
         public override nothrow void Redo(TextView* textView)
         {
@@ -111,6 +111,7 @@ namespace System.Windows
         private int lineIndex;
         private int columnIndex;
         private uchar c;
+        private bool removeIndent;
     }
 
     public class DeleteCharCommand : EditCommand
@@ -126,12 +127,12 @@ namespace System.Windows
             }
             else
             {
-                textView->NewLine(lineIndex, columnIndex, false);
+                textView->NewLine(lineIndex, columnIndex);
             }
         }
         public override nothrow void Redo(TextView* textView)
         {
-            textView->DeleteChar(lineIndex, columnIndex, 0, 0, 0);
+            textView->DeleteChar(lineIndex, columnIndex, 0, 0, false);
         }
         private int lineIndex;
         private int columnIndex;
@@ -140,22 +141,21 @@ namespace System.Windows
 
     public class NewLineCommand : EditCommand
     {
-        public nothrow NewLineCommand(int lineIndex_, int columnIndex_, int indent_, int removedIndent_, int numSpaces_) :
-            lineIndex(lineIndex_), columnIndex(columnIndex_), indent(indent_), removedIndent(removedIndent_), numSpaces(numSpaces_)
+        public nothrow NewLineCommand(int lineIndex_, int columnIndex_, int indent_, int numSpaces_) :
+            lineIndex(lineIndex_), columnIndex(columnIndex_), indent(indent_), numSpaces(numSpaces_)
         {
         }
         public override nothrow void Undo(TextView* textView)
         {
-            textView->DeleteChar(lineIndex, columnIndex, indent, removedIndent, numSpaces);
+            textView->DeleteChar(lineIndex, columnIndex, indent, numSpaces, false);
         }
         public override nothrow void Redo(TextView* textView)
         {
-            textView->NewLine(lineIndex, columnIndex, true);
+            textView->NewLine(lineIndex, columnIndex);
         }
         private int lineIndex;
         private int columnIndex;
         private int indent;
-        private int removedIndent;
         private int numSpaces;
     }
 
