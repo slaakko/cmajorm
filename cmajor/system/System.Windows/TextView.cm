@@ -118,7 +118,7 @@ namespace System.Windows
     {
         private enum Flags : sbyte
         {
-            none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4
+            none = 0, changed = 1 << 0, painting = 1 << 1, readOnly = 1 << 2, fixed = 1 << 3, dirty = 1 << 4, mouseExtendSelection = 1 << 5
         }
 
         public TextView(const FontFamily& fontFamily_, float fontSize_, const Color& backgroundColor, const Color& textColor_, const Point& location, const Size& size,
@@ -644,6 +644,15 @@ namespace System.Windows
             base->OnMouseDown(args);
             SetFocus(this);
             ResetSelection();
+            if (args.buttons == MouseButtons.lbutton)
+            {
+                int line = 0;
+                short column = 0;
+                GetLineColumn(args.location, line, column);
+                mouseSelectionStart = SourcePos(line, column);
+                SetMouseExtendSelection();
+                WinSetCapture(Handle());
+            }
             if (charHeight != 0 && charWidth != 0)
             {
                 if ((args.buttons == MouseButtons.lbutton || args.buttons == MouseButtons.rbutton) && args.clicks == 1)
@@ -667,6 +676,34 @@ namespace System.Windows
                         OnRightClick(rightClickArgs);
                     }
                 }
+            }
+        }
+        protected override void OnMouseMove(MouseEventArgs& args)
+        {
+            base->OnMouseMove(args);
+            if (MouseExtendSelection())
+            {
+                int line = 0;
+                short column = 0;
+                GetLineColumn(args.location, line, column);
+                mouseSelectionEnd = SourcePos(line, column);
+                ExtendSelection(mouseSelectionStart, mouseSelectionEnd);
+                Invalidate();
+            }
+        }
+        protected override void OnMouseUp(MouseEventArgs& args)
+        {
+            base->OnMouseUp(args);
+            if (MouseExtendSelection())
+            {
+                ResetMouseExtendSelection();
+                WinReleaseCapture();
+                int line = 0;
+                short column = 0;
+                GetLineColumn(args.location, line, column);
+                mouseSelectionEnd = SourcePos(line, column);
+                ExtendSelection(mouseSelectionStart, mouseSelectionEnd);
+                Invalidate();
             }
         }
         protected override void OnKeyDown(KeyEventArgs& args)
@@ -2212,6 +2249,18 @@ namespace System.Windows
                 OnDirtyChanged();
             }
         }
+        private nothrow inline bool MouseExtendSelection() const
+        {
+            return (flags & Flags.mouseExtendSelection) != Flags.none;
+        }
+        private nothrow void SetMouseExtendSelection()
+        {
+            flags = cast<Flags>(flags | Flags.mouseExtendSelection);
+        }
+        private nothrow void ResetMouseExtendSelection()
+        {
+            flags = cast<Flags>(flags & ~Flags.mouseExtendSelection);
+        }
         public nothrow Event<CaretPosChangedEventHandler>& CaretPosChangedEvent() const
         {
             return caretPosChangedEvent;
@@ -2295,6 +2344,8 @@ namespace System.Windows
         private Event<PasteEventHandler> pasteEvent;
         private string measureString;
         private Selection selection;
+        private SourcePos mouseSelectionStart;
+        private SourcePos mouseSelectionEnd;
         private System.Windows.Color selectionBackgroundColor;
         private EditCommandList editCommandList;
     }
