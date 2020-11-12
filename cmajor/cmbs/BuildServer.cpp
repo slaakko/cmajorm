@@ -75,9 +75,9 @@ std::string CmbsLogFilePath()
 class BuildServer
 {
 public:
-    BuildServer(int timeOutSecs_, bool log_);
+    BuildServer(bool log_);
     ~BuildServer();
-    void Start(int port, const std::string& version);
+    void Start(int port, const std::string& version, std::condition_variable* exitVar, bool* exiting);
     void Stop();
     void Run();
     BuildReply ProcessRequest(const BuildRequest& buildRequest);
@@ -96,10 +96,8 @@ public:
     void RunLog();
     void StopLogThread();
     std::string GetMessageKind(JsonValue* message) const;
-    void SetLastActionTime();
     void SetRequestInProgress();
     void ResetRequestInProgress();
-    bool TimeOut() const;
     bool StopRequested() const { return stopRequested; }
     const std::string& LogFilePath() const { return logFilePath; }
     bool Log() const { return log; }
@@ -107,7 +105,7 @@ private:
     int port;
     bool log;
     std::string version;
-    std::atomic_bool exiting;
+    std::atomic_bool exit;
     bool running;
     std::thread serverThread;
     std::thread logThread;
@@ -116,11 +114,12 @@ private:
     std::exception_ptr runException;
     std::exception_ptr logException;
     bool requestInProgress;
-    int timeoutSecs;
     time_t lastActionTime;
     bool stopRequested;
     std::string logFilePath;
     int progressIntervalMs;
+    std::condition_variable* exitVar;
+    bool* exiting;
 };
 
 struct RequestGuard
@@ -136,18 +135,17 @@ struct RequestGuard
     BuildServer* server;
 };
 
-BuildServer::BuildServer(int timeoutSecs_, bool log_) :
-    port(54325), log(log_), version(), exiting(false), listenSocket(), socket(), requestInProgress(false), timeoutSecs(timeoutSecs_),
-    lastActionTime(), stopRequested(false), logFilePath(CmbsLogFilePath()), running(false), progressIntervalMs(250)
+BuildServer::BuildServer(bool log_) :
+    port(54325), log(log_), version(), exit(false), listenSocket(), socket(), requestInProgress(false), 
+    lastActionTime(), stopRequested(false), logFilePath(CmbsLogFilePath()), running(false), progressIntervalMs(250), exitVar(nullptr), exiting(nullptr)
 {
-    SetLastActionTime();
     if (log)
     {
         LogFileWriter writer(logFilePath);
         writer.WriteLine("================================================================================");
         writer.WriteCurrentDateTime();
         writer << "build server created" << std::endl;
-        writer << "timeout=" << timeoutSecs << ", log=" << log << std::endl;
+        writer << "log=" << log << std::endl;
     }
 }
 
@@ -169,11 +167,11 @@ void BuildServer::Run()
         }
         listenSocket.Bind(port);
         listenSocket.Listen(10);
-        while (!exiting)
+        while (!exit)
         {
             std::cout << "build-server-ready" << std::endl;
             socket = listenSocket.Accept();
-            if (exiting)
+            if (exit)
             {
                 if (log)
                 {
@@ -189,7 +187,11 @@ void BuildServer::Run()
             std::string messageKind = GetMessageKind(requestJsonValue.get());
             if (messageKind == "stopRequest")
             {
-                stopRequested = true;
+                StopReply reply;
+                reply.messageKind = "stopReply";
+                std::unique_ptr<JsonValue> replyJsonValue = reply.ToJson();
+                std::string replyStr = replyJsonValue->ToString();
+                Write(socket, replyStr);
                 if (log)
                 {
                     LogFileWriter writer(logFilePath);
@@ -199,10 +201,12 @@ void BuildServer::Run()
                     CodeFormatter formatter(writer.LogFile());
                     requestJsonValue->Write(formatter);
                 }
-            }
-            else if (messageKind == "keepAliveRequest")
-            {
-                SetLastActionTime();
+                stopRequested = true;
+                if (exitVar && exiting)
+                {
+                    *exiting = true;
+                    exitVar->notify_one();
+                }
             }
             else if (messageKind == "buildRequest")
             {
@@ -878,11 +882,10 @@ void RunServer(BuildServer* server)
     }
 }
 
-void BuildServer::Start(int port, const std::string& version)
+void BuildServer::Start(int port, const std::string& version, std::condition_variable* exitVar, bool* exiting)
 {
     try
     {
-        SetLastActionTime();
         if (log)
         {
             LogFileWriter writer(logFilePath);
@@ -892,7 +895,13 @@ void BuildServer::Start(int port, const std::string& version)
         }
         this->port = port;
         this->version = version;
+        this->exitVar = exitVar;
+        this->exiting = exiting;
         serverThread = std::thread{ RunServer, this };
+        while (!running)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds{ 1 });
+        }
     }
     catch (const std::exception& ex)
     {
@@ -914,7 +923,7 @@ void BuildServer::Stop()
             writer.WriteCurrentDateTime();
             writer << "build server stop" << std::endl;
         }
-        exiting = true;
+        exit = true;
         if (running)
         {
             cmajor::build::StopBuild();
@@ -937,64 +946,30 @@ void BuildServer::Stop()
     }
 }
 
-void BuildServer::SetLastActionTime()
-{
-    time(&lastActionTime);
-}
-
 void BuildServer::SetRequestInProgress()
 {
     requestInProgress = true;
-    SetLastActionTime();
 }
 
 void BuildServer::ResetRequestInProgress()
 {
     requestInProgress = false;
-    SetLastActionTime();
-}
-
-bool BuildServer::TimeOut() const
-{
-    if (requestInProgress)
-    {
-        return false;
-    }
-    time_t now;
-    time(&now);
-    if (now - lastActionTime > timeoutSecs)
-    {
-        if (log)
-        {
-            LogFileWriter writer(logFilePath);
-            writer.WriteLine("================================================================================");
-            writer.WriteCurrentDateTime();
-            writer << "build server timeout" << std::endl;
-        }
-        return true;
-    }
-    return false;
 }
 
 BuildServer* buildServer = nullptr;
 
-void StartBuildServer(int port, const std::string& version, int timeoutSecs, bool log)
+void StartBuildServer(int port, const std::string& version, bool log, std::condition_variable* exitVar, bool* exiting)
 {
     if (!buildServer)
     {
-        buildServer = new BuildServer(timeoutSecs, log);
+        buildServer = new BuildServer(log);
     }
-    buildServer->Start(port, version);
+    buildServer->Start(port, version, exitVar, exiting);
 }
 
 void StopBuildServer()
 {
     buildServer->Stop();
-}
-
-bool BuildServerTimeOut()
-{
-    return buildServer->TimeOut();
 }
 
 bool BuildServerStopRequested()

@@ -269,6 +269,21 @@ namespace cmcode
         private TreeViewNode* projectNode;
     }
 
+    public class ProjectReferencesAction : ClickAction
+    {
+        public nothrow ProjectReferencesAction(MainWindow* mainWindow_, Cm.Ast.Project* project_) :
+            base(), mainWindow(mainWindow_), project(project_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->SetProjectReferences(project);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+    }
+
     public class RemoveFileAction : ClickAction
     {
         public nothrow RemoveFileAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, const string& filePath_, const string& fileName_, TreeViewNode* fileNode_) :
@@ -315,4 +330,5 @@ namespace cmcode
         private MainWindow* mainWindow;
         private Cm.Views.CmajorSourceCodeView* sourceCodeView;
     }
+
 }

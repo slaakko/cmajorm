@@ -22,7 +22,7 @@ namespace Cm.Service.Debug
     public class DebugServiceArgs
     {
         public nothrow DebugServiceArgs() :
-            port(defaultPort), sessionPort(defaultSessionPort), log(false), verbose(false), debugServer(false), serverStartWaitSeconds(1),
+            port(defaultPort), sessionPort(defaultSessionPort), log(false), wait(false), verbose(false), debugServer(false), serverStartWaitSeconds(1),
             backend("cpp"), toolChain("gcc"), config("debug")
         {
         }
@@ -49,6 +49,11 @@ namespace Cm.Service.Debug
         public nothrow DebugServiceArgs& Log(bool log_)
         {
             log = log_;
+            return *this;
+        }
+        public nothrow DebugServiceArgs& Wait(bool wait_)
+        {
+            wait = wait_;
             return *this;
         }
         public nothrow DebugServiceArgs& Verbose(bool verbose_)
@@ -107,6 +112,7 @@ namespace Cm.Service.Debug
         public int port;
         public int sessionPort;
         public bool log;
+        public bool wait;
         public bool verbose;
         public bool debugServer;
         public int serverStartWaitSeconds;
@@ -236,6 +242,10 @@ namespace Cm.Service.Debug
             {
                 serverStartCommand.Append(" --log");
             }
+            if (args.wait)
+            {
+                serverStartCommand.Append(" --wait");
+            }
             if (args.verbose)
             {
                 serverStartCommand.Append(" --verbose");
@@ -262,6 +272,7 @@ namespace Cm.Service.Debug
             {
                 RequestGuard requestGuard(this);
                 string serverStartCommand = MakeDebugServerStartCommand();
+                LogMessage("DebugService: Starting Debug Server (port=" + ToString(port) + ", sessionPort=" + ToString(sessionPort) + ")");
                 debugServer.Reset(new Process(serverStartCommand,
                     cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr)));
                 string line = debugServer->ReadLine(Process.StdHandle.stdOut);
@@ -809,7 +820,6 @@ namespace Cm.Service.Debug
         }
         private void ProcessTargetRunningRequest(const TargetRunningRequest& targetRunningRequest)
         {
-            
             if (targetRunning != TargetRunningMethod())
             {
                 targetRunning();

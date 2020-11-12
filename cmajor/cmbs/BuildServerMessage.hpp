@@ -1,5 +1,5 @@
-#ifndef HPP_1D3CEDFE37CD9403F7EA26C07CE160FC9C3CB8D2
-#define HPP_1D3CEDFE37CD9403F7EA26C07CE160FC9C3CB8D2
+#ifndef HPP_9A6473C10E9B8484FB5E3A9E7350059CF7F315F8
+#define HPP_9A6473C10E9B8484FB5E3A9E7350059CF7F315F8
 #include <soulng/util/Json.hpp>
 #include <string>
 #include <vector>
@@ -8,7 +8,15 @@
 struct StopRequest
 {
     StopRequest();
-    StopRequest(soulng::util::JsonValue* value);
+    StopRequest(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+};
+
+struct StopReply
+{
+    StopReply();
+    StopReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -16,7 +24,15 @@ struct StopRequest
 struct KeepAliveRequest
 {
     KeepAliveRequest();
-    KeepAliveRequest(soulng::util::JsonValue* value);
+    KeepAliveRequest(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+};
+
+struct KeepAliveReply
+{
+    KeepAliveReply();
+    KeepAliveReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -24,7 +40,7 @@ struct KeepAliveRequest
 struct BuildRequest
 {
     BuildRequest();
-    BuildRequest(soulng::util::JsonValue* value);
+    BuildRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string backend;
@@ -55,7 +71,7 @@ struct BuildRequest
 struct BuildReply
 {
     BuildReply();
-    BuildReply(soulng::util::JsonValue* value);
+    BuildReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool requestValid;
@@ -69,7 +85,7 @@ struct BuildReply
 struct LogMessageRequest
 {
     LogMessageRequest();
-    LogMessageRequest(soulng::util::JsonValue* value);
+    LogMessageRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string message;
@@ -78,7 +94,7 @@ struct LogMessageRequest
 struct LogMessageReply
 {
     LogMessageReply();
-    LogMessageReply(soulng::util::JsonValue* value);
+    LogMessageReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     bool ok;
@@ -87,7 +103,7 @@ struct LogMessageReply
 struct ProgressMessage
 {
     ProgressMessage();
-    ProgressMessage(soulng::util::JsonValue* value);
+    ProgressMessage(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
 };
@@ -95,10 +111,10 @@ struct ProgressMessage
 struct GenericErrorReply
 {
     GenericErrorReply();
-    GenericErrorReply(soulng::util::JsonValue* value);
+    GenericErrorReply(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string messageKind;
     std::string error;
 };
 
-#endif // HPP_1D3CEDFE37CD9403F7EA26C07CE160FC9C3CB8D2
+#endif // HPP_9A6473C10E9B8484FB5E3A9E7350059CF7F315F8

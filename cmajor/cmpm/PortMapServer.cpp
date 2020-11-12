@@ -12,10 +12,12 @@
 #include <sngjson/json/JsonLexer.hpp>
 #include <sngjson/json/JsonParser.hpp>
 #include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/LogFileWriter.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Json.hpp>
+#include <soulng/util/Time.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <fstream>
@@ -51,20 +53,33 @@ std::string ConfigFilePath()
     return Path::Combine(CmajorConfigDir(), "cmpm.config.xml");
 }
 
+std::string CmajorLogDir()
+{
+    std::string logDir = Path::Combine(CmajorRootDir(), "log");
+    boost::filesystem::create_directories(logDir);
+    return logDir;
+}
+
+std::string LogFilePath()
+{
+    return Path::Combine(CmajorLogDir(), "cmpms.log");
+}
+
 struct PortEntry
 {
-    PortEntry() : portNumber(-1), programName(), pid(), startTime(), leaseTime()
+    PortEntry() : portNumber(-1), programName(), pid(), leaseStartTime(), leaseRenewalTime(), leaseTimePoint()
     {
     }
-    PortEntry(int portNumber_, const std::string& programName_, int pid_, const std::string& startTime_) : 
-        portNumber(portNumber_), programName(programName_), pid(pid_), startTime(startTime_), leaseTime(std::chrono::steady_clock::now())
+    PortEntry(int portNumber_, const std::string& programName_, int pid_, const std::string& leaseStartTime_) :
+        portNumber(portNumber_), programName(programName_), pid(pid_), leaseStartTime(leaseStartTime_), leaseRenewalTime(), leaseTimePoint(std::chrono::steady_clock::now())
     {
     }
     int portNumber;
     std::string programName;
     int pid;
-    std::string startTime;
-    std::chrono::time_point<std::chrono::steady_clock> leaseTime;
+    std::string leaseStartTime;
+    std::string leaseRenewalTime;
+    std::chrono::time_point<std::chrono::steady_clock> leaseTimePoint;
 };
 
 class PortMapServer
@@ -85,10 +100,12 @@ private:
     TcpSocket listenSocket;
     bool exiting;
     std::string GetMessage(JsonValue* messageValue);
-    int GetNextPortNumber(const std::string& programName, int pid, const std::string& startTime);
+    int GetNextPortNumber(const std::string& programName, int pid, const std::string& leaseStartTime);
     PortEntry* GetPortEntry(int portNumber) const;
     GetFreePortNumberReply ProcessGetFreePortNumberRequest(const GetFreePortNumberRequest& request);
     ExtendPortLeaseReply ProcessExtendPortLeaseRequest(const ExtendPortLeaseRequest& request);
+    ViewPortLeaseReply ProcessViewPortLeaseRequest(const ViewPortLeaseRequest& request);
+    StopPortMapServerReply ProcessStopPortMapServerRequest(const StopPortMapServerRequest& request);
 };
 
 std::unique_ptr<PortMapServer> PortMapServer::instance;
@@ -103,7 +120,7 @@ void PortMapServer::Done()
     instance.reset();
 }
 
-PortMapServer::PortMapServer() : portMapServicePort(54321), startPortRange(54300), endPortRange(54319), nextPortNumber(-1), exiting(false)
+PortMapServer::PortMapServer() : portMapServicePort(54321), startPortRange(54300), endPortRange(54320), nextPortNumber(-1), exiting(false)
 {
     std::string configFilePath = ConfigFilePath();
     std::unique_ptr<sngxml::dom::Document> configDoc;
@@ -212,7 +229,7 @@ PortEntry* PortMapServer::GetPortEntry(int portNumber) const
     return nullptr;
 }
 
-int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, const std::string& startTime)
+int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, const std::string& leaseStartTime)
 {
     if (nextPortNumber > endPortRange)
     {
@@ -222,19 +239,20 @@ int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, co
     if (entry == nullptr)
     {
         int portNumber = nextPortNumber++;
-        portEntryMap[portNumber] = PortEntry(portNumber, programName, pid, startTime);
+        portEntryMap[portNumber] = PortEntry(portNumber, programName, pid, leaseStartTime);
         return portNumber;
     }
     else
     {
         std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();  
-        if (std::chrono::duration_cast<std::chrono::seconds>(now - entry->leaseTime).count() > 120)
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - entry->leaseTimePoint).count() > leaseExpirationTimeSecs)
         {
             ++nextPortNumber;
             entry->programName = programName;
             entry->pid = pid;
-            entry->startTime = startTime;
-            entry->leaseTime = now;
+            entry->leaseStartTime = leaseStartTime;
+            entry->leaseRenewalTime.clear();
+            entry->leaseTimePoint = now;
             return entry->portNumber;
         }
         int start = nextPortNumber++;
@@ -248,18 +266,19 @@ int PortMapServer::GetNextPortNumber(const std::string& programName, int pid, co
             if (entry == nullptr)
             {
                 int portNumber = nextPortNumber++;
-                portEntryMap[portNumber] = PortEntry(portNumber, programName, pid, startTime);
+                portEntryMap[portNumber] = PortEntry(portNumber, programName, pid, leaseStartTime);
                 return portNumber;
             }
             else
             {
-                if (std::chrono::duration_cast<std::chrono::seconds>(now - entry->leaseTime).count() > 120)
+                if (std::chrono::duration_cast<std::chrono::seconds>(now - entry->leaseTimePoint).count() > leaseExpirationTimeSecs)
                 {
                     ++nextPortNumber;
                     entry->programName = programName;
                     entry->pid = pid;
-                    entry->startTime = startTime;
-                    entry->leaseTime = now;
+                    entry->leaseStartTime = leaseStartTime;
+                    entry->leaseRenewalTime.clear();
+                    entry->leaseTimePoint = now;
                     return entry->portNumber;
                 }
             }
@@ -287,13 +306,47 @@ ExtendPortLeaseReply PortMapServer::ProcessExtendPortLeaseRequest(const ExtendPo
         if (entry != nullptr)
         {
             std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
-            entry->leaseTime = now;
+            entry->leaseRenewalTime = GetCurrentDateTime().ToString();
+            entry->leaseTimePoint = now;
             entry->programName = request.programName;
             entry->pid = boost::lexical_cast<int>(request.pid);
         }
     }
     ExtendPortLeaseReply reply;
     reply.message = "ExtendPortLeaseReply";
+    return reply;
+}
+
+ViewPortLeaseReply PortMapServer::ProcessViewPortLeaseRequest(const ViewPortLeaseRequest& request)
+{
+    ViewPortLeaseReply reply;
+    reply.message = "ViewPortLeaseReply";
+    for (const std::pair<int, PortEntry>& p : portEntryMap)
+    {
+        const PortEntry& portEntry = p.second;
+        PortLease portLease;
+        portLease.portNumber = std::to_string(portEntry.portNumber);
+        portLease.programName = portEntry.programName;
+        portLease.pid = std::to_string(portEntry.pid);
+        portLease.leaseStartTime = portEntry.leaseStartTime;
+        portLease.leaseRenewalTime = portEntry.leaseRenewalTime;
+        std::string leaseStateStr = "valid";
+        std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - portEntry.leaseTimePoint).count() > leaseExpirationTimeSecs)
+        {
+            leaseStateStr = "expired";
+        }
+        portLease.leaseState = leaseStateStr;
+        reply.portLeases.push_back(portLease);
+    }
+    return reply;
+}
+
+StopPortMapServerReply PortMapServer::ProcessStopPortMapServerRequest(const StopPortMapServerRequest& request)
+{
+    StopPortMapServerReply reply;
+    reply.message = "StopPortMapServerReply";
+    exiting = true;
     return reply;
 }
 
@@ -330,9 +383,21 @@ void PortMapServer::Run()
                     std::string replyStr = replyValue->ToString();
                     Write(socket, replyStr);
                 }
-                else if (message == "StopPortNumberServerRequest")
+                else if (message == "StopPortMapServerRequest")
                 {
-                    exiting = true;
+                    StopPortMapServerRequest request(requestValue.get());
+                    StopPortMapServerReply reply = ProcessStopPortMapServerRequest(request);
+                    std::unique_ptr<JsonValue> replyValue = reply.ToJson();
+                    std::string replyStr = replyValue->ToString();
+                    Write(socket, replyStr);
+                }
+                else if (message == "ViewPortLeaseRequest")
+                {
+                    ViewPortLeaseRequest request(requestValue.get());
+                    ViewPortLeaseReply reply = ProcessViewPortLeaseRequest(request);
+                    std::unique_ptr<JsonValue> replyValue = reply.ToJson();
+                    std::string replyStr = replyValue->ToString();
+                    Write(socket, replyStr);
                 }
             }
             else
@@ -342,7 +407,9 @@ void PortMapServer::Run()
         }
         catch (const std::exception& ex)
         {
-            // todo
+            LogFileWriter writer(LogFilePath());
+            writer.WriteCurrentDateTime();
+            writer << "cmpms got exception '" << ex.what() << "'" << std::endl;
         }
     }
 }

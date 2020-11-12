@@ -9,6 +9,9 @@
 
 namespace cmajor { namespace cmpm {
 
+const int leaseExpirationTimeSecs = 120;
+const int leaseRenewalTimeSecs = 60;
+
 CMPM_API void InitPortMapServer();
 CMPM_API void DonePortMapServer();
 CMPM_API void RunPortMapServer();

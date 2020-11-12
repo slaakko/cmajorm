@@ -25,6 +25,7 @@ namespace System.Windows
         }
         public virtual void WriteLine(const string& text)
         {
+            int startLineNumber = cast<int>(Lines().Count() - 1);
             List<ustring> lines = SplitTextIntoLines(ToUtf32(text));
             for (const ustring& line : lines)
             {
@@ -33,7 +34,7 @@ namespace System.Windows
             SetCaretLineCol(cast<int>(Lines().Count()), 1);
             ScrollToCaret();
             SetChanged();
-            Invalidate();
+            InvalidateLines(startLineNumber, cast<int>(startLineNumber + lines.Count()));
         }
         protected override void OnPaint(PaintEventArgs& args)
         {

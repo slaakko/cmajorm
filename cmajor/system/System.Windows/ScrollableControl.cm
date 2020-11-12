@@ -151,7 +151,6 @@ namespace System.Windows
             {
                 scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
                 ScrollWindow(scrolledChild->Handle(), horizontalScrollUnit * (prevHPos - hpos), 0, null, null);
-                scrolledChild->Update();
             }
         }
         public override void ScrollLineDown()
@@ -168,7 +167,6 @@ namespace System.Windows
                 {
                     scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
                     ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
-                    scrolledChild->Update();
                 }
             }
         }
@@ -186,7 +184,6 @@ namespace System.Windows
                 {
                     scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
                     ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
-                    scrolledChild->Update();
                 }
             }
         }
@@ -240,7 +237,6 @@ namespace System.Windows
             {
                 scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
                 ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
-                scrolledChild->Update();
             }
         }
         protected override void OnMouseWheel(MouseWheelEventArgs& args)
@@ -260,7 +256,6 @@ namespace System.Windows
                     {
                         scrolledChild->SetContentLocationInternal(Point(horizontalScrollUnit * hpos, verticalScrollUnit * vpos));
                         ScrollWindow(scrolledChild->Handle(), 0, verticalScrollUnit * (prevVPos - vpos), null, null);
-                        scrolledChild->Update();
                     }
                     args.handled = true;
                 }

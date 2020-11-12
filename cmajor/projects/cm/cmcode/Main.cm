@@ -8,6 +8,7 @@ using System.Collections;
 using System.IO;
 using System.Windows;
 using System.RegularExpressions;
+using System.Threading;
 using Cm.Service;
 using Cm.Service.Build;
 using Cm.Service.Debug;
@@ -19,7 +20,7 @@ namespace cmcode
     {
         return "3.7.0";
     }
-    
+
     enum UserInterfaceAction
     {
         none = 0, build = 1, debug = 2, debugging = 3
@@ -136,7 +137,7 @@ namespace cmcode
         public MainWindow(const string& filePath) :
             base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), Title(), MainWindowLocation(), MainWindowSize(),
             Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true), toolTipWindow(new ToolTip()),
-            clipboardListener(Handle()), cmajorCodeFormat("cmajor.code"), pid(WinGetCurrentProcessId())
+            clipboardListener(Handle()), cmajorCodeFormat("cmajor.code"), pid(WinGetCurrentProcessId()), disableBuildServerToolButton(false)
         {
             UniquePtr<MenuBar> menuBarPtr(new MenuBar());
             menuBar = menuBarPtr.Get();
@@ -220,15 +221,20 @@ namespace cmcode
             menuBar->AddMenuItem(editMenuItem.Release());
 
             UniquePtr<MenuItem> viewMenuItem(new MenuItem("&View"));
+            UniquePtr<MenuItem> debugWindowsMenuItem(new MenuItem("&Debug Windows"));
             UniquePtr<MenuItem> callStackMenuItemPtr(new MenuItem("&Call Stack"));
             callStackMenuItemPtr->ClickEvent().AddHandler(ViewCallStackClick);
-            viewMenuItem->AddMenuItem(callStackMenuItemPtr.Release());
+            debugWindowsMenuItem->AddMenuItem(callStackMenuItemPtr.Release());
             UniquePtr<MenuItem> localsMenuItemPtr(new MenuItem("&Locals"));
             localsMenuItemPtr->ClickEvent().AddHandler(ViewLocalsClick);
-            viewMenuItem->AddMenuItem(localsMenuItemPtr.Release());
+            debugWindowsMenuItem->AddMenuItem(localsMenuItemPtr.Release());
+            viewMenuItem->AddMenuItem(debugWindowsMenuItem.Release());
             UniquePtr<MenuItem> searchResultsMenuItemPtr(new MenuItem("&Search Results"));
             searchResultsMenuItemPtr->ClickEvent().AddHandler(ViewSearchResultsClick);
             viewMenuItem->AddMenuItem(searchResultsMenuItemPtr.Release());
+            UniquePtr<MenuItem> portMapMenuItemPtr(new MenuItem("&Port Map"));
+            portMapMenuItemPtr->ClickEvent().AddHandler(ViewPortMapClick);
+            viewMenuItem->AddMenuItem(portMapMenuItemPtr.Release());
             menuBar->AddMenuItem(viewMenuItem.Release());
 
             UniquePtr<MenuItem> buildMenuItem(new MenuItem("&Build"));
@@ -410,12 +416,13 @@ namespace cmcode
             buildProjectToolButton->SetPadding(Padding(8, 8, 8, 8));
             toolBar->AddToolButton(buildProjectToolButtonPtr.Release());
 
-            UniquePtr<ToolButton> cancelBuildToolButtonPtr(new ToolButton("cmcode.cancel.build.bitmap"));
-            cancelBuildToolButton = cancelBuildToolButtonPtr.Get();
-            cancelBuildToolButton->ClickEvent().AddHandler(CancelBuildClick);
-            cancelBuildToolButton->SetToolTip("Cancel Build");
-            cancelBuildToolButton->SetPadding(Padding(8, 8, 8, 8));
-            toolBar->AddToolButton(cancelBuildToolButtonPtr.Release());
+            UniquePtr<ToolButton> stopBuildServerToolButtonPtr(new ToolButton("cmcode.cancel.build.bitmap", ToolButton.Style.manual));
+            stopBuildServerToolButton = stopBuildServerToolButtonPtr.Get();
+            stopBuildServerToolButton->Disable();
+            stopBuildServerToolButton->ClickEvent().AddHandler(StopBuildServerClick);
+            stopBuildServerToolButton->SetToolTip("Stop Build Server");
+            stopBuildServerToolButton->SetPadding(Padding(8, 8, 8, 8));
+            toolBar->AddToolButton(stopBuildServerToolButtonPtr.Release());
 
             UniquePtr<ToolButtonSeparator> separator4(new ToolButtonSeparator());
             toolBar->AddToolButton(separator4.Release());
@@ -514,6 +521,7 @@ namespace cmcode
             UniquePtr<Control> scrollableConsole(new ScrollableControl(consolePtr.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             consoleTabPage->AddChild(scrollableConsole.Release());
             outputTabControl->AddTabPage(consoleTabPagePtr.Release());
+#if (DEBUG)
             UniquePtr<TabPage> logTabPagePtr(new TabPage("Log", "log"));
             logTabPage = logTabPagePtr.Get();
             UniquePtr<LogView> logView(new LogView(Point(), Size(), Dock.none, Anchors.none));
@@ -521,6 +529,7 @@ namespace cmcode
             UniquePtr<Control> scrollableLogView(new ScrollableControl(logView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
             logTabPage->AddChild(scrollableLogView.Release());
             outputTabControl->AddTabPage(logTabPagePtr.Release());
+#endif
             verticalSplitContainer->Pane2Container()->AddChild(borderedOutputTabControl.Release());
             AddChild(verticalSplitContainerPtr.Release());
             StatusBar* statusBar = new StatusBar();
@@ -842,6 +851,8 @@ namespace cmcode
                         contextMenu->AddMenuItemAction(addNewTextFileMenuItem, new AddNewTextFileAction(this, project, node));
                         MenuItem* addExistingTextFileMenuItem = new MenuItem("Add Existing Text File...");
                         contextMenu->AddMenuItemAction(addExistingTextFileMenuItem, new AddExistingTextFileAction(this, project, node));
+                        MenuItem* referencesMenuItem = new MenuItem("References...");
+                        contextMenu->AddMenuItemAction(referencesMenuItem, new ProjectReferencesAction(this, project));
                         MenuItem* buildMenuItem = new MenuItem("Build");
                         contextMenu->AddMenuItemAction(buildMenuItem, new BuildProjectAction(this, project));
                         MenuItem* rebuildMenuItem = new MenuItem("Rebuild");
@@ -854,7 +865,7 @@ namespace cmcode
                         {
                             MenuItem* setActiveMenuItem = new MenuItem("Set Active");
                             contextMenu->AddMenuItemAction(setActiveMenuItem, new SetActiveProjectAction(this, solutionExplorerTreeView, solutionExplorerData.Get(),
-                                solution.Get(), project, node)); 
+                                solution.Get(), project, node));
                         }
                         MenuItem* removeMenuItem = new MenuItem("Remove");
                         contextMenu->AddMenuItemAction(removeMenuItem, new RemoveProjectAction(this, solution.Get(), project));
@@ -991,6 +1002,7 @@ namespace cmcode
                     cmcode.settings.LoadProjectSettings(activeProject, solutionExplorerData.Get());
                 }
                 SetControlStatus(UserInterfaceAction.none);
+                Invalidate();
             }
             catch (const Exception& ex)
             {
@@ -1517,6 +1529,16 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        internal void SetProjectReferences(Cm.Ast.Project* project)
+        {
+            SetProjectReferencesDialog dialog(project, solution.Get());
+            if (dialog.ShowDialog(*this) == DialogResult.ok)
+            {
+                List<Cm.Ast.Project*> referencedProjects = dialog.GetReferencedProjects();
+                project->SetReferencedProjects(referencedProjects);
+                project->Save();
+            }
+        }
         internal void RemoveFile(Cm.Ast.Project* project, const string& filePath, const string& fileName, TreeViewNode* fileNode)
         {
             try
@@ -1734,9 +1756,9 @@ namespace cmcode
         private BuildServiceArgs MakeBuildServiceArgs()
         {
         #if (DEBUG)
-            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false);
+            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).Wait(false).SaveRequestOnly(false).DebugServer(true);
         #else
-            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(false).KeepAliveIntervalSeconds(5).ServerTimeoutSeconds(15).SaveRequestOnly(false).DebugServer(false);
+            BuildServiceArgs args = BuildServiceArgs().ProgramName("cmcode").Pid(pid).Log(false).SaveRequestOnly(false).DebugServer(false);
         #endif
             return args;
         }
@@ -1747,6 +1769,8 @@ namespace cmcode
                 buildService.Reset(new BuildService(MakeBuildServiceArgs()));
                 buildService->SetLogMessageNotificationFunction(BuildServiceLogMessagesAvailable);
                 buildService->SetProgressNotificationFunction(BuildServiceProgress);
+                buildService->SetBuildServerStartNotificationFunction(BuildServerStarted);
+                buildService->SetBuildServerStopNotificationFunction(BuildServerStopped);
             }
             return *buildService;
         }
@@ -1880,14 +1904,16 @@ namespace cmcode
                 LogException(ex);
             }
         }
-        private void CancelBuildClick()
+        private void StopBuildServerClick()
         {
             try
             {
                 GetBuildService().TerminateServer(true);
+                stopBuildServerToolButton->SetState(ToolButton.State.normal);
             }
             catch (const Exception& ex)
             {
+                stopBuildServerToolButton->SetState(ToolButton.State.normal);
                 MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
                 LogException(ex);
             }
@@ -1939,6 +1965,31 @@ namespace cmcode
             try
             {
                 Application.ProcessMessages();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void BuildServerStarted()
+        {
+            try
+            {
+                stopBuildServerToolButton->Enable();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void BuildServerStopped()
+        {
+            try
+            {
+                stopBuildServerToolButton->SetState(ToolButton.State.normal);
+                stopBuildServerToolButton->Disable();
             }
             catch (const Exception& ex)
             {
@@ -2000,31 +2051,38 @@ namespace cmcode
         }
         protected override void OnClipboardUpdate()
         {
-            base->OnClipboardUpdate();
-            Clipboard clipboard(Handle());
-            if (clipboard.IsClipboardFormatAvailable(cmajorCodeFormat))
+            try
             {
-                clipboardData = clipboard.GetStringData(cmajorCodeFormat);
-                pasteMenuItem->Enable();
-            }
-            else
-            {
-                ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
-                if (clipboard.IsClipboardFormatAvailable(unicodeText))
+                base->OnClipboardUpdate();
+                Clipboard clipboard(Handle());
+                if (clipboard.IsClipboardFormatAvailable(cmajorCodeFormat))
                 {
-                    clipboardData = clipboard.GetStringData(unicodeText);
+                    clipboardData = clipboard.GetStringData(cmajorCodeFormat);
                     pasteMenuItem->Enable();
                 }
                 else
                 {
-                    ClipboardFormat ansiText(ClipboardFormat.Format.text);
-                    if (clipboard.IsClipboardFormatAvailable(ansiText))
+                    ClipboardFormat unicodeText(ClipboardFormat.Format.unicodeText);
+                    if (clipboard.IsClipboardFormatAvailable(unicodeText))
                     {
-                        clipboardData = clipboard.GetStringData(ansiText);
+                        clipboardData = clipboard.GetStringData(unicodeText);
                         pasteMenuItem->Enable();
+                    }
+                    else
+                    {
+                        ClipboardFormat ansiText(ClipboardFormat.Format.text);
+                        if (clipboard.IsClipboardFormatAvailable(ansiText))
+                        {
+                            clipboardData = clipboard.GetStringData(ansiText);
+                            pasteMenuItem->Enable();
+                        }
                     }
                 }
             }
+            catch (const Exception& ex)
+            {
+
+   }
         }
         private void CopyClick()
         {
@@ -2286,7 +2344,7 @@ namespace cmcode
         private DebugServiceArgs MakeDebugServiceArgs(const string& backend, const string& config, Cm.Ast.Project* project, const string& programArguments)
         {
         #if (DEBUG)
-            DebugServiceArgs args = DebugServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).DebugServer(false).Verbose(true).Backend(backend).Config(config).
+            DebugServiceArgs args = DebugServiceArgs().ProgramName("cmcode").Pid(pid).Log(true).DebugServer(true).Verbose(true).Backend(backend).Config(config).
                 ProjectFilePath(project->FilePath()).ExecutableName(ToUtf8(project->Name())).Arguments(programArguments);
         #else
             DebugServiceArgs args = DebugServiceArgs().ProgramName("cmcode").Pid(pid).Log(false).DebugServer(false).Verbose(true).Backend(backend).Config(config).
@@ -2882,6 +2940,7 @@ namespace cmcode
                 searchResultsTabPage->AddChild(searchResultsPtr.Release());
                 outputTabControl->AddTabPage(searchResultsTabPagePtr.Release());
             }
+            searchResultsTabPage->Select();
             return searchResults;
         }
         private TabPage* GetSearchResultsTabPage()
@@ -2936,6 +2995,17 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private void ViewPortMapClick()
+        {
+            try
+            {
+                Process* viewPortMap = new Process("cmpmm", Process.Redirections());
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
         private void ViewSearchResult(Cm.Views.ViewSearchResultEventArgs& args)
         {
             try
@@ -2966,6 +3036,7 @@ namespace cmcode
                     TextView* textView = editor->GetTextView();
                     if (textView != null)
                     {
+                        textView->EnsureLineVisible(cast<int>(searchResult->lineNumber));
                         textView->SetCaretLineCol(Min(cast<int>(searchResult->lineNumber), cast<int>(textView->Lines().Count())), 1 + textView->LineNumberFieldLength());
                         textView->ScrollToCaret();
                         textView->SetFocus();
@@ -3406,7 +3477,6 @@ namespace cmcode
             releaseToolButton->SetState(ToolButton.State.disabled);
             buildSolutionToolButton->Disable();
             buildProjectToolButton->Disable();
-            cancelBuildToolButton->Disable();
             startDebuggingToolButton->Disable();
             stopDebuggingToolButton->Disable();
             showNextStatementToolButton->Disable();
@@ -3433,7 +3503,6 @@ namespace cmcode
 
             if (action == UserInterfaceAction.build)
             {
-                cancelBuildToolButton->Enable();
                 return;
             }
             else if (action == UserInterfaceAction.debug)
@@ -3573,7 +3642,7 @@ namespace cmcode
         private ToolButton* releaseToolButton;
         private ToolButton* buildSolutionToolButton;
         private ToolButton* buildProjectToolButton;
-        private ToolButton* cancelBuildToolButton;
+        private ToolButton* stopBuildServerToolButton;
         private ToolButton* startDebuggingToolButton;
         private ToolButton* stopDebuggingToolButton;
         private ToolButton* showNextStatementToolButton;
@@ -3594,6 +3663,7 @@ namespace cmcode
         private ClipboardFormat cmajorCodeFormat;
         private ustring clipboardData;
         private int pid;
+        private bool disableBuildServerToolButton;
     }
 }
 

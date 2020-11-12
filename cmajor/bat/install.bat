@@ -265,3 +265,5 @@ xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\spring\bin\release\spring.exe 
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\soulcm\scm2html\bin\release\scm2html.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\soulcm\scmlg\bin\release\scmlg.exe ..\bin
 xcopy /Y /D C:\work\cmajorm\cmajor\projects\tools\soulcm\scmpg\bin\release\scmpg.exe ..\bin
+xcopy /Y /D C:\work\cmajorm\cmajor\projects\cm\cmpmm\bin\release\cmpmm.exe ..\bin
+

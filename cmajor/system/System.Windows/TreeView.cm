@@ -180,6 +180,14 @@ namespace System.Windows
         {
             return root.Get();
         }
+        public nothrow TreeViewNode* ReleaseRoot()
+        {
+            return root.Release();
+        }
+        public nothrow void ResetRoot(TreeViewNode* root_)
+        {
+            root.Reset(root_);
+        }
         public nothrow void SetRoot(TreeViewNode* root_)
         {
             if (!root.IsNull())
@@ -194,6 +202,7 @@ namespace System.Windows
                 SetTreeViewNodeStateChanged();
                 SetContentChanged();
             }
+            SetChanged();
             Invalidate();
         }
         public nothrow inline const Font& GetNormalNodeFont() const

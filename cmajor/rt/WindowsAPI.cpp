@@ -1974,7 +1974,14 @@ int WinGetCurrentProcessId()
     return soulng::util::GetPid();
 }
 
-#ifndef __MINGW32__
+#ifdef __MINGW32__
+
+bool WinGetFolder(void* windowHandle, const char16_t* defaultDirectory, char16_t* folderNameBuffer, uint32_t folderNameBufferSize)
+{
+    return false;
+}
+
+#else
 
 bool WinGetFolder(void* windowHandle, const char16_t* defaultDirectory, char16_t* folderNameBuffer, uint32_t folderNameBufferSize)
 {

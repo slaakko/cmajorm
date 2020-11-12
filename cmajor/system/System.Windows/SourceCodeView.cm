@@ -155,14 +155,12 @@ namespace System.Windows
                 tokenLines.Add(TokenLine());
             }
             tokenLines[lineIndex] = TokenizeLine(line, lineIndex + 1, state);
-            Invalidate();
         }
         protected override void OnLineDeleted(LineEventArgs& args)
         {
             base->OnLineDeleted(args);
             int lineIndex = args.lineIndex;
             tokenLines.Remove(tokenLines.Begin() + lineIndex);
-            Invalidate();
         }
         private nothrow bool IsBeginBlockLine(int lineIndex) const
         {

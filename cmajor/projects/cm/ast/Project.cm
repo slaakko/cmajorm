@@ -12,18 +12,18 @@ namespace Cm.Ast
     {
         llvm, cmsx
     }
-    
+
     public abstract class ModuleVersionTagVerifier
     {
         public default virtual ~ModuleVersionTagVerifier();
         abstract void VerifyModuleVersionTag(const string& moduleFilePath);
     }
-    
+
     public nothrow void SetModuleVersionTagVerifier(ModuleVersionTagVerifier* verifier)
     {
         moduleVersionTagVerifier = verifier;
     }
-    
+
     public string CmajorRootDir()
     {
         string cmajorRootDir;
@@ -38,7 +38,7 @@ namespace Cm.Ast
         }
         return cmajorRootDir;
     }
-    
+
     public string CmajorSystemLibDir(const string& config, BackEnd backend)
     {
         if (backend == BackEnd.llvm)
@@ -56,32 +56,32 @@ namespace Cm.Ast
             return string();
         }
     }
-    
+
     public string CmajorSystemModuleFilePath(const string& config, BackEnd backend)
     {
         return GetFullPath(Path.Combine(CmajorSystemLibDir(config, backend), "System.cmm"));
     }
-    
+
     public string CmajorSystemWindowsModuleFilePath(const string& config)
     {
         return GetFullPath(Path.Combine(CmajorSystemLibDir(config, BackEnd.llvm), "System.Windows.cmm"));
     }
-    
+
     public nothrow void SetOutDir(const string& outDir_)
     {
         outDir = outDir_;
     }
-    
-    public nothrow const string& OutDir() 
+
+    public nothrow const string& OutDir()
     {
         return outDir;
     }
-    
+
     public enum ProjectDeclarationType
     {
         referenceDeclaration, sourceFileDeclaration, resourceFileDeclaration, textFileDeclaration, targetDeclaration
     }
-    
+
     public abstract class ProjectDeclaration
     {
         public nothrow ProjectDeclaration(ProjectDeclarationType declarationType_) : declarationType(declarationType_)
@@ -94,7 +94,7 @@ namespace Cm.Ast
         }
         private ProjectDeclarationType declarationType;
     }
-    
+
     public class ReferenceDeclaration : ProjectDeclaration
     {
         public nothrow ReferenceDeclaration(const string& filePath_) : base(ProjectDeclarationType.referenceDeclaration), filePath(filePath_)
@@ -142,8 +142,8 @@ namespace Cm.Ast
         }
         private string filePath;
     }
-    
-    public enum Target 
+
+    public enum Target
     {
         program, winguiapp, winapp, library, winlib, unitTest
     }
@@ -161,7 +161,7 @@ namespace Cm.Ast
         }
         return "program";
     }
-    
+
     public class TargetDeclaration : ProjectDeclaration
     {
         public nothrow TargetDeclaration(Target target_) : base(ProjectDeclarationType.targetDeclaration), target(target_)
@@ -173,7 +173,7 @@ namespace Cm.Ast
         }
         private Target target;
     }
-    
+
     public class Project
     {
         public nothrow Project(const ustring& name_, const string& filePath_, const string& config_, BackEnd backend_) :
@@ -272,6 +272,19 @@ namespace Cm.Ast
         public nothrow const List<string>& RelativeReferencedProjectFilePaths() const
         {
             return relativeReferencedProjectFilePaths;
+        }
+        public nothrow void SetReferencedProjects(const List<Project*>& referencedProjects)
+        {
+            referencedProjectFilePaths.Clear();
+            relativeReferencedProjectFilePaths.Clear();
+            string absoluteProjectDirPath = GetFullPath(sourceBasePath);
+            for (Project* referencedProject : referencedProjects)
+            {
+                referencedProjectFilePaths.Add(referencedProject->FilePath());
+                string absoluteReferenceDirPath = GetFullPath(Path.GetDirectoryName(referencedProject->FilePath()));
+                string referenceProjectDir = MakeRelativeDirPath(absoluteReferenceDirPath, absoluteProjectDirPath);
+                relativeReferencedProjectFilePaths.Add(Path.Combine(referenceProjectDir, Path.GetFileName(referencedProject->FilePath())));
+            }
         }
         public nothrow const List<string>& SourceFilePaths() const
         {
@@ -432,7 +445,7 @@ namespace Cm.Ast
         {
             return built;
         }
-        public nothrow void SetBuilt() 
+        public nothrow void SetBuilt()
         {
             built = true;
         }
@@ -473,7 +486,7 @@ namespace Cm.Ast
                         }
                         else
                         {
-                            string absolutePath = GetFullPath(sourceBasePath, filePath);
+                            string absolutePath = GetFullPath(Path.Combine(sourceBasePath, filePath));
                             referencedProjectFilePaths.Add(absolutePath);
                         }
                         string fileName = Path.GetFileName(filePath);
@@ -612,5 +625,49 @@ namespace Cm.Ast
         private bool isSystemProject;
         private int logStreamId;
         private int index;
+    }
+
+    public nothrow List<Project*> GetReferencedProjects(Project* project, Solution* solution)
+    {
+        List<Project*> referencedProjects;
+        for (const string& referencedProjectFilePath : project->ReferencedProjectFilePaths())
+        {
+            string rpfp = GetFullPath(referencedProjectFilePath);
+            long n = solution->Projects().Count();
+            bool found = false;
+            long i = 0;
+            while (i < n && !found)
+            {
+                Project* solutionProject = solution->Projects()[i].Get();
+                string fp = GetFullPath(solutionProject->FilePath());
+                if (fp == rpfp)
+                {
+                    referencedProjects.Add(solutionProject);
+                    found = true;
+                }
+                ++i;
+            }
+        }
+        return referencedProjects;
+    }
+
+    public nothrow Set<Project*> GetAllReferencedProjects(Project* project, Solution* solution)
+    {
+        Set<Project*> allReferencedProjects;
+        AddReferencedProjects(allReferencedProjects, project, solution);
+        return allReferencedProjects;
+    }
+
+    internal nothrow void AddReferencedProjects(Set<Project*>& allReferencedProjects, Project* project, Solution* solution)
+    {
+        List<Project*> referencedProjects = GetReferencedProjects(project, solution);
+        for (Project* referencedProject : referencedProjects)
+        {
+            if (allReferencedProjects.CFind(referencedProject) == allReferencedProjects.CEnd())
+            {
+                allReferencedProjects.Insert(referencedProject);
+                AddReferencedProjects(allReferencedProjects, referencedProject, solution);
+            }
+        }
     }
 }

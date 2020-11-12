@@ -108,6 +108,7 @@ void ServerDebuggerOutputWriter::WriteWarning(const std::string& warning)
 class ServerDebugger : public Debugger, public ClientChannelUser
 {
 public:
+    const int maxPointerLevel = 3;
     ServerDebugger(const std::string& executable, const std::vector<std::string>& args, bool verbose_, bool breakOnThrow_, const std::string& version_, int port_, bool log_);
     ~ServerDebugger();
     void StartServer();
@@ -139,21 +140,21 @@ public:
     std::unique_ptr<JsonValue> ProcessCountRequest(const CountRequest& countRequest);
     std::unique_ptr<JsonValue> ProcessEvaluateChildRequest(const EvaluateChildRequest& evaluateChildRequest);
     std::unique_ptr<JsonValue> ProcessEvaluateRequest(const EvaluateRequest& evaluateRequest);
-    void DoEvaluateChildRequest(Project* project, const std::string& expression, int start, int count, EvaluateChildReply& reply, std::set<uint64_t>& printedPointers);
+    void DoEvaluateChildRequest(Project* project, const std::string& expression, int start, int count, EvaluateChildReply& reply, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
     void EvaluateSpecializationTypeChildRequest(DIClassTemplateSpecializationType* specializationType, const std::string& expression, int start, int count,
-        EvaluateChildReply& reply, std::set<uint64_t>& printedPointers);
+        EvaluateChildReply& reply, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
     void EvaluateContainerTypeChildRequest(DIClassTemplateSpecializationType* containerType, const std::string& expression, int start, int count,
-        EvaluateChildReply& reply, std::set<uint64_t>& printedPointers);
+        EvaluateChildReply& reply, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
     void EvaluateClassTypeChildRequest(DIClassType* classType, const std::string& expression, int start, int count, EvaluateChildReply& reply,
-        std::set<uint64_t>& printedPointers);
-    std::string GetValue(const std::string& parentExpr, DIVariable* variable, int64_t& count, DIType*& dynType, std::set<uint64_t>& printedPointers);
-    std::string GetValue(const std::string& expression, DIType* type, int64_t& count, DIType*& dynType, std::set<uint64_t>& printedPointers);
+        std::set<uint64_t>& printedPointers, int& level, int maxLevel);
+    std::string GetValue(const std::string& parentExpr, DIVariable* variable, int64_t& count, DIType*& dynType, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
+    std::string GetValue(const std::string& expression, DIType* type, int64_t& count, DIType*& dynType, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
     std::string GetEnumeratedTypeValue(uint64_t value, DIEnumType* enumType);
     std::string GetSpecializationValue(bool initialized, const std::string& expression, DIClassTemplateSpecializationType* specializationType, int64_t& count,
-        std::set<uint64_t>& printedPointers);
-    std::string GetClassValue(const std::string& expression, DIClassType* classType, int64_t& count, std::set<uint64_t>& printedPointers);
-    std::string GetPointedValue(const std::string& expression, DIType* derefType, DIType* dynamicType, int64_t& count, std::set<uint64_t>& printedPointers);
-    std::string GetClassDelegateValue(const std::string& expression, DIClassDelegateType* classDelegateType, std::set<uint64_t>& printedPointers);
+        std::set<uint64_t>& printedPointers, int& level, int maxLevel);
+    std::string GetClassValue(const std::string& expression, DIClassType* classType, int64_t& count, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
+    std::string GetPointedValue(const std::string& expression, DIType* derefType, DIType* dynamicType, int64_t& count, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
+    std::string GetClassDelegateValue(const std::string& expression, DIClassDelegateType* classDelegateType, std::set<uint64_t>& printedPointers, int& level, int maxLevel);
     std::string GetStringValue(const std::string& expression);
     std::string GetWStringValue(const std::string& expression);
     std::string GetUStringValue(const std::string& expression);
@@ -923,7 +924,9 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateChildRequest(const Eva
                             int64_t count = 0;
                             DIType* dynType = nullptr;
                             std::set<uint64_t> printedPointers;
-                            result.value = GetValue(std::string(), localVariable, count, dynType, printedPointers);
+                            int level = 0;
+                            int maxLevel = maxPointerLevel;
+                            result.value = GetValue(std::string(), localVariable, count, dynType, printedPointers, level, maxLevel);
                             if (dynType != nullptr)
                             {
                                 result.dynType = dynType->Name();
@@ -949,7 +952,9 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateChildRequest(const Eva
                 CompileUnit* compileUnit = function->GetCompileUnit();
                 Project* project = compileUnit->GetProject();
                 std::set<uint64_t> printedPointers;
-                DoEvaluateChildRequest(project, evaluateChildRequest.expression, start, count, evaluateChildReply, printedPointers);
+                int level = 0;
+                int maxLevel = maxPointerLevel;
+                DoEvaluateChildRequest(project, evaluateChildRequest.expression, start, count, evaluateChildReply, printedPointers, level, maxLevel);
             }
         }
         else
@@ -984,7 +989,9 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const Evaluate
                 int64_t count = 0;
                 DIType* dynType = nullptr;
                 std::set<uint64_t> printedPointers;
-                evaluateReply.result.value = GetValue(evaluateRequest.expression, type, count, dynType, printedPointers);
+                int level = 0;
+                int maxLevel = maxPointerLevel;
+                evaluateReply.result.value = GetValue(evaluateRequest.expression, type, count, dynType, printedPointers, level, maxLevel);
             }
             else
             {
@@ -1002,7 +1009,7 @@ std::unique_ptr<JsonValue> ServerDebugger::ProcessEvaluateRequest(const Evaluate
 }
 
 void ServerDebugger::DoEvaluateChildRequest(Project* project, const std::string& expression, int start, int count, EvaluateChildReply& reply,
-    std::set<uint64_t>& printedPointers)
+    std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
     EvaluateReply evaluateReply = DoEvaluate(expression);
     if (evaluateReply.success)
@@ -1019,24 +1026,24 @@ void ServerDebugger::DoEvaluateChildRequest(Project* project, const std::string&
                 case DIType::Kind::specializationType:
                 {
                     DIClassTemplateSpecializationType* specializationType = static_cast<DIClassTemplateSpecializationType*>(type);
-                    EvaluateSpecializationTypeChildRequest(specializationType, expression, start, count, reply, printedPointers);
+                    EvaluateSpecializationTypeChildRequest(specializationType, expression, start, count, reply, printedPointers, level, maxLevel);
                     return;
                 }
                 case DIType::Kind::classType:
                 {
                     DIClassType* classType = static_cast<DIClassType*>(type);
-                    EvaluateClassTypeChildRequest(classType, expression, start, count, reply, printedPointers);
+                    EvaluateClassTypeChildRequest(classType, expression, start, count, reply, printedPointers, level, maxLevel);
                     return;
                 }
                 case DIType::Kind::pointerType:
                 {
                     if (!dynamicType.id.empty())
                     {
-                        DoEvaluateChildRequest(project, "(*cast<typeid(\"" + dynamicType.id + "\")>(" + expression + "))", start, count, reply, printedPointers);
+                        DoEvaluateChildRequest(project, "(*cast<typeid(\"" + dynamicType.id + "\")>(" + expression + "))", start, count, reply, printedPointers, level, maxLevel);
                     }
                     else
                     {
-                        DoEvaluateChildRequest(project, "(*" + expression + ")", start, count, reply, printedPointers);
+                        DoEvaluateChildRequest(project, "(*" + expression + ")", start, count, reply, printedPointers, level, maxLevel);
                     }
                     return;
                 }
@@ -1044,11 +1051,11 @@ void ServerDebugger::DoEvaluateChildRequest(Project* project, const std::string&
                 {
                     if (!dynamicType.id.empty())
                     {
-                        DoEvaluateChildRequest(project, "(*cast<typeid(\"" + dynamicType.id + "\")>(" + expression + "))", start, count, reply, printedPointers);
+                        DoEvaluateChildRequest(project, "(*cast<typeid(\"" + dynamicType.id + "\")>(" + expression + "))", start, count, reply, printedPointers, level, maxLevel);
                     }
                     else
                     {
-                        DoEvaluateChildRequest(project, "(*" + expression + ")", start, count, reply, printedPointers);
+                        DoEvaluateChildRequest(project, "(*" + expression + ")", start, count, reply, printedPointers, level, maxLevel);
                     }
                     return;
                 }
@@ -1069,20 +1076,20 @@ void ServerDebugger::DoEvaluateChildRequest(Project* project, const std::string&
 }
 
 void ServerDebugger::EvaluateSpecializationTypeChildRequest(DIClassTemplateSpecializationType* specializationType, const std::string& expression, int start, int count,
-    EvaluateChildReply& reply, std::set<uint64_t>& printedPointers)
+    EvaluateChildReply& reply, std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
     if (specializationType->GetContainerClassTemplateKind() != ContainerClassTemplateKind::notContainerClassTemplate)
     {
-        EvaluateContainerTypeChildRequest(specializationType, expression, start, count, reply, printedPointers);
+        EvaluateContainerTypeChildRequest(specializationType, expression, start, count, reply, printedPointers, level, maxLevel);
     }
     else
     {
-        EvaluateClassTypeChildRequest(specializationType, expression, start, count, reply, printedPointers);
+        EvaluateClassTypeChildRequest(specializationType, expression, start, count, reply, printedPointers, level, maxLevel);
     }
 }
 
 void ServerDebugger::EvaluateContainerTypeChildRequest(DIClassTemplateSpecializationType* containerType, const std::string& expression, int start, int count,
-    EvaluateChildReply& reply, std::set<uint64_t>& printedPointers)
+    EvaluateChildReply& reply, std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
     Container* container = GetContainer(containerType->GetContainerClassTemplateKind(), expression);
     int64_t childCount = container->Count(expression);
@@ -1099,7 +1106,7 @@ void ServerDebugger::EvaluateContainerTypeChildRequest(DIClassTemplateSpecializa
                 result.type = valueType->Name();
                 int64_t count = 0;
                 DIType* dynType = nullptr;
-                result.value = GetValue(result.expr, valueType, count, dynType, printedPointers);
+                result.value = GetValue(result.expr, valueType, count, dynType, printedPointers, level, maxLevel);
                 if (dynType != nullptr)
                 {
                     result.dynType = dynType->Name();
@@ -1123,7 +1130,7 @@ void ServerDebugger::EvaluateContainerTypeChildRequest(DIClassTemplateSpecializa
 }
 
 void ServerDebugger::EvaluateClassTypeChildRequest(DIClassType* classType, const std::string& expression, int start, int count, EvaluateChildReply& reply,
-    std::set<uint64_t>& printedPointers)
+    std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
     int index = 0;
     int nb = NumBaseClasses(classType);
@@ -1145,7 +1152,7 @@ void ServerDebugger::EvaluateClassTypeChildRequest(DIClassType* classType, const
             childResult.type = type->Name();
             int64_t count = 0;
             DIType* dynType = nullptr;
-            childResult.value = GetValue(expr, type, count, dynType, printedPointers);
+            childResult.value = GetValue(expr, type, count, dynType, printedPointers, level, maxLevel);
             if (dynType != nullptr)
             {
                 childResult.dynType = dynType->Name();
@@ -1170,7 +1177,7 @@ void ServerDebugger::EvaluateClassTypeChildRequest(DIClassType* classType, const
             childResult.type = type->Name();
             int64_t count = 0;
             DIType* dynType = nullptr;
-            childResult.value = GetValue(expr, type, count, dynType, printedPointers);
+            childResult.value = GetValue(expr, type, count, dynType, printedPointers, level, maxLevel);
             if (dynType != nullptr)
             {
                 childResult.dynType = dynType->Name();
@@ -1183,7 +1190,7 @@ void ServerDebugger::EvaluateClassTypeChildRequest(DIClassType* classType, const
     reply.success = true;
 }
 
-std::string ServerDebugger::GetValue(const std::string& expression, DIType* type, int64_t& count, DIType*& dynType, std::set<uint64_t>& printedPointers)
+std::string ServerDebugger::GetValue(const std::string& expression, DIType* type, int64_t& count, DIType*& dynType, std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
     dynType = nullptr;
     EvaluateReply evaluateReply = DoEvaluate(expression);
@@ -1217,11 +1224,11 @@ std::string ServerDebugger::GetValue(const std::string& expression, DIType* type
             case DIType::Kind::specializationType:
             {
                 return GetSpecializationValue(evaluateReply.result.initialized, expression, static_cast<DIClassTemplateSpecializationType*>(type), count,
-                    printedPointers);
+                    printedPointers, level, maxLevel);
             }
             case DIType::Kind::classType:
             {
-                return GetClassValue(expression, static_cast<DIClassType*>(type), count, printedPointers);
+                return GetClassValue(expression, static_cast<DIClassType*>(type), count, printedPointers, level, maxLevel);
             }
             case DIType::Kind::pointerType:
             {
@@ -1245,7 +1252,7 @@ std::string ServerDebugger::GetValue(const std::string& expression, DIType* type
                             {
                             }
                         }
-                        std::string pointedValue = GetPointedValue(expression, static_cast<DIPointerType*>(type)->PointedToType(), dynamicType, count, printedPointers);
+                        std::string pointedValue = GetPointedValue(expression, static_cast<DIPointerType*>(type)->PointedToType(), dynamicType, count, printedPointers, level, maxLevel);
                         if (!pointedValue.empty())
                         {
                             value.append(" *=").append(pointedValue);
@@ -1274,7 +1281,7 @@ std::string ServerDebugger::GetValue(const std::string& expression, DIType* type
                         {
                         }
                     }
-                    std::string pointedValue = GetPointedValue(expression, static_cast<DIReferenceType*>(type)->BaseType(), dynamicType, count, printedPointers);
+                    std::string pointedValue = GetPointedValue(expression, static_cast<DIReferenceType*>(type)->BaseType(), dynamicType, count, printedPointers, level, maxLevel);
                     if (!pointedValue.empty())
                     {
                         value.append(" *=").append(pointedValue);
@@ -1285,7 +1292,7 @@ std::string ServerDebugger::GetValue(const std::string& expression, DIType* type
             case DIType::Kind::constType:
             {
                 DIConstType* constType = static_cast<DIConstType*>(type);
-                return GetValue(expression, constType->BaseType(), count, dynType, printedPointers);
+                return GetValue(expression, constType->BaseType(), count, dynType, printedPointers, level, maxLevel);
             }
             case DIType::Kind::delegateType:
             {
@@ -1293,14 +1300,14 @@ std::string ServerDebugger::GetValue(const std::string& expression, DIType* type
             }
             case DIType::Kind::classDelegateType:
             {
-                return GetClassDelegateValue(expression, static_cast<DIClassDelegateType*>(type), printedPointers);
+                return GetClassDelegateValue(expression, static_cast<DIClassDelegateType*>(type), printedPointers, level, maxLevel);
             }
         }
     }
     return std::string();
 }
 
-std::string ServerDebugger::GetValue(const std::string& parentExpr, DIVariable* variable, int64_t& count, DIType*& dynType, std::set<uint64_t>& printedPointers)
+std::string ServerDebugger::GetValue(const std::string& parentExpr, DIVariable* variable, int64_t& count, DIType*& dynType, std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
     std::string expression;
     if (!parentExpr.empty())
@@ -1308,7 +1315,7 @@ std::string ServerDebugger::GetValue(const std::string& parentExpr, DIVariable* 
         expression.append(parentExpr).append(".");
     }
     expression.append(variable->Name());
-    return GetValue(expression, variable->GetType(), count, dynType, printedPointers);
+    return GetValue(expression, variable->GetType(), count, dynType, printedPointers, level, maxLevel);
 }
 
 std::string ServerDebugger::GetEnumeratedTypeValue(uint64_t value, DIEnumType* enumType)
@@ -1344,7 +1351,7 @@ std::string ServerDebugger::GetEnumeratedTypeValue(uint64_t value, DIEnumType* e
 }
 
 std::string ServerDebugger::GetSpecializationValue(bool initialized, const std::string& expression, DIClassTemplateSpecializationType* specializationType, int64_t& count,
-    std::set<uint64_t>& printedPointers)
+    std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
     if (specializationType->GetContainerClassTemplateKind() != ContainerClassTemplateKind::notContainerClassTemplate)
     {
@@ -1379,12 +1386,12 @@ std::string ServerDebugger::GetSpecializationValue(bool initialized, const std::
         }
         else
         {
-            return GetClassValue(expression, specializationType, count, printedPointers);
+            return GetClassValue(expression, specializationType, count, printedPointers, level, maxLevel);
         }
     }
 }
 
-std::string ServerDebugger::GetClassValue(const std::string& expression, DIClassType* classType, int64_t& count, std::set<uint64_t>& printedPointers)
+std::string ServerDebugger::GetClassValue(const std::string& expression, DIClassType* classType, int64_t& count, std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
     bool first = true;
     std::string value = "{ ";
@@ -1394,7 +1401,7 @@ std::string ServerDebugger::GetClassValue(const std::string& expression, DIClass
         if (baseClassType && (baseClassType->GetKind() == DIType::Kind::classType || baseClassType->GetKind() == DIType::Kind::specializationType))
         {
             int64_t cnt = 0;
-            std::string baseClassValue = GetClassValue(expression + ".base", static_cast<DIClassType*>(baseClassType), cnt, printedPointers);
+            std::string baseClassValue = GetClassValue(expression + ".base", static_cast<DIClassType*>(baseClassType), cnt, printedPointers, level, maxLevel);
             value.append(baseClassValue);
         }
         if (first)
@@ -1414,20 +1421,25 @@ std::string ServerDebugger::GetClassValue(const std::string& expression, DIClass
         }
         int64_t count = 0;
         DIType* dynType = nullptr;
-        value.append(memberVar->Name()).append("=").append(GetValue(expression, memberVar.get(), count, dynType, printedPointers));
+        value.append(memberVar->Name()).append("=").append(GetValue(expression, memberVar.get(), count, dynType, printedPointers, level, maxLevel));
     }
     value.append(" }");
     count = NumBaseClasses(classType) + classType->MemberVariables().size();
     return value;
 }
 
-std::string ServerDebugger::GetPointedValue(const std::string& expression, DIType* derefType, DIType* dynamicType, int64_t& count, std::set<uint64_t>& printedPointers)
+std::string ServerDebugger::GetPointedValue(const std::string& expression, DIType* derefType, DIType* dynamicType, int64_t& count, std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
+    if (level >= maxLevel)
+    {
+        return "...";
+    }
+    ++level;
     DIType* dynType = nullptr;
     if (dynamicType)
     {
         return GetValue("(*cast<typeid(\"" + boost::uuids::to_string(dynamicType->Id()) + "\")>(" + expression + "))", dynamicType->DerefType(), count, dynType,
-            printedPointers);
+            printedPointers, level, maxLevel);
     }
     else
     {
@@ -1442,14 +1454,14 @@ std::string ServerDebugger::GetPointedValue(const std::string& expression, DITyp
                 return std::string();
             }
         }
-        return GetValue("(*" + expression + ")", derefType, count, dynType, printedPointers);
+        return GetValue("(*" + expression + ")", derefType, count, dynType, printedPointers, level, maxLevel);
     }
 }
 
-std::string ServerDebugger::GetClassDelegateValue(const std::string& expression, DIClassDelegateType* classDelegateType, std::set<uint64_t>& printedPointers)
+std::string ServerDebugger::GetClassDelegateValue(const std::string& expression, DIClassDelegateType* classDelegateType, std::set<uint64_t>& printedPointers, int& level, int maxLevel)
 {
     int64_t count = 0;
-    std::string value = GetClassValue(expression, static_cast<DIClassType*>(classDelegateType->GetClassType()), count, printedPointers);
+    std::string value = GetClassValue(expression, static_cast<DIClassType*>(classDelegateType->GetClassType()), count, printedPointers, level, maxLevel);
     return value;
 }
 

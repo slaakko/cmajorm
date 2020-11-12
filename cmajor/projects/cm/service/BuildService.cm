@@ -14,15 +14,19 @@ using Cm.Service;
 
 namespace Cm.Service.Build
 {
-    public int defaultPort = 54325;
+    public const int defaultPort = 54325;
+    public const int defaultKeepAliveServerPort = 54329;
+    public const int defaultKeepAliveIntervalSeconds = 60;
 
     public class delegate void ProgressNotificationFunction();
+    public class delegate void BuildServerStartNotificationFunction();
+    public class delegate void BuildServerStopNotificationFunction();
 
     public class BuildServiceArgs
     {
         public BuildServiceArgs() :
-            port(defaultPort), log(false), keepAliveIntervalSeconds(5), serverStartWaitSeconds(1), serverStopWaitSeconds(10),
-            serverTimeoutSeconds(0), saveRequestOnly(false), debugServer(false)
+            port(defaultPort), keepAliveServerPort(defaultKeepAliveServerPort), log(false), wait(false),
+            serverStartWaitSeconds(1), serverStopWaitSeconds(10), saveRequestOnly(false), debugServer(false)
         {
         }
         public nothrow BuildServiceArgs& ProgramName(const string& programName_)
@@ -40,14 +44,19 @@ namespace Cm.Service.Build
             port = port_;
             return *this;
         }
+        public nothrow BuildServiceArgs& KeepAliveServerPort(int keepAliveServerPort_)
+        {
+            keepAliveServerPort = keepAliveServerPort_;
+            return *this;
+        }
         public nothrow BuildServiceArgs& Log(bool log_)
         {
             log = log_;
             return *this;
         }
-        public nothrow BuildServiceArgs& KeepAliveIntervalSeconds(int keepAliveIntervalSeconds_)
+        public nothrow BuildServiceArgs& Wait(bool wait_)
         {
-            keepAliveIntervalSeconds = keepAliveIntervalSeconds_;
+            wait = wait_;
             return *this;
         }
         public nothrow BuildServiceArgs& ServerStartWaitSeconds(int serverStartWaitSeconds_)
@@ -58,11 +67,6 @@ namespace Cm.Service.Build
         public nothrow BuildServiceArgs& ServerStopWaitSeconds(int serverStopWaitSeconds_)
         {
             serverStopWaitSeconds = serverStopWaitSeconds_;
-            return *this;
-        }
-        public nothrow BuildServiceArgs& ServerTimeoutSeconds(int serverTimeoutSeconds_)
-        {
-            serverTimeoutSeconds = serverTimeoutSeconds_;
             return *this;
         }
         public nothrow BuildServiceArgs& SaveRequestOnly(bool saveRequestOnly_)
@@ -78,19 +82,32 @@ namespace Cm.Service.Build
         public string programName;
         public int pid;
         public int port;
+        public int keepAliveServerPort;
         public bool log;
+        public bool wait;
         public bool saveRequestOnly;
-        public int keepAliveIntervalSeconds;
         public int serverStartWaitSeconds;
         public int serverStopWaitSeconds;
-        public int serverTimeoutSeconds;
         public bool debugServer;
+    }
+
+    public class KeepAliveServerGuard
+    {
+        public nothrow KeepAliveServerGuard(bool& keepAliveServerRunning_) : keepAliveServerRunning(keepAliveServerRunning_)
+        {
+            keepAliveServerRunning = true;
+        }
+        public ~KeepAliveServerGuard()
+        {
+            keepAliveServerRunning = false;
+        }
+        private bool& keepAliveServerRunning;
     }
 
     public class BuildService : ServiceBase
     {
         public nothrow BuildService(BuildServiceArgs& args_) :
-            base(), args(args_), notifyProgress(), serverMutex(), terminating(false)
+            base(), args(args_), notifyProgress(), terminating(false), stopKeepAlives(false), keepAliveServerRunning(false)
         {
         }
         private string MakeServerStartCommand()
@@ -101,12 +118,24 @@ namespace Cm.Service.Build
                 serverStartCommand = "cmbsd";
             }
             port = Cm.Service.PortMap.GetFreePortNumber(args.programName, args.pid, portMapServicePortNumber);
+            bool gotNoPort = false;
             if (port == -1)
             {
                 port = args.port;
                 LogMessage("BuildService: got no port from port map server, resorting to default port " + ToString(port));
+                gotNoPort = true;
             }
             serverStartCommand.Append(" --port=" + ToString(port));
+            if (!gotNoPort)
+            {
+                keepAliveServerPort = Cm.Service.PortMap.GetFreePortNumber(args.programName, args.pid, portMapServicePortNumber);
+            }
+            serverStartCommand.Append(" --keepAliveServerPort=" + ToString(keepAliveServerPort));
+            if (keepAliveServerPort == -1)
+            {
+                keepAliveServerPort = args.keepAliveServerPort;
+                LogMessage("BuildService: got no port from port map server, resorting to default keep alive server port " + ToString(keepAliveServerPort));
+            }
             if (portMapServicePortNumber != -1)
             {
                 serverStartCommand.Append(" --portMapServicePort=" + ToString(portMapServicePortNumber));
@@ -115,15 +144,23 @@ namespace Cm.Service.Build
             {
                 serverStartCommand.Append(" --log");
             }
-            if (args.serverTimeoutSeconds != 0)
+            if (args.wait)
             {
-                serverStartCommand.Append(" --timeoutSecs=" + ToString(args.serverTimeoutSeconds));
+                serverStartCommand.Append(" --wait");
             }
             return serverStartCommand;
         }
         public nothrow void SetProgressNotificationFunction(const ProgressNotificationFunction& notifyProgress_)
         {
             notifyProgress = notifyProgress_;
+        }
+        public nothrow void SetBuildServerStartNotificationFunction(const BuildServerStartNotificationFunction& notifyBuildServerStart_)
+        {
+            notifyBuildServerStart = notifyBuildServerStart_;
+        }
+        public nothrow void SetBuildServerStopNotificationFunction(const BuildServerStopNotificationFunction& notifyBuildServerStop_)
+        {
+            notifyBuildServerStop = notifyBuildServerStop_;
         }
         public nothrow bool ServerRunning() const
         {
@@ -139,7 +176,7 @@ namespace Cm.Service.Build
                     StopServer(true);
                 }
                 string serverStartCommand = MakeServerStartCommand();
-                LogMessage("BuildService: Starting Build Server (port=" + ToString(port) + ")...");
+                LogMessage("BuildService: Starting Build Server (port=" + ToString(port) + ", keep alive server port=" + ToString(keepAliveServerPort) + ")...");
                 buildServer.Reset(
                     new Process(serverStartCommand,
                     cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr)));
@@ -151,9 +188,9 @@ namespace Cm.Service.Build
                 }
                 LogMessage(line);
                 Sleep(Duration.FromSeconds(args.serverStartWaitSeconds));
-                sendKeepAlives = true;
                 keepAliveThread = Thread.StartMethod(KeepAliveServer);
                 LogMessage("BuildService: Build Server started.");
+                notifyBuildServerStart();
             }
             catch (const Exception& ex)
             {
@@ -168,13 +205,17 @@ namespace Cm.Service.Build
             try
             {
                 if (!ServerRunning()) return;
-                sendKeepAlives = false;
-                keepAliveThread.Join();
+                if (keepAliveServerRunning)
+                {
+                    stopKeepAlives = true;
+                    stopKeepAlivesVar.NotifyOne();
+                    keepAliveThread.Join();
+                }
                 if (log)
                 {
                     LogMessage("Cm.Build.Service: Stopping Build Server...");
                 }
-                SendStopRequest();
+                SendReceiveStopRequest();
                 bool serverStopped = false;
                 for (int i = 0; i < args.serverStopWaitSeconds; ++i)
                 {
@@ -222,13 +263,19 @@ namespace Cm.Service.Build
             {
                 if (!ServerRunning()) return;
                 terminating = true;
-                sendKeepAlives = false;
+                if (keepAliveServerRunning)
+                {
+                    stopKeepAlives = true;
+                    stopKeepAlivesVar.NotifyOne();
+                    keepAliveThread.Join();
+                }
                 buildServer->Terminate();
                 terminatingVar.NotifyOne();
                 if (logTerminate)
                 {
                     LogMessage("Cm.Build.Service: Build Server stopped.");
                 }
+                notifyBuildServerStop();
             }
             catch (const Exception& ex)
             {
@@ -239,27 +286,37 @@ namespace Cm.Service.Build
                 }
             }
         }
-        private bool Terminating(void* arg)
-        {
-            return terminating;
-        }
         public void Quit()
         {
             TerminateServer(false);
-            keepAliveThread.Join();
+            if (keepAliveServerRunning)
+            {
+                stopKeepAlives = true;
+                stopKeepAlivesVar.NotifyOne();
+                keepAliveThread.Join();
+            }
+        }
+        private nothrow bool StopKeepAlives(void* arg) 
+        {
+            return stopKeepAlives;
         }
         public void KeepAliveServer()
         {
+            KeepAliveServerGuard keepAliveServerGuard(keepAliveServerRunning);
             try
             {
-                while (sendKeepAlives && ServerRunning())
+                stopKeepAlives = false;
+                while (!stopKeepAlives)
                 {
+                    LockGuard<RecursiveMutex> lock(keepAliveMutex);
+                    if (stopKeepAlivesVar.WaitFor(keepAliveMutex, StopKeepAlives, null, Duration.FromSeconds(defaultKeepAliveIntervalSeconds)))
                     {
-                        LockGuard<RecursiveMutex> lock(terminateMutex);
-                        terminatingVar.WaitFor(terminateMutex, Terminating, null, Duration.FromSeconds(args.keepAliveIntervalSeconds));
-                        if (terminating) return;
+                        return;
                     }
-                    SendKeepAliveRequest();
+                    else
+                    {
+                        SendReceiveKeepAliveRequest();
+                    }
                 }
             }
             catch (const Exception& ex)
@@ -267,23 +324,43 @@ namespace Cm.Service.Build
                 LogException(ex);
             }
         }
-        public void SendStopRequest()
+        private void SendReceiveStopRequest()
         {
-            LockGuard<RecursiveMutex> lock(serverMutex);
+            TcpSocket socket("localhost", ToString(port));
             StopRequest stopRequest;
             UniquePtr<JsonValue> requestJsonValue = stopRequest.ToJson();
-            TcpSocket socket("localhost", ToString(port));
             string requestStr = requestJsonValue->ToString();
             Write(socket, requestStr);
+            string replyStr = ReadStr(socket);
+            UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
+            string messageKind = GetMessageKind(replyJsonValue.Get());
+            if (messageKind == "stopReply")
+            {
+                StopReply reply(replyJsonValue.Get());
+            }
+            else
+            {
+                throw Exception("stopReply expected, unknown reply message kind '" + messageKind + "' received");
+            }
         }
-        public void SendKeepAliveRequest()
+        private void SendReceiveKeepAliveRequest()
         {
-            LockGuard<RecursiveMutex> lock(serverMutex);
+            TcpSocket socket("localhost", ToString(keepAliveServerPort));
             KeepAliveRequest keepAliveRequest;
             UniquePtr<JsonValue> requestJsonValue = keepAliveRequest.ToJson();
-            TcpSocket socket("localhost", ToString(port));
             string requestStr = requestJsonValue->ToString();
             Write(socket, requestStr);
+            string replyStr = ReadStr(socket);
+            UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
+            string messageKind = GetMessageKind(replyJsonValue.Get());
+            if (messageKind == "keepAliveReply")
+            {
+                KeepAliveReply reply(replyJsonValue.Get());
+            }
+            else
+            {
+                throw Exception("keepAliveReply expected, unknown reply message kind '" + messageKind + "' received");
+            }
         }
         public void ProcessBuildRequest(const BuildRequest& request)
         {
@@ -302,7 +379,6 @@ namespace Cm.Service.Build
                 CodeFormatter requestFormatter(requestWriter);
                 requestJsonValue->Write(requestFormatter);
                 if (saveRequestOnly) return;
-                LockGuard<RecursiveMutex> lock(serverMutex);
                 TcpSocket socket("localhost", ToString(port));
                 string requestStr = requestJsonValue->ToString();
                 Write(socket, requestStr);
@@ -360,7 +436,22 @@ namespace Cm.Service.Build
         }
         private void ProcessBuildReply(const BuildReply& buildReply)
         {
-            // todo
+            if (buildReply.success)
+            {
+                LogMessage("Cm.Build.Service: build successful, time=" + buildReply.time);
+            }
+            else
+            {
+                LogMessage("Cm.Build.Service: build unsuccessful: error: " + buildReply.error);
+            }
+            if (!buildReply.requestValid)
+            {
+                throw Exception("server claims build request not valid: " + buildReply.requestErrorMessage);
+            }
+            if (!buildReply.logException.IsEmpty())
+            {
+                throw Exception("server log exception: " + buildReply.logException);
+            }
         }
         private string GetMessageKind(JsonValue* jsonValue)
         {
@@ -383,17 +474,21 @@ namespace Cm.Service.Build
         }
         private BuildServiceArgs args;
         private int port;
+        private int keepAliveServerPort;
         private int portMapServicePortNumber;
-        private bool sendKeepAlives;
         private bool log;
         private bool saveRequestOnly;
         private bool terminating;
+        private bool stopKeepAlives;
+        private bool keepAliveServerRunning;
         private ConditionVariable terminatingVar;
+        private ConditionVariable stopKeepAlivesVar;
         private ProgressNotificationFunction notifyProgress;
+        private BuildServerStartNotificationFunction notifyBuildServerStart;
+        private BuildServerStopNotificationFunction notifyBuildServerStop;
         private string serverStartCommand;
         private UniquePtr<Process> buildServer;
         private Thread keepAliveThread;
-        private RecursiveMutex serverMutex;
-        private RecursiveMutex terminateMutex;
+        private RecursiveMutex keepAliveMutex;
     }
 }

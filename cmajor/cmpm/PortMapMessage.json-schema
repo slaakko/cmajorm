@@ -30,7 +30,33 @@ struct ExtendPortLeaseReply
     string message;
 }
 
-struct StopPortNumberServerRequest
+struct StopPortMapServerRequest
 {
     string message;
+}
+
+struct StopPortMapServerReply
+{
+    string message;
+}
+
+struct PortLease
+{
+    string portNumber;
+    string programName;
+    string pid;
+    string leaseStartTime;
+    string leaseRenewalTime;
+    string leaseState;
+}
+
+struct ViewPortLeaseRequest
+{
+    string message;
+}
+
+struct ViewPortLeaseReply
+{
+    string message;
+    PortLease[] portLeases;
 }

@@ -1,0 +1,113 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace Cm.Views
+{
+    public class PortMapView : Control
+    {
+        public PortMapView(MenuItem* startServerMenuItem_, MenuItem* stopServerMenuItem_) :
+            base("Cm.Views.PortMapView", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), Color.White(),
+            "portMapView", Point(), Size(), Dock.fill, Anchors.none), container(this), treeView(null), child(null),
+            startServerMenuItem(startServerMenuItem_), stopServerMenuItem(stopServerMenuItem_)
+        {
+            UniquePtr<TreeView> treeViewPtr(new TreeView(Point(), Size(), Dock.none, Anchors.none));
+            treeView = treeViewPtr.Get();
+            UniquePtr<Control> paddedTreeView(new PaddedControl(treeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> scrollableTreeView(new ScrollableControl(paddedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            child = scrollableTreeView.Get();
+            container.AddChild(scrollableTreeView.Release());
+            Clear();
+        }
+        public void Clear()
+        {
+            treeView->SetRoot(new TreeViewNode("Port Map Entries"));
+            child->Invalidate();
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            treeView->Root()->ExpandAll();
+            treeView->Invalidate();
+            child->Invalidate();
+        }
+        public void Update()
+        {
+            try
+            {
+                Clear();
+                List<Cm.Service.PortMap.PortLease> portLeases = Cm.Service.PortMap.GetPortLeases();
+                for (const Cm.Service.PortMap.PortLease& portLease : portLeases)
+                {
+                    TreeViewNode* node = new TreeViewNode("Port " + portLease.portNumber);
+                    treeView->Root()->AddChild(node);
+                    TreeViewNode* programNode = new TreeViewNode("Program: " + portLease.programName);
+                    node->AddChild(programNode);
+                    TreeViewNode* pidNode = new TreeViewNode("PID: " + portLease.pid);
+                    node->AddChild(pidNode);
+                    TreeViewNode* leaseStartTimeNode = new TreeViewNode("Lease start time: " + portLease.leaseStartTime);
+                    node->AddChild(leaseStartTimeNode);
+                    TreeViewNode* leaseRenewalTimeNode = new TreeViewNode("Lease renewal time: " + portLease.leaseRenewalTime);
+                    node->AddChild(leaseRenewalTimeNode);
+                    TreeViewNode* leaseStateNode = new TreeViewNode("Lease state: " + portLease.leaseState);
+                    node->AddChild(leaseStateNode);
+                }
+                TreeViewNode* runningNode = new TreeViewNode("cmpms running");
+                TreeViewNode* countNode = new TreeViewNode(ToString(portLeases.Count()) + " ports in the port map");
+                runningNode->AddChild(countNode);
+                treeView->Root()->AddChild(runningNode);
+                Invalidate();
+                startServerMenuItem->Disable();
+                stopServerMenuItem->Enable();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show("Update failed: " + ex.Message());
+                SetStopped();
+            }
+        }
+        public void SetStopped()
+        {
+            try
+            {
+                Clear();
+                TreeViewNode* stoppedNode = new TreeViewNode("cmpms stopped");
+                treeView->Root()->AddChild(stoppedNode);
+                Invalidate();
+                stopServerMenuItem->Disable();
+                startServerMenuItem->Enable();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+            SetChildPos();
+        }
+        protected override void OnSizeChanged(uint windowState)
+        {
+            base->OnSizeChanged(windowState);
+            SetChildPos();
+        }
+        private void SetChildPos()
+        {
+            Point loc;
+            Size size = GetSize();
+            Rect childRect(loc, size);
+            child->SetLocation(childRect.location);
+            child->SetSize(childRect.size);
+        }
+        private Container container;
+        private TreeView* treeView;
+        private Control* child;
+        private MenuItem* startServerMenuItem;
+        private MenuItem* stopServerMenuItem;
+    }
+}

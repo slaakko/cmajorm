@@ -44,12 +44,50 @@ struct ExtendPortLeaseReply
     std::string message;
 };
 
-struct StopPortNumberServerRequest
+struct StopPortMapServerRequest
 {
-    StopPortNumberServerRequest();
-    StopPortNumberServerRequest(soulng::util::JsonValue* __json_value);
+    StopPortMapServerRequest();
+    StopPortMapServerRequest(soulng::util::JsonValue* __json_value);
     std::unique_ptr<soulng::util::JsonValue> ToJson() const;
     std::string message;
+};
+
+struct StopPortMapServerReply
+{
+    StopPortMapServerReply();
+    StopPortMapServerReply(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string message;
+};
+
+struct PortLease
+{
+    PortLease();
+    PortLease(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string portNumber;
+    std::string programName;
+    std::string pid;
+    std::string leaseStartTime;
+    std::string leaseRenewalTime;
+    std::string leaseState;
+};
+
+struct ViewPortLeaseRequest
+{
+    ViewPortLeaseRequest();
+    ViewPortLeaseRequest(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string message;
+};
+
+struct ViewPortLeaseReply
+{
+    ViewPortLeaseReply();
+    ViewPortLeaseReply(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string message;
+    std::vector<PortLease> portLeases;
 };
 
 #endif // HPP_E9A7CDC085758979427A3E510D8D38DC3640E725

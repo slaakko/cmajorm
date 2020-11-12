@@ -5,6 +5,7 @@
 
 #include <cmajor/cmbs/BuildServer.hpp>
 #include <cmajor/cmbs/BuildClient.hpp>
+#include <cmajor/cmbs/KeepAliveServer.hpp>
 #include <cmajor/cmpm/PortMapClient.hpp>
 #include <soulng/util/Path.hpp>
 #include <soulng/util/Process.hpp>
@@ -25,6 +26,8 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <mutex>
+#include <condition_variable>
 
 struct InitDone
 {
@@ -70,26 +73,37 @@ void PrintHelp()
     std::cout << "--log | -l" << std::endl;
     std::cout << "  Write log to %CMAJOR_ROOT%/log/cmbs.log (by default C:\\cmajor\\log\\cmbs.log)." << std::endl;
     std::cout << std::endl;
-    std::cout << "--timeoutSecs=SECS | -t=SECS" << std::endl;
-    std::cout << "  Set timeout in seconds." << std::endl;
-    std::cout << "  Default timeout is 15 seconds." << std::endl;
-    std::cout << std::endl;
     std::cout << "--port=PORT | -p=PORT" << std::endl;
     std::cout << "  Set server port number to PORT." << std::endl;
     std::cout << "  Default port number is 54325." << std::endl;
+    std::cout << "--keepAliveServerPort=PORT | -k=PORT." << std::endl;
+    std::cout << "  Set keep alive server port number to PORT." << std::endl;
+    std::cout << "  Default port number is 54329." << std::endl;
     std::cout << "--portMapServicePort=PORT | -m=PORT" << std::endl;
     std::cout << "  Set port map service port number to PORT." << std::endl;
-    std::cout << "  Optional. When set revises main port number using port map service every minute." << std::endl;
+    std::cout << "  Optional. When set revises main port number and keep aliver server port number using port map service every minute." << std::endl;
     std::cout << std::endl;
     std::cout << "--request=FILE | -r=FILE" << std::endl;
     std::cout << "  Read build request from file FILE and run it." << std::endl;
 }
 
+struct KeepAliveServerRun
+{
+    KeepAliveServerRun(int keepAliveServerPort, std::condition_variable* exitVar, bool* exiting)
+    {
+        cmbs::StartKeepAliveServer(keepAliveServerPort, exitVar, exiting);
+    }
+    ~KeepAliveServerRun()
+    {
+        cmbs::StopKeepAliveServer();
+    }
+};
+
 struct BuildServerRun
 {
-    BuildServerRun(int port, const std::string& version, int timeoutSecs, bool log)
+    BuildServerRun(int port, const std::string& version, bool log, std::condition_variable* exitVar, bool* exiting)
     {
-        cmbs::StartBuildServer(port, version, timeoutSecs, log);
+        cmbs::StartBuildServer(port, version, log, exitVar, exiting);
     }
     ~BuildServerRun()
     {
@@ -116,16 +130,21 @@ struct PortMapClientRun
     int portMapServicePort;
 };
 
+std::mutex mtx;
+
 int main(int argc, const char** argv)
 {
     InitDone initDone;
+    std::condition_variable exitVar;
+    bool exiting = false;
     bool log = false;
+    bool wait = false;
     try
     {
         int port = 54325;
+        int keepAliveServerPort = cmbs::defaultKeepAliveServerPort;
         int portMapServicePort = -1;
         std::string requestFilePath;
-        int timeoutSecs = 15;
         for (int i = 1; i < argc; ++i)
         {
             std::string arg = argv[i];
@@ -140,6 +159,10 @@ int main(int argc, const char** argv)
                 {
                     log = true;
                 }
+                else if (arg == "--wait")
+                {
+                    wait = true;
+                }
                 else if (arg.find('=') != std::string::npos)
                 {
                     std::vector<std::string> components = Split(arg, '=');
@@ -151,6 +174,10 @@ int main(int argc, const char** argv)
                         {
                             port = boost::lexical_cast<int>(value);
                         }
+                        else if (option == "--keepAliveServerPort")
+                        {
+                            keepAliveServerPort = boost::lexical_cast<int>(value);
+                        }
                         else if (option == "--portMapServicePort")
                         {
                             portMapServicePort = boost::lexical_cast<int>(value);
@@ -158,10 +185,6 @@ int main(int argc, const char** argv)
                         else if (option == "--request")
                         {
                             requestFilePath = GetFullPath(value);
-                        }
-                        else if (option == "--timeoutSecs")
-                        {
-                            timeoutSecs = boost::lexical_cast<int>(value);
                         }
                         else
                         {
@@ -193,13 +216,13 @@ int main(int argc, const char** argv)
                     {
                         portMapServicePort = boost::lexical_cast<int>(value);
                     }
+                    else if (option == "-k")
+                    {
+                        keepAliveServerPort = boost::lexical_cast<int>(value);
+                    }
                     else if (option == "-r")
                     {
                         requestFilePath = GetFullPath(value);
-                    }
-                    else if (option == "-t")
-                    {
-                        timeoutSecs = boost::lexical_cast<int>(value);
                     }
                     else
                     {
@@ -223,6 +246,11 @@ int main(int argc, const char** argv)
                                 log = true;
                                 break;
                             }
+                            case 'w':
+                            {
+                                wait = true;
+                                break;
+                            }
                             default:
                             {
                                 throw std::runtime_error("unknown option '-" + std::string(1, o) + "'");
@@ -236,24 +264,46 @@ int main(int argc, const char** argv)
                 throw std::runtime_error("unknown argument '" + arg + "'");
             }
         }
-        BuildServerRun runBuildServer(port, version, timeoutSecs, log);
+        if (wait)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds{ 60 });
+        }
+        KeepAliveServerRun runKeepAliveServer(keepAliveServerPort, &exitVar, &exiting);
+        BuildServerRun runBuildServer(port, version, log, &exitVar, &exiting);
         std::vector<int> ports;
         if (portMapServicePort != -1)
         {
             ports.push_back(port);
+            ports.push_back(keepAliveServerPort);
         }
         PortMapClientRun runPortMapClient(portMapServicePort, ports, "cmbs", soulng::util::GetPid());
         if (requestFilePath.empty())
         {
-            while (!cmbs::BuildServerStopRequested() && !cmbs::BuildServerTimeOut())
+            bool stopReported = false;
+            bool timeoutReported = false;
+            while (!cmbs::BuildServerStopRequested() && !cmbs::Timeout())
             {
-                std::this_thread::sleep_for(std::chrono::duration{ std::chrono::seconds{ 1 } });
+                std::unique_lock<std::mutex> lock(mtx);
+                if (exitVar.wait_for(lock, std::chrono::seconds{ 3 }, [exiting] { return exiting; }))
+                {
+                    if (cmbs::BuildServerStopRequested())
+                    {
+                        std::cout << "Build server stop request received." << std::endl;
+                        stopReported = true;
+                    }
+                    else if (cmbs::Timeout())
+                    {
+                        std::cout << "Build server timeout." << std::endl;
+                        timeoutReported = true;
+                    }
+                    break;
+                }
             }
-            if (cmbs::BuildServerStopRequested())
+            if (cmbs::BuildServerStopRequested() && !stopReported)
             {
                 std::cout << "Build server stop request received." << std::endl;
             }
-            else if (cmbs::BuildServerTimeOut())
+            else if (cmbs::Timeout() && !timeoutReported)
             {
                 std::cout << "Build server timeout." << std::endl;
             }

@@ -29,8 +29,6 @@ namespace cmcode
     UniquePtr<Cm.Ast.Solution> ReadSolution(const string& solutionFilePath, List<UniquePtr<ustring>>& contents)
     {
         UniquePtr<ustring> content(new ustring(ToUtf32(File.ReadAllText(solutionFilePath))));
-        LogView* logView = Application.GetLogView();
-        logView->WriteLine(ToUtf8(*content));
         ContainerFileLexer lexer(content->Chars(), content->Chars() + content->Length(), solutionFilePath, 0);
         UniquePtr<Cm.Ast.Solution> solution(SolutionFileParser.Parse(lexer));
         solution->ResolveDeclarations();

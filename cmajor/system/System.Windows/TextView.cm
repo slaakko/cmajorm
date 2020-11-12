@@ -19,12 +19,22 @@ namespace System.Windows
         {
             return wordSeparators.Find(c) != -1;
         }
-        private static ustring wordSeparators; 
+        private static ustring wordSeparators;
     }
 
     public nothrow bool IsWordSeparator(uchar c)
     {
         return WordSeparators.IsWordSeparatorChar(c);
+    }
+
+    public nothrow bool IsEmptyOrSpaceLine(const ustring& line)
+    {
+        if (line.IsEmpty()) return true;
+        for (uchar c : line)
+        {
+            if (c != ' ') return false;
+        }
+        return true;
     }
 
     public nothrow System.Windows.Color DefaultSelectionBackgroundColor()
@@ -515,7 +525,7 @@ namespace System.Windows
         {
             try
             {
-                PaintContent(args.graphics);
+                PaintContent(args.graphics, args.clipRect);
                 base->OnPaint(args);
             }
             catch (const Exception& ex)
@@ -523,7 +533,7 @@ namespace System.Windows
                 MessageBox.Show(ex.Message());
             }
         }
-        protected virtual void PaintContent(Graphics& graphics)
+        protected virtual void PaintContent(Graphics& graphics, const Rect& clipRect)
         {
             if (Changed())
             {
@@ -542,6 +552,7 @@ namespace System.Windows
             SetLineNumberFieldLength(n);
             int lineNumberFieldLength = LineNumberFieldLength();
             PointF origin(0, 0);
+            Size size = GetSize();
             for (int i = 0; i < n; ++i)
             {
                 if (IsLinePartiallyVisible(i + 1))
@@ -688,7 +699,7 @@ namespace System.Windows
                 GetLineColumn(args.location, line, column);
                 mouseSelectionEnd = SourcePos(line, column);
                 ExtendSelection(mouseSelectionStart, mouseSelectionEnd);
-                Invalidate();
+                InvalidateLines(selection.start.line, selection.end.line);
             }
         }
         protected override void OnMouseUp(MouseEventArgs& args)
@@ -703,7 +714,7 @@ namespace System.Windows
                 GetLineColumn(args.location, line, column);
                 mouseSelectionEnd = SourcePos(line, column);
                 ExtendSelection(mouseSelectionStart, mouseSelectionEnd);
-                Invalidate();
+                InvalidateLines(selection.start.line, selection.end.line);
             }
         }
         protected override void OnKeyDown(KeyEventArgs& args)
@@ -729,7 +740,7 @@ namespace System.Windows
                         SourcePos end(CaretLine(), 1);
                         ExtendSelection(start, end);
                         columnNumber = 1 + LineNumberFieldLength();
-                        Invalidate();
+                        InvalidateLineCol(CaretLine(), columnNumber);
                         args.handled = true;
                         break;
                     }
@@ -746,7 +757,7 @@ namespace System.Windows
                         SourcePos end(CaretLine(), GetLineLength(lineNumber) + 1);
                         ExtendSelection(start, end);
                         columnNumber = GetLineLength(lineNumber) + 1 + LineNumberFieldLength();
-                        Invalidate();
+                        InvalidateLineCol(CaretLine(), 1 + LineNumberFieldLength());
                         args.handled = true;
                         break;
                     }
@@ -775,7 +786,7 @@ namespace System.Windows
                             --columnNumber;
                             --end.column;
                             ExtendSelection(start, end);
-                            Invalidate();
+                            InvalidateLines(selection.start.line, selection.end.line);
                         }
                         else if (lineNumber > 1)
                         {
@@ -786,7 +797,7 @@ namespace System.Windows
                             columnNumber = lineLength + 1 + LineNumberFieldLength();
                             end.column = lineLength + 1;
                             ExtendSelection(start, end);
-                            Invalidate();
+                            InvalidateLines(selection.start.line, selection.end.line);
                         }
                         args.handled = true;
                         break;
@@ -831,7 +842,7 @@ namespace System.Windows
                                 end.column = 1;
                                 ExtendSelection(start, end);
                             }
-                            Invalidate();
+                            InvalidateLines(selection.start.line, selection.end.line);
                         }
                         args.handled = true;
                         break;
@@ -873,7 +884,7 @@ namespace System.Windows
                             end.column = 1;
                         }
                         ExtendSelection(start, end);
-                        Invalidate();
+                        InvalidateLines(selection.start.line, selection.end.line);
                         args.handled = true;
                         break;
                     }
@@ -900,8 +911,8 @@ namespace System.Windows
                             int lineLength = GetLineLength(lineNumber);
                             columnNumber = Min(columnNumber, lineLength + 1 + LineNumberFieldLength());
                             end.column = Min(end.column, lineLength + 1);
-                            Invalidate();
                             ExtendSelection(start, end);
+                            InvalidateLines(selection.start.line, selection.end.line);
                         }
                         args.handled = true;
                         break;
@@ -927,7 +938,7 @@ namespace System.Windows
                         lineNumber = Min(lineNumber, cast<int>(lines.Count()) + 1);
                         end.line = Min(end.line, cast<int>(lines.Count()) + 1);
                         ExtendSelection(start, end);
-                        Invalidate();
+                        InvalidateLines(selection.start.line, selection.end.line);
                         args.handled = true;
                         break;
                     }
@@ -952,7 +963,7 @@ namespace System.Windows
                         lineNumber = Max(lineNumber, 1);
                         end.line = Max(end.line, 1);
                         ExtendSelection(start, end);
-                        Invalidate();
+                        InvalidateLines(selection.start.line, selection.end.line);
                         args.handled = true;
                         break;
                     }
@@ -973,7 +984,7 @@ namespace System.Windows
                         columnNumber = 1 + LineNumberFieldLength();
                         end.column = 1;
                         ExtendSelection(start, end);
-                        Invalidate();
+                        InvalidateLines(selection.start.line, selection.end.line);
                         args.handled = true;
                         break;
                     }
@@ -994,7 +1005,7 @@ namespace System.Windows
                         columnNumber = 1 + LineNumberFieldLength();
                         end.column = 1;
                         ExtendSelection(start, end);
-                        Invalidate();
+                        InvalidateLines(selection.start.line, selection.end.line);
                         args.handled = true;
                         break;
                     }
@@ -1021,7 +1032,7 @@ namespace System.Windows
                         columnNumber = col + LineNumberFieldLength();
                         end.column = col;
                         ExtendSelection(start, end);
-                        Invalidate();
+                        InvalidateLines(selection.start.line, selection.end.line);
                         args.handled = true;
                         break;
                     }
@@ -1048,7 +1059,7 @@ namespace System.Windows
                         columnNumber = col + LineNumberFieldLength();
                         end.column = col;
                         ExtendSelection(start, end);
-                        Invalidate();
+                        InvalidateLines(selection.start.line, selection.end.line);
                         args.handled = true;
                         break;
                     }
@@ -1209,7 +1220,11 @@ namespace System.Windows
             }
             if (!args.handled)
             {
-                ResetSelection();
+                if (!selection.IsEmpty())
+                {
+                    AddRemoveSelectionCommand();
+                    RemoveSelection();
+                }
                 uchar c(args.keyChar);
                 int lineIndex = caretLine - 1;
                 int columnIndex = CaretColumn() - 1;
@@ -1261,6 +1276,11 @@ namespace System.Windows
         public void InsertText(int lineIndex, int columnIndex, const ustring& text)
         {
             if (text.IsEmpty()) return;
+            if (!selection.IsEmpty())
+            {
+                AddRemoveSelectionCommand();
+                RemoveSelection();
+            }
             List<ustring> linesToInsert = SplitTextIntoLines(text);
             AddInsertLinesCommand(lineIndex, columnIndex, linesToInsert);
             InsertLines(lineIndex, columnIndex, linesToInsert);
@@ -1283,7 +1303,7 @@ namespace System.Windows
                 OnLineChanged(args);
                 SetCaretLineCol(lineIndex + 1, cast<int>(columnIndex + linesToInsert.Front().Length() + 1 + LineNumberFieldLength()));
                 ScrollToCaret();
-                Invalidate();
+                InvalidateLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
                 SetDirty();
             }
             else
@@ -1305,6 +1325,7 @@ namespace System.Windows
                 SetCaretLineCol(lineIndex, 1 + LineNumberFieldLength() + indent);
                 ScrollToCaret();
                 Invalidate();
+                InvalidateLines(lineIndex + 1, cast<int>(lineIndex + linesToInsert.Count() + 1));
                 SetDirty();
             }
         }
@@ -1464,9 +1485,17 @@ namespace System.Windows
             lines.Insert(lines.Begin() + lineIndex + 1, toInsert);
             SetLineNumberFieldLength(cast<int>(lines.Count()));
             int indentLineIndex = lineIndex;
+            while (indentLineIndex >= 0 && IsEmptyOrSpaceLine(lines[indentLineIndex]))
+            {
+                --indentLineIndex;
+            }
+            if (indentLineIndex < 0)
+            {
+                indentLineIndex = 0;
+            }
             LineEventArgs insertedArgs(lineIndex + 1, indentLineIndex);
             OnLineInserted(insertedArgs);
-            SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength() + GetIndent(line, lineIndex));
+            SetCaretLineCol(lineIndex + 1 + 1, 1 + LineNumberFieldLength() + GetIndent(lines[indentLineIndex], indentLineIndex));
             ScrollToCaret();
             Invalidate();
             SetDirty();
@@ -1497,7 +1526,7 @@ namespace System.Windows
             OnLineChanged(args);
             SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength() + IndentSize());
             ScrollToCaret();
-            Invalidate();
+            InvalidateLineCol(lineIndex + 1, columnIndex + 1);
             SetDirty();
         }
         private void AddBacktabCommand(int lineIndex, int columnIndex)
@@ -1544,7 +1573,7 @@ namespace System.Windows
                 OnLineChanged(args);
                 SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength() - numSpaces);
                 ScrollToCaret();
-                Invalidate();
+                InvalidateLineCol(lineIndex + 1, 1 + col + LineNumberFieldLength());
                 SetDirty();
             }
         }
@@ -1556,7 +1585,7 @@ namespace System.Windows
             OnLineChanged(args);
             SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength() - numSpaces);
             ScrollToCaret();
-            Invalidate();
+            InvalidateLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
             SetDirty();
         }
         public nothrow void RemoveSpaces(int lineIndex, int columnIndex, int numSpaces)
@@ -1567,7 +1596,7 @@ namespace System.Windows
             OnLineChanged(args);
             SetCaretLineCol(lineIndex + 1, columnIndex + 1 + LineNumberFieldLength() - numSpaces);
             ScrollToCaret();
-            Invalidate();
+            InvalidateLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
             SetDirty();
         }
         protected virtual void OnCopy()
@@ -1719,7 +1748,8 @@ namespace System.Windows
             ExtendSelection(start, end);
             SetCaretLineCol(line, col + LineNumberFieldLength());
             ScrollToCaret();
-            Invalidate();
+            //Invalidate();
+            InvalidateLineCol(line, col);
         }
         protected override void SetCursor()
         {
@@ -1748,7 +1778,7 @@ namespace System.Windows
         protected virtual void OnLineChanged(LineEventArgs& args)
         {
             lineChangedEvent.Fire(args);
-            Invalidate();
+            InvalidateLineCol(args.lineIndex + 1, 1 + LineNumberFieldLength());
         }
         protected virtual void OnLineDeleted(LineEventArgs& args)
         {
@@ -2080,7 +2110,8 @@ namespace System.Windows
                 LineEventArgs changeArgs(i, -1);
                 OnLineChanged(changeArgs);
             }
-            Invalidate();
+            //Invalidate();
+            InvalidateLines(selection.start.line, selection.end.line);
             SetDirty();
         }
         public nothrow void AddUnindentSelectionCommand()
@@ -2107,7 +2138,8 @@ namespace System.Windows
                     OnLineChanged(changeArgs);
                 }
             }
-            Invalidate();
+            //Invalidate();
+            InvalidateLines(selection.start.line, selection.end.line);
             SetDirty();
         }
         public nothrow void ExtendSelection(const SourcePos& start, const SourcePos& end)
@@ -2304,6 +2336,38 @@ namespace System.Windows
         public nothrow Event<PasteEventHandler>& PasteEvent() const
         {
             return pasteEvent;
+        }
+        public void InvalidateLineCol(int lineNumber, int columNumber)
+        {
+            if (charHeight != 0 && charWidth != 0)
+            {
+                Point pt(cast<int>(charWidth * (columNumber - 1)), cast<int>(charHeight * (lineNumber - 1)));
+                TranslateContentLocation(pt);
+                Size size = GetSize();
+                Size sz(size.w - pt.x, cast<int>(charHeight + 1.5f));
+                Rect rect(pt, sz);
+                Invalidate(rect);
+            }
+            else
+            {
+                Invalidate();
+            }
+        }
+        public void InvalidateLines(int startLineNumber, int endLineNumber)
+        {
+            if (charHeight != 0 && charWidth != 0)
+            {
+                Point pt(0, cast<int>(charHeight * (startLineNumber - 1) - charHeight));
+                TranslateContentLocation(pt);
+                Size size = GetSize();
+                Size sz(size.w, cast<int>(charHeight * (endLineNumber - startLineNumber + 1) + 2 * charHeight + 1.5f));
+                Rect rect(pt, sz);
+                Invalidate(rect);
+            }
+            else
+            {
+                Invalidate();
+            }
         }
         private Flags flags;
         private List<ustring> lines;

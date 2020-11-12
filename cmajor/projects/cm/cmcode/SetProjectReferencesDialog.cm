@@ -1,0 +1,112 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+
+namespace cmcode
+{
+    public class SetProjectReferencesDialog : Window
+    {
+        public SetProjectReferencesDialog(Cm.Ast.Project* project_, Cm.Ast.Solution* solution_) : base("cmcode.ReferencesDialog",
+            DefaultWindowClassStyle(), DialogWindowStyle(), DefaultExtendedWindowStyle(), DefaultControlBackgroundColor(),
+            ToUtf8(project_->Name()) + " Project References", Point.Default(), Size(ScreenMetrics.Get().MMToHorizontalPixels(160),
+            ScreenMetrics.Get().MMToVerticalPixels(60)), Dock.none, Anchors.none, WindowState.normal),
+            project(project_), solution(solution_)
+        {
+            Size s = GetSize();
+            Size defaultControlSpacing = ScreenMetrics.Get().DefaultControlSpacing();
+            Size defaultButtonSize = ScreenMetrics.Get().DefaultButtonSize();
+
+            UniquePtr<GroupBox> groupBoxPtr(new GroupBox("Project References", Point(16, 16),
+                Size(ScreenMetrics.Get().MMToHorizontalPixels(120), ScreenMetrics.Get().MMToVerticalPixels(40)),
+                Dock.none, cast<Anchors>(Anchors.top | Anchors.left)));
+            List<Cm.Ast.Project*> referencedProjects = Cm.Ast.GetReferencedProjects(project, solution);
+            Point loc(16, 24);
+
+            for (const UniquePtr<Cm.Ast.Project>& proj : solution->Projects())
+            {
+                if (proj->GetTarget() == Cm.Ast.Target.library || proj->GetTarget() == Cm.Ast.Target.winlib)
+                {
+                    bool disable = false;
+                    if (proj.Get() == project)
+                    {
+                        disable = true;
+                    }
+                    else
+                    {
+                        Set<Cm.Ast.Project*> projReferences = Cm.Ast.GetAllReferencedProjects(proj.Get(), solution);
+                        if (projReferences.CFind(project) != projReferences.CEnd())
+                        {
+                            disable = true;
+                        }
+                    }
+                    UniquePtr<CheckBox> checkBoxPtr(new CheckBox(ToUtf8(proj->Name()), loc, Size(), Dock.none,
+                        cast<Anchors>(Anchors.top | Anchors.left), true));
+                    if (disable)
+                    {
+                        checkBoxPtr->Disable();
+                    }
+                    libraryProjects.Add(MakePair(checkBoxPtr.Get(), proj.Get()));
+                    if (Find(referencedProjects.Begin(), referencedProjects.End(), proj.Get()) != referencedProjects.End())
+                    {
+                        checkBoxPtr->SetChecked(true);
+                    }
+                    groupBoxPtr->AddChild(checkBoxPtr.Release());
+                    loc.Offset(0, 16);
+                }
+            }
+            loc.Offset(0, 16);
+            Size gbs = groupBoxPtr->GetSize();
+            GroupBox* groupBox = groupBoxPtr.Get();
+            groupBox->SetSize(Size(gbs.w, loc.y));
+            AddChild(groupBoxPtr.Release());
+
+            Size sz = s;
+            sz.h = groupBox->Location().y;
+            sz.h = sz.h + groupBox->GetSize().h;
+            sz.h = sz.h + 2 * (defaultButtonSize.h + defaultControlSpacing.h + 64);
+            SetSize(sz);
+            s = GetSize();
+            
+            int x = s.w - defaultButtonSize.w - defaultControlSpacing.w;
+            int y = s.h - defaultButtonSize.h - defaultControlSpacing.h;
+            UniquePtr<Button> cancelButtonPtr(new Button("Cancel", Point(x, y), defaultButtonSize, Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            cancelButton = cancelButtonPtr.Get();
+            cancelButton->SetDialogResult(DialogResult.cancel);
+            x = x - defaultButtonSize.w - defaultControlSpacing.w;
+            UniquePtr<Button> okButtonPtr(new Button(ButtonStyle.BS_DEFPUSHBUTTON, GetSystemColor(SystemColor.COLOR_BTNFACE), "OK", Point(x, y), defaultButtonSize,
+                Dock.none, cast<Anchors>(Anchors.bottom | Anchors.right)));
+            okButton = okButtonPtr.Get();
+            okButton->SetDialogResult(DialogResult.ok);
+            AddChild(okButtonPtr.Release());
+            AddChild(cancelButtonPtr.Release());
+            SetDefaultButton(okButton);
+            SetCancelButton(cancelButton);
+        }
+        public nothrow List<Cm.Ast.Project*> GetReferencedProjects() const
+        {
+            List<Cm.Ast.Project*> referencedProjects;
+            long n = libraryProjects.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                const Pair<CheckBox*, Cm.Ast.Project*>& p = libraryProjects[i];
+                CheckBox* checkBox = p.first;
+                if (checkBox->Checked())
+                {
+                    Cm.Ast.Project* project = p.second;
+                    referencedProjects.Add(project);
+                }
+            }
+            return referencedProjects;
+        }
+        private Cm.Ast.Project* project;
+        private Cm.Ast.Solution* solution;
+        private List<Pair<CheckBox*, Cm.Ast.Project*>> libraryProjects;
+        private Button* okButton;
+        private Button* cancelButton;
+    }
+}

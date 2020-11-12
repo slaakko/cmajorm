@@ -1,0 +1,109 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+using Cm.Service;
+using cmpmm;
+
+namespace cmpmm
+{
+    class MainWindow : Window
+    {
+        public MainWindow() :
+            base("cmpmm.MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), "Cmajor Port Map Monitor",
+            Point.Default(), Size.Default(), Dock.none, Anchors.none, WindowState.normal)
+        {
+            UniquePtr<MenuBar> menuBar(new MenuBar());
+            UniquePtr<MenuItem> fileMenuItemPtr(new MenuItem("&File"));
+            UniquePtr<MenuItem> exitMenuItemPtr(new MenuItem("E&xit"));
+            exitMenuItemPtr->SetShortcut(cast<Keys>(Keys.altModifier | Keys.f4));
+            exitMenuItemPtr->ClickEvent().AddHandler(ExitClick);
+            fileMenuItemPtr->AddMenuItem(exitMenuItemPtr.Release());
+            menuBar->AddMenuItem(fileMenuItemPtr.Release());
+            UniquePtr<MenuItem> serverMenuItemPtr(new MenuItem("&Server"));
+            UniquePtr<MenuItem> startMenuItemPtr(new MenuItem("&Start"));
+            startServerMenuItem = startMenuItemPtr.Get();
+            startServerMenuItem->ClickEvent().AddHandler(StartServerClick);
+            startServerMenuItem->Disable();
+            serverMenuItemPtr->AddMenuItem(startMenuItemPtr.Release());
+            UniquePtr<MenuItem> stopMenuItemPtr(new MenuItem("&Stop"));
+            stopServerMenuItem = stopMenuItemPtr.Get();
+            stopServerMenuItem->ClickEvent().AddHandler(StopServerClick);
+            stopServerMenuItem->Disable();
+            serverMenuItemPtr->AddMenuItem(stopMenuItemPtr.Release());
+            menuBar->AddMenuItem(serverMenuItemPtr.Release());
+            UniquePtr<MenuItem> windowMenuItemPtr(new MenuItem("&Window"));
+            UniquePtr<MenuItem> updateMenuItemPtr(new MenuItem("&Update"));
+            updateMenuItemPtr->SetShortcut(Keys.f5);
+            updateMenuItemPtr->ClickEvent().AddHandler(UpdateClick);
+            windowMenuItemPtr->AddMenuItem(updateMenuItemPtr.Release());
+            menuBar->AddMenuItem(windowMenuItemPtr.Release());
+            AddChild(menuBar.Release());
+
+            UniquePtr<Cm.Views.PortMapView> portMapViewPtr(new Cm.Views.PortMapView(startServerMenuItem, stopServerMenuItem));
+            portMapView = portMapViewPtr.Get();
+            AddChild(portMapViewPtr.Release());
+
+            UpdateClick();
+        }
+        private void ExitClick()
+        {
+            Close();
+        }
+        private void UpdateClick()
+        {
+            portMapView->Update();
+            Invalidate();
+        }
+        private void StartServerClick()
+        {
+            try
+            {
+                Cm.Service.PortMap.StartPortMapServer();
+                UpdateClick();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        private void StopServerClick()
+        {
+            try
+            {
+                Cm.Service.PortMap.StopPortMapServer();
+                portMapView->SetStopped();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+            }
+        }
+        private Cm.Views.PortMapView* portMapView;
+        private MenuItem* startServerMenuItem;
+        private MenuItem* stopServerMenuItem;
+    }
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        MainWindow mainWindow;
+        mainWindow.SetSmallIcon(Application.GetResourceManager().GetIcon("cmpmm.icon"));
+        int exitCode = Application.Run(mainWindow);
+        return exitCode;
+    }
+    catch (const Exception& ex)
+    {
+        Application.SetLogView(null);
+        MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+        LogException(ex);
+        return 1;
+    }
+    return 0;
+}
+

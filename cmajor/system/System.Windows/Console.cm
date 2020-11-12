@@ -220,7 +220,7 @@ namespace System.Windows
             textColorLines.Clear();
             backColorLines.Clear();
         }
-        protected override void PaintContent(Graphics& graphics)
+        protected override void PaintContent(Graphics& graphics, const Rect& clipRect)
         {
             TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
             graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);

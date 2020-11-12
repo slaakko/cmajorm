@@ -1804,6 +1804,14 @@ namespace System.Windows
         {
             InvalidateRect(handle, &rect, eraseBackground);
         }
+        public void Invalidate(const Rect& rect)
+        {
+            Invalidate(rect.ToWinRect());
+        }
+        public void Invalidate(const Rect& rect, bool eraseBackground)
+        {
+            Invalidate(rect.ToWinRect(), eraseBackground);
+        }
         public nothrow inline const Color& BackgroundColor() const
         {
             return backgroundColor;

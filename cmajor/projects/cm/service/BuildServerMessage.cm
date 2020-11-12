@@ -18,9 +18,27 @@ namespace Cm.Service.Build
     }
 
     [json]
+    public class StopReply
+    {
+        public nothrow StopReply() : messageKind("stopReply")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
     public class KeepAliveRequest
     {
         public nothrow KeepAliveRequest() : messageKind("keepAliveRequest")
+        {
+        }
+        public string messageKind;
+    }
+
+    [json]
+    public class KeepAliveReply
+    {
+        public nothrow KeepAliveReply() : messageKind("keepAliveReply")
         {
         }
         public string messageKind;

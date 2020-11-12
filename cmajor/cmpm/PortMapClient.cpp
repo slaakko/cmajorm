@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmpm/PortMapClient.hpp>
+#include <cmajor/cmpm/PortMapServer.hpp>
 #include <cmajor/cmpm/PortMapMessage.hpp>
 #include <soulng/util/Socket.hpp>
 #include <soulng/util/Unicode.hpp>
@@ -19,6 +20,8 @@ namespace cmajor { namespace cmpm {
 
 using namespace soulng::util;
 using namespace soulng::unicode;
+
+
 
 class PortMapClient
 {
@@ -66,7 +69,7 @@ void PortMapClient::Run()
     while (!exiting)
     {
         std::unique_lock<std::mutex> lock(mtx);
-        if (exitVar.wait_for(lock, std::chrono::seconds{ 60 }, [this] { return exiting; }))
+        if (exitVar.wait_for(lock, std::chrono::seconds{ leaseRenewalTimeSecs }, [this] { return exiting; }))
         {
             return;
         }

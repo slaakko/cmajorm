@@ -234,48 +234,55 @@ namespace Cm.Views
         }
         protected override void OnPaint(PaintEventArgs& args)
         {
-            UpdateLocalsEventArgs updateArgs;
-            updateArgs.debugging = false;
-            updateArgs.targetStopped = false;
-            OnUpdateLocals(updateArgs);
-            if (updateArgs.debugging && updateArgs.targetStopped)
+            try
             {
-                debugService = updateArgs.debugService;
-                TreeViewNode* root = treeView->Root();
-                Size size = root->GetSize();
-                if (size.h == 0)
+                UpdateLocalsEventArgs updateArgs;
+                updateArgs.debugging = false;
+                updateArgs.targetStopped = false;
+                OnUpdateLocals(updateArgs);
+                if (updateArgs.debugging && updateArgs.targetStopped)
                 {
-                    root->MeasureSize(args.graphics, treeView);
-                    size = root->GetSize();
-                }
-                if (debugService != null)
-                {
-                    localQuery->Init(debugService);
-                    localQuery->Execute(debugService);
-                }
-                List<TreeViewNode*> visibleNodes = treeView->GetVisibleNodes();
-                for (TreeViewNode* node : visibleNodes)
-                {
-                    if (node->Data() == null)
+                    debugService = updateArgs.debugService;
+                    TreeViewNode* root = treeView->Root();
+                    Size size = root->GetSize();
+                    if (size.h == 0)
                     {
-                        TreeViewNode* parent = node->Parent();
-                        if (parent != null)
+                        root->MeasureSize(args.graphics, treeView);
+                        size = root->GetSize();
+                    }
+                    if (debugService != null)
+                    {
+                        localQuery->Init(debugService);
+                        localQuery->Execute(debugService);
+                    }
+                    List<TreeViewNode*> visibleNodes = treeView->GetVisibleNodes();
+                    for (TreeViewNode* node : visibleNodes)
+                    {
+                        if (node->Data() == null)
                         {
-                            if (parent->Data() != null)
+                            TreeViewNode* parent = node->Parent();
+                            if (parent != null)
                             {
-                                NodeData* nodeData = cast<NodeData*>(parent->Data());
-                                if (nodeData is ChildResultNodeData*)
+                                if (parent->Data() != null)
                                 {
-                                    ChildResultNodeData* resultNodeData = cast<ChildResultNodeData*>(nodeData);
-                                    List<TreeViewNode*> visibleChildren;
-                                    parent->GetVisibleNodes(visibleChildren, treeView, parent->Level() + 1);
-                                    FetchChildData(visibleChildren, resultNodeData->Result().expr);
-                                    treeView->Invalidate();
+                                    NodeData* nodeData = cast<NodeData*>(parent->Data());
+                                    if (nodeData is ChildResultNodeData*)
+                                    {
+                                        ChildResultNodeData* resultNodeData = cast<ChildResultNodeData*>(nodeData);
+                                        List<TreeViewNode*> visibleChildren;
+                                        parent->GetVisibleNodes(visibleChildren, treeView, parent->Level() + 1);
+                                        FetchChildData(visibleChildren, resultNodeData->Result().expr);
+                                        treeView->Invalidate();
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
             }
         }
         private void FetchChildData(const List<TreeViewNode*>& childNodes, const string& expression)

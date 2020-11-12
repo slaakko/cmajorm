@@ -15,9 +15,26 @@ std::unique_ptr<soulng::util::JsonValue> StopRequest::ToJson() const
     return object;
 }
 
-StopRequest::StopRequest(soulng::util::JsonValue* value)
+StopRequest::StopRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+}
+
+StopReply::StopReply() : messageKind()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> StopReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    return object;
+}
+
+StopReply::StopReply(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 KeepAliveRequest::KeepAliveRequest() : messageKind()
@@ -32,9 +49,26 @@ std::unique_ptr<soulng::util::JsonValue> KeepAliveRequest::ToJson() const
     return object;
 }
 
-KeepAliveRequest::KeepAliveRequest(soulng::util::JsonValue* value)
+KeepAliveRequest::KeepAliveRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+}
+
+KeepAliveReply::KeepAliveReply() : messageKind()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> KeepAliveReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    return object;
+}
+
+KeepAliveReply::KeepAliveReply(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 BuildRequest::BuildRequest() : messageKind(), backend(), config(), optimizationLevel(), filePath(), defines(), numBuildThreads(), toolChain(), verbose(), quiet(), clean(), strictNothrow(), emitIR(), emitOptIR(), linkWithDebugRuntime(), linkUsingMsLink(), rebuild(), buildAllDependencies(), forceDebugInfo(), forceNoDebugInfo(), disableModuleCache(), singleThreadedCompile(), disableCodeGen(), justMyCode()
@@ -95,32 +129,32 @@ std::unique_ptr<soulng::util::JsonValue> BuildRequest::ToJson() const
     return object;
 }
 
-BuildRequest::BuildRequest(soulng::util::JsonValue* value)
+BuildRequest::BuildRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "backend", backend);
-    sngjson::json::FromJson(value, "config", config);
-    sngjson::json::FromJson(value, "optimizationLevel", optimizationLevel);
-    sngjson::json::FromJson(value, "filePath", filePath);
-    sngjson::json::FromJson(value, "defines", defines);
-    sngjson::json::FromJson(value, "numBuildThreads", numBuildThreads);
-    sngjson::json::FromJson(value, "toolChain", toolChain);
-    sngjson::json::FromJson(value, "verbose", verbose);
-    sngjson::json::FromJson(value, "quiet", quiet);
-    sngjson::json::FromJson(value, "clean", clean);
-    sngjson::json::FromJson(value, "strictNothrow", strictNothrow);
-    sngjson::json::FromJson(value, "emitIR", emitIR);
-    sngjson::json::FromJson(value, "emitOptIR", emitOptIR);
-    sngjson::json::FromJson(value, "linkWithDebugRuntime", linkWithDebugRuntime);
-    sngjson::json::FromJson(value, "linkUsingMsLink", linkUsingMsLink);
-    sngjson::json::FromJson(value, "rebuild", rebuild);
-    sngjson::json::FromJson(value, "buildAllDependencies", buildAllDependencies);
-    sngjson::json::FromJson(value, "forceDebugInfo", forceDebugInfo);
-    sngjson::json::FromJson(value, "forceNoDebugInfo", forceNoDebugInfo);
-    sngjson::json::FromJson(value, "disableModuleCache", disableModuleCache);
-    sngjson::json::FromJson(value, "singleThreadedCompile", singleThreadedCompile);
-    sngjson::json::FromJson(value, "disableCodeGen", disableCodeGen);
-    sngjson::json::FromJson(value, "justMyCode", justMyCode);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "backend", backend);
+    sngjson::json::FromJson(__json_value, "config", config);
+    sngjson::json::FromJson(__json_value, "optimizationLevel", optimizationLevel);
+    sngjson::json::FromJson(__json_value, "filePath", filePath);
+    sngjson::json::FromJson(__json_value, "defines", defines);
+    sngjson::json::FromJson(__json_value, "numBuildThreads", numBuildThreads);
+    sngjson::json::FromJson(__json_value, "toolChain", toolChain);
+    sngjson::json::FromJson(__json_value, "verbose", verbose);
+    sngjson::json::FromJson(__json_value, "quiet", quiet);
+    sngjson::json::FromJson(__json_value, "clean", clean);
+    sngjson::json::FromJson(__json_value, "strictNothrow", strictNothrow);
+    sngjson::json::FromJson(__json_value, "emitIR", emitIR);
+    sngjson::json::FromJson(__json_value, "emitOptIR", emitOptIR);
+    sngjson::json::FromJson(__json_value, "linkWithDebugRuntime", linkWithDebugRuntime);
+    sngjson::json::FromJson(__json_value, "linkUsingMsLink", linkUsingMsLink);
+    sngjson::json::FromJson(__json_value, "rebuild", rebuild);
+    sngjson::json::FromJson(__json_value, "buildAllDependencies", buildAllDependencies);
+    sngjson::json::FromJson(__json_value, "forceDebugInfo", forceDebugInfo);
+    sngjson::json::FromJson(__json_value, "forceNoDebugInfo", forceNoDebugInfo);
+    sngjson::json::FromJson(__json_value, "disableModuleCache", disableModuleCache);
+    sngjson::json::FromJson(__json_value, "singleThreadedCompile", singleThreadedCompile);
+    sngjson::json::FromJson(__json_value, "disableCodeGen", disableCodeGen);
+    sngjson::json::FromJson(__json_value, "justMyCode", justMyCode);
 }
 
 BuildReply::BuildReply() : messageKind(), requestValid(), requestErrorMessage(), logException(), time(), success(), error()
@@ -147,15 +181,15 @@ std::unique_ptr<soulng::util::JsonValue> BuildReply::ToJson() const
     return object;
 }
 
-BuildReply::BuildReply(soulng::util::JsonValue* value)
+BuildReply::BuildReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "requestValid", requestValid);
-    sngjson::json::FromJson(value, "requestErrorMessage", requestErrorMessage);
-    sngjson::json::FromJson(value, "logException", logException);
-    sngjson::json::FromJson(value, "time", time);
-    sngjson::json::FromJson(value, "success", success);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "requestValid", requestValid);
+    sngjson::json::FromJson(__json_value, "requestErrorMessage", requestErrorMessage);
+    sngjson::json::FromJson(__json_value, "logException", logException);
+    sngjson::json::FromJson(__json_value, "time", time);
+    sngjson::json::FromJson(__json_value, "success", success);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
 LogMessageRequest::LogMessageRequest() : messageKind(), message()
@@ -172,10 +206,10 @@ std::unique_ptr<soulng::util::JsonValue> LogMessageRequest::ToJson() const
     return object;
 }
 
-LogMessageRequest::LogMessageRequest(soulng::util::JsonValue* value)
+LogMessageRequest::LogMessageRequest(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "message", message);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "message", message);
 }
 
 LogMessageReply::LogMessageReply() : messageKind(), ok()
@@ -192,10 +226,10 @@ std::unique_ptr<soulng::util::JsonValue> LogMessageReply::ToJson() const
     return object;
 }
 
-LogMessageReply::LogMessageReply(soulng::util::JsonValue* value)
+LogMessageReply::LogMessageReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "ok", ok);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "ok", ok);
 }
 
 ProgressMessage::ProgressMessage() : messageKind()
@@ -210,9 +244,9 @@ std::unique_ptr<soulng::util::JsonValue> ProgressMessage::ToJson() const
     return object;
 }
 
-ProgressMessage::ProgressMessage(soulng::util::JsonValue* value)
+ProgressMessage::ProgressMessage(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
 }
 
 GenericErrorReply::GenericErrorReply() : messageKind(), error()
@@ -229,9 +263,9 @@ std::unique_ptr<soulng::util::JsonValue> GenericErrorReply::ToJson() const
     return object;
 }
 
-GenericErrorReply::GenericErrorReply(soulng::util::JsonValue* value)
+GenericErrorReply::GenericErrorReply(soulng::util::JsonValue* __json_value)
 {
-    sngjson::json::FromJson(value, "messageKind", messageKind);
-    sngjson::json::FromJson(value, "error", error);
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "error", error);
 }
 
