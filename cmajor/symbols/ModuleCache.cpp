@@ -37,12 +37,12 @@ public:
     static ModuleCache& Instance() { return *instance; }
     Module* GetModule(const std::string& moduleFilePath);
     void PutModule(std::unique_ptr<Module>&& module);
+    void ResetCacheEntries(Module* module);
 private:
     static std::unique_ptr<ModuleCache> instance;
     std::unordered_map<std::string, int> moduleMap;
     std::vector<std::unique_ptr<Module>> modules;
     void CollectModuleIndices(Module* module, std::unordered_set<int>& moduleIndeces);
-    void ResetCacheEntries(Module* module);
 };
 
 std::unique_ptr<ModuleCache> ModuleCache::instance;

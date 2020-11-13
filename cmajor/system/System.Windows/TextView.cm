@@ -137,7 +137,7 @@ namespace System.Windows
             "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
             charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(1), caretColumn(1),
             caretTimerPeriod(defaultCaretTimerPeriod), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
-            padding(), selectionBackgroundColor(DefaultSelectionBackgroundColor()), textColor(textColor_), editCommandList(this)
+            padding(), selectionBackgroundColor(DefaultSelectionBackgroundColor()), textColor(textColor_), editCommandList(this), selection()
         {
             uint caretTimeOut = 0u;
             bool succeeded = ReadCaretTimeoutFromRegistry(caretTimeOut);
@@ -655,14 +655,17 @@ namespace System.Windows
             base->OnMouseDown(args);
             SetFocus(this);
             ResetSelection();
-            if (args.buttons == MouseButtons.lbutton)
+            if (args.buttons == MouseButtons.lbutton && !lines.IsEmpty())
             {
                 int line = 0;
                 short column = 0;
                 GetLineColumn(args.location, line, column);
-                mouseSelectionStart = SourcePos(line, column);
-                SetMouseExtendSelection();
-                WinSetCapture(Handle());
+                if (line >= 1 && line <= lines.Count())
+                {
+                    mouseSelectionStart = SourcePos(line, column);
+                    SetMouseExtendSelection();
+                    WinSetCapture(Handle());
+                }
             }
             if (charHeight != 0 && charWidth != 0)
             {

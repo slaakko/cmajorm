@@ -17,6 +17,10 @@ const int exitCodeOutOfMemory = 252;
 const int exitCodeExceptionEscapedFromThread = 251;
 const int exitCodeSocketInitializationFailed = 250;
 
+using AssertionFailureFunction = void(*)(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber);
+
+extern "C" RT_API bool RtIsUserAssertionFailureFunctionSet();
+extern "C" RT_API void RtSetUserAssertionFailureFunction(AssertionFailureFunction userAssertionFailureFunc);
 extern "C" RT_API void RtFailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber);
 extern "C" RT_API const char* RtGetError(int32_t errorId);
 extern "C" RT_API void RtDisposeError(int32_t errorId);

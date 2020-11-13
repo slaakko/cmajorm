@@ -1,0 +1,15 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Windows;
+
+public void WindowsAssertionFailureFunction(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber)
+{
+    string assertionFailureStr = "assertion ";
+    assertionFailureStr.Append(assertion).Append(" failed at ").Append(function).Append(" ").Append(sourceFilePath).Append(":").Append(System.ToString(lineNumber));
+    MessageBox.Show(assertionFailureStr, "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+    RtExit(253);
+}

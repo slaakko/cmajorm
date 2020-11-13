@@ -414,6 +414,10 @@ Span SpanMapper::MapSpan(const Span& span, const boost::uuids::uuid& rootModuleI
     if (rootModuleId.is_nil()) return span;
     if (rootModuleId == currentRootModule->Id()) return span;
     Module* rm = ModuleMap::Instance().GetModule(rootModuleId);
+    if (!rm)
+    {
+        return Span();
+    }
     int16_t moduleId = GetModuleId(span.fileIndex);
     int16_t fileId = GetFileId(span.fileIndex);
     std::unordered_map<int16_t, std::string>* moduleNameTable = rm->GetModuleNameTable();

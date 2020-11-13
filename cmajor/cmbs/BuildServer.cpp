@@ -6,6 +6,7 @@
 #include <cmajor/cmbs/BuildServer.hpp>
 #include <cmajor/cmbs/BuildServerMessage.hpp>
 #include <cmajor/build/Build.hpp>
+#include <cmajor/symbols/Module.hpp>
 #include <sngcm/ast/Project.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
@@ -37,6 +38,7 @@ using namespace soulng::util;
 using namespace soulng::unicode;
 using namespace sngjson::json;
 using namespace cmajor::mid;
+using namespace cmajor::symbols;
 
 struct BackendSelector
 {
@@ -670,6 +672,11 @@ void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_p
 {
     try
     {
+        if (GetGlobalFlag(GlobalFlags::rebuild) && GetGlobalFlag(GlobalFlags::buildAll))
+        {
+            InitModule();
+            InitModuleCache();
+        }
         cmajor::build::BuildProject(projectFilePath, rootModule, builtProjects);
         reply.success = true;
     }

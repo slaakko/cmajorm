@@ -53,7 +53,7 @@ namespace System.Windows
     public static class Application
     {
         static Application() : logView(null), activeWindow(null), runningModal(false)
-        {            
+        {
             MessageProcessorFunction messageProcessorFunction = ProcessMessage;
             ModelessWindowKeyPreviewFunction keyPreviewFunction = ModelessWindowKeyPreview;
             void* messageProcessorFunctionAddress = cast<void*>(messageProcessorFunction);
@@ -63,6 +63,10 @@ namespace System.Windows
         }
         public static void Init()
         {
+            if (!RtIsUserAssertionFailureFunctionSet())
+            {
+                RtSetUserAssertionFailureFunction(WindowsAssertionFailureFunction);
+            }
         }
         public static int Run(Window& mainWindow)
         {
@@ -132,7 +136,7 @@ namespace System.Windows
                 if (handled)
                 {
                     result = message.result;
-                }                
+                }
                 if (Debug.Messages())
                 {
                     System.IO.LogWriter writer(ApplicationLogFilePath());
@@ -168,7 +172,7 @@ namespace System.Windows
             Control* focusedControl = windowManager.GetWindow(focusedWindowHandle);
             return focusedControl;
         }
-        public static nothrow Window* GetActiveWindow() 
+        public static nothrow Window* GetActiveWindow()
         {
             return activeWindow;
         }

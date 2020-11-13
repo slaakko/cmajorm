@@ -116,27 +116,46 @@ void DoneError()
 
 } } // namespace cmajor::rt
 
-extern "C" RT_API void RtFailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber)
+AssertionFailureFunction userAssertionFailureFunction;
+
+bool RtIsUserAssertionFailureFunctionSet()
 {
-    std::stringstream s;
-    s << "assertion '" << assertion << "' failed in function '" << function << "' at " << sourceFilePath << ":" << lineNumber << "\n";
-    std::string str = s.str();
-    RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
-    RtPrintCallStack(stdErrFileHandle);
-    exit(exitCodeAssertionFailed);
+    return userAssertionFailureFunction != nullptr;
 }
 
-extern "C" RT_API const char* RtGetError(int32_t errorId)
+void RtSetUserAssertionFailureFunction(AssertionFailureFunction userAssertionFailureFunc)
+{
+    userAssertionFailureFunction = userAssertionFailureFunc;
+}
+
+void RtFailAssertion(const char* assertion, const char* function, const char* sourceFilePath, int lineNumber)
+{
+    if (userAssertionFailureFunction)
+    {
+        userAssertionFailureFunction(assertion, function, sourceFilePath, lineNumber);
+    }
+    else
+    {
+        std::stringstream s;
+        s << "assertion '" << assertion << "' failed in function '" << function << "' at " << sourceFilePath << ":" << lineNumber << "\n";
+        std::string str = s.str();
+        RtWrite(stdErrFileHandle, reinterpret_cast<const uint8_t*>(str.c_str()), str.length());
+        RtPrintCallStack(stdErrFileHandle);
+        exit(exitCodeAssertionFailed);
+    }
+}
+
+const char* RtGetError(int32_t errorId)
 {
     return cmajor::rt::GetError(errorId);
 }
 
-extern "C" RT_API void RtDisposeError(int32_t errorId)
+void RtDisposeError(int32_t errorId)
 {
     cmajor::rt::DisposeError(errorId);
 }
 
-extern "C" RT_API void RtThrowException(void* exception, void* exceptionTypeId)
+void RtThrowException(void* exception, void* exceptionTypeId)
 {
     cmajor::rt::currentException = exception;
     boost::uuids::uuid* exTypeId = reinterpret_cast<boost::uuids::uuid*>(exceptionTypeId);
@@ -146,7 +165,7 @@ extern "C" RT_API void RtThrowException(void* exception, void* exceptionTypeId)
     throw cmajor::eh::Exception();
 }
 
-extern "C" RT_API void RtCaptureException(void** exception, uint64_t& exceptionClassIdHi, uint64_t& exceptionClassIdLo)
+void RtCaptureException(void** exception, uint64_t& exceptionClassIdHi, uint64_t& exceptionClassIdLo)
 {
     *exception = cmajor::rt::currentException;
     cmajor::rt::currentException = nullptr;
@@ -156,7 +175,7 @@ extern "C" RT_API void RtCaptureException(void** exception, uint64_t& exceptionC
     cmajor::rt::currentExceptionClassId[1] = 0;
 }
 
-extern "C" RT_API void RtThrowCapturedException(void* exception, uint64_t exceptionClassIdHi, uint64_t exceptionClassIdLo)
+void RtThrowCapturedException(void* exception, uint64_t exceptionClassIdHi, uint64_t exceptionClassIdLo)
 {
     cmajor::rt::currentException = exception;
     cmajor::rt::currentExceptionClassId[0] = exceptionClassIdHi;
@@ -164,7 +183,7 @@ extern "C" RT_API void RtThrowCapturedException(void* exception, uint64_t except
     throw cmajor::eh::Exception();
 }
 
-extern "C" RT_API bool RtHandleException(void* exceptionTypeId)
+bool RtHandleException(void* exceptionTypeId)
 {
     boost::multiprecision::uint128_t currentExceptionClassId = boost::multiprecision::uint128_t(cmajor::rt::currentExceptionClassId[0]) << 64 | cmajor::rt::currentExceptionClassId[1];
     boost::uuids::uuid* exTypeId = reinterpret_cast<boost::uuids::uuid*>(exceptionTypeId);
@@ -173,12 +192,12 @@ extern "C" RT_API bool RtHandleException(void* exceptionTypeId)
     return handle;
 }
 
-extern "C" RT_API void* RtGetException()
+void* RtGetException()
 {
     return cmajor::rt::currentException;
 }
 
-extern "C" RT_API void* RtGetExceptionTypeId()
+void* RtGetExceptionTypeId()
 {
     return EhGetExceptionTypeId();
 }
