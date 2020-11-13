@@ -147,7 +147,7 @@ namespace spring
         return MainDirection(v);
     }
 
-    public class Diagram 
+    public class Diagram
     {
         private enum Flags : sbyte
         {
@@ -459,11 +459,11 @@ namespace spring
             }
             return indeces;
         }
-        public nothrow Selection* GetSelection()
+        public nothrow spring.Selection* GetSelection()
         {
             return selection.Get();
         }
-        public nothrow void SetSelection(Selection* selection_)
+        public nothrow void SetSelection(spring.Selection* selection_)
         {
             selection->Clear();
             selection.Reset(selection_);
@@ -687,7 +687,7 @@ namespace spring
         private Layout* layout;
         private UniquePtr<Layout> layoutPtr;
         private IndexList<DiagramElement> elements;
-        private UniquePtr<Selection> selection;
+        private UniquePtr<spring.Selection> selection;
         private UniquePtr<Operation> operation;
         private CommandList commandList;
     }
@@ -1990,7 +1990,7 @@ namespace spring
                     DrawCombinedInheritance270(graphics, layout);
                     break;
                 }
-            }   
+            }
         }
         private void DrawCombinedInheritance0(Graphics& graphics, Layout& layout)
         {
@@ -2353,7 +2353,7 @@ namespace spring
                     DrawCombinedInheritance270Selected(graphics, layout, selectedLinePen);
                     break;
                 }
-            }   
+            }
         }
         private void DrawCombinedInheritance0Selected(Graphics& graphics, Layout& layout, const Pen& selectedLinePen)
         {
@@ -3958,7 +3958,7 @@ namespace spring
             endpoints.Add(GetEndpoint(Snap(Snap.BottomLeft())));
             endpoints.Add(GetEndpoint(Snap(Snap.LeftBottom())));
             endpoints.Add(GetEndpoint(Snap(Snap.LeftCenter())));
-            endpoints.Add(GetEndpoint(Snap(Snap.LeftTop()))); 
+            endpoints.Add(GetEndpoint(Snap(Snap.LeftTop())));
             return endpoints;
         }
         public override void Measure(Graphics& graphics, Layout& layout)
@@ -4529,7 +4529,7 @@ namespace spring
                 fields.Add(clonedField);
             }
         }
-        public nothrow IndexList<OperationElement>& Operations() 
+        public nothrow IndexList<OperationElement>& Operations()
         {
             return operations;
         }
@@ -4538,7 +4538,7 @@ namespace spring
             operations = operations_;
             for (UniquePtr<OperationElement>& operation : operations)
             {
-                operation->SetContainerElement(this);   
+                operation->SetContainerElement(this);
             }
         }
         public nothrow IndexList<FieldElement>& Fields()
@@ -5145,7 +5145,7 @@ namespace spring
         boundingRect.size.w = boundingRect.size.w + margins.Horizontal();
         boundingRect.size.h = boundingRect.size.h + margins.Vertical();
         int width = ScreenMetrics.Get().MMToHorizontalPixels(boundingRect.size.w);
-        int height = ScreenMetrics.Get().MMToVerticalPixels(boundingRect.size.h); 
+        int height = ScreenMetrics.Get().MMToVerticalPixels(boundingRect.size.h);
         Bitmap bitmap(width, height, graphics);
         Graphics bitmapGraphics = Graphics.FromImage(bitmap);
         bitmapGraphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);

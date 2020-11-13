@@ -2793,7 +2793,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 }
                 std::unique_ptr<Project> referencedProject = ReadProject(referencedProjectFilePath);
                 project->AddDependsOnId(referencedProject->Id());
-                if (currentSolution == nullptr && GetGlobalFlag(GlobalFlags::buildAll))
+                if (GetGlobalFlag(GlobalFlags::buildAll))
                 {
                     if (builtProjects.find(referencedProjectFilePath) == builtProjects.cend())
                     {

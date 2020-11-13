@@ -1782,7 +1782,7 @@ namespace cmcode
                 {
                     throw Exception("no solution is open");
                 }
-                BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), solution->FilePath(), BuildRequestKind.build);
+                BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), solution->FilePath(), cast<BuildRequestKind>(BuildRequestKind.build | BuildRequestKind.buildDependencies));
                 StartBuild(buildRequest);
             }
             catch (const Exception& ex)
@@ -1799,7 +1799,7 @@ namespace cmcode
                 {
                     throw Exception("no solution is open");
                 }
-                BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), solution->FilePath(), BuildRequestKind.rebuild);
+                BuildRequest buildRequest = MakeBuildRequest(GetBackend(), GetConfig(), solution->FilePath(), cast<BuildRequestKind>(BuildRequestKind.rebuild | BuildRequestKind.buildDependencies));
                 StartBuild(buildRequest);
             }
             catch (const Exception& ex)

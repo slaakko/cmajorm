@@ -644,6 +644,11 @@ void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector
 {
     try
     {
+        if (GetGlobalFlag(GlobalFlags::rebuild) || GetGlobalFlag(GlobalFlags::clean))
+        {
+            InitModule();
+            InitModuleCache();
+        }
         cmajor::build::BuildSolution(solutionFilePath, rootModules);
         reply.success = true;
     }
@@ -672,7 +677,7 @@ void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_p
 {
     try
     {
-        if (GetGlobalFlag(GlobalFlags::rebuild) && GetGlobalFlag(GlobalFlags::buildAll))
+        if (GetGlobalFlag(GlobalFlags::rebuild) || GetGlobalFlag(GlobalFlags::clean))
         {
             InitModule();
             InitModuleCache();

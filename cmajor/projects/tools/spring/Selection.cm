@@ -71,7 +71,7 @@ namespace spring
         private Diagram& diagram;
     }
 
-    public class EmptySelection : Selection
+    public class EmptySelection : spring.Selection
     {
         public nothrow EmptySelection(Diagram& diagram) : base(diagram)
         {
@@ -127,7 +127,7 @@ namespace spring
         }
     }
 
-    public class ElementSelection : Selection
+    public class ElementSelection : spring.Selection
     {
         public nothrow ElementSelection(Diagram& diagram) : base(diagram)
         {
@@ -933,7 +933,7 @@ namespace spring
         private float width;
     }
 
-    public class RectangleSelection : Selection
+    public class RectangleSelection : spring.Selection
     {
         public nothrow RectangleSelection(Diagram& diagram, const System.Windows.PointF& startLocation_) : base(diagram), rect(startLocation_, System.Windows.SizeF()), startLocation(startLocation_),
             arrowCursor(System.Windows.LoadStandardCursor(System.Windows.StandardCursorId.IDC_ARROW))
@@ -1227,7 +1227,7 @@ namespace spring
         {
             for (UniquePtr<ResizeHandle>& handle : resizeHandles)
             {
-                handle->Locate(rect);   
+                handle->Locate(rect);
             }
         }
         private void DrawResizeHandles(System.Windows.Graphics& graphics, Layout& layout)
