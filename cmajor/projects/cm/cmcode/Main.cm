@@ -23,7 +23,7 @@ namespace cmcode
 
     enum UserInterfaceAction
     {
-        none = 0, build = 1, debug = 2, debugging = 3
+        none = 0, build = 1, debug = 2, debugging = 3, run = 4
     }
 
     enum BackendConfig
@@ -74,6 +74,21 @@ namespace cmcode
         }
         private MainWindow* mainWindow;
         private bool startFailed;
+    }
+
+    class RunGuard
+    {
+        public nothrow RunGuard(MainWindow* mainWindow_) : mainWindow(mainWindow_)
+        {
+            mainWindow->SaveBackendConfig();
+            mainWindow->SetControlStatus(UserInterfaceAction.run);
+        }
+        public ~RunGuard()
+        {
+            mainWindow->SetControlStatus(UserInterfaceAction.none);
+            mainWindow->RestoreBackendConfig();
+        }
+        private MainWindow* mainWindow;
     }
 
     class StopDebugGuard
@@ -277,6 +292,11 @@ namespace cmcode
             startDebuggingMenuItem->SetShortcut(Keys.f5);
             startDebuggingMenuItem->ClickEvent().AddHandler(StartContinueDebuggingClick);
             debugMenuItem->AddMenuItem(startDebuggingMenuItemPtr.Release());
+            UniquePtr<MenuItem> startWithoutDebuggingMenuItemPtr(new MenuItem("Start &Without Debugging"));
+            startWithoutDebuggingMenuItem = startWithoutDebuggingMenuItemPtr.Get();
+            startWithoutDebuggingMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.f5));
+            startWithoutDebuggingMenuItem->ClickEvent().AddHandler(StartWithoutDebuggingClick);
+            debugMenuItem->AddMenuItem(startWithoutDebuggingMenuItemPtr.Release());
             UniquePtr<MenuItem> stopDebuggingMenuItemPtr(new MenuItem("Sto&p Debugging"));
             stopDebuggingMenuItem = stopDebuggingMenuItemPtr.Get();
             stopDebuggingMenuItem->SetShortcut(cast<Keys>(Keys.shiftModifier | Keys.f5));
@@ -2520,6 +2540,75 @@ namespace cmcode
                 debugService.Reset();
             }
         }
+        private void StartWithoutDebuggingClick()
+        {
+            try
+            {
+                string backend = GetBackend();
+                string config = GetConfig();
+                GetConsole()->Clear();
+                GetOutputLogView()->Clear();
+                string executableFilePath;
+                if (solution != null)
+                {
+                    Cm.Ast.Project* project = solution->ActiveProject();
+                    if (project != null)
+                    {
+                        Cm.Ast.Target target = project->GetTarget();
+                        if (target != Cm.Ast.Target.program && target != Cm.Ast.Target.winapp && target != Cm.Ast.Target.winguiapp)
+                        {
+                            throw Exception("project '" + ToUtf8(project->Name()) + "' is a library project");
+                        }
+                        if (backend == "llvm")
+                        {
+                            executableFilePath = Path.Combine(Path.Combine(Path.Combine(project->OutDirBasePath(), "bin"), config), Path.GetFileName(project->FilePath()));
+                        }
+                        else if (backend == "cpp")
+                        {
+                            executableFilePath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(project->OutDirBasePath(), "bin"), "cpp"), "gcc"), config),
+                                Path.GetFileName(project->FilePath()));
+                        }
+                        executableFilePath = GetFullPath(Path.ChangeExtension(executableFilePath, ".exe"));
+                    }
+                }
+                if (!executableFilePath.IsEmpty())
+                {
+                    RunGuard runGuard(this);
+                    LogView* outputLogView = GetOutputLogView();
+                    outputLogView->WriteLine("Starting executable '" + executableFilePath + "'...");
+                    Application.ProcessMessages();
+                    Console* console = GetConsole();
+                    consoleTabPage->Select();
+                    Process process(executableFilePath, cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr));
+                    do
+                    {
+                        string line = process.ReadLine(Process.StdHandle.stdOut);
+                        if (!line.IsEmpty())
+                        {
+                            console->Write(1, line);
+                        }
+                        else
+                        {
+                            line = process.ReadLine(Process.StdHandle.stdErr);
+                            if (!line.IsEmpty())
+                            {
+                                console->Write(2, line);
+                            }
+                        }
+                    }
+                    while (process.Running());
+                    process.WaitForExit();
+                    int exitCode = process.ExitCode();
+                    outputTabPage->Select();
+                    outputLogView->WriteLine("Process exited with code " + ToString(exitCode) + ".");
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void StepOverClick()
         {
             try
@@ -3599,6 +3688,7 @@ namespace cmcode
 
             startDebuggingMenuItem->Disable();
             stopDebuggingMenuItem->Disable();
+            startWithoutDebuggingMenuItem->Disable();
             showNextStatementMenuItem->Disable();
             stepOverMenuItem->Disable();
             stepIntoMenuItem->Disable();
@@ -3632,6 +3722,9 @@ namespace cmcode
                 toggleBreakpointMenuItem->Enable();
                 return;
             }
+            else if (action == UserInterfaceAction.run)
+            {
+            }
 
             bool solutionOpen = !solutionExplorerData.IsNull();
             if (solutionOpen)
@@ -3644,7 +3737,6 @@ namespace cmcode
                 releaseToolButton->Enable();
                 debugToolButton->SetState(ToolButton.State.pressed);
                 buildSolutionToolButton->Enable();
-                startDebuggingToolButton->Enable();
                 stepOverToolButton->Enable();
                 stepIntoToolButton->Enable();
                 closeSolutionMenuItem->Enable();
@@ -3656,6 +3748,7 @@ namespace cmcode
                 cleanSolutionMenuItem->Enable();
 
                 startDebuggingMenuItem->Enable();
+                startWithoutDebuggingMenuItem->Enable();
                 stepOverMenuItem->Enable();
                 stepIntoMenuItem->Enable();
                 toggleBreakpointMenuItem->Enable();
@@ -3726,6 +3819,7 @@ namespace cmcode
 
         private MenuItem* startDebuggingMenuItem;
         private MenuItem* stopDebuggingMenuItem;
+        private MenuItem* startWithoutDebuggingMenuItem;
         private MenuItem* showNextStatementMenuItem;
         private MenuItem* stepOverMenuItem;
         private MenuItem* stepIntoMenuItem;
