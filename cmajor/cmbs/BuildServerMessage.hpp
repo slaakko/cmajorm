@@ -68,6 +68,19 @@ struct BuildRequest
     bool justMyCode;
 };
 
+struct CompileError
+{
+    CompileError();
+    CompileError(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string message;
+    std::string project;
+    std::string file;
+    std::string line;
+    std::string scol;
+    std::string ecol;
+};
+
 struct BuildReply
 {
     BuildReply();
@@ -79,7 +92,7 @@ struct BuildReply
     std::string logException;
     std::string time;
     bool success;
-    std::string error;
+    std::vector<CompileError> errors;
 };
 
 struct LogMessageRequest

@@ -229,6 +229,9 @@ namespace cmcode
             localsMenuItemPtr->ClickEvent().AddHandler(ViewLocalsClick);
             debugWindowsMenuItem->AddMenuItem(localsMenuItemPtr.Release());
             viewMenuItem->AddMenuItem(debugWindowsMenuItem.Release());
+            UniquePtr<MenuItem> errorsMenuItemPtr(new MenuItem("&Errors"));
+            errorsMenuItemPtr->ClickEvent().AddHandler(ViewErrorsClick);
+            viewMenuItem->AddMenuItem(errorsMenuItemPtr.Release());
             UniquePtr<MenuItem> searchResultsMenuItemPtr(new MenuItem("&Search Results"));
             searchResultsMenuItemPtr->ClickEvent().AddHandler(ViewSearchResultsClick);
             viewMenuItem->AddMenuItem(searchResultsMenuItemPtr.Release());
@@ -757,6 +760,11 @@ namespace cmcode
                 {
                     outputTabPage = null;
                     outputLogView = null;
+                }
+                else if (removedTabPage == errorTabPage)
+                {
+                    errorTabPage = null;
+                    errorView = null;
                 }
                 else if (removedTabPage == consoleTabPage)
                 {
@@ -1715,6 +1723,25 @@ namespace cmcode
             LogView* logView = GetOutputLogView();
             return outputTabPage;
         }
+        private Cm.Views.ErrorView* GetErrorView()
+        {
+            if (errorView == null)
+            {
+                UniquePtr<TabPage> errorTabPagePtr(new TabPage("Errors", "errors"));
+                errorTabPage = errorTabPagePtr.Get();
+                UniquePtr<Cm.Views.ErrorView> errorViewPtr(new Cm.Views.ErrorView());
+                errorView = errorViewPtr.Get();
+                errorView->ViewErrorEvent().AddHandler(ViewError);
+                errorTabPagePtr->AddChild(errorViewPtr.Release());
+                outputTabControl->AddTabPage(errorTabPagePtr.Release());
+            }
+            return errorView;
+        }
+        private TabPage* GetErrorTabPage()
+        {
+            GetErrorView();
+            return errorTabPage;
+        }
         private Console* GetConsole()
         {
             if (console == null)
@@ -1740,10 +1767,16 @@ namespace cmcode
             {
                 SaveAllClick();
                 GetOutputLogView()->Clear();
+                GetErrorView()->Clear();
                 GetOutputTabPage()->Select();
                 BuildGuard buildGuard(this);
                 Application.ProcessMessages();
-                GetBuildService().ProcessBuildRequest(buildRequest);
+                List<CompileError> errors = GetBuildService().ProcessBuildRequest(buildRequest);
+                if (!errors.IsEmpty())
+                {
+                    GetErrorView()->SetErrors(Rvalue(errors));
+                    errorTabPage->Select();
+                }
                 return true;
             }
             catch (const Exception& ex)
@@ -3050,6 +3083,77 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private void ViewErrorsClick()
+        {
+            try
+            {
+                TabPage* errorTabPage = GetErrorTabPage();
+                errorTabPage->Select();
+                if (errorView != null)
+                {
+                    errorView->Invalidate();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void ViewError(Cm.Views.ViewErrorEventArgs& args)
+        {
+            try
+            {
+                Cm.Service.Build.CompileError* error = args.error;
+                if (error != null)
+                {
+                    TabPage* tabPage = codeTabControl->GetTabPageByKey(error->file);
+                    Cm.Views.Editor* editor = null;
+                    if (tabPage != null)
+                    {
+                        editor = GetEditorByTabPage(tabPage);
+                        tabPage->Select();
+                    }
+                    if (editor == null)
+                    {
+                        HashMap<string, TreeViewNodeData*>.ConstIterator it = solutionExplorerData->treeViewDataMap.CFind(error->file);
+                        if (it != solutionExplorerData->treeViewDataMap.CEnd())
+                        {
+                            TreeViewNodeData* data = it->second;
+                            editor = AddCmajorEditor(data->fileName, data->key, data->filePath);
+                        }
+                        else
+                        {
+                            editor = AddCmajorEditor(Path.GetFileName(error->file), error->file, error->file);
+                        }
+                    }
+                    TextView* textView = editor->GetTextView();
+                    if (textView != null)
+                    {
+                        int line = ParseInt(error->line);
+                        int scol = ParseInt(error->scol);
+                        int ecol = ParseInt(error->ecol);
+                        textView->EnsureLineVisible(line);
+                        textView->SetCaretLineCol(Min(line, cast<int>(textView->Lines().Count())), 1 + textView->LineNumberFieldLength());
+                        textView->ScrollToCaret();
+                        textView->SetFocus();
+                        textView->Invalidate();
+                        if (scol != 0 && ecol != 0 && scol != ecol)
+                        {
+                            textView->ResetSelection();
+                            SourcePos start(line, scol);
+                            SourcePos end(line, ecol);
+                            textView->ExtendSelection(start, end);
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void BreakpointAdded(Cm.Views.AddBreakpointEventArgs& args)
         {
             if (!Debugging())
@@ -3587,6 +3691,8 @@ namespace cmcode
         private LogView* outputLogView;
         private TabPage* logTabPage;
         private TabPage* outputTabPage;
+        private Cm.Views.ErrorView* errorView;
+        private TabPage* errorTabPage;
         private Console* console;
         private TabPage* consoleTabPage;
         private Cm.Views.CallStack* callStack;

@@ -51,6 +51,16 @@ struct BuildRequest
     bool justMyCode;
 }
 
+struct CompileError
+{
+    string message;
+    string project;
+    string file;
+    string line;
+    string scol;
+    string ecol;
+}
+
 struct BuildReply
 {
     string messageKind;
@@ -59,7 +69,7 @@ struct BuildReply
     string logException;
     string time;
     bool success;
-    string error;
+    CompileError[] errors;
 }
 
 struct LogMessageRequest

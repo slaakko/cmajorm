@@ -77,6 +77,17 @@ namespace Cm.Service.Build
     }
 
     [json]
+    public class CompileError
+    {
+        public string message;
+        public string project;
+        public string file;
+        public string line;
+        public string scol;
+        public string ecol;
+    }
+
+    [json]
     public class BuildReply
     {
         public nothrow BuildReply() : messageKind("buildReply")
@@ -88,7 +99,7 @@ namespace Cm.Service.Build
         public string logException;
         public string time;
         public bool success;
-        public string error;
+        public List<CompileError> errors;
     }
 
     [json]

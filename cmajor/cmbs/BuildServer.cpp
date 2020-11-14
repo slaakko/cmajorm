@@ -5,6 +5,7 @@
 
 #include <cmajor/cmbs/BuildServer.hpp>
 #include <cmajor/cmbs/BuildServerMessage.hpp>
+#include <cmajor/cmbs/Error.hpp>
 #include <cmajor/build/Build.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <sngcm/ast/Project.hpp>
@@ -644,30 +645,29 @@ void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector
 {
     try
     {
-        if (GetGlobalFlag(GlobalFlags::rebuild) || GetGlobalFlag(GlobalFlags::clean))
-        {
-            InitModule();
-            InitModuleCache();
-        }
+        InitModule();
+        InitModuleCache();
         cmajor::build::BuildSolution(solutionFilePath, rootModules);
         reply.success = true;
     }
     catch (const soulng::lexer::ParsingException& ex)
     {
         reply.success = false;
-        reply.error = ex.what();
+        reply.errors.push_back(ParsingExceptionToError(ex));
         LogMessage(-1, ex.what());
     }
     catch (const cmajor::symbols::Exception& ex)
     {
         reply.success = false;
-        reply.error = ex.What();
+        reply.errors = SymbolsExceptionToErrors(ex);
         LogMessage(-1, ex.What());
     }
     catch (const std::exception& ex)
     {
         reply.success = false;
-        reply.error = ex.what();
+        CompileError error;
+        error.message = ex.what();
+        reply.errors.push_back(error);
         LogMessage(-1, ex.what());
     }
 }
@@ -688,19 +688,21 @@ void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_p
     catch (const soulng::lexer::ParsingException& ex)
     {
         reply.success = false;
-        reply.error = ex.what();
+        reply.errors.push_back(ParsingExceptionToError(ex));
         LogMessage(-1, ex.what());
     }
     catch (const cmajor::symbols::Exception& ex)
     {
         reply.success = false;
-        reply.error = ex.What();
+        reply.errors = SymbolsExceptionToErrors(ex);
         LogMessage(-1, ex.What());
     }
     catch (const std::exception& ex)
     {
         reply.success = false;
-        reply.error = ex.what();
+        CompileError error;
+        error.message = ex.what();
+        reply.errors.push_back(error);
         LogMessage(-1, ex.what());
     }
 }

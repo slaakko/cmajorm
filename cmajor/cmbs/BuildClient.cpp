@@ -44,7 +44,7 @@ void ProcessBuildReply(const BuildReply& buildReply)
     }
     if (!buildReply.success)
     {
-        std::cout << "buildReply.success=false:\n" << buildReply.error << std::endl;
+        std::cout << "buildReply.success=false:\n" << std::endl;
     }
     if (!buildReply.logException.empty())
     {

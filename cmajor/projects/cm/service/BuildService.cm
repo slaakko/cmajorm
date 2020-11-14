@@ -296,7 +296,7 @@ namespace Cm.Service.Build
                 keepAliveThread.Join();
             }
         }
-        private nothrow bool StopKeepAlives(void* arg) 
+        private nothrow bool StopKeepAlives(void* arg)
         {
             return stopKeepAlives;
         }
@@ -362,7 +362,7 @@ namespace Cm.Service.Build
                 throw Exception("keepAliveReply expected, unknown reply message kind '" + messageKind + "' received");
             }
         }
-        public void ProcessBuildRequest(const BuildRequest& request)
+        public List<CompileError> ProcessBuildRequest(const BuildRequest& request)
         {
             try
             {
@@ -371,14 +371,14 @@ namespace Cm.Service.Build
                 {
                     if (!StartServer())
                     {
-                        return;
+                        return List<CompileError>();
                     }
                 }
                 UniquePtr<JsonValue> requestJsonValue = request.ToJson();
                 StreamWriter requestWriter(File.CreateText(Path.Combine(CmCodeLogDir(), "build-request.json")));
                 CodeFormatter requestFormatter(requestWriter);
                 requestJsonValue->Write(requestFormatter);
-                if (saveRequestOnly) return;
+                if (saveRequestOnly) return List<CompileError>();
                 TcpSocket socket("localhost", ToString(port));
                 string requestStr = requestJsonValue->ToString();
                 Write(socket, requestStr);
@@ -413,7 +413,7 @@ namespace Cm.Service.Build
                     CodeFormatter replyFormatter(replyWriter);
                     replyJsonValue->Write(replyFormatter);
                     BuildReply buildReply(replyJsonValue.Get());
-                    ProcessBuildReply(buildReply);
+                    return ProcessBuildReply(buildReply);
                 }
                 else if (messageKind == "genericErrorReply")
                 {
@@ -433,8 +433,9 @@ namespace Cm.Service.Build
                     LogMessage("Cm.Build.Service.ProcessBuildRequest: " + ex.Message());
                 }
             }
+            return List<CompileError>();
         }
-        private void ProcessBuildReply(const BuildReply& buildReply)
+        private List<CompileError> ProcessBuildReply(const BuildReply& buildReply)
         {
             if (buildReply.success)
             {
@@ -442,7 +443,7 @@ namespace Cm.Service.Build
             }
             else
             {
-                LogMessage("Cm.Build.Service: build unsuccessful: error: " + buildReply.error);
+                LogMessage("Cm.Build.Service: build unsuccessful");
             }
             if (!buildReply.requestValid)
             {
@@ -452,6 +453,7 @@ namespace Cm.Service.Build
             {
                 throw Exception("server log exception: " + buildReply.logException);
             }
+            return Rvalue(buildReply.errors);
         }
         private string GetMessageKind(JsonValue* jsonValue)
         {

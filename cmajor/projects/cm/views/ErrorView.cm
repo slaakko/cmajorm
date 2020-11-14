@@ -1,0 +1,128 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+using Cm.Service.Build;
+
+namespace Cm.Views
+{
+    public class ViewErrorEventArgs
+    {
+        public nothrow ViewErrorEventArgs(CompileError* error_) : error(error_)
+        {
+        }
+        public CompileError* error;
+    }
+
+    public nothrow List<ustring> GetErrorLines(const ustring& errorLinesStr)
+    {
+        List<ustring> errorLines = SplitTextIntoLines(errorLinesStr);
+        return errorLines;
+    }
+
+    public class delegate void ViewErrorEventHandler(ViewErrorEventArgs& args);
+
+    public class ErrorView : Control
+    {
+        public ErrorView() : base("Cm.Views.ErrorView", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), Color.White(),
+            "errorView", Point(), Size(), Dock.fill, Anchors.none), container(this), treeView(null), child(null)
+        {
+            UniquePtr<TreeView> treeViewPtr(new TreeView(Point(), Size(), Dock.none, Anchors.none));
+            treeView = treeViewPtr.Get();
+            treeView->SetNormalNodeFont(Font(FontFamily("Consolas"), 9.0f));
+            treeView->NodeDoubleClickEvent().AddHandler(TreeViewNodeDoubleClick);
+            UniquePtr<Control> paddedTreeView(new PaddedControl(treeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
+            UniquePtr<Control> scrollableTreeView(new ScrollableControl(paddedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            child = scrollableTreeView.Get();
+            container.AddChild(scrollableTreeView.Release());
+            Clear();
+        }
+        public void Clear()
+        {
+            treeView->SetRoot(new TreeViewNode("Errors"));
+            child->Invalidate();
+        }
+        public void SetErrors(List<CompileError>&& errors_)
+        {
+            errors = errors_;
+            Clear();
+            for (const CompileError& error : errors)
+            {
+                List<ustring> lines = GetErrorLines(ToUtf32(error.message));
+                string firstLine;
+                if (!lines.IsEmpty())
+                {
+                    firstLine = ToUtf8(lines.Front());
+                }
+                TreeViewNode* node = new TreeViewNode(firstLine);
+                if (!error.project.IsEmpty())
+                {
+                    TreeViewNode* project = new TreeViewNode("Module: " + error.project);
+                    node->AddChild(project);
+                }
+                TreeViewNode* file = new TreeViewNode("File: " + error.file);
+                node->AddChild(file);
+                TreeViewNode* line = new TreeViewNode("Line: " + error.line);
+                node->AddChild(line);
+                TreeViewNode* code = new TreeViewNode("Code:");
+                for (long i = 1; i < lines.Count(); ++i)
+                {
+                    TreeViewNode* codeNode = new TreeViewNode(ToUtf8(lines[i]));
+                    code->AddChild(codeNode);
+                }
+                node->AddChild(code);
+                node->SetData(&error);
+                treeView->Root()->AddChild(node);
+            }
+            Invalidate();
+        }
+        private void TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs& args)
+        {
+            CompileError* error = cast<CompileError*>(args.node->Data());
+            OnViewError(error);
+        }
+        protected virtual void OnViewError(CompileError* error)
+        {
+            ViewErrorEventArgs args(error);
+            viewErrorEvent.Fire(args);
+        }
+        protected override void OnLocationChanged()
+        {
+            base->OnLocationChanged();
+            SetChildPos();
+        }
+        protected override void OnSizeChanged(uint windowState)
+        {
+            base->OnSizeChanged(windowState);
+            SetChildPos();
+        }
+        private void SetChildPos()
+        {
+            Point loc;
+            Size size = GetSize();
+            Rect childRect(loc, size);
+            child->SetLocation(childRect.location);
+            child->SetSize(childRect.size);
+        }
+        protected override void OnPaint(PaintEventArgs& args)
+        {
+            treeView->Root()->ExpandAll();
+            treeView->Invalidate();
+            child->Invalidate();
+        }
+        public nothrow Event<ViewErrorEventHandler, ViewErrorEventArgs>& ViewErrorEvent()
+        {
+            return viewErrorEvent;
+        }
+        private List<CompileError> errors;
+        private Container container;
+        private TreeView* treeView;
+        private Control* child;
+        private Event<ViewErrorEventHandler, ViewErrorEventArgs> viewErrorEvent;
+    }
+}
+

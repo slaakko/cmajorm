@@ -110,60 +110,76 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesInMainThread(Module* m
     }
     std::vector<std::unique_ptr<CmajorLexer>> lexers;
     std::vector<std::unique_ptr<CompileUnitNode>> compileUnits;
-    for (const std::string& sourceFilePath : sourceFilePaths)
+    try
     {
-        if (stop)
+        for (const std::string& sourceFilePath : sourceFilePaths)
         {
-            return std::vector<std::unique_ptr<CompileUnitNode>>();
+            if (stop)
+            {
+                return std::vector<std::unique_ptr<CompileUnitNode>>();
+            }
+            if (boost::filesystem::file_size(sourceFilePath) == 0)
+            {
+                std::unique_ptr<CompileUnitNode> compileUnit(new CompileUnitNode(Span(), sourceFilePath));
+                compileUnit->SetHash(GetSha1MessageDigest(""));
+                int32_t fileIndex = module->GetFileTable().RegisterFilePath(sourceFilePath);
+                compileUnits.push_back(std::move(compileUnit));
+                lexers.push_back(std::unique_ptr<CmajorLexer>());
+            }
+            else
+            {
+                MappedInputFile sourceFile(sourceFilePath);
+                int32_t fileIndex = module->GetFileTable().RegisterFilePath(sourceFilePath);
+                ParsingContext parsingContext;
+                std::string fileContent(sourceFile.Begin(), sourceFile.End());
+                std::u32string s(ToUtf32(fileContent));
+                std::unique_ptr<CmajorLexer> lexer(new CmajorLexer(s, sourceFilePath, fileIndex));
+                try
+                {
+                    soulng::lexer::XmlParsingLog log(std::cout);
+                    if (GetGlobalFlag(GlobalFlags::debugParsing))
+                    {
+                        lexer->SetLog(&log);
+                    }
+                    std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(*lexer, &parsingContext);
+                    compileUnit->SetHash(GetSha1MessageDigest(fileContent));
+                    if (GetGlobalFlag(GlobalFlags::ast2xml))
+                    {
+                        std::unique_ptr<sngxml::dom::Document> ast2xmlDoc = cmajor::ast2dom::GenerateAstDocument(compileUnit.get());
+                        std::string ast2xmlFilePath = Path::ChangeExtension(sourceFilePath, ".ast.xml");
+                        std::ofstream ast2xmlFile(ast2xmlFilePath);
+                        CodeFormatter formatter(ast2xmlFile);
+                        formatter.SetIndentSize(1);
+                        ast2xmlDoc->Write(formatter);
+                    }
+                    if (GetGlobalFlag(GlobalFlags::generateDebugInfo) || GetGlobalFlag(GlobalFlags::cmdoc))
+                    {
+                        compileUnit->ComputeLineStarts(s);
+                    }
+                    compileUnits.push_back(std::move(compileUnit));
+                }
+                catch (...)
+                {
+                    lexers.push_back(std::move(lexer));
+                    throw;
+                }
+                lexers.push_back(std::move(lexer));
+            }
         }
-        if (boost::filesystem::file_size(sourceFilePath) == 0)
+        if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            std::unique_ptr<CompileUnitNode> compileUnit(new CompileUnitNode(Span(), sourceFilePath));
-            compileUnit->SetHash(GetSha1MessageDigest(""));
-            int32_t fileIndex = module->GetFileTable().RegisterFilePath(sourceFilePath);
-            compileUnits.push_back(std::move(compileUnit));
-            lexers.push_back(std::unique_ptr<CmajorLexer>());
-        }
-        else
-        {
-            MappedInputFile sourceFile(sourceFilePath);
-            int32_t fileIndex = module->GetFileTable().RegisterFilePath(sourceFilePath);
-            ParsingContext parsingContext;
-            std::string fileContent(sourceFile.Begin(), sourceFile.End());
-            std::u32string s(ToUtf32(fileContent));
-            std::unique_ptr<CmajorLexer> lexer(new CmajorLexer(s, sourceFilePath, fileIndex));
-            soulng::lexer::XmlParsingLog log(std::cout);
-            if (GetGlobalFlag(GlobalFlags::debugParsing))
+            std::string s;
+            if (sourceFilePaths.size() != 1)
             {
-                lexer->SetLog(&log);
+                s = "s";
             }
-            std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(*lexer, &parsingContext);
-            compileUnit->SetHash(GetSha1MessageDigest(fileContent));
-            if (GetGlobalFlag(GlobalFlags::ast2xml))
-            {
-                std::unique_ptr<sngxml::dom::Document> ast2xmlDoc = cmajor::ast2dom::GenerateAstDocument(compileUnit.get());
-                std::string ast2xmlFilePath = Path::ChangeExtension(sourceFilePath, ".ast.xml");
-                std::ofstream ast2xmlFile(ast2xmlFilePath);
-                CodeFormatter formatter(ast2xmlFile);
-                formatter.SetIndentSize(1);
-                ast2xmlDoc->Write(formatter);
-            }
-            if (GetGlobalFlag(GlobalFlags::generateDebugInfo) || GetGlobalFlag(GlobalFlags::cmdoc))
-            {
-                compileUnit->ComputeLineStarts(s);
-            }
-            compileUnits.push_back(std::move(compileUnit));
-            lexers.push_back(std::move(lexer));
+            LogMessage(module->LogStreamId(), "Source file" + s + " parsed.");
         }
     }
-    if (GetGlobalFlag(GlobalFlags::verbose))
+    catch (...)
     {
-        std::string s;
-        if (sourceFilePaths.size() != 1)
-        {
-            s = "s";
-        }
-        LogMessage(module->LogStreamId(), "Source file" + s + " parsed.");
+        module->SetLexers(std::move(lexers));
+        throw;
     }
     module->SetLexers(std::move(lexers));
     return compileUnits;
@@ -215,22 +231,30 @@ void ParseSourceFile(ParserData* parserData)
                 std::string fileContent(sourceFile.Begin(), sourceFile.End());
                 std::u32string s(ToUtf32(fileContent));
                 std::unique_ptr<CmajorLexer> lexer(new CmajorLexer(s, sourceFilePath, fileIndex));
-                std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(*lexer, &parsingContext);
-                compileUnit->SetHash(GetSha1MessageDigest(fileContent));
-                if (GetGlobalFlag(GlobalFlags::ast2xml))
+                try
                 {
-                    std::unique_ptr<sngxml::dom::Document> ast2xmlDoc = cmajor::ast2dom::GenerateAstDocument(compileUnit.get());
-                    std::string ast2xmlFilePath = Path::ChangeExtension(sourceFilePath, ".ast.xml");
-                    std::ofstream ast2xmlFile(ast2xmlFilePath);
-                    CodeFormatter formatter(ast2xmlFile);
-                    formatter.SetIndentSize(1);
-                    ast2xmlDoc->Write(formatter);
+                    std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(*lexer, &parsingContext);
+                    compileUnit->SetHash(GetSha1MessageDigest(fileContent));
+                    if (GetGlobalFlag(GlobalFlags::ast2xml))
+                    {
+                        std::unique_ptr<sngxml::dom::Document> ast2xmlDoc = cmajor::ast2dom::GenerateAstDocument(compileUnit.get());
+                        std::string ast2xmlFilePath = Path::ChangeExtension(sourceFilePath, ".ast.xml");
+                        std::ofstream ast2xmlFile(ast2xmlFilePath);
+                        CodeFormatter formatter(ast2xmlFile);
+                        formatter.SetIndentSize(1);
+                        ast2xmlDoc->Write(formatter);
+                    }
+                    if (GetGlobalFlag(GlobalFlags::generateDebugInfo) || GetGlobalFlag(GlobalFlags::cmdoc))
+                    {
+                        compileUnit->ComputeLineStarts(s);
+                    }
+                    parserData->compileUnits[index].reset(compileUnit.release());
                 }
-                if (GetGlobalFlag(GlobalFlags::generateDebugInfo) || GetGlobalFlag(GlobalFlags::cmdoc))
+                catch (...)
                 {
-                    compileUnit->ComputeLineStarts(s);
+                    parserData->lexers[index].reset(lexer.release());
+                    throw;
                 }
-                parserData->compileUnits[index].reset(compileUnit.release());
                 parserData->lexers[index].reset(lexer.release());
             }
         }
@@ -258,52 +282,60 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSourcesConcurrently(Module* m
     }
     std::vector<std::unique_ptr<CompileUnitNode>> compileUnits;
     std::vector<std::unique_ptr<CmajorLexer>> lexers;
-    int n = int(sourceFilePaths.size());
-    compileUnits.resize(n);
-    lexers.resize(n);
-    std::vector<uint32_t> fileIndeces;
-    for (int i = 0; i < n; ++i)
+    try
     {
-        const std::string& sourceFilePath = sourceFilePaths[i];
-        int32_t fileIndex = module->GetFileTable().RegisterFilePath(sourceFilePath);
-        fileIndeces.push_back(fileIndex);
-    }
-    std::vector<std::exception_ptr> exceptions;
-    exceptions.resize(n);
-    ParserData parserData(sourceFilePaths, compileUnits, lexers, fileIndeces, exceptions, stop);
-    for (int i = 0; i < n; ++i)
-    {
-        parserData.indexQueue.push_back(i);
-    }
-    std::vector<std::thread> threads;
-    for (int i = 0; i < numThreads; ++i)
-    {
-        threads.push_back(std::thread(ParseSourceFile, &parserData));
-        if (parserData.stop) break;
-    }
-    int numStartedThreads = int(threads.size());
-    for (int i = 0; i < numStartedThreads; ++i)
-    {
-        if (threads[i].joinable())
+        int n = int(sourceFilePaths.size());
+        compileUnits.resize(n);
+        lexers.resize(n);
+        std::vector<uint32_t> fileIndeces;
+        for (int i = 0; i < n; ++i)
         {
-            threads[i].join();
+            const std::string& sourceFilePath = sourceFilePaths[i];
+            int32_t fileIndex = module->GetFileTable().RegisterFilePath(sourceFilePath);
+            fileIndeces.push_back(fileIndex);
+        }
+        std::vector<std::exception_ptr> exceptions;
+        exceptions.resize(n);
+        ParserData parserData(sourceFilePaths, compileUnits, lexers, fileIndeces, exceptions, stop);
+        for (int i = 0; i < n; ++i)
+        {
+            parserData.indexQueue.push_back(i);
+        }
+        std::vector<std::thread> threads;
+        for (int i = 0; i < numThreads; ++i)
+        {
+            threads.push_back(std::thread(ParseSourceFile, &parserData));
+            if (parserData.stop) break;
+        }
+        int numStartedThreads = int(threads.size());
+        for (int i = 0; i < numStartedThreads; ++i)
+        {
+            if (threads[i].joinable())
+            {
+                threads[i].join();
+            }
+        }
+        for (int i = 0; i < n; ++i)
+        {
+            if (exceptions[i])
+            {
+                std::rethrow_exception(exceptions[i]);
+            }
+        }
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            std::string s;
+            if (sourceFilePaths.size() != 1)
+            {
+                s = "s";
+            }
+            LogMessage(module->LogStreamId(), "Source file" + s + " parsed.");
         }
     }
-    for (int i = 0; i < n; ++i)
+    catch (...)
     {
-        if (exceptions[i])
-        {
-            std::rethrow_exception(exceptions[i]);
-        }
-    }
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        std::string s;
-        if (sourceFilePaths.size() != 1)
-        {
-            s = "s";
-        }
-        LogMessage(module->LogStreamId(), "Source file" + s + " parsed.");
+        module->SetLexers(std::move(lexers));
+        throw;
     }
     module->SetLexers(std::move(lexers));
     return compileUnits;

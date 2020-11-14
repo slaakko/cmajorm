@@ -157,7 +157,39 @@ BuildRequest::BuildRequest(soulng::util::JsonValue* __json_value)
     sngjson::json::FromJson(__json_value, "justMyCode", justMyCode);
 }
 
-BuildReply::BuildReply() : messageKind(), requestValid(), requestErrorMessage(), logException(), time(), success(), error()
+CompileError::CompileError() : message(), project(), file(), line(), scol(), ecol()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> CompileError::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(message);
+    object->AddField(U"message", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(project);
+    object->AddField(U"project", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(file);
+    object->AddField(U"file", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(line);
+    object->AddField(U"line", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(scol);
+    object->AddField(U"scol", std::move(fieldValue4));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(ecol);
+    object->AddField(U"ecol", std::move(fieldValue5));
+    return object;
+}
+
+CompileError::CompileError(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "message", message);
+    sngjson::json::FromJson(__json_value, "project", project);
+    sngjson::json::FromJson(__json_value, "file", file);
+    sngjson::json::FromJson(__json_value, "line", line);
+    sngjson::json::FromJson(__json_value, "scol", scol);
+    sngjson::json::FromJson(__json_value, "ecol", ecol);
+}
+
+BuildReply::BuildReply() : messageKind(), requestValid(), requestErrorMessage(), logException(), time(), success(), errors()
 {
 }
 
@@ -176,8 +208,8 @@ std::unique_ptr<soulng::util::JsonValue> BuildReply::ToJson() const
     object->AddField(U"time", std::move(fieldValue4));
     std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(success);
     object->AddField(U"success", std::move(fieldValue5));
-    std::unique_ptr<soulng::util::JsonValue> fieldValue6 = sngjson::json::ToJson(error);
-    object->AddField(U"error", std::move(fieldValue6));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue6 = sngjson::json::ToJson(errors);
+    object->AddField(U"errors", std::move(fieldValue6));
     return object;
 }
 
@@ -189,7 +221,7 @@ BuildReply::BuildReply(soulng::util::JsonValue* __json_value)
     sngjson::json::FromJson(__json_value, "logException", logException);
     sngjson::json::FromJson(__json_value, "time", time);
     sngjson::json::FromJson(__json_value, "success", success);
-    sngjson::json::FromJson(__json_value, "error", error);
+    sngjson::json::FromJson(__json_value, "errors", errors);
 }
 
 LogMessageRequest::LogMessageRequest() : messageKind(), message()
