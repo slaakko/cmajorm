@@ -677,11 +677,8 @@ void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_p
 {
     try
     {
-        if (GetGlobalFlag(GlobalFlags::rebuild) || GetGlobalFlag(GlobalFlags::clean))
-        {
-            InitModule();
-            InitModuleCache();
-        }
+        InitModule();
+        InitModuleCache();
         cmajor::build::BuildProject(projectFilePath, rootModule, builtProjects);
         reply.success = true;
     }
