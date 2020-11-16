@@ -1074,6 +1074,11 @@ namespace System.Windows
                     }
                     case cast<Keys>(Keys.controlModifier | Keys.down):
                     {
+                        if (lines.Count() < GetVisibleLineCount())
+                        {
+                            args.handled = true;
+                            return;
+                        }
                         ResetSelection();
                         ScrollLineDown();
                         scrolled = true;
@@ -1082,6 +1087,11 @@ namespace System.Windows
                     }
                     case cast<Keys>(Keys.controlModifier | Keys.up):
                     {
+                        if (lines.Count() < GetVisibleLineCount())
+                        {
+                            args.handled = true;
+                            return;
+                        }
                         ResetSelection();
                         ScrollLineUp();
                         scrolled = true;
