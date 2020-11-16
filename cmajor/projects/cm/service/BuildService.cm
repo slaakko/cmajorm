@@ -213,7 +213,7 @@ namespace Cm.Service.Build
                 }
                 if (log)
                 {
-                    LogMessage("Cm.Build.Service: Stopping Build Server...");
+                    LogMessage("BuildService: Stopping Build Server...");
                 }
                 SendReceiveStopRequest();
                 bool serverStopped = false;
@@ -233,7 +233,7 @@ namespace Cm.Service.Build
                 {
                     if (log)
                     {
-                        LogMessage("Cm.Build.Service: Build Server not stopped after " + ToString(args.serverStopWaitSeconds) + " seconds, terminating server process...");
+                        LogMessage("BuildService: Build Server not stopped after " + ToString(args.serverStopWaitSeconds) + " seconds, terminating server process...");
                     }
                     buildServer->Terminate();
                 }
@@ -245,7 +245,7 @@ namespace Cm.Service.Build
                 }
                 if (log)
                 {
-                    LogMessage("Cm.Build.Service: Build Server stopped." + exitCodeStr);
+                    LogMessage("BuildService: Build Server stopped." + exitCodeStr);
                 }
             }
             catch (const Exception& ex)
@@ -253,7 +253,7 @@ namespace Cm.Service.Build
                 LogException(ex);
                 if (log)
                 {
-                    LogMessage("Cm.Build.Service.StopServer: " + ex.Message());
+                    LogMessage("BuildService: StopServer: " + ex.Message());
                 }
             }
         }
@@ -273,7 +273,7 @@ namespace Cm.Service.Build
                 terminatingVar.NotifyOne();
                 if (logTerminate)
                 {
-                    LogMessage("Cm.Build.Service: Build Server stopped.");
+                    LogMessage("BuildService: Build Server stopped.");
                 }
                 notifyBuildServerStop();
             }
@@ -282,7 +282,7 @@ namespace Cm.Service.Build
                 LogException(ex);
                 if (logTerminate && log)
                 {
-                    LogMessage("Cm.Build.Service.TerminateServer: " + ex.Message());
+                    LogMessage("BuildService: TerminateServer: " + ex.Message());
                 }
             }
         }
@@ -418,7 +418,7 @@ namespace Cm.Service.Build
                 else if (messageKind == "genericErrorReply")
                 {
                     GenericErrorReply genericErrorReply(replyJsonValue.Get());
-                    LogMessage("Build.Service.ProcessBuildRequest: generic error reply received: " + genericErrorReply.error);
+                    LogMessage("BuildService: ProcessBuildRequest: generic error reply received: " + genericErrorReply.error);
                 }
                 else
                 {
@@ -430,7 +430,7 @@ namespace Cm.Service.Build
                 if (!terminating)
                 {
                     LogException(ex);
-                    LogMessage("Cm.Build.Service.ProcessBuildRequest: " + ex.Message());
+                    LogMessage("BuildService: ProcessBuildRequest: " + ex.Message());
                 }
             }
             return List<CompileError>();
@@ -439,11 +439,11 @@ namespace Cm.Service.Build
         {
             if (buildReply.success)
             {
-                LogMessage("Cm.Build.Service: build successful, time=" + buildReply.time);
+                LogMessage("BuildService: build successful, time=" + buildReply.time);
             }
             else
             {
-                LogMessage("Cm.Build.Service: build unsuccessful");
+                LogMessage("BuildService: build unsuccessful");
             }
             if (!buildReply.requestValid)
             {

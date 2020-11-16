@@ -872,6 +872,12 @@ namespace cmcode
                     {
                         Cm.Ast.Project* project = data->project;
                         UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+                        if (solution->ActiveProject() != project)
+                        {
+                            MenuItem* setActiveMenuItem = new MenuItem("Set Active");
+                            contextMenu->AddMenuItemAction(setActiveMenuItem, new SetActiveProjectAction(this, solutionExplorerTreeView, solutionExplorerData.Get(),
+                                solution.Get(), project, node));
+                        }
                         MenuItem* addNewSourceFileMenuItem = new MenuItem("Add New Source File...");
                         contextMenu->AddMenuItemAction(addNewSourceFileMenuItem, new AddNewSourceFileAction(this, project, node));
                         MenuItem* addExistingSourceFileMenuItem = new MenuItem("Add Existing Source File...");
@@ -894,12 +900,6 @@ namespace cmcode
                         contextMenu->AddMenuItemAction(cleanMenuItem, new CleanProjectAction(this, project));
                         MenuItem* openFileLocationMenuItem = new MenuItem("Open File Location");
                         contextMenu->AddMenuItemAction(openFileLocationMenuItem, new OpenFileLocationAction(this, project->FilePath()));
-                        if (solution->ActiveProject() != project)
-                        {
-                            MenuItem* setActiveMenuItem = new MenuItem("Set Active");
-                            contextMenu->AddMenuItemAction(setActiveMenuItem, new SetActiveProjectAction(this, solutionExplorerTreeView, solutionExplorerData.Get(),
-                                solution.Get(), project, node));
-                        }
                         MenuItem* removeMenuItem = new MenuItem("Remove");
                         contextMenu->AddMenuItemAction(removeMenuItem, new RemoveProjectAction(this, solution.Get(), project));
                         if (contextMenu->HasMenuItems())

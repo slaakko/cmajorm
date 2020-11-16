@@ -143,7 +143,7 @@ namespace Cm.Service.Run
             }
             catch (const Exception& ex)
             {
-                LogMessage("Cm.Service.RunService: exception from Run(): " + ex.Message());
+                LogMessage("RunService: exception from Run(): " + ex.Message());
                 LogException(ex);
                 if (File.Exists(cmdbSessionFilePath))
                 {
@@ -172,7 +172,7 @@ namespace Cm.Service.Run
             }
             catch (const Exception& ex)
             {
-                LogMessage("Cm.Service.RunService: exception from TerminateProcess: " + ex.Message());
+                LogMessage("RunService: exception from TerminateProcess: " + ex.Message());
                 LogException(ex);
             }
         }
