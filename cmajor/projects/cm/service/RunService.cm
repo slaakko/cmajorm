@@ -1,0 +1,236 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Threading;
+using Cm.Service;
+
+namespace Cm.Service.Run
+{
+    public class CmdbSessionBridge : CmdbSessionClient
+    {
+        public nothrow CmdbSessionBridge(RunService* runService_) : runService(runService_)
+        {
+        }
+        public override void WriteOutputMessage(const string& message)
+        {
+            runService->LogMessage(message);
+        }
+        public override string GetTargetInputBytes()
+        {
+            return runService->GetTargetInputBytes();
+        }
+        public override void WriteTargetOutput(int handle, const string& s)
+        {
+            runService->WriteTargetOutput(handle, s);
+        }
+        private RunService* runService;
+    }
+
+    public int defaultSessionPort = 54322;
+    public class delegate void WriteTargetOutputMethod(int handle, const string& targetOutput);
+    public class delegate void ReadTargetInputMethod(string& targetInput, bool& eof);
+    public class delegate void TargetRunningMethod();
+
+    public class RunServiceArgs
+    {
+        public nothrow RunServiceArgs() : sessionPort(defaultSessionPort)
+        {
+        }
+        public nothrow RunServiceArgs& SessionPort(int sessionPort_)
+        {
+            sessionPort = sessionPort_;
+            return *this;
+        }
+        public nothrow RunServiceArgs& Pid(int pid_)
+        {
+            pid = pid_;
+            return *this;
+        }
+        public nothrow RunServiceArgs& ExecutableName(const string& executableName_)
+        {
+            executableName = executableName_;
+            return *this;
+        }
+        public nothrow RunServiceArgs& Arguments(const string& arguments_)
+        {
+            arguments = arguments_;
+            return *this;
+        }
+        public int sessionPort;
+        public int pid;
+        public string executableName;
+        public string arguments;
+    }
+
+    public class RunService : ServiceBase
+    {
+        public nothrow RunService(RunServiceArgs& args_) : base(), args(args_), processStarted(false), cmdbSessionBridge(this)
+        {
+        }
+        public nothrow void SetWriteTargetOutputMethod(const WriteTargetOutputMethod& writeTargetOutput_)
+        {
+            writeTargetOutput = writeTargetOutput_;
+        }
+        public nothrow void SetReadTargetInputMethod(const ReadTargetInputMethod& readTargetInput_)
+        {
+            readTargetInput = readTargetInput_;
+        }
+        public nothrow void SetTargetRunningMethod(const TargetRunningMethod& targetRunning_)
+        {
+            targetRunning = targetRunning_;
+        }
+        public void Execute()
+        {
+            bool sessionServerStarted = false;
+            string cmdbSessionFilePath = Path.ChangeExtension(args.executableName, ".cmdbs");
+            try
+            {
+                int portMapServicePortNumber = -1;
+                int port = Cm.Service.PortMap.GetFreePortNumber("cmcode", args.pid, portMapServicePortNumber);
+                if (port == -1)
+                {
+                    port = args.sessionPort;
+                    LogMessage("RunService: got no port from port map server, resorting to default port " + ToString(port));
+                }
+                sessionServer.Reset(new CmdbSessionServer(port, cmdbSessionFilePath, &cmdbSessionBridge));
+                sessionServer->Start();
+                sessionServerStarted = true;
+                processStarted = false;
+                bool sessionFileRemoved = false;
+                LogMessage("Starting '" + args.executableName + "' with arguments [" + args.arguments + "]...");
+                runProcessThread = Thread.StartMethod(RunProcess);
+                while (!processStarted)
+                {
+                    Sleep(Duration.FromSeconds(1));
+                }
+                while (!process.IsNull() && process->Running())
+                {
+                    if (!sessionFileRemoved && sessionServer->SessionOpen())
+                    {
+                        sessionFileRemoved = true;
+                        sessionServer->RemoveSessionFilePath();
+                    }
+                    CmdbSessionRequest* request = sessionServer->GetRequest();
+                    if (request != null)
+                    {
+                        request->Execute(&cmdbSessionBridge);
+                    }
+                    if (targetRunning != TargetRunningMethod())
+                    {
+                        targetRunning();
+                    }
+                }
+                runProcessThread.Join();
+                int exitCode = process->ExitCode();
+                LogMessage("Process exited with code " + ToString(exitCode));
+                if (!sessionFileRemoved)
+                {
+                    try
+                    {
+                        File.Remove(cmdbSessionFilePath);
+                    }
+                    catch (const Exception& ex)
+                    {
+                    }
+                }
+                if (sessionServerStarted)
+                {
+                    sessionServer->Stop();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogMessage("Cm.Service.RunService: exception from Run(): " + ex.Message());
+                LogException(ex);
+                if (File.Exists(cmdbSessionFilePath))
+                {
+                    try
+                    {
+                        File.Remove(cmdbSessionFilePath);
+                    }
+                    catch (const Exception& ex)
+                    {
+                    }
+                }
+                if (sessionServerStarted)
+                {
+                    sessionServer->Stop();
+                }
+            }
+        }
+        public void TerminateProcess()
+        {
+            try
+            {
+                if (!process.IsNull() && process->Running())
+                {
+                    process->Terminate();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogMessage("Cm.Service.RunService: exception from TerminateProcess: " + ex.Message());
+                LogException(ex);
+            }
+        }
+        public string GetTargetInputBytes()
+        {
+            if (readTargetInput != ReadTargetInputMethod())
+            {
+                string targetInputLine;
+                bool targetInputEof = false;
+                readTargetInput(targetInputLine, targetInputEof);
+                if (targetInputEof)
+                {
+                    return string();
+                }
+                else
+                {
+                    string targetInputBytes;
+                    for (char c : targetInputLine)
+                    {
+                        byte x = cast<byte>(c);
+                        targetInputBytes.Append(ToHexString(x));
+                    }
+                    return targetInputBytes;
+                }
+            }
+            return string();
+        }
+        public void WriteTargetOutput(int handle, const string& output)
+        {
+            if (writeTargetOutput != WriteTargetOutputMethod())
+            {
+                writeTargetOutput(handle, output);
+            }
+        }
+        private void RunProcess()
+        {
+            try
+            {
+                string command = args.executableName;
+                command.Append(" ").Append(args.arguments);
+                process.Reset(new Process(command, Process.Redirections.none));
+                processStarted = true;
+                process->WaitForExit();
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+                processStarted = true;
+            }
+        }
+        private RunServiceArgs args;
+        private WriteTargetOutputMethod writeTargetOutput;
+        private ReadTargetInputMethod readTargetInput;
+        private TargetRunningMethod targetRunning;
+        private bool processStarted;
+        private CmdbSessionBridge cmdbSessionBridge;
+        private UniquePtr<Process> process;
+        private Thread runProcessThread;
+        private UniquePtr<CmdbSessionServer> sessionServer;
+    }
+}

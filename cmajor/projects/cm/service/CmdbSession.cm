@@ -1,0 +1,381 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Dom;
+using System.IO;
+using System.Net.Sockets;
+using System.Security;
+using System.Text;
+using System.Threading;
+using System.XPath;
+
+namespace Cm.Service.Run
+{
+    public abstract class CmdbSessionClient
+    {
+        public default virtual ~CmdbSessionClient();
+        public abstract void WriteOutputMessage(const string& message);
+        public abstract string GetTargetInputBytes();
+        public abstract void WriteTargetOutput(int handle, const string& s);
+    }
+
+    public abstract class CmdbSessionRequest
+    {
+        public default virtual ~CmdbSessionRequest();
+        public abstract void Execute(CmdbSessionClient* client);
+    }
+
+    public abstract class CmdbSessionReply
+    {
+        public default virtual ~CmdbSessionReply();
+    }
+
+    public class CmdbInputRequest : CmdbSessionRequest
+    {
+        public nothrow CmdbInputRequest(CmdbSessionServer* server_) : server(server_)
+        {
+        }
+        public override void Execute(CmdbSessionClient* client)
+        {
+            server->SetReply(new CmdbInputReply(client->GetTargetInputBytes()));
+        }
+        private CmdbSessionServer* server;
+    }
+
+    public class CmdbInputReply : CmdbSessionReply
+    {
+        public nothrow CmdbInputReply(const string& bytes_) : bytes(bytes_)
+        {
+        }
+        public string bytes;
+    }
+
+    public class CmdbOutputRequest : CmdbSessionRequest
+    {
+        public nothrow CmdbOutputRequest(CmdbSessionServer* server_, int handle_, const string& output_) : server(server_), handle(handle_), output(output_)
+        {
+        }
+        public override void Execute(CmdbSessionClient* client)
+        {
+            client->WriteTargetOutput(handle, output);
+            server->SetReply(new CmdbOutputReply());
+        }
+        private CmdbSessionServer* server;
+        public int handle;
+        public string output;
+    }
+
+    public class CmdbOutputReply : CmdbSessionReply
+    {
+    }
+
+    public class CmdbSessionServer
+    {
+        public nothrow CmdbSessionServer(int port_, const string& cmdbSessionFilePath_, CmdbSessionClient* client_) :
+            port(port_), cmdbSessionFilePath(cmdbSessionFilePath_), client(client_), started(false), running(false), exiting(false),
+            sessionClosed(false), requestWaiting(false), replyReady(false)
+        {
+        }
+        public nothrow bool SessionOpen() const
+        {
+            return sessionOpen;
+        }
+        public void RemoveSessionFilePath()
+        {
+            try
+            {
+                File.Remove(cmdbSessionFilePath);
+            }
+            catch (const Exception& ex)
+            {
+                client->WriteOutputMessage("could not remove session file: " + ex.Message());
+            }
+        }
+        public bool RequestWaiting(void* arg)
+        {
+            return requestWaiting;
+        }
+        public CmdbSessionRequest* GetRequest()
+        {
+            LockGuard<RecursiveMutex> lock(mtx);
+            if (requestVar.WaitFor(mtx, RequestWaiting, null, Duration.FromMilliseconds(250)))
+            {
+                return request.Get();
+            }
+            return null;
+        }
+        public void SetReply(CmdbSessionReply* reply_)
+        {
+            reply.Reset(reply_);
+            replyReady = true;
+            replyVar.NotifyOne();
+        }
+        public void Start()
+        {
+            try
+            {
+                StartCmdbSession();
+                thread = Thread.StartMethod(Run);
+                while (!started)
+                {
+                    Sleep(Duration.FromSeconds(1));
+                }
+            }
+            catch (const Exception& ex)
+            {
+                client->WriteOutputMessage("CmdbSession: could not start CMDB session: " + ex.Message());
+            }
+        }
+        public void Stop()
+        {
+            try
+            {
+                if (started)
+                {
+                    exiting = true;
+                    if (running)
+                    {
+                        try
+                        {
+                            TcpSocket socket("localhost", ToString(port));
+                        }
+                        catch (const Exception& ex)
+                        {
+                        }
+                    }
+                    thread.Join();
+                }
+            }
+            catch (const Exception& ex)
+            {
+                client->WriteOutputMessage("CmdbSession: could not stop CMDB session: " + ex.Message());
+            }
+        }
+        private void StartCmdbSession()
+        {
+            StreamWriter cmdbSessionFile = File.CreateText(cmdbSessionFilePath);
+            CodeFormatter formatter(cmdbSessionFile);
+            formatter.SetIndentSize(1);
+            Document cmdbSessionDoc;
+            Element* sessionElement = new Element(u"cmdbSession");
+            Element* timestampElement = new Element(u"timestamp");
+            long timestamp = RtGetCurrentTime();
+            timestampElement->SetAttribute(u"value", ToUtf32(ToString(timestamp)));
+            sessionElement->AppendChild(UniquePtr<Node>(timestampElement));
+            Element* skeyElement = new Element(u"skey");
+            Uuid skey = Uuid.Random();
+            skeyStr = ToString(skey);
+            skeyElement->SetAttribute(u"value", ToUtf32(skeyStr));
+            sessionElement->AppendChild(UniquePtr<Node>(skeyElement));
+            Uuid rkey = Uuid.Random();
+            rkeyStr = ToString(rkey);
+            Element* rkeyElement = new Element(u"rkey");
+            rkeyElement->SetAttribute(u"value", ToUtf32(rkeyStr));
+            sessionElement->AppendChild(UniquePtr<Node>(rkeyElement));
+            Element* portElement = new Element(u"port");
+            portElement->SetAttribute(u"value", ToUtf32(ToString(port)));
+            sessionElement->AppendChild(UniquePtr<Node>(portElement));
+            cmdbSessionDoc.AppendChild(UniquePtr<Node>(sessionElement));
+            cmdbSessionDoc.Write(formatter);
+        }
+        private void Run()
+        {
+            try
+            {
+                listenSocket.Bind(port);
+                listenSocket.Listen(10);
+                started = true;
+                running = true;
+                while (!exiting)
+                {
+                    TcpSocket socket = listenSocket.Accept();
+                    if (exiting) return;
+                    sessionClosed = false;
+                    while (!sessionClosed)
+                    {
+                        Transact(socket);
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                client->WriteOutputMessage("CmdbSession.Run failed: " + ex.Message());
+                started = true;
+            }
+            running = false;
+        }
+        private void Transact(TcpSocket& socket)
+        {
+            ustring requestStr = ToUtf32(ReadStr(socket));
+            UniquePtr<Document> requestDoc = ParseDocument(requestStr, "socket");
+            UniquePtr<XPathObject> messageObject = Evaluate(u"/cmdbMessage", requestDoc.Get());
+            if (messageObject.Get() is XPathNodeSet*)
+            {
+                XPathNodeSet* nodeSet = cast<XPathNodeSet*>(messageObject.Get());
+                if (nodeSet->Length() == 1)
+                {
+                    Node* node = (*nodeSet)[0];
+                    if (node is Element*)
+                    {
+                        Element* element = cast<Element*>(node);
+                        ustring kind = element->GetAttribute(u"kind");
+                        if (kind == u"openSessionRequest")
+                        {
+                            OpenSession(socket, element);
+                        }
+                        else if (kind == u"closeSessionRequest")
+                        {
+                            CloseSession();
+                        }
+                        else if (kind == u"inputRequest")
+                        {
+                            GetInput(socket);
+                        }
+                        else if (kind == u"outputRequest")
+                        {
+                            PutOutput(socket, element);
+                        }
+                        else
+                        {
+                            throw Exception("invalid CMDB session request received: kind='" + ToUtf8(kind) + "'");
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("invalid CMDB session request received: element node expected");
+                    }
+                }
+                else
+                {
+                    throw Exception("invalid CMDB session request received: one node expected");
+                }
+            }
+            else
+            {
+                throw Exception("invalid CMDB session request received: node set expected");
+            }
+        }
+        private void OpenSession(TcpSocket& socket, Element* request)
+        {
+            ustring skeyValue = request->GetAttribute(u"key");
+            if (!skeyValue.IsEmpty())
+            {
+                if (GetSha1MessageDigest(skeyStr) == ToUtf8(skeyValue))
+                {
+                    Document openSessionResponse;
+                    Element* responseMessage = new Element(u"cmdbMessage");
+                    responseMessage->SetAttribute(u"kind", u"openSessionResponse");
+                    responseMessage->SetAttribute(u"key", ToUtf32(GetSha1MessageDigest(rkeyStr)));
+                    openSessionResponse.AppendChild(UniquePtr<Node>(responseMessage));
+                    WriteDocumentToSocket(openSessionResponse, socket);
+                    sessionOpen = true;
+                }
+            }
+        }
+        private void CloseSession()
+        {
+            sessionClosed = true;
+        }
+        private bool ReplyReady(void* arg)
+        {
+            return replyReady;
+        }
+        private void GetInput(TcpSocket& socket)
+        {
+            string bytes;
+            requestWaiting = true;
+            replyReady = false;
+            request.Reset(new CmdbInputRequest(this));
+            requestVar.NotifyOne();
+            {
+                LockGuard<RecursiveMutex> lock(mtx);
+                replyVar.Wait(mtx, ReplyReady, null);
+                if (!reply.IsNull() && (reply.Get() is CmdbInputReply*))
+                {
+                    CmdbInputReply* inputReply = cast<CmdbInputReply*>(reply.Get());
+                    bytes = inputReply->bytes;
+                }
+            }
+            requestWaiting = false;
+            Document inputResponse;
+            Element* inputResponseElement = new Element(u"cmdbMessage");
+            inputResponseElement->SetAttribute(u"kind", u"inputResponse");
+            inputResponseElement->SetAttribute(u"bytes", ToUtf32(bytes));
+            inputResponse.AppendChild(UniquePtr<Node>(inputResponseElement));
+            WriteDocumentToSocket(inputResponse, socket);
+        }
+        private void PutOutput(TcpSocket& socket, Element* requestElement)
+        {
+            ustring handleValue = requestElement->GetAttribute(u"handle");
+            if (!handleValue.IsEmpty())
+            {
+                string handleStr = ToUtf8(handleValue);
+                int handle = ParseInt(handleStr);
+                if (handle == 1 || handle == 2)
+                {
+                    ustring bytesValue = requestElement->GetAttribute(u"bytes");
+                    if (!bytesValue.IsEmpty())
+                    {
+                        string output;
+                        string bytesStr = ToUtf8(bytesValue);
+                        long n = bytesStr.Length() / 2;
+                        for (long i = 0; i < n; ++i)
+                        {
+                            string hex;
+                            hex.Append(bytesStr[i * 2]);
+                            hex.Append(bytesStr[i * 2 + 1]);
+                            byte x = ParseHexByte(hex);
+                            output.Append(cast<char>(x));
+                        }
+                        requestWaiting = true;
+                        replyReady = false;
+                        request.Reset(new CmdbOutputRequest(this, handle, output));
+                        requestVar.NotifyOne();
+                        {
+                            LockGuard<RecursiveMutex> lock(mtx);
+                            replyVar.Wait(mtx, ReplyReady, null);
+                        }
+                        requestWaiting = false;
+                        Document outputResponse;
+                        Element* outputResponseElement = new Element(u"cmdbMessage");
+                        outputResponseElement->SetAttribute(u"kind", u"outputResponse");
+                        outputResponse.AppendChild(UniquePtr<Node>(outputResponseElement));
+                        WriteDocumentToSocket(outputResponse, socket);
+                    }
+                }
+            }
+        }
+        private void WriteDocumentToSocket(const Document& doc, TcpSocket& socket)
+        {
+            StringWriter writer;
+            CodeFormatter formatter(writer);
+            formatter.SetIndentSize(1);
+            doc.Write(formatter);
+            string str = writer.GetString();
+            Write(socket, str);
+        }
+        private int port;
+        private string skeyStr;
+        private string rkeyStr;
+        private string cmdbSessionFilePath;
+        private CmdbSessionClient* client;
+        private Thread thread;
+        private bool started;
+        private bool running;
+        private bool exiting;
+        private bool sessionOpen;
+        private bool sessionClosed;
+        private TcpSocket listenSocket;
+        private RecursiveMutex mtx;
+        private ConditionVariable requestVar;
+        private bool requestWaiting;
+        private UniquePtr<CmdbSessionRequest> request;
+        private UniquePtr<CmdbSessionReply> reply;
+        private ConditionVariable replyVar;
+        private bool replyReady;
+    }
+}
+

@@ -155,6 +155,7 @@ namespace cmcode
         }
         public override void Execute()
         {
+            mainWindow->SaveBackendConfig();
             TreeViewNode* activeProjectNode = solutionExplorerData->GetActiveProjectNode();
             activeProjectNode->SetActive(false);
             newActiveProjectNode->SetActive(true);
@@ -164,6 +165,7 @@ namespace cmcode
             mainWindow->HideContextMenu();
             treeView->Invalidate();
             mainWindow->SetControlStatus(UserInterfaceAction.none);
+            mainWindow->RestoreBackendConfig();
         }
         private MainWindow* mainWindow;
         private TreeView* treeView;

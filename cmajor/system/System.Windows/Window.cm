@@ -8,7 +8,7 @@ using System;
 namespace System.Windows
 {
     public class delegate void WindowClosingEventHandler(bool& cancelClose);
-    
+
     public class delegate void WindowClosedEventHandler();
 
     public delegate int GetDialogResultFunction(void* dialogWindowPtr);
@@ -18,7 +18,7 @@ namespace System.Windows
     public delegate void ModelessWindowKeyPreviewFunction(uint keyCode, bool shift, bool control, bool alt, bool keyDown, bool& handled);
 
     public class delegate void KeyPreviewMethod(Keys key, bool shift, bool control, bool alt, bool keyDown, bool& handled);
-    
+
     public nothrow Color DefaultWindowBackgroundColor()
     {
         return GetSystemColor(SystemColor.COLOR_WINDOW);
@@ -53,9 +53,9 @@ namespace System.Windows
         {
             none = 0, mainWindow = 1 << 0, showingDialog = 1 << 1
         }
-        public Window(const char* windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle, 
+        public Window(const char* windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle,
             const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
-            const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_, WindowState state_) : 
+            const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_, WindowState state_) :
             base(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors), flags(Flags.none), state(state_),
             menuBar(null), contextMenu(null), defaultButton(null), cancelButton(null), focusedControl(null), dialogResult(DialogResult.none), keyPreviewMethod(),
             fontFamilyName(fontFamilyName_), fontSize(fontSize_), fontStyle(fontStyle_)
@@ -63,26 +63,26 @@ namespace System.Windows
             SetKeyPreviewMethod(DefaultKeyPreview);
             if (Handle() != null)
             {
-                OnCreated(); 
+                OnCreated();
             }
             if (!fontFamilyName.IsEmpty())
             {
                 SetFont(Font(FontFamily(fontFamilyName), fontSize, fontStyle, Unit.point));
             }
         }
-        public Window(const char* windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle, 
-            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, WindowState state) : 
+        public Window(const char* windowClassName, WindowClassStyle classStyle, WindowStyle style, ExtendedWindowStyle exStyle,
+            const Color& backgroundColor, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, WindowState state) :
             this(windowClassName, classStyle, style, exStyle, backgroundColor, text, location, size, dock, anchors,
                 DefaultWindowFontFamilyName(), DefaultWindowFontSize(), FontStyle.regular, state)
         {
         }
         public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors,
-            const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_, WindowState state) : 
+            const string& fontFamilyName_, float fontSize_, FontStyle fontStyle_, WindowState state) :
             this(windowClassName, cast<WindowClassStyle>(WindowClassStyle.CS_VREDRAW | WindowClassStyle.CS_HREDRAW), style, exStyle, DefaultWindowBackgroundColor(),
             text, location, size, dock, anchors, fontFamilyName_, fontSize_, fontStyle_, state)
         {
         }
-        public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, WindowState state) : 
+        public Window(const char* windowClassName, WindowStyle style, ExtendedWindowStyle exStyle, const string& text, const Point& location, const Size& size, Dock dock, Anchors anchors, WindowState state) :
             this(windowClassName, style, exStyle, text, location, size, dock, anchors, DefaultWindowFontFamilyName(), DefaultWindowFontSize(), FontStyle.regular, state)
         {
         }
@@ -108,7 +108,7 @@ namespace System.Windows
             int result = WinDialogWindowMessageLoop(Handle(), parentWindow.Handle(), cast<void*>(dialogResultFunction), cast<void*>(keyPreviewFunction), this);
             return cast<DialogResult>(result);
         }
-        protected override void OnCreated() 
+        protected override void OnCreated()
         {
             if (!BaseOnCreatedCalled())
             {
@@ -191,7 +191,7 @@ namespace System.Windows
                     Application.Exit();
                     processed = true;
                 }
-            }            
+            }
             else
             {
                 windowClosedEvent.Fire();
@@ -465,7 +465,7 @@ namespace System.Windows
                         }
                         break;
                     }
-                    case WindowState.minimized: case WindowState.maximized: 
+                    case WindowState.minimized: case WindowState.maximized:
                     {
                         switch (newState)
                         {
@@ -542,9 +542,9 @@ namespace System.Windows
         {
             if (contextMenu != null)
             {
+                Rect rect(contextMenu->Location(), contextMenu->GetSize());
                 contextMenu->Hide();
-                Invalidate();
-                Update();
+                Invalidate(rect);
             }
         }
         public nothrow Event<WindowClosingEventHandler, bool>& WindowClosingEvent()

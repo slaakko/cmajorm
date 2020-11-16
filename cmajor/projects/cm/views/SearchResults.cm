@@ -28,7 +28,7 @@ namespace Cm.Views
     }
 
     public class delegate void ViewSearchResultEventHandler(ViewSearchResultEventArgs& args);
-    
+
     public class SearchResults : Control
     {
         public SearchResults() : base("Cm.Views.SearchResults", DefaultWindowClassStyle(), DefaultChildWindowStyle(), DefaultExtendedWindowStyle(), Color.White(),
@@ -85,6 +85,7 @@ namespace Cm.Views
         {
             treeView->Root()->ExpandAll();
             treeView->Invalidate();
+            child->Invalidate();
         }
         protected virtual void OnViewSearchResult(SearchResult* searchResult)
         {

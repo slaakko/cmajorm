@@ -12,6 +12,7 @@ using System.Threading;
 using Cm.Service;
 using Cm.Service.Build;
 using Cm.Service.Debug;
+using Cm.Service.Run;
 using cmcode;
 
 namespace cmcode
@@ -297,6 +298,10 @@ namespace cmcode
             startWithoutDebuggingMenuItem->SetShortcut(cast<Keys>(Keys.controlModifier | Keys.f5));
             startWithoutDebuggingMenuItem->ClickEvent().AddHandler(StartWithoutDebuggingClick);
             debugMenuItem->AddMenuItem(startWithoutDebuggingMenuItemPtr.Release());
+            UniquePtr<MenuItem> terminateProcessMenuItemPtr(new MenuItem("&Terminate Process"));
+            terminateProcessMenuItem = terminateProcessMenuItemPtr.Get();
+            terminateProcessMenuItem->ClickEvent().AddHandler(TerminateProcessClick);
+            debugMenuItem->AddMenuItem(terminateProcessMenuItemPtr.Release());
             UniquePtr<MenuItem> stopDebuggingMenuItemPtr(new MenuItem("Sto&p Debugging"));
             stopDebuggingMenuItem = stopDebuggingMenuItemPtr.Get();
             stopDebuggingMenuItem->SetShortcut(cast<Keys>(Keys.shiftModifier | Keys.f5));
@@ -1030,7 +1035,7 @@ namespace cmcode
                     cmcode.settings.LoadProjectSettings(activeProject, solutionExplorerData.Get());
                 }
                 SetControlStatus(UserInterfaceAction.none);
-                Invalidate();
+                //Invalidate();
             }
             catch (const Exception& ex)
             {
@@ -1240,7 +1245,7 @@ namespace cmcode
                 solutionExplorerData.Reset();
                 SetControlStatus(UserInterfaceAction.none);
                 gotoLineMenuItem->Disable();
-                Invalidate();
+                //Invalidate();
                 return true;
             }
             catch (const Exception& ex)
@@ -1787,15 +1792,16 @@ namespace cmcode
             {
                 SaveAllClick();
                 GetOutputLogView()->Clear();
-                GetErrorView()->Clear();
                 GetOutputTabPage()->Select();
                 BuildGuard buildGuard(this);
                 Application.ProcessMessages();
                 List<CompileError> errors = GetBuildService().ProcessBuildRequest(buildRequest);
                 if (!errors.IsEmpty())
                 {
+                    GetErrorView()->Clear();
                     GetErrorView()->SetErrors(Rvalue(errors));
                     errorTabPage->Select();
+                    return false;
                 }
                 return true;
             }
@@ -1999,6 +2005,27 @@ namespace cmcode
                 while (!debugService->MessageLogEmpty())
                 {
                     string logMessage = debugService->FetchLogMessage();
+                    if (!logMessage.IsEmpty())
+                    {
+                        GetOutputTabPage()->Select();
+                        GetOutputLogView()->WriteLine(logMessage);
+                    }
+                }
+                Application.ProcessMessages();
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void RunServiceLogMessagesAvailable()
+        {
+            try
+            {
+                while (!runService->MessageLogEmpty())
+                {
+                    string logMessage = runService->FetchLogMessage();
                     if (!logMessage.IsEmpty())
                     {
                         GetOutputTabPage()->Select();
@@ -2540,10 +2567,17 @@ namespace cmcode
                 debugService.Reset();
             }
         }
+        private RunServiceArgs MakeRunServiceArgs(int pid, const string& executableName, const string& programArguments)
+        {
+            RunServiceArgs args = RunServiceArgs().Pid(pid).ExecutableName(executableName).Arguments(programArguments);
+            return args;
+        }
         private void StartWithoutDebuggingClick()
         {
             try
             {
+                BuildActiveProjectClick();
+                if (!buildSucceeded) return;
                 string backend = GetBackend();
                 string config = GetConfig();
                 GetConsole()->Clear();
@@ -2569,39 +2603,37 @@ namespace cmcode
                                 Path.GetFileName(project->FilePath()));
                         }
                         executableFilePath = GetFullPath(Path.ChangeExtension(executableFilePath, ".exe"));
+                        if (!File.Exists(executableFilePath))
+                        {
+                            throw Exception("Executable '" + executableFilePath + "' not found");
+                        }
+                        string programArguments = solutionExplorerData->ActiveProjectSettings().programArguments;
+                        RunGuard runGuard(this);
+                        runService.Reset(new RunService(MakeRunServiceArgs(pid, executableFilePath, programArguments)));
+                        runService->SetLogMessageNotificationFunction(RunServiceLogMessagesAvailable);
+                        runService->SetWriteTargetOutputMethod(WriteTargetOutput);
+                        runService->SetReadTargetInputMethod(ReadTargetInput);
+                        runService->SetTargetRunningMethod(TargetRunning);
+                        runService->Execute();
                     }
                 }
-                if (!executableFilePath.IsEmpty())
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void TerminateProcessClick()
+        {
+            try
+            {
+                if (runService.IsNull()) return;
+                if (Application.RunningModal())
                 {
-                    RunGuard runGuard(this);
-                    LogView* outputLogView = GetOutputLogView();
-                    outputLogView->WriteLine("Starting executable '" + executableFilePath + "'...");
-                    Application.ProcessMessages();
-                    Console* console = GetConsole();
-                    consoleTabPage->Select();
-                    Process process(executableFilePath, cast<Process.Redirections>(Process.Redirections.processStdIn | Process.Redirections.processStdOut | Process.Redirections.processStdErr));
-                    do
-                    {
-                        string line = process.ReadLine(Process.StdHandle.stdOut);
-                        if (!line.IsEmpty())
-                        {
-                            console->Write(1, line);
-                        }
-                        else
-                        {
-                            line = process.ReadLine(Process.StdHandle.stdErr);
-                            if (!line.IsEmpty())
-                            {
-                                console->Write(2, line);
-                            }
-                        }
-                    }
-                    while (process.Running());
-                    process.WaitForExit();
-                    int exitCode = process.ExitCode();
-                    outputTabPage->Select();
-                    outputLogView->WriteLine("Process exited with code " + ToString(exitCode) + ".");
+                    GetConsole()->SetEof();
                 }
+                runService->TerminateProcess();
             }
             catch (const Exception& ex)
             {
@@ -3689,6 +3721,7 @@ namespace cmcode
             startDebuggingMenuItem->Disable();
             stopDebuggingMenuItem->Disable();
             startWithoutDebuggingMenuItem->Disable();
+            terminateProcessMenuItem->Disable();
             showNextStatementMenuItem->Disable();
             stepOverMenuItem->Disable();
             stepIntoMenuItem->Disable();
@@ -3724,6 +3757,8 @@ namespace cmcode
             }
             else if (action == UserInterfaceAction.run)
             {
+                terminateProcessMenuItem->Enable();
+                return;
             }
 
             bool solutionOpen = !solutionExplorerData.IsNull();
@@ -3737,6 +3772,7 @@ namespace cmcode
                 releaseToolButton->Enable();
                 debugToolButton->SetState(ToolButton.State.pressed);
                 buildSolutionToolButton->Enable();
+                startDebuggingToolButton->Enable();
                 stepOverToolButton->Enable();
                 stepIntoToolButton->Enable();
                 closeSolutionMenuItem->Enable();
@@ -3820,6 +3856,7 @@ namespace cmcode
         private MenuItem* startDebuggingMenuItem;
         private MenuItem* stopDebuggingMenuItem;
         private MenuItem* startWithoutDebuggingMenuItem;
+        private MenuItem* terminateProcessMenuItem;
         private MenuItem* showNextStatementMenuItem;
         private MenuItem* stepOverMenuItem;
         private MenuItem* stepIntoMenuItem;
@@ -3854,6 +3891,7 @@ namespace cmcode
 
         private UniquePtr<BuildService> buildService;
         private UniquePtr<DebugService> debugService;
+        private UniquePtr<RunService> runService;
         private Cm.Service.Debug.Location latestDebugLocation;
         private Cm.Service.Debug.Location selectedFrameLocation;
         private bool stopPending;
