@@ -103,12 +103,15 @@ namespace Cm.Service.Run
             LockGuard<RecursiveMutex> lock(mtx);
             if (requestVar.WaitFor(mtx, RequestWaiting, null, Duration.FromMilliseconds(250)))
             {
+                requestWaiting = false;
+                replyReady = false;
                 return request.Get();
             }
             return null;
         }
         public void SetReply(CmdbSessionReply* reply_)
         {
+            LockGuard<RecursiveMutex> lock(mtx);
             reply.Reset(reply_);
             replyReady = true;
             replyVar.NotifyOne();
