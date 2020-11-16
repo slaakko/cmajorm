@@ -1791,6 +1791,10 @@ namespace cmcode
             try
             {
                 SaveAllClick();
+                if (errorView != null)
+                {
+                    errorView->Clear();
+                }
                 GetOutputLogView()->Clear();
                 GetOutputTabPage()->Select();
                 BuildGuard buildGuard(this);
@@ -3685,6 +3689,24 @@ namespace cmcode
             {
                 releaseToolButton->SetState(ToolButton.State.pressed);
             }
+            if (GetBackend() == "cpp" && GetConfig() == "debug")
+            {
+                startDebuggingToolButton->Enable();
+                stepOverToolButton->Enable();
+                stepIntoToolButton->Enable();
+                startDebuggingMenuItem->Enable();
+                stepOverMenuItem->Enable();
+                stepIntoMenuItem->Enable();
+            }
+            else
+            {
+                startDebuggingToolButton->Disable();
+                stepOverToolButton->Disable();
+                stepIntoToolButton->Disable();
+                startDebuggingMenuItem->Disable();
+                stepOverMenuItem->Disable();
+                stepIntoMenuItem->Disable();
+            }
         }
 
         internal void SetControlStatus(UserInterfaceAction action)
@@ -3782,9 +3804,9 @@ namespace cmcode
                 buildSolutionMenuItem->Enable();
                 rebuildSolutionMenuItem->Enable();
                 cleanSolutionMenuItem->Enable();
+                startWithoutDebuggingMenuItem->Enable();
 
                 startDebuggingMenuItem->Enable();
-                startWithoutDebuggingMenuItem->Enable();
                 stepOverMenuItem->Enable();
                 stepIntoMenuItem->Enable();
                 toggleBreakpointMenuItem->Enable();

@@ -715,9 +715,15 @@ namespace System.Windows
                 int line = 0;
                 short column = 0;
                 GetLineColumn(args.location, line, column);
-                mouseSelectionEnd = SourcePos(line, column);
-                ExtendSelection(mouseSelectionStart, mouseSelectionEnd);
-                InvalidateLines(selection.start.line, selection.end.line);
+                if (line >= 1 && line <= lines.Count())
+                {
+                    mouseSelectionEnd = SourcePos(line, column);
+                    if (mouseSelectionStart != mouseSelectionEnd)
+                    {
+                        ExtendSelection(mouseSelectionStart, mouseSelectionEnd);
+                        InvalidateLines(selection.start.line, selection.end.line);
+                    }
+                }
             }
         }
         protected override void OnKeyDown(KeyEventArgs& args)
