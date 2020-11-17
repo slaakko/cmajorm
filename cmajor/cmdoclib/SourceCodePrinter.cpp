@@ -489,7 +489,8 @@ std::u32string SourceCodePrinter::MakeSymbolRef(Symbol* symbol, Module* module)
                     }
                     else
                     {
-                        throw std::runtime_error("module '" + ToUtf8(module->Name()) + "' not found in source code printer");
+                        //throw std::runtime_error("module '" + ToUtf8(module->Name()) + "' not found in source code printer");
+                        return std::u32string();
                     }
                     if (file == U"index")
                     {

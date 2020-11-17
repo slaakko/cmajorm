@@ -735,7 +735,7 @@ BaseClassInfo GetBaseClass(Input* input, sngxml::dom::Element* classElement, sng
         }
         if (!baseClassInfo.baseClassElement)
         {
-            throw std::runtime_error("base class id '" + ToUtf8(baseClassId) + "' not found");
+            //throw std::runtime_error("base class id '" + ToUtf8(baseClassId) + "' not found");
         }
     }
     return baseClassInfo;

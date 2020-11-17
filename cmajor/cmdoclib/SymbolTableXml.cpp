@@ -106,7 +106,7 @@ std::pair<std::string, bool> ResolveModuleXmlDocFilePath(Input* input, const std
             }
         }
     }
-    throw std::runtime_error("cmdoc module directory for module '" + ToUtf8(moduleName) + "' not found");
+    return std::pair<std::string, bool>();
 }
 
 struct FileByName
@@ -1822,17 +1822,24 @@ void GenerateSymbolTableXml(Module* rootModule, std::unordered_map<int, File>& f
         }
         if (!moduleDoc)
         {
-            std::unique_ptr<sngxml::dom::Document> refModuleXmlDoc = sngxml::dom::ReadDocument(refModuleXmlDocFilePathExternal.first);
-            sngxml::dom::Document* moduleXmlDoc = refModuleXmlDoc.get();
-            if (refModuleXmlDocFilePathExternal.second)
+            if (!refModuleXmlDocFilePathExternal.first.empty())
             {
-                input->externalModuleDocs.push_back(std::move(refModuleXmlDoc));
+                std::unique_ptr<sngxml::dom::Document> refModuleXmlDoc = sngxml::dom::ReadDocument(refModuleXmlDocFilePathExternal.first);
+                sngxml::dom::Document* moduleXmlDoc = refModuleXmlDoc.get();
+                if (refModuleXmlDocFilePathExternal.second)
+                {
+                    input->externalModuleDocs.push_back(std::move(refModuleXmlDoc));
+                }
+                else
+                {
+                    refModuleXmlDocs.push_back(std::move(refModuleXmlDoc));
+                }
+                symbolTableXmlBuilder.AddModuleXmlDocument(moduleXmlDoc);
             }
             else
             {
-                refModuleXmlDocs.push_back(std::move(refModuleXmlDoc));
+                continue;
             }
-            symbolTableXmlBuilder.AddModuleXmlDocument(moduleXmlDoc);
         }
     }
     symbolTableXmlBuilder.AddNamespace(symbolTable.GlobalNs());
