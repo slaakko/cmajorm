@@ -4,7 +4,9 @@
 #include <cmajor/cmdebug/ServerDebugger.hpp>
 #include <cmajor/cmdebug/DebuggerClient.hpp>
 #include <cmajor/cmdebug/CmdbSession.hpp>
+#ifdef _WIN32
 #include <cmajor/cmpm/PortMapClient.hpp>
+#endif
 #include <soulng/util/Ansi.hpp>
 #include <soulng/util/InitDone.hpp>
 #include <soulng/util/Process.hpp>
@@ -23,11 +25,15 @@ struct InitDone
         soulng::util::Init();
         sngxml::xpath::Init();
         cmajor::debug::Init();
+#ifdef _WIN32
         cmajor::cmpm::InitPortMapClient();
+#endif
     }
     ~InitDone()
     {
+#ifdef _WIN32
         cmajor::cmpm::DonePortMapClient();
+#endif
         cmajor::debug::Done();
         sngxml::xpath::Done();
         soulng::util::Done();
@@ -244,6 +250,7 @@ int main(int argc, const char** argv)
         }
         if (server)
         {
+#ifdef _WIN32
             if (portMapServicePort != -1)
             {
                 std::vector<int> portNumbers;
@@ -251,6 +258,7 @@ int main(int argc, const char** argv)
                 portNumbers.push_back(sessionPort);
                 cmajor::cmpm::StartPortMapClient(portMapServicePort, portNumbers, "cmdb", GetPid());
             }
+#endif
             if (client)
             {
                 cmajor::debug::StartDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log);
@@ -261,11 +269,13 @@ int main(int argc, const char** argv)
             {
                 cmajor::debug::RunDebuggerServer(executable, args, verbose, breakOnThrow, version, port, log);
             }
+#ifdef _WIN32
             if (portMapServicePort != -1)
             {
                 cmajor::cmpm::StopPortMapClient();
                 portMapServicePort = -1;
             }
+#endif
         }
         else
         {
@@ -274,10 +284,12 @@ int main(int argc, const char** argv)
     }
     catch (const std::exception& ex)
     {
+#ifdef _WIN32
         if (portMapServicePort != -1)
         {
             cmajor::cmpm::StopPortMapClient();
         }
+#endif
         if (server)
         {
             std::cout << "debug-server-error" << std::endl;
