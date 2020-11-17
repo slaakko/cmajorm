@@ -270,7 +270,8 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "Cm.Service.ServiceBase", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../Cm.Service/doc/class_ServiceBase_3E67914875E21E2B9DDCF7A3E587E05A81A8C00A.html" },
         { name: "Cm.Service.Build.BuildService", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../Cm.Service/doc/class_BuildService_98521BAF9D856C61C5BB4F7283CF6102C4DCC7F4.html" },
-        { name: "Cm.Service.Debug.DebugService", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../Cm.Service/doc/class_DebugService_9BC517A3056668BD8B018D2AD67E2ACA9BD17E63.html" }];
+        { name: "Cm.Service.Debug.DebugService", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../Cm.Service/doc/class_DebugService_9BC517A3056668BD8B018D2AD67E2ACA9BD17E63.html" },
+        { name: "Cm.Service.Run.RunService", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../Cm.Service/doc/class_RunService_DF6A1D18821E3BAA480D260F075BE668C25089D4.html" }];
     drawDiagram(diagramNodes);
 }
 
