@@ -1471,15 +1471,13 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
     {
         std::string cmrtLibName = "cmrtd";
         args.push_back("-l" + cmrtLibName);
-        args.push_back("-lgmpintf");
     }
     else
     {
         std::string cmrtLibName = "cmrt";
         args.push_back("-l" + cmrtLibName);
-        args.push_back("-lgmpintf");
     }
-    args.push_back("-lboost_filesystem -lboost_iostreams -lboost_system -lgmp -lbz2 -lz");
+    args.push_back("-lboost_filesystem -lboost_iostreams -lboost_system -lbz2 -lz");
     args.push_back("-Xlinker --end-group");
     args.push_back("-o " + QuotedPath(executableFilePath));
     std::string linkCommandLine;
