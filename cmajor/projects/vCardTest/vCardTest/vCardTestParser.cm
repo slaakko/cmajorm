@@ -1,0 +1,300 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System;
+using vCard;
+
+// this file has been automatically generated from 'C:/work/cmajorm/cmajor/projects/vCardTest/vCardTest/vCardTestParser.parser' using soulcm parser generator scmpg version 3.0.0
+
+namespace
+{
+    public const int[10] s2 = [69, 78, 68, 58, 86, 67, 65, 82, 68, 10];
+    public const int[12] s1 = [86, 69, 82, 83, 73, 79, 78, 58, 52, 46, 48, 10];
+    public const int[12] s0 = [66, 69, 71, 73, 78, 58, 86, 67, 65, 82, 68, 10];
+} // namespace
+
+public static class vCardTestParser
+{
+    public static UniquePtr<vCardClass> Parse(TrivialLexer& lexer)
+    {
+        UniquePtr<vCardClass> value;
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->WriteBeginRule(u"parse");
+                lexer.Log()->IncIndent();
+            }
+        #endif
+        ++lexer;
+        System.Lex.Span span = lexer.GetSpan();
+        Match match = vCardTestRule(lexer);
+        value.Reset(cast<vCardClass*>(match.value));
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->DecIndent();
+                lexer.Log()->WriteEndRule(u"parse");
+            }
+        #endif
+        if (match.hit)
+        {
+            if (*lexer == System.Lex.END_TOKEN)
+            {
+                return value;
+            }
+            else
+            {
+                lexer.ThrowExpectationFailure(lexer.GetSpan(), GetEndTokenInfo());
+            }
+        }
+        else
+        {
+            lexer.ThrowExpectationFailure(span, u"vCardTestRule");
+        }
+        return value;
+    }
+    public static Match vCardTestRule(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"vCardTestRule");
+            }
+        #endif
+        UniquePtr<vCardClass> vc;
+        UniquePtr<vCardClass> v;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match = vCardTestParser.vCardBeginRule(lexer);
+                    v.Reset(cast<vCardClass*>(match.value));
+                    if (match.hit)
+                    {
+                        vc.Reset(v.Release());
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch3 = &match;
+                {
+                    Match match = vCardTestParser.vCardVersionRule(lexer, vc.Get());
+                    *parentMatch3 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch4 = &match;
+            {
+                Match match(false);
+                Match* parentMatch5 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match = vCardTestParser.vCardEndRule(lexer);
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"vCardTestRule");
+                            #endif
+                            return Match(true, vc.Release());
+                        }
+                    }
+                    *parentMatch5 = match;
+                }
+                *parentMatch4 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"vCardTestRule");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"vCardTestRule");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match vCardBeginRule(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"vCardBeginRule");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(true);
+            for (int i : s0)
+            {
+                if (*lexer == i)
+                {
+                    ++lexer;
+                }
+                else
+                {
+                    match.hit = false;
+                    break;
+                }
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"vCardBeginRule");
+                    #endif
+                    return Match(true, new vCardClass());
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"vCardBeginRule");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"vCardBeginRule");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match vCardVersionRule(TrivialLexer& lexer, vCardClass* vc)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"vCardVersionRule");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(true);
+            for (int i : s1)
+            {
+                if (*lexer == i)
+                {
+                    ++lexer;
+                }
+                else
+                {
+                    match.hit = false;
+                    break;
+                }
+            }
+            if (match.hit)
+            {
+                vc->version = "4.0";
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"vCardVersionRule");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"vCardVersionRule");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match vCardEndRule(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"vCardEndRule");
+            }
+        #endif
+        Match match(true);
+        for (int i : s2)
+        {
+            if (*lexer == i)
+            {
+                ++lexer;
+            }
+            else
+            {
+                match.hit = false;
+                break;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"vCardEndRule");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"vCardEndRule");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

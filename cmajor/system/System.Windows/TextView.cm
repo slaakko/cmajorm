@@ -137,7 +137,8 @@ namespace System.Windows
             "textView", location, size, dock, anchors), flags(Flags.none), drawFormat(StringAlignment.near, StringAlignment.near), fontFamily(fontFamily_), fontSize(fontSize_),
             charWidth(0), charHeight(0), textWidth(0), textHeight(0), maxLineLength(0), cursor(LoadStandardCursor(StandardCursorId.IDC_IBEAM)), caretLine(1), caretColumn(1),
             caretTimerPeriod(defaultCaretTimerPeriod), update(false), topLine(1), topLineDiff(0.0f), leftCol(1), leftColDiff(0.0f),
-            padding(), selectionBackgroundColor(DefaultSelectionBackgroundColor()), textColor(textColor_), editCommandList(this), selection()
+            padding(), selectionBackgroundColor(DefaultSelectionBackgroundColor()), textColor(textColor_), editCommandList(this), selection(),
+            indentSize(1)
         {
             uint caretTimeOut = 0u;
             bool succeeded = ReadCaretTimeoutFromRegistry(caretTimeOut);
@@ -1521,7 +1522,11 @@ namespace System.Windows
         }
         public virtual nothrow int IndentSize() const
         {
-            return 1;
+            return indentSize;
+        }
+        public void SetIndentSize(int indentSize_)
+        {
+            indentSize = indentSize_;
         }
         private void AddTabCommand(int lineIndex, int columnIndex)
         {
@@ -2429,6 +2434,7 @@ namespace System.Windows
         private SourcePos mouseSelectionEnd;
         private System.Windows.Color selectionBackgroundColor;
         private EditCommandList editCommandList;
+        private int indentSize;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)

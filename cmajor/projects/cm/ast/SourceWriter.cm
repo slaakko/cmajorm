@@ -1408,7 +1408,7 @@ namespace Cm.Ast
         }
         public override void Visit(ConstantNode& constantNode)
         {
-            if (constantNode.Parent()->GetNodeType() != NodeType.classNode)
+            if (constantNode.Parent() != null && constantNode.Parent()->GetNodeType() != NodeType.classNode)
             {
                 WriteEmptyLine();
             }
@@ -1424,7 +1424,7 @@ namespace Cm.Ast
             formatter.Write(" = ");
             constantNode.Value()->Accept(*this);
             formatter.WriteLine(";");
-            if (constantNode.Parent()->GetNodeType() != NodeType.classNode)
+            if (constantNode.Parent() != null && constantNode.Parent()->GetNodeType() != NodeType.classNode)
             {
                 emptyLine = true;
             }

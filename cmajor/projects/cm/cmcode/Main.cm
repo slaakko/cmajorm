@@ -1201,6 +1201,7 @@ namespace cmcode
                         filePath = Path.Combine(currentDirectory, fileNames[0]);
                     }
                     OpenProject(GetFullPath(filePath));
+                    Invalidate();
                 }
             }
             catch (const Exception& ex)
@@ -1244,6 +1245,7 @@ namespace cmcode
                 solutionExplorerData.Reset();
                 SetControlStatus(UserInterfaceAction.none);
                 gotoLineMenuItem->Disable();
+                Invalidate();
                 return true;
             }
             catch (const Exception& ex)
