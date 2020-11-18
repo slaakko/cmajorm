@@ -83,6 +83,9 @@ bindist:
 	cp -r system/* $(BINDISTDIR)/system
 	cp -r projects/* $(BINDISTDIR)/projects
 	cp  unicode/cmajor_ucd.bin $(BINDISTDIR)/unicode
+	mkdir -p $(BINDISTDIR)/cmajor/common
+	rm -f common/*.o
+	cp -r common/* $(BINDISTDIR)/cmajor/common
 	mkdir -p $(BINDISTDIR)/cmajor/eh
 	rm -f eh/*.o
 	cp -r eh/* $(BINDISTDIR)/cmajor/eh

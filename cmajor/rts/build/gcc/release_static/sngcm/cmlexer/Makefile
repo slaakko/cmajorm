@@ -14,6 +14,13 @@ SOURCE_PREFIX=../../../../../../sngcm/cmlexer
 
 LIBRARY_PREFIX=../../../lib
 
+all: $(PLATFORM)
+
+windows: $(LIBRARY_PREFIX)/$(LIBRARY_NAME)
+
+linux:
+	# nothing to do for linux
+
 CXXFLAGS += -std=c++14 -I$(SOURCE_PREFIX)/../.. -I$(SOURCE_PREFIX)/../../.. -DNDEBUG -O2
 
 %.o: $(SOURCE_PREFIX)/%.cpp

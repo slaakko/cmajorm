@@ -14,6 +14,13 @@ SOURCE_PREFIX=../../../../../../sngcm/ast
 
 LIBRARY_PREFIX=../../../lib
 
+all: $(PLATFORM)
+
+windows: $(LIBRARY_PREFIX)/$(LIBRARY_NAME)
+
+linux:
+	# nothing to do for linux
+
 CXXFLAGS += -std=c++14 -I$(SOURCE_PREFIX)/../.. -I$(SOURCE_PREFIX)/../../.. -g -O0
 
 %.o: $(SOURCE_PREFIX)/%.cpp

@@ -5,7 +5,9 @@
 
 #include <cmajor/rts/CommandLine.hpp>
 #include <cmajor/rts/Memory.hpp>
+#ifdef _WIN32
 #include <sngcm/cmparser/CommandLine.hpp>
+#endif
 #include <soulng/lexer/TrivialLexer.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Error.hpp>
