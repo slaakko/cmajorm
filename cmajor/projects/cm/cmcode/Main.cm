@@ -596,7 +596,11 @@ namespace cmcode
                     debugService->Stop();
                     debugService.Reset();
                 }
-                CloseSolutionClick();
+                if (!CloseSolution())
+                {
+                    cancelClose = true;
+                    return;
+                }
                 Application.SetLogView(null);
                 Cm.Views.Bitmaps.Instance().Clear();
                 base->OnWindowClosing(cancelClose);
@@ -1593,6 +1597,7 @@ namespace cmcode
                 project->RemoveFile(filePath, fileName);
                 project->Save();
                 projectNode->RemoveChild(fileNode);
+                Invalidate();
             }
             catch (const Exception& ex)
             {
@@ -2165,8 +2170,7 @@ namespace cmcode
             }
             catch (const Exception& ex)
             {
-
-   }
+            }
         }
         private void CopyClick()
         {
@@ -2244,6 +2248,7 @@ namespace cmcode
                         {
                             int lineIndex = textView->CaretLine() - 1;
                             int columnIndex = textView->CaretColumn() - 1;
+                            textView->SetFocus();
                             textView->InsertText(lineIndex, columnIndex, clipboardData);
                         }
                     }

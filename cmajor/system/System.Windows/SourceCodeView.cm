@@ -86,18 +86,13 @@ namespace System.Windows
     public class SourceCodeView : TextView
     {
         public SourceCodeView(const FontFamily& fontFamily, float fontSize, const Color& backgroundColor, const Color& textColor, const Point& location, const Size& size,
-            Dock dock, Anchors anchors) :
-            base(fontFamily, fontSize, backgroundColor, textColor, location, size, dock, anchors), numLineNumberDigits(0), indentSize(0)
+            Dock dock, Anchors anchors) : base(fontFamily, fontSize, backgroundColor, textColor, location, size, dock, anchors), numLineNumberDigits(0)
         {
             BuildDefaultStyles();
         }
         public SourceCodeView(const Point& location, const Size& size, Dock dock, Anchors anchors) :
             this(FontFamily("Consolas"), 10.0f, Color.White(), Color.Black(), location, size, dock, anchors)
         {
-        }
-        public nothrow void SetIndentSize(int indentSize_)
-        {
-            indentSize = indentSize_;
         }
         protected override void OnFontChanged()
         {
@@ -196,16 +191,12 @@ namespace System.Windows
         {
             if (IsEndBlockLine(lineIndex))
             {
-                return indentSize;
+                return IndentSize();
             }
             else
             {
                 return 0;
             }
-        }
-        protected override nothrow int IndentSize() const
-        {
-            return indentSize;
         }
         protected override nothrow int GetIndent(const ustring& line, int lineIndex)
         {
@@ -215,7 +206,7 @@ namespace System.Windows
                 {
                     if (IsBeginBlockLine(lineIndex))
                     {
-                        return i + indentSize;
+                        return i + IndentSize();
                     }
                     else
                     {
@@ -416,7 +407,6 @@ namespace System.Windows
         }
         private List<TokenLine> tokenLines;
         private int numLineNumberDigits;
-        private int indentSize;
         private List<UniquePtr<SourceCodeTextStyle>> textStyles;
         private List<UniquePtr<SourceCodeTokenStyle>> sourceCodeTokenStyles;
         private Map<FontStyle, Font*> fontStyleFontMap;

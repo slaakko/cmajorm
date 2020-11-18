@@ -37,6 +37,8 @@ namespace System.Windows
         return true;
     }
 
+    public const int mouseSelectionThresholdMs = 100;
+
     public nothrow System.Windows.Color DefaultSelectionBackgroundColor()
     {
         return System.Windows.Color(153u, 201u, 239u);
@@ -665,7 +667,6 @@ namespace System.Windows
                 {
                     mouseSelectionStart = SourcePos(line, column);
                     SetMouseExtendSelection();
-                    WinSetCapture(Handle());
                 }
             }
             if (charHeight != 0 && charWidth != 0)
@@ -701,9 +702,15 @@ namespace System.Windows
                 int line = 0;
                 short column = 0;
                 GetLineColumn(args.location, line, column);
-                mouseSelectionEnd = SourcePos(line, column);
-                ExtendSelection(mouseSelectionStart, mouseSelectionEnd);
-                InvalidateLines(selection.start.line, selection.end.line);
+                if (line >= 1 && line <= lines.Count())
+                {
+                    mouseSelectionEnd = SourcePos(line, column);
+                    if (mouseSelectionStart != mouseSelectionEnd)
+                    {
+                        ExtendSelection(mouseSelectionStart, mouseSelectionEnd);
+                        InvalidateLines(selection.start.line, selection.end.line);
+                    }
+                }
             }
         }
         protected override void OnMouseUp(MouseEventArgs& args)
@@ -712,7 +719,6 @@ namespace System.Windows
             if (MouseExtendSelection())
             {
                 ResetMouseExtendSelection();
-                WinReleaseCapture();
                 int line = 0;
                 short column = 0;
                 GetLineColumn(args.location, line, column);
@@ -1298,6 +1304,8 @@ namespace System.Windows
             if (text.IsEmpty()) return;
             if (!selection.IsEmpty())
             {
+                lineIndex = selection.start.line - 1;
+                columnIndex = selection.start.column - 1;
                 AddRemoveSelectionCommand();
                 RemoveSelection();
             }
@@ -1311,7 +1319,7 @@ namespace System.Windows
         }
         public nothrow void InsertLines(int lineIndex, int columnIndex, const List<ustring>& linesToInsert)
         {
-            if (linesToInsert.Count() == 1)
+            if (linesToInsert.Count() == 1 || linesToInsert.Count() == 2 && IsEmptyOrSpaceLine(linesToInsert[1]))
             {
                 while (lineIndex >= lines.Count())
                 {
@@ -1434,8 +1442,15 @@ namespace System.Windows
                 OnKeyDown(deleteArgs);
             }
         }
-        protected virtual nothrow int GetIndent(const ustring& line, int lineIndex) const
+        protected virtual nothrow int GetIndent(const ustring& line, int lineIndex) 
         {
+            for (int i = 0; i < line.Length(); ++i)
+            {
+                if (line[i] != ' ')
+                {
+                    return i;
+                }
+            }
             return 0;
         }
         protected virtual nothrow int RemoveIndent(int lineIndex) const
@@ -1520,7 +1535,7 @@ namespace System.Windows
             Invalidate();
             SetDirty();
         }
-        public virtual nothrow int IndentSize() const
+        public nothrow inline int IndentSize() const
         {
             return indentSize;
         }
@@ -1772,7 +1787,6 @@ namespace System.Windows
             ExtendSelection(start, end);
             SetCaretLineCol(line, col + LineNumberFieldLength());
             ScrollToCaret();
-            //Invalidate();
             InvalidateLineCol(line, col);
         }
         protected override void SetCursor()
@@ -2058,7 +2072,7 @@ namespace System.Windows
                     lines.Remove(lines.Begin() + lineIndex);
                     LineEventArgs deleteArgs(lineIndex, -1);
                     OnLineDeleted(deleteArgs);
-                    SetCaretLineCol(lineIndex + 1, 1 + LineNumberFieldLength());
+                    SetCaretLineCol(selection.start.line, 1 + LineNumberFieldLength());
                 }
                 else
                 {
@@ -2115,6 +2129,7 @@ namespace System.Windows
             ResetSelection();
             Invalidate();
             SetDirty();
+            SetFocus();
         }
         private nothrow void AddIndentSelectionCommand()
         {

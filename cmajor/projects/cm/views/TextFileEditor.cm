@@ -19,10 +19,7 @@ namespace Cm.Views
             ustring content = ToUtf32(File.ReadAllText(filePath));
             textView->SetTextContent(content);
             textView->SetFixed();
-            if (Path.GetExtension(filePath) == ".parser" || Path.GetExtension(filePath) == ".lexer")
-            {
-                textView->SetIndentSize(4);
-            }
+            textView->SetIndentSize(4);
         }
         public nothrow override TextView* GetTextView() const
         {

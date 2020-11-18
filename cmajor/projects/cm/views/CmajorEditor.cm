@@ -33,6 +33,7 @@ namespace Cm.Views
             AddChild(scrollableSourceCodeView.Release());
             ustring content = ToUtf32(File.ReadAllText(filePath));
             sourceCodeView->SetTextContent(content);
+            sourceCodeView->SetIndentSize(4);
         }
         public CmajorEditor(const string& filePath, BreakpointList& breakpointList) :
             this(filePath, breakpointList, DefaultDebugStripWidth(), DefaultDebugStripBackgroundColor())
