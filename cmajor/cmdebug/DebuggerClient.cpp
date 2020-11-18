@@ -26,6 +26,7 @@ class DebuggerClient;
 class ClientCommand
 {
 public:
+    virtual ~ClientCommand();
     virtual void Execute(DebuggerClient& client) = 0;
 };
 
@@ -540,6 +541,10 @@ void DebuggerClient::Break(const SourceLoc& location)
     WriteRequest(request.get());
     std::unique_ptr<JsonValue> reply = ReadReply(MessageKind::breakReply);
     ProcessBreakReply(reply.get());
+}
+
+ClientCommand::~ClientCommand()
+{
 }
 
 void StartCommand::Execute(DebuggerClient& client)
