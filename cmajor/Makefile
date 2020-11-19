@@ -64,9 +64,33 @@ sys:
 	cmc --verbose system/platform/linux/System.cms
 	cmc --verbose --config=release system/platform/linux/System.cms
 
+SRCDIR = ~/cmajor-3.7.0-src
+SRCPACKAGE = cmajor-3.7.0-src.tar.bz2
+SRCDIRNAME = cmajor-3.7.0-src
+
+srcpackage:
+	mkdir -p $(SRCDIR)
+	cd ~/cmajorm && git archive master | tar -x -C $(SRCDIR)
+	rm -r $(SRCDIR)/devenv
+	rm -r $(SRCDIR)/setup
+	rm -r $(SRCDIR)/vs
+	rm -r $(SRCDIR)/cmajor/vs
+	rm $(SRCDIR)/cmajor/supd.xml
+	mkdir -p $(SRCDIR)/cmajor/bin
+	mkdir -p $(SRCDIR)/cmajor/lib
+	mkdir -p $(SRCDIR)/cmajor/lib/gcc
+	mkdir -p $(SRCDIR)/cmajor/rts/build/gcc/bin
+	mkdir -p $(SRCDIR)/cmajor/rts/build/gcc/lib
+	cp /mnt/c/work/cmajorm/cmajor/unicode/cmajor_ucd.bin $(SRCDIR)/cmajor/unicode
+	cd ~ && tar cjf $(SRCPACKAGE) $(SRCDIRNAME)
+
 BINDISTDIR = ~/cmajor-3.7.0
+BINDISTPACKAGE = cmajor-3.7.0-ubuntu-20.04-x86_64-binaries.tar.bz2
+BINDISTDIRNAME = cmajor-3.7.0
 
 bindist:
+	cmc --clean ~/cmajor-3.7.0-src/cmajor/system/platform/linux/System.cms
+	cmc --clean -c=release ~/cmajor-3.7.0-src/cmajor/system/platform/linux/System.cms
 	mkdir -p $(BINDISTDIR)
 	mkdir -p $(BINDISTDIR)/bin
 	mkdir -p $(BINDISTDIR)/config
@@ -104,6 +128,7 @@ bindist:
 	cp -r soulng/* $(BINDISTDIR)/cmajor/soulng
 	cd $(BINDISTDIR)/cmajor && ln -s ../system
 	cd $(BINDISTDIR)/cmajor && ln -s ../lib
+	cd ~ && tar cjf $(BINDISTPACKAGE) $(BINDISTDIRNAME)
 	
 clean:
 	$(MAKE) -C soulng clean

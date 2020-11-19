@@ -1,4 +1,4 @@
-#	Cmajor system library, tools and examples makefile.
+#	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 
 all: compiler sys tools examples install
 
