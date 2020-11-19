@@ -1,8 +1,25 @@
-System.Net.Sockets.SocketException: Yhteyttä ei voi muodostaa, koska kohdekone ei salli sitä.
-
+System.IO.FileSystemException: could not open file '': Invalid argument
 CALL STACK:
-System.Net.Sockets.TcpSocket.TcpSocket(const String<char>&, const String<char>&, System.Net.Sockets.ConnectOptions) C:/work/cmajorm/cmajor/system/System.Net.Sockets/TcpSocket.cm:48
-System.Net.Sockets.TcpSocket.TcpSocket(const String<char>&, const String<char>&) C:/work/cmajorm/cmajor/system/System.Net.Sockets/TcpSocket.cm:56
-Cm.Service.Build.BuildService.SendReceiveKeepAliveRequest() C:/work/cmajorm/cmajor/projects/cm/service/BuildService.cm:348
-Cm.Service.Build.BuildService.KeepAliveServer() C:/work/cmajorm/cmajor/projects/cm/service/BuildService.cm:318
+System.IO.FileByteStream.Open(const String<char>&, System.IO.OpenMode) C:/work/cmajorm/cmajor/system/System.Base/FileByteStream.cm:49
+System.IO.FileByteStream.FileByteStream(const String<char>&, System.IO.OpenMode) C:/work/cmajorm/cmajor/system/System.Base/FileByteStream.cm:17
+System.IO.File.OpenRead(const String<char>&) C:/work/cmajorm/cmajor/system/System.Base/File.cm:54
+System.IO.File.ReadAllText(const String<char>&) C:/work/cmajorm/cmajor/system/System.Base/File.cm:63
+Cm.Views.CmajorEditor.CmajorEditor(const String<char>&, BreakpointList&, int, const Color&) C:/work/cmajorm/cmajor/projects/cm/views/CmajorEditor.cm:34
+Cm.Views.CmajorEditor.CmajorEditor(const String<char>&, BreakpointList&) C:/work/cmajorm/cmajor/projects/cm/views/CmajorEditor.cm:40
+cmcode.MainWindow.AddCmajorEditor(const String<char>&, const String<char>&, const String<char>&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:2332
+cmcode.MainWindow.ViewError(ViewErrorEventArgs&) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:3257
+Cm.Views.ErrorView.OnViewError(CompileError*) C:/work/cmajorm/cmajor/projects/cm/views/ErrorView.cm:91
+Cm.Views.ErrorView.TreeViewNodeDoubleClick(TreeViewNodeMouseClickEventArgs&) C:/work/cmajorm/cmajor/projects/cm/views/ErrorView.cm:86
+System.Windows.TreeView.OnNodeDoubleClick(TreeViewNodeMouseClickEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/TreeView.cm:657
+System.Windows.TreeView.NodeDoubleClick(const Point&, System.Windows.MouseButtons, TreeViewNode*) C:/work/cmajorm/cmajor/system/System.Windows/TreeView.cm:662
+System.Windows.TreeViewNode.OnMouseDoubleClick(MouseEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/TreeView.cm:1103
+System.Windows.TreeViewNode.DispatchMouseDoubleClick(MouseEventArgs&, bool&) C:/work/cmajorm/cmajor/system/System.Windows/TreeView.cm:938
+System.Windows.TreeViewNode.DispatchMouseDoubleClick(MouseEventArgs&, bool&) C:/work/cmajorm/cmajor/system/System.Windows/TreeView.cm:951
+System.Windows.TreeView.OnMouseDoubleClick(MouseEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/TreeView.cm:394
+System.Windows.Control.DoMouseDoubleClick(MouseEventArgs&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:1680
+System.Windows.Control.ProcessMessage(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:878
+System.Windows.Control.ProcessMessageInternal(Message&) C:/work/cmajorm/cmajor/system/System.Windows/Control.cm:789
+System.Windows.Application.ProcessMessage(void*, uint, uint, long, long&, void*&) C:/work/cmajorm/cmajor/system/System.Windows/Application.cm:131
+System.Windows.Application.Run(Window&) C:/work/cmajorm/cmajor/system/System.Windows/Application.cm:94
+main(int, const char**) C:/work/cmajorm/cmajor/projects/cm/cmcode/Main.cm:3947
 

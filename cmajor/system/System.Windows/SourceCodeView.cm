@@ -221,15 +221,6 @@ namespace System.Windows
             base->OnLineInserted(args);
             int lineIndex = args.lineIndex;
             ustring& line = Lines()[lineIndex];
-            int indent = 0;
-            if (args.indentLineIndex >= 0 && args.indentLineIndex < Lines().Count())
-            {
-                indent = GetIndent(Lines()[args.indentLineIndex], args.indentLineIndex);
-            }
-            if (indent != 0)
-            {
-                line.Insert(0, ustring(' ', indent));
-            }
             int state = 0;
             while (lineIndex >= tokenLines.Count())
             {

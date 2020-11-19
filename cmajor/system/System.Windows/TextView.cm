@@ -1826,6 +1826,17 @@ namespace System.Windows
         protected virtual void OnLineInserted(LineEventArgs& args)
         {
             lineInsertedEvent.Fire(args);
+            int lineIndex = args.lineIndex;
+            ustring& line = Lines()[lineIndex];
+            int indent = 0;
+            if (args.indentLineIndex >= 0 && args.indentLineIndex < Lines().Count())
+            {
+                indent = GetIndent(Lines()[args.indentLineIndex], args.indentLineIndex);
+            }
+            if (indent != 0)
+            {
+                line.Insert(0, ustring(' ', indent));
+            }
             Invalidate();
         }
         public nothrow inline int MaxLineLength() const
