@@ -1,12 +1,16 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 
-all: compiler sys tools examples install
+all: compiler cppbert sys tools examples install
 
 compiler: buildcomp install
 
 buildcomp:
 	MSBuild -m -verbosity:minimal ..\cmajor.sln -p:Configuration="Debug"
 	MSBuild -m -verbosity:minimal ..\cmajor.sln -p:Configuration="Release"
+	
+cppbert:
+	cd ../rts/build/gcc && mingw32-make
+	cd ../rts/build/gcc && mingw32-make install
 	
 sys:
 	cmc -u -v ../system/platform/windows/System.cms
