@@ -1,6 +1,12 @@
 #	Cmajor system library, tools and examples makefile.
 
-all: sys tools examples
+all: compiler sys tools examples install
+
+compiler: buildcomp install
+
+buildcomp:
+	MSBuild -m -verbosity:minimal ..\cmajor.sln -p:Configuration="Debug"
+	MSBuild -m -verbosity:minimal ..\cmajor.sln -p:Configuration="Release"
 	
 sys:
 	cmc -u -v ../system/platform/windows/System.cms
@@ -25,3 +31,6 @@ tools:
 examples:
 	cmc -u -v ../projects/examples/examples.cms
 	cmc -u -v -c=release ../projects/examples/examples.cms
+
+install:
+	install.bat

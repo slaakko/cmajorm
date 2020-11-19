@@ -701,6 +701,28 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        protected override void OnGotFocus()
+        {
+            try
+            {
+                base->OnGotFocus();
+                TabPage* selectedTabPage = codeTabControl->SelectedTabPage();
+                Cm.Views.Editor* editor = GetEditorByTabPage(selectedTabPage);
+                if (editor != null)
+                {
+                    TextView* textView = editor->GetTextView();
+                    if (textView != null)
+                    {
+                        textView->SetFocus();
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message());
+                LogException(ex);
+            }
+        }
         private void VerticalSplitterDistanceChanged()
         {
             try
