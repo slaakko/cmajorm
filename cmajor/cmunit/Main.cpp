@@ -66,7 +66,7 @@ using namespace cmajor::build;
 using namespace cmajor::binder;
 using namespace sngxml::dom;
 
-const char* version = "3.7.0";
+const char* version = "3.8.0";
 
 void PrintHelp()
 {

@@ -748,8 +748,8 @@ std::string MakeGccLibraryName(const std::string& libraryFilePath)
     return libraryFilePath;
 }
 
-const char* dynamicRuntimeArg = "-lcmrt370cpp";
-const char* dynamicDebugRuntimeArg = "-lcmrt370cppd";
+const char* dynamicRuntimeArg = "-lcmrt380cpp";
+const char* dynamicDebugRuntimeArg = "-lcmrt380cppd";
 
 void LinkCpp(Target target, const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, const std::string& mainObjectFilePath, Module& module)
 {
@@ -1282,10 +1282,10 @@ void LinkLlvm(Target target, const std::string& executableFilePath, const std::s
     args.push_back("/debug");
     args.push_back("/out:" + QuotedPath(executableFilePath));
     args.push_back("/stack:16777216");
-    std::string cmrtLibName = "cmrt370.lib";
+    std::string cmrtLibName = "cmrt380.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
-        cmrtLibName = "cmrt370d.lib";
+        cmrtLibName = "cmrt380d.lib";
     }
     args.push_back(QuotedPath(GetFullPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName))));
     args.push_back(QuotedPath(mainObjectFilePath));

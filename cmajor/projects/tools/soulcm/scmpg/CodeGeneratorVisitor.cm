@@ -115,8 +115,8 @@ namespace soulcm.scmpg
                 Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
                 actionS->AddStatement(ifStmt);
                 Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(),
-                    new Cm.Ast.ConstNode(System.Lex.Span(), 
-                    new Cm.Ast.LValueRefNode(System.Lex.Span(), 
+                    new Cm.Ast.ConstNode(System.Lex.Span(),
+                    new Cm.Ast.LValueRefNode(System.Lex.Span(),
                     new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(parser.ArrayName())), actionS);
                 currentBlock->AddStatement(rangeFor);
                 Cm.Ast.CompoundStatementNode* then2S = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
@@ -137,7 +137,7 @@ namespace soulcm.scmpg
                 Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
                 actionS->AddStatement(ifStmt);
                 Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(), new Cm.Ast.ConstNode(System.Lex.Span(),
-                    new Cm.Ast.LValueRefNode(System.Lex.Span(), 
+                    new Cm.Ast.LValueRefNode(System.Lex.Span(),
                     new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(parser.ArrayName())), actionS);
                 currentBlock->AddStatement(rangeFor);
             }
@@ -1133,6 +1133,6 @@ namespace soulcm.scmpg
     }
     public string ParserGeneratorVersionStr()
     {
-        return "3.0.0";
+        return "3.8.0";
     }
 } // namespace soulcm.scmpg
