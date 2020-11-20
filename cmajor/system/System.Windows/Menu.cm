@@ -207,6 +207,23 @@ namespace System.Windows
         public MenuBar() : this(Font(FontFamily("Segoe UI"), 9.0f))
         {
         }
+        public void CloseMenu()
+        {
+            if (!IsOpen()) return;
+            SetClosed();
+            SetLatestOpenedMenuItem(null);
+            Component* child = children.FirstChild();
+            while (child != null)
+            {
+                if (child is MenuItem*)
+                {
+                    MenuItem* menuItem = cast<MenuItem*>(child);
+                    menuItem->SetState(MenuItem.State.closed, this);
+                }
+                child = child->NextSibling();
+            }
+            InvalidateMenu();
+        }
         public void AddMenuItem(MenuItem* menuItem)
         {
             children.AddChild(menuItem);
@@ -486,7 +503,7 @@ namespace System.Windows
                 {
                     menuBox->SetPaintThisMenuBox(true);
                     menuBox->SetLocation(Point(Location().x + menuRect.location.x, Location().y + menuRect.location.y));
-                    menuBox->SetSize(menuRect.size); 
+                    menuBox->SetSize(menuRect.size);
                     Control* parentControl = ParentControl();
                     Control* topControl = null;
                     if (parentControl != null)
@@ -834,7 +851,7 @@ namespace System.Windows
         }
         private nothrow void SetMenuBoxAdded()
         {
-            flags = cast<Flags>(flags | Flags.menuBoxAdded); 
+            flags = cast<Flags>(flags | Flags.menuBoxAdded);
         }
         private void AddMenuBox()
         {
@@ -1086,7 +1103,7 @@ namespace System.Windows
             rootItemPtr->SetState(MenuItem.State.open, this);
             Graphics graphics = Graphics.FromWindowHandle(Handle());
             rootItemPtr->CalculateChildRect(graphics, GetFont(), Format(), Point(0, 0));
-            Rect menuRect; 
+            Rect menuRect;
             rootItemPtr->GetOpenRect(menuRect);
             SetSize(menuRect.size);
         }
@@ -2431,7 +2448,7 @@ namespace System.Windows
                     }
                 }
             }
-            else 
+            else
             {
                 if (drawSubItems)
                 {
@@ -2487,7 +2504,7 @@ namespace System.Windows
                     }
                 }
             }
-            else 
+            else
             {
                 if (drawSubItems)
                 {
@@ -2556,7 +2573,7 @@ namespace System.Windows
                         graphics.DrawLineChecked(blackPen,
                             Point(rect.location.x + rect.size.w - shadowWidth, rect.location.y), Point(r.location.x + r.size.w, rect.location.y));
                     }
-                    else 
+                    else
                     {
                         graphics.DrawLineChecked(blackPen, rect.location, Point(rect.location.x, rect.location.y + rect.size.h - shadowWidth));
                         graphics.DrawLineChecked(blackPen, Point(rect.location.x, r.location.y + rect.size.h - shadowWidth),
@@ -2751,7 +2768,7 @@ namespace System.Windows
         private wchar accessKey;
         private Keys shortcut;
         private int shortcutFieldWidth;
-        private int childIndicatorFieldWidth; 
+        private int childIndicatorFieldWidth;
     }
 
     public class MenuItemSeparator : MenuItemBase

@@ -30,24 +30,24 @@
 
 GlobalInitFunctionType initCompileUnitsFunction = nullptr;
 
-extern "C" RT_API void RtInit(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray,
+void RtInit(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray,
     GlobalInitFunctionType globalInitializationFunction)
 {
     cmajor::rt::Init(numberOfPolymorphicClassIds, polymorphicClassIdArray, numberOfStaticClassIds, staticClassIdArray);
     initCompileUnitsFunction = globalInitializationFunction;
 }
 
-extern "C" RT_API bool DynamicInitVmtsAndCompare(void* vmt1, void* vmt2)
+bool DynamicInitVmtsAndCompare(void* vmt1, void* vmt2)
 {
     return cmajor::rt::DynamicInitVmtsAndCompare(vmt1, vmt2);
 }
 
-extern "C" RT_API void RtDone()
+void RtDone()
 {
     cmajor::rt::Done();
 }
 
-extern "C" RT_API void RtExit(int32_t exitCode)
+void RtExit(int32_t exitCode)
 {
     exit(exitCode);
 }
@@ -65,13 +65,13 @@ void RtInitCompileUnits()
     }
 }
 
-extern "C" RT_API void RtBeginUnwindInfoInit()
+void RtBeginUnwindInfoInit()
 {
     initMutex.lock();
     RtInitCompileUnits();
 }
 
-extern "C" RT_API void RtEndUnwindInfoInit()
+void RtEndUnwindInfoInit()
 {
     initMutex.unlock();
 }

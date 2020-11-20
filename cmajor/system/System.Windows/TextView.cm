@@ -37,8 +37,6 @@ namespace System.Windows
         return true;
     }
 
-    public const int mouseSelectionThresholdMs = 100;
-
     public nothrow System.Windows.Color DefaultSelectionBackgroundColor()
     {
         return System.Windows.Color(153u, 201u, 239u);
@@ -1442,7 +1440,7 @@ namespace System.Windows
                 OnKeyDown(deleteArgs);
             }
         }
-        protected virtual nothrow int GetIndent(const ustring& line, int lineIndex) 
+        protected virtual nothrow int GetIndent(const ustring& line, int lineIndex)
         {
             for (int i = 0; i < line.Length(); ++i)
             {

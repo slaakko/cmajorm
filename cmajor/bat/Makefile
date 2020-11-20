@@ -1,6 +1,6 @@
 #	Makefile for Cmajor compiler & tools, system library, tool programs and examples.
 
-all: compiler cppbert sys tools examples 
+all: compiler cppbert sys cm tools examples 
 	install.bat
 
 compiler: buildcomp install
@@ -18,10 +18,12 @@ sys:
 	cmc -u -v -c=release ../system/platform/windows/System.cms
 	cppcmc -u -v -st ../system/platform/windows/System.cms
 	cppcmc -u -v -st -c=release ../system/platform/windows/System.cms
-	
-tools:
+
+cm:
 	cmc -u -v ../projects/cm/Cm.cms
 	cmc -u -v -c=release ../projects/cm/Cm.cms
+	
+tools:
 	cmc -u -v ../projects/tools/soulcm/scmpg/scmpg.cmp
 	cmc -u -v -c=release ../projects/tools/soulcm/scmpg/scmpg.cmp
 	cmc -u -v ../projects/tools/soulcm/scmlg/scmlg.cmp
