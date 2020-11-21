@@ -2849,6 +2849,10 @@ namespace cmcode
             try
             {
                 if (solution.IsNull()) return;
+                if (searchResultsTabPage != null)
+                {
+                    searchResultsTabPage->Close();
+                }
                 bool hasCurrentFile = false;
                 TabPage* tabPage = codeTabControl->SelectedTabPage();
                 Cm.Views.Editor* editor = null;
