@@ -1,0 +1,115 @@
+<h1>Cmajor 3.7.1 for Windows x64 and Linux</h1>
+
+<h2>Release notes</h2>
+
+<ul>
+<li><p>Bug fix: Fixed a bug in class template compilation causing access violation in compiler.</p></li>
+<li><p>Bug fix: Removed flashing console window when building projects in CmDevEnv.</p></li>
+<li><p>Bug fix: JSON parser did not accept empty array and empty object.</p></li>
+<li><p>Bug fix: Consider the following program:</p>
+
+<pre><code>using System;
+
+
+abstract class Component
+{
+    public Component()
+    {
+    }
+    public default virtual ~Component();
+    public string Addr()
+    {
+        return ToHexString(cast&lt;ulong&gt;(cast&lt;void*&gt;(this)));
+    }
+    public abstract void Boom();
+}
+
+
+class Container
+{
+    public nothrow Container(Component* parent_) : parent(parent_)
+    {
+    }
+    public void Fail()
+    {
+        Console.Out() &lt;&lt; "&gt;Container.Fail()" &lt;&lt; endl();
+        parent-&gt;Fail();
+        Console.Out() &lt;&lt; "&lt;Container.Fail()" &lt;&lt; endl();
+    }
+    public Component* parent;
+}
+
+
+class ToFail : Component
+{
+    public ToFail(const string&amp; text_) : base(), text(text_), container(this)
+    {
+    }
+    public nothrow Container&amp; GetContainer()
+    {
+        return container;
+    }
+    public ~ToFail()
+    {
+        Console.Out() &lt;&lt; "destructor ~ToFail() " &lt;&lt; Addr() &lt;&lt; " called" &lt;&lt; endl();
+    }
+    public override void Fail()
+    {
+        Console.Out() &lt;&lt; "&gt;ToFail.Fail: " &lt;&lt; Addr() &lt;&lt; endl();
+        Console.Out() &lt;&lt; "&lt;ToFail.Fail: " &lt;&lt; Addr() &lt;&lt; endl();
+    }
+    public string text;
+    public Container container;
+}
+
+
+void main()
+{
+    Console.Out() &lt;&lt; "start" &lt;&lt; endl();
+    UniquePtr&lt;ToFail&gt; toFail(new ToFail(ToString(1))); 
+    Console.Out() &lt;&lt; "toFail addr is " &lt;&lt; toFail-&gt;Addr() &lt;&lt; endl();
+    Console.Out() &lt;&lt; "toFail container parent addr is " &lt;&lt; toFail-&gt;container.parent-&gt;Addr() &lt;&lt; endl();
+    toFail-&gt;GetContainer().Fail();
+    Console.Out() &lt;&lt; "end" &lt;&lt; endl();
+}
+</code></pre>
+
+<p>Because ToString(1) returns an rvalue, the compiler erroneously generated a move constructor for the ToFail class and called it after 
+converting the string to a ToFail object. This has been fixed now so that move constructor is not generated and called, 
+but ToFail.ToFail(const string&amp;) constructor is just called with a string argument as expected.</p>
+
+<p>Before the fix, the program above printed the following lines and crashed:</p>
+
+<pre><code>D:\work\bug&gt;bin\debug\bug
+start
+destructor ~ToFail() 00000038913FF888 called
+toFail addr is 00000210D28CC780
+toFail container parent addr is 00000038913FF888
+&gt;Container.Fail() // &lt;--- access violation
+</code></pre>
+
+<p>Now the program prints:</p>
+
+<pre><code>D:\work\bug&gt;bin\debug\bug
+start
+toFail addr is 0000024F7DE191E0
+toFail container parent addr is 0000024F7DE191E0
+&gt;Container.Fail()
+&gt;ToFail.Fail: 0000024F7DE191E0
+&lt;ToFail.Fail: 0000024F7DE191E0
+&lt;Container.Fail()
+end
+destructor ~ToFail() 0000024F7DE191E0 called
+</code></pre></li>
+<li><p>Fixed a couple of IDE bugs</p></li>
+<li><p>The debugger has now <a href="https://slaakko.github.io/cmajor/tools/cmdb/cmdb.html#set-condition-command">conditional breakpoints</a>.</p></li>
+<li><p><a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_Directory_BC859E3181032FEF203267BDB17523BD8C99C7E4.html#member_function_GetDirectories_Directory_65AE3E544E2D506C377E1404520BFF71F03F2CC2">Directory.GetDirectories</a>.</p></li>
+<li><p>New tool: <a href="https://slaakko.github.io/cmajor/projects/tools/supd/supd.html">supd</a> for synchronizing parallel source code directory trees.</p></li>
+<li><p>Decided to drop TLS support on Windows. </p></li>
+<li><p><a href="https://slaakko.github.io/cmajor/installation/installation.html">Installation</a> instructions updated.</p></li>
+<li><p>Includes first version of <a href="https://slaakko.github.io/cmajor/projects/cm/cmcode.html">Cmajor Code</a>, a new IDE for Windows written in Cmajor.</p></li>
+<li><p><a href="https://slaakko.github.io/cmajor/compiler/devenv/cmajor-dev.html">Instructions</a> for setting up compiler development environment on Windows and compiling the compiler and tools from sources.</p></li>
+<li><p>Occasionally you may get the following internal error when compiling the system library with the compiler with the C++ backend: "Error: class 'String<uchar>' not bound."
+I think it has something to do with concurrency in the compiler. A workaround is to compile sequentally by adding the "-st" option (this is much slower). 
+That is: "cppcmc -st -u -v System.cms" for the debug mode and "cppcmc -st -u -v -c=release System.cms" for the release mode.</p></li>
+</ul>
