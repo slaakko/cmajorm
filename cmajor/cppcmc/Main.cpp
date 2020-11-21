@@ -69,7 +69,7 @@ struct BackendInit
     }
 };
 
-const char* version = "3.8.0";
+const char* version = "3.7.1";
 
 void PrintHelp()
 {

@@ -13,7 +13,7 @@ namespace soulng { namespace unicode {
 
 std::string CmajorVersionStr()
 {
-    return "3.8.0";
+    return "3.7.1";
 }
 
 UnicodeException::UnicodeException(const std::string& message_) : std::runtime_error(message_)
