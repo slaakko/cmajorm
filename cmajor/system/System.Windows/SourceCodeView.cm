@@ -249,11 +249,6 @@ namespace System.Windows
             }
             return ustring();
         }
-        public override nothrow void GetLineColumn(const Point& contentLocation, int& line, short& column) const
-        {
-            base->GetLineColumn(contentLocation, line, column);
-            column = column - cast<short>(LineNumberFieldLength());
-        }
         public nothrow ustring GetTokenText(int lineNumber, short columnNumber) const
         {
             if (lineNumber >= 1 && lineNumber <= tokenLines.Count())

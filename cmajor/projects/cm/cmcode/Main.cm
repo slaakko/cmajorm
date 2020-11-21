@@ -523,9 +523,10 @@ namespace cmcode
             UniquePtr<Control> paddedTreeView(new PaddedControl(solutionExplorerTreeViewPtr.Release(), Padding(4, 4, 4, 4), Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
             UniquePtr<Control> borderedTreeView(new BorderedControl(paddedTreeView.Release(), BorderStyle.single, TreeViewNormalBorderColor(), TreeViewSelectedBorderColor(),
                 Point(0, 0), Size(0, 0), Dock.none, Anchors.none));
-            UniquePtr<Control> scrollableTreeView(new ScrollableControl(borderedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            UniquePtr<ScrollableControl> scrollableTreeViewPtr(new ScrollableControl(borderedTreeView.Release(), Point(0, 0), Size(0, 0), Dock.fill, Anchors.none));
+            scrollableTreeView = scrollableTreeViewPtr.Get();
             horizontalSplitContainer->Pane1Container()->AddChild(borderedTabControl.Release());
-            horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeView.Release());
+            horizontalSplitContainer->Pane2Container()->AddChild(scrollableTreeViewPtr.Release());
             verticalSplitContainer->Pane1Container()->AddChild(horizontalSplitContainerPtr.Release());
             UniquePtr<TabControl> outputTabControlPtr(new TabControl(Point(), Size(), Dock.none, Anchors.none));
             outputTabControl = outputTabControlPtr.Get();
@@ -799,6 +800,7 @@ namespace cmcode
             if (codeTabControl->TabPages().IsEmpty())
             {
                 sourceFilePathStatusBarItem->SetText("");
+                ResetFocusedControl();
             }
         }
         private void OutputTabControlTabPageRemoved(ControlEventArgs& args)
@@ -1055,6 +1057,7 @@ namespace cmcode
                 codeTabControl->CloseAllTabPages();
                 UniquePtr<TreeViewNode> root = BuildSolutionTree(solution.Get(), solutionExplorerData, contents);
                 solutionExplorerTreeView->SetRoot(root.Release());
+                scrollableTreeView->Invalidate();
                 Cm.Ast.Project* activeProject = solution->ActiveProject();
                 if (activeProject != null)
                 {
@@ -1226,6 +1229,7 @@ namespace cmcode
                     {
                         filePath = Path.Combine(currentDirectory, fileNames[0]);
                     }
+                    ResetFocusedControl();
                     OpenProject(GetFullPath(filePath));
                     Invalidate();
                 }
@@ -1268,9 +1272,11 @@ namespace cmcode
                 }
                 codeTabControl->CloseAllTabPages();
                 solutionExplorerTreeView->SetRoot(null);
+                scrollableTreeView->Invalidate();
                 solutionExplorerData.Reset();
                 SetControlStatus(UserInterfaceAction.none);
                 gotoLineMenuItem->Disable();
+                ResetFocusedControl();
                 Invalidate();
                 return true;
             }
@@ -3886,6 +3892,7 @@ namespace cmcode
         private Cm.Views.SearchResults* searchResults;
         private TabPage* searchResultsTabPage;
         private TreeView* solutionExplorerTreeView;
+        private ScrollableControl* scrollableTreeView;
         private UniquePtr<SolutionExplorerData> solutionExplorerData;
         private StatusBarItem* sourceFilePathStatusBarItem;
         private StatusBarItem* dirtyStatusBarItem;

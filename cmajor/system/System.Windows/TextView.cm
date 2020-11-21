@@ -306,10 +306,10 @@ namespace System.Windows
         {
             return line >= topLine && line < topLine + GetVisibleLineCount();
         }
-        public virtual nothrow void GetLineColumn(const Point& contentLocation, int& line, short& column) const
+        public nothrow void GetLineColumn(const Point& contentLocation, int& line, int& column) const
         {
             line = cast<int>(contentLocation.y / charHeight + 1);
-            column = cast<short>(contentLocation.x / charWidth + 1);
+            column = cast<int>(contentLocation.x / charWidth + 1) - LineNumberFieldLength();
         }
         public void EnsureLineVisible(int line)
         {
@@ -654,12 +654,17 @@ namespace System.Windows
         protected override void OnMouseDown(MouseEventArgs& args)
         {
             base->OnMouseDown(args);
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                logView->WriteLine("OnMouseDown!");
+            }
             SetFocus(this);
             ResetSelection();
             if (args.buttons == MouseButtons.lbutton && !lines.IsEmpty())
             {
                 int line = 0;
-                short column = 0;
+                int column = 0;
                 GetLineColumn(args.location, line, column);
                 if (line >= 1 && line <= lines.Count())
                 {
@@ -672,9 +677,9 @@ namespace System.Windows
                 if ((args.buttons == MouseButtons.lbutton || args.buttons == MouseButtons.rbutton) && args.clicks == 1)
                 {
                     Point loc = args.location;
-                    int lineNumber = cast<int>(loc.y / charHeight + 1.5);
+                    int lineNumber = cast<int>(loc.y / charHeight) + 1;
                     lineNumber = Max(1, Min(lineNumber, cast<int>(lines.Count())));
-                    int columnNumber = cast<int>(loc.x / charWidth + 1.5);
+                    int columnNumber = cast<int>(loc.x / charWidth) + 1;
                     columnNumber = Max(columnNumber, 1 + LineNumberFieldLength());
                     int lineLength = GetLineLength(lineNumber);
                     columnNumber = Min(columnNumber, lineLength + 1 + LineNumberFieldLength());
@@ -698,7 +703,7 @@ namespace System.Windows
             if (MouseExtendSelection())
             {
                 int line = 0;
-                short column = 0;
+                int column = 0;
                 GetLineColumn(args.location, line, column);
                 if (line >= 1 && line <= lines.Count())
                 {
@@ -714,11 +719,16 @@ namespace System.Windows
         protected override void OnMouseUp(MouseEventArgs& args)
         {
             base->OnMouseUp(args);
+            LogView* logView = Application.GetLogView();
+            if (logView != null)
+            {
+                logView->WriteLine("OnMouseUp!");
+            }
             if (MouseExtendSelection())
             {
                 ResetMouseExtendSelection();
                 int line = 0;
-                short column = 0;
+                int column = 0;
                 GetLineColumn(args.location, line, column);
                 if (line >= 1 && line <= lines.Count())
                 {
@@ -1750,42 +1760,43 @@ namespace System.Windows
         protected override void OnMouseDoubleClick(MouseEventArgs& args)
         {
             base->OnMouseDoubleClick(args);
+            ResetMouseExtendSelection();
+            mouseSelectionStart = SourcePos();
+            mouseSelectionEnd = SourcePos();
             SetFocus();
             ResetSelection();
             int line = 0;
-            int col = 0;
-            short column = 0;
+            int column = 0;
             GetLineColumn(args.location, line, column);
-            col = column;
-            uchar c = GetCharAt(line, col);
+            uchar c = GetCharAt(line, column);
             while (!IsWhiteSpace(c) && !IsWordSeparator(c))
             {
-                if (col == 1 || !Prev(line, col))
+                if (column == 1 || !Prev(line, column))
                 {
                     break;
                 }
-                c = GetCharAt(line, col);
+                c = GetCharAt(line, column);
             }
-            c = GetCharAt(line, col);
+            c = GetCharAt(line, column);
             if (IsWhiteSpace(c) || IsWordSeparator(c))
             {
-                Next(line, col);
+                Next(line, column);
             }
-            SourcePos start(line, col);
-            c = GetCharAt(line, col);
+            SourcePos start(line, column);
+            c = GetCharAt(line, column);
             while (!IsWhiteSpace(c) && !IsWordSeparator(c))
             {
-                if (col == 1 || !Next(line, col))
+                if (!Next(line, column))
                 {
                     break;
                 }
-                c = GetCharAt(line, col);
+                c = GetCharAt(line, column);
             }
-            SourcePos end(line, col);
+            SourcePos end(line, column);
             ExtendSelection(start, end);
-            SetCaretLineCol(line, col + LineNumberFieldLength());
+            SetCaretLineCol(start.line, start.column + LineNumberFieldLength());
             ScrollToCaret();
-            InvalidateLineCol(line, col);
+            InvalidateLineCol(start.line, start.column);
         }
         protected override void SetCursor()
         {
