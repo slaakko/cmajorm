@@ -209,6 +209,8 @@ public:
     IdentifierNode* GetLatestIdentifier() { return latestIdentifierNode; }
     void MapSymbol(Node* node, Symbol* symbol);
     Symbol* GetMappedSymbol(Node* node) const;
+    void MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode, Symbol* symbol);
+    SymbolLocation* GetDefinitionLocation(const SymbolLocation& identifierLocation);
     void InitUuids();
     const boost::uuids::uuid& GetDerivationId(Derivation derivation) const;
     const boost::uuids::uuid& GetPositionId(int index) const;
@@ -222,6 +224,8 @@ private:
     std::vector<boost::uuids::uuid> derivationIds;
     std::vector<boost::uuids::uuid> positionIds;
     NamespaceSymbol globalNs;
+    std::unordered_map<IdentifierNode*, Symbol*> identifierSymbolDefinitionMap;
+    std::map<SymbolLocation, SymbolLocation> symbolDefinitionMap;
     CompileUnitNode* currentCompileUnit;
     ContainerSymbol* container;
     ClassTypeSymbol* currentClass;
@@ -260,6 +264,8 @@ private:
     int GetNextDeclarationBlockIndex() { return declarationBlockIndex++; }
     void ResetDeclarationBlockIndex() { declarationBlockIndex = 0; }
     void EmplaceTypeOrConceptRequest(SymbolReader& reader, Symbol* forSymbol, const boost::uuids::uuid& typeId, int index);
+    void WriteSymbolDefinitionMap(SymbolWriter& writer);
+    void ReadSymbolDefinitionMap(SymbolReader& reader);
 };
 
 void InitCoreSymbolTable(SymbolTable& symbolTable);

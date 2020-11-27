@@ -83,7 +83,9 @@ public:
     void Start(int port, const std::string& version, std::condition_variable* exitVar, bool* exiting);
     void Stop();
     void Run();
-    BuildReply ProcessRequest(const BuildRequest& buildRequest);
+    BuildReply ProcessBuildRequest(const BuildRequest& buildRequest);
+    CacheModuleReply ProcessCacheModuleRequest(const CacheModuleRequest& cacheModuleRequest);
+    GetDefinitionReply ProcessGetDefinitionRequest(const GetDefinitionRequest& getDefinitionRequest);
     void WriteGenericErrorReply(const std::string& messageKind);
     void ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, BuildReply& reply);
     void ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest, BuildReply& reply);
@@ -223,11 +225,57 @@ void BuildServer::Run()
                     requestJsonValue->Write(formatter);
                 }
                 BuildRequest buildRequest(requestJsonValue.get());
-                BuildReply buildReply = ProcessRequest(buildRequest);
+                BuildReply buildReply = ProcessBuildRequest(buildRequest);
                 std::unique_ptr<JsonValue> replyJsonValue = buildReply.ToJson();
                 if (log)
                 {
                     writer << "build reply:" << std::endl;
+                    CodeFormatter formatter(writer.LogFile());
+                    replyJsonValue->Write(formatter);
+                }
+                std::string reply = replyJsonValue->ToString();
+                Write(socket, reply);
+            }
+            else if (messageKind == "cacheModuleRequest")
+            {
+                LogFileWriter writer(logFilePath, log);
+                if (log)
+                {
+                    writer.WriteLine("================================================================================");
+                    writer.WriteCurrentDateTime();
+                    writer << "cache module request received:" << std::endl;
+                    CodeFormatter formatter(writer.LogFile());
+                    requestJsonValue->Write(formatter);
+                }
+                CacheModuleRequest cacheModuleRequest(requestJsonValue.get());
+                CacheModuleReply cacheModuleReply = ProcessCacheModuleRequest(cacheModuleRequest);
+                std::unique_ptr<JsonValue> replyJsonValue = cacheModuleReply.ToJson();
+                if (log)
+                {
+                    writer << "cache module reply:" << std::endl;
+                    CodeFormatter formatter(writer.LogFile());
+                    replyJsonValue->Write(formatter);
+                }
+                std::string reply = replyJsonValue->ToString();
+                Write(socket, reply);
+            }
+            else if (messageKind == "getDefinitionRequest")
+            {
+                LogFileWriter writer(logFilePath, log);
+                if (log)
+                {
+                    writer.WriteLine("================================================================================");
+                    writer.WriteCurrentDateTime();
+                    writer << "get definition request received:" << std::endl;
+                    CodeFormatter formatter(writer.LogFile());
+                    requestJsonValue->Write(formatter);
+                }
+                GetDefinitionRequest getDefinitionRequest(requestJsonValue.get());
+                GetDefinitionReply getDefinitionReply = ProcessGetDefinitionRequest(getDefinitionRequest);
+                std::unique_ptr<JsonValue> replyJsonValue = getDefinitionReply.ToJson();
+                if (log)
+                {
+                    writer << "get definition reply:" << std::endl;
                     CodeFormatter formatter(writer.LogFile());
                     replyJsonValue->Write(formatter);
                 }
@@ -281,7 +329,7 @@ void BuildServer::WriteGenericErrorReply(const std::string& messageKind)
     Write(socket, reply);
 }
 
-BuildReply BuildServer::ProcessRequest(const BuildRequest& buildRequest)
+BuildReply BuildServer::ProcessBuildRequest(const BuildRequest& buildRequest)
 {
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     BuildReply buildReply;
@@ -328,6 +376,158 @@ BuildReply BuildServer::ProcessRequest(const BuildRequest& buildRequest)
     EndLogging();
     SetLogExceptionToReply(buildReply);
     return buildReply;
+}
+
+CacheModuleReply BuildServer::ProcessCacheModuleRequest(const CacheModuleRequest& cacheModuleRequest)
+{
+    CacheModuleReply reply;
+    reply.messageKind = "cacheModuleReply";
+    try
+    {
+        sngcm::ast::BackEnd backend = sngcm::ast::BackEnd::llvm;
+        if (cacheModuleRequest.backend == "cpp")
+        {
+            backend = sngcm::ast::BackEnd::cppcm;
+        }
+        else if (cacheModuleRequest.backend == "llvm")
+        {
+            backend = sngcm::ast::BackEnd::llvm;
+        }
+        std::u32string moduleName = ToUtf32(cacheModuleRequest.projectName);
+        Project project(moduleName, cacheModuleRequest.projectFilePath, cacheModuleRequest.config, backend, "gcc", sngcm::ast::SystemDirKind::regular);
+        std::string moduleFilePath = project.ModuleFilePath();
+        if (!IsModuleCached(moduleFilePath))
+        {
+            std::unique_ptr<ModuleCache> prevCache;
+            try
+            {
+                prevCache = ReleaseModuleCache();
+                if (IsSystemModule(moduleName))
+                {
+                    InitModuleCache();
+                }
+                else
+                {
+                    MoveNonSystemModulesTo(prevCache);
+                }
+                std::unique_ptr<Module> module(new Module(moduleFilePath, true));
+                SetCacheModule(moduleFilePath, std::move(module));
+                RestoreModulesFrom(prevCache.get());
+            }
+            catch (...)
+            {
+                RestoreModulesFrom(prevCache.get());
+                throw;
+            }
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        reply.error = ex.what();
+    }
+    return reply;
+}
+
+GetDefinitionReply BuildServer::ProcessGetDefinitionRequest(const GetDefinitionRequest& getDefinitionRequest)
+{
+    GetDefinitionReply reply;
+    reply.messageKind = "getDefinitionReply";
+    try
+    {
+        sngcm::ast::BackEnd backend = sngcm::ast::BackEnd::llvm;
+        if (getDefinitionRequest.backend == "cpp")
+        {
+            backend = sngcm::ast::BackEnd::cppcm;
+            SetBackEnd(cmajor::symbols::BackEnd::cmcpp);
+        }
+        else if (getDefinitionRequest.backend == "llvm")
+        {
+            backend = sngcm::ast::BackEnd::llvm;
+            SetBackEnd(cmajor::symbols::BackEnd::llvm);
+        }
+        if (getDefinitionRequest.config == "release")
+        {
+            cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::release);
+        }
+        else if (!getDefinitionRequest.config.empty() && getDefinitionRequest.config != "debug")
+        {
+            throw std::runtime_error("buildserver: error processing get definition request: unknown configuration '" + getDefinitionRequest.config + "'");
+        }
+        ReadToolChains(cmajor::symbols::GetGlobalFlag(cmajor::symbols::GlobalFlags::verbose));
+        ResetToolChain();
+        BackendSelector backendSelector(cmajor::symbols::GetBackEnd());
+        std::u32string moduleName = ToUtf32(getDefinitionRequest.projectName);
+        Project project(moduleName, getDefinitionRequest.projectFilePath, getDefinitionRequest.config, backend, GetToolChain(), sngcm::ast::SystemDirKind::regular);
+        std::string moduleFilePath = project.ModuleFilePath();
+        if (!IsModuleCached(moduleFilePath))
+        {
+            std::unique_ptr<ModuleCache> prevCache;
+            try
+            {
+                if (IsSystemModule(moduleName))
+                {
+                    prevCache = ReleaseModuleCache();
+                    InitModuleCache();
+                }
+                else
+                {
+                    MoveNonSystemModulesTo(prevCache);
+                }
+                std::unique_ptr<Module> module(new Module(moduleFilePath, true));
+                SetCacheModule(moduleFilePath, std::move(module));
+                RestoreModulesFrom(prevCache.get());
+            }
+            catch (...)
+            {
+                RestoreModulesFrom(prevCache.get());
+                throw;
+            }
+        }
+        Module* module = GetCachedModule(moduleFilePath);
+        if (module)
+        {
+            int32_t fileIndex = module->GetFileIndexForFilePath(getDefinitionRequest.identifierLocation.file);
+            if (fileIndex != -1)
+            {
+                int32_t line = boost::lexical_cast<int32_t>(getDefinitionRequest.identifierLocation.line);
+                int32_t scol = boost::lexical_cast<int32_t>(getDefinitionRequest.identifierLocation.scol);
+                int32_t ecol = boost::lexical_cast<int32_t>(getDefinitionRequest.identifierLocation.ecol);
+                SymbolLocation identifierLocation(fileIndex, line, scol, ecol);
+                SymbolLocation* definitionLocation = module->GetSymbolTable().GetDefinitionLocation(identifierLocation);
+                if (definitionLocation)
+                {
+                    std::string filePath = module->GetFilePath(definitionLocation->fileIndex);
+                    if (filePath.empty())
+                    {
+                        throw std::runtime_error("file path for file index " + std::to_string(definitionLocation->fileIndex) + " not found");
+                    }
+                    reply.definitionLocation.file = filePath;
+                    reply.definitionLocation.line = std::to_string(definitionLocation->line);
+                    reply.definitionLocation.scol = std::to_string(definitionLocation->scol);
+                    reply.definitionLocation.ecol = std::to_string(definitionLocation->ecol);
+                    reply.ok = true;
+                }
+                else
+                {
+                    throw std::runtime_error("definition location of identifier '" + getDefinitionRequest.identifier  + "' not found");
+                }
+            }
+            else
+            {
+                throw std::runtime_error("source file '" + getDefinitionRequest.identifierLocation.file + "' not included by module '" + ToUtf8(module->Name()) + "' or any of its referenced modules");
+            }
+        }
+        else
+        {
+            throw std::runtime_error("module '" + moduleFilePath + "' not in cache");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        reply.error = ex.what();
+        reply.ok = false;
+    }
+    return reply;
 }
 
 void BuildServer::ProcessCppBackendRequest(const BuildRequest& cppBuildRequest, BuildReply& reply)
@@ -643,10 +843,18 @@ void BuildServer::ProcessLlvmBackendRequest(const BuildRequest& llvmBuildRequest
 
 void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<cmajor::symbols::Module>>& rootModules, BuildReply& reply)
 {
+    std::unique_ptr<ModuleCache> prevCache;
     try
     {
-        InitModule();
-        InitModuleCache();
+        if (cmajor::build::SolutionContainsSystemModule(solutionFilePath))
+        {
+            prevCache = ReleaseModuleCache();
+            InitModuleCache();
+        }
+        else
+        {
+            MoveNonSystemModulesTo(prevCache);
+        }
         cmajor::build::BuildSolution(solutionFilePath, rootModules);
         reply.success = true;
     }
@@ -670,15 +878,25 @@ void BuildServer::BuildSolution(const std::string& solutionFilePath, std::vector
         reply.errors.push_back(error);
         LogMessage(-1, ex.what());
     }
+    RestoreModulesFrom(prevCache.get());
 }
 
 void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_ptr<cmajor::symbols::Module>& rootModule,
     std::set<std::string>& builtProjects, BuildReply& reply)
 {
+    std::unique_ptr<ModuleCache> prevCache;
     try
     {
-        InitModule();
-        InitModuleCache();
+        std::unique_ptr<Project> project = cmajor::build::ReadProject(projectFilePath);
+        if (IsSystemModule(project->Name()))
+        {
+            prevCache = ReleaseModuleCache();
+            InitModuleCache();
+        }
+        else
+        {
+            MoveNonSystemModulesTo(prevCache);
+        }
         cmajor::build::BuildProject(projectFilePath, rootModule, builtProjects);
         reply.success = true;
     }
@@ -702,6 +920,7 @@ void BuildServer::BuildProject(const std::string& projectFilePath, std::unique_p
         reply.errors.push_back(error);
         LogMessage(-1, ex.what());
     }
+    RestoreModulesFrom(prevCache.get());
 }
 
 void BuildServer::SetRunException(const std::exception_ptr& runException_)

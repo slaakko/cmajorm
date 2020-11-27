@@ -3291,6 +3291,23 @@ struct CurrentSolutionGuard
     ~CurrentSolutionGuard() { currentSolution = nullptr; }
 };
 
+bool SolutionContainsSystemModule(const std::string& solutionFilePath)
+{
+    MappedInputFile solutionFile(solutionFilePath);
+    std::u32string s(ToUtf32(std::string(solutionFile.Begin(), solutionFile.End())));
+    ContainerFileLexer containerFileLexer(s, solutionFilePath, 0);
+    std::unique_ptr<Solution> solution = SolutionFileParser::Parse(containerFileLexer);
+    solution->ResolveDeclarations();
+    int np = solution->ProjectFilePaths().size();
+    for (int i = 0; i < np; ++i)
+    {
+        const std::string& projectFilePath = solution->ProjectFilePaths()[i];
+        std::unique_ptr<Project> project = ReadProject(projectFilePath);
+        if (cmajor::symbols::IsSystemModule(project->Name())) return true;
+    }
+    return false;
+}
+
 void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_ptr<Module>>& rootModules)
 {
     std::u32string solutionName;

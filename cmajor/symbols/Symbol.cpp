@@ -134,6 +134,32 @@ uint32_t AccessFlag(Emitter& emitter, SymbolAccess access)
     return emitter.GetNoFlags();
 }
 
+bool operator==(const SymbolLocation& left, const SymbolLocation& right)
+{
+    return left.fileIndex == right.fileIndex && left.line == right.line && left.scol == right.scol && left.ecol == right.ecol;
+}
+
+bool operator<(const SymbolLocation& left, const SymbolLocation& right)
+{
+    if (left.fileIndex < right.fileIndex) return true;
+    if (left.fileIndex > right.fileIndex) return false;
+    if (left.line < right.line) return true;
+    if (left.line > right.line) return false;
+    if (left.scol < right.scol) return true;
+    if (left.scol > right.scol) return false;
+    return left.ecol < right.ecol;
+}
+
+SymbolLocation ToSymbolLocation(const Span& span, Module* module)
+{
+    int16_t moduleId = GetModuleId(span.fileIndex);
+    Assert(moduleId == 0, "current project expected");
+    int32_t scol = 0;
+    int32_t ecol = 0;
+    module->GetColumns(span, scol, ecol);
+    return SymbolLocation(span.fileIndex, span.line, scol, ecol);
+}
+
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
     symbolType(symbolType_), span(span_), name(name_), flags(SymbolFlags::project), parent(nullptr), module(nullptr), compileUnit(nullptr)
 {
@@ -967,6 +993,24 @@ std::unique_ptr<sngxml::dom::Element> Symbol::ToDomElement(TypeMap& typeMap)
 std::unique_ptr<sngxml::dom::Element> Symbol::CreateDomElement(TypeMap& typeMap)
 {
     return std::unique_ptr<sngxml::dom::Element>(new sngxml::dom::Element(ToUtf32(ClassName())));
+}
+
+SymbolLocation Symbol::GetLocation(Module* idNodeModule) const
+{
+    Span s = GetSpan();
+    std::string sourceFilePath = module->GetFilePath(s.fileIndex);
+    if (sourceFilePath.empty())
+    {
+        int32_t fileIndex = MakeFileIndex(0, GetFileId(s.fileIndex));
+        s = Span(fileIndex, span.line, span.start, span.end);
+        sourceFilePath = module->GetFilePath(fileIndex);
+    }
+    Assert(!sourceFilePath.empty(), "file not found");
+    int32_t idModuleFileIndex = idNodeModule->GetFileIndexForFilePath(sourceFilePath);
+    int32_t scol = 0;
+    int32_t ecol = 0;
+    module->GetColumns(s, scol, ecol);
+    return SymbolLocation(idModuleFileIndex, span.line, scol, ecol);
 }
 
 SymbolCreator::~SymbolCreator()

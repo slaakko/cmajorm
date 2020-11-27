@@ -25,15 +25,17 @@ namespace Cm.Views
         {
             UniquePtr<CmajorSourceCodeView> sourceCodeViewPtr(new CmajorSourceCodeView(Point(), Size(), Dock.none, Anchors.none));
             sourceCodeView = sourceCodeViewPtr.Get();
-            UniquePtr<DebugStrip> debugStrip(new DebugStrip(debugStripWidth, debugStripBackgroundColor, breakpointList, sourceCodeView));
-            sourceCodeView->SetDebugStrip(debugStrip.Get());
+            UniquePtr<DebugStrip> debugStripPtr(new DebugStrip(debugStripWidth, debugStripBackgroundColor, breakpointList, sourceCodeView));
+            DebugStrip* debugStrip = debugStripPtr.Get();
+            sourceCodeView->SetDebugStrip(debugStrip);
             sourceCodeView->SetEditor(this);
-            AddChild(debugStrip.Release());
+            AddChild(debugStripPtr.Release());
             UniquePtr<ScrollableControl> scrollableSourceCodeView(new ScrollableControl(sourceCodeViewPtr.Release(), Point(), Size(), Dock.fill, Anchors.none));
             AddChild(scrollableSourceCodeView.Release());
             ustring content = ToUtf32(File.ReadAllText(filePath));
             sourceCodeView->SetTextContent(content);
             sourceCodeView->SetIndentSize(4);
+            sourceCodeView->SetFilePath(filePath);
         }
         public CmajorEditor(const string& filePath, BreakpointList& breakpointList) :
             this(filePath, breakpointList, DefaultDebugStripWidth(), DefaultDebugStripBackgroundColor())

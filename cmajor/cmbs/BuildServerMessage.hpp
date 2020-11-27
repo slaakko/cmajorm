@@ -130,4 +130,61 @@ struct GenericErrorReply
     std::string error;
 };
 
+struct CacheModuleRequest
+{
+    CacheModuleRequest();
+    CacheModuleRequest(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    std::string projectName;
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+};
+
+struct CacheModuleReply
+{
+    CacheModuleReply();
+    CacheModuleReply(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    std::string error;
+};
+
+struct SourceLocation
+{
+    SourceLocation();
+    SourceLocation(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string file;
+    std::string line;
+    std::string scol;
+    std::string ecol;
+};
+
+struct GetDefinitionRequest
+{
+    GetDefinitionRequest();
+    GetDefinitionRequest(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    std::string projectName;
+    std::string projectFilePath;
+    std::string backend;
+    std::string config;
+    std::string identifier;
+    SourceLocation identifierLocation;
+};
+
+struct GetDefinitionReply
+{
+    GetDefinitionReply();
+    GetDefinitionReply(soulng::util::JsonValue* __json_value);
+    std::unique_ptr<soulng::util::JsonValue> ToJson() const;
+    std::string messageKind;
+    SourceLocation definitionLocation;
+    bool ok;
+    std::string error;
+};
+
 #endif // HPP_9A6473C10E9B8484FB5E3A9E7350059CF7F315F8

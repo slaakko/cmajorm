@@ -20,6 +20,7 @@
 #include <cmajor/cmtoolchain/ToolChains.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <mutex>
+#include <map>
 #include <set>
 #include <time.h>
 
@@ -50,11 +51,12 @@ const uint8_t moduleFormat_9 = uint8_t('9');
 const uint8_t moduleFormat_10 = uint8_t('A');
 const uint8_t moduleFormat_11 = uint8_t('B');
 const uint8_t moduleFormat_12 = uint8_t('C');
-const uint8_t currentModuleFormat = moduleFormat_12;
+const uint8_t moduleFormat_13 = uint8_t('D');
+const uint8_t currentModuleFormat = moduleFormat_13;
 
 enum class ModuleFlags : uint8_t
 {
-    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4, dontRemoveFromModuleMap = 1 << 5
+    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4, dontRemoveFromModuleMap = 1 << 5, fileIndexFilePathMapBuilt = 1 << 6, readFromModuleFile = 1 << 7
 };
 
 inline ModuleFlags operator|(ModuleFlags left, ModuleFlags right)
@@ -130,6 +132,7 @@ class SYMBOLS_API Module
 public:
     Module();
     Module(const std::string& filePath);
+    Module(const std::string& filePath, bool readRoot);
     Module(const std::u32string& name_, const std::string& filePath_, sngcm::ast::Target target);
     ~Module();
     uint8_t Format() const { return format; }
@@ -149,6 +152,7 @@ public:
     uint32_t SymbolTablePos() const { return symbolTablePos; }
     FileTable& GetFileTable() { return fileTable; }
     void RegisterFileTable(FileTable* fileTable, Module* module);
+    void MakeFilePathFileIndexMap();
 #ifdef _WIN32
     ResourceTable& GetResourceTable() { return resourceTable; }
     ResourceTable& GetGlobalResourceTable() { return globalResourceTable; }
@@ -225,6 +229,7 @@ public:
     std::unordered_map<int16_t, std::string>* GetModuleNameTable() { return &moduleNameTable; }
     std::unordered_map<std::string, int16_t>* GetModuleIdMap() { return &moduleIdMap; }
     cmajor::debug::SourceSpan SpanToSourceSpan(const Span& span);
+    int32_t GetFileIndexForFilePath(const std::string& filePath) const;
 private:
     uint8_t format;
     ModuleFlags flags;
@@ -243,6 +248,7 @@ private:
     ResourceTable globalResourceTable;
 #endif
     std::vector<FileTable*> fileTables;
+    std::unordered_map<std::string, int32_t> filePathFileIndexMap;
     std::vector<std::unique_ptr<CmajorLexer>> lexers;
     std::vector<soulng::lexer::Lexer*> lexerVec;
     std::unordered_map<int16_t, std::string> moduleNameTable;
@@ -279,6 +285,7 @@ private:
     void CheckUpToDate();
 };
 
+SYMBOLS_API bool HasRootModuleForCurrentThread();
 SYMBOLS_API Module* GetRootModuleForCurrentThread();
 SYMBOLS_API void SetRootModuleForCurrentThread(Module* rootModule_);
 

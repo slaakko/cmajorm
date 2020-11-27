@@ -94,3 +94,46 @@ struct GenericErrorReply
     string messageKind;
     string error;
 }
+
+struct CacheModuleRequest
+{
+    string messageKind;
+    string projectName;
+    string projectFilePath;
+    string backend;
+    string config;
+}
+
+struct CacheModuleReply
+{
+    string messageKind;
+    string error;
+}
+
+struct SourceLocation
+{
+    string file;
+    string line;
+    string scol;
+    string ecol;
+}
+
+struct GetDefinitionRequest
+{
+    string messageKind;
+    string projectName;
+    string projectFilePath;
+    string backend;
+    string config;
+    string identifier;
+    SourceLocation identifierLocation;
+}
+
+struct GetDefinitionReply
+{
+    string messageKind;
+    SourceLocation definitionLocation;
+    bool ok;
+    string error;
+}
+

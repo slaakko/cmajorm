@@ -30,6 +30,7 @@ BUILD_API void StopBuild();
 BUILD_API void ResetStopBuild();
 BUILD_API std::unique_ptr<Project> ReadProject(const std::string& projectFilePath);
 BUILD_API ProjectInfo ReadPojectInfo(Project* project, const std::string& projectInfoFilePath);
+BUILD_API bool SolutionContainsSystemModule(const std::string& solutionFilePath);
 
 } } // namespace cmajor::build
 

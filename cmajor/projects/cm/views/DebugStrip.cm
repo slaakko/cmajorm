@@ -150,6 +150,7 @@ namespace Cm.Views
             {
                 args.graphics.Clear(BackgroundColor());
                 if (breakpointList.IsEmpty() && debugLocation == SourceSpan()) return;
+                if (view->CharHeight() == 0 || view->CharWidth() == 0) return;
                 SmoothingMode prevSmoothingMode = args.graphics.GetSmoothingModeChecked();
                 args.graphics.SetSmoothingModeChecked(SmoothingMode.highQuality);
                 Point myOrigin = origin;

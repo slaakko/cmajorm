@@ -301,3 +301,139 @@ GenericErrorReply::GenericErrorReply(soulng::util::JsonValue* __json_value)
     sngjson::json::FromJson(__json_value, "error", error);
 }
 
+CacheModuleRequest::CacheModuleRequest() : messageKind(), projectName(), projectFilePath(), backend(), config()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> CacheModuleRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(projectName);
+    object->AddField(U"projectName", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(projectFilePath);
+    object->AddField(U"projectFilePath", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(backend);
+    object->AddField(U"backend", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(config);
+    object->AddField(U"config", std::move(fieldValue4));
+    return object;
+}
+
+CacheModuleRequest::CacheModuleRequest(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "projectName", projectName);
+    sngjson::json::FromJson(__json_value, "projectFilePath", projectFilePath);
+    sngjson::json::FromJson(__json_value, "backend", backend);
+    sngjson::json::FromJson(__json_value, "config", config);
+}
+
+CacheModuleReply::CacheModuleReply() : messageKind(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> CacheModuleReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue1));
+    return object;
+}
+
+CacheModuleReply::CacheModuleReply(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "error", error);
+}
+
+SourceLocation::SourceLocation() : file(), line(), scol(), ecol()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> SourceLocation::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(file);
+    object->AddField(U"file", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(line);
+    object->AddField(U"line", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(scol);
+    object->AddField(U"scol", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(ecol);
+    object->AddField(U"ecol", std::move(fieldValue3));
+    return object;
+}
+
+SourceLocation::SourceLocation(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "file", file);
+    sngjson::json::FromJson(__json_value, "line", line);
+    sngjson::json::FromJson(__json_value, "scol", scol);
+    sngjson::json::FromJson(__json_value, "ecol", ecol);
+}
+
+GetDefinitionRequest::GetDefinitionRequest() : messageKind(), projectName(), projectFilePath(), backend(), config(), identifier(), identifierLocation()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> GetDefinitionRequest::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(projectName);
+    object->AddField(U"projectName", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(projectFilePath);
+    object->AddField(U"projectFilePath", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(backend);
+    object->AddField(U"backend", std::move(fieldValue3));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue4 = sngjson::json::ToJson(config);
+    object->AddField(U"config", std::move(fieldValue4));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue5 = sngjson::json::ToJson(identifier);
+    object->AddField(U"identifier", std::move(fieldValue5));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue6 = sngjson::json::ToJson(identifierLocation);
+    object->AddField(U"identifierLocation", std::move(fieldValue6));
+    return object;
+}
+
+GetDefinitionRequest::GetDefinitionRequest(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "projectName", projectName);
+    sngjson::json::FromJson(__json_value, "projectFilePath", projectFilePath);
+    sngjson::json::FromJson(__json_value, "backend", backend);
+    sngjson::json::FromJson(__json_value, "config", config);
+    sngjson::json::FromJson(__json_value, "identifier", identifier);
+    sngjson::json::FromJson(__json_value, "identifierLocation", identifierLocation);
+}
+
+GetDefinitionReply::GetDefinitionReply() : messageKind(), definitionLocation(), ok(), error()
+{
+}
+
+std::unique_ptr<soulng::util::JsonValue> GetDefinitionReply::ToJson() const
+{
+    std::unique_ptr<soulng::util::JsonObject> object(new soulng::util::JsonObject());
+    std::unique_ptr<soulng::util::JsonValue> fieldValue0 = sngjson::json::ToJson(messageKind);
+    object->AddField(U"messageKind", std::move(fieldValue0));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue1 = sngjson::json::ToJson(definitionLocation);
+    object->AddField(U"definitionLocation", std::move(fieldValue1));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue2 = sngjson::json::ToJson(ok);
+    object->AddField(U"ok", std::move(fieldValue2));
+    std::unique_ptr<soulng::util::JsonValue> fieldValue3 = sngjson::json::ToJson(error);
+    object->AddField(U"error", std::move(fieldValue3));
+    return object;
+}
+
+GetDefinitionReply::GetDefinitionReply(soulng::util::JsonValue* __json_value)
+{
+    sngjson::json::FromJson(__json_value, "messageKind", messageKind);
+    sngjson::json::FromJson(__json_value, "definitionLocation", definitionLocation);
+    sngjson::json::FromJson(__json_value, "ok", ok);
+    sngjson::json::FromJson(__json_value, "error", error);
+}
+

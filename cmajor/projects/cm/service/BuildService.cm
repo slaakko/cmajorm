@@ -455,6 +455,70 @@ namespace Cm.Service.Build
             }
             return Rvalue(buildReply.errors);
         }
+        public void ProcessCacheModuleRequest(const CacheModuleRequest& cacheModuleRequest)
+        {
+            try
+            {
+                if (!ServerRunning())
+                {
+                    if (!StartServer())
+                    {
+                        return;
+                    }
+                }
+                UniquePtr<JsonValue> requestJsonValue = cacheModuleRequest.ToJson();
+                TcpSocket socket("localhost", ToString(port));
+                string requestStr = requestJsonValue->ToString();
+                Write(socket, requestStr);
+                string replyStr = ReadStr(socket);
+                UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
+                string messageKind = GetMessageKind(replyJsonValue.Get());
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+                LogMessage("BuildService: ProcessCacheModuleRequest: " + ex.Message());
+            }
+        }
+        public GetDefinitionReply ProcessGetDefinitionRequest(const GetDefinitionRequest& request)
+        {
+            GetDefinitionReply reply;
+            try
+            {
+                if (!ServerRunning())
+                {
+                    if (!StartServer())
+                    {
+                        reply.ok = false;
+                        reply.error = "could not start server";
+                        return reply;
+                    }
+                }
+                UniquePtr<JsonValue> requestJsonValue = request.ToJson();
+                TcpSocket socket("localhost", ToString(port));
+                string requestStr = requestJsonValue->ToString();
+                Write(socket, requestStr);
+                string replyStr = ReadStr(socket);
+                UniquePtr<JsonValue> replyJsonValue = ParseJson(replyStr);
+                string messageKind = GetMessageKind(replyJsonValue.Get());
+                if (messageKind == "getDefinitionReply")
+                {
+                    reply = GetDefinitionReply(replyJsonValue.Get());
+                }
+                else
+                {
+                    throw Exception("'getDefinitionReply' expected");
+                }
+            }
+            catch (const Exception& ex)
+            {
+                LogException(ex);
+                LogMessage("BuildService: ProcessGetDefinitionRequest: " + ex.Message());
+                reply.ok = false;
+                reply.error = ex.Message();
+            }
+            return reply;
+        }
         private string GetMessageKind(JsonValue* jsonValue)
         {
             if (jsonValue is JsonObject*)

@@ -1,0 +1,99 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows;
+using Cm.Service.Build;
+
+namespace cmcode
+{
+    public const int maxLocations = 20;
+
+    public class LocationList
+    {
+        public nothrow LocationList(MainWindow* mainWindow_) : currentIndex(0), mainWindow(mainWindow_)
+        {
+        }
+        public nothrow void SetToolButtons(ToolButton* prevToolButton_, ToolButton* nextToolButton_)
+        {
+            prevToolButton = prevToolButton_;
+            nextToolButton = nextToolButton_;
+            UpdateToolButtons();
+        }
+        public nothrow bool CanGotoPrev() const
+        {
+            return currentIndex > 0;
+        }
+        public nothrow bool CanGotoNext() const
+        {
+            return currentIndex < locations.Count();
+        }
+        public nothrow void UpdateToolButtons()
+        {
+            if (CanGotoPrev())
+            {
+                prevToolButton->SetState(ToolButton.State.normal);
+            }
+            else
+            {
+                prevToolButton->SetState(ToolButton.State.disabled);
+            }
+            if (CanGotoNext())
+            {
+                nextToolButton->SetState(ToolButton.State.normal);
+            }
+            else
+            {
+                nextToolButton->SetState(ToolButton.State.disabled);
+            }
+        }
+        public nothrow void AddLocation(const SourceLocation& location)
+        {
+            while (locations.Count() > maxLocations)
+            {
+                locations.RemoveFirst();
+            }
+            locations.Add(location);
+            currentIndex = cast<int>(locations.Count());
+            UpdateToolButtons();
+        }
+        public nothrow void GotoPreviousLocation(const SourceLocation& currentLocation)
+        {
+            while (CanGotoPrev())
+            {
+                --currentIndex;
+                if (locations[currentIndex] != currentLocation)
+                {
+                    mainWindow->GotoLocation(locations[currentIndex]);
+                    break;
+                }
+            }
+            UpdateToolButtons();
+        }
+        public nothrow void GotoNextLocation(const SourceLocation& currentLocation)
+        {
+            while (CanGotoNext())
+            {
+                if (locations[currentIndex] != currentLocation)
+                {
+                    mainWindow->GotoLocation(locations[currentIndex]);
+                    ++currentIndex;
+                    break;
+                }
+                else
+                {
+                    ++currentIndex;
+                }
+            }
+            UpdateToolButtons();
+        }
+        private int currentIndex;
+        private MainWindow* mainWindow;
+        private List<SourceLocation> locations;
+        private ToolButton* prevToolButton;
+        private ToolButton* nextToolButton;
+    }
+}

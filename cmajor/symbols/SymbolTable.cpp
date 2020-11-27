@@ -89,6 +89,7 @@ void SymbolTable::Write(SymbolWriter& writer)
         }
     }
     globalNs.Write(writer);
+    WriteSymbolDefinitionMap(writer);
     std::vector<ArrayTypeSymbol*> exportedArrayTypes;
     for (const std::unique_ptr<ArrayTypeSymbol>& arrayType : arrayTypes)
     {
@@ -180,6 +181,7 @@ void SymbolTable::Read(SymbolReader& reader)
         }
     }
     globalNs.Read(reader);
+    ReadSymbolDefinitionMap(reader);
     uint32_t na = reader.GetBinaryReader().ReadULEB128UInt();
     for (uint32_t i = 0; i < na; ++i)
     {
@@ -1020,7 +1022,6 @@ void SymbolTable::AddFunctionSymbolToGlobalScope(FunctionSymbol* functionSymbol)
 
 void SymbolTable::MapNode(Node* node, Symbol* symbol)
 {
-    Assert(GetRootModuleForCurrentThread() == module, "root module expected");
     nodeSymbolMap[node] = symbol;
     symbolNodeMap[symbol] = node;
 }
@@ -1639,6 +1640,34 @@ Symbol* SymbolTable::GetMappedSymbol(Node* node) const
     }
 }
 
+void SymbolTable::MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode, Symbol* symbol)
+{
+    if (symbol->GetSymbolType() == SymbolType::namespaceSymbol) return;
+    if (identifierNode->IsInternal()) return;
+    if (!identifierNode->GetSpan().Valid()) return;
+    int16_t moduleId = GetModuleId(identifierNode->GetSpan().fileIndex);
+    if (moduleId != 0) return;
+    if (!symbol->GetSpan().Valid()) return;
+    if (identifierSymbolDefinitionMap.find(identifierNode) != identifierSymbolDefinitionMap.cend()) return;
+    identifierSymbolDefinitionMap[identifierNode] = symbol;
+    SymbolLocation identifierLocation = ToSymbolLocation(identifierNode->GetSpan(), GetModule());
+    SymbolLocation symbolLocation = symbol->GetLocation(GetModule());
+    symbolDefinitionMap[identifierLocation] = symbolLocation;
+}
+
+SymbolLocation* SymbolTable::GetDefinitionLocation(const SymbolLocation& identifierLocation) 
+{
+    auto it = symbolDefinitionMap.find(identifierLocation);
+    if (it != symbolDefinitionMap.cend())
+    {
+        return &(it->second);
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 void SymbolTable::InitUuids()
 {
     derivationIds.clear();
@@ -1774,6 +1803,44 @@ void SymbolTable::Check()
         {
             throw SymbolCheckException(GetRootModuleForCurrentThread(), "symbol table contains null static class pointer", globalNs.GetSpan());
         }
+    }
+}
+
+void SymbolTable::WriteSymbolDefinitionMap(SymbolWriter& writer)
+{
+    int64_t n = symbolDefinitionMap.size();
+    writer.GetBinaryWriter().Write(n);
+    for (const std::pair<SymbolLocation, SymbolLocation>& p : symbolDefinitionMap)
+    {
+        const SymbolLocation& left = p.first;
+        writer.GetBinaryWriter().Write(left.fileIndex);
+        writer.GetBinaryWriter().Write(left.line);
+        writer.GetBinaryWriter().Write(left.scol);
+        writer.GetBinaryWriter().Write(left.ecol);
+        const SymbolLocation& right = p.second;
+        writer.GetBinaryWriter().Write(right.fileIndex);
+        writer.GetBinaryWriter().Write(right.line);
+        writer.GetBinaryWriter().Write(right.scol);
+        writer.GetBinaryWriter().Write(right.ecol);
+    }
+}
+
+void SymbolTable::ReadSymbolDefinitionMap(SymbolReader& reader)
+{
+    int64_t n = reader.GetBinaryReader().ReadLong();
+    for (int64_t i = 0; i < n; ++i)
+    {
+        SymbolLocation left;
+        left.fileIndex = reader.GetBinaryReader().ReadInt();
+        left.line = reader.GetBinaryReader().ReadInt();
+        left.scol = reader.GetBinaryReader().ReadInt();
+        left.ecol = reader.GetBinaryReader().ReadInt();
+        SymbolLocation right;
+        right.fileIndex = reader.GetBinaryReader().ReadInt();
+        right.line = reader.GetBinaryReader().ReadInt();
+        right.scol = reader.GetBinaryReader().ReadInt();
+        right.ecol = reader.GetBinaryReader().ReadInt();
+        symbolDefinitionMap[left] = right;
     }
 }
 

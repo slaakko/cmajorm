@@ -106,6 +106,26 @@ inline SymbolFlags operator~(SymbolFlags flags)
 std::string SymbolFlagStr(SymbolFlags symbolFlags);
 std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess);
 
+class SYMBOLS_API SymbolLocation
+{
+public:
+    SymbolLocation() : fileIndex(0), line(0), scol(0), ecol(0)
+    {
+    }
+    SymbolLocation(int32_t fileIndex_, int32_t line_, int32_t scol_, int32_t ecol_) : fileIndex(fileIndex_), line(line_), scol(scol_), ecol(ecol_)
+    {
+    }
+    int32_t fileIndex;
+    int32_t line;
+    int32_t scol;
+    int32_t ecol;
+};
+
+SYMBOLS_API bool operator==(const SymbolLocation& left, const SymbolLocation& right);
+SYMBOLS_API bool operator<(const SymbolLocation& left, const SymbolLocation& right);
+
+SYMBOLS_API SymbolLocation ToSymbolLocation(const Span& span, Module* module);
+
 class SYMBOLS_API Symbol
 {
 public:
@@ -212,6 +232,7 @@ public:
     virtual void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const {}
     virtual bool HasProjectMembers() const { return false; }
     virtual const char* ClassName() const { return "Symbol"; }
+    SymbolLocation GetLocation(Module* idNodeModule) const;
 private:
     SymbolType symbolType;
     Span span;

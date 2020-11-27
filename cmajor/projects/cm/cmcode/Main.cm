@@ -153,7 +153,7 @@ namespace cmcode
         public MainWindow(const string& filePath) :
             base("MainWindow", WindowStyle.WS_OVERLAPPEDWINDOW, DefaultExtendedWindowStyle(), Title(), MainWindowLocation(), MainWindowSize(),
             Dock.none, Anchors.none, MainWindowWindowState()), buildService(), debugService(), stopPending(false), targetStopped(true), toolTipWindow(new ToolTip()),
-            clipboardListener(Handle()), cmajorCodeFormat("cmajor.code"), pid(WinGetCurrentProcessId()), disableBuildServerToolButton(false)
+            clipboardListener(Handle()), cmajorCodeFormat("cmajor.code"), pid(WinGetCurrentProcessId()), disableBuildServerToolButton(false), locations(this)
         {
             UniquePtr<MenuBar> menuBarPtr(new MenuBar());
             menuBar = menuBarPtr.Get();
@@ -370,12 +370,38 @@ namespace cmcode
             helpMenuItem->AddMenuItem(aboutMenuItem.Release());
             menuBar->AddMenuItem(helpMenuItem.Release());
 
+            UniquePtr<MenuItem> testMenuItem(new MenuItem("&Test"));
+
+                        UniquePtr<MenuItem> cacheModuleMenuItem(new MenuItem("&Cache Module"));
+            cacheModuleMenuItem->ClickEvent().AddHandler(CacheModuleClick);
+            testMenuItem->AddMenuItem(cacheModuleMenuItem.Release());
+            menuBar->AddMenuItem(testMenuItem.Release());
+
             UniquePtr<ToolBar> toolBarPtr(new ToolBar(30, ToolButtonToolTipColor(), Color.DefaultBitmapTransparent(), ToolBar.Style.regular,
                 Padding(4, 4, 4, 4), Padding(2, 0, 2, 0)));
             toolBar = toolBarPtr.Get();
             toolBar->SetTextToolButtonFont(Font(FontFamily("Segoe UI"), 9.0f));
             UniquePtr<BorderedControl> borderedToolBar(new BorderedControl(
                 toolBarPtr.Release(), BorderStyle.single, ToolBarBorderColor(), ToolBarBorderColor(), Point(), toolBar->GetSize(), Dock.top, Anchors.none));
+
+            UniquePtr<ToolButton> prevToolButtonPtr(new ToolButton("cmcode.prev.bitmap", ToolButton.Style.manual));
+            prevToolButton = prevToolButtonPtr.Get();
+            prevToolButton->ClickEvent().AddHandler(GotoPreviousLocationClick);
+            prevToolButton->SetToolTip("Goto Previous Location");
+            prevToolButton->SetPadding(Padding(8, 8, 8, 8));
+            prevToolButton->Disable();
+            toolBar->AddToolButton(prevToolButtonPtr.Release());
+
+            UniquePtr<ToolButton> nextToolButtonPtr(new ToolButton("cmcode.next.bitmap", ToolButton.Style.manual));
+            nextToolButton = nextToolButtonPtr.Get();
+            nextToolButton->ClickEvent().AddHandler(GotoNextLocationClick);
+            nextToolButton->SetToolTip("Goto Next Location");
+            nextToolButton->SetPadding(Padding(8, 8, 8, 8));
+            nextToolButton->Disable();
+            toolBar->AddToolButton(nextToolButtonPtr.Release());
+
+            UniquePtr<ToolButtonSeparator> separator0(new ToolButtonSeparator());
+            toolBar->AddToolButton(separator0.Release());
 
             UniquePtr<ToolButton> saveToolButtonPtr(new ToolButton("cmcode.save.bitmap"));
             saveToolButton = saveToolButtonPtr.Get();
@@ -582,6 +608,8 @@ namespace cmcode
             }
 
             AddChild(toolTipWindow);
+
+            locations.SetToolButtons(prevToolButton, nextToolButton);
         }
         protected override void OnWindowClosing(bool& cancelClose)
         {
@@ -2114,6 +2142,135 @@ namespace cmcode
                 LogException(ex);
             }
         }
+        private SourceLocation GetCurrentLocation() const
+        {
+            SourceLocation sourceLocation;
+            if (solution.IsNull()) return sourceLocation;
+            TabPage* tabPage = codeTabControl->SelectedTabPage();
+            if (tabPage != null)
+            {
+                Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                if (editor != null)
+                {
+                    if (editor is Cm.Views.CmajorEditor*)
+                    {
+                        Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                        SourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                        if (sourceCodeView != null)
+                        {
+                            sourceLocation.file = cmajorEditor->FilePath();
+                            int line = sourceCodeView->CaretLine();
+                            int column = sourceCodeView->CaretColumn();
+                            sourceLocation.line = ToString(line);
+                            sourceLocation.scol = ToString(column);
+                            sourceLocation.ecol = ToString(column);
+                        }
+                    }
+                }
+            }
+            return sourceLocation;
+        }
+        public void GotoLocation(const SourceLocation& location)
+        {
+            TabPage* tabPage = codeTabControl->GetTabPageByKey(location.file);
+            Cm.Views.CmajorEditor* cmajorEditor = null;
+            if (tabPage != null)
+            {
+                Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                if (editor is Cm.Views.CmajorEditor*)
+                {
+                    cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                }
+                tabPage->Select();
+            }
+            if (cmajorEditor == null)
+            {
+                HashMap<string, TreeViewNodeData*>.ConstIterator it = solutionExplorerData->treeViewDataMap.CFind(location.file);
+                if (it != solutionExplorerData->treeViewDataMap.CEnd())
+                {
+                    TreeViewNodeData* data = it->second;
+                    cmajorEditor = AddCmajorEditor(data->fileName, data->key, data->filePath);
+                }
+                else
+                {
+                    cmajorEditor = AddCmajorEditor(Path.GetFileName(location.file), location.file, location.file);
+                }
+            }
+            if (cmajorEditor != null)
+            {
+                Cm.Views.CmajorSourceCodeView* sourceCodeView = cmajorEditor->GetSourceCodeView();
+                if (sourceCodeView != null)
+                {
+                    int line = ParseInt(location.line);
+                    int scol = ParseInt(location.scol);
+                    int ecol = ParseInt(location.ecol);
+                    Selection selection;
+                    selection.start.line = line;
+                    selection.start.column = scol;
+                    selection.end.line = line;
+                    selection.end.column = ecol;
+                    sourceCodeView->EnsureLineVisible(line);
+                    sourceCodeView->SetSelection(selection);
+                    sourceCodeView->SetCaretLineCol(line, scol);
+                }
+            }
+        }
+        private void GotoPreviousLocationClick()
+        {
+            try
+            {
+                locations.GotoPreviousLocation(GetCurrentLocation());
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private void GotoNextLocationClick()
+        {
+            try
+            {
+                locations.GotoNextLocation(GetCurrentLocation());
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        public void GotoDefinition(Cm.Ast.Project* project, const string& identifier, const SourceLocation& sourceLocation)
+        {
+            try
+            {
+                string backend = GetBackend();
+                string config = GetConfig();
+                BuildGuard buildGuard(this);
+                GetDefinitionRequest request;
+                request.projectName = ToUtf8(project->Name());
+                request.projectFilePath = project->FilePath();
+                request.identifier = identifier;
+                request.backend = backend;
+                request.config = config;
+                request.identifierLocation = sourceLocation;
+                GetDefinitionReply reply = GetBuildService().ProcessGetDefinitionRequest(request);
+                if (reply.ok)
+                {
+                    locations.AddLocation(GetCurrentLocation());
+                    locations.AddLocation(reply.definitionLocation);
+                    locations.GotoPreviousLocation(GetCurrentLocation());
+                }
+                else
+                {
+                    throw Exception(reply.error);
+                }
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
         private void SaveClick()
         {
             try
@@ -3368,6 +3525,125 @@ namespace cmcode
         {
             MessageBox.Show("Cmajor Code version " + Version(), "Info", null, MessageBoxType.MB_OK);
         }
+        private void CacheModuleClick()
+        {
+            try
+            {
+                if (solution.IsNull()) return;
+                TimePoint start = Now();
+                Cm.Ast.Project* project = null;
+                TabPage* tabPage = codeTabControl->SelectedTabPage();
+                if (tabPage != null)
+                {
+                    Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                    if (editor != null)
+                    {
+                        if (editor is Cm.Views.CmajorEditor*)
+                        {
+                            Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                            TreeViewNodeData* data = solutionExplorerData->GetTreeViewNodeDataByKey(cmajorEditor->FilePath());
+                            if (data != null)
+                            {
+                                project = data->project;
+                            }
+                        }
+                    }
+                }
+                if (project == null)
+                {
+                    project = solution->ActiveProject();
+                }
+                if (project != null)
+                {
+                    CacheModuleRequest cacheModuleRequest;
+                    cacheModuleRequest.projectName = ToUtf8(project->Name());
+                    cacheModuleRequest.projectFilePath = project->FilePath();
+                    cacheModuleRequest.backend = GetBackend();
+                    cacheModuleRequest.config = GetConfig();
+                    GetBuildService().ProcessCacheModuleRequest(cacheModuleRequest);
+                }
+                TimePoint end = Now();
+                Duration dur = end - start;
+                MessageBox.Show(ToString(dur.Milliseconds()));
+            }
+            catch (const Exception& ex)
+            {
+                MessageBox.Show(ex.Message(), "Error", null, cast<MessageBoxType>(MessageBoxType.MB_OK | MessageBoxType.MB_ICONSTOP));
+                LogException(ex);
+            }
+        }
+        private bool GetIdentifierSourceLocationAt(const Point& loc, TextView* textView, string& identifier, SourceLocation& sourceLocation)
+        {
+            int line = 0;
+            int column = 0;
+            textView->GetLineColumn(loc, line, column);
+            if (line >= 1 && line <= textView->Lines().Count())
+            {
+                if (column >= 1 && column <= textView->GetLineLength(line))
+                {
+                    uchar c = textView->GetCharAt(line, column);
+                    if (IsIdStart(c) || IsIdCont(c))
+                    {
+                        while (column > 1 && (IsIdStart(c) || IsIdCont(c)))
+                        {
+                            --column;
+                            c = textView->GetCharAt(line, column);
+                        }
+                        if (IsWhiteSpace(c) || IsWordSeparator(c))
+                        {
+                            ++column;
+                        }
+                        c = textView->GetCharAt(line, column);
+                        ustring id;
+                        int scol = column;
+                        while (column <= textView->GetLineLength(line) && (IsIdStart(c) || IsIdCont(c)))
+                        {
+                            id.Append(c);
+                            ++column;
+                            if (column <= textView->GetLineLength(line))
+                            {
+                                c = textView->GetCharAt(line, column);
+                            }
+                        }
+                        int ecol = column;
+                        identifier = ToUtf8(id);
+                        sourceLocation.file = textView->FilePath();
+                        sourceLocation.line = ToString(line);
+                        sourceLocation.scol = ToString(scol);
+                        sourceLocation.ecol = ToString(ecol);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        private nothrow Cm.Ast.Project* GetCurrentProject() const
+        {
+            if (solution.IsNull()) return null;
+            Cm.Ast.Project* project = null;
+            TabPage* tabPage = codeTabControl->SelectedTabPage();
+            if (tabPage != null)
+            {
+                Cm.Views.Editor* editor = GetEditorByTabPage(tabPage);
+                if (editor != null)
+                {
+                    if (editor is Cm.Views.CmajorEditor*)
+                    {
+                        Cm.Views.CmajorEditor* cmajorEditor = cast<Cm.Views.CmajorEditor*>(editor);
+                        TreeViewNodeData* data = solutionExplorerData->GetTreeViewNodeDataByKey(cmajorEditor->FilePath());
+                        if (data != null)
+                        {
+                            project = data->project;
+                        }
+                    }
+                }
+            }
+            if (project == null)
+            {
+                project = solution->ActiveProject();
+            }
+            return project;
+        }
         private void SourceCodeViewRightClick(RightClickEventArgs& args)
         {
             try
@@ -3377,6 +3653,18 @@ namespace cmcode
                 {
                     Cm.Views.CmajorSourceCodeView* sourceCodeView = cast<Cm.Views.CmajorSourceCodeView*>(control);
                     UniquePtr<ContextMenu> contextMenu(new ContextMenu());
+                    string identifier;
+                    SourceLocation sourceLocation;
+                    if (GetIdentifierSourceLocationAt(args.location, sourceCodeView, identifier, sourceLocation))
+                    {
+                        MenuItem* gotoDefinitionMenuItem = new MenuItem("Goto Definition");
+                        Cm.Ast.Project* project = GetCurrentProject();
+                        if (project == null)
+                        {
+                            throw Exception("current project not deduced");
+                        }
+                        contextMenu->AddMenuItemAction(gotoDefinitionMenuItem, new GotoDefinitionAction(this, project, identifier, sourceLocation));
+                    }
                     if (Debugging())
                     {
                         MenuItem* runToCursorMenuItem = new MenuItem("Run To Cursor");
@@ -3931,6 +4219,8 @@ namespace cmcode
         private MenuItem* gotoLineMenuItem;
         private MenuItem* searchMenuItem;
 
+        private ToolButton* prevToolButton;
+        private ToolButton* nextToolButton;
         private ToolButton* saveToolButton;
         private ToolButton* saveAllToolButton;
         private ToolButton* llvmToolButton;
@@ -3962,6 +4252,7 @@ namespace cmcode
         private ustring clipboardData;
         private int pid;
         private bool disableBuildServerToolButton;
+        private LocationList locations;
     }
 }
 

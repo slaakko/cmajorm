@@ -338,6 +338,7 @@ namespace System.Windows
             SetContentChanged();
             SetChanged();
             SetCaretLineCol(1, 1 + LineNumberFieldLength());
+            OnContentLocationChanged();
             Invalidate();
             update = true;
         }
@@ -545,6 +546,7 @@ namespace System.Windows
                     SetCaretLocation();
                     ShowCaret();
                 }
+                OnContentLocationChanged();
             }
             TextRenderingHint prevRenderingHint = graphics.GetTextRenderingHint();
             graphics.SetTextRenderingHintChecked(TextRenderingHint.clearTypeGridFit);
@@ -2426,6 +2428,14 @@ namespace System.Windows
                 Invalidate();
             }
         }
+        public nothrow void SetFilePath(const string& filePath_)
+        {
+            filePath = filePath_;
+        }
+        public nothrow const string& FilePath() const
+        {
+            return filePath;
+        }
         private Flags flags;
         private List<ustring> lines;
         private List<int> lineStartIndeces;
@@ -2470,6 +2480,7 @@ namespace System.Windows
         private System.Windows.Color selectionBackgroundColor;
         private EditCommandList editCommandList;
         private int indentSize;
+        private string filePath;
     }
 
     public nothrow ustring TrimEnd(const ustring& line)

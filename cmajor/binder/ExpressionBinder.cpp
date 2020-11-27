@@ -312,6 +312,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             {
                 symbolTable.MapSymbol(idNode, classTypeSymbol);
             }
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, classTypeSymbol);
+            }
             break;
         }
         case SymbolType::classGroupTypeSymbol: 
@@ -323,6 +327,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             {
                 symbolTable.MapSymbol(idNode, classTypeSymbol);
             }
+            if (idNode && classTypeSymbol)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, classTypeSymbol);
+            }
             break;
         }
         case SymbolType::interfaceTypeSymbol:
@@ -332,6 +340,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
             {
                 symbolTable.MapSymbol(idNode, interfaceTypeSymbol);
+            }
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, interfaceTypeSymbol);
             }
             break;
         }
@@ -344,6 +356,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             {
                 symbolTable.MapSymbol(idNode, delegateTypeSymbol);
             }
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, delegateTypeSymbol);
+            }
             break;
         }
         case SymbolType::classDelegateTypeSymbol:
@@ -355,6 +371,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             {
                 symbolTable.MapSymbol(idNode, classDelegateTypeSymbol);
             }
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, classDelegateTypeSymbol);
+            }
             break;
         }
         case SymbolType::typedefSymbol:
@@ -365,6 +385,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
             {
                 symbolTable.MapSymbol(idNode, typedefSymbol);
+            }
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, typedefSymbol);
             }
             break;
         }
@@ -379,6 +403,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             ParameterSymbol* parameterSymbol = static_cast<ParameterSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), parameterSymbol);
             expression.reset(new BoundParameter(module, span, parameterSymbol));
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, parameterSymbol);
+            }
             break;
         }
         case SymbolType::localVariableSymbol:
@@ -386,6 +414,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             LocalVariableSymbol* localVariableSymbol = static_cast<LocalVariableSymbol*>(symbol);
             CheckAccess(boundFunction->GetFunctionSymbol(), localVariableSymbol);
             expression.reset(new BoundLocalVariable(module, span, localVariableSymbol));
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, localVariableSymbol);
+            }
             break;
         }
         case SymbolType::memberVariableSymbol:
@@ -394,6 +426,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
             {
                 symbolTable.MapSymbol(idNode, memberVariableSymbol);
+            }
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, memberVariableSymbol);
             }
             FunctionSymbol* currentFuctionSymbol = boundFunction->GetFunctionSymbol();
             CheckAccess(currentFuctionSymbol, memberVariableSymbol);
@@ -465,6 +501,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             {
                 symbolTable.MapSymbol(idNode, constantSymbol);
             }
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, constantSymbol);
+            }
             break;
         }
         case SymbolType::enumTypeSymbol:
@@ -476,6 +516,10 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             {
                 symbolTable.MapSymbol(idNode, enumTypeSymbol);
             }
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, enumTypeSymbol);
+            }
             break;
         }
         case SymbolType::enumConstantSymbol:
@@ -486,16 +530,25 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             {
                 symbolTable.MapSymbol(idNode, enumConstantSymbol);
             }
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, enumConstantSymbol);
+            }
             break;
         }
         case SymbolType::namespaceSymbol:
         {
             NamespaceSymbol* ns = static_cast<NamespaceSymbol*>(symbol);
             expression.reset(new BoundNamespaceExpression(module, span, ns));
+            if (idNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, ns);
+            }
             break;
         }
         case SymbolType::globalVariableGroupSymbol:
         {
+            GlobalVariableSymbol* globalVariableSymbol = nullptr;
             GlobalVariableGroupSymbol* globalVariableGroup = static_cast<GlobalVariableGroupSymbol*>(symbol);
             std::vector<GlobalVariableSymbol*> globalVariables;
             globalVariableGroup->CollectGlobalVariables(boundCompileUnit.GetCompileUnitNode()->FilePath(), globalVariables);
@@ -505,7 +558,7 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             }
             else if (globalVariables.size() == 1)
             {
-                GlobalVariableSymbol* globalVariableSymbol = globalVariables.front();
+                globalVariableSymbol = globalVariables.front();
                 if (globalVariableSymbol->Access() == SymbolAccess::private_ && globalVariableSymbol->CompileUnitFilePath() != boundCompileUnit.GetCompileUnitNode()->FilePath())
                 {
                     throw Exception(module, "global variable group '" + ToUtf8(globalVariableGroup->Name()) +
@@ -535,6 +588,13 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
                 }
                 throw Exception(module, "global variable group '" + ToUtf8(globalVariableGroup->Name()) +
                     "' does not contain a public or internal global variable with the given name but do contain private global variables defined in the following compile units: " + compileUnits, span);
+            }
+            if (idNode)
+            {
+                if (globalVariableSymbol)
+                {
+                    symbolTable.MapIdentifierToSymbolDefinition(idNode, globalVariableSymbol);
+                }
             }
             break;
         }
@@ -757,6 +817,10 @@ void ExpressionBinder::Visit(TemplateIdNode& templateIdNode)
         {
             ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(typeSymbol);
             typeSymbol = classGroup->GetClass(arity);
+            if (templateIdNode.Primary()->GetNodeType() == sngcm::ast::NodeType::identifierNode)
+            {
+                symbolTable.MapIdentifierToSymbolDefinition(static_cast<sngcm::ast::IdentifierNode*>(templateIdNode.Primary()), typeSymbol);
+            }
             expression.reset(new BoundTypeExpression(module, span, typeSymbol));
         }
     }
@@ -890,6 +954,7 @@ void ExpressionBinder::Visit(DotNode& dotNode)
             {
                 symbolTable.MapSymbol(idNode, typeSymbol);
             }
+            symbolTable.MapIdentifierToSymbolDefinition(idNode, typeSymbol);
             if (!typeSymbol)
             {
                 throw Exception(module, "ordinary class not found from class group '" + ToUtf8(classGroupTypeSymbol->FullName()) + "'", span, classGroupTypeSymbol->GetSpan());
@@ -2181,6 +2246,10 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
     if (GetGlobalFlag(GlobalFlags::cmdoc) && functionSymbol->HasSource())
     {
         symbolTable.MapInvoke(invokeId, functionSymbol);
+    }
+    if (functionSymbol->HasSource())
+    {
+        symbolTable.MapIdentifierToSymbolDefinition(invokeId, functionSymbol);
     }
 }
 

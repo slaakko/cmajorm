@@ -25,6 +25,7 @@ public:
     const std::u32string& Str() const { return identifier; }
     void SetStr(const std::u32string& str) { identifier = str; }
     std::string ToString() const override;
+    bool IsInternal() const;
 private:
     std::u32string identifier;
 };

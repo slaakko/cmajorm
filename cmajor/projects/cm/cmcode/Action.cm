@@ -318,6 +318,23 @@ namespace cmcode
         private string filePath;
     }
 
+    public class GotoDefinitionAction : ClickAction
+    {
+        public nothrow GotoDefinitionAction(MainWindow* mainWindow_, Cm.Ast.Project* project_, const string& identifier_, const SourceLocation& sourceLocation_) :
+            mainWindow(mainWindow_), project(project_), identifier(identifier_), sourceLocation(sourceLocation_)
+        {
+        }
+        public override void Execute()
+        {
+            mainWindow->HideContextMenu();
+            mainWindow->GotoDefinition(project, identifier, sourceLocation);
+        }
+        private MainWindow* mainWindow;
+        private Cm.Ast.Project* project;
+        private string identifier;
+        private SourceLocation sourceLocation;
+    }
+
     public class RunToCursorAction : ClickAction
     {
         public nothrow RunToCursorAction(MainWindow* mainWindow_, Cm.Views.CmajorSourceCodeView* sourceCodeView_) :

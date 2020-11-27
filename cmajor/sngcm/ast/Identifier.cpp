@@ -70,6 +70,11 @@ std::string IdentifierNode::ToString() const
     return ToUtf8(identifier);
 }
 
+bool IdentifierNode::IsInternal() const
+{
+    return !identifier.empty() && identifier.front() == '@';
+}
+
 CursorIdNode::CursorIdNode(const Span& span_) : IdentifierNode(span_, NodeType::cursorIdNode)
 {
 }
