@@ -41,17 +41,21 @@ public:
     void Visit(MultiParamConstraintNode& multiParamConstraintNode) override;
     void Visit(IdentifierNode& identifierNode) override;
     void Visit(DotNode& dotNode) override;
+    IdentifierNode* PrevId() const { return prevId; }
 private:
     ContainerScope* containerScope;
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
     ConceptGroupSymbol* conceptGroup;
     NamespaceSymbol* ns;
+    IdentifierNode* prevId;
 };
 
 ConstraintBinderVisitor::ConstraintBinderVisitor(ContainerScope* containerScope_, BoundCompileUnit& boundCompileUnit_) :
-    symbolTable(boundCompileUnit_.GetSymbolTable()), containerScope(containerScope_), boundCompileUnit(boundCompileUnit_), conceptGroup(nullptr), ns(nullptr)
+    symbolTable(boundCompileUnit_.GetSymbolTable()), containerScope(containerScope_), boundCompileUnit(boundCompileUnit_), conceptGroup(nullptr), ns(nullptr), 
+    prevId(boundCompileUnit.GetLatestIdentifier())
 {
+    boundCompileUnit.SetLatestIdentifier(nullptr);
 }
 
 void ConstraintBinderVisitor::Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
@@ -98,7 +102,11 @@ void ConstraintBinderVisitor::Visit(ConceptIdNode& conceptIdNode)
         ConceptSymbol* conceptSymbol = conceptGroup->GetConcept(n);
         if (conceptSymbol)
         {
-            symbolTable.MapSymbol(symbolTable.GetLatestIdentifier(), conceptSymbol);
+            if (boundCompileUnit.GetLatestIdentifier())
+            {
+                symbolTable.MapSymbol(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
+                symbolTable.MapIdentifierToSymbolDefinition(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
+            }
         }
     }
     int n = conceptIdNode.TypeParameters().Count();
@@ -117,7 +125,11 @@ void ConstraintBinderVisitor::Visit(IsConstraintNode& isConstraintNode)
         ConceptSymbol* conceptSymbol = conceptGroup->GetConcept(1);
         if (conceptSymbol)
         {
-            symbolTable.MapSymbol(symbolTable.GetLatestIdentifier(), conceptSymbol);
+            if (boundCompileUnit.GetLatestIdentifier())
+            {
+                symbolTable.MapSymbol(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
+                symbolTable.MapIdentifierToSymbolDefinition(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
+            }
         }
     }
 }
@@ -131,7 +143,11 @@ void ConstraintBinderVisitor::Visit(MultiParamConstraintNode& multiParamConstrai
         ConceptSymbol* conceptSymbol = conceptGroup->GetConcept(n);
         if (conceptSymbol)
         {
-            symbolTable.MapSymbol(symbolTable.GetLatestIdentifier(), conceptSymbol);
+            if (boundCompileUnit.GetLatestIdentifier())
+            {
+                symbolTable.MapSymbol(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
+                symbolTable.MapIdentifierToSymbolDefinition(boundCompileUnit.GetLatestIdentifier(), conceptSymbol);
+            }
         }
     }
     int n = multiParamConstraintNode.TypeExprs().Count();
@@ -145,7 +161,7 @@ void ConstraintBinderVisitor::Visit(IdentifierNode& identifierNode)
 {
     ns = nullptr;
     conceptGroup = nullptr;
-    symbolTable.SetLatestIdentifier(&identifierNode);
+    boundCompileUnit.SetLatestIdentifier(&identifierNode);
     const std::u32string& name = identifierNode.Str();
     Symbol* symbol = containerScope->Lookup(name, ScopeLookup::this_and_base_and_parent);
     if (!symbol)
@@ -173,6 +189,7 @@ void ConstraintBinderVisitor::Visit(IdentifierNode& identifierNode)
                 symbol = boundTemplateParam->GetType();
             }
             symbolTable.MapSymbol(&identifierNode, symbol);
+            symbolTable.MapIdentifierToSymbolDefinition(&identifierNode, symbol);
         }
     }
 }
@@ -182,7 +199,7 @@ void ConstraintBinderVisitor::Visit(DotNode& dotNode)
     conceptGroup = nullptr;
     ns = nullptr;
     dotNode.Subject()->Accept(*this);
-    symbolTable.SetLatestIdentifier(dotNode.MemberId());
+    boundCompileUnit.SetLatestIdentifier(dotNode.MemberId());
     if (ns)
     {
         Symbol* symbol = ns->GetContainerScope()->Lookup(dotNode.MemberId()->Str());
@@ -204,6 +221,7 @@ void BindConstraintSymbols(Node* node, ContainerScope* containerScope, BoundComp
 {
     ConstraintBinderVisitor visitor(containerScope, boundCompileUnit);
     node->Accept(visitor);
+    boundCompileUnit.SetLatestIdentifier(visitor.PrevId());
 }
 
 } } // namespace cmajor::cmdoclib

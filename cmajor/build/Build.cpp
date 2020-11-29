@@ -346,7 +346,7 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSources(Module* module, const
     try
     {
         int numCores = std::thread::hardware_concurrency();
-        if (numCores == 0 || sourceFilePaths.size() < numCores || GetGlobalFlag(GlobalFlags::debugParsing))
+        if (numCores == 0 || sourceFilePaths.size() == 1 || GetGlobalFlag(GlobalFlags::debugParsing))
         {
             return ParseSourcesInMainThread(module, sourceFilePaths, stop);
         }

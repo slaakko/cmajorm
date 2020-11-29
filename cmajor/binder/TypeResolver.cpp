@@ -229,6 +229,16 @@ void TypeResolver::ResolveSymbol(Node& node, IdentifierNode* idNode, Symbol* sym
             }
             symbolTable.MapSymbol(idNode, cmdocType);
         }
+        TypeSymbol* definitionType = type;
+        if (type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
+        {
+            ClassGroupTypeSymbol* group = static_cast<ClassGroupTypeSymbol*>(type);
+            if (group->GetClass(0))
+            {
+                definitionType = group->GetClass(0);
+            }
+        }
+        symbolTable.MapIdentifierToSymbolDefinition(idNode, definitionType);
     }
     else
     {
@@ -251,6 +261,7 @@ void TypeResolver::ResolveSymbol(Node& node, IdentifierNode* idNode, Symbol* sym
                 {
                     symbolTable.MapSymbol(idNode, typedefSymbol);
                 }
+                symbolTable.MapIdentifierToSymbolDefinition(idNode, typedefSymbol);
                 break;
             }
             case SymbolType::boundTemplateParameterSymbol:
@@ -277,7 +288,7 @@ void TypeResolver::ResolveSymbol(Node& node, IdentifierNode* idNode, Symbol* sym
 
 void TypeResolver::Visit(IdentifierNode& identifierNode)
 {
-    symbolTable.SetLatestIdentifier(&identifierNode);
+    boundCompileUnit.SetLatestIdentifier(&identifierNode);
     std::u32string name = identifierNode.Str();
     Symbol* symbol = containerScope->Lookup(name, ScopeLookup::this_and_base_and_parent);
     if (!symbol)
@@ -303,7 +314,8 @@ void TypeResolver::Visit(IdentifierNode& identifierNode)
 
 void TypeResolver::Visit(TemplateIdNode& templateIdNode)
 {
-    IdentifierNode* prevId = symbolTable.GetLatestIdentifier();
+    IdentifierNode* prevId = boundCompileUnit.GetLatestIdentifier();
+    boundCompileUnit.SetLatestIdentifier(nullptr);
     int arity = templateIdNode.TemplateArguments().Count();
     TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope, TypeResolverFlags::resolveClassGroup, currentClass);
     if (primaryTemplateType->GetSymbolType() == SymbolType::classGroupTypeSymbol)
@@ -328,11 +340,15 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
     {
         throw Exception(module, "class template expected", templateIdNode.Primary()->GetSpan());
     }
-    IdentifierNode* idNode = symbolTable.GetLatestIdentifier();
-    symbolTable.SetLatestIdentifier(prevId);
+    IdentifierNode* idNode = boundCompileUnit.GetLatestIdentifier();
+    boundCompileUnit.SetLatestIdentifier(prevId);
     if (GetGlobalFlag(GlobalFlags::cmdoc))
     {
         symbolTable.MapSymbol(idNode, classTemplate);
+    }
+    if (idNode)
+    {
+        symbolTable.MapIdentifierToSymbolDefinition(idNode, classTemplate);
     }
     if (classTemplate->IsProject() && !classTemplate->IsBound())
     {
@@ -347,15 +363,20 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
     int n = arity;
     for (int i = 0; i < n; ++i)
     {
-        IdentifierNode* prevId = symbolTable.GetLatestIdentifier();
+        IdentifierNode* prevId = boundCompileUnit.GetLatestIdentifier();
+        boundCompileUnit.SetLatestIdentifier(nullptr);
         TypeSymbol* templateArgumentType = ResolveType(templateIdNode.TemplateArguments()[i], boundCompileUnit, containerScope, currentClass);
         templateArgumentTypes.push_back(templateArgumentType);
-        IdentifierNode* idNode = symbolTable.GetLatestIdentifier();
+        IdentifierNode* idNode = boundCompileUnit.GetLatestIdentifier();
         if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
         {
             symbolTable.MapSymbol(idNode, templateArgumentType);
         }
-        symbolTable.SetLatestIdentifier(prevId);
+        if (idNode)
+        {
+            symbolTable.MapIdentifierToSymbolDefinition(idNode, templateArgumentType);
+        }
+        boundCompileUnit.SetLatestIdentifier(prevId);
     }
     int m = classTemplate->TemplateParameters().size();
     if (n < m)

@@ -271,7 +271,7 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
     hasGotos(false), operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), 
     constExprFunctionRepository(*this), conversionTable(nullptr), bindingTypes(false), compileUnitIndex(-2), immutable(false), nextExitEntryIndex(0),
     systemRuntimeUnwindInfoSymbol(nullptr), systemRuntimeAddCompileUnitFunctionSymbol(nullptr), pushCompileUnitUnwindInfoInitFunctionSymbol(nullptr),
-    initUnwindInfoDelegateType(nullptr), globalInitFunctionSymbol(nullptr)
+    initUnwindInfoDelegateType(nullptr), globalInitFunctionSymbol(nullptr), latestIdentifierNode(nullptr)
 {
     if (compileUnitNode)
     {

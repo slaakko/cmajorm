@@ -65,7 +65,7 @@ bool operator!=(const ArrayKey& left, const ArrayKey& right)
 
 SymbolTable::SymbolTable(Module* module_) : 
     module(module_), globalNs(Span(), std::u32string()), currentCompileUnit(nullptr), container(&globalNs), currentClass(nullptr), currentInterface(nullptr), 
-    mainFunctionSymbol(nullptr), currentFunctionSymbol(nullptr), parameterIndex(0), declarationBlockIndex(0), conversionTable(module), latestIdentifierNode(nullptr), 
+    mainFunctionSymbol(nullptr), currentFunctionSymbol(nullptr), parameterIndex(0), declarationBlockIndex(0), conversionTable(module), 
     numSpecializationsNew(0), numSpecializationsCopied(0), createdFunctionSymbol(nullptr)
 {
     globalNs.SetModule(module);
@@ -1651,8 +1651,11 @@ void SymbolTable::MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode
     if (identifierSymbolDefinitionMap.find(identifierNode) != identifierSymbolDefinitionMap.cend()) return;
     identifierSymbolDefinitionMap[identifierNode] = symbol;
     SymbolLocation identifierLocation = ToSymbolLocation(identifierNode->GetSpan(), GetModule());
-    SymbolLocation symbolLocation = symbol->GetLocation(GetModule());
-    symbolDefinitionMap[identifierLocation] = symbolLocation;
+    SymbolLocation definitionLocation;
+    if (symbol->GetLocation(GetModule(), definitionLocation))
+    {
+        symbolDefinitionMap[identifierLocation] = definitionLocation;
+    }
 }
 
 SymbolLocation* SymbolTable::GetDefinitionLocation(const SymbolLocation& identifierLocation) 

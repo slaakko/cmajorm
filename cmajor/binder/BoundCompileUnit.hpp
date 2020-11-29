@@ -120,9 +120,12 @@ public:
     void SetCodeGenerated(FunctionSymbol* functionSymbol);
     bool CanReuse(FunctionSymbol* functionSymbol) const;
     void SetCanReuse(FunctionSymbol* functionSymbol);
+    void SetLatestIdentifier(IdentifierNode* latestIdentifierNode_) { latestIdentifierNode = latestIdentifierNode_; }
+    IdentifierNode* GetLatestIdentifier() { return latestIdentifierNode; }
 private:
     Module& module;
     SymbolTable& symbolTable;
+    IdentifierNode* latestIdentifierNode;
     CompileUnitNode* compileUnitNode;
     AttributeBinder* attributeBinder;
     std::stack<BoundNamespace*> namespaceStack;

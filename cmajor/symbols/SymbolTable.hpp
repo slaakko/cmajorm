@@ -205,8 +205,6 @@ public:
     std::unique_ptr<sngxml::dom::Document> ToDomDocument();
     void MapInvoke(IdentifierNode* invokeId, FunctionSymbol* functionSymbol);
     FunctionSymbol* GetInvoke(IdentifierNode* invokeId) const;
-    void SetLatestIdentifier(IdentifierNode* latestIdentifierNode_) { latestIdentifierNode = latestIdentifierNode_; }
-    IdentifierNode* GetLatestIdentifier() { return latestIdentifierNode; }
     void MapSymbol(Node* node, Symbol* symbol);
     Symbol* GetMappedSymbol(Node* node) const;
     void MapIdentifierToSymbolDefinition(IdentifierNode* identifierNode, Symbol* symbol);
@@ -258,7 +256,6 @@ private:
     std::unordered_set<ClassTypeSymbol*> polymorphicClasses;
     std::unordered_set<ClassTypeSymbol*> classesHavingStaticConstructor;
     std::unordered_set<std::u32string> jsonClasses;
-    IdentifierNode* latestIdentifierNode;
     int numSpecializationsCopied;
     int numSpecializationsNew;
     int GetNextDeclarationBlockIndex() { return declarationBlockIndex++; }

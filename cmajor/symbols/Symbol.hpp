@@ -232,7 +232,7 @@ public:
     virtual void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const {}
     virtual bool HasProjectMembers() const { return false; }
     virtual const char* ClassName() const { return "Symbol"; }
-    SymbolLocation GetLocation(Module* idNodeModule) const;
+    bool GetLocation(Module* idNodeModule, SymbolLocation& definitionLocation) const;
 private:
     SymbolType symbolType;
     Span span;

@@ -782,7 +782,7 @@ void ExpressionBinder::Visit(UuidLiteralNode& uuidLiteralNode)
 
 void ExpressionBinder::Visit(IdentifierNode& identifierNode)
 {
-    symbolTable.SetLatestIdentifier(&identifierNode);
+    boundCompileUnit.SetLatestIdentifier(&identifierNode);
     std::u32string name = identifierNode.Str();
     Symbol* symbol = containerScope->Lookup(name, ScopeLookup::this_and_base_and_parent);
     if (!symbol)
@@ -941,8 +941,8 @@ void ExpressionBinder::Visit(DotNode& dotNode)
 {
     ContainerScope* prevContainerScope = containerScope;
     expression = BindExpression(dotNode.Subject(), boundCompileUnit, boundFunction, containerScope, statementBinder, false, true, true, false);
-    IdentifierNode* idNode = symbolTable.GetLatestIdentifier();
-    symbolTable.SetLatestIdentifier(dotNode.MemberId());
+    IdentifierNode* idNode = boundCompileUnit.GetLatestIdentifier();
+    boundCompileUnit.SetLatestIdentifier(dotNode.MemberId());
     if (expression->GetBoundNodeType() == BoundNodeType::boundTypeExpression)
     {
         TypeSymbol* typeSymbol = expression->GetType();
@@ -1327,7 +1327,7 @@ void ExpressionBinder::Visit(ArrowNode& arrowNode)
     {
         expression->SetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
     }
-    symbolTable.SetLatestIdentifier(arrowNode.MemberId());
+    boundCompileUnit.SetLatestIdentifier(arrowNode.MemberId());
 }
 
 void ExpressionBinder::Visit(DisjunctionNode& disjunctionNode) 
@@ -1758,10 +1758,11 @@ void ExpressionBinder::Visit(IndexingNode& indexingNode)
 
 void ExpressionBinder::Visit(InvokeNode& invokeNode) 
 {
-    IdentifierNode* prevIdentifier = symbolTable.GetLatestIdentifier();
+    IdentifierNode* prevIdentifier = boundCompileUnit.GetLatestIdentifier();
+    boundCompileUnit.SetLatestIdentifier(nullptr);
     invokeNode.Subject()->Accept(*this);
-    IdentifierNode* invokeId = symbolTable.GetLatestIdentifier();
-    symbolTable.SetLatestIdentifier(prevIdentifier);
+    IdentifierNode* invokeId = boundCompileUnit.GetLatestIdentifier();
+    boundCompileUnit.SetLatestIdentifier(prevIdentifier);
     bool argIsExplicitThisOrBasePtr = expression->GetFlag(BoundExpressionFlags::argIsExplicitThisOrBasePtr);
     std::vector<std::unique_ptr<BoundExpression>> arguments;
     std::vector<FunctionScopeLookup> functionScopeLookups;

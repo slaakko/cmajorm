@@ -49,6 +49,7 @@ void ConceptIdResolver::Visit(ConceptIdNode& conceptIdNode)
     {
         int arity = conceptIdNode.Arity();
         conceptSymbol = conceptGroup->GetConcept(arity);
+        boundCompileUnit.GetSymbolTable().MapIdentifierToSymbolDefinition(conceptIdNode.Id(), conceptSymbol);
     }
     else
     {

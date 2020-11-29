@@ -995,7 +995,7 @@ std::unique_ptr<sngxml::dom::Element> Symbol::CreateDomElement(TypeMap& typeMap)
     return std::unique_ptr<sngxml::dom::Element>(new sngxml::dom::Element(ToUtf32(ClassName())));
 }
 
-SymbolLocation Symbol::GetLocation(Module* idNodeModule) const
+bool Symbol::GetLocation(Module* idNodeModule, SymbolLocation& definitionLocation) const
 {
     Span s = GetSpan();
     std::string sourceFilePath = module->GetFilePath(s.fileIndex);
@@ -1005,12 +1005,13 @@ SymbolLocation Symbol::GetLocation(Module* idNodeModule) const
         s = Span(fileIndex, span.line, span.start, span.end);
         sourceFilePath = module->GetFilePath(fileIndex);
     }
-    Assert(!sourceFilePath.empty(), "file not found");
+    if (sourceFilePath.empty()) return false;
     int32_t idModuleFileIndex = idNodeModule->GetFileIndexForFilePath(sourceFilePath);
     int32_t scol = 0;
     int32_t ecol = 0;
     module->GetColumns(s, scol, ecol);
-    return SymbolLocation(idModuleFileIndex, span.line, scol, ecol);
+    definitionLocation = SymbolLocation(idModuleFileIndex, span.line, scol, ecol);
+    return true;
 }
 
 SymbolCreator::~SymbolCreator()
